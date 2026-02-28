@@ -30,8 +30,20 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
-.env*
+# env files — never commit secrets
+.env.local
+.env.*.local
+
+# these template files ARE committed (no secrets, just public keys)
+!.env.example
+!.env.staging
+!.env.production
+
+# claude code
+.claude/
+
+# supabase cli temp
+supabase/.temp/
 
 # vercel
 .vercel

@@ -1,0 +1,65 @@
+import { z } from 'zod/v4'
+
+export const profileSchema = z.object({
+  first_name: z.string().min(1, 'First name is required').max(100),
+  last_name: z.string().min(1, 'Last name is required').max(100),
+  email: z.email('Invalid email address'),
+  phone: z.string().max(30).optional(),
+})
+
+export type ProfileFormValues = z.infer<typeof profileSchema>
+
+export const firmSchema = z.object({
+  name: z.string().min(1, 'Firm name is required').max(255),
+  primary_color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Invalid colour'),
+  secondary_color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Invalid colour'),
+  accent_color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Invalid colour'),
+  timezone: z.string(),
+  currency: z.string().length(3),
+  date_format: z.string(),
+})
+
+export type FirmFormValues = z.infer<typeof firmSchema>
+
+export const inviteUserSchema = z.object({
+  email: z.email('Invalid email address'),
+  first_name: z.string().min(1, 'First name is required').max(100),
+  last_name: z.string().min(1, 'Last name is required').max(100),
+  role_id: z.string().uuid('Please select a role'),
+})
+
+export type InviteUserFormValues = z.infer<typeof inviteUserSchema>
+
+export const roleSchema = z.object({
+  name: z.string().min(1, 'Role name is required').max(100),
+  description: z.string().optional(),
+  permissions: z.record(z.string(), z.record(z.string(), z.boolean())),
+})
+
+export type RoleFormValues = z.infer<typeof roleSchema>
+
+export const practiceAreaSchema = z.object({
+  name: z.string().min(1, 'Practice area name is required').max(100),
+  color: z.string().default('#6366f1'),
+  default_pipeline_id: z.string().uuid().optional().nullable(),
+})
+
+export type PracticeAreaFormValues = z.infer<typeof practiceAreaSchema>
+
+export const customFieldSchema = z.object({
+  entity_type: z.enum(['contact', 'matter', 'lead']),
+  field_key: z.string().min(1).max(100).regex(/^[a-z_][a-z0-9_]*$/, 'Must be lowercase with underscores'),
+  field_label: z.string().min(1, 'Label is required').max(255),
+  field_type: z.enum([
+    'text', 'number', 'decimal', 'date', 'datetime', 'boolean',
+    'select', 'multi_select', 'email', 'phone', 'url', 'textarea', 'currency', 'file'
+  ]),
+  options: z.array(z.object({ label: z.string(), value: z.string() })).optional(),
+  is_required: z.boolean().default(false),
+  default_value: z.string().optional(),
+  practice_area_id: z.string().uuid().optional().nullable(),
+  show_on_card: z.boolean().default(false),
+  show_in_table: z.boolean().default(false),
+})
+
+export type CustomFieldFormValues = z.infer<typeof customFieldSchema>

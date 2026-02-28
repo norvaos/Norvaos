@@ -1,0 +1,195 @@
+# =============================================================================
+# LexCRM CI/CD Pipeline
+# =============================================================================
+# Triggers:
+#   - Pull requests to main/develop → runs lint + type-check + build
+#   - Push to main → deploys to staging, then production (with approval)
+#   - Tags (v*) → creates GitHub Release
+# =============================================================================
+
+name: CI/CD
+
+on:
+  pull_request:
+    branches: [main, develop]
+  push:
+    branches: [main]
+    tags: ['v*']
+
+env:
+  NODE_VERSION: '20'
+  PNPM_VERSION: '10'
+
+# Cancel in-progress runs for the same branch/PR
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ─── Lint, Type-check, Build ─────────────────────────────────────
+  build:
+    name: Build & Verify
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Type Check & Build
+        run: pnpm build
+        env:
+          # Provide dummy env vars for build (not real secrets)
+          NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder_anon_key
+          NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: pk_test_placeholder
+          NEXT_PUBLIC_APP_URL: https://app.lexcrm.com
+
+      - name: Verify version API
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "Build version: $VERSION"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+        id: version
+
+  # ─── Deploy to Staging ───────────────────────────────────────────
+  deploy-staging:
+    name: Deploy to Staging
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    environment:
+      name: staging
+      url: https://staging.lexcrm.com
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # ──────────────────────────────────────────────────────────
+      # Deploy to your platform of choice. Examples:
+      # ──────────────────────────────────────────────────────────
+      #
+      # OPTION A: Vercel (recommended for Next.js)
+      # - name: Deploy to Vercel (Staging)
+      #   uses: amondnet/vercel-action@v25
+      #   with:
+      #     vercel-token: ${{ secrets.VERCEL_TOKEN }}
+      #     vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+      #     vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+      #     vercel-args: '--env staging'
+      #
+      # OPTION B: AWS Amplify
+      # - name: Deploy to AWS Amplify
+      #   run: |
+      #     aws amplify start-deployment ...
+      #
+      # OPTION C: Docker + any cloud
+      # - name: Build Docker Image
+      #   run: docker build -t lexcrm:${{ github.sha }} .
+      # ──────────────────────────────────────────────────────────
+
+      - name: Staging deployment placeholder
+        run: |
+          echo "🚀 Deploy to staging environment"
+          echo "Configure your deployment platform in this step"
+          echo "Version: $(node -p "require('./package.json').version")"
+
+  # ─── Run Database Migrations (Staging) ───────────────────────────
+  migrate-staging:
+    name: Migrate Staging DB
+    needs: deploy-staging
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install pg
+        run: npm install pg
+
+      - name: Run migrations (staging)
+        run: node scripts/migrate.mjs --status
+        env:
+          SUPABASE_DB_URL: ${{ secrets.STAGING_DB_URL }}
+
+      # Uncomment when ready to auto-run migrations:
+      # - name: Apply pending migrations
+      #   run: node scripts/migrate.mjs
+      #   env:
+      #     SUPABASE_DB_URL: ${{ secrets.STAGING_DB_URL }}
+
+  # ─── Deploy to Production ────────────────────────────────────────
+  deploy-production:
+    name: Deploy to Production
+    needs: [deploy-staging, migrate-staging]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    environment:
+      name: production
+      url: https://app.lexcrm.com
+      # ⬆️ This creates a manual approval gate in GitHub.
+      # Go to Settings > Environments > production > add required reviewers
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Production deployment placeholder
+        run: |
+          echo "🚀 Deploy to production environment"
+          echo "Configure your deployment platform in this step"
+          echo "Version: $(node -p "require('./package.json').version")"
+
+  # ─── Create GitHub Release on Tag ────────────────────────────────
+  release:
+    name: Create Release
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Extract version from tag
+        id: tag
+        run: echo "version=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Extract changelog for this version
+        id: changelog
+        run: |
+          VERSION="${GITHUB_REF#refs/tags/v}"
+          # Extract the section for this version from CHANGELOG.md
+          NOTES=$(awk "/^## \[$VERSION\]/{flag=1; next} /^## \[/{flag=0} flag" CHANGELOG.md)
+          echo "notes<<EOF" >> $GITHUB_OUTPUT
+          echo "$NOTES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.tag.outputs.version }}
+          name: Release ${{ steps.tag.outputs.version }}
+          body: ${{ steps.changelog.outputs.notes }}
+          draft: false
+          prerelease: false

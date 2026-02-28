@@ -1,0 +1,355 @@
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { createClient } from '@/lib/supabase/client'
+import type { Database } from '@/lib/types/database'
+import { createTaskNotification } from '@/lib/queries/notifications'
+import { logAudit } from '@/lib/queries/audit-logs'
+import { toast } from 'sonner'
+
+type Task = Database['public']['Tables']['tasks']['Row']
+type TaskInsert = Database['public']['Tables']['tasks']['Insert']
+type TaskUpdate = Database['public']['Tables']['tasks']['Update']
+
+interface TaskListParams {
+  tenantId: string
+  page?: number
+  pageSize?: number
+  assignedTo?: string
+  matterId?: string
+  status?: string
+  priority?: string
+  sortBy?: string
+  sortDirection?: 'asc' | 'desc'
+}
+
+export const taskKeys = {
+  all: ['tasks'] as const,
+  lists: () => [...taskKeys.all, 'list'] as const,
+  list: (params: TaskListParams) => [...taskKeys.lists(), params] as const,
+  details: () => [...taskKeys.all, 'detail'] as const,
+  detail: (id: string) => [...taskKeys.details(), id] as const,
+  myTasks: (userId: string) => [...taskKeys.all, 'my', userId] as const,
+}
+
+export function useTasks(params: TaskListParams) {
+  const {
+    tenantId, page = 1, pageSize = 50, assignedTo, matterId,
+    status, priority, sortBy = 'due_date', sortDirection = 'asc',
+  } = params
+
+  return useQuery({
+    queryKey: taskKeys.list(params),
+    queryFn: async () => {
+      const supabase = createClient()
+      const from = (page - 1) * pageSize
+      const to = from + pageSize - 1
+
+      let query = supabase
+        .from('tasks')
+        .select('*', { count: 'exact' })
+        .eq('tenant_id', tenantId)
+
+      if (assignedTo) query = query.eq('assigned_to', assignedTo)
+      if (matterId) query = query.eq('matter_id', matterId)
+      if (status) query = query.eq('status', status)
+      if (priority) query = query.eq('priority', priority)
+
+      query = query.order(sortBy, { ascending: sortDirection === 'asc', nullsFirst: false }).range(from, to)
+
+      const { data, error, count } = await query
+
+      if (error) throw error
+
+      return {
+        tasks: data as Task[],
+        totalCount: count ?? 0,
+        page,
+        pageSize,
+        totalPages: Math.ceil((count ?? 0) / pageSize),
+      }
+    },
+    enabled: !!tenantId,
+  })
+}
+
+export function useMyTasks(tenantId: string, userId: string) {
+  return useQuery({
+    queryKey: taskKeys.myTasks(userId),
+    queryFn: async () => {
+      const supabase = createClient()
+
+      const { data, error } = await supabase
+        .from('tasks')
+        .select('*')
+        .eq('tenant_id', tenantId)
+        .eq('assigned_to', userId)
+        .in('status', ['not_started', 'working_on_it', 'stuck'])
+        .order('due_date', { ascending: true, nullsFirst: false })
+
+      if (error) throw error
+      return data as Task[]
+    },
+    enabled: !!tenantId && !!userId,
+  })
+}
+
+export function useTask(id: string) {
+  return useQuery({
+    queryKey: taskKeys.detail(id),
+    queryFn: async () => {
+      const supabase = createClient()
+      const { data, error } = await supabase
+        .from('tasks')
+        .select('*')
+        .eq('id', id)
+        .single()
+
+      if (error) throw error
+      return data as Task
+    },
+    enabled: !!id,
+  })
+}
+
+export function useCreateTask() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (task: TaskInsert) => {
+      const supabase = createClient()
+      const { data, error } = await supabase
+        .from('tasks')
+        .insert(task)
+        .select()
+        .single()
+
+      if (error) throw error
+      return data as Task
+    },
+    onSuccess: (task) => {
+      queryClient.invalidateQueries({ queryKey: taskKeys.lists() })
+      queryClient.invalidateQueries({ queryKey: taskKeys.all })
+      toast.success('Task created successfully')
+
+      logAudit({
+        tenantId: task.tenant_id,
+        userId: task.created_by ?? null,
+        entityType: 'task',
+        entityId: task.id,
+        action: 'created',
+        changes: { title: task.title, status: task.status, priority: task.priority },
+        metadata: { matter_id: task.matter_id, contact_id: task.contact_id },
+      })
+
+      // Notify the assignee (if different from creator)
+      if (task.assigned_to && task.assigned_to !== task.created_by) {
+        createTaskNotification({
+          tenantId: task.tenant_id,
+          recipientId: task.assigned_to,
+          title: `New task assigned: ${task.title}`,
+          message: task.description?.slice(0, 100) ?? undefined,
+          taskId: task.id,
+          type: 'task_assigned',
+        }).catch(() => {}) // Don't fail if notification fails
+      }
+    },
+    onError: () => {
+      toast.error('Failed to create task')
+    },
+  })
+}
+
+export function useUpdateTask() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async ({ id, ...updates }: TaskUpdate & { id: string }) => {
+      const supabase = createClient()
+      const { data, error } = await supabase
+        .from('tasks')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single()
+
+      if (error) throw error
+      return data as Task
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: taskKeys.lists() })
+      queryClient.invalidateQueries({ queryKey: taskKeys.all })
+      queryClient.setQueryData(taskKeys.detail(data.id), data)
+      toast.success('Task updated')
+
+      logAudit({
+        tenantId: data.tenant_id,
+        userId: data.created_by ?? null,
+        entityType: 'task',
+        entityId: data.id,
+        action: 'updated',
+        changes: { title: data.title, status: data.status, priority: data.priority },
+      })
+    },
+    onError: () => {
+      toast.error('Failed to update task')
+    },
+  })
+}
+
+export function useCompleteTask() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async ({ id, userId }: { id: string; userId: string }) => {
+      const supabase = createClient()
+      const { data, error } = await supabase
+        .from('tasks')
+        .update({
+          status: 'done',
+          completed_at: new Date().toISOString(),
+          completed_by: userId,
+        })
+        .eq('id', id)
+        .select()
+        .single()
+
+      if (error) throw error
+
+      // Check if task has follow_up_days, and auto-create follow-up
+      const task = data as Task
+      if (task.follow_up_days) {
+        const followUpDate = new Date()
+        followUpDate.setDate(followUpDate.getDate() + task.follow_up_days)
+
+        await supabase.from('tasks').insert({
+          tenant_id: task.tenant_id,
+          title: `Follow-up: ${task.title}`,
+          description: task.description,
+          matter_id: task.matter_id,
+          contact_id: task.contact_id,
+          assigned_to: task.assigned_to,
+          due_date: followUpDate.toISOString().split('T')[0],
+          priority: task.priority,
+          parent_task_id: task.id,
+          created_via: 'automation',
+          created_by: userId,
+        })
+      }
+
+      return task
+    },
+    onSuccess: (task) => {
+      queryClient.invalidateQueries({ queryKey: taskKeys.lists() })
+      queryClient.invalidateQueries({ queryKey: taskKeys.all })
+      toast.success('Task completed')
+
+      logAudit({
+        tenantId: task.tenant_id,
+        userId: task.completed_by ?? null,
+        entityType: 'task',
+        entityId: task.id,
+        action: 'completed',
+        changes: { status: 'done', completed_at: task.completed_at },
+        metadata: { title: task.title },
+      })
+
+      // Notify the person who assigned the task
+      if (task.assigned_by && task.assigned_by !== task.completed_by) {
+        createTaskNotification({
+          tenantId: task.tenant_id,
+          recipientId: task.assigned_by,
+          title: `Task completed: ${task.title}`,
+          message: 'This task has been marked as completed.',
+          taskId: task.id,
+          type: 'task_completed',
+        }).catch(() => {}) // Don't fail if notification fails
+      }
+    },
+    onError: () => {
+      toast.error('Failed to complete task')
+    },
+  })
+}
+
+// Fetch all non-deleted tasks for client-side table operations
+export function useAllTasks(tenantId: string) {
+  return useQuery({
+    queryKey: [...taskKeys.all, 'all-table', tenantId],
+    queryFn: async () => {
+      const supabase = createClient()
+      const { data, error } = await supabase
+        .from('tasks')
+        .select('*')
+        .eq('tenant_id', tenantId)
+        .eq('is_deleted', false)
+        .order('created_at', { ascending: false })
+
+      if (error) throw error
+      return data as Task[]
+    },
+    enabled: !!tenantId,
+  })
+}
+
+// Get document counts per task for the file column
+export function useTaskDocumentCounts(tenantId: string) {
+  return useQuery({
+    queryKey: ['task-document-counts', tenantId],
+    queryFn: async () => {
+      const supabase = createClient()
+      const { data, error } = await supabase
+        .from('documents')
+        .select('task_id')
+        .eq('tenant_id', tenantId)
+        .not('task_id', 'is', null)
+
+      if (error) throw error
+      const counts: Record<string, number> = {}
+      data?.forEach((doc: { task_id: string | null }) => {
+        if (doc.task_id) counts[doc.task_id] = (counts[doc.task_id] || 0) + 1
+      })
+      return counts
+    },
+    enabled: !!tenantId,
+  })
+}
+
+// Soft-delete a task (keeps activity log intact)
+export function useDeleteTask() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async ({ id, userId }: { id: string; userId: string }) => {
+      const supabase = createClient()
+      const { data, error } = await supabase
+        .from('tasks')
+        .update({
+          is_deleted: true,
+          deleted_at: new Date().toISOString(),
+          deleted_by: userId,
+          status: 'cancelled',
+        })
+        .eq('id', id)
+        .select()
+        .single()
+
+      if (error) throw error
+      return data as Task
+    },
+    onSuccess: (task) => {
+      queryClient.invalidateQueries({ queryKey: taskKeys.all })
+      toast.success('Task deleted')
+
+      logAudit({
+        tenantId: task.tenant_id,
+        userId: task.deleted_by ?? null,
+        entityType: 'task',
+        entityId: task.id,
+        action: 'deleted',
+        metadata: { title: task.title },
+      })
+    },
+    onError: () => {
+      toast.error('Failed to delete task')
+    },
+  })
+}

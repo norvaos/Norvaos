@@ -1,26 +1,151 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+:root {
+  --radius: 0.625rem;
+  /* Professional legal-tech palette: deep indigo primary with warm accents (HSL for browser compat) */
+  --background: hsl(0 0% 100%);
+  --foreground: hsl(250 40% 16%);
+  --card: hsl(0 0% 100%);
+  --card-foreground: hsl(250 40% 16%);
+  --popover: hsl(0 0% 100%);
+  --popover-foreground: hsl(250 40% 16%);
+  --primary: hsl(258 58% 36%);
+  --primary-foreground: hsl(250 20% 98%);
+  --secondary: hsl(248 28% 94%);
+  --secondary-foreground: hsl(252 35% 28%);
+  --muted: hsl(248 16% 94%);
+  --muted-foreground: hsl(250 12% 46%);
+  --accent: hsl(42 76% 58%);
+  --accent-foreground: hsl(42 38% 24%);
+  --destructive: hsl(4 72% 50%);
+  --border: hsl(248 14% 88%);
+  --input: hsl(248 18% 88%);
+  --ring: hsl(258 48% 44%);
+  /* Chart colors: indigo, teal, amber, rose, emerald */
+  --chart-1: hsl(258 56% 44%);
+  --chart-2: hsl(178 44% 44%);
+  --chart-3: hsl(42 70% 56%);
+  --chart-4: hsl(4 62% 50%);
+  --chart-5: hsl(155 44% 44%);
+  /* Dark navy sidebar */
+  --sidebar: hsl(252 42% 18%);
+  --sidebar-foreground: hsl(248 10% 88%);
+  --sidebar-primary: hsl(258 52% 50%);
+  --sidebar-primary-foreground: hsl(250 20% 98%);
+  --sidebar-accent: hsl(252 38% 25%);
+  --sidebar-accent-foreground: hsl(248 14% 94%);
+  --sidebar-border: hsl(252 32% 28%);
+  --sidebar-ring: hsl(258 48% 44%);
+}
+
+.dark {
+  --background: hsl(250 28% 12%);
+  --foreground: hsl(248 12% 92%);
+  --card: hsl(250 20% 16%);
+  --card-foreground: hsl(248 12% 92%);
+  --popover: hsl(250 20% 16%);
+  --popover-foreground: hsl(248 12% 92%);
+  --primary: hsl(258 52% 50%);
+  --primary-foreground: hsl(250 20% 98%);
+  --secondary: hsl(250 18% 22%);
+  --secondary-foreground: hsl(248 12% 92%);
+  --muted: hsl(250 16% 22%);
+  --muted-foreground: hsl(248 10% 56%);
+  --accent: hsl(42 68% 52%);
+  --accent-foreground: hsl(42 14% 96%);
+  --destructive: hsl(6 62% 52%);
+  --border: hsl(250 14% 26%);
+  --input: hsl(250 16% 24%);
+  --ring: hsl(258 48% 48%);
+  --chart-1: hsl(258 52% 48%);
+  --chart-2: hsl(178 42% 48%);
+  --chart-3: hsl(42 64% 52%);
+  --chart-4: hsl(6 60% 52%);
+  --chart-5: hsl(155 42% 48%);
+  --sidebar: hsl(252 32% 14%);
+  --sidebar-foreground: hsl(248 10% 88%);
+  --sidebar-primary: hsl(258 52% 50%);
+  --sidebar-primary-foreground: hsl(250 20% 98%);
+  --sidebar-accent: hsl(252 28% 20%);
+  --sidebar-accent-foreground: hsl(248 12% 92%);
+  --sidebar-border: hsl(252 22% 24%);
+  --sidebar-ring: hsl(258 48% 48%);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/*
+ * Pre-hydration overrides
+ * ──────────────────────────────────────────────────────────────────
+ * The blocking <script> in <head> reads Zustand persisted state from
+ * localStorage and sets data-attributes on <html> BEFORE the first
+ * paint. These CSS rules use those attributes (with !important) to
+ * apply the correct sidebar width and hide practice-filter UI that
+ * would otherwise flash during React hydration.
+ *
+ * Once Zustand's persist middleware finishes rehydrating, React
+ * removes the data-attributes so normal Tailwind classes take over.
+ */
+
+/* Sidebar: collapsed width before React hydrates */
+@media (min-width: 1024px) {
+  html[data-sidebar-collapsed] [data-sidebar] {
+    width: 68px !important;
+    transition: none !important;
+  }
 }
+
