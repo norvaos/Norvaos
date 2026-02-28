@@ -172,7 +172,7 @@ function useMatterUsers(tenantId: string) {
       const supabase = createClient()
       const { data, error } = await supabase
         .from('users')
-        .select('*')
+        .select('id, tenant_id, auth_user_id, email, first_name, last_name, avatar_url, role_id, is_active')
         .eq('tenant_id', tenantId)
         .eq('is_active', true)
         .order('first_name')

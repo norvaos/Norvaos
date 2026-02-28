@@ -651,6 +651,7 @@ export function useStaffWorkload(tenantId: string) {
         .select('id, first_name, last_name')
         .eq('tenant_id', tenantId)
         .eq('is_active', true)
+        .limit(500)
 
       if (usersError) throw usersError
       if (!users || users.length === 0) return []
@@ -662,6 +663,7 @@ export function useStaffWorkload(tenantId: string) {
         .eq('tenant_id', tenantId)
         .eq('status', 'active')
         .not('responsible_lawyer_id', 'is', null)
+        .limit(5000)
 
       if (mattersError) throw mattersError
 
@@ -857,9 +859,8 @@ export function useAdvanceStage() {
       queryClient.invalidateQueries({ queryKey: immigrationKeys.matterImmigration(variables.matterId) })
       queryClient.invalidateQueries({ queryKey: immigrationKeys.checklistItems(variables.matterId) })
       queryClient.invalidateQueries({ queryKey: immigrationKeys.deadlines(variables.matterId) })
-      queryClient.invalidateQueries({ queryKey: ['tasks'] })
+      queryClient.invalidateQueries({ queryKey: ['tasks', 'list'] })
       queryClient.invalidateQueries({ queryKey: ['activities'] })
-      queryClient.invalidateQueries({ queryKey: ['notifications'] })
       toast.success(`Stage advanced to ${result.stageName}`)
     },
     onError: (error: Error) => {

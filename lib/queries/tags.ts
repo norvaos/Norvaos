@@ -50,27 +50,22 @@ export function useEntityTags(entityType: string, entityId: string, tenantId: st
     queryFn: async () => {
       const supabase = createClient()
 
-      // Get entity_tags for this entity
-      const { data: entityTags, error: etError } = await supabase
+      // Join tags via FK (entity_tags.tag_id -> tags.id) to avoid N+1
+      const { data: entityTags, error } = await supabase
         .from('entity_tags')
-        .select('*')
+        .select('*, tags(*)')
         .eq('entity_type', entityType)
         .eq('entity_id', entityId)
         .eq('tenant_id', tenantId)
 
-      if (etError) throw etError
+      if (error) throw error
 
       if (!entityTags?.length) return []
 
-      // Get the actual tags
-      const tagIds = entityTags.map((et: EntityTag) => et.tag_id)
-      const { data: tags, error: tagError } = await supabase
-        .from('tags')
-        .select('*')
-        .in('id', tagIds)
-
-      if (tagError) throw tagError
-      return tags as Tag[]
+      // Extract the nested tag objects to match the Tag[] return type
+      return entityTags
+        .map((et: any) => et.tags)
+        .filter(Boolean) as Tag[]
     },
     enabled: !!entityId && !!tenantId,
   })

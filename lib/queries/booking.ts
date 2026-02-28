@@ -44,7 +44,7 @@ export function useBookingPages(tenantId: string) {
     queryFn: async () => {
       const supabase = createClient()
 
-      // Fetch booking pages (no FK join — resolve users separately)
+      // No direct FK from booking_pages to users in generated types — batch resolve
       const { data: pages, error } = await supabase
         .from('booking_pages')
         .select('*')
@@ -55,18 +55,21 @@ export function useBookingPages(tenantId: string) {
       if (error) throw error
       if (!pages || pages.length === 0) return [] as BookingPageWithUser[]
 
-      // Resolve user info
-      const userIds = [...new Set(pages.map((p) => p.user_id))]
-      const { data: users } = await supabase
-        .from('users')
-        .select('id, first_name, last_name, avatar_url')
-        .in('id', userIds)
-
-      const userMap = new Map((users ?? []).map((u) => [u.id, u]))
+      const userIds = [...new Set(pages.map((p) => p.user_id).filter(Boolean))] as string[]
+      let usersMap: Record<string, { id: string; first_name: string | null; last_name: string | null; avatar_url: string | null }> = {}
+      if (userIds.length > 0) {
+        const { data: users } = await supabase
+          .from('users')
+          .select('id, first_name, last_name, avatar_url')
+          .in('id', userIds)
+        if (users) {
+          usersMap = Object.fromEntries(users.map((u) => [u.id, u]))
+        }
+      }
 
       return pages.map((p) => ({
         ...p,
-        users: userMap.get(p.user_id) ?? null,
+        users: p.user_id ? usersMap[p.user_id] ?? null : null,
       })) as BookingPageWithUser[]
     },
     enabled: !!tenantId,
@@ -207,6 +210,7 @@ export function useAppointments(
     queryFn: async () => {
       const supabase = createClient()
 
+      // No direct FK from appointments to booking_pages/users in generated types — batch resolve
       let q = supabase
         .from('appointments')
         .select('*')
@@ -228,29 +232,29 @@ export function useAppointments(
       if (error) throw error
       if (!appointments || appointments.length === 0) return [] as AppointmentWithDetails[]
 
-      // Resolve booking page + user info
-      const pageIds = [...new Set(appointments.map((a) => a.booking_page_id))]
-      const userIds = [...new Set(appointments.map((a) => a.user_id))]
+      // Batch-fetch booking pages and users in 2 parallel queries (instead of per-row)
+      const pageIds = [...new Set(appointments.map((a) => a.booking_page_id).filter(Boolean))] as string[]
+      const userIds = [...new Set(appointments.map((a) => a.user_id).filter(Boolean))] as string[]
 
       const [pagesRes, usersRes] = await Promise.all([
-        supabase.from('booking_pages').select('id, title, slug').in('id', pageIds),
-        supabase.from('users').select('id, first_name, last_name').in('id', userIds),
+        pageIds.length > 0
+          ? supabase.from('booking_pages').select('id, title, slug').in('id', pageIds)
+          : { data: [] },
+        userIds.length > 0
+          ? supabase.from('users').select('id, first_name, last_name').in('id', userIds)
+          : { data: [] },
       ])
 
-      const pageMap = new Map((pagesRes.data ?? []).map((p) => [p.id, p]))
-      const userMap = new Map((usersRes.data ?? []).map((u) => [u.id, u]))
+      const pagesMap = Object.fromEntries((pagesRes.data ?? []).map((p) => [p.id, p]))
+      const usersMap = Object.fromEntries((usersRes.data ?? []).map((u) => [u.id, u]))
 
-      return appointments.map((a) => {
-        const page = pageMap.get(a.booking_page_id)
-        const user = userMap.get(a.user_id)
-        return {
-          ...a,
-          booking_page_title: page?.title ?? null,
-          booking_page_slug: page?.slug ?? null,
-          user_first_name: user?.first_name ?? null,
-          user_last_name: user?.last_name ?? null,
-        }
-      }) as AppointmentWithDetails[]
+      return appointments.map((a) => ({
+        ...a,
+        booking_page_title: a.booking_page_id ? pagesMap[a.booking_page_id]?.title ?? null : null,
+        booking_page_slug: a.booking_page_id ? pagesMap[a.booking_page_id]?.slug ?? null : null,
+        user_first_name: a.user_id ? usersMap[a.user_id]?.first_name ?? null : null,
+        user_last_name: a.user_id ? usersMap[a.user_id]?.last_name ?? null : null,
+      })) as AppointmentWithDetails[]
     },
     enabled: !!tenantId,
   })

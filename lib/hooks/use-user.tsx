@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
+import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUIStore } from '@/lib/stores/ui-store'
 import type { User as AuthUser } from '@supabase/supabase-js'
@@ -88,12 +88,21 @@ export function UserProvider({ children }: { children: ReactNode }) {
     fetchUser()
   }, [])
 
-  const fullName = appUser
-    ? [appUser.first_name, appUser.last_name].filter(Boolean).join(' ') || appUser.email
-    : ''
+  const fullName = useMemo(
+    () =>
+      appUser
+        ? [appUser.first_name, appUser.last_name].filter(Boolean).join(' ') || appUser.email
+        : '',
+    [appUser]
+  )
+
+  const value = useMemo(
+    () => ({ authUser, appUser, isLoading, error, fullName }),
+    [authUser, appUser, isLoading, error, fullName]
+  )
 
   return (
-    <UserContext.Provider value={{ authUser, appUser, isLoading, error, fullName }}>
+    <UserContext.Provider value={value}>
       {children}
     </UserContext.Provider>
   )

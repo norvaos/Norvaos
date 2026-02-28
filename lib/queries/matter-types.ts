@@ -885,9 +885,8 @@ export function useAdvanceMatterStage() {
       queryClient.invalidateQueries({ queryKey: matterStageKeys.state(variables.matterId) })
       queryClient.invalidateQueries({ queryKey: ['immigration', 'matter', variables.matterId] })
       queryClient.invalidateQueries({ queryKey: ['immigration', 'checklist', variables.matterId] })
-      queryClient.invalidateQueries({ queryKey: ['tasks'] })
+      queryClient.invalidateQueries({ queryKey: ['tasks', 'list'] })
       queryClient.invalidateQueries({ queryKey: ['activities'] })
-      queryClient.invalidateQueries({ queryKey: ['notifications'] })
       queryClient.invalidateQueries({ queryKey: ['immigration', 'deadlines', variables.matterId] })
       toast.success(`Stage advanced to ${result.stageName}`)
     },

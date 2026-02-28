@@ -329,6 +329,7 @@ export function useReportTasksByAssignee(tenantId: string, range: DateRange) {
         .eq('tenant_id', tenantId)
         .neq('is_deleted', true)
         .not('assigned_to', 'is', null)
+        .limit(5000)
 
       if (error) throw error
       const grouped: Record<string, { overdue: number; completed: number; open: number }> = {}
@@ -530,6 +531,7 @@ export function useReportTaskCompletionByUser(tenantId: string, range: DateRange
         .not('assigned_to', 'is', null)
         .gte('created_at', s)
         .lte('created_at', e)
+        .limit(5000)
 
       if (error) throw error
       const grouped: Record<string, { completed: number; total: number }> = {}

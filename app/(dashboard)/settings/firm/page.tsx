@@ -98,13 +98,13 @@ function ColourPickerField({
 }
 
 export default function SettingsFirmPage() {
-  const supabase = createClient()
   const { tenant, isLoading: tenantLoading } = useTenant()
   const queryClient = useQueryClient()
 
   const { data: firmData, isLoading } = useQuery({
     queryKey: ['settings', 'firm', tenant?.id],
     queryFn: async () => {
+      const supabase = createClient()
       if (!tenant) return null
       const { data, error } = await supabase
         .from('tenants')
@@ -146,6 +146,7 @@ export default function SettingsFirmPage() {
 
   const updateFirm = useMutation({
     mutationFn: async (values: FirmFormValues) => {
+      const supabase = createClient()
       if (!tenant) throw new Error('No tenant found')
       const { error } = await supabase
         .from('tenants')

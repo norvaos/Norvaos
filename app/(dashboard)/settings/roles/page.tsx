@@ -134,7 +134,6 @@ function totalPermissionsCount(): number {
 }
 
 export default function SettingsRolesPage() {
-  const supabase = createClient()
   const { tenant, isLoading: tenantLoading } = useTenant()
   const queryClient = useQueryClient()
   const [createOpen, setCreateOpen] = useState(false)
@@ -143,6 +142,7 @@ export default function SettingsRolesPage() {
   const { data: roles, isLoading } = useQuery({
     queryKey: ['settings', 'roles', tenant?.id],
     queryFn: async () => {
+      const supabase = createClient()
       if (!tenant) return []
       const { data: rolesData, error } = await supabase
         .from('roles')
@@ -182,6 +182,7 @@ export default function SettingsRolesPage() {
 
   const createRole = useMutation({
     mutationFn: async (values: RoleFormValues) => {
+      const supabase = createClient()
       if (!tenant) throw new Error('No tenant found')
       const { error } = await supabase.from('roles').insert({
         tenant_id: tenant.id,
@@ -204,6 +205,7 @@ export default function SettingsRolesPage() {
 
   const deleteRole = useMutation({
     mutationFn: async (roleId: string) => {
+      const supabase = createClient()
       const { error } = await supabase.from('roles').delete().eq('id', roleId)
       if (error) throw error
     },

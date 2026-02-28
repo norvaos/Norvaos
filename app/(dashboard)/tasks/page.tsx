@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import {
   LayoutList,
@@ -89,7 +89,7 @@ export default function TasksPage() {
       const supabase = createClient()
       const { data, error } = await supabase
         .from('users')
-        .select('*')
+        .select('id, tenant_id, auth_user_id, email, first_name, last_name, avatar_url, role_id, is_active')
         .eq('tenant_id', tenantId)
         .eq('is_active', true)
         .order('first_name')
@@ -143,12 +143,12 @@ export default function TasksPage() {
   // ---------------------------------------------------------------------------
   // Handlers
   // ---------------------------------------------------------------------------
-  function handleTaskClick(taskId: string) {
+  const handleTaskClick = useCallback((taskId: string) => {
     setSelectedTaskId(taskId)
     setDetailOpen(true)
-  }
+  }, [])
 
-  function handleToggleComplete(task: Task) {
+  const handleToggleComplete = useCallback((task: Task) => {
     if (!appUser) return
 
     if (task.status === 'done') {
@@ -161,19 +161,19 @@ export default function TasksPage() {
     } else {
       completeTask.mutate({ id: task.id, userId: appUser.id })
     }
-  }
+  }, [appUser, updateTask, completeTask])
 
-  function handleUpdateTask(id: string, updates: Record<string, any>) {
+  const handleUpdateTask = useCallback((id: string, updates: Record<string, any>) => {
     updateTask.mutate({ id, ...updates })
-  }
+  }, [updateTask])
 
-  function handleStatusChange(taskId: string, newStatus: string) {
+  const handleStatusChange = useCallback((taskId: string, newStatus: string) => {
     if (newStatus === 'done' && appUser) {
       completeTask.mutate({ id: taskId, userId: appUser.id })
     } else {
       updateTask.mutate({ id: taskId, status: newStatus })
     }
-  }
+  }, [appUser, completeTask, updateTask])
 
   // ---------------------------------------------------------------------------
   // Render

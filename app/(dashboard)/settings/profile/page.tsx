@@ -28,13 +28,13 @@ import {
 } from '@/components/ui/form'
 
 export default function SettingsProfilePage() {
-  const supabase = createClient()
   const { appUser, isLoading: userLoading } = useUser()
   const queryClient = useQueryClient()
 
   const { data: profile, isLoading } = useQuery({
     queryKey: ['settings', 'profile', appUser?.id],
     queryFn: async () => {
+      const supabase = createClient()
       if (!appUser) return null
       const { data, error } = await supabase
         .from('users')
@@ -70,6 +70,7 @@ export default function SettingsProfilePage() {
 
   const updateProfile = useMutation({
     mutationFn: async (values: ProfileFormValues) => {
+      const supabase = createClient()
       if (!appUser) throw new Error('No user found')
       const { error } = await supabase
         .from('users')

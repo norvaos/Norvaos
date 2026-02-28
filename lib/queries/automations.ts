@@ -66,7 +66,7 @@ export function useAutomationExecutionLog(tenantId: string, ruleId: string | nul
     queryKey: ['automation-execution-log', tenantId, ruleId],
     queryFn: async () => {
       const supabase = createClient()
-      // Fetch execution logs
+      // No FK from automation_execution_log to matters — use 2-query pattern
       const { data: logs, error } = await supabase
         .from('automation_execution_log')
         .select('*')
@@ -77,20 +77,22 @@ export function useAutomationExecutionLog(tenantId: string, ruleId: string | nul
       if (error) throw error
       if (!logs || logs.length === 0) return []
 
-      // Fetch matter details for the logs
-      const matterIds = [...new Set(logs.map((l) => l.matter_id))]
-      const { data: matters } = await supabase
-        .from('matters')
-        .select('id, title, matter_number')
-        .in('id', matterIds)
-
-      const matterMap = new Map(
-        (matters ?? []).map((m) => [m.id, { title: m.title, matter_number: m.matter_number }])
-      )
+      // Batch-fetch matter info for all logs
+      const matterIds = [...new Set(logs.map((l) => l.matter_id).filter(Boolean))] as string[]
+      let mattersMap: Record<string, { id: string; title: string; matter_number: string | null }> = {}
+      if (matterIds.length > 0) {
+        const { data: matters } = await supabase
+          .from('matters')
+          .select('id, title, matter_number')
+          .in('id', matterIds)
+        if (matters) {
+          mattersMap = Object.fromEntries(matters.map((m) => [m.id, m]))
+        }
+      }
 
       return logs.map((log) => ({
         ...log,
-        matters: matterMap.get(log.matter_id) ?? null,
+        matters: log.matter_id ? mattersMap[log.matter_id] ?? null : null,
       }))
     },
     enabled: !!tenantId && !!ruleId,

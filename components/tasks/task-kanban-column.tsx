@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo } from 'react'
+import { memo, useMemo } from 'react'
 import { useDroppable } from '@dnd-kit/core'
 import { Badge } from '@/components/ui/badge'
 import { ScrollArea } from '@/components/ui/scroll-area'
@@ -20,7 +20,7 @@ interface TaskKanbanColumnProps {
   onTaskClick: (taskId: string) => void
 }
 
-export function TaskKanbanColumn({
+export const TaskKanbanColumn = memo(function TaskKanbanColumn({
   statusKey,
   statusLabel,
   statusColor,
@@ -84,4 +84,4 @@ export function TaskKanbanColumn({
       </ScrollArea>
     </div>
   )
-}
+})

@@ -143,9 +143,10 @@ export function useInvoices(tenantId: string, matterId?: string) {
     queryKey: invoicingKeys.invoices(tenantId, matterId),
     queryFn: async (): Promise<InvoiceWithMatter[]> => {
       const supabase = createClient()
+      // Join matters via FK (invoices.matter_id -> matters.id) to avoid N+1
       let query = supabase
         .from('invoices')
-        .select('*')
+        .select('*, matters(id, title, matter_number)')
         .eq('tenant_id', tenantId)
         .order('created_at', { ascending: false })
         .limit(100)
@@ -155,28 +156,15 @@ export function useInvoices(tenantId: string, matterId?: string) {
       const { data, error } = await query
       if (error) throw error
 
-      const invoices = (data ?? []) as Invoice[]
-
-      // Resolve matter titles
-      const matterIds = [...new Set(invoices.map((i) => i.matter_id))]
-      let matterMap: Record<string, { title: string; matter_number: string | null }> = {}
-      if (matterIds.length > 0) {
-        const { data: matters } = await supabase
-          .from('matters')
-          .select('id, title, matter_number')
-          .in('id', matterIds)
-        if (matters) {
-          matterMap = Object.fromEntries(
-            matters.map((m) => [m.id, { title: m.title, matter_number: m.matter_number }])
-          )
+      // Flatten nested matter data to match InvoiceWithMatter return type
+      return (data ?? []).map((inv: any) => {
+        const { matters, ...rest } = inv
+        return {
+          ...rest,
+          matter_title: matters?.title ?? 'Unknown',
+          matter_number: matters?.matter_number ?? null,
         }
-      }
-
-      return invoices.map((inv) => ({
-        ...inv,
-        matter_title: matterMap[inv.matter_id]?.title ?? 'Unknown',
-        matter_number: matterMap[inv.matter_id]?.matter_number ?? null,
-      }))
+      }) as InvoiceWithMatter[]
     },
     enabled: !!tenantId,
   })

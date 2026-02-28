@@ -17,6 +17,35 @@ const nextConfig: NextConfig = {
     NEXT_PUBLIC_BUILD_SHA: gitSha,
     NEXT_PUBLIC_BUILD_TIME: new Date().toISOString(),
   },
+
+  // Image optimization — allow Supabase storage URLs
+  images: {
+    remotePatterns: [
+      { protocol: "https", hostname: "*.supabase.co" },
+      { protocol: "https", hostname: "*.supabase.in" },
+    ],
+  },
+
+  // Enable gzip/brotli response compression
+  compress: true,
+
+  // Cache headers for static assets and API routes
+  async headers() {
+    return [
+      {
+        source: "/_next/static/:path*",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
+        ],
+      },
+      {
+        source: "/api/:path*",
+        headers: [
+          { key: "Cache-Control", value: "no-store, max-age=0" },
+        ],
+      },
+    ];
+  },
 };
 
 export default nextConfig;

@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo } from 'react'
+import { memo, useMemo } from 'react'
 import { useDraggable } from '@dnd-kit/core'
 import { CSS } from '@dnd-kit/utilities'
 import {
@@ -101,7 +101,7 @@ function calculateDaysInStage(lead: Lead): number {
   return Math.floor(diff / (1000 * 60 * 60 * 24))
 }
 
-export function KanbanCard({
+export const KanbanCard = memo(function KanbanCard({
   lead,
   contact,
   assignedUser,
@@ -283,4 +283,4 @@ export function KanbanCard({
       )}
     </div>
   )
-}
+})

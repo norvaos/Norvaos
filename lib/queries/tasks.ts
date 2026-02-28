@@ -127,7 +127,6 @@ export function useCreateTask() {
     },
     onSuccess: (task) => {
       queryClient.invalidateQueries({ queryKey: taskKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: taskKeys.all })
       toast.success('Task created successfully')
 
       logAudit({
@@ -176,7 +175,6 @@ export function useUpdateTask() {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: taskKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: taskKeys.all })
       queryClient.setQueryData(taskKeys.detail(data.id), data)
       toast.success('Task updated')
 
@@ -239,7 +237,6 @@ export function useCompleteTask() {
     },
     onSuccess: (task) => {
       queryClient.invalidateQueries({ queryKey: taskKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: taskKeys.all })
       toast.success('Task completed')
 
       logAudit({
@@ -301,6 +298,7 @@ export function useTaskDocumentCounts(tenantId: string) {
         .select('task_id')
         .eq('tenant_id', tenantId)
         .not('task_id', 'is', null)
+        .limit(5000)
 
       if (error) throw error
       const counts: Record<string, number> = {}
@@ -336,7 +334,7 @@ export function useDeleteTask() {
       return data as Task
     },
     onSuccess: (task) => {
-      queryClient.invalidateQueries({ queryKey: taskKeys.all })
+      queryClient.invalidateQueries({ queryKey: taskKeys.lists() })
       toast.success('Task deleted')
 
       logAudit({

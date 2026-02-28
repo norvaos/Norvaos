@@ -92,7 +92,6 @@ function getStatusBadge(user: UserRow) {
 }
 
 export default function SettingsUsersPage() {
-  const supabase = createClient()
   const { tenant, isLoading: tenantLoading } = useTenant()
   const queryClient = useQueryClient()
   const [inviteOpen, setInviteOpen] = useState(false)
@@ -103,6 +102,7 @@ export default function SettingsUsersPage() {
   const { data: users, isLoading } = useQuery({
     queryKey: ['settings', 'users', tenant?.id],
     queryFn: async () => {
+      const supabase = createClient()
       if (!tenant) return []
       const { data, error } = await supabase
         .from('users')
@@ -127,6 +127,7 @@ export default function SettingsUsersPage() {
   const { data: roles } = useQuery({
     queryKey: ['settings', 'roles-list', tenant?.id],
     queryFn: async () => {
+      const supabase = createClient()
       if (!tenant) return []
       const { data, error } = await supabase
         .from('roles')
@@ -151,6 +152,7 @@ export default function SettingsUsersPage() {
 
   const inviteUser = useMutation({
     mutationFn: async (values: InviteUserFormValues) => {
+      const supabase = createClient()
       if (!tenant) throw new Error('No tenant found')
       const { error } = await supabase.from('users').insert({
         tenant_id: tenant.id,
@@ -176,6 +178,7 @@ export default function SettingsUsersPage() {
 
   const updateRole = useMutation({
     mutationFn: async ({ userId, roleId }: { userId: string; roleId: string }) => {
+      const supabase = createClient()
       const { error } = await supabase
         .from('users')
         .update({ role_id: roleId })
@@ -195,6 +198,7 @@ export default function SettingsUsersPage() {
 
   const deactivateUser = useMutation({
     mutationFn: async (userId: string) => {
+      const supabase = createClient()
       const { error } = await supabase
         .from('users')
         .update({ is_active: false, status: 'deactivated' })

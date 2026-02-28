@@ -191,9 +191,11 @@ export function useAllDocuments(params: AllDocumentsParams) {
     queryFn: async (): Promise<{ documents: DocumentWithEntity[]; total: number }> => {
       const supabase = createClient()
 
+      // Join matters via FK (documents.matter_id -> matters.id) to avoid N+1.
+      // count: 'exact' counts the primary table (documents) rows, not joined rows.
       let query = supabase
         .from('documents')
-        .select('*', { count: 'exact' })
+        .select('*, matters(id, title, matter_number)', { count: 'exact' })
         .eq('tenant_id', tenantId)
         .eq('is_archived', false)
         .order('created_at', { ascending: false })
@@ -223,28 +225,15 @@ export function useAllDocuments(params: AllDocumentsParams) {
       const { data, error, count } = await query
       if (error) throw error
 
-      const docs = (data ?? []) as Document[]
-
-      // Resolve matter titles for documents linked to matters
-      const matterIds = [...new Set(docs.filter((d) => d.matter_id).map((d) => d.matter_id!))]
-      let matterMap: Record<string, { title: string; matter_number: string | null }> = {}
-      if (matterIds.length > 0) {
-        const { data: matters } = await supabase
-          .from('matters')
-          .select('id, title, matter_number')
-          .in('id', matterIds)
-        if (matters) {
-          matterMap = Object.fromEntries(
-            matters.map((m) => [m.id, { title: m.title, matter_number: m.matter_number }])
-          )
+      // Flatten nested matter data to match DocumentWithEntity return type
+      const enriched: DocumentWithEntity[] = (data ?? []).map((d: any) => {
+        const { matters, ...rest } = d
+        return {
+          ...rest,
+          matter_title: matters?.title ?? null,
+          matter_number: matters?.matter_number ?? null,
         }
-      }
-
-      const enriched: DocumentWithEntity[] = docs.map((d) => ({
-        ...d,
-        matter_title: d.matter_id ? matterMap[d.matter_id]?.title ?? null : null,
-        matter_number: d.matter_id ? matterMap[d.matter_id]?.matter_number ?? null : null,
-      }))
+      })
 
       return { documents: enriched, total: count ?? 0 }
     },

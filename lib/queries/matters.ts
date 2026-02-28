@@ -46,7 +46,7 @@ export function useMatters(params: MatterListParams) {
 
       let query = supabase
         .from('matters')
-        .select('*', { count: 'exact' })
+        .select('id, tenant_id, title, matter_number, status, priority, practice_area_id, matter_type_id, matter_type, pipeline_id, stage_id, stage_entered_at, responsible_lawyer_id, originating_lawyer_id, date_opened, date_closed, billing_type, estimated_value, total_billed, total_paid, case_type_id, created_at, updated_at', { count: 'exact' })
         .eq('tenant_id', tenantId)
 
       if (search) {

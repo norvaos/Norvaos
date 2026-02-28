@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo } from 'react'
+import { memo, useMemo } from 'react'
 import { useDroppable } from '@dnd-kit/core'
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { Plus } from 'lucide-react'
@@ -33,7 +33,7 @@ interface KanbanColumnProps extends KanbanCardDisplayOptions {
   onCardClick?: (leadId: string) => void
 }
 
-export function KanbanColumn({
+export const KanbanColumn = memo(function KanbanColumn({
   stage,
   leads,
   contactsMap,
@@ -143,7 +143,7 @@ export function KanbanColumn({
       </div>
     </div>
   )
-}
+})
 
 export function KanbanColumnSkeleton() {
   return (

@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo } from 'react'
+import { memo, useMemo } from 'react'
 import { useDraggable } from '@dnd-kit/core'
 import { CSS } from '@dnd-kit/utilities'
 import { CalendarDays, GripVertical } from 'lucide-react'
@@ -50,7 +50,7 @@ function getUserDisplayName(user?: UserRow | null): string {
   return [user.first_name, user.last_name].filter(Boolean).join(' ') || 'Unassigned'
 }
 
-export function TaskKanbanCard({
+export const TaskKanbanCard = memo(function TaskKanbanCard({
   task,
   user,
   onTaskClick,
@@ -159,4 +159,4 @@ export function TaskKanbanCard({
       </div>
     </div>
   )
-}
+})

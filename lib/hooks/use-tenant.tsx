@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
+import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { createClient } from '@/lib/supabase/client'
 
 interface Tenant {
@@ -84,8 +84,13 @@ export function TenantProvider({ children }: { children: ReactNode }) {
     fetchTenant()
   }, [])
 
+  const value = useMemo(
+    () => ({ tenant, isLoading, error }),
+    [tenant, isLoading, error]
+  )
+
   return (
-    <TenantContext.Provider value={{ tenant, isLoading, error }}>
+    <TenantContext.Provider value={value}>
       {children}
     </TenantContext.Provider>
   )

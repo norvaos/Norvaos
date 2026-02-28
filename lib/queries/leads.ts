@@ -47,7 +47,7 @@ export function useLeads(params: LeadListParams) {
 
       let query = supabase
         .from('leads')
-        .select('*', { count: 'exact' })
+        .select('id, tenant_id, contact_id, pipeline_id, stage_id, assigned_to, practice_area_id, status, temperature, source, estimated_value, next_follow_up, stage_entered_at, created_at, updated_at', { count: 'exact' })
         .eq('tenant_id', tenantId)
 
       if (pipelineId) query = query.eq('pipeline_id', pipelineId)

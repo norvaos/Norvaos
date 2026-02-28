@@ -28,7 +28,7 @@ export function useNotifications(userId: string) {
       return data as Notification[]
     },
     enabled: !!userId,
-    refetchInterval: 30000, // Poll every 30 seconds
+    refetchInterval: 60_000, // Poll every 60 seconds
   })
 }
 
@@ -47,7 +47,7 @@ export function useUnreadNotificationCount(userId: string) {
       return count ?? 0
     },
     enabled: !!userId,
-    refetchInterval: 30000, // Poll every 30 seconds
+    refetchInterval: 60_000, // Poll every 60 seconds
   })
 }
 
