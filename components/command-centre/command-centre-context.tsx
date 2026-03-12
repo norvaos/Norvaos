@@ -5,10 +5,11 @@ import { useLead } from '@/lib/queries/leads'
 import { useMatter } from '@/lib/queries/matters'
 import { useCreateNote } from '@/lib/queries/notes'
 import { useEnabledPracticeAreas, type EnabledPracticeArea } from '@/lib/queries/practice-areas'
+import { frontDeskKeys } from '@/lib/queries/front-desk-queries'
 import { useTenant } from '@/lib/hooks/use-tenant'
 import { useUser } from '@/lib/hooks/use-user'
 import { createClient } from '@/lib/supabase/client'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { formatElapsed, formatTimeHM, formatDate } from '@/lib/utils/formatters'
 import { toast } from 'sonner'
 import type { Database } from '@/lib/types/database'
@@ -66,6 +67,7 @@ export function CommandCentreProvider({ entityType, entityId, children }: Provid
   const { appUser } = useUser()
   const tenantId = tenant?.id ?? ''
   const userId = appUser?.id ?? ''
+  const queryClient = useQueryClient()
 
   // ── Lead data ─────────────────────────────────────────────────
   const { data: lead, isLoading: leadLoading } = useLead(entityType === 'lead' ? entityId : '')
@@ -228,7 +230,24 @@ export function CommandCentreProvider({ entityType, entityId, children }: Provid
     lastInteractionRef.current = Date.now()
     hourNotificationShownRef.current = false
     toast.success(`Meeting timer started at ${formatTimeHM(now)}`)
-  }, [])
+
+    // Acknowledge the check-in for this contact so it leaves the front desk queue
+    if (contactId) {
+      const supabase = createClient()
+      const todayStart = new Date()
+      todayStart.setHours(0, 0, 0, 0)
+      supabase
+        .from('check_in_sessions')
+        .update({ status: 'acknowledged' })
+        .eq('contact_id', contactId)
+        .not('status', 'in', '("acknowledged","completed","abandoned")')
+        .gte('created_at', todayStart.toISOString())
+        .then(() => {
+          queryClient.invalidateQueries({ queryKey: frontDeskKeys.checkIns(tenantId) })
+          queryClient.invalidateQueries({ queryKey: frontDeskKeys.stats(tenantId) })
+        })
+    }
+  }, [contactId, tenantId, queryClient])
 
   const stopMeetingTimer = useCallback(async () => {
     if (!timerStartTime) return

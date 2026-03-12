@@ -568,6 +568,7 @@ export function useFrontDeskCheckIns(tenantId: string) {
         .from('check_in_sessions')
         .select('id, status, client_name, contact_id, booking_appointment_id, completed_at, started_at, id_scan_path, id_scan_uploaded_at, metadata, created_at')
         .gte('created_at', todayStart.toISOString())
+        .not('status', 'in', '("completed","abandoned","acknowledged")')
         .order('created_at', { ascending: false })
 
       if (error) throw error

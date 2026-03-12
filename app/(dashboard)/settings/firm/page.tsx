@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
@@ -142,7 +143,7 @@ function ColourPickerField({
 
 export default function SettingsFirmPage() {
   const { tenant, isLoading: tenantLoading, refreshTenant } = useTenant()
-  const queryClient = useQueryClient()
+  const router = useRouter()
 
   const { data: firmData, isLoading } = useQuery({
     queryKey: ['settings', 'firm', tenant?.id],
@@ -174,41 +175,35 @@ export default function SettingsFirmPage() {
   })
 
   useEffect(() => {
-    if (firmData) {
+    if (tenant) {
       form.reset({
-        name: firmData.name ?? '',
-        primary_color: firmData.primary_color ?? '#6366f1',
-        secondary_color: firmData.secondary_color ?? '#8b5cf6',
-        accent_color: firmData.accent_color ?? '#ec4899',
-        timezone: firmData.timezone ?? 'America/Toronto',
-        currency: firmData.currency ?? 'CAD',
-        date_format: firmData.date_format ?? 'YYYY-MM-DD',
+        name: tenant.name ?? '',
+        primary_color: tenant.primary_color ?? '#6366f1',
+        secondary_color: tenant.secondary_color ?? '#8b5cf6',
+        accent_color: tenant.accent_color ?? '#ec4899',
+        timezone: tenant.timezone ?? 'America/Toronto',
+        currency: tenant.currency ?? 'CAD',
+        date_format: tenant.date_format ?? 'YYYY-MM-DD',
       })
     }
-  }, [firmData, form])
+  }, [tenant, form])
 
   const updateFirm = useMutation({
     mutationFn: async (values: FirmFormValues) => {
-      const supabase = createClient()
-      if (!tenant) throw new Error('No tenant found')
-      const { error } = await supabase
-        .from('tenants')
-        .update({
-          name: values.name,
-          primary_color: values.primary_color,
-          secondary_color: values.secondary_color,
-          accent_color: values.accent_color,
-          timezone: values.timezone,
-          currency: values.currency,
-          date_format: values.date_format,
-        })
-        .eq('id', tenant.id)
-      if (error) throw error
+      const res = await fetch('/api/settings/firm', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(values),
+      })
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}))
+        throw new Error((body as { error?: string }).error ?? 'Failed to save')
+      }
     },
     onSuccess: () => {
       toast.success('Firm settings updated successfully.')
-      queryClient.invalidateQueries({ queryKey: ['settings', 'firm'] })
       refreshTenant()
+      router.refresh()
     },
     onError: (error) => {
       toast.error('Failed to update firm settings.', {
@@ -221,7 +216,7 @@ export default function SettingsFirmPage() {
     updateFirm.mutate(values)
   }
 
-  if (tenantLoading || isLoading) {
+  if (tenantLoading) {
     return (
       <div className="space-y-6">
         <div>
