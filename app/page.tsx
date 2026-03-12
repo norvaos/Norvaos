@@ -894,13 +894,13 @@ export default async function LandingPage() {
                 Walk-in ready.
                 <br />
                 <span className="bg-gradient-to-r from-pink-600 to-rose-600 bg-clip-text text-transparent">
-                  Your receptionist can focus on what matters.
+                  Your front desk runs itself.
                 </span>
               </h2>
               <p className="mt-4 text-lg text-gray-600">
-                Set a tablet at your front desk. Clients tap their name, confirm their appointment,
+                Place a tablet or print a QR code at reception. Clients tap their name, confirm their appointment,
                 sign consent forms, and upload documents — all before they sit down.
-                Your team is notified instantly.
+                Your team is notified instantly, so staff can focus on higher-value work.
               </p>
 
               <div className="mt-8 space-y-5">
