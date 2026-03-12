@@ -39,6 +39,7 @@ export async function updateSession(request: NextRequest) {
   // Protected routes - redirect to login if not authenticated
   if (
     !user &&
+    request.nextUrl.pathname !== '/' &&
     !request.nextUrl.pathname.startsWith('/login') &&
     !request.nextUrl.pathname.startsWith('/signup') &&
     !request.nextUrl.pathname.startsWith('/forgot-password') &&
@@ -80,7 +81,7 @@ export async function updateSession(request: NextRequest) {
     const pathname = request.nextUrl.pathname
 
     // Only check for dashboard routes (skip front-desk, api, auth, portal, etc.)
-    const isDashboardRoute = pathname === '/' || (
+    const isDashboardRoute = (
       !pathname.startsWith('/front-desk') &&
       !pathname.startsWith('/api') &&
       !pathname.startsWith('/auth') &&
