@@ -894,7 +894,7 @@ export default async function LandingPage() {
                 Walk-in ready.
                 <br />
                 <span className="bg-gradient-to-r from-pink-600 to-rose-600 bg-clip-text text-transparent">
-                  No receptionist needed.
+                  Your receptionist can focus on what matters.
                 </span>
               </h2>
               <p className="mt-4 text-lg text-gray-600">
