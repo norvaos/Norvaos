@@ -1,15 +1,34 @@
 import Stripe from 'stripe'
 
 /**
- * Server-side Stripe instance
- * Only use in API routes, server components, or server actions
+ * Server-side Stripe instance — lazily initialised so that
+ * the SDK is never constructed at Next.js build time (when
+ * STRIPE_SECRET_KEY is not available in the build environment).
  */
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2026-02-25.clover',
-  typescript: true,
-  appInfo: {
-    name: 'NorvaOS',
-    version: process.env.NEXT_PUBLIC_APP_VERSION || '1.0.0',
+let _stripe: Stripe | null = null
+
+export function getStripe(): Stripe {
+  if (!_stripe) {
+    const key = process.env.STRIPE_SECRET_KEY
+    if (!key) {
+      throw new Error('STRIPE_SECRET_KEY is not set')
+    }
+    _stripe = new Stripe(key, {
+      apiVersion: '2026-02-25.clover',
+      typescript: true,
+      appInfo: {
+        name: 'NorvaOS',
+        version: process.env.NEXT_PUBLIC_APP_VERSION || '1.0.0',
+      },
+    })
+  }
+  return _stripe
+}
+
+// Convenience re-export so existing callers can migrate gradually
+export const stripe = new Proxy({} as Stripe, {
+  get(_target, prop) {
+    return (getStripe() as never)[prop]
   },
 })
 
