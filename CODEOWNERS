@@ -1,0 +1,36 @@
+# ─── CODEOWNERS ──────────────────────────────────────────────────────────────
+#
+# Any change to enforcement governance files requires approval from the
+# enforcement reviewers group. This is a hard gate — not optional.
+#
+# ENFORCEMENT FREEZE (enforcement-v1.0.0, 2026-03-01):
+# All paths below are frozen. Modifications require version-bump protocol:
+#   1. Bump CORE_ENFORCEMENT_SPEC_VERSION in lib/config/version.ts
+#   2. Update docs/core-enforcement-spec-v1.md
+#   3. Update docs/enforcement/sensitive-surfaces.json
+#   4. Update enforcement regression tests
+#   5. Include "Enforcement impact:" declaration in PR
+#
+# GitHub Docs: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# ── Enforcement governance files ────────────────────────────────────────────
+# Spec, registry, and waivers — these define what the system enforces.
+# Changes here can silently weaken security if not reviewed.
+
+docs/enforcement/                       @lexcrm/enforcement-reviewers
+docs/core-enforcement-spec-v1.md        @lexcrm/enforcement-reviewers
+scripts/check-spec-updated.ts           @lexcrm/enforcement-reviewers
+lib/config/version.ts                   @lexcrm/enforcement-reviewers
+
+# ── Frozen enforcement components (enforcement-v1.0.0) ─────────────────────
+# These files implement enforcement invariants. Any modification requires
+# the full version-bump protocol described above.
+
+components/require-permission.tsx                   @lexcrm/enforcement-reviewers
+lib/services/billing-permission.ts                  @lexcrm/enforcement-reviewers
+lib/services/stage-engine.ts                        @lexcrm/enforcement-reviewers
+lib/services/document-slot-engine.ts                @lexcrm/enforcement-reviewers
+scripts/migrations/024-uee-phase-a-hardening.sql    @lexcrm/enforcement-reviewers
+scripts/migrations/027-enforcement-enabled-lockdown.sql @lexcrm/enforcement-reviewers
+scripts/migrations/028-document-engine.sql          @lexcrm/enforcement-reviewers
+scripts/migrations/033-billing-rls-role-check.sql   @lexcrm/enforcement-reviewers

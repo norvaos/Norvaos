@@ -52,7 +52,7 @@ function getPageTitle(pathname: string): string {
     '/settings/firm': 'Firm Settings',
     '/settings/users': 'Users',
     '/settings/roles': 'Roles',
-    '/settings/practice-areas': 'Practice Areas',
+    '/settings/practice-areas': 'Practice Areas & Matter Types',
     '/settings/pipelines': 'Pipelines',
     '/settings/custom-fields': 'Custom Fields',
     '/settings/integrations': 'Integrations',
@@ -60,20 +60,34 @@ function getPageTitle(pathname: string): string {
     '/settings/forms': 'Intake Forms',
     '/settings/billing-plan': 'Billing & Plan',
     '/settings/task-templates': 'Task Templates',
-    '/settings/matter-types': 'Matter Types',
+    '/settings/matter-types': 'Practice Areas & Matter Types',
   }
 
   if (titles[pathname]) return titles[pathname]
 
   // Handle dynamic routes such as /contacts/[id] or /matters/[id]
   const segments = pathname.split('/').filter(Boolean)
+
+  // Command Centre routes: /command/lead/[id] or /command/matter/[id]
+  if (segments[0] === 'command') {
+    if (segments[1] === 'lead') return 'Command Centre'
+    if (segments[1] === 'matter') return 'Command Centre'
+    return 'Command Centre'
+  }
+
   if (segments.length >= 2) {
     const parentTitle = titles[`/${segments[0]}`]
     if (parentTitle) return parentTitle
   }
 
-  // Fallback: capitalise the last segment
+  // Fallback: capitalise the last segment (skip UUIDs)
   const last = segments[segments.length - 1] ?? 'Dashboard'
+  // If the last segment looks like a UUID, use the parent segment instead
+  if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(last)) {
+    const parent = segments[segments.length - 2]
+    if (parent) return parent.charAt(0).toUpperCase() + parent.slice(1).replace(/-/g, ' ')
+    return 'Dashboard'
+  }
   return last.charAt(0).toUpperCase() + last.slice(1).replace(/-/g, ' ')
 }
 

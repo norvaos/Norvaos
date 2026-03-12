@@ -1,7 +1,7 @@
 'use client'
 
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
-import { createClient } from '@/lib/supabase/client'
+import { useUser } from './use-user'
 
 interface Tenant {
   id: string
@@ -19,6 +19,8 @@ interface Tenant {
   trial_ends_at: string | null
   feature_flags: Record<string, boolean>
   settings: Record<string, unknown>
+  jurisdiction_code: string
+  max_users: number
 }
 
 interface TenantContextType {
@@ -34,40 +36,45 @@ const TenantContext = createContext<TenantContextType>({
 })
 
 export function TenantProvider({ children }: { children: ReactNode }) {
+  const { appUser } = useUser()
   const [tenant, setTenant] = useState<Tenant | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
+  // Re-fetch tenant whenever the authenticated user changes (login/logout).
+  // appUser?.id transitions null → string on login, triggering the re-fetch.
+  const userId = appUser?.id ?? null
+
   useEffect(() => {
+    // No user yet — reset tenant state but keep loading true
+    // only if we haven't loaded before (avoids flicker on logout)
+    if (!userId) {
+      setTenant(null)
+      setIsLoading(false)
+      return
+    }
+
     async function fetchTenant() {
       try {
-        const supabase = createClient()
-        const { data: { user } } = await supabase.auth.getUser()
-
-        if (!user) {
+        setIsLoading(true)
+        setError(null)
+        // Use the server-side API route which bypasses RLS via the admin client.
+        // This is more reliable than direct client-side Supabase queries which
+        // depend on RLS policies being correctly configured for every tenant.
+        const res = await fetch('/api/auth/me')
+        if (!res.ok) {
+          if (res.status === 401) {
+            // Not logged in — leave tenant null
+            setIsLoading(false)
+            return
+          }
+          setError('Failed to load firm data')
           setIsLoading(false)
           return
         }
 
-        const { data: userData, error: userError } = await supabase
-          .from('users')
-          .select('tenant_id')
-          .eq('auth_user_id', user.id)
-          .single()
-
-        if (userError || !userData) {
-          setError('Failed to load user data')
-          setIsLoading(false)
-          return
-        }
-
-        const { data: tenantData, error: tenantError } = await supabase
-          .from('tenants')
-          .select('*')
-          .eq('id', userData.tenant_id)
-          .single()
-
-        if (tenantError || !tenantData) {
+        const { data: tenantData } = await res.json()
+        if (!tenantData) {
           setError('Failed to load firm data')
           setIsLoading(false)
           return
@@ -82,7 +89,7 @@ export function TenantProvider({ children }: { children: ReactNode }) {
     }
 
     fetchTenant()
-  }, [])
+  }, [userId])
 
   const value = useMemo(
     () => ({ tenant, isLoading, error }),

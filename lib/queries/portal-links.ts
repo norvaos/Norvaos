@@ -9,7 +9,7 @@ type PortalLink = Database['public']['Tables']['portal_links']['Row']
 export interface PortalLinkMetadata {
   /** Custom welcome message shown at the top of the portal */
   welcome_message?: string
-  /** Instructions for the client on what to upload */
+  /** Instructions for the client on what to upload (overrides matter-type defaults) */
   instructions?: string
   /** Lawyer's display name shown on the portal */
   lawyer_name?: string
@@ -17,6 +17,26 @@ export interface PortalLinkMetadata {
   lawyer_email?: string
   /** Lawyer's phone number */
   lawyer_phone?: string
+  /** What the lawyer handles, e.g. "For legal questions" */
+  lawyer_role_description?: string
+  /** Support staff display name */
+  support_staff_name?: string
+  /** Support staff email */
+  support_staff_email?: string
+  /** Support staff phone number */
+  support_staff_phone?: string
+  /** What support staff handles, e.g. "For documents, portal support, and payment confirmation" */
+  support_staff_role_description?: string
+  /** Preferred language for the portal and emails (default: 'en') */
+  preferred_language?: 'en' | 'fr'
+  /** Per-matter payment config overrides (overrides tenant defaults field-by-field) */
+  payment_config?: {
+    e_transfer_email?: string
+    e_transfer_instructions?: string
+    credit_card_url?: string
+    credit_card_label?: string
+    payment_instructions?: string
+  }
 }
 
 export const portalLinkKeys = {

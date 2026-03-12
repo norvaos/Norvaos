@@ -6,6 +6,7 @@ import {
   CheckSquare,
   Calendar,
   CalendarCheck,
+  Clock,
   FileText,
   Mail,
   MessageSquare,
@@ -14,8 +15,8 @@ import {
   Settings,
   Phone,
   Globe,
-  FileInput,
-  FileSignature,
+  Building2,
+  MonitorSmartphone,
   type LucideIcon,
 } from 'lucide-react'
 
@@ -51,7 +52,6 @@ export const navigation: NavSection[] = [
       { title: 'Contacts', href: '/contacts', icon: Users },
       { title: 'Matters', href: '/matters', icon: Briefcase },
       { title: 'Leads', href: '/leads', icon: Target },
-      { title: 'Intake Forms', href: '/settings/forms', icon: FileInput },
       { title: 'Bookings', href: '/bookings', icon: CalendarCheck },
     ],
   },
@@ -66,7 +66,7 @@ export const navigation: NavSection[] = [
   {
     title: 'Communicate',
     items: [
-      { title: 'Email', href: '/communications', icon: Mail, comingSoon: true, featureFlag: 'email_sync' },
+      { title: 'Email', href: '/communications', icon: Mail },
       { title: 'Phone', href: '/communications/phone', icon: Phone, comingSoon: true, featureFlag: 'phone' },
       { title: 'Chat', href: '/chat', icon: MessageSquare, comingSoon: true },
     ],
@@ -74,20 +74,23 @@ export const navigation: NavSection[] = [
   {
     title: 'Finance',
     items: [
+      { title: 'Time Tracking', href: '/time-tracking', icon: Clock },
       { title: 'Billing', href: '/billing', icon: DollarSign },
       { title: 'Reports', href: '/reports', icon: BarChart3, featureFlag: 'advanced_reporting' },
     ],
   },
   {
-    title: 'Tools',
+    title: 'Operations',
     items: [
-      { title: 'Visa Invitation', href: '/tools/visitor-visa-invitation', icon: FileSignature },
+      { title: 'Front Desk', href: '/front-desk', icon: MonitorSmartphone, featureFlag: 'front_desk_mode' },
+      { title: 'Command Centre', href: '/leads', icon: LayoutDashboard },
     ],
   },
   {
     title: 'Admin',
     items: [
       { title: 'Settings', href: '/settings', icon: Settings },
+      { title: 'Tenants', href: '/admin/tenants', icon: Building2 },
     ],
   },
 ]

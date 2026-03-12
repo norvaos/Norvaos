@@ -44,31 +44,42 @@ export function useRealtime<T extends Record<string, unknown>>({
       channelConfig.filter = filter
     }
 
-    const channel = supabase
-      .channel(`${table}-changes`)
-      .on(
-        'postgres_changes' as never,
-        channelConfig,
-        (payload: RealtimePostgresChangesPayload<T>) => {
-          onChange?.(payload)
+    let channel: RealtimeChannel | null = null
 
-          if (payload.eventType === 'INSERT' && onInsert) {
-            onInsert(payload.new as T)
-          }
-          if (payload.eventType === 'UPDATE' && onUpdate) {
-            onUpdate({ old: payload.old as T, new: payload.new as T })
-          }
-          if (payload.eventType === 'DELETE' && onDelete) {
-            onDelete(payload.old as T)
-          }
-        }
-      )
-      .subscribe()
+    try {
+      channel = supabase
+        .channel(`${table}-changes`)
+        .on(
+          'postgres_changes' as never,
+          channelConfig,
+          (payload: RealtimePostgresChangesPayload<T>) => {
+            onChange?.(payload)
 
-    channelRef.current = channel
+            if (payload.eventType === 'INSERT' && onInsert) {
+              onInsert(payload.new as T)
+            }
+            if (payload.eventType === 'UPDATE' && onUpdate) {
+              onUpdate({ old: payload.old as T, new: payload.new as T })
+            }
+            if (payload.eventType === 'DELETE' && onDelete) {
+              onDelete(payload.old as T)
+            }
+          }
+        )
+        .subscribe()
+
+      channelRef.current = channel
+    } catch (err) {
+      // WebSocket may fail in insecure contexts (e.g. HTTP in dev) or when
+      // the browser blocks the connection. Degrade gracefully — data still
+      // loads via React Query; only real-time push is lost.
+      console.warn('[useRealtime] Subscription failed, real-time disabled:', err)
+    }
 
     return () => {
-      supabase.removeChannel(channel)
+      if (channel) {
+        supabase.removeChannel(channel)
+      }
     }
   }, [table, schema, event, filter, enabled, onChange, onInsert, onUpdate, onDelete])
 

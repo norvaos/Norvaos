@@ -203,10 +203,10 @@ export function useToggleBookingPageStatus() {
 
 export function useAppointments(
   tenantId: string,
-  options?: { status?: string; upcoming?: boolean }
+  options?: { status?: string; upcoming?: boolean; contactId?: string }
 ) {
   return useQuery({
-    queryKey: [...bookingKeys.appointments(tenantId), options?.status ?? 'all', options?.upcoming ?? false],
+    queryKey: [...bookingKeys.appointments(tenantId), options?.status ?? 'all', options?.upcoming ?? false, options?.contactId ?? 'all'],
     queryFn: async () => {
       const supabase = createClient()
 
@@ -226,6 +226,10 @@ export function useAppointments(
       if (options?.upcoming) {
         const today = new Date().toISOString().split('T')[0]
         q = q.gte('appointment_date', today)
+      }
+
+      if (options?.contactId) {
+        q = q.eq('contact_id', options.contactId)
       }
 
       const { data: appointments, error } = await q
@@ -294,6 +298,216 @@ export function useUpdateAppointmentStatus() {
     onError: (err: Error) => {
       toast.error(err.message || 'Failed to update appointment')
     },
+  })
+}
+
+// ── Internal Booking (CRM-initiated) ────────────────────────────────────────
+
+export function useCreateAppointmentInternal() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (input: {
+      bookingPageId: string
+      contactId: string
+      date: string
+      time: string
+      notes?: string
+    }) => {
+      const res = await fetch('/api/appointments/book', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(input),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Failed to book appointment')
+      return data as { success: boolean; appointment_id: string }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: bookingKeys.all })
+      toast.success('Appointment booked successfully')
+    },
+    onError: (err: Error) => {
+      toast.error(err.message || 'Failed to book appointment')
+    },
+  })
+}
+
+export function useCancelAppointment() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (input: { appointmentId: string; reason?: string }) => {
+      const res = await fetch(`/api/appointments/${input.appointmentId}/cancel`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reason: input.reason }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Failed to cancel appointment')
+      return data
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: bookingKeys.all })
+      toast.success('Appointment cancelled')
+    },
+    onError: (err: Error) => {
+      toast.error(err.message || 'Failed to cancel appointment')
+    },
+  })
+}
+
+export function useMarkNoShow() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (appointmentId: string) => {
+      const res = await fetch(`/api/appointments/${appointmentId}/no-show`, {
+        method: 'POST',
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Failed to mark no-show')
+      return data
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: bookingKeys.all })
+      toast.success('Appointment marked as no-show')
+    },
+    onError: (err: Error) => {
+      toast.error(err.message || 'Failed to mark no-show')
+    },
+  })
+}
+
+export function useRescheduleAppointment() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (input: { appointmentId: string; date: string; time: string }) => {
+      const res = await fetch(`/api/appointments/${input.appointmentId}/reschedule`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ date: input.date, time: input.time }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Failed to reschedule appointment')
+      return data
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: bookingKeys.all })
+      toast.success('Appointment rescheduled')
+    },
+    onError: (err: Error) => {
+      toast.error(err.message || 'Failed to reschedule appointment')
+    },
+  })
+}
+
+// ── Appointment Lifecycle ─────────────────────────────────────────────────
+
+export function useCheckInAppointment() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (appointmentId: string) => {
+      const res = await fetch(`/api/appointments/${appointmentId}/check-in`, {
+        method: 'POST',
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Failed to check in')
+      return data
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: bookingKeys.all })
+      toast.success('Client checked in')
+    },
+    onError: (err: Error) => {
+      toast.error(err.message || 'Failed to check in')
+    },
+  })
+}
+
+export function useStartAppointment() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (appointmentId: string) => {
+      const res = await fetch(`/api/appointments/${appointmentId}/start`, {
+        method: 'POST',
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Failed to start meeting')
+      return data as { success: boolean; leadId: string | null; matterId: string | null }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: bookingKeys.all })
+      toast.success('Meeting started')
+    },
+    onError: (err: Error) => {
+      toast.error(err.message || 'Failed to start meeting')
+    },
+  })
+}
+
+export function useCompleteAppointment() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (input: { appointmentId: string; notes?: string }) => {
+      const res = await fetch(`/api/appointments/${input.appointmentId}/complete`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ notes: input.notes }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Failed to complete appointment')
+      return data
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: bookingKeys.all })
+      toast.success('Appointment completed')
+    },
+    onError: (err: Error) => {
+      toast.error(err.message || 'Failed to complete appointment')
+    },
+  })
+}
+
+export function useTodaysAppointments(tenantId: string, userId: string) {
+  return useQuery({
+    queryKey: [...bookingKeys.appointments(tenantId), 'today', userId],
+    queryFn: async () => {
+      const supabase = createClient()
+      const today = new Date().toISOString().split('T')[0]
+
+      const { data: appts, error } = await supabase
+        .from('appointments')
+        .select('*')
+        .eq('tenant_id', tenantId)
+        .eq('user_id', userId)
+        .eq('appointment_date', today)
+        .in('status', ['confirmed', 'checked_in', 'in_meeting'])
+        .order('start_time', { ascending: true })
+
+      if (error) throw error
+      if (!appts?.length) return [] as AppointmentWithDetails[]
+
+      // Batch resolve contact names
+      const contactIds = [...new Set(appts.map((a) => a.contact_id).filter(Boolean))] as string[]
+      let contactMap: Record<string, { first_name: string | null; last_name: string | null }> = {}
+      if (contactIds.length > 0) {
+        const { data: contacts } = await supabase
+          .from('contacts')
+          .select('id, first_name, last_name')
+          .in('id', contactIds)
+        if (contacts) contactMap = Object.fromEntries(contacts.map((c) => [c.id, c]))
+      }
+
+      return appts.map((a) => ({
+        ...a,
+        booking_page_title: null,
+        booking_page_slug: null,
+        user_first_name: null,
+        user_last_name: null,
+        contact_first_name: a.contact_id ? contactMap[a.contact_id]?.first_name ?? null : null,
+        contact_last_name: a.contact_id ? contactMap[a.contact_id]?.last_name ?? null : null,
+      })) as AppointmentWithDetails[]
+    },
+    enabled: !!tenantId && !!userId,
+    refetchInterval: 60 * 1000,
   })
 }
 

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { processAutomationTrigger } from '@/lib/services/automation-engine'
 import { calculateDeadlineRiskScore } from '@/lib/utils/deadline-risk-engine'
+import { withTiming } from '@/lib/middleware/request-timing'
 import type { Database } from '@/lib/types/database'
 
 type MatterDeadline = Database['public']['Tables']['matter_deadlines']['Row']
@@ -15,7 +16,7 @@ type MatterDeadline = Database['public']['Tables']['matter_deadlines']['Row']
  * Uses admin client (service role) to operate across all tenants.
  * Auth: Bearer token matching CRON_SECRET env var (or skip for dev).
  */
-export async function POST(request: Request) {
+async function handlePost(request: Request) {
   // Auth check for production
   const cronSecret = process.env.CRON_SECRET
   if (cronSecret) {
@@ -145,3 +146,5 @@ export async function POST(request: Request) {
     )
   }
 }
+
+export const POST = withTiming(handlePost, 'POST /api/cron/deadline-alerts')

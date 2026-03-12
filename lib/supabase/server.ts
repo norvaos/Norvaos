@@ -1,11 +1,13 @@
 import { createServerClient } from '@supabase/ssr'
+import { createClient } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
 import type { Database } from '@/lib/types/database'
+import { incrementDbCalls } from '@/lib/middleware/request-timing'
 
 export async function createServerSupabaseClient() {
   const cookieStore = await cookies()
 
-  return createServerClient<Database>(
+  const client = createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
@@ -23,6 +25,35 @@ export async function createServerSupabaseClient() {
             // This can be ignored if you have middleware refreshing sessions.
           }
         },
+      },
+    }
+  )
+
+  // Instrument .from() to count DB round-trips
+  const originalFrom = client.from.bind(client)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ;(client as any).from = (table: string) => {
+    incrementDbCalls()
+    return originalFrom(table)
+  }
+
+  return client
+}
+
+/**
+ * Service role Supabase client — bypasses RLS entirely.
+ * Use ONLY for server-side operations that require elevated privileges,
+ * such as storage uploads, admin operations, etc.
+ * NEVER expose to client-side code.
+ */
+export function createServiceRoleClient() {
+  return createClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false,
       },
     }
   )

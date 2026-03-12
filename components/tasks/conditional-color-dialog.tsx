@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
@@ -248,6 +249,7 @@ export function ConditionalColorDialog({
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Conditional Coloring</DialogTitle>
+          <DialogDescription className="sr-only">Configure conditional coloring rules for this column</DialogDescription>
         </DialogHeader>
 
         {/* Existing rules list */}

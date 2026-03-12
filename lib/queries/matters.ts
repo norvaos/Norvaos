@@ -21,6 +21,7 @@ interface MatterListParams {
   responsibleLawyerId?: string
   pipelineId?: string
   stageId?: string
+  riskLevel?: string
 }
 
 export const matterKeys = {
@@ -34,7 +35,7 @@ export const matterKeys = {
 export function useMatters(params: MatterListParams) {
   const {
     tenantId, page = 1, pageSize = 25, search, sortBy = 'created_at',
-    sortDirection = 'desc', practiceAreaId, status, priority, responsibleLawyerId, pipelineId, stageId,
+    sortDirection = 'desc', practiceAreaId, status, priority, responsibleLawyerId, pipelineId, stageId, riskLevel,
   } = params
 
   return useQuery({
@@ -46,8 +47,9 @@ export function useMatters(params: MatterListParams) {
 
       let query = supabase
         .from('matters')
-        .select('id, tenant_id, title, matter_number, status, priority, practice_area_id, matter_type_id, matter_type, pipeline_id, stage_id, stage_entered_at, responsible_lawyer_id, originating_lawyer_id, date_opened, date_closed, billing_type, estimated_value, total_billed, total_paid, case_type_id, created_at, updated_at', { count: 'exact' })
+        .select('id, tenant_id, title, matter_number, status, priority, practice_area_id, matter_type_id, matter_type, pipeline_id, stage_id, stage_entered_at, responsible_lawyer_id, originating_lawyer_id, date_opened, date_closed, billing_type, estimated_value, total_billed, total_paid, case_type_id, intake_status, risk_level, created_at, updated_at', { count: 'exact' })
         .eq('tenant_id', tenantId)
+        .neq('status', 'archived')
 
       if (search) {
         query = query.or(`title.ilike.%${search}%,matter_number.ilike.%${search}%`)
@@ -59,6 +61,7 @@ export function useMatters(params: MatterListParams) {
       if (responsibleLawyerId) query = query.eq('responsible_lawyer_id', responsibleLawyerId)
       if (pipelineId) query = query.eq('pipeline_id', pipelineId)
       if (stageId) query = query.eq('stage_id', stageId)
+      if (riskLevel) query = query.eq('risk_level', riskLevel)
 
       query = query.order(sortBy, { ascending: sortDirection === 'asc' }).range(from, to)
 
@@ -105,7 +108,12 @@ export function useCreateMatter() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async (matter: MatterInsert) => {
+    mutationFn: async (matter: MatterInsert & {
+      contact_id?: string | null
+      // initial_matter_stage_id is a creation-time param: seeds matter_stage_state
+      // but is NOT stored on matters itself. The API reads it from the body.
+      initial_matter_stage_id?: string | null
+    }) => {
       const response = await fetch('/api/matters', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -128,7 +136,7 @@ export function useCreateMatter() {
 
       logAudit({
         tenantId: matter.tenant_id,
-        userId: matter.created_by ?? null,
+        userId: matter.created_by ?? 'system',
         entityType: 'matter',
         entityId: matter.id,
         action: 'created',
@@ -147,6 +155,14 @@ export function useUpdateMatter() {
   return useMutation({
     mutationFn: async ({ id, ...updates }: MatterUpdate & { id: string }) => {
       const supabase = createClient()
+
+      // Fetch current state before update for diff comparison
+      const { data: before } = await supabase
+        .from('matters')
+        .select()
+        .eq('id', id)
+        .single()
+
       const { data, error } = await supabase
         .from('matters')
         .update(updates)
@@ -155,21 +171,35 @@ export function useUpdateMatter() {
         .single()
 
       if (error) throw error
-      return data as Matter
+      return { matter: data as Matter, before }
     },
-    onSuccess: (data) => {
+    onSuccess: ({ matter: data, before }) => {
       queryClient.invalidateQueries({ queryKey: matterKeys.lists() })
       queryClient.setQueryData(matterKeys.detail(data.id), data)
       toast.success('Matter updated successfully')
 
-      logAudit({
-        tenantId: data.tenant_id,
-        userId: data.created_by ?? null,
-        entityType: 'matter',
-        entityId: data.id,
-        action: 'updated',
-        changes: { title: data.title, status: data.status },
-      })
+      // Only log fields that actually changed
+      if (before) {
+        const changes: Record<string, { from: unknown; to: unknown }> = {}
+        for (const key of Object.keys(before) as (keyof typeof before)[]) {
+          const oldVal = before[key]
+          const newVal = data[key as keyof typeof data]
+          if (JSON.stringify(oldVal) !== JSON.stringify(newVal)) {
+            changes[key] = { from: oldVal, to: newVal }
+          }
+        }
+        // Only audit if something actually changed
+        if (Object.keys(changes).length > 0) {
+          logAudit({
+            tenantId: data.tenant_id,
+            userId: data.created_by ?? 'system',
+            entityType: 'matter',
+            entityId: data.id,
+            action: 'updated',
+            changes,
+          })
+        }
+      }
     },
     onError: () => {
       toast.error('Failed to update matter')
@@ -200,7 +230,7 @@ export function useUpdateMatterStage() {
 
       logAudit({
         tenantId: data.tenant_id,
-        userId: data.created_by ?? null,
+        userId: data.created_by ?? 'system',
         entityType: 'matter',
         entityId: data.id,
         action: 'stage_changed',

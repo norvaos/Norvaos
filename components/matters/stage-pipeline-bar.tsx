@@ -2,6 +2,7 @@
 
 import { memo, useMemo } from 'react'
 import { cn } from '@/lib/utils'
+import { formatDate } from '@/lib/utils/formatters'
 import { Check, Lock, Clock, User } from 'lucide-react'
 import {
   Tooltip,
@@ -129,18 +130,10 @@ export const StagePipelineBar = memo(function StagePipelineBar({
               ? formatDuration(historyEntry.entered_at, historyEntry.exited_at)
               : null
             const stageEnteredDate = historyEntry
-              ? new Date(historyEntry.entered_at).toLocaleDateString('en-US', {
-                  month: 'short',
-                  day: 'numeric',
-                  year: 'numeric',
-                })
+              ? formatDate(historyEntry.entered_at)
               : null
             const stageExitedDate = historyEntry?.exited_at
-              ? new Date(historyEntry.exited_at).toLocaleDateString('en-US', {
-                  month: 'short',
-                  day: 'numeric',
-                  year: 'numeric',
-                })
+              ? formatDate(historyEntry.exited_at)
               : null
             const movedBy = getUserName(historyEntry?.user_id, users)
 
@@ -152,16 +145,18 @@ export const StagePipelineBar = memo(function StagePipelineBar({
                     disabled={!isClickable}
                     onClick={() => isClickable && onStageClick(stage.id)}
                     className={cn(
-                      'relative flex-1 flex items-center justify-center h-8 px-2 text-xs font-medium transition-all duration-200 min-w-0',
+                      'relative flex items-center justify-center h-5 text-[10px] font-medium transition-all duration-200 min-w-0',
                       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1',
-                      isFirst && 'rounded-l-md',
-                      isLast && 'rounded-r-md',
+                      isFirst && 'rounded-l-full',
+                      isLast && 'rounded-r-full',
                       isClickable && 'cursor-pointer',
                       !isClickable && 'cursor-default',
+                      // Current stage expands to fit label
+                      isCurrent ? 'flex-[3] px-3' : 'flex-1 px-0',
                       // Completed
                       isCompleted && 'text-white',
                       // Current
-                      isCurrent && 'text-white ring-2 ring-offset-1 z-10',
+                      isCurrent && 'text-white ring-1 ring-offset-1 z-10 rounded-full',
                       // Upcoming
                       isUpcoming && !isGated && 'bg-slate-100 text-slate-400',
                       // Gated
@@ -171,38 +166,25 @@ export const StagePipelineBar = memo(function StagePipelineBar({
                       backgroundColor: isCompleted || isCurrent ? stage.color : undefined,
                     }}
                   >
-                    {/* Completed: check + name */}
+                    {/* Completed: checkmark only */}
                     {isCompleted && (
-                      <span className="flex items-center gap-1 min-w-0 overflow-hidden">
-                        <Check className="h-3 w-3 shrink-0" />
-                        <span className="truncate hidden sm:inline">{stage.name}</span>
-                      </span>
+                      <Check className="h-3 w-3 shrink-0" />
                     )}
 
                     {/* Current: name prominently */}
                     {isCurrent && (
                       <span className="flex items-center gap-1.5 min-w-0 overflow-hidden">
-                        <span className="h-2 w-2 rounded-full bg-white shrink-0 animate-pulse" />
+                        <span className="h-1.5 w-1.5 rounded-full bg-white shrink-0 animate-pulse" />
                         <span className="truncate font-semibold">{stage.name}</span>
-                        {stageEnteredAt && (
-                          <span className="text-[10px] font-normal opacity-75 shrink-0 hidden md:inline">
-                            {formatDurationShort(stageEnteredAt)}
-                          </span>
-                        )}
                       </span>
                     )}
 
-                    {/* Upcoming */}
-                    {isUpcoming && !isGated && (
-                      <span className="truncate">{stage.name}</span>
-                    )}
+                    {/* Upcoming: no text */}
+                    {isUpcoming && !isGated && null}
 
-                    {/* Gated upcoming */}
+                    {/* Gated upcoming: lock icon only */}
                     {isUpcoming && isGated && (
-                      <span className="flex items-center gap-1 min-w-0 overflow-hidden">
-                        <Lock className="h-3 w-3 shrink-0" />
-                        <span className="truncate">{stage.name}</span>
-                      </span>
+                      <Lock className="h-3 w-3 shrink-0" />
                     )}
                   </button>
                 </TooltipTrigger>

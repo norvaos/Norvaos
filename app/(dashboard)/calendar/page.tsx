@@ -26,6 +26,7 @@ import {
   endOfDay,
   set as setDate,
 } from 'date-fns'
+import { formatDate } from '@/lib/utils/formatters'
 import {
   DndContext,
   DragOverlay,
@@ -64,11 +65,14 @@ import { useUIStore } from '@/lib/stores/ui-store'
 import { useCalendarEvents, calendarKeys, type CalendarEvent } from '@/lib/queries/calendar'
 import { useUpdateTask, useCreateTask } from '@/lib/queries/tasks'
 import { useCreateMatterDeadline, useUpdateMatterDeadline } from '@/lib/queries/matter-types'
+import { useUpdateCalendarEvent } from '@/lib/queries/calendar-events'
 import { DEADLINE_STATUSES, TASK_STATUSES } from '@/lib/utils/constants'
 import { cn } from '@/lib/utils'
 import { createClient } from '@/lib/supabase/client'
 
 import { TaskDetailSheet } from '@/components/tasks/task-detail-sheet'
+import { EventCreateDialog } from '@/components/calendar/event-create-dialog'
+import { EventDetailSheet } from '@/components/calendar/event-detail-sheet'
 import { ContactSearch } from '@/components/shared/contact-search'
 import { EmptyState } from '@/components/shared/empty-state'
 
@@ -133,6 +137,7 @@ const TYPE_FILTERS = [
   { key: 'all' as const, label: 'All' },
   { key: 'deadline' as const, label: 'Deadlines' },
   { key: 'task' as const, label: 'Tasks' },
+  { key: 'event' as const, label: 'Events' },
 ] as const
 
 type TypeFilterKey = (typeof TYPE_FILTERS)[number]['key']
@@ -207,6 +212,8 @@ function DraggableEventPill({
       <GripVertical className="h-3 w-3 flex-shrink-0 text-slate-300 opacity-0 transition-opacity group-hover:opacity-100" />
       {event.source === 'deadline' ? (
         <AlertCircle className="h-3 w-3 flex-shrink-0" style={{ color: event.color }} />
+      ) : event.source === 'event' ? (
+        <CalendarDays className="h-3 w-3 flex-shrink-0" style={{ color: event.color }} />
       ) : (
         <CheckSquare className="h-3 w-3 flex-shrink-0" style={{ color: event.color }} />
       )}
@@ -231,6 +238,8 @@ function EventPillStatic({ event }: { event: CalendarEvent }) {
     >
       {event.source === 'deadline' ? (
         <AlertCircle className="h-3 w-3 flex-shrink-0" style={{ color: event.color }} />
+      ) : event.source === 'event' ? (
+        <CalendarDays className="h-3 w-3 flex-shrink-0" style={{ color: event.color }} />
       ) : (
         <CheckSquare className="h-3 w-3 flex-shrink-0" style={{ color: event.color }} />
       )}
@@ -686,7 +695,7 @@ function AgendaView({
       <EmptyState
         icon={CalendarIcon}
         title="No upcoming events"
-        description="There are no active deadlines or tasks in this period."
+        description="There are no active deadlines, tasks, or events in this period."
       />
     )
   }
@@ -722,6 +731,8 @@ function AgendaView({
                     <div className="flex items-center gap-2">
                       {event.source === 'deadline' ? (
                         <AlertCircle className="h-3.5 w-3.5 flex-shrink-0" style={{ color: event.color }} />
+                      ) : event.source === 'event' ? (
+                        <CalendarDays className="h-3.5 w-3.5 flex-shrink-0" style={{ color: event.color }} />
                       ) : (
                         <CheckSquare className="h-3.5 w-3.5 flex-shrink-0" style={{ color: event.color }} />
                       )}
@@ -1213,17 +1224,17 @@ function CalendarNavHeader({
         if (ws.getMonth() === we.getMonth()) {
           return `${format(ws, 'MMMM d')} – ${format(we, 'd, yyyy')}`
         }
-        return `${format(ws, 'MMM d')} – ${format(we, 'MMM d, yyyy')}`
+        return `${formatDate(ws)} – ${formatDate(we)}`
       }
       case '3day': {
         const end = addDays(currentDate, 2)
         if (currentDate.getMonth() === end.getMonth()) {
           return `${format(currentDate, 'MMMM d')} – ${format(end, 'd, yyyy')}`
         }
-        return `${format(currentDate, 'MMM d')} – ${format(end, 'MMM d, yyyy')}`
+        return `${formatDate(currentDate)} – ${formatDate(end)}`
       }
       case 'day':
-        return format(currentDate, 'EEEE, MMMM d, yyyy')
+        return formatDate(currentDate)
       case 'timeline':
         return format(currentDate, 'MMMM yyyy')
       default:
@@ -1283,10 +1294,16 @@ export default function CalendarPage() {
   const [quickCreateOpen, setQuickCreateOpen] = useState(false)
   const [quickCreateDate, setQuickCreateDate] = useState<string | null>(null)
 
+  // Event create/detail
+  const [selectedEventId, setSelectedEventId] = useState<string | null>(null)
+  const [eventDetailOpen, setEventDetailOpen] = useState(false)
+  const [eventCreateOpen, setEventCreateOpen] = useState(false)
+
   // DnD
   const [activeEvent, setActiveEvent] = useState<CalendarEvent | null>(null)
   const updateTask = useUpdateTask()
   const updateDeadline = useUpdateMatterDeadline()
+  const updateCalendarEvent = useUpdateCalendarEvent()
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
     useSensor(KeyboardSensor)
@@ -1352,6 +1369,7 @@ export default function CalendarPage() {
   // Fetch events
   const { data: events, isLoading } = useCalendarEvents(tenantId, dateRange, {
     practiceAreaId,
+    timezone: tenant?.timezone,
   })
 
   // Client-side filtering
@@ -1447,6 +1465,9 @@ export default function CalendarPage() {
       } else if (event.source === 'task') {
         setSelectedTaskId(event.sourceId)
         setTaskDetailOpen(true)
+      } else if (event.source === 'event') {
+        setSelectedEventId(event.sourceId)
+        setEventDetailOpen(true)
       }
     },
     [router]
@@ -1489,9 +1510,21 @@ export default function CalendarPage() {
           matterId: calEvent.matterId,
           updates: { due_date: newDate },
         })
+      } else if (calEvent.source === 'event') {
+        // Move event to new date, preserving time offsets
+        const oldDatePart = calEvent.date
+        const startAt = calEvent.startTime ?? `${oldDatePart}T00:00:00`
+        const endAt = calEvent.endTime ?? `${oldDatePart}T23:59:59`
+        const newStartAt = startAt.replace(oldDatePart, newDate)
+        const newEndAt = endAt.replace(oldDatePart, newDate)
+        updateCalendarEvent.mutate({
+          id: calEvent.sourceId,
+          start_at: newStartAt,
+          end_at: newEndAt,
+        })
       }
     },
-    [tenantId, updateTask, updateDeadline, queryClient]
+    [tenantId, updateTask, updateDeadline, updateCalendarEvent, queryClient]
   )
 
   const handleDragCancel = useCallback(() => setActiveEvent(null), [])
@@ -1506,7 +1539,7 @@ export default function CalendarPage() {
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Calendar</h1>
           <p className="text-sm text-muted-foreground">
-            View deadlines and tasks across all matters
+            View deadlines, tasks, and events across all matters
           </p>
         </div>
 
@@ -1524,17 +1557,31 @@ export default function CalendarPage() {
             </div>
           )}
 
-          <Button
-            size="sm"
-            className="gap-1.5"
-            onClick={() => {
-              setQuickCreateDate(format(new Date(), 'yyyy-MM-dd'))
-              setQuickCreateOpen(true)
-            }}
-          >
-            <Plus className="h-4 w-4" />
-            <span className="hidden sm:inline">Create</span>
-          </Button>
+          <div className="flex items-center gap-1">
+            <Button
+              size="sm"
+              className="gap-1.5"
+              onClick={() => {
+                setQuickCreateDate(format(new Date(), 'yyyy-MM-dd'))
+                setQuickCreateOpen(true)
+              }}
+            >
+              <Plus className="h-4 w-4" />
+              <span className="hidden sm:inline">Task / Deadline</span>
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              className="gap-1.5"
+              onClick={() => {
+                setQuickCreateDate(format(new Date(), 'yyyy-MM-dd'))
+                setEventCreateOpen(true)
+              }}
+            >
+              <CalendarDays className="h-4 w-4" />
+              <span className="hidden sm:inline">Event</span>
+            </Button>
+          </div>
 
           {/* View switcher */}
           <TooltipProvider>
@@ -1663,6 +1710,25 @@ export default function CalendarPage() {
         onOpenChange={(open) => {
           setTaskDetailOpen(open)
           if (!open) setSelectedTaskId(null)
+        }}
+      />
+
+      {/* ── Event Create Dialog ── */}
+      <EventCreateDialog
+        open={eventCreateOpen}
+        onOpenChange={setEventCreateOpen}
+        initialDate={quickCreateDate}
+        tenantId={tenantId}
+        userId={userId}
+      />
+
+      {/* ── Event Detail Sheet ── */}
+      <EventDetailSheet
+        eventId={selectedEventId}
+        open={eventDetailOpen}
+        onOpenChange={(open) => {
+          setEventDetailOpen(open)
+          if (!open) setSelectedEventId(null)
         }}
       />
     </div>

@@ -18,9 +18,10 @@ interface TaskCreateDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   matterId?: string
+  contactId?: string
 }
 
-export function TaskCreateDialog({ open, onOpenChange, matterId }: TaskCreateDialogProps) {
+export function TaskCreateDialog({ open, onOpenChange, matterId, contactId }: TaskCreateDialogProps) {
   const { tenant } = useTenant()
   const { appUser } = useUser()
   const createTask = useCreateTask()
@@ -41,6 +42,13 @@ export function TaskCreateDialog({ open, onOpenChange, matterId }: TaskCreateDia
       priority: values.priority,
       estimated_minutes: values.estimated_minutes ?? undefined,
       follow_up_days: values.follow_up_days ?? undefined,
+      task_type: values.task_type,
+      category: values.category,
+      is_billable: values.is_billable ?? undefined,
+      visibility: values.visibility,
+      reminder_date: values.reminder_date ?? undefined,
+      status: 'not_started',
+      created_via: 'manual',
       assigned_by: appUser.id,
       created_by: appUser.id,
     })
@@ -62,6 +70,7 @@ export function TaskCreateDialog({ open, onOpenChange, matterId }: TaskCreateDia
           onSubmit={handleSubmit}
           isLoading={createTask.isPending}
           matterId={matterId}
+          contactId={contactId}
         />
       </DialogContent>
     </Dialog>

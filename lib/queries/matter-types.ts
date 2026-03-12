@@ -18,6 +18,31 @@ export const matterStageKeys = {
   state: (matterId: string) => [...matterStageKeys.all, matterId] as const,
 }
 
+export const gatingKeys = {
+  all: ['check_gating'] as const,
+  check: (matterId: string) => [...gatingKeys.all, matterId] as const,
+}
+
+// ─── Check Gating ──────────────────────────────────────────────────────────
+
+/**
+ * Pre-evaluate gating rules for all stages in a matter's pipeline.
+ * Returns which stages are blocked and why.
+ * Uses the exact same evaluateGatingRules logic as the server-side stage engine.
+ */
+export function useCheckGating(matterId: string, enabled = true) {
+  return useQuery({
+    queryKey: gatingKeys.check(matterId),
+    queryFn: async () => {
+      const res = await fetch(`/api/matters/${matterId}/check-gating`)
+      if (!res.ok) return { gatingErrors: {} }
+      return res.json() as Promise<{ gatingErrors: Record<string, string[]> }>
+    },
+    enabled: !!matterId && enabled,
+    staleTime: 1000 * 30, // 30s — re-check frequently
+  })
+}
+
 // ─── Matter Types ────────────────────────────────────────────────────────────
 
 /**
@@ -38,7 +63,8 @@ export function useMatterTypes(tenantId: string, practiceAreaId?: string | null)
         .order('name')
 
       if (practiceAreaId) {
-        q = q.eq('practice_area_id', practiceAreaId)
+        // Include both practice-area-specific and global (null) matter types
+        q = q.or(`practice_area_id.eq.${practiceAreaId},practice_area_id.is.null`)
       }
 
       const { data, error } = await q
@@ -802,6 +828,28 @@ export function useDeleteMatterStage() {
   })
 }
 
+export function useDeleteMatterStagePipeline() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (input: { id: string; matterTypeId: string }) => {
+      const supabase = createClient()
+      const { error } = await supabase
+        .from('matter_stage_pipelines')
+        .delete()
+        .eq('id', input.id)
+      if (error) throw error
+      return input.matterTypeId
+    },
+    onSuccess: (matterTypeId) => {
+      queryClient.invalidateQueries({ queryKey: ['matter_stage_pipelines', matterTypeId] })
+      toast.success('Pipeline deleted')
+    },
+    onError: () => {
+      toast.error('Failed to delete pipeline')
+    },
+  })
+}
+
 export function useReorderMatterStages() {
   const queryClient = useQueryClient()
   return useMutation({
@@ -888,10 +936,102 @@ export function useAdvanceMatterStage() {
       queryClient.invalidateQueries({ queryKey: ['tasks', 'list'] })
       queryClient.invalidateQueries({ queryKey: ['activities'] })
       queryClient.invalidateQueries({ queryKey: ['immigration', 'deadlines', variables.matterId] })
+      queryClient.invalidateQueries({ queryKey: gatingKeys.check(variables.matterId) })
       toast.success(`Stage advanced to ${result.stageName}`)
     },
     onError: (error: Error) => {
       toast.error(error.message || 'Failed to advance stage')
+    },
+  })
+}
+
+// ─── IRCC Question Set Codes per Matter Type ──────────────────────────────
+
+/**
+ * Fetch the configured IRCC form codes for a matter type.
+ * Returns the ircc_question_set_codes array from the matter_types table.
+ */
+export function useMatterTypeFormCodes(matterTypeId: string | null) {
+  return useQuery({
+    queryKey: ['matter-type-form-codes', matterTypeId] as const,
+    queryFn: async () => {
+      if (!matterTypeId) return []
+      const supabase = createClient()
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data, error } = await (supabase as any)
+        .from('matter_types')
+        .select('ircc_question_set_codes')
+        .eq('id', matterTypeId)
+        .single()
+
+      if (error) throw error
+      return (data?.ircc_question_set_codes ?? []) as string[]
+    },
+    enabled: !!matterTypeId,
+    staleTime: 60_000,
+  })
+}
+
+// ─── Intake Question Schema ───────────────────────────────────────────────────
+
+export interface IntakeQuestion {
+  key: string
+  label: string
+  type: 'text' | 'select' | 'date' | 'boolean'
+  required: boolean
+  options?: string[]       // for select type
+  placeholder?: string
+  help_text?: string
+  show_if?: {              // conditional display: show this question only if...
+    question_key: string
+    equals: string
+  }
+}
+
+/**
+ * Fetch the intake question schema for a matter type.
+ */
+export function useMatterTypeIntakeSchema(matterTypeId: string | null | undefined) {
+  return useQuery({
+    queryKey: ['matter-type-intake-schema', matterTypeId] as const,
+    queryFn: async () => {
+      if (!matterTypeId) return [] as IntakeQuestion[]
+      const supabase = createClient()
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data, error } = await (supabase as any)
+        .from('matter_types')
+        .select('intake_question_schema')
+        .eq('id', matterTypeId)
+        .single()
+      if (error) throw error
+      return (data?.intake_question_schema ?? []) as IntakeQuestion[]
+    },
+    enabled: !!matterTypeId,
+    staleTime: 30_000,
+  })
+}
+
+/**
+ * Save the full intake question schema for a matter type.
+ */
+export function useUpdateMatterTypeIntakeSchema() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (input: { matterTypeId: string; schema: IntakeQuestion[] }) => {
+      const supabase = createClient()
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error } = await (supabase as any)
+        .from('matter_types')
+        .update({ intake_question_schema: input.schema })
+        .eq('id', input.matterTypeId)
+      if (error) throw error
+    },
+    onSuccess: (_, vars) => {
+      queryClient.invalidateQueries({ queryKey: ['matter-type-intake-schema', vars.matterTypeId] })
+      toast.success('Intake questions saved')
+    },
+    onError: () => {
+      toast.error('Failed to save intake questions')
     },
   })
 }

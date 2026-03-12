@@ -8,12 +8,20 @@ export const BUILD_SHA = process.env.NEXT_PUBLIC_BUILD_SHA || 'dev'
 export const BUILD_TIME = process.env.NEXT_PUBLIC_BUILD_TIME || new Date().toISOString()
 export const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME || 'NorvaOS'
 
+/**
+ * Core Enforcement Specification version.
+ * Must match the version in docs/core-enforcement-spec-v1.md.
+ * Bump this when spec invariants change.
+ */
+export const CORE_ENFORCEMENT_SPEC_VERSION = '1.3.0'
+
 export function getVersionInfo() {
   return {
     version: APP_VERSION,
     build: BUILD_SHA,
     buildTime: BUILD_TIME,
     name: APP_NAME,
+    enforcementSpec: CORE_ENFORCEMENT_SPEC_VERSION,
     environment: process.env.NODE_ENV || 'development',
   }
 }

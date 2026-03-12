@@ -708,6 +708,165 @@ export function useStaffWorkload(tenantId: string) {
   })
 }
 
+// ─── 22a. useAllCaseTypes (includes inactive, for settings) ─────────────────
+
+export function useAllCaseTypes(tenantId: string) {
+  return useQuery({
+    queryKey: [...immigrationKeys.caseTypes(tenantId), 'all'] as const,
+    queryFn: async () => {
+      const supabase = createClient()
+      const { data, error } = await supabase
+        .from('immigration_case_types')
+        .select('*')
+        .eq('tenant_id', tenantId)
+        .order('sort_order', { ascending: true })
+
+      if (error) throw error
+      return data as ImmigrationCaseType[]
+    },
+    enabled: !!tenantId,
+  })
+}
+
+// ─── 22b. useCreateCaseType ────────────────────────────────────────────────────
+
+export function useCreateCaseType() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (input: {
+      tenant_id: string
+      name: string
+      description?: string | null
+      default_billing_type?: string
+      default_estimated_value?: number | null
+    }) => {
+      const slug = input.name
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)/g, '')
+
+      const supabase = createClient()
+      const { data, error } = await supabase
+        .from('immigration_case_types')
+        .insert({
+          tenant_id: input.tenant_id,
+          name: input.name,
+          slug,
+          description: input.description ?? null,
+          default_billing_type: input.default_billing_type ?? 'flat_fee',
+          default_estimated_value: input.default_estimated_value ?? null,
+        })
+        .select()
+        .single()
+
+      if (error) throw error
+      return data as ImmigrationCaseType
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: immigrationKeys.caseTypes(data.tenant_id) })
+      toast.success('Case type created')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Failed to create case type')
+    },
+  })
+}
+
+// ─── 22c. useUpdateCaseType ────────────────────────────────────────────────────
+
+export function useUpdateCaseType() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async ({
+      id,
+      tenantId,
+      updates,
+    }: {
+      id: string
+      tenantId: string
+      updates: Database['public']['Tables']['immigration_case_types']['Update']
+    }) => {
+      const supabase = createClient()
+      const { data, error } = await supabase
+        .from('immigration_case_types')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single()
+
+      if (error) throw error
+      return { data: data as ImmigrationCaseType, tenantId }
+    },
+    onSuccess: ({ tenantId }) => {
+      queryClient.invalidateQueries({ queryKey: immigrationKeys.caseTypes(tenantId) })
+      toast.success('Case type updated')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Failed to update case type')
+    },
+  })
+}
+
+// ─── 22d. useDeleteCaseType (soft delete) ──────────────────────────────────────
+
+export function useDeleteCaseType() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async ({ id, tenantId }: { id: string; tenantId: string }) => {
+      const supabase = createClient()
+      const { error } = await supabase
+        .from('immigration_case_types')
+        .update({ is_active: false })
+        .eq('id', id)
+
+      if (error) throw error
+      return { tenantId }
+    },
+    onSuccess: ({ tenantId }) => {
+      queryClient.invalidateQueries({ queryKey: immigrationKeys.caseTypes(tenantId) })
+      toast.success('Case type archived')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Failed to archive case type')
+    },
+  })
+}
+
+// ─── 22e. useReorderCaseTypes ──────────────────────────────────────────────────
+
+export function useReorderCaseTypes() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async ({
+      caseTypes,
+      tenantId,
+    }: {
+      caseTypes: { id: string; sort_order: number }[]
+      tenantId: string
+    }) => {
+      const supabase = createClient()
+      for (const ct of caseTypes) {
+        const { error } = await supabase
+          .from('immigration_case_types')
+          .update({ sort_order: ct.sort_order })
+          .eq('id', ct.id)
+        if (error) throw error
+      }
+      return { tenantId }
+    },
+    onSuccess: ({ tenantId }) => {
+      queryClient.invalidateQueries({ queryKey: immigrationKeys.caseTypes(tenantId) })
+    },
+    onError: () => {
+      toast.error('Failed to reorder case types')
+    },
+  })
+}
+
 // ─── 22. useCreateCaseStage ─────────────────────────────────────────────────────
 
 export function useCreateCaseStage() {

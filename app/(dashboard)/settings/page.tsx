@@ -8,17 +8,22 @@ import {
   Shield,
   Layers,
   GitBranch,
-  Briefcase,
   SlidersHorizontal,
   Plug,
   Zap,
   FileInput,
   CreditCard,
   ListChecks,
-  FileCheck,
+  FileText,
   Clock,
+  Receipt,
+  Bell,
+  MonitorSmartphone,
+  Upload,
+  FileStack,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { APP_VERSION, BUILD_SHA, CORE_ENFORCEMENT_SPEC_VERSION } from '@/lib/config/version'
 
 interface SettingsCard {
   title: string
@@ -60,31 +65,31 @@ const settingsCards: { section: string; items: SettingsCard[] }[] = [
         icon: Shield,
         color: 'text-purple-600 bg-purple-50',
       },
+      {
+        title: 'Notifications',
+        description: 'Email, push, and in-app notification preferences',
+        href: '/settings/notifications',
+        icon: Bell,
+        color: 'text-amber-600 bg-amber-50',
+      },
+      {
+        title: 'Billing & Plan',
+        description: 'Subscription, invoices, and payment',
+        href: '/settings/billing-plan',
+        icon: CreditCard,
+        color: 'text-slate-600 bg-slate-100',
+      },
     ],
   },
   {
     section: 'Practice',
     items: [
       {
-        title: 'Practice Areas',
-        description: 'Configure areas of law your firm handles',
-        href: '/settings/practice-areas',
+        title: 'Practice Areas & Matter Types',
+        description: 'Configure practice areas, matter types, pipelines, and workflow stages',
+        href: '/settings/matter-types',
         icon: Layers,
         color: 'text-emerald-600 bg-emerald-50',
-      },
-      {
-        title: 'Matter Types',
-        description: 'Matter types, pipelines, and workflow stages',
-        href: '/settings/matter-types',
-        icon: Briefcase,
-        color: 'text-teal-600 bg-teal-50',
-      },
-      {
-        title: 'Deadline Types',
-        description: 'Configure deadline categories and auto-calculation rules',
-        href: '/settings/deadline-types',
-        icon: Clock,
-        color: 'text-red-600 bg-red-50',
       },
       {
         title: 'Pipelines',
@@ -94,30 +99,63 @@ const settingsCards: { section: string; items: SettingsCard[] }[] = [
         color: 'text-cyan-600 bg-cyan-50',
       },
       {
-        title: 'Task Templates',
-        description: 'Reusable task lists and checklists',
+        title: 'Deadline Types',
+        description: 'Deadline categories and auto-calculation rules',
+        href: '/settings/deadline-types',
+        icon: Clock,
+        color: 'text-red-600 bg-red-50',
+      },
+      {
+        title: 'Templates',
+        description: 'Reusable task lists and workflow automation rules for stage transitions',
         href: '/settings/task-templates',
         icon: ListChecks,
         color: 'text-sky-600 bg-sky-50',
       },
       {
-        title: 'Document Templates',
-        description: 'Required documents per immigration case type',
+        title: 'Document Settings',
+        description: 'Required documents per case type and auto-generation of retainer and engagement letters',
         href: '/settings/document-templates',
-        icon: FileCheck,
-        color: 'text-green-600 bg-green-50',
+        icon: FileText,
+        color: 'text-violet-600 bg-violet-50',
       },
       {
-        title: 'Workflow Templates',
-        description: 'Auto-create tasks on stage transitions',
-        href: '/settings/workflow-templates',
-        icon: Zap,
-        color: 'text-yellow-600 bg-yellow-50',
+        title: 'Forms & Document Library',
+        description: 'Upload forms, manage required documents, map XFA fields, and sync IRCC form versions',
+        href: '/settings/ircc-form-library',
+        icon: FileStack,
+        color: 'text-rose-600 bg-rose-50',
+      },
+      {
+        title: 'Fees & Billing Presets',
+        description: 'Services, government fees, disbursement presets, and default fee structures per matter type',
+        href: '/settings/retainer-presets',
+        icon: Receipt,
+        color: 'text-lime-600 bg-lime-50',
       },
     ],
   },
   {
-    section: 'Advanced',
+    section: 'Operations',
+    items: [
+      {
+        title: 'Reception & Front Desk',
+        description: 'Front desk zones, lobby kiosk, check-in languages, and visitor options',
+        href: '/settings/front-desk',
+        icon: MonitorSmartphone,
+        color: 'text-teal-600 bg-teal-50',
+      },
+      {
+        title: 'Data Import',
+        description: 'Import data from Go High Level, Clio, or Officio',
+        href: '/settings/data-import',
+        icon: Upload,
+        color: 'text-emerald-600 bg-emerald-50',
+      },
+    ],
+  },
+  {
+    section: 'Platform',
     items: [
       {
         title: 'Custom Fields',
@@ -147,13 +185,6 @@ const settingsCards: { section: string; items: SettingsCard[] }[] = [
         icon: FileInput,
         color: 'text-pink-600 bg-pink-50',
       },
-      {
-        title: 'Billing & Plan',
-        description: 'Subscription, invoices, and payment',
-        href: '/settings/billing-plan',
-        icon: CreditCard,
-        color: 'text-slate-600 bg-slate-100',
-      },
     ],
   },
 ]
@@ -178,7 +209,7 @@ export default function SettingsPage() {
               const Icon = card.icon
               return (
                 <Link
-                  key={card.href}
+                  key={card.title}
                   href={card.href}
                   className="group flex items-start gap-3 rounded-lg border bg-white p-4 transition-all hover:shadow-sm hover:border-slate-300"
                 >
@@ -204,6 +235,18 @@ export default function SettingsPage() {
           </div>
         </div>
       ))}
+
+      {/* System Info */}
+      <div className="border-t pt-6">
+        <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3">
+          System Info
+        </h2>
+        <div className="flex flex-wrap gap-x-6 gap-y-1 text-xs text-slate-400">
+          <span>App v{APP_VERSION}</span>
+          <span>Build {BUILD_SHA}</span>
+          <span>Enforcement Spec v{CORE_ENFORCEMENT_SPEC_VERSION}</span>
+        </div>
+      </div>
     </div>
   )
 }

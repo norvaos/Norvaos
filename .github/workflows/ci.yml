@@ -26,6 +26,37 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # ─── Enforcement Spec Gate (PR only) ───────────────────────────────
+  enforcement-gate:
+    name: Enforcement Gate
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for merge-base
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run enforcement spec gate
+        run: npx tsx scripts/check-spec-updated.ts --base origin/${{ github.base_ref }}
+
+      - name: Run tests
+        run: pnpm vitest run
+
   # ─── Lint, Type-check, Build ─────────────────────────────────────
   build:
     name: Build & Verify
@@ -50,6 +81,9 @@ jobs:
 
       - name: Lint
         run: pnpm lint
+
+      - name: Security audit
+        run: pnpm audit --audit-level=high || echo "::warning::Security vulnerabilities found — review pnpm audit output above"
 
       - name: Type Check & Build
         run: pnpm build
@@ -80,34 +114,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # ──────────────────────────────────────────────────────────
-      # Deploy to your platform of choice. Examples:
-      # ──────────────────────────────────────────────────────────
-      #
-      # OPTION A: Vercel (recommended for Next.js)
-      # - name: Deploy to Vercel (Staging)
-      #   uses: amondnet/vercel-action@v25
-      #   with:
-      #     vercel-token: ${{ secrets.VERCEL_TOKEN }}
-      #     vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-      #     vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-      #     vercel-args: '--env staging'
-      #
-      # OPTION B: AWS Amplify
-      # - name: Deploy to AWS Amplify
-      #   run: |
-      #     aws amplify start-deployment ...
-      #
-      # OPTION C: Docker + any cloud
-      # - name: Build Docker Image
-      #   run: docker build -t lexcrm:${{ github.sha }} .
-      # ──────────────────────────────────────────────────────────
-
-      - name: Staging deployment placeholder
-        run: |
-          echo "🚀 Deploy to staging environment"
-          echo "Configure your deployment platform in this step"
-          echo "Version: $(node -p "require('./package.json').version")"
+      - name: Deploy to Vercel (Staging)
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          vercel-args: '--env staging'
+        env:
+          CRON_SECRET: ${{ secrets.STAGING_CRON_SECRET }}
 
   # ─── Run Database Migrations (Staging) ───────────────────────────
   migrate-staging:
@@ -127,21 +142,62 @@ jobs:
       - name: Install pg
         run: npm install pg
 
-      - name: Run migrations (staging)
+      - name: Check migration status
         run: node scripts/migrate.mjs --status
         env:
           SUPABASE_DB_URL: ${{ secrets.STAGING_DB_URL }}
 
-      # Uncomment when ready to auto-run migrations:
-      # - name: Apply pending migrations
-      #   run: node scripts/migrate.mjs
-      #   env:
-      #     SUPABASE_DB_URL: ${{ secrets.STAGING_DB_URL }}
+      - name: Apply pending migrations
+        run: node scripts/migrate.mjs
+        env:
+          SUPABASE_DB_URL: ${{ secrets.STAGING_DB_URL }}
+
+  # ─── Staging API Validation ─────────────────────────────────────
+  validate-staging:
+    name: Validate Staging APIs
+    needs: migrate-staging
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run staging API validation
+        run: npx tsx scripts/staging-api-validation.ts
+        env:
+          STAGING_URL: https://staging.lexcrm.com
+          SUPABASE_URL: ${{ secrets.STAGING_SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.STAGING_SUPABASE_ANON_KEY }}
+          ADMIN_EMAIL: ${{ secrets.STAGING_ADMIN_EMAIL }}
+          ADMIN_PASSWORD: ${{ secrets.STAGING_ADMIN_PASSWORD }}
+          LAWYER_EMAIL: ${{ secrets.STAGING_LAWYER_EMAIL }}
+          LAWYER_PASSWORD: ${{ secrets.STAGING_LAWYER_PASSWORD }}
+          PARALEGAL_EMAIL: ${{ secrets.STAGING_PARALEGAL_EMAIL }}
+          PARALEGAL_PASSWORD: ${{ secrets.STAGING_PARALEGAL_PASSWORD }}
+          CLERK_EMAIL: ${{ secrets.STAGING_CLERK_EMAIL }}
+          CLERK_PASSWORD: ${{ secrets.STAGING_CLERK_PASSWORD }}
+          TENANT_B_ADMIN_EMAIL: ${{ secrets.STAGING_TENANT_B_ADMIN_EMAIL }}
+          TENANT_B_ADMIN_PASSWORD: ${{ secrets.STAGING_TENANT_B_ADMIN_PASSWORD }}
+          CRON_SECRET: ${{ secrets.STAGING_CRON_SECRET }}
 
   # ─── Deploy to Production ────────────────────────────────────────
   deploy-production:
     name: Deploy to Production
-    needs: [deploy-staging, migrate-staging]
+    needs: [deploy-staging, migrate-staging, validate-staging]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     environment:

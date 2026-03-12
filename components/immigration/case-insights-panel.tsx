@@ -3,18 +3,19 @@
 import { useMemo, useState, useCallback } from 'react'
 import {
   useMatterImmigration,
-  useMatterChecklistItems,
   useMatterDeadlines,
   useCaseStages,
 } from '@/lib/queries/immigration'
+import { useDocumentSlots } from '@/lib/queries/document-slots'
 import {
-  analyzeCaseInsights,
+  analyzeCaseInsightsV2,
 } from '@/lib/utils/case-insights-engine'
 import type {
   CaseInsights,
   InsightSeverity,
   CrsAnalysis,
   ReadinessBreakdown,
+  DocumentSlotSummary,
 } from '@/lib/utils/case-insights-engine'
 import { cn } from '@/lib/utils'
 
@@ -42,6 +43,8 @@ import {
 interface CaseInsightsPanelProps {
   matterId: string
   tenantId: string
+  stageEnteredAt?: string
+  currentStageName?: string
 }
 
 // ─── Severity Config ────────────────────────────────────────────────────────────
@@ -270,9 +273,9 @@ function InsightSection({
 
 // ─── Main Component ─────────────────────────────────────────────────────────────
 
-export function CaseInsightsPanel({ matterId, tenantId }: CaseInsightsPanelProps) {
+export function CaseInsightsPanel({ matterId, tenantId, stageEnteredAt, currentStageName }: CaseInsightsPanelProps) {
   const { data: immigration, isLoading: loadingImmigration } = useMatterImmigration(matterId)
-  const { data: checklistItems, isLoading: loadingChecklist } = useMatterChecklistItems(matterId)
+  const { data: documentSlots, isLoading: loadingSlots } = useDocumentSlots(matterId)
   const { data: deadlines, isLoading: loadingDeadlines } = useMatterDeadlines(matterId)
 
   const caseTypeId = immigration?.case_type_id ?? ''
@@ -291,18 +294,31 @@ export function CaseInsightsPanel({ matterId, tenantId }: CaseInsightsPanelProps
     })
   }, [])
 
-  const isLoading = loadingImmigration || loadingChecklist || loadingDeadlines
+  const isLoading = loadingImmigration || loadingSlots || loadingDeadlines
 
-  // Compute insights
+  // Map document slots to lightweight summaries for the insights engine
+  const slotSummaries: DocumentSlotSummary[] = useMemo(() => {
+    if (!documentSlots) return []
+    return documentSlots.map((s) => ({
+      id: s.id,
+      slot_name: s.slot_name,
+      is_required: s.is_required,
+      status: s.status,
+      current_version: s.current_version,
+      created_at: s.created_at,
+    }))
+  }, [documentSlots])
+
+  // Compute insights using V2 (document-slot-based) engine
   const insights: CaseInsights | null = useMemo(() => {
     if (!immigration) return null
-    return analyzeCaseInsights({
+    return analyzeCaseInsightsV2({
       immigration,
-      checklistItems: checklistItems ?? [],
+      documentSlots: slotSummaries,
       deadlines: deadlines ?? [],
       stages: stages ?? [],
     })
-  }, [immigration, checklistItems, deadlines, stages])
+  }, [immigration, slotSummaries, deadlines, stages])
 
   if (isLoading) {
     return (
@@ -353,6 +369,33 @@ export function CaseInsightsPanel({ matterId, tenantId }: CaseInsightsPanelProps
       </div>
 
       <div className="p-4 space-y-4">
+        {/* Stage Duration */}
+        {currentStageName && stageEnteredAt && (() => {
+          const daysInStage = Math.floor((Date.now() - new Date(stageEnteredAt).getTime()) / (1000 * 60 * 60 * 24))
+          const isBottleneck = daysInStage > 30
+          const isWarning = daysInStage > 14
+          return (
+            <div className={cn(
+              'flex items-center justify-between rounded-lg border px-3 py-2',
+              isBottleneck ? 'bg-red-50 border-red-200' : isWarning ? 'bg-amber-50 border-amber-200' : 'bg-slate-50 border-slate-200'
+            )}>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-slate-600">Current Stage:</span>
+                <span className="text-xs font-medium text-slate-800">{currentStageName}</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className={cn(
+                  'text-xs font-bold tabular-nums',
+                  isBottleneck ? 'text-red-600' : isWarning ? 'text-amber-600' : 'text-slate-700'
+                )}>
+                  {daysInStage} days
+                </span>
+                {isBottleneck && <AlertTriangle className="h-3 w-3 text-red-500" />}
+              </div>
+            </div>
+          )
+        })()}
+
         {/* Readiness Gauges */}
         <div className="grid grid-cols-3 gap-4">
           <ReadinessGauge

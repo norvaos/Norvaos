@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { Suspense, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
@@ -28,7 +28,24 @@ const loginSchema = z.object({
 type LoginFormValues = z.infer<typeof loginSchema>
 
 export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <Card>
+        <CardHeader>
+          <CardTitle>Sign in to your account</CardTitle>
+          <CardDescription>Loading...</CardDescription>
+        </CardHeader>
+      </Card>
+    }>
+      <LoginForm />
+    </Suspense>
+  )
+}
+
+function LoginForm() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const redirectTo = searchParams.get('redirect') || '/'
   const [isLoading, setIsLoading] = useState(false)
 
   const {
@@ -60,7 +77,16 @@ export default function LoginPage() {
         return
       }
 
-      router.push('/')
+      // Update last_login_at for the authenticated user
+      const { data: { user: authUser } } = await supabase.auth.getUser()
+      if (authUser) {
+        await supabase
+          .from('users')
+          .update({ last_login_at: new Date().toISOString() })
+          .eq('auth_user_id', authUser.id)
+      }
+
+      router.push(redirectTo)
       router.refresh()
     } catch {
       toast.error('An unexpected error occurred. Please try again.')

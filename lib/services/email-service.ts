@@ -39,6 +39,14 @@ function getResend(): Resend | null {
 
 const FROM_DOMAIN = process.env.RESEND_FROM_DOMAIN || 'notifications.norvaos.com'
 
+/** Build the FROM address. Uses Resend test address when domain is resend.dev */
+function getFromAddress(firmName: string): string {
+  if (FROM_DOMAIN === 'resend.dev') {
+    return 'onboarding@resend.dev'
+  }
+  return `${firmName} <notifications@${FROM_DOMAIN}>`
+}
+
 async function getPortalToken(
   supabase: SupabaseClient<Database>,
   matterId: string
@@ -188,7 +196,7 @@ export async function sendStageChangeEmail(params: SendStageChangeEmailParams): 
 
     // Send via Resend
     const { data: resendData, error: resendError } = await resend.emails.send({
-      from: `${tenant.name} <notifications@${FROM_DOMAIN}>`,
+      from: getFromAddress(tenant.name),
       to: [contact.email_primary],
       subject,
       html,
@@ -251,11 +259,47 @@ export async function sendClientEmail(params: SendClientEmailParams): Promise<vo
       fetchMatterRef(supabase, matterId),
     ])
 
-    if (!contact?.email_primary) return
-    if (contact.email_notifications_enabled === false) return
+    if (!contact?.email_primary) {
+      console.warn(`[email-service] Skipping ${notificationType}: contact ${contactId} has no email address`)
+      await logNotification(supabase, {
+        tenantId, matterId, contactId,
+        notificationType,
+        subject: `${notificationType} notification`,
+        status: 'skipped',
+        errorMessage: 'Contact has no email address',
+        metadata: templateData as Record<string, unknown>,
+      })
+      return
+    }
+
+    if (contact.email_notifications_enabled === false) {
+      console.warn(`[email-service] Skipping ${notificationType}: notifications disabled for ${contact.email_primary}`)
+      await logNotification(supabase, {
+        tenantId, matterId, contactId,
+        notificationType,
+        subject: `${notificationType} notification`,
+        status: 'skipped',
+        recipientEmail: contact.email_primary,
+        errorMessage: 'Email notifications disabled for this contact',
+        metadata: templateData as Record<string, unknown>,
+      })
+      return
+    }
 
     const resend = getResend()
-    if (!resend) return
+    if (!resend) {
+      console.warn(`[email-service] Skipping ${notificationType}: RESEND_API_KEY not configured`)
+      await logNotification(supabase, {
+        tenantId, matterId, contactId,
+        notificationType,
+        subject: `${notificationType} notification`,
+        status: 'skipped',
+        recipientEmail: contact.email_primary,
+        errorMessage: 'RESEND_API_KEY not configured',
+        metadata: templateData as Record<string, unknown>,
+      })
+      return
+    }
 
     const portalToken = await getPortalToken(supabase, matterId)
     const portalUrl = portalToken ? getPortalUrl(portalToken) : undefined
@@ -293,6 +337,7 @@ export async function sendClientEmail(params: SendClientEmailParams): Promise<vo
           documentNames: (templateData.document_names as string[]) || [],
           portalUrl,
           message: templateData.message as string | undefined,
+          language: (templateData.language as 'en' | 'fr') || 'en',
         })
         html = rendered.html
         text = rendered.text
@@ -359,13 +404,21 @@ export async function sendClientEmail(params: SendClientEmailParams): Promise<vo
       .select('id')
       .single()
 
+    console.log(`[email-service] Sending ${notificationType} to ${contact.email_primary} via Resend (from: notifications@${FROM_DOMAIN})`)
+
     const { data: resendData, error: resendError } = await resend.emails.send({
-      from: `${tenant.name} <notifications@${FROM_DOMAIN}>`,
+      from: getFromAddress(tenant.name),
       to: [contact.email_primary],
       subject,
       html,
       text,
     })
+
+    if (resendError) {
+      console.error(`[email-service] Resend API error for ${notificationType}:`, resendError)
+    } else {
+      console.log(`[email-service] Email sent successfully: ${notificationType} → ${contact.email_primary} (resend_id: ${resendData?.id})`)
+    }
 
     if (notifRow) {
       if (resendError) {
@@ -386,6 +439,78 @@ export async function sendClientEmail(params: SendClientEmailParams): Promise<vo
     }
   } catch (err) {
     console.error('[email-service] Failed to send client email:', err)
+  }
+}
+
+// ─── Core: Internal Staff Notification Email ─────────────────────────────────────
+
+interface SendInternalEmailParams {
+  supabase: SupabaseClient<Database>
+  tenantId: string
+  recipientEmail: string
+  recipientName: string
+  title: string
+  message: string
+  entityType?: string
+  entityId?: string
+}
+
+/**
+ * Send a notification email to an internal staff member.
+ * Called from the notification dispatch engine.
+ * Non-blocking: all errors caught internally — never throws.
+ */
+export async function sendInternalEmail(params: SendInternalEmailParams): Promise<void> {
+  const { supabase, tenantId, recipientEmail, recipientName, title, message, entityType, entityId } = params
+
+  try {
+    const resend = getResend()
+    if (!resend) return
+
+    const tenant = await fetchTenantBranding(supabase, tenantId)
+
+    // Build action URL if entity context is available
+    let actionUrl: string | undefined
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+    if (entityType && entityId) {
+      switch (entityType) {
+        case 'matter':
+          actionUrl = `${baseUrl}/matters/${entityId}`
+          break
+        case 'task':
+          actionUrl = `${baseUrl}/tasks`
+          break
+        case 'chat':
+          actionUrl = `${baseUrl}/chat`
+          break
+        case 'document':
+          actionUrl = `${baseUrl}/matters`
+          break
+      }
+    }
+
+    const { renderInternalNotificationEmail } = await import('@/lib/email-templates/internal-notification')
+    const { html, text, subject } = await renderInternalNotificationEmail({
+      firmName: tenant.name,
+      firmLogoUrl: tenant.logo_url,
+      primaryColor: tenant.primary_color,
+      recipientName,
+      title,
+      message,
+      actionUrl,
+      actionLabel: actionUrl ? 'View Details' : undefined,
+    })
+
+    await resend.emails.send({
+      from: getFromAddress(tenant.name),
+      to: [recipientEmail],
+      subject,
+      html,
+      text,
+    })
+  } catch (err) {
+    // Non-blocking — never throw from email service
+    console.error('[email-service] Failed to send internal email:', err)
   }
 }
 

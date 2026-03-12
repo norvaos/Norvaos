@@ -1,6 +1,10 @@
 import { NextResponse } from 'next/server'
 import { authenticateRequest, AuthError } from '@/lib/services/auth'
+import { requirePermission } from '@/lib/services/require-role'
 import { advanceGenericStage, advanceImmigrationStage } from '@/lib/services/stage-engine'
+import { invalidateGating, invalidateMatter } from '@/lib/services/cache-invalidation'
+import { dispatchNotification } from '@/lib/services/notification-engine'
+import { withTiming } from '@/lib/middleware/request-timing'
 
 /**
  * POST /api/matters/[id]/advance-stage
@@ -11,15 +15,16 @@ import { advanceGenericStage, advanceImmigrationStage } from '@/lib/services/sta
  * Body: { targetStageId: string, system: 'immigration' | 'generic' }
  * Returns: { success: true, stageName } | { success: false, error, failedRules? }
  */
-export async function POST(
+async function handlePost(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id: matterId } = await params
 
-    // 1. Authenticate and get tenant context
+    // 1. Authenticate, authorize, and get tenant context
     const auth = await authenticateRequest()
+    requirePermission(auth, 'matters', 'edit')
 
     // 2. Parse request body
     const body = await request.json()
@@ -70,8 +75,38 @@ export async function POST(
       ? await advanceImmigrationStage(engineParams)
       : await advanceGenericStage(engineParams)
 
-    // 5. Return result
+    // 5. Invalidate caches on success and return result
     if (result.success) {
+      await Promise.all([
+        invalidateGating(auth.tenantId, matterId),
+        invalidateMatter(auth.tenantId, matterId),
+      ])
+
+      // 6. Notify responsible lawyer about stage change
+      const { data: matterDetail } = await auth.supabase
+        .from('matters')
+        .select('responsible_lawyer_id')
+        .eq('id', matterId)
+        .single()
+
+      const recipientIds = matterDetail?.responsible_lawyer_id
+        && matterDetail.responsible_lawyer_id !== auth.userId
+        ? [matterDetail.responsible_lawyer_id]
+        : []
+
+      if (recipientIds.length > 0) {
+        dispatchNotification(auth.supabase, {
+          tenantId: auth.tenantId,
+          eventType: 'stage_change',
+          recipientUserIds: recipientIds,
+          title: `Stage changed: ${result.stageName ?? 'New Stage'}`,
+          message: `A matter has been advanced to a new stage.`,
+          entityType: 'matter',
+          entityId: matterId,
+          priority: 'normal',
+        }).catch(() => {})
+      }
+
       return NextResponse.json(result, { status: 200 })
     } else {
       return NextResponse.json(result, { status: 400 })
@@ -91,3 +126,5 @@ export async function POST(
     )
   }
 }
+
+export const POST = withTiming(handlePost, 'POST /api/matters/[id]/advance-stage')

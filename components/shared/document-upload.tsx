@@ -2,9 +2,11 @@
 
 import { useState, useRef, useCallback } from 'react'
 import { useDocuments, useUploadDocument, useDeleteDocument, useDownloadDocument } from '@/lib/queries/documents'
+import { useMicrosoftConnection } from '@/lib/queries/microsoft-integration'
 import { useUser } from '@/lib/hooks/use-user'
 import { formatDate } from '@/lib/utils/formatters'
 import { DocumentViewer } from '@/components/shared/document-viewer'
+import { toast } from 'sonner'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -38,6 +40,9 @@ import {
   X,
   Paperclip,
   Eye,
+  Cloud,
+  HardDrive,
+  ExternalLink,
 } from 'lucide-react'
 
 const DOCUMENT_CATEGORIES = [
@@ -51,6 +56,27 @@ const DOCUMENT_CATEGORIES = [
   { value: 'property', label: 'Property' },
   { value: 'other', label: 'Other' },
 ]
+
+const ACCEPTED_FILE_TYPES = [
+  'application/pdf',
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'application/vnd.ms-excel',
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  'text/csv',
+  'text/plain',
+  'application/rtf',
+  'image/jpeg',
+  'image/png',
+  'image/heic',
+  'image/tiff',
+  'image/bmp',
+  'image/webp',
+]
+
+const ACCEPTED_EXTENSIONS = '.pdf,.doc,.docx,.xls,.xlsx,.csv,.txt,.rtf,.jpg,.jpeg,.png,.heic,.tiff,.tif,.bmp,.webp'
+
+const MAX_FILE_SIZE_BYTES = 25 * 1024 * 1024 // 25 MB
 
 function formatFileSize(bytes: number | null): string {
   if (!bytes) return 'Unknown'
@@ -83,19 +109,27 @@ interface DocumentUploadProps {
   entityType: 'matter' | 'contact' | 'lead' | 'task'
   entityId: string
   tenantId: string
+  entityName?: string
+  /** When true, only renders the upload area — hides the document list below */
+  hideList?: boolean
 }
 
-export function DocumentUpload({ entityType, entityId, tenantId }: DocumentUploadProps) {
+export function DocumentUpload({ entityType, entityId, tenantId, entityName, hideList }: DocumentUploadProps) {
   const { appUser } = useUser()
   const [showUploadDialog, setShowUploadDialog] = useState(false)
   const [selectedFiles, setSelectedFiles] = useState<File[]>([])
   const [fileNames, setFileNames] = useState<Record<number, string>>({})
   const [category, setCategory] = useState('general')
   const [description, setDescription] = useState('')
+  const [storageLocation, setStorageLocation] = useState<'local' | 'onedrive'>('local')
   const [deleteId, setDeleteId] = useState<{ id: string; storagePath: string; name: string } | null>(null)
   const [isDragging, setIsDragging] = useState(false)
   const [viewerDoc, setViewerDoc] = useState<{ storagePath: string; fileName: string; fileType: string | null } | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  // Check if OneDrive is connected and enabled
+  const { data: msConnection } = useMicrosoftConnection(appUser?.id || '')
+  const hasOneDrive = !!(msConnection?.is_active && msConnection?.onedrive_enabled)
 
   const entityKey =
     entityType === 'matter'
@@ -110,19 +144,62 @@ export function DocumentUpload({ entityType, entityId, tenantId }: DocumentUploa
   const deleteMutation = useDeleteDocument()
   const downloadMutation = useDownloadDocument()
 
+  /** Build an auto-generated display name: {EntityName}_{Category}_{Date}_v{N} */
+  const buildAutoName = useCallback(
+    (originalName: string, cat: string, idx: number) => {
+      if (!entityName) return getFileNameWithoutExtension(originalName)
+      const safeName = entityName.replace(/[^a-zA-Z0-9]+/g, '_').replace(/_+$/, '')
+      const catLabel = DOCUMENT_CATEGORIES.find((c) => c.value === cat)?.label ?? cat
+      const datePart = new Date().toISOString().slice(0, 10) // YYYY-MM-DD
+      // Determine version number by counting existing docs with similar prefix
+      const existingCount =
+        documents?.filter(
+          (d) => d.file_name.startsWith(`${safeName}_${catLabel}_`)
+        ).length ?? 0
+      const version = existingCount + idx + 1
+      return `${safeName}_${catLabel}_${datePart}_v${version}`
+    },
+    [entityName, documents]
+  )
+
   const handleFiles = useCallback((files: FileList | null) => {
-    if (files) {
-      const fileArray = Array.from(files)
-      setSelectedFiles(fileArray)
-      // Initialize editable file names (without extension)
-      const names: Record<number, string> = {}
-      fileArray.forEach((file, idx) => {
-        names[idx] = getFileNameWithoutExtension(file.name)
-      })
-      setFileNames(names)
-      setShowUploadDialog(true)
+    if (!files || files.length === 0) return
+
+    const fileArray = Array.from(files)
+    const validFiles: File[] = []
+    const errors: string[] = []
+
+    for (const file of fileArray) {
+      // Validate file size
+      if (file.size > MAX_FILE_SIZE_BYTES) {
+        errors.push(`"${file.name}" exceeds the 25 MB limit (${formatFileSize(file.size)})`)
+        continue
+      }
+      // Validate file type — check MIME type or extension fallback
+      const ext = file.name.split('.').pop()?.toLowerCase() ?? ''
+      const allowedExts = ACCEPTED_EXTENSIONS.split(',').map((e) => e.replace('.', ''))
+      if (!ACCEPTED_FILE_TYPES.includes(file.type) && !allowedExts.includes(ext)) {
+        errors.push(`"${file.name}" has an unsupported file type`)
+        continue
+      }
+      validFiles.push(file)
     }
-  }, [])
+
+    if (errors.length > 0) {
+      toast.error(errors.join('. '))
+    }
+
+    if (validFiles.length === 0) return
+
+    setSelectedFiles(validFiles)
+    // Initialize editable file names — auto-name if entityName provided
+    const names: Record<number, string> = {}
+    validFiles.forEach((file, idx) => {
+      names[idx] = buildAutoName(file.name, category, idx)
+    })
+    setFileNames(names)
+    setShowUploadDialog(true)
+  }, [buildAutoName, category])
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault()
@@ -151,12 +228,34 @@ export function DocumentUpload({ entityType, entityId, tenantId }: DocumentUploa
       description: description || undefined,
     }
 
+    let successCount = 0
+    const errors: string[] = []
+
     for (let i = 0; i < selectedFiles.length; i++) {
       const file = selectedFiles[i]
       const editedName = fileNames[i]
       const ext = getFileExtension(file.name)
       const displayName = editedName ? `${editedName}${ext}` : file.name
-      await uploadMutation.mutateAsync({ file, metadata: metadataBase, displayName })
+      try {
+        await uploadMutation.mutateAsync({
+          file,
+          metadata: metadataBase,
+          displayName,
+          storageLocation: hasOneDrive ? storageLocation : undefined,
+        })
+        successCount++
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : 'Upload failed'
+        errors.push(`"${displayName}": ${msg}`)
+      }
+    }
+
+    if (successCount > 0 && errors.length === 0) {
+      toast.success(`${successCount} file${successCount > 1 ? 's' : ''} uploaded`)
+    } else if (successCount > 0 && errors.length > 0) {
+      toast.warning(`${successCount} uploaded, ${errors.length} failed: ${errors.join('; ')}`)
+    } else if (errors.length > 0) {
+      toast.error(`Upload failed: ${errors.join('; ')}`)
     }
 
     setShowUploadDialog(false)
@@ -164,10 +263,11 @@ export function DocumentUpload({ entityType, entityId, tenantId }: DocumentUploa
     setFileNames({})
     setCategory('general')
     setDescription('')
+    setStorageLocation('local')
   }
 
   const handleDownload = async (storagePath: string, fileName: string) => {
-    const blob = await downloadMutation.mutateAsync(storagePath)
+    const blob = await downloadMutation.mutateAsync({ storagePath })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
@@ -203,8 +303,12 @@ export function DocumentUpload({ entityType, entityId, tenantId }: DocumentUploa
     return (
       <div className="space-y-3">
         <Skeleton className="h-32 w-full" />
-        <Skeleton className="h-16 w-full" />
-        <Skeleton className="h-16 w-full" />
+        {!hideList && (
+          <>
+            <Skeleton className="h-16 w-full" />
+            <Skeleton className="h-16 w-full" />
+          </>
+        )}
       </div>
     )
   }
@@ -225,6 +329,7 @@ export function DocumentUpload({ entityType, entityId, tenantId }: DocumentUploa
           ref={fileInputRef}
           type="file"
           multiple
+          accept={ACCEPTED_EXTENSIONS}
           className="hidden"
           onChange={(e) => handleFiles(e.target.files)}
         />
@@ -232,11 +337,11 @@ export function DocumentUpload({ entityType, entityId, tenantId }: DocumentUploa
         <p className="text-sm text-slate-600">
           <span className="font-medium text-blue-600">Click to upload</span> or drag and drop
         </p>
-        <p className="text-xs text-slate-400 mt-1">PDF, DOC, XLS, Images up to 50MB</p>
+        <p className="text-xs text-slate-400 mt-1">PDF, DOC, DOCX, XLS, XLSX, CSV, Images up to 25 MB</p>
       </div>
 
-      {/* Document list */}
-      {documents && documents.length > 0 ? (
+      {/* Document list (hidden when parent manages its own list) */}
+      {!hideList && (documents && documents.length > 0 ? (
         <div className="space-y-2">
           {documents.map((doc) => {
             const FileIcon = getFileIcon(doc.file_type)
@@ -249,7 +354,14 @@ export function DocumentUpload({ entityType, entityId, tenantId }: DocumentUploa
                   <FileIcon className="h-8 w-8 text-slate-400" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-slate-900 truncate">{doc.file_name}</p>
+                  <div className="flex items-center gap-1.5">
+                    <p className="text-sm font-medium text-slate-900 truncate">{doc.file_name}</p>
+                    {doc.external_provider === 'microsoft_onedrive' && (
+                      <Badge variant="secondary" className="text-xs py-0 gap-1 shrink-0">
+                        <Cloud className="h-3 w-3" /> OneDrive
+                      </Badge>
+                    )}
+                  </div>
                   <div className="flex items-center gap-2 text-xs text-slate-500">
                     <span>{formatFileSize(doc.file_size)}</span>
                     <span>&bull;</span>
@@ -266,22 +378,32 @@ export function DocumentUpload({ entityType, entityId, tenantId }: DocumentUploa
                     variant="ghost"
                     size="icon"
                     className="h-8 w-8"
-                    onClick={() =>
-                      setViewerDoc({
-                        storagePath: doc.storage_path,
-                        fileName: doc.file_name,
-                        fileType: doc.file_type,
-                      })
-                    }
+                    onClick={() => {
+                      if (doc.onedrive_web_url) {
+                        window.open(doc.onedrive_web_url, '_blank')
+                      } else {
+                        setViewerDoc({
+                          storagePath: doc.storage_path,
+                          fileName: doc.file_name,
+                          fileType: doc.file_type,
+                        })
+                      }
+                    }}
                   >
-                    <Eye className="h-4 w-4" />
+                    {doc.onedrive_web_url ? <ExternalLink className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </Button>
                   <Button
                     variant="ghost"
                     size="icon"
                     className="h-8 w-8"
-                    onClick={() => handleDownload(doc.storage_path, doc.file_name)}
-                    disabled={downloadMutation.isPending}
+                    onClick={() => {
+                      if (doc.onedrive_web_url) {
+                        window.open(doc.onedrive_web_url, '_blank')
+                      } else {
+                        handleDownload(doc.storage_path, doc.file_name)
+                      }
+                    }}
+                    disabled={!doc.onedrive_web_url && downloadMutation.isPending}
                   >
                     <Download className="h-4 w-4" />
                   </Button>
@@ -304,7 +426,7 @@ export function DocumentUpload({ entityType, entityId, tenantId }: DocumentUploa
           <p className="text-sm">No documents yet</p>
           <p className="text-xs text-slate-400">Upload files to get started</p>
         </div>
-      )}
+      ))}
 
       {/* Upload dialog */}
       <Dialog open={showUploadDialog} onOpenChange={setShowUploadDialog}>
@@ -350,7 +472,20 @@ export function DocumentUpload({ entityType, entityId, tenantId }: DocumentUploa
             </div>
             <div>
               <label className="text-sm font-medium">Category</label>
-              <Select value={category} onValueChange={setCategory}>
+              <Select
+                value={category}
+                onValueChange={(val) => {
+                  setCategory(val)
+                  // Regenerate auto-names with new category if entityName provided
+                  if (entityName) {
+                    const names: Record<number, string> = {}
+                    selectedFiles.forEach((file, idx) => {
+                      names[idx] = buildAutoName(file.name, val, idx)
+                    })
+                    setFileNames(names)
+                  }
+                }}
+              >
                 <SelectTrigger className="w-full mt-1">
                   <SelectValue />
                 </SelectTrigger>
@@ -372,6 +507,38 @@ export function DocumentUpload({ entityType, entityId, tenantId }: DocumentUploa
                 onChange={(e) => setDescription(e.target.value)}
               />
             </div>
+            {hasOneDrive && (
+              <div>
+                <label className="text-sm font-medium">Save to</label>
+                <div className="flex gap-2 mt-1">
+                  <Button
+                    type="button"
+                    variant={storageLocation === 'local' ? 'default' : 'outline'}
+                    size="sm"
+                    className="flex-1"
+                    onClick={() => setStorageLocation('local')}
+                  >
+                    <HardDrive className="h-4 w-4 mr-2" />
+                    NorvaOS
+                  </Button>
+                  <Button
+                    type="button"
+                    variant={storageLocation === 'onedrive' ? 'default' : 'outline'}
+                    size="sm"
+                    className="flex-1"
+                    onClick={() => setStorageLocation('onedrive')}
+                  >
+                    <Cloud className="h-4 w-4 mr-2" />
+                    OneDrive
+                  </Button>
+                </div>
+                {storageLocation === 'onedrive' && (
+                  <p className="text-xs text-muted-foreground mt-1">
+                    File will be saved to your OneDrive in the NorvaOS folder.
+                  </p>
+                )}
+              </div>
+            )}
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowUploadDialog(false)}>

@@ -51,3 +51,14 @@ supabase/.temp/
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# python
+__pycache__/
+*.pyc
+*.pyo
+
+# scale readiness / load test artifacts (internal only)
+/scale-readiness/
+
+# os
+Thumbs.db

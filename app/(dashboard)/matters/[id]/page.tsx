@@ -1,63 +1,61 @@
 'use client'
 
-import { useState, useMemo, useCallback, memo } from 'react'
-import { differenceInDays } from 'date-fns'
+import { useState, useMemo, useCallback, useRef, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { useTenant } from '@/lib/hooks/use-tenant'
 import { useUser } from '@/lib/hooks/use-user'
+import { useUserRole } from '@/lib/hooks/use-user-role'
 import { useMatter, useUpdateMatter } from '@/lib/queries/matters'
-import { useActivities } from '@/lib/queries/activities'
+import { useConditionErrors } from '@/lib/queries/activities'
 import { createClient } from '@/lib/supabase/client'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import type { Database } from '@/lib/types/database'
 import {
-  MATTER_STATUSES,
-  PRIORITIES,
-  BILLING_TYPES,
-  MATTER_CONTACT_ROLES,
-  TASK_STATUSES,
-  INVOICE_STATUSES,
-  PAYMENT_METHODS,
+  IMMIGRATION_INTAKE_STATUSES,
 } from '@/lib/utils/constants'
 import {
   formatDate,
-  formatRelativeDate,
-  formatCurrency,
-  formatFullName,
-  formatPhoneNumber,
 } from '@/lib/utils/formatters'
 import { MatterForm } from '@/components/matters/matter-form'
 import type { MatterFormValues } from '@/lib/schemas/matter'
 import { DocumentUpload } from '@/components/shared/document-upload'
-import {
-  useTimeEntries,
-  useUnbilledTimeEntries,
-  useCreateTimeEntry,
-  useDeleteTimeEntry,
-  useInvoices,
-  useCreateInvoice,
-  useUpdateInvoiceStatus,
-  useDeleteInvoice,
-  useRecordPayment,
-  type TimeEntry,
-  type InvoiceWithMatter,
-} from '@/lib/queries/invoicing'
+import { DocumentSlotPanel } from '@/components/matters/document-slot-panel'
+import { DocumentList } from '@/components/document-engine/document-list'
 import { TagManager } from '@/components/shared/tag-manager'
 import { NotesEditor } from '@/components/shared/notes-editor'
 import { ActivityTimeline } from '@/components/shared/activity-timeline'
-import { MiniTimeline } from '@/components/shared/mini-timeline'
+import { OverviewTab } from '@/components/matters/tabs/overview-tab'
+import { MilestonesTab } from '@/components/matters/tabs/milestones-tab'
+import { ContactsTab } from '@/components/matters/tabs/contacts-tab'
+import { TasksTab } from '@/components/matters/tabs/tasks-tab'
+import { DeadlinesTab } from '@/components/matters/tabs/deadlines-tab'
+import { BillingTab } from '@/components/matters/tabs/billing-tab'
+import { OnboardingTab } from '@/components/matters/tabs/onboarding-tab'
+import { useOnboardingBadgeCount } from '@/lib/queries/matter-onboarding'
+import { ClientReviewPanel } from '@/components/ircc/client-review-panel'
+import { getStatusConfig, getPriorityConfig } from '@/components/matters/tabs/matter-tab-helpers'
 import { useCreateAuditLog } from '@/lib/queries/audit-logs'
+import { RequirePermission } from '@/components/require-permission'
+
+// Unified workspace components
+import { MatterControlHeader } from '@/components/matters/matter-control-header'
+import { CentralActionPanel } from '@/components/matters/central-action-panel'
+import { QuestionsWorkflowSection } from '@/components/matters/workflow/questions-section'
+import { DocumentsWorkflowSection } from '@/components/matters/workflow/documents-section'
+import { ReviewBlockersWorkflowSection } from '@/components/matters/workflow/review-blockers-section'
+import { FormPacksGateSection } from '@/components/matters/workflow/form-packs-gate-section'
+import { SecondaryAccessBar } from '@/components/matters/secondary-access-bar'
+import { LawyerReviewDialog } from '@/components/matters/lawyer-review-dialog'
+import { ContradictionOverrideDialog } from '@/components/matters/contradiction-override-dialog'
+import type { ImmigrationReadinessData } from '@/lib/queries/immigration-readiness'
 
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardHeader, CardTitle, CardAction } from '@/components/ui/card'
-import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Checkbox } from '@/components/ui/checkbox'
 import {
   Select,
   SelectContent,
@@ -65,14 +63,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
 import {
   Sheet,
   SheetContent,
@@ -103,63 +93,58 @@ import {
   Archive,
   Trash2,
   Mail,
-  Phone,
-  Calendar,
-  Briefcase,
-  FileText,
-  MessageSquare,
-  Clock,
   Loader2,
-  DollarSign,
-  Users,
   Hash,
   AlertTriangle,
-  CheckCircle2,
   ListTodo,
   ListChecks,
   Shield,
-  Plus,
-  Plane,
   Settings2,
   Link2,
   Copy,
   ExternalLink,
   RefreshCw,
+  ShieldAlert,
+  CloudUpload,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
-import { ContactSearch } from '@/components/shared/contact-search'
-import { TaskCreateDialog } from '@/components/tasks/task-create-dialog'
-import { TaskDetailSheet } from '@/components/tasks/task-detail-sheet'
-import { useTaskTemplates, useApplyTemplate } from '@/lib/queries/task-templates'
 import { CaseInsightsPanel } from '@/components/immigration/case-insights-panel'
 import { ImmigrationDetailsPanel } from '@/components/immigration/immigration-details-panel'
+import { ClientProgressPanel } from '@/components/immigration/client-progress-panel'
 import { DocumentChecklistPanel } from '@/components/immigration/document-checklist-panel'
 import { DeadlineRiskPanel } from '@/components/immigration/deadline-risk-panel'
-import { StageProgressionBar } from '@/components/immigration/stage-progression-bar'
-import { StagePipelineBar } from '@/components/matters/stage-pipeline-bar'
+import { StageProgressionBar } from '@/components/immigration/stage-progression-bar' // compact redesign
+import { StagePipelineBar } from '@/components/matters/stage-pipeline-bar' // compact redesign
 import { StageManageSheet } from '@/components/immigration/stage-manage-sheet'
+import { MatterComments } from '@/components/matters/matter-comments'
+import { IRCCIntakeTab } from './ircc-intake-tab'
+import { IRCCFormsTab } from './ircc-forms-tab'
+import { FormsTab } from '@/components/matters/tabs/forms-tab'
+import { UnifiedCaseDetailsTab } from '@/components/matters/unified-case-details-tab'
+import { CoreDataSummaryPanel } from '@/components/matters/core-data-summary-panel'
+import { CoreDataCardTab } from '@/components/matters/core-data-card-tab'
+import { SendDocumentRequestDialog } from '@/components/matters/send-document-request-dialog'
+import { ImmigrationReadinessHub } from '@/components/matters/immigration-readiness-hub'
+import { useImmigrationReadiness } from '@/lib/queries/immigration-readiness'
+import { ClientNotificationsTab } from '@/components/matters/client-notifications-tab'
+import { useRegenerateSlots, useDocumentSlots } from '@/lib/queries/document-slots'
+import { useMicrosoftConnection, useSyncMatterOneDrive } from '@/lib/queries/microsoft-integration'
+import { useMatterIntake } from '@/lib/queries/matter-intake'
 import { usePortalLinks, useCreatePortalLink, useRevokePortalLink, type PortalLinkMetadata } from '@/lib/queries/portal-links'
 import { useMatterImmigration, useCaseStages, useMatterChecklistItems } from '@/lib/queries/immigration'
 import {
-  useMatterDeadlines,
-  useDeadlineTypes,
-  useCreateMatterDeadline,
-  useToggleMatterDeadline,
-  useDeleteMatterDeadline,
   useMatterStagePipelines,
   useMatterStages,
   useMatterStageState,
   useAdvanceMatterStage,
+  useCheckGating,
 } from '@/lib/queries/matter-types'
 
 type Matter = Database['public']['Tables']['matters']['Row']
-type MatterContact = Database['public']['Tables']['matter_contacts']['Row']
-type Contact = Database['public']['Tables']['contacts']['Row']
 type Task = Database['public']['Tables']['tasks']['Row']
 type UserRow = Database['public']['Tables']['users']['Row']
 type PracticeArea = Database['public']['Tables']['practice_areas']['Row']
-type Activity = Database['public']['Tables']['activities']['Row']
 
 // -------------------------------------------------------------------
 // Custom hooks for matter-related data
@@ -199,47 +184,6 @@ function useMatterPracticeArea(practiceAreaId: string | null) {
       return data as PracticeArea
     },
     enabled: !!practiceAreaId,
-  })
-}
-
-function useMatterContacts(matterId: string, tenantId: string) {
-  return useQuery({
-    queryKey: ['matter-contacts', matterId],
-    queryFn: async () => {
-      const supabase = createClient()
-
-      // Get matter_contacts for this matter
-      const { data: matterContacts, error: mcError } = await supabase
-        .from('matter_contacts')
-        .select('*')
-        .eq('matter_id', matterId)
-        .eq('tenant_id', tenantId)
-
-      if (mcError) throw mcError
-      if (!matterContacts || matterContacts.length === 0) return []
-
-      // Fetch the corresponding contacts
-      const contactIds = matterContacts.map((mc: MatterContact) => mc.contact_id)
-      const { data: contacts, error: cError } = await supabase
-        .from('contacts')
-        .select('*')
-        .in('id', contactIds)
-        .eq('tenant_id', tenantId)
-
-      if (cError) throw cError
-
-      // Combine contact data with role info
-      const typedMatterContacts = matterContacts as MatterContact[]
-      return (contacts as Contact[]).map((contact) => {
-        const mc = typedMatterContacts.find((mc) => mc.contact_id === contact.id)
-        return {
-          ...contact,
-          role: mc?.role ?? 'client',
-          is_primary: mc?.is_primary ?? false,
-        }
-      })
-    },
-    enabled: !!matterId && !!tenantId,
   })
 }
 
@@ -286,40 +230,52 @@ function useDeleteMatter() {
 }
 
 // -------------------------------------------------------------------
-// Helper functions
-// -------------------------------------------------------------------
+// Auto-expand logic for immigration workspace
+// ── Auto-expand logic ─────────────────────────────────────────────
 
-function getStatusConfig(status: string) {
-  const found = MATTER_STATUSES.find((s) => s.value === status)
-  return found ?? { label: status, color: '#6b7280' }
-}
+function computeAutoExpandSection(
+  readinessData: ImmigrationReadinessData,
+  intakeStatus: string,
+): 'questions' | 'documents' | 'review' | null {
+  const matrix = readinessData.readinessMatrix
 
-function getPriorityConfig(priority: string) {
-  const found = PRIORITIES.find((p) => p.value === priority)
-  return found ?? { label: priority, color: '#6b7280' }
-}
+  // If next action relates to documents, expand documents
+  if (
+    ['client_in_progress', 'review_required'].includes(intakeStatus) &&
+    readinessData.documents.pendingReview > 0
+  ) {
+    return 'documents'
+  }
 
-function getBillingLabel(billingType: string) {
-  const found = BILLING_TYPES.find((b) => b.value === billingType)
-  return found?.label ?? billingType
-}
+  // If blocked by contradictions or active lawyer review, expand review
+  // (status defaults to 'not_required' when no review has happened yet —
+  //  only expand review if status indicates an actual pending/in-progress review)
+  if (
+    (readinessData.contradictions?.blockingCount ?? 0) > 0 ||
+    (readinessData.lawyerReview?.required
+      && readinessData.lawyerReview?.status !== 'approved'
+      && readinessData.lawyerReview?.status !== 'not_required')
+  ) {
+    return 'review'
+  }
 
-function getTaskStatusConfig(status: string) {
-  const found = TASK_STATUSES.find((s) => s.value === status)
-  return found ?? { label: status, color: '#6b7280' }
-}
+  // Compare question vs document blockers — expand whichever has more
+  const questionBlockers = matrix?.allBlockers?.filter((b) => b.type === 'question') ?? []
+  const docBlockers = matrix?.allBlockers?.filter((b) => b.type === 'document') ?? []
 
-function getRoleLabel(role: string) {
-  const found = MATTER_CONTACT_ROLES.find((r) => r.value === role)
-  return found?.label ?? role
-}
+  if (questionBlockers.length > docBlockers.length) {
+    return 'questions'
+  }
+  if (docBlockers.length > 0) {
+    return 'documents'
+  }
 
-function getUserName(userId: string | null, users: UserRow[] | undefined): string {
-  if (!userId || !users) return '-'
-  const user = users.find((u) => u.id === userId)
-  if (!user) return '-'
-  const name = formatFullName(user.first_name, user.last_name)
-  return name || user.email
+  // Default: expand review if any blockers exist
+  if ((matrix?.allBlockers?.length ?? 0) > 0) {
+    return 'review'
+  }
+
+  return null // Everything clear — keep all collapsed
 }
 
 // -------------------------------------------------------------------
@@ -332,8 +288,15 @@ export default function MatterDetailPage() {
   const matterId = params.id as string
   const { tenant } = useTenant()
   const { appUser } = useUser()
+  const { role: userRole } = useUserRole()
   const tenantId = tenant?.id ?? ''
+  const userId = appUser?.id ?? ''
 
+  const queryClient = useQueryClient()
+
+  // OneDrive: check connection once per page; only show sync button when enabled
+  const { data: msConnection } = useMicrosoftConnection(userId)
+  const syncOneDrive = useSyncMatterOneDrive(matterId)
   const { data: matter, isLoading, isError } = useMatter(matterId)
   const updateMatter = useUpdateMatter()
   const deleteMatter = useDeleteMatter()
@@ -343,14 +306,77 @@ export default function MatterDetailPage() {
   const { data: immigrationData } = useMatterImmigration(matterId)
   const { data: immigrationStages } = useCaseStages(immigrationData?.case_type_id ?? '')
 
+  // UEE: Fetch intake data and detect enforcement
+  const { data: intake } = useMatterIntake(matterId)
+  const { data: matterTypeData } = useQuery({
+    queryKey: ['matter_types', 'single', matter?.matter_type_id],
+    queryFn: async () => {
+      const supabase = createClient()
+      const { data, error } = await supabase
+        .from('matter_types')
+        .select('id, enforcement_enabled')
+        .eq('id', matter!.matter_type_id!)
+        .single()
+      if (error) throw error
+      return data as { id: string; enforcement_enabled: boolean }
+    },
+    enabled: !!matter?.matter_type_id,
+    staleTime: 5 * 60 * 1000,
+  })
+  const enforcementEnabled = matterTypeData?.enforcement_enabled ?? false
+  const regenerateSlots = useRegenerateSlots()
+
   // Immigration vs generic pipeline — must be mutually exclusive
-  const hasImmigration = !!matter?.case_type_id || !!immigrationData
-  const hasGenericPipeline = !!matter?.matter_type_id && !matter?.case_type_id && !immigrationData
+  // Detect immigration: legacy case_type_id, matter_immigration record, OR enforcement-enabled matter type
+  const hasImmigration = !!matter?.case_type_id || !!immigrationData || enforcementEnabled
+  const { data: readinessData } = useImmigrationReadiness(hasImmigration ? matterId : undefined)
+  const { data: documentSlots = [] } = useDocumentSlots(hasImmigration ? matterId : undefined)
+  const hasGenericPipeline = !!matter?.matter_type_id && !hasImmigration
+  // Unified Case Details tab — show when matter has a matter type
+  const showCaseDetails = !!matter?.matter_type_id
   const { data: pipelines } = useMatterStagePipelines(tenantId, hasGenericPipeline ? matter?.matter_type_id : null)
   const defaultPipeline = pipelines?.find((p) => p.is_default) ?? pipelines?.[0]
   const { data: pipelineStages } = useMatterStages(defaultPipeline?.id)
   const { data: stageState } = useMatterStageState(hasGenericPipeline ? matterId : null)
   const advanceStage = useAdvanceMatterStage()
+  const { data: gatingData } = useCheckGating(matterId, hasGenericPipeline)
+
+  // Primary contact for edit form defaults
+  const { data: primaryContactId } = useQuery({
+    queryKey: ['matter-primary-contact', matterId],
+    queryFn: async () => {
+      const supabase = createClient()
+      const { data } = await supabase
+        .from('matter_contacts')
+        .select('contact_id')
+        .eq('matter_id', matterId)
+        .eq('tenant_id', tenantId)
+        .eq('is_primary', true)
+        .maybeSingle()
+      return data?.contact_id ?? null
+    },
+    enabled: !!matterId && !!tenantId,
+  })
+
+  // Primary client name for header display
+  const { data: primaryClientName } = useQuery({
+    queryKey: ['matter-primary-client-name', primaryContactId],
+    queryFn: async () => {
+      const supabase = createClient()
+      const { data } = await supabase
+        .from('contacts')
+        .select('first_name, last_name, organization_name')
+        .eq('id', primaryContactId!)
+        .single()
+      if (!data) return null
+      const name = [data.first_name, data.last_name].filter(Boolean).join(' ')
+      return name || data.organization_name || null
+    },
+    enabled: !!primaryContactId,
+  })
+
+  // Template condition error banner (fail-closed errors affecting required docs)
+  const { data: conditionErrorActivity } = useConditionErrors(matterId)
 
   // Checklist completion & upcoming tasks for the stage bar header
   const { data: checklistItems } = useMatterChecklistItems(hasImmigration ? matterId : '')
@@ -374,11 +400,16 @@ export default function MatterDetailPage() {
       .slice(0, 3)
   }, [topTasks])
 
+  const onboardingBadgeCount = useOnboardingBadgeCount(matterId)
+  const [activeTab, setActiveTab] = useState('onboarding')
   const [editOpen, setEditOpen] = useState(false)
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [stageError, setStageError] = useState<string | null>(null)
   const [stageManageOpen, setStageManageOpen] = useState(false)
   const [portalDialogOpen, setPortalDialogOpen] = useState(false)
+  const [docRequestDialogOpen, setDocRequestDialogOpen] = useState(false)
+  const [lawyerReviewDialogOpen, setLawyerReviewDialogOpen] = useState(false)
+  const [contradictionOverrideDialogOpen, setContradictionOverrideDialogOpen] = useState(false)
   const [portalView, setPortalView] = useState<'manage' | 'create'>('manage')
   const [portalExpiryDays, setPortalExpiryDays] = useState('30')
   const [portalMeta, setPortalMeta] = useState<PortalLinkMetadata>({})
@@ -408,6 +439,61 @@ export default function MatterDetailPage() {
     }
   }, [activePortalLink, appUser])
 
+  // ── Immigration workspace state (controlled expand + navigation) ──
+  const isImmigrationWorkspace = hasImmigration && enforcementEnabled && showCaseDetails
+  const intakeStatus = readinessData?.intakeStatus ?? 'not_issued'
+
+  const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set())
+  const hasAutoExpanded = useRef(false)
+
+  // Auto-expand the most relevant section when readiness data first arrives
+  useEffect(() => {
+    if (isImmigrationWorkspace && readinessData && !hasAutoExpanded.current) {
+      hasAutoExpanded.current = true
+      const autoSection = computeAutoExpandSection(readinessData, intakeStatus)
+      if (autoSection) {
+        setExpandedSections(new Set([autoSection]))
+      }
+    }
+  }, [isImmigrationWorkspace, readinessData, intakeStatus])
+
+  const toggleSection = useCallback((section: string) => {
+    setExpandedSections((prev) => {
+      const next = new Set(prev)
+      if (next.has(section)) next.delete(section)
+      else next.add(section)
+      return next
+    })
+  }, [])
+
+  // Cross-section navigation — expands target section
+  const handleNavigateToSection = useCallback((section: 'questions' | 'documents' | 'review' | 'formPacks') => {
+    setExpandedSections((prev) => {
+      const next = new Set(prev)
+      next.add(section)
+      return next
+    })
+    // Scroll into view after a tick
+    setTimeout(() => {
+      document.getElementById(`workflow-section-${section}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }, 100)
+  }, [])
+
+  // Open sheet externally (e.g., "Go to Field" → open Case Details sheet)
+  const [externalSheetKey, setExternalSheetKey] = useState<string | null>(null)
+  const clearExternalSheet = useCallback(() => setExternalSheetKey(null), [])
+
+  // Target profile path for deep field-level navigation within the questionnaire
+  const [navigateProfilePath, setNavigateProfilePath] = useState<string | null>(null)
+
+  // Field-level navigation — open the Case Details sheet and navigate to the exact field
+  const handleNavigateToField = useCallback((profilePath: string) => {
+    setNavigateProfilePath(profilePath)
+    // Immigration workspace: questionnaire lives in IRCC Intake sheet
+    // Non-immigration: questionnaire lives in Case Details sheet
+    setExternalSheetKey(isImmigrationWorkspace ? 'irccIntake' : 'caseDetails')
+  }, [isImmigrationWorkspace])
+
   // Build default values for the edit form — must be above early returns to
   // satisfy React's Rules of Hooks (hooks must be called unconditionally).
   const editDefaults = useMemo<Partial<MatterFormValues>>(() => {
@@ -415,6 +501,7 @@ export default function MatterDetailPage() {
     return {
       title: matter.title,
       description: matter.description ?? undefined,
+      contact_id: primaryContactId ?? undefined,
       practice_area_id: matter.practice_area_id ?? undefined,
       pipeline_id: matter.pipeline_id ?? undefined,
       stage_id: matter.stage_id ?? undefined,
@@ -425,10 +512,13 @@ export default function MatterDetailPage() {
       estimated_value: matter.estimated_value ?? undefined,
       priority: (matter.priority as MatterFormValues['priority']) ?? 'medium',
       status: (matter.status as MatterFormValues['status']) ?? 'active',
+      visibility: (matter.visibility as MatterFormValues['visibility']) ?? 'all',
       statute_of_limitations: matter.statute_of_limitations ?? undefined,
       next_deadline: matter.next_deadline ?? undefined,
+      case_type_id: matter.case_type_id ?? undefined,
+      matter_type_id: matter.matter_type_id ?? undefined,
     }
-  }, [matter])
+  }, [matter, primaryContactId])
 
   // Loading state
   if (isLoading) {
@@ -463,7 +553,59 @@ export default function MatterDetailPage() {
   const statusConfig = getStatusConfig(matter.status)
   const priorityConfig = getPriorityConfig(matter.priority)
 
-  function handleUpdate(values: MatterFormValues) {
+  async function handleUpdatePrimaryContact(contactId: string | null | undefined) {
+    const supabase = createClient()
+    const newContactId = contactId || null
+
+    // If contact didn't change, skip
+    if (newContactId === (primaryContactId ?? null)) return
+
+    // Remove old primary contact link (if any)
+    if (primaryContactId) {
+      await supabase
+        .from('matter_contacts')
+        .delete()
+        .eq('matter_id', matterId)
+        .eq('contact_id', primaryContactId)
+        .eq('tenant_id', tenantId)
+    }
+
+    // Add new primary contact link (if any)
+    if (newContactId) {
+      await supabase.from('matter_contacts').upsert(
+        {
+          tenant_id: tenantId,
+          matter_id: matterId,
+          contact_id: newContactId,
+          role: 'client',
+          is_primary: true,
+        },
+        { onConflict: 'matter_id,contact_id' }
+      )
+    }
+
+    // Invalidate contacts queries
+    queryClient.invalidateQueries({ queryKey: ['matter-contacts', matterId] })
+    queryClient.invalidateQueries({ queryKey: ['matter-primary-contact', matterId] })
+  }
+
+  async function handleUpdate(values: MatterFormValues) {
+    // If matter_type_id is being newly assigned, look up the type name
+    const newMatterTypeId = values.matter_type_id || null
+    const oldMatterTypeId = matter?.matter_type_id || null
+    const matterTypeChanged = newMatterTypeId !== oldMatterTypeId
+    let matterTypeName: string | null = null
+
+    if (matterTypeChanged && newMatterTypeId) {
+      const supabase = createClient()
+      const { data: mt } = await supabase
+        .from('matter_types')
+        .select('name')
+        .eq('id', newMatterTypeId)
+        .single()
+      matterTypeName = mt?.name ?? null
+    }
+
     updateMatter.mutate(
       {
         id: matterId,
@@ -479,11 +621,46 @@ export default function MatterDetailPage() {
         estimated_value: values.estimated_value ?? null,
         priority: values.priority,
         status: values.status,
+        visibility: values.visibility || 'all',
         statute_of_limitations: values.statute_of_limitations || null,
         next_deadline: values.next_deadline || null,
+        case_type_id: values.case_type_id || null,
+        matter_type_id: newMatterTypeId,
+        // Sync the matter_type text name from the selected type
+        ...(matterTypeChanged && { matter_type: matterTypeName }),
       },
       {
-        onSuccess: () => {
+        onSuccess: async () => {
+          // Update primary contact in junction table (fire-and-forget)
+          handleUpdatePrimaryContact(values.contact_id)
+
+          // If matter type changed, regenerate document slots
+          if (matterTypeChanged) {
+            regenerateSlots.mutate({ matterId })
+          }
+
+          // If a matter type was NEWLY assigned (was null, now set), activate the workflow kit
+          if (matterTypeChanged && newMatterTypeId && !oldMatterTypeId) {
+            try {
+              await fetch(`/api/matters/${matterId}/activate-kit`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  matterTypeId: newMatterTypeId,
+                  caseTypeId: values.case_type_id || null,
+                }),
+              })
+              // Invalidate pipeline / stage queries so the UI picks up the new pipeline
+              queryClient.invalidateQueries({ queryKey: ['matter_stage_pipelines'] })
+              queryClient.invalidateQueries({ queryKey: ['matter_stages'] })
+              queryClient.invalidateQueries({ queryKey: ['matter_stage_state'] })
+              queryClient.invalidateQueries({ queryKey: ['matter_types', 'single'] })
+              toast.success('Workflow kit activated for the new matter type')
+            } catch (err) {
+              console.error('Failed to activate workflow kit:', err)
+            }
+          }
+
           setEditOpen(false)
           createAuditLog.mutate({
             tenant_id: tenantId,
@@ -507,32 +684,34 @@ export default function MatterDetailPage() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Back button */}
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={() => router.push('/matters')}
-      >
-        <ArrowLeft className="mr-2 size-4" />
-        Back to Matters
-      </Button>
+    <div className="space-y-3">
+      {/* Compact header */}
+      <div className="flex items-start gap-2">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="size-8 shrink-0 mt-0.5"
+          onClick={() => router.push('/matters')}
+        >
+          <ArrowLeft className="size-4" />
+        </Button>
 
-      {/* Header */}
-      <div className="flex items-start justify-between">
-        <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-semibold text-slate-900">
+        <div className="flex flex-1 items-start justify-between gap-4 min-w-0">
+          <div className="flex items-center gap-2.5 min-w-0 flex-wrap">
+            <h1 className="text-xl font-semibold text-slate-900 truncate">
               {matter.title}
             </h1>
+            {primaryClientName && (
+              <span className="text-sm text-muted-foreground shrink-0">
+                — {primaryClientName}
+              </span>
+            )}
             {matter.matter_number && (
-              <Badge variant="secondary" className="gap-1">
+              <Badge variant="secondary" className="gap-1 text-[11px] shrink-0">
                 <Hash className="size-3" />
                 {matter.matter_number}
               </Badge>
             )}
-          </div>
-          <div className="mt-2 flex items-center gap-2">
             <Badge
               variant="secondary"
               style={{
@@ -540,7 +719,7 @@ export default function MatterDetailPage() {
                 color: statusConfig.color,
                 borderColor: `${statusConfig.color}30`,
               }}
-              className="border"
+              className="border text-[11px] shrink-0"
             >
               {statusConfig.label}
             </Badge>
@@ -551,63 +730,77 @@ export default function MatterDetailPage() {
                 color: priorityConfig.color,
                 borderColor: `${priorityConfig.color}30`,
               }}
-              className="border"
+              className="border text-[11px] shrink-0"
             >
-              {priorityConfig.label} Priority
+              {priorityConfig.label}
             </Badge>
             {matter.visibility && matter.visibility !== 'all' && (
-              <Badge variant="outline" className="gap-1">
+              <Badge variant="outline" className="gap-1 text-[11px] shrink-0">
                 <Shield className="h-3 w-3" />
                 {matter.visibility === 'owner' ? 'Owner Only' : matter.visibility === 'team' ? 'Team' : 'Group'}
               </Badge>
             )}
             {practiceArea && (
-              <Badge variant="outline">{practiceArea.name}</Badge>
+              <Badge variant="outline" className="text-[11px] shrink-0">{practiceArea.name}</Badge>
             )}
-          </div>
-          <div className="mt-2">
             <TagManager entityType="matter" entityId={matterId} tenantId={tenantId} />
           </div>
-        </div>
 
-        <div className="flex items-center gap-2">
-          <Button variant="outline" onClick={() => handlePortalDialogOpen(true)}>
-            <Link2 className="mr-2 size-4" />
-            Portal Link
-          </Button>
-          <Button variant="outline" onClick={() => setEditOpen(true)}>
-            <Pencil className="mr-2 size-4" />
-            Edit
-          </Button>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="icon">
-                <MoreHorizontal className="size-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => setEditOpen(true)}>
-                <Pencil className="mr-2 size-4" />
-                Edit Matter
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handlePortalDialogOpen(true)}>
-                <Link2 className="mr-2 size-4" />
-                Client Portal Link
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleArchive}>
-                <Archive className="mr-2 size-4" />
-                Archive Matter
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                className="text-destructive focus:text-destructive"
-                onClick={() => setDeleteOpen(true)}
-              >
-                <Trash2 className="mr-2 size-4" />
-                Delete Matter
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <div className="flex items-center gap-1.5 shrink-0">
+            <Button variant="outline" size="sm" onClick={() => setEditOpen(true)}>
+              <Pencil className="mr-1.5 size-3.5" />
+              Edit
+            </Button>
+            <DropdownMenu modal={false}>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="icon" className="size-8">
+                  <MoreHorizontal className="size-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="z-[100]">
+                {enforcementEnabled && (
+                  <>
+                    <DropdownMenuItem
+                      onClick={() => regenerateSlots.mutate({ matterId })}
+                      disabled={regenerateSlots.isPending}
+                    >
+                      {regenerateSlots.isPending ? (
+                        <Loader2 className="mr-2 size-4 animate-spin" />
+                      ) : (
+                        <RefreshCw className="mr-2 size-4" />
+                      )}
+                      {regenerateSlots.isPending ? 'Refreshing...' : 'Regenerate Slots'}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setDocRequestDialogOpen(true)}>
+                      <Mail className="mr-2 size-4" />
+                      Request Documents
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                  </>
+                )}
+                <DropdownMenuItem onClick={() => handlePortalDialogOpen(true)}>
+                  <Link2 className="mr-2 size-4" />
+                  Client Portal Link
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setEditOpen(true)}>
+                  <Pencil className="mr-2 size-4" />
+                  Edit Matter
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleArchive}>
+                  <Archive className="mr-2 size-4" />
+                  Archive Matter
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="text-destructive focus:text-destructive"
+                  onClick={() => setDeleteOpen(true)}
+                >
+                  <Trash2 className="mr-2 size-4" />
+                  Delete Matter
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
       </div>
 
@@ -625,210 +818,634 @@ export default function MatterDetailPage() {
         </div>
       )}
 
+      {/* Template condition error banner — visible inline on the matter view */}
+      {conditionErrorActivity && (
+        <div className="flex items-start gap-2 rounded-md border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+          <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0" />
+          <div className="flex-1">
+            <span className="font-medium">Template condition error affecting required documents.</span>
+            <span className="ml-1">
+              One or more document slot conditions failed evaluation and the affected slots were not generated.
+              Review the template conditions in Settings &rarr; Document Slot Templates.
+            </span>
+          </div>
+        </div>
+      )}
+
       {/* Generic Stage Pipeline Bar (non-immigration matters) */}
       {hasGenericPipeline && pipelineStages && pipelineStages.length > 0 && (
-        <Card>
-          <CardContent className="pt-4 pb-3">
-            <StagePipelineBar
-              stages={pipelineStages}
-              currentStageId={stageState?.current_stage_id ?? null}
-              stageEnteredAt={stageState?.entered_at ?? null}
-              stageHistory={(Array.isArray(stageState?.stage_history) ? stageState.stage_history : []) as Array<{ stage_id: string; stage_name: string; entered_at: string; exited_at?: string; user_id?: string }>}
-              onStageClick={(stageId) => {
-                setStageError(null)
-                advanceStage.mutate(
-                  { matterId, targetStageId: stageId, system: 'generic' },
-                  {
-                    onError: (error) => {
-                      setStageError(error.message)
-                    },
-                  }
-                )
-              }}
-              disabled={advanceStage.isPending}
-              users={users}
-            />
-          </CardContent>
-        </Card>
+        <div className="border-b border-slate-100 pb-2">
+          <StagePipelineBar
+            stages={pipelineStages}
+            currentStageId={stageState?.current_stage_id ?? null}
+            stageEnteredAt={stageState?.entered_at ?? null}
+            stageHistory={(Array.isArray(stageState?.stage_history) ? stageState.stage_history : []) as Array<{ stage_id: string; stage_name: string; entered_at: string; exited_at?: string; user_id?: string }>}
+            onStageClick={(stageId) => {
+              setStageError(null)
+              advanceStage.mutate(
+                { matterId, targetStageId: stageId, system: 'generic' },
+                {
+                  onError: (error) => {
+                    setStageError(error.message)
+                  },
+                }
+              )
+            }}
+            disabled={advanceStage.isPending}
+            gatingErrors={gatingData?.gatingErrors}
+            completionPercent={intake?.completion_pct ?? null}
+            users={users}
+          />
+        </div>
       )}
 
       {/* Immigration Stage Progression Bar (always visible for immigration matters) */}
       {hasImmigration && immigrationStages && immigrationStages.length > 0 && immigrationData && (
-        <Card className="overflow-hidden">
-          <CardContent className="p-0">
-            {/* Stage bar row */}
-            <div className="flex items-center gap-2 px-4 pt-2.5 pb-1">
-              <div className="flex-1 min-w-0">
-                <StageProgressionBar
-                  stages={immigrationStages}
-                  currentStageId={immigrationData.current_stage_id}
-                  stageEnteredAt={immigrationData.stage_entered_at}
-                  stageHistory={(Array.isArray(immigrationData.stage_history) ? immigrationData.stage_history : []) as Array<{ stage_id: string; stage_name: string; entered_at: string; exited_at?: string; entered_by?: string }>}
-                  onStageClick={(stageId) => {
-                    setStageError(null)
-                    advanceStage.mutate(
-                      { matterId, targetStageId: stageId, system: 'immigration' },
-                      {
-                        onError: (error) => {
-                          setStageError(error.message)
-                        },
-                      }
-                    )
-                  }}
-                  disabled={advanceStage.isPending}
-                  users={users}
-                />
+        <div className="border-b border-slate-100 pb-1">
+          {/* Stage bar row */}
+          <div className="flex items-center gap-2">
+            <div className="flex-1 min-w-0">
+              <StageProgressionBar
+                stages={immigrationStages}
+                currentStageId={immigrationData.current_stage_id}
+                stageEnteredAt={immigrationData.stage_entered_at}
+                stageHistory={(Array.isArray(immigrationData.stage_history) ? immigrationData.stage_history : []) as Array<{ stage_id: string; stage_name: string; entered_at: string; exited_at?: string; entered_by?: string }>}
+                onStageClick={(stageId) => {
+                  setStageError(null)
+                  advanceStage.mutate(
+                    { matterId, targetStageId: stageId, system: 'immigration' },
+                    {
+                      onError: (error) => {
+                        setStageError(error.message)
+                      },
+                    }
+                  )
+                }}
+                disabled={advanceStage.isPending}
+                users={users}
+              />
+            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6 shrink-0 text-slate-400 hover:text-slate-600"
+              onClick={() => setStageManageOpen(true)}
+              title="Manage stages"
+            >
+              <Settings2 className="h-3.5 w-3.5" />
+            </Button>
+          </div>
+
+          {/* Bottom strip: completion + upcoming tasks */}
+          <div className="flex items-center gap-3 py-1 text-[11px]">
+            {/* Checklist completion */}
+            {checklistCompletion !== null && (
+              <div className="flex items-center gap-1.5">
+                <ListChecks className="h-3 w-3 text-slate-400" />
+                <span className="text-slate-500">Documents</span>
+                <div className="w-16 h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                  <div
+                    className={cn(
+                      'h-full rounded-full transition-all',
+                      checklistCompletion >= 100
+                        ? 'bg-green-500'
+                        : checklistCompletion >= 50
+                          ? 'bg-blue-500'
+                          : 'bg-amber-500'
+                    )}
+                    style={{ width: `${Math.min(checklistCompletion, 100)}%` }}
+                  />
+                </div>
+                <span className="font-medium text-slate-600 tabular-nums">{checklistCompletion}%</span>
               </div>
+            )}
+
+            {/* Divider */}
+            {checklistCompletion !== null && upcomingTasks.length > 0 && (
+              <div className="h-3 w-px bg-slate-200" />
+            )}
+
+            {/* Upcoming tasks */}
+            {upcomingTasks.length > 0 && (
+              <div className="flex items-center gap-1.5 flex-1 min-w-0">
+                <ListTodo className="h-3 w-3 text-slate-400 shrink-0" />
+                <span className="text-slate-500 shrink-0">Next:</span>
+                <div className="flex items-center gap-2 min-w-0 overflow-hidden">
+                  {upcomingTasks.map((task) => (
+                    <span
+                      key={task.id}
+                      className={cn(
+                        'truncate max-w-[160px]',
+                        task.due_date && new Date(task.due_date) < new Date()
+                          ? 'text-red-600 font-medium'
+                          : 'text-slate-600'
+                      )}
+                      title={`${task.title}${task.due_date ? ` — due ${task.due_date}` : ''}`}
+                    >
+                      {task.title}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Empty state */}
+            {checklistCompletion === null && upcomingTasks.length === 0 && (
+              <span className="text-slate-400">No checklist or tasks yet</span>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Assign Matter Type Banner — shown when no matter type is assigned */}
+      {!matter?.matter_type_id && (
+        <div className="flex items-center gap-3 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3">
+          <AlertTriangle className="size-5 text-amber-500 shrink-0" />
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium text-amber-800">
+              No matter type assigned
+            </p>
+            <p className="text-xs text-amber-600 mt-0.5">
+              Assign a matter type to activate the pipeline, document slots, and intake workflow.
+            </p>
+          </div>
+          <Button
+            size="sm"
+            variant="outline"
+            className="shrink-0 border-amber-400 text-amber-700 hover:bg-amber-100"
+            onClick={() => setEditOpen(true)}
+          >
+            <Settings2 className="size-3.5 mr-1.5" />
+            Assign Type
+          </Button>
+        </div>
+      )}
+
+      {/* Core Data Summary Panel (non-workspace matters with enforcement) */}
+      {enforcementEnabled && !isImmigrationWorkspace && (
+        <CoreDataSummaryPanel matterId={matterId} />
+      )}
+
+      {/* ─── Immigration Workspace Layout ─── */}
+      {isImmigrationWorkspace ? (
+        <div className="space-y-3">
+          {/* Row 3: Operational metrics strip */}
+          <MatterControlHeader
+            matterTypeName={matter.matter_type ?? null}
+            readinessData={readinessData}
+          />
+
+          {/* Secondary Access Bar + optional OneDrive sync action */}
+          <div className="flex items-start gap-2">
+            <div className="flex-1 min-w-0">
+          <SecondaryAccessBar
+            sheetContent={{
+              onboarding: (
+                <OnboardingTab
+                  matter={matter}
+                  users={users ?? []}
+                  matterId={matterId}
+                  tenantId={tenantId}
+                />
+              ),
+              ...(matter.matter_type_id ? {
+                caseDetails: (
+                  <UnifiedCaseDetailsTab
+                    matterId={matterId}
+                    tenantId={tenantId}
+                    matterTypeId={matter.matter_type_id}
+                    caseTypeId={matter.case_type_id ?? immigrationData?.case_type_id ?? null}
+                    contactId={primaryContactId ?? null}
+                    navigateToProfilePath={navigateProfilePath}
+                  />
+                ),
+                irccIntake: (
+                  <IRCCIntakeTab
+                    matterId={matterId}
+                    contactId={primaryContactId ?? null}
+                    tenantId={tenantId}
+                    matterTypeId={matter.matter_type_id}
+                    initialProfilePath={navigateProfilePath}
+                    onOpenContactsSheet={() => setExternalSheetKey('contacts')}
+                  />
+                ),
+                clientReview: <ClientReviewPanel matterId={matterId} />,
+              } : {}),
+              contacts: <ContactsTab matterId={matterId} tenantId={tenantId} />,
+              tasks: <TasksTab matterId={matterId} tenantId={tenantId} users={users} practiceAreaId={matter.practice_area_id ?? null} contactId={primaryContactId ?? undefined} />,
+              deadlines: <DeadlinesTab matterId={matterId} tenantId={tenantId} practiceAreaId={matter.practice_area_id ?? null} />,
+              billing: (
+                <RequirePermission entity="billing" action="view" variant="inline">
+                  <BillingTab matterId={matterId} tenantId={tenantId} matter={matter} />
+                </RequirePermission>
+              ),
+              milestones: <MilestonesTab matterId={matterId} tenantId={tenantId} />,
+              notes: <NotesEditor tenantId={tenantId} matterId={matterId} />,
+              discussion: <MatterComments matterId={matterId} tenantId={tenantId} />,
+              history: <ActivityTimeline tenantId={tenantId} matterId={matterId} entityType="matter" entityId={matterId} />,
+              notifications: <ClientNotificationsTab matterId={matterId} tenantId={tenantId} />,
+            }}
+            labelOverrides={isImmigrationWorkspace ? { caseDetails: 'Case Config' } : undefined}
+            externalOpenSheet={externalSheetKey}
+            onExternalSheetHandled={clearExternalSheet}
+          />
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-auto py-2 px-3 shrink-0 gap-1.5 text-xs text-slate-600"
+              onClick={() => syncOneDrive.mutate()}
+              disabled={syncOneDrive.isPending}
+              title="Sync folder structure to OneDrive"
+            >
+              {syncOneDrive.isPending ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <CloudUpload className="h-3.5 w-3.5" />
+              )}
+              OneDrive
+            </Button>
+          </div>
+
+          {/* Central Action Panel: primary + secondary actions */}
+          <CentralActionPanel
+            readinessData={readinessData}
+            intakeStatus={intakeStatus}
+            isLawyer={userRole?.name === 'Lawyer' || userRole?.name === 'Admin'}
+            onOpenDocRequest={() => setDocRequestDialogOpen(true)}
+            onNavigateToSection={handleNavigateToSection}
+            onOpenLawyerReview={() => setLawyerReviewDialogOpen(true)}
+            onOpenContradictionOverride={() => setContradictionOverrideDialogOpen(true)}
+          />
+
+          {/* Client Portal Link — quick copy bar */}
+          {activePortalLink && (
+            <div className="flex items-center gap-2 rounded-lg border bg-slate-50/80 px-3 py-2">
+              <Link2 className="h-3.5 w-3.5 text-slate-500 shrink-0" />
+              <span className="text-[10px] text-muted-foreground uppercase tracking-wider shrink-0">
+                Portal
+              </span>
+              <code className="flex-1 truncate text-xs text-slate-500">
+                {typeof window !== 'undefined'
+                  ? `${window.location.origin}/portal/${activePortalLink.token}`
+                  : `/portal/${activePortalLink.token}`}
+              </code>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-6 text-[11px] shrink-0 px-2"
+                onClick={() => {
+                  navigator.clipboard.writeText(
+                    `${window.location.origin}/portal/${activePortalLink.token}`
+                  )
+                  toast.success('Portal link copied to clipboard')
+                }}
+              >
+                <Copy className="mr-1 h-3 w-3" />
+                Copy
+              </Button>
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-6 w-6 shrink-0 text-slate-400 hover:text-slate-600"
-                onClick={() => setStageManageOpen(true)}
-                title="Manage stages"
+                className="h-6 w-6 shrink-0"
+                onClick={() =>
+                  window.open(`/portal/${activePortalLink.token}`, '_blank')
+                }
               >
-                <Settings2 className="h-3.5 w-3.5" />
+                <ExternalLink className="h-3 w-3" />
+              </Button>
+            </div>
+          )}
+
+          {/* Workflow Section 1: Questions & Profile Completeness */}
+          <div id="workflow-section-questions">
+            <QuestionsWorkflowSection
+              readinessData={readinessData}
+              isExpanded={expandedSections.has('questions')}
+              onToggle={() => toggleSection('questions')}
+              onNavigateToField={handleNavigateToField}
+            />
+          </div>
+
+          {/* Workflow Section 2: Documents */}
+          <div id="workflow-section-documents">
+            <DocumentsWorkflowSection
+              matterId={matterId}
+              tenantId={tenantId}
+              readinessData={readinessData}
+              isExpanded={expandedSections.has('documents')}
+              onToggle={() => toggleSection('documents')}
+            />
+          </div>
+
+          {/* Workflow Section 3: Review & Blockers */}
+          <div id="workflow-section-review">
+            <ReviewBlockersWorkflowSection
+              readinessData={readinessData}
+              matterId={matterId}
+              slots={documentSlots}
+              isExpanded={expandedSections.has('review')}
+              onToggle={() => toggleSection('review')}
+              onNavigateToSection={handleNavigateToSection}
+              onNavigateToField={handleNavigateToField}
+              onOpenLawyerReview={() => setLawyerReviewDialogOpen(true)}
+              onOpenContradictionOverride={() => setContradictionOverrideDialogOpen(true)}
+            />
+          </div>
+
+          {/* Workflow Section 4: Form Packs (gated) */}
+          <div id="workflow-section-formPacks">
+            <FormPacksGateSection
+              readinessData={readinessData}
+              intakeStatus={intakeStatus}
+              renderFormsTab={() => (
+                <IRCCFormsTab
+                  matterId={matterId}
+                  contactId={primaryContactId ?? null}
+                  tenantId={tenantId}
+                  caseTypeId={matter?.case_type_id ?? immigrationData?.case_type_id ?? null}
+                />
+              )}
+              onNavigateToSection={handleNavigateToSection}
+              onOpenIRCCIntake={() => setExternalSheetKey('irccIntake')}
+            />
+          </div>
+
+        </div>
+      ) : (
+        /* ─── Legacy Tab Layout (non-immigration or legacy matters) ─── */
+        <>
+          {/* Immigration Readiness Banner (non-workspace immigration matters) */}
+          {hasImmigration && !isImmigrationWorkspace && readinessData?.readinessMatrix && (() => {
+            const matrix = readinessData.readinessMatrix!
+            const threshold = readinessData.playbook?.readinessThreshold ?? 85
+            const statusMeta = IMMIGRATION_INTAKE_STATUSES.find(
+              (s) => s.value === readinessData.intakeStatus
+            )
+            const pctColor = matrix.overallPct >= threshold
+              ? 'bg-emerald-100 text-emerald-700 border-emerald-300'
+              : matrix.overallPct >= 60
+                ? 'bg-amber-100 text-amber-700 border-amber-300'
+                : 'bg-red-100 text-red-700 border-red-300'
+            const borderColor = matrix.overallPct >= threshold
+              ? 'border-emerald-200'
+              : matrix.overallPct >= 60
+                ? 'border-amber-200'
+                : 'border-red-200'
+            const bgColor = matrix.overallPct >= threshold
+              ? 'bg-emerald-50/50'
+              : matrix.overallPct >= 60
+                ? 'bg-amber-50/50'
+                : 'bg-red-50/50'
+            const topBlockers = [
+              ...matrix.draftingBlockers.slice(0, 2),
+              ...matrix.filingBlockers.slice(0, 2),
+            ].slice(0, 2)
+            return (
+              <div className={cn('flex items-center gap-3 rounded-lg border px-4 py-2.5', borderColor, bgColor)}>
+                <ShieldAlert className="size-4 shrink-0 text-slate-500" />
+                <span className={cn('text-xs font-semibold px-2 py-0.5 rounded-full border', pctColor)}>
+                  {matrix.overallPct}%
+                </span>
+                {statusMeta && (
+                  <span className="text-xs font-medium text-slate-600">
+                    {statusMeta.label}
+                  </span>
+                )}
+                {topBlockers.length > 0 && (
+                  <>
+                    <div className="h-3 w-px bg-slate-300" />
+                    <div className="flex items-center gap-2 flex-1 min-w-0 overflow-hidden">
+                      {topBlockers.map((b, i) => (
+                        <span key={i} className="text-xs text-slate-600 truncate max-w-[200px]">
+                          {b.label}{b.person_name ? ` (${b.person_name})` : ''}
+                        </span>
+                      ))}
+                      {(matrix.draftingBlockers.length + matrix.filingBlockers.length) > 2 && (
+                        <span className="text-xs text-slate-400 shrink-0">
+                          +{matrix.draftingBlockers.length + matrix.filingBlockers.length - 2} more
+                        </span>
+                      )}
+                    </div>
+                  </>
+                )}
+                {readinessData.nextAction && topBlockers.length === 0 && (
+                  <>
+                    <div className="h-3 w-px bg-slate-300" />
+                    <span className="text-xs text-slate-600 truncate flex-1 min-w-0">
+                      {readinessData.nextAction}
+                    </span>
+                  </>
+                )}
+                {activeTab !== 'documents' && (
+                  <button
+                    onClick={() => setActiveTab('documents')}
+                    className="text-xs font-medium text-blue-600 hover:text-blue-800 shrink-0"
+                  >
+                    View details
+                  </button>
+                )}
+              </div>
+            )
+          })()}
+
+          {/* Tabs + OneDrive sync */}
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-2">
+            <div className="flex items-center gap-2">
+            <TabsList className="flex-wrap flex-1">
+              <TabsTrigger value="onboarding" className="relative">
+                Onboarding
+                {onboardingBadgeCount > 0 && (
+                  <span className="ml-1.5 inline-flex items-center justify-center rounded-full bg-amber-500 text-white text-[9px] font-bold leading-none h-4 w-4 shrink-0">
+                    {onboardingBadgeCount}
+                  </span>
+                )}
+              </TabsTrigger>
+              <TabsTrigger value="overview">Overview</TabsTrigger>
+              {showCaseDetails && (
+                <TabsTrigger value="case-details">Case Details</TabsTrigger>
+              )}
+              {!showCaseDetails && enforcementEnabled && (
+                <TabsTrigger value="core-data">Core Data</TabsTrigger>
+              )}
+              <TabsTrigger value="contacts">Contacts</TabsTrigger>
+              <TabsTrigger value="tasks">Tasks</TabsTrigger>
+              <TabsTrigger value="documents">Documents</TabsTrigger>
+              <TabsTrigger value="form-instances">Forms</TabsTrigger>
+              {!showCaseDetails && hasImmigration && (
+                <TabsTrigger value="immigration">Immigration</TabsTrigger>
+              )}
+              {!showCaseDetails && hasImmigration && (
+                <TabsTrigger value="ircc-intake">IRCC Intake</TabsTrigger>
+              )}
+              {!showCaseDetails && hasImmigration && (
+                <TabsTrigger value="ircc-forms">IRCC Forms</TabsTrigger>
+              )}
+              <TabsTrigger value="deadlines">Deadlines</TabsTrigger>
+              <TabsTrigger value="billing">Billing</TabsTrigger>
+              <TabsTrigger value="milestones">Milestones</TabsTrigger>
+              <TabsTrigger value="notes">Notes</TabsTrigger>
+              <TabsTrigger value="discussion">Discussion</TabsTrigger>
+              <TabsTrigger value="history">Audit History</TabsTrigger>
+              <TabsTrigger value="notifications">Notifications</TabsTrigger>
+            </TabsList>
+              <Button
+                variant="outline"
+                size="sm"
+                className="shrink-0 gap-1.5 text-xs text-slate-600"
+                onClick={() => syncOneDrive.mutate()}
+                disabled={syncOneDrive.isPending}
+                title="Sync folder structure to OneDrive"
+              >
+                {syncOneDrive.isPending ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  <CloudUpload className="h-3.5 w-3.5" />
+                )}
+                OneDrive
               </Button>
             </div>
 
-            {/* Bottom strip: completion + upcoming tasks */}
-            <div className="flex items-center gap-3 px-4 py-1.5 bg-slate-50/80 border-t border-slate-100 text-[11px]">
-              {/* Checklist completion */}
-              {checklistCompletion !== null && (
-                <div className="flex items-center gap-1.5">
-                  <ListChecks className="h-3 w-3 text-slate-400" />
-                  <span className="text-slate-500">Documents</span>
-                  <div className="w-16 h-1.5 bg-slate-200 rounded-full overflow-hidden">
-                    <div
-                      className={cn(
-                        'h-full rounded-full transition-all',
-                        checklistCompletion >= 100
-                          ? 'bg-green-500'
-                          : checklistCompletion >= 50
-                            ? 'bg-blue-500'
-                            : 'bg-amber-500'
-                      )}
-                      style={{ width: `${Math.min(checklistCompletion, 100)}%` }}
+            {showCaseDetails && (
+              <TabsContent value="case-details" className="space-y-4">
+                <UnifiedCaseDetailsTab
+                  matterId={matterId}
+                  tenantId={tenantId}
+                  matterTypeId={matter.matter_type_id!}
+                  contactId={primaryContactId ?? null}
+                  caseTypeId={matter?.case_type_id ?? immigrationData?.case_type_id ?? null}
+                />
+              </TabsContent>
+            )}
+
+            {!showCaseDetails && enforcementEnabled && (
+              <TabsContent value="core-data" className="space-y-4">
+                <CoreDataCardTab matterId={matterId} tenantId={tenantId} />
+              </TabsContent>
+            )}
+
+            <TabsContent value="onboarding" className="space-y-4">
+              <OnboardingTab
+                matter={matter}
+                users={users ?? []}
+                matterId={matterId}
+                tenantId={tenantId}
+              />
+            </TabsContent>
+
+            <TabsContent value="overview" className="space-y-4">
+              <OverviewTab matter={matter} users={users} practiceArea={practiceArea} tenantId={tenantId} matterId={matterId} hasImmigration={hasImmigration} immigrationData={immigrationData} />
+            </TabsContent>
+
+            <TabsContent value="contacts">
+              <ContactsTab matterId={matterId} tenantId={tenantId} />
+            </TabsContent>
+
+            <TabsContent value="tasks">
+              <TasksTab matterId={matterId} tenantId={tenantId} users={users} practiceAreaId={matter.practice_area_id ?? null} contactId={primaryContactId ?? undefined} />
+            </TabsContent>
+
+            <TabsContent value="deadlines" className="space-y-4">
+              <DeadlinesTab matterId={matterId} tenantId={tenantId} practiceAreaId={matter.practice_area_id ?? null} />
+            </TabsContent>
+
+            <TabsContent value="documents" className="space-y-4">
+              {enforcementEnabled && intake?.intake_status === 'incomplete' ? (
+                <div className="flex flex-col items-center justify-center py-12 text-center rounded-lg border border-dashed border-amber-300 bg-amber-50/50">
+                  <Shield className="size-8 text-amber-400 mb-3" />
+                  <h3 className="text-sm font-medium text-amber-700">Documents Locked</h3>
+                  <p className="text-sm text-amber-600 mt-1 max-w-md">
+                    Complete the Core Data Card before uploading documents. Switch to the Core Data tab to fill in required information.
+                  </p>
+                </div>
+              ) : enforcementEnabled ? (
+                <>
+                  {hasImmigration && (
+                    <ImmigrationReadinessHub
+                      matterId={matterId}
+                      userId={appUser?.id ?? ''}
+                      userRole="lawyer"
                     />
-                  </div>
-                  <span className="font-medium text-slate-600 tabular-nums">{checklistCompletion}%</span>
+                  )}
+                  <DocumentSlotPanel matterId={matterId} tenantId={tenantId} enforcementEnabled={enforcementEnabled} />
+                </>
+              ) : (
+                <DocumentUpload entityType="matter" entityId={matterId} tenantId={tenantId} />
+              )}
+              <DocumentList matterId={matterId} contactId={primaryContactId ?? undefined} />
+            </TabsContent>
+
+            <TabsContent value="form-instances" className="space-y-4">
+              <FormsTab matterId={matterId} matterStatus={matter.status} />
+            </TabsContent>
+
+            <TabsContent value="billing" className="space-y-4">
+              <RequirePermission entity="billing" action="view" variant="inline">
+                <BillingTab matterId={matterId} tenantId={tenantId} matter={matter} />
+              </RequirePermission>
+            </TabsContent>
+
+            <TabsContent value="milestones" className="space-y-4">
+              <MilestonesTab matterId={matterId} tenantId={tenantId} />
+            </TabsContent>
+
+            <TabsContent value="history" className="space-y-4">
+              <ActivityTimeline tenantId={tenantId} matterId={matterId} entityType="matter" entityId={matterId} />
+            </TabsContent>
+
+            <TabsContent value="notes" className="space-y-4">
+              <NotesEditor tenantId={tenantId} matterId={matterId} />
+            </TabsContent>
+
+            <TabsContent value="discussion" className="space-y-4">
+              <MatterComments matterId={matterId} tenantId={tenantId} />
+            </TabsContent>
+
+            <TabsContent value="notifications" className="space-y-4">
+              <ClientNotificationsTab matterId={matterId} tenantId={tenantId} />
+            </TabsContent>
+
+            {!showCaseDetails && hasImmigration && (
+              <TabsContent value="immigration" className="space-y-6">
+                <CaseInsightsPanel
+                  matterId={matterId}
+                  tenantId={tenantId}
+                  stageEnteredAt={immigrationData?.stage_entered_at}
+                  currentStageName={immigrationStages?.find((s) => s.id === immigrationData?.current_stage_id)?.name}
+                />
+                <ClientProgressPanel matterId={matterId} tenantId={tenantId} />
+                <ImmigrationDetailsPanel matterId={matterId} tenantId={tenantId} />
+                <div className="grid gap-6 lg:grid-cols-2">
+                  <DocumentChecklistPanel matterId={matterId} tenantId={tenantId} />
+                  <DeadlineRiskPanel matterId={matterId} tenantId={tenantId} />
                 </div>
-              )}
+              </TabsContent>
+            )}
 
-              {/* Divider */}
-              {checklistCompletion !== null && upcomingTasks.length > 0 && (
-                <div className="h-3 w-px bg-slate-200" />
-              )}
+            {!showCaseDetails && hasImmigration && (
+              <TabsContent value="ircc-intake" className="space-y-4">
+                <IRCCIntakeTab
+                  matterId={matterId}
+                  contactId={primaryContactId ?? null}
+                  tenantId={tenantId}
+                  matterTypeId={matter?.matter_type_id ?? null}
+                />
+              </TabsContent>
+            )}
 
-              {/* Upcoming tasks */}
-              {upcomingTasks.length > 0 && (
-                <div className="flex items-center gap-1.5 flex-1 min-w-0">
-                  <ListTodo className="h-3 w-3 text-slate-400 shrink-0" />
-                  <span className="text-slate-500 shrink-0">Next:</span>
-                  <div className="flex items-center gap-2 min-w-0 overflow-hidden">
-                    {upcomingTasks.map((task) => (
-                      <span
-                        key={task.id}
-                        className={cn(
-                          'truncate max-w-[160px]',
-                          task.due_date && new Date(task.due_date) < new Date()
-                            ? 'text-red-600 font-medium'
-                            : 'text-slate-600'
-                        )}
-                        title={`${task.title}${task.due_date ? ` — due ${task.due_date}` : ''}`}
-                      >
-                        {task.title}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Empty state */}
-              {checklistCompletion === null && upcomingTasks.length === 0 && (
-                <span className="text-slate-400">No checklist or tasks yet</span>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+            {!showCaseDetails && hasImmigration && (
+              <TabsContent value="ircc-forms" className="space-y-4">
+                <IRCCFormsTab
+                  matterId={matterId}
+                  contactId={primaryContactId ?? null}
+                  tenantId={tenantId}
+                  caseTypeId={matter?.case_type_id ?? immigrationData?.case_type_id ?? null}
+                />
+              </TabsContent>
+            )}
+          </Tabs>
+        </>
       )}
-
-      {/* Tabs */}
-      <Tabs defaultValue="overview" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="contacts">Contacts</TabsTrigger>
-          <TabsTrigger value="tasks">Tasks</TabsTrigger>
-          <TabsTrigger value="deadlines">Deadlines</TabsTrigger>
-          <TabsTrigger value="documents">Documents</TabsTrigger>
-          <TabsTrigger value="billing">Billing</TabsTrigger>
-          <TabsTrigger value="history">History</TabsTrigger>
-          <TabsTrigger value="notes">Notes</TabsTrigger>
-          {hasImmigration && (
-            <TabsTrigger value="immigration">Immigration</TabsTrigger>
-          )}
-        </TabsList>
-
-        {/* Overview Tab */}
-        <TabsContent value="overview" className="space-y-4">
-          <OverviewTab matter={matter} users={users} practiceArea={practiceArea} tenantId={tenantId} matterId={matterId} />
-        </TabsContent>
-
-        {/* Contacts Tab */}
-        <TabsContent value="contacts">
-          <ContactsTab matterId={matterId} tenantId={tenantId} />
-        </TabsContent>
-
-        {/* Tasks Tab */}
-        <TabsContent value="tasks">
-          <TasksTab matterId={matterId} tenantId={tenantId} users={users} practiceAreaId={matter.practice_area_id ?? null} />
-        </TabsContent>
-
-        {/* Deadlines Tab */}
-        <TabsContent value="deadlines" className="space-y-4">
-          <DeadlinesTab
-            matterId={matterId}
-            tenantId={tenantId}
-            practiceAreaId={matter.practice_area_id ?? null}
-          />
-        </TabsContent>
-
-        {/* Documents Tab */}
-        <TabsContent value="documents" className="space-y-4">
-          <DocumentUpload entityType="matter" entityId={matterId} tenantId={tenantId} />
-        </TabsContent>
-
-        {/* Billing Tab */}
-        <TabsContent value="billing" className="space-y-4">
-          <BillingTab matterId={matterId} tenantId={tenantId} matter={matter} />
-        </TabsContent>
-
-        {/* History Tab */}
-        <TabsContent value="history" className="space-y-4">
-          <ActivityTimeline tenantId={tenantId} matterId={matterId} entityType="matter" entityId={matterId} />
-        </TabsContent>
-
-        {/* Notes Tab */}
-        <TabsContent value="notes" className="space-y-4">
-          <NotesEditor tenantId={tenantId} matterId={matterId} />
-        </TabsContent>
-
-        {/* Immigration Tab */}
-        {hasImmigration && (
-          <TabsContent value="immigration" className="space-y-6">
-            {/* Smart Case Insights */}
-            <CaseInsightsPanel matterId={matterId} tenantId={tenantId} />
-
-            {/* Immigration Details */}
-            <ImmigrationDetailsPanel matterId={matterId} tenantId={tenantId} />
-
-            {/* Document Checklist and Deadlines side by side */}
-            <div className="grid gap-6 lg:grid-cols-2">
-              <DocumentChecklistPanel matterId={matterId} tenantId={tenantId} />
-              <DeadlineRiskPanel matterId={matterId} tenantId={tenantId} />
-            </div>
-          </TabsContent>
-        )}
-      </Tabs>
 
       {/* Edit Sheet */}
       <Sheet open={editOpen} onOpenChange={setEditOpen}>
@@ -851,6 +1468,31 @@ export default function MatterDetailPage() {
           </ScrollArea>
         </SheetContent>
       </Sheet>
+
+      {/* Send Document Request Dialog */}
+      {enforcementEnabled && (
+        <SendDocumentRequestDialog
+          open={docRequestDialogOpen}
+          onOpenChange={setDocRequestDialogOpen}
+          matterId={matterId}
+        />
+      )}
+
+      {/* Lawyer Review Dialog */}
+      <LawyerReviewDialog
+        open={lawyerReviewDialogOpen}
+        onOpenChange={setLawyerReviewDialogOpen}
+        matterId={matterId}
+        userId={appUser?.id ?? ''}
+      />
+
+      {/* Contradiction Override Dialog */}
+      <ContradictionOverrideDialog
+        open={contradictionOverrideDialogOpen}
+        onOpenChange={setContradictionOverrideDialogOpen}
+        matterId={matterId}
+        userId={appUser?.id ?? ''}
+      />
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
@@ -929,7 +1571,7 @@ export default function MatterDetailPage() {
               {/* Link info */}
               <div className="flex items-center justify-between text-xs text-slate-500">
                 <span>
-                  Expires: {new Date(activePortalLink.expires_at).toLocaleDateString()}
+                  Expires: {formatDate(activePortalLink.expires_at)}
                 </span>
                 <span>Accessed: {activePortalLink.access_count} times</span>
               </div>
@@ -1148,1309 +1790,7 @@ export default function MatterDetailPage() {
   )
 }
 
-// -------------------------------------------------------------------
-// Overview Tab
-// -------------------------------------------------------------------
-
-function OverviewTab({
-  matter,
-  users,
-  practiceArea,
-  tenantId,
-  matterId,
-}: {
-  matter: Matter
-  users: UserRow[] | undefined
-  practiceArea: PracticeArea | undefined
-  tenantId: string
-  matterId: string
-}) {
-  return (
-    <div className="grid gap-4 md:grid-cols-2">
-      {/* Matter Details */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-sm">
-            <Briefcase className="size-4 text-muted-foreground" />
-            Matter Details
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <InfoRow label="Matter Number" value={matter.matter_number} />
-          <InfoRow label="Title" value={matter.title} />
-          {matter.description && (
-            <InfoRow label="Description" value={matter.description} />
-          )}
-          <Separator />
-          <InfoRow label="Practice Area" value={practiceArea?.name ?? '-'} />
-          {matter.matter_type && (
-            <InfoRow label="Matter Type" value={matter.matter_type} />
-          )}
-          <InfoRow
-            label="Date Opened"
-            value={formatDate(matter.date_opened, 'dd MMM yyyy')}
-          />
-          {matter.date_closed && (
-            <InfoRow
-              label="Date Closed"
-              value={formatDate(matter.date_closed, 'dd MMM yyyy')}
-            />
-          )}
-          <InfoRow
-            label="Created"
-            value={formatDate(matter.created_at, 'dd MMM yyyy')}
-          />
-        </CardContent>
-      </Card>
-
-      {/* Assignment */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-sm">
-            <Users className="size-4 text-muted-foreground" />
-            Assignment
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <InfoRow
-            label="Responsible Lawyer"
-            value={getUserName(matter.responsible_lawyer_id, users)}
-          />
-          <InfoRow
-            label="Originating Lawyer"
-            value={getUserName(matter.originating_lawyer_id, users)}
-          />
-          {matter.team_member_ids && matter.team_member_ids.length > 0 && (
-            <>
-              <Separator />
-              <div>
-                <p className="text-xs text-muted-foreground">Team Members</p>
-                <div className="mt-1 flex flex-wrap gap-1">
-                  {matter.team_member_ids.map((memberId) => (
-                    <Badge key={memberId} variant="secondary" className="text-xs">
-                      {getUserName(memberId, users)}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-            </>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Billing & Financial */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-sm">
-            <DollarSign className="size-4 text-muted-foreground" />
-            Billing & Financial
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <InfoRow label="Billing Type" value={getBillingLabel(matter.billing_type)} />
-          {matter.hourly_rate != null && (
-            <InfoRow
-              label="Hourly Rate"
-              value={formatCurrency(matter.hourly_rate)}
-            />
-          )}
-          <Separator />
-          <InfoRow
-            label="Estimated Value"
-            value={matter.estimated_value != null ? formatCurrency(matter.estimated_value) : '-'}
-          />
-          {matter.weighted_value != null && (
-            <InfoRow
-              label="Weighted Value"
-              value={formatCurrency(matter.weighted_value)}
-            />
-          )}
-          <Separator />
-          <InfoRow
-            label="Total Billed"
-            value={formatCurrency(matter.total_billed)}
-          />
-          <InfoRow
-            label="Total Paid"
-            value={formatCurrency(matter.total_paid)}
-          />
-          <InfoRow
-            label="Trust Balance"
-            value={formatCurrency(matter.trust_balance)}
-          />
-        </CardContent>
-      </Card>
-
-      {/* Key Dates */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-sm">
-            <Calendar className="size-4 text-muted-foreground" />
-            Key Dates
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <InfoRow
-            label="Date Opened"
-            value={formatDate(matter.date_opened, 'dd MMM yyyy')}
-          />
-          {matter.date_closed && (
-            <InfoRow
-              label="Date Closed"
-              value={formatDate(matter.date_closed, 'dd MMM yyyy')}
-            />
-          )}
-          <Separator />
-          {matter.statute_of_limitations ? (
-            <div>
-              <p className="text-xs text-muted-foreground">Statute of Limitations</p>
-              <div className="flex items-center gap-2">
-                <p className="text-sm text-slate-900">
-                  {formatDate(matter.statute_of_limitations, 'dd MMM yyyy')}
-                </p>
-                {new Date(matter.statute_of_limitations) < new Date() && (
-                  <Badge variant="destructive" className="text-[10px]">
-                    <AlertTriangle className="mr-1 size-3" />
-                    Expired
-                  </Badge>
-                )}
-              </div>
-            </div>
-          ) : (
-            <InfoRow label="Statute of Limitations" value="-" />
-          )}
-          {matter.next_deadline ? (
-            <div>
-              <p className="text-xs text-muted-foreground">Next Deadline</p>
-              <div className="flex items-center gap-2">
-                <p className="text-sm text-slate-900">
-                  {formatDate(matter.next_deadline, 'dd MMM yyyy')}
-                </p>
-                {new Date(matter.next_deadline) < new Date() && (
-                  <Badge variant="destructive" className="text-[10px]">
-                    <AlertTriangle className="mr-1 size-3" />
-                    Overdue
-                  </Badge>
-                )}
-              </div>
-            </div>
-          ) : (
-            <InfoRow label="Next Deadline" value="-" />
-          )}
-          <Separator />
-          <InfoRow
-            label="Current Stage Since"
-            value={formatDate(matter.stage_entered_at, 'dd MMM yyyy')}
-          />
-        </CardContent>
-      </Card>
-
-      {/* Recent Activity — spans full width */}
-      <Card className="md:col-span-2">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-sm">
-            <Clock className="size-4 text-muted-foreground" />
-            Recent Activity
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <MiniTimeline
-            tenantId={tenantId}
-            entityType="matter"
-            entityId={matterId}
-            matterId={matterId}
-            limit={6}
-          />
-        </CardContent>
-      </Card>
-    </div>
-  )
-}
-
-// -------------------------------------------------------------------
-// Contacts Tab
-// -------------------------------------------------------------------
-
-function ContactsTab({
-  matterId,
-  tenantId,
-}: {
-  matterId: string
-  tenantId: string
-}) {
-  const router = useRouter()
-  const queryClient = useQueryClient()
-  const { data: contacts, isLoading } = useMatterContacts(matterId, tenantId)
-
-  const [addDialogOpen, setAddDialogOpen] = useState(false)
-  const [selectedContactId, setSelectedContactId] = useState('')
-  const [selectedRole, setSelectedRole] = useState('client')
-  const [isPrimary, setIsPrimary] = useState(false)
-  const [isLinking, setIsLinking] = useState(false)
-
-  async function handleAddContact() {
-    if (!selectedContactId) return
-    setIsLinking(true)
-    try {
-      const supabase = createClient()
-      const { error } = await supabase.from('matter_contacts').insert({
-        tenant_id: tenantId,
-        matter_id: matterId,
-        contact_id: selectedContactId,
-        role: selectedRole,
-        is_primary: isPrimary,
-      })
-      if (error) throw error
-      queryClient.invalidateQueries({ queryKey: ['matter-contacts', matterId] })
-      setAddDialogOpen(false)
-      setSelectedContactId('')
-      setSelectedRole('client')
-      setIsPrimary(false)
-      toast.success('Contact added to matter')
-    } catch {
-      toast.error('Failed to add contact')
-    } finally {
-      setIsLinking(false)
-    }
-  }
-
-  async function handleRemoveContact(contactId: string) {
-    try {
-      const supabase = createClient()
-      const { error } = await supabase
-        .from('matter_contacts')
-        .delete()
-        .eq('matter_id', matterId)
-        .eq('contact_id', contactId)
-        .eq('tenant_id', tenantId)
-      if (error) throw error
-      queryClient.invalidateQueries({ queryKey: ['matter-contacts', matterId] })
-      toast.success('Contact removed from matter')
-    } catch {
-      toast.error('Failed to remove contact')
-    }
-  }
-
-  // IDs of contacts already linked
-  const linkedContactIds = contacts?.map((c) => c.id) ?? []
-
-  return (
-    <>
-      {/* Action bar */}
-      <div className="flex items-center justify-between mb-4">
-        <p className="text-sm text-muted-foreground">
-          {isLoading ? '' : `${contacts?.length ?? 0} contacts`}
-        </p>
-        <Button size="sm" onClick={() => setAddDialogOpen(true)}>
-          <Plus className="mr-1.5 size-4" />
-          Add Contact
-        </Button>
-      </div>
-
-      {isLoading ? (
-        <Card>
-          <CardContent className="py-6">
-            <div className="space-y-3">
-              {Array.from({ length: 3 }).map((_, i) => (
-                <div key={i} className="flex items-center gap-4">
-                  <Skeleton className="h-4 w-48" />
-                  <Skeleton className="h-5 w-16 rounded-full" />
-                  <Skeleton className="h-4 w-24" />
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      ) : !contacts || contacts.length === 0 ? (
-        <Card>
-          <CardContent className="py-12 text-center">
-            <Users className="mx-auto mb-3 size-10 text-muted-foreground/50" />
-            <p className="text-sm font-medium text-slate-900">
-              No linked contacts
-            </p>
-            <p className="mt-1 text-sm text-muted-foreground">
-              This matter does not have any linked contacts yet.
-            </p>
-            <Button
-              size="sm"
-              className="mt-4"
-              onClick={() => setAddDialogOpen(true)}
-            >
-              <Plus className="mr-1.5 size-4" />
-              Add First Contact
-            </Button>
-          </CardContent>
-        </Card>
-      ) : (
-        <Card>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Role</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Phone</TableHead>
-                <TableHead className="w-10" />
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {contacts.map((contact) => {
-                const displayName =
-                  contact.contact_type === 'organization'
-                    ? contact.organization_name ?? 'Unnamed Organisation'
-                    : formatFullName(contact.first_name, contact.last_name) || 'Unnamed Contact'
-                return (
-                  <TableRow
-                    key={contact.id}
-                    className="cursor-pointer hover:bg-slate-50"
-                    onClick={() => router.push(`/contacts/${contact.id}`)}
-                  >
-                    <TableCell className="font-medium text-slate-900">
-                      {displayName}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <span className="text-slate-600">
-                          {getRoleLabel(contact.role)}
-                        </span>
-                        {contact.is_primary && (
-                          <Badge variant="outline" className="text-[10px]">
-                            Primary
-                          </Badge>
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-slate-600">
-                      {contact.email_primary ?? '-'}
-                    </TableCell>
-                    <TableCell className="text-slate-600">
-                      {contact.phone_primary
-                        ? formatPhoneNumber(contact.phone_primary)
-                        : '-'}
-                    </TableCell>
-                    <TableCell>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-7 w-7 text-muted-foreground hover:text-destructive"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          handleRemoveContact(contact.id)
-                        }}
-                        title="Remove contact from matter"
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                )
-              })}
-            </TableBody>
-          </Table>
-        </Card>
-      )}
-
-      {/* Add Contact Dialog */}
-      <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Add Contact to Matter</DialogTitle>
-            <DialogDescription>
-              Search for an existing contact or create a new one to link to this matter.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-2">
-            <div>
-              <label className="text-sm font-medium text-slate-700 mb-1.5 block">
-                Contact *
-              </label>
-              <ContactSearch
-                value={selectedContactId}
-                onChange={setSelectedContactId}
-                tenantId={tenantId}
-                placeholder="Search contacts..."
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium text-slate-700 mb-1.5 block">
-                Role *
-              </label>
-              <Select value={selectedRole} onValueChange={setSelectedRole}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select role" />
-                </SelectTrigger>
-                <SelectContent>
-                  {MATTER_CONTACT_ROLES.map((r) => (
-                    <SelectItem key={r.value} value={r.value}>
-                      {r.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="flex items-center gap-2">
-              <Checkbox
-                id="is-primary"
-                checked={isPrimary}
-                onCheckedChange={(checked) => setIsPrimary(!!checked)}
-              />
-              <label htmlFor="is-primary" className="text-sm text-slate-600">
-                Primary contact
-              </label>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setAddDialogOpen(false)}>
-              Cancel
-            </Button>
-            <Button
-              onClick={handleAddContact}
-              disabled={!selectedContactId || isLinking}
-            >
-              {isLinking && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Add Contact
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </>
-  )
-}
-
-// -------------------------------------------------------------------
-// Tasks Tab
-// -------------------------------------------------------------------
-
-function TasksTab({
-  matterId,
-  tenantId,
-  users,
-  practiceAreaId,
-}: {
-  matterId: string
-  tenantId: string
-  users: UserRow[] | undefined
-  practiceAreaId: string | null
-}) {
-  const { appUser } = useUser()
-  const { data: tasks, isLoading } = useMatterTasks(matterId, tenantId)
-  const { data: templates } = useTaskTemplates(tenantId)
-  const applyTemplate = useApplyTemplate()
-
-  const [createOpen, setCreateOpen] = useState(false)
-  const [templateOpen, setTemplateOpen] = useState(false)
-  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null)
-  const [detailOpen, setDetailOpen] = useState(false)
-
-  // Filter templates by practice area (memoized to avoid array recreation)
-  const filteredTemplates = useMemo(
-    () => templates?.filter(
-      (t) => !practiceAreaId || !t.practice_area_id || t.practice_area_id === practiceAreaId
-    ) ?? [],
-    [templates, practiceAreaId]
-  )
-
-  function handleTaskClick(taskId: string) {
-    setSelectedTaskId(taskId)
-    setDetailOpen(true)
-  }
-
-  function handleApplyTemplate(templateId: string) {
-    if (!appUser) return
-    applyTemplate.mutate(
-      {
-        tenantId,
-        matterId,
-        templateId,
-        createdBy: appUser.id,
-      },
-      {
-        onSuccess: () => {
-          setTemplateOpen(false)
-        },
-      }
-    )
-  }
-
-  return (
-    <>
-      {/* Action bar */}
-      <div className="flex items-center justify-between mb-4">
-        <p className="text-sm text-muted-foreground">
-          {isLoading ? '' : `${tasks?.length ?? 0} tasks`}
-        </p>
-        <div className="flex items-center gap-2">
-          {filteredTemplates.length > 0 && (
-            <Button size="sm" variant="outline" onClick={() => setTemplateOpen(true)}>
-              <ListChecks className="mr-1.5 size-4" />
-              Apply Template
-            </Button>
-          )}
-          <Button size="sm" onClick={() => setCreateOpen(true)}>
-            <Plus className="mr-1.5 size-4" />
-            Create Task
-          </Button>
-        </div>
-      </div>
-
-      {isLoading ? (
-        <Card>
-          <CardContent className="py-6">
-            <div className="space-y-3">
-              {Array.from({ length: 3 }).map((_, i) => (
-                <div key={i} className="flex items-center gap-4">
-                  <Skeleton className="h-4 w-48" />
-                  <Skeleton className="h-5 w-16 rounded-full" />
-                  <Skeleton className="h-4 w-24" />
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      ) : !tasks || tasks.length === 0 ? (
-        <Card>
-          <CardContent className="py-12 text-center">
-            <ListTodo className="mx-auto mb-3 size-10 text-muted-foreground/50" />
-            <p className="text-sm font-medium text-slate-900">
-              No tasks
-            </p>
-            <p className="mt-1 text-sm text-muted-foreground">
-              There are no tasks associated with this matter yet.
-            </p>
-            <div className="mt-4 flex items-center justify-center gap-2">
-              {filteredTemplates.length > 0 && (
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => setTemplateOpen(true)}
-                >
-                  <ListChecks className="mr-1.5 size-4" />
-                  Apply Template
-                </Button>
-              )}
-              <Button
-                size="sm"
-                onClick={() => setCreateOpen(true)}
-              >
-                <Plus className="mr-1.5 size-4" />
-                Create First Task
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      ) : (
-        <Card>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Title</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Priority</TableHead>
-                <TableHead>Due Date</TableHead>
-                <TableHead>Assigned To</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {tasks.map((task) => {
-                const taskStatusConfig = getTaskStatusConfig(task.status)
-                const taskPriorityConfig = getPriorityConfig(task.priority)
-                return (
-                  <TableRow
-                    key={task.id}
-                    className="cursor-pointer"
-                    onClick={() => handleTaskClick(task.id)}
-                  >
-                    <TableCell className="font-medium text-slate-900">
-                      <div className="flex items-center gap-2">
-                        {task.status === 'done' && (
-                          <CheckCircle2 className="size-4 text-green-500" />
-                        )}
-                        {task.title}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge
-                        variant="secondary"
-                        style={{
-                          backgroundColor: `${taskStatusConfig.color}15`,
-                          color: taskStatusConfig.color,
-                          borderColor: `${taskStatusConfig.color}30`,
-                        }}
-                        className="border"
-                      >
-                        {taskStatusConfig.label}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Badge
-                        variant="secondary"
-                        style={{
-                          backgroundColor: `${taskPriorityConfig.color}15`,
-                          color: taskPriorityConfig.color,
-                          borderColor: `${taskPriorityConfig.color}30`,
-                        }}
-                        className="border"
-                      >
-                        {taskPriorityConfig.label}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-slate-600">
-                      {task.due_date ? (
-                        <div className="flex items-center gap-1">
-                          {formatDate(task.due_date, 'dd MMM yyyy')}
-                          {new Date(task.due_date) < new Date() &&
-                            task.status !== 'completed' &&
-                            task.status !== 'cancelled' && (
-                              <AlertTriangle className="size-3.5 text-red-500" />
-                            )}
-                        </div>
-                      ) : (
-                        '-'
-                      )}
-                    </TableCell>
-                    <TableCell className="text-slate-600">
-                      {getUserName(task.assigned_to, users)}
-                    </TableCell>
-                  </TableRow>
-                )
-              })}
-            </TableBody>
-          </Table>
-        </Card>
-      )}
-
-      {/* Create Task Dialog (pre-filled with this matter) */}
-      <TaskCreateDialog
-        open={createOpen}
-        onOpenChange={setCreateOpen}
-        matterId={matterId}
-      />
-
-      {/* Task Detail Sheet */}
-      <TaskDetailSheet
-        taskId={selectedTaskId}
-        open={detailOpen}
-        onOpenChange={setDetailOpen}
-      />
-
-      {/* Apply Template Dialog */}
-      <Dialog open={templateOpen} onOpenChange={setTemplateOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Apply Task Template</DialogTitle>
-            <DialogDescription>
-              Select a template to create tasks for this matter. Tasks will be created with due dates relative to today.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="max-h-80 overflow-y-auto space-y-2 py-2">
-            {filteredTemplates.length === 0 ? (
-              <p className="text-sm text-muted-foreground text-center py-4">
-                No templates available. Create templates in Settings → Task Templates.
-              </p>
-            ) : (
-              filteredTemplates.map((template) => (
-                <button
-                  key={template.id}
-                  type="button"
-                  className="flex w-full items-start gap-3 rounded-lg border p-3 text-left transition-colors hover:bg-muted/50 disabled:opacity-50"
-                  onClick={() => handleApplyTemplate(template.id)}
-                  disabled={applyTemplate.isPending}
-                >
-                  <ListChecks className="mt-0.5 size-5 shrink-0 text-primary" />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium">{template.name}</p>
-                    {template.description && (
-                      <p className="mt-0.5 text-xs text-muted-foreground line-clamp-2">
-                        {template.description}
-                      </p>
-                    )}
-                  </div>
-                  {applyTemplate.isPending && (
-                    <Loader2 className="size-4 animate-spin text-muted-foreground" />
-                  )}
-                </button>
-              ))
-            )}
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setTemplateOpen(false)}>
-              Cancel
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </>
-  )
-}
-
-// -------------------------------------------------------------------
-// Helper components
-// -------------------------------------------------------------------
-
-function InfoRow({
-  label,
-  value,
-}: {
-  label: string
-  value: string | null | undefined
-}) {
-  return (
-    <div>
-      <p className="text-xs text-muted-foreground">{label}</p>
-      <p className="text-sm text-slate-900">{value || '-'}</p>
-    </div>
-  )
-}
-
-// -------------------------------------------------------------------
-// Skeleton
-// -------------------------------------------------------------------
-
-// -------------------------------------------------------------------
-// Deadlines Tab — Key Deadlines panel with typed deadline catalog
-// -------------------------------------------------------------------
-
-type MatterDeadlineRow = Database['public']['Tables']['matter_deadlines']['Row']
-type DeadlineTypeRow = Database['public']['Tables']['deadline_types']['Row']
-
-function DeadlinesTab({
-  matterId,
-  tenantId,
-  practiceAreaId,
-}: {
-  matterId: string
-  tenantId: string
-  practiceAreaId: string | null
-}) {
-  const [showForm, setShowForm] = useState(false)
-  const [newDate, setNewDate] = useState('')
-  const [newTypeId, setNewTypeId] = useState<string>('')
-  const [newDescription, setNewDescription] = useState('')
-
-  const { data: deadlines, isLoading } = useMatterDeadlines(tenantId, matterId)
-  const { data: deadlineTypes } = useDeadlineTypes(tenantId, practiceAreaId)
-  const createDeadline = useCreateMatterDeadline()
-  const toggleDeadline = useToggleMatterDeadline()
-  const deleteDeadline = useDeleteMatterDeadline()
-
-  const selectedType = deadlineTypes?.find((dt) => dt.id === newTypeId)
-
-  function handleAdd() {
-    if (!newDate) return
-    createDeadline.mutate(
-      {
-        tenantId,
-        matterId,
-        deadlineTypeId: newTypeId || null,
-        deadlineType: selectedType?.name ?? 'General',
-        deadlineDate: newDate,
-        description: newDescription || null,
-        title: selectedType?.name ?? 'Deadline',
-      },
-      {
-        onSuccess: () => {
-          setShowForm(false)
-          setNewDate('')
-          setNewTypeId('')
-          setNewDescription('')
-        },
-      }
-    )
-  }
-
-  if (isLoading) {
-    return (
-      <div className="space-y-3">
-        {Array.from({ length: 3 }).map((_, i) => (
-          <Skeleton key={i} className="h-12 w-full rounded-md" />
-        ))}
-      </div>
-    )
-  }
-
-  return (
-    <div className="space-y-4">
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-base">
-            <AlertTriangle className="h-4 w-4 text-orange-500" />
-            Key Deadlines
-          </CardTitle>
-          <CardAction>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => setShowForm((v) => !v)}
-            >
-              <Plus className="mr-1 h-3.5 w-3.5" />
-              Add Deadline
-            </Button>
-          </CardAction>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {/* Add form */}
-          {showForm && (
-            <div className="rounded-lg border bg-slate-50 p-4 space-y-3">
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-medium text-slate-700 mb-1">
-                    Deadline Type
-                  </label>
-                  <Select value={newTypeId} onValueChange={setNewTypeId}>
-                    <SelectTrigger className="h-9 text-sm">
-                      <SelectValue placeholder="Select type (optional)" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="">— None —</SelectItem>
-                      {deadlineTypes?.map((dt) => (
-                        <SelectItem key={dt.id} value={dt.id}>
-                          <div className="flex items-center gap-2">
-                            <span
-                              className="h-2 w-2 rounded-full shrink-0"
-                              style={{ backgroundColor: dt.color }}
-                            />
-                            {dt.name}
-                            {dt.is_hard && (
-                              <Badge variant="destructive" className="text-[10px] py-0 px-1">HARD</Badge>
-                            )}
-                          </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-slate-700 mb-1">
-                    Date *
-                  </label>
-                  <Input
-                    type="date"
-                    value={newDate}
-                    onChange={(e) => setNewDate(e.target.value)}
-                    className="h-9 text-sm"
-                  />
-                </div>
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">
-                  Notes (optional)
-                </label>
-                <Input
-                  placeholder="e.g. Closing at 3pm"
-                  value={newDescription}
-                  onChange={(e) => setNewDescription(e.target.value)}
-                  className="h-9 text-sm"
-                />
-              </div>
-              <div className="flex items-center gap-2">
-                <Button
-                  size="sm"
-                  onClick={handleAdd}
-                  disabled={!newDate || createDeadline.isPending}
-                >
-                  {createDeadline.isPending ? 'Saving…' : 'Save'}
-                </Button>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => {
-                    setShowForm(false)
-                    setNewDate('')
-                    setNewTypeId('')
-                    setNewDescription('')
-                  }}
-                >
-                  Cancel
-                </Button>
-              </div>
-            </div>
-          )}
-
-          {/* List */}
-          {!deadlines || deadlines.length === 0 ? (
-            <div className="py-8 text-center">
-              <Calendar className="mx-auto mb-2 h-8 w-8 text-slate-300" />
-              <p className="text-sm text-muted-foreground">No deadlines added yet.</p>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                Add key deadlines to track important dates for this matter.
-              </p>
-            </div>
-          ) : (
-            <div className="divide-y">
-              {deadlines.map((dl: MatterDeadlineRow) => {
-                const today = new Date().toISOString().split('T')[0]
-                const isComplete = dl.status === 'completed' || dl.status === 'dismissed'
-                const daysLeft = differenceInDays(new Date(dl.due_date), new Date())
-                const isOverdue = dl.due_date < today && !isComplete
-                const isUrgent = daysLeft >= 0 && daysLeft <= 3 && !isComplete
-                const isWarning = daysLeft > 3 && daysLeft <= 7 && !isComplete
-
-                return (
-                  <div
-                    key={dl.id}
-                    className={cn(
-                      'flex items-start gap-3 py-3',
-                      isComplete && 'opacity-50'
-                    )}
-                  >
-                    <Checkbox
-                      checked={isComplete}
-                      onCheckedChange={(checked) =>
-                        toggleDeadline.mutate({
-                          id: dl.id,
-                          tenantId,
-                          matterId,
-                          isCompleted: !!checked,
-                        })
-                      }
-                      className="mt-0.5 shrink-0"
-                      aria-label={`Mark deadline ${dl.title} as ${isComplete ? 'incomplete' : 'complete'}`}
-                    />
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span
-                          className={cn(
-                            'text-sm font-medium',
-                            isComplete && 'line-through text-muted-foreground'
-                          )}
-                        >
-                          {dl.title}
-                        </span>
-                        {isOverdue && (
-                          <Badge variant="destructive" className="text-xs">Overdue</Badge>
-                        )}
-                        {isUrgent && !isOverdue && (
-                          <Badge variant="destructive" className="text-xs">{daysLeft}d</Badge>
-                        )}
-                        {isWarning && (
-                          <Badge variant="outline" className="text-xs border-orange-400 text-orange-600 bg-orange-50">
-                            {daysLeft}d
-                          </Badge>
-                        )}
-                      </div>
-                      {dl.description && (
-                        <p className="text-xs text-muted-foreground mt-0.5">{dl.description}</p>
-                      )}
-                      <p className="text-xs text-muted-foreground">
-                        {formatDate(dl.due_date, 'EEEE, MMMM d, yyyy')}
-                      </p>
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-7 w-7 shrink-0 text-muted-foreground hover:text-destructive"
-                      onClick={() =>
-                        deleteDeadline.mutate({ id: dl.id, tenantId, matterId })
-                      }
-                      aria-label="Delete deadline"
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </Button>
-                  </div>
-                )
-              })}
-            </div>
-          )}
-        </CardContent>
-      </Card>
-    </div>
-  )
-}
-
-// ── Billing Tab ──────────────────────────────────────────────────────────────
-
-type MatterRow = Database['public']['Tables']['matters']['Row']
-
-function fmtCents(cents: number): string {
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 }).format(cents / 100)
-}
-
-function BillingTab({ matterId, tenantId, matter }: { matterId: string; tenantId: string; matter: MatterRow }) {
-  const { appUser } = useUser()
-  const [showLogTime, setShowLogTime] = useState(false)
-  const [showCreateInvoice, setShowCreateInvoice] = useState(false)
-  const [showPayment, setShowPayment] = useState<string | null>(null)
-
-  // Time entry form state
-  const [teHours, setTeHours] = useState('')
-  const [teMinutes, setTeMinutes] = useState('')
-  const [teDesc, setTeDesc] = useState('')
-  const [teRate, setTeRate] = useState(matter.hourly_rate?.toString() ?? '')
-  const [teBillable, setTeBillable] = useState(true)
-
-  // Invoice form state
-  const [invNotes, setInvNotes] = useState('')
-  const [invDueDays, setInvDueDays] = useState('30')
-  const [selectedEntries, setSelectedEntries] = useState<Set<string>>(new Set())
-
-  // Payment form state
-  const [payAmount, setPayAmount] = useState('')
-  const [payMethod, setPayMethod] = useState('bank_transfer')
-  const [payRef, setPayRef] = useState('')
-
-  const { data: timeEntries = [], isLoading: teLoading } = useTimeEntries(tenantId, matterId)
-  const { data: unbilledEntries = [] } = useUnbilledTimeEntries(tenantId, matterId)
-  const { data: invoices = [], isLoading: invLoading } = useInvoices(tenantId, matterId)
-  const createTimeEntry = useCreateTimeEntry()
-  const deleteTimeEntry = useDeleteTimeEntry()
-  const createInvoice = useCreateInvoice()
-  const updateStatus = useUpdateInvoiceStatus()
-  const deleteInvoice = useDeleteInvoice()
-  const recordPayment = useRecordPayment()
-
-  const outstanding = (matter.total_billed ?? 0) - (matter.total_paid ?? 0)
-
-  // ── Log Time Handler ──
-  const handleLogTime = async () => {
-    const totalMin = (parseInt(teHours || '0') * 60) + parseInt(teMinutes || '0')
-    if (totalMin <= 0 || !teDesc.trim()) return
-    await createTimeEntry.mutateAsync({
-      tenant_id: tenantId,
-      matter_id: matterId,
-      user_id: appUser?.id ?? '',
-      duration_minutes: totalMin,
-      description: teDesc.trim(),
-      is_billable: teBillable,
-      hourly_rate: teRate ? parseFloat(teRate) : undefined,
-    })
-    setTeHours(''); setTeMinutes(''); setTeDesc(''); setShowLogTime(false)
-  }
-
-  // ── Create Invoice Handler ──
-  const handleCreateInvoice = async () => {
-    const entries = unbilledEntries.filter((e) => selectedEntries.has(e.id))
-    if (entries.length === 0) return
-    const now = new Date()
-    const dueDate = new Date(now.getTime() + parseInt(invDueDays) * 86400000)
-    const invoiceNumber = `INV-${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`
-
-    const lineItems = entries.map((e) => ({
-      description: e.description,
-      quantity: Math.round((e.duration_minutes / 60) * 100) / 100,
-      unitPrice: Math.round((e.hourly_rate ?? matter.hourly_rate ?? 0) * 100),
-      timeEntryId: e.id,
-    }))
-
-    await createInvoice.mutateAsync({
-      tenantId,
-      matterId,
-      invoiceNumber,
-      issueDate: now.toISOString().split('T')[0],
-      dueDate: dueDate.toISOString().split('T')[0],
-      notes: invNotes || undefined,
-      lineItems,
-    })
-    setSelectedEntries(new Set()); setInvNotes(''); setShowCreateInvoice(false)
-  }
-
-  // ── Record Payment Handler ──
-  const handleRecordPayment = async () => {
-    if (!showPayment) return
-    const amountCents = Math.round(parseFloat(payAmount) * 100)
-    if (isNaN(amountCents) || amountCents <= 0) return
-    await recordPayment.mutateAsync({
-      tenant_id: tenantId,
-      invoice_id: showPayment,
-      amount: amountCents,
-      payment_method: payMethod,
-      reference: payRef || undefined,
-    })
-    setPayAmount(''); setPayRef(''); setShowPayment(null)
-  }
-
-  const toggleEntry = (id: string) => {
-    setSelectedEntries((prev) => {
-      const next = new Set(prev)
-      if (next.has(id)) next.delete(id); else next.add(id)
-      return next
-    })
-  }
-
-  const selectAllUnbilled = () => {
-    setSelectedEntries(new Set(unbilledEntries.map((e) => e.id)))
-  }
-
-  const invoiceStatusColor = (status: string) => INVOICE_STATUSES.find((s) => s.value === status)?.color ?? '#6b7280'
-  const invoiceStatusLabel = (status: string) => INVOICE_STATUSES.find((s) => s.value === status)?.label ?? status
-
-  return (
-    <div className="space-y-6">
-      {/* Summary Cards */}
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <Card><CardContent className="p-4"><p className="text-xs text-muted-foreground">Total Billed</p><p className="text-lg font-semibold">{formatCurrency(matter.total_billed)}</p></CardContent></Card>
-        <Card><CardContent className="p-4"><p className="text-xs text-muted-foreground">Total Paid</p><p className="text-lg font-semibold">{formatCurrency(matter.total_paid)}</p></CardContent></Card>
-        <Card><CardContent className="p-4"><p className="text-xs text-muted-foreground">Outstanding</p><p className="text-lg font-semibold">{formatCurrency(outstanding)}</p></CardContent></Card>
-        <Card><CardContent className="p-4"><p className="text-xs text-muted-foreground">Trust Balance</p><p className="text-lg font-semibold">{formatCurrency(matter.trust_balance)}</p></CardContent></Card>
-      </div>
-
-      {/* Time Entries Section */}
-      <Card>
-        <CardHeader className="pb-3 flex flex-row items-center justify-between">
-          <CardTitle className="text-sm font-semibold">Time Entries</CardTitle>
-          <Button size="sm" variant="outline" onClick={() => setShowLogTime(true)}>
-            <Plus className="mr-1 h-3.5 w-3.5" /> Log Time
-          </Button>
-        </CardHeader>
-        <CardContent>
-          {teLoading ? (
-            <div className="space-y-2">{Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-10" />)}</div>
-          ) : timeEntries.length === 0 ? (
-            <p className="text-sm text-muted-foreground text-center py-6">No time entries yet</p>
-          ) : (
-            <div className="space-y-1">
-              <div className="grid grid-cols-[80px_60px_70px_70px_1fr_60px_50px] gap-2 px-2 py-1.5 text-xs font-medium text-muted-foreground border-b">
-                <span>Date</span><span>Duration</span><span>Rate</span><span>Amount</span><span>Description</span><span>Billable</span><span></span>
-              </div>
-              {timeEntries.slice(0, 30).map((te) => {
-                const hrs = Math.floor(te.duration_minutes / 60)
-                const mins = te.duration_minutes % 60
-                const amount = te.hourly_rate ? (te.duration_minutes / 60) * Number(te.hourly_rate) : 0
-                return (
-                  <div key={te.id} className="grid grid-cols-[80px_60px_70px_70px_1fr_60px_50px] gap-2 px-2 py-2 text-sm items-center rounded hover:bg-slate-50">
-                    <span className="text-xs">{formatDate(te.entry_date)}</span>
-                    <span className="text-xs">{hrs}h {mins > 0 ? `${mins}m` : ''}</span>
-                    <span className="text-xs">{te.hourly_rate ? `$${Number(te.hourly_rate).toFixed(0)}` : '—'}</span>
-                    <span className="text-xs font-medium">{amount > 0 ? `$${amount.toFixed(2)}` : '—'}</span>
-                    <span className="text-xs truncate">{te.description}</span>
-                    <span>{te.is_billable ? <Badge variant="outline" className="text-xs py-0">{te.is_billed ? 'Billed' : 'Yes'}</Badge> : <span className="text-xs text-muted-foreground">No</span>}</span>
-                    <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => deleteTimeEntry.mutate(te.id)} disabled={te.is_billed}><Trash2 className="h-3 w-3" /></Button>
-                  </div>
-                )
-              })}
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Invoices Section */}
-      <Card>
-        <CardHeader className="pb-3 flex flex-row items-center justify-between">
-          <CardTitle className="text-sm font-semibold">Invoices</CardTitle>
-          <Button size="sm" onClick={() => { selectAllUnbilled(); setShowCreateInvoice(true) }} disabled={unbilledEntries.length === 0}>
-            <Plus className="mr-1 h-3.5 w-3.5" /> Create Invoice
-          </Button>
-        </CardHeader>
-        <CardContent>
-          {invLoading ? (
-            <div className="space-y-2">{Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-10" />)}</div>
-          ) : invoices.length === 0 ? (
-            <p className="text-sm text-muted-foreground text-center py-6">No invoices yet</p>
-          ) : (
-            <div className="space-y-1">
-              <div className="grid grid-cols-[90px_80px_90px_90px_80px_1fr] gap-2 px-2 py-1.5 text-xs font-medium text-muted-foreground border-b">
-                <span>Invoice #</span><span>Date</span><span>Amount</span><span>Paid</span><span>Status</span><span>Actions</span>
-              </div>
-              {invoices.map((inv) => (
-                <div key={inv.id} className="grid grid-cols-[90px_80px_90px_90px_80px_1fr] gap-2 px-2 py-2 text-sm items-center rounded hover:bg-slate-50">
-                  <span className="font-mono text-xs">{inv.invoice_number}</span>
-                  <span className="text-xs">{formatDate(inv.issue_date)}</span>
-                  <span className="text-xs font-medium">{fmtCents(inv.total_amount)}</span>
-                  <span className="text-xs">{fmtCents(inv.amount_paid)}</span>
-                  <Badge variant="outline" className="text-xs py-0 w-fit" style={{ borderColor: invoiceStatusColor(inv.status), color: invoiceStatusColor(inv.status) }}>
-                    {invoiceStatusLabel(inv.status)}
-                  </Badge>
-                  <div className="flex gap-1">
-                    {inv.status === 'draft' && (
-                      <>
-                        <Button variant="ghost" size="sm" className="h-6 text-xs px-2" onClick={() => updateStatus.mutate({ id: inv.id, status: 'sent' })}>Send</Button>
-                        <Button variant="ghost" size="sm" className="h-6 text-xs px-2 text-red-500" onClick={() => deleteInvoice.mutate(inv.id)}>Delete</Button>
-                      </>
-                    )}
-                    {['sent', 'viewed', 'overdue'].includes(inv.status) && (
-                      <Button variant="ghost" size="sm" className="h-6 text-xs px-2" onClick={() => setShowPayment(inv.id)}>Record Payment</Button>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Log Time Dialog */}
-      <Dialog open={showLogTime} onOpenChange={setShowLogTime}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader><DialogTitle>Log Time</DialogTitle><DialogDescription>Add a time entry for this matter</DialogDescription></DialogHeader>
-          <div className="space-y-3">
-            <div className="grid grid-cols-2 gap-3">
-              <div><Label className="text-xs">Hours</Label><Input type="number" min="0" value={teHours} onChange={(e) => setTeHours(e.target.value)} className="mt-1" /></div>
-              <div><Label className="text-xs">Minutes</Label><Input type="number" min="0" max="59" value={teMinutes} onChange={(e) => setTeMinutes(e.target.value)} className="mt-1" /></div>
-            </div>
-            <div><Label className="text-xs">Rate ($/hr)</Label><Input type="number" step="0.01" value={teRate} onChange={(e) => setTeRate(e.target.value)} className="mt-1" /></div>
-            <div><Label className="text-xs">Description</Label><Input value={teDesc} onChange={(e) => setTeDesc(e.target.value)} className="mt-1" placeholder="Work performed..." /></div>
-            <div className="flex items-center gap-2"><Checkbox id="te-billable" checked={teBillable} onCheckedChange={(v) => setTeBillable(v === true)} /><label htmlFor="te-billable" className="text-sm">Billable</label></div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowLogTime(false)}>Cancel</Button>
-            <Button onClick={handleLogTime} disabled={createTimeEntry.isPending}>
-              {createTimeEntry.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}Log Time
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Create Invoice Dialog */}
-      <Dialog open={showCreateInvoice} onOpenChange={setShowCreateInvoice}>
-        <DialogContent className="sm:max-w-lg">
-          <DialogHeader><DialogTitle>Create Invoice</DialogTitle><DialogDescription>Select time entries to include</DialogDescription></DialogHeader>
-          <div className="space-y-4">
-            {unbilledEntries.length === 0 ? (
-              <p className="text-sm text-muted-foreground text-center py-4">No unbilled time entries</p>
-            ) : (
-              <div className="max-h-48 overflow-y-auto space-y-1 border rounded-md p-2">
-                {unbilledEntries.map((e) => {
-                  const hrs = Math.floor(e.duration_minutes / 60)
-                  const mins = e.duration_minutes % 60
-                  const amt = e.hourly_rate ? (e.duration_minutes / 60) * Number(e.hourly_rate) : 0
-                  return (
-                    <div key={e.id} className="flex items-center gap-2 py-1 text-sm">
-                      <Checkbox checked={selectedEntries.has(e.id)} onCheckedChange={() => toggleEntry(e.id)} />
-                      <span className="text-xs flex-1 truncate">{e.description}</span>
-                      <span className="text-xs text-muted-foreground">{hrs}h{mins > 0 ? ` ${mins}m` : ''}</span>
-                      <span className="text-xs font-medium">{amt > 0 ? `$${amt.toFixed(2)}` : '—'}</span>
-                    </div>
-                  )
-                })}
-              </div>
-            )}
-            <div><Label className="text-xs">Payment Terms (days)</Label><Input type="number" value={invDueDays} onChange={(e) => setInvDueDays(e.target.value)} className="mt-1" /></div>
-            <div><Label className="text-xs">Notes (optional)</Label><Input value={invNotes} onChange={(e) => setInvNotes(e.target.value)} className="mt-1" placeholder="Additional notes..." /></div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowCreateInvoice(false)}>Cancel</Button>
-            <Button onClick={handleCreateInvoice} disabled={createInvoice.isPending || selectedEntries.size === 0}>
-              {createInvoice.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}Create Invoice
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Record Payment Dialog */}
-      <Dialog open={!!showPayment} onOpenChange={() => setShowPayment(null)}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader><DialogTitle>Record Payment</DialogTitle></DialogHeader>
-          <div className="space-y-3">
-            <div><Label className="text-xs">Amount ($)</Label><Input type="number" step="0.01" value={payAmount} onChange={(e) => setPayAmount(e.target.value)} className="mt-1" /></div>
-            <div>
-              <Label className="text-xs">Method</Label>
-              <Select value={payMethod} onValueChange={setPayMethod}>
-                <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
-                <SelectContent>{PAYMENT_METHODS.map((pm) => <SelectItem key={pm.value} value={pm.value}>{pm.label}</SelectItem>)}</SelectContent>
-              </Select>
-            </div>
-            <div><Label className="text-xs">Reference</Label><Input value={payRef} onChange={(e) => setPayRef(e.target.value)} className="mt-1" placeholder="Optional" /></div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowPayment(null)}>Cancel</Button>
-            <Button onClick={handleRecordPayment} disabled={recordPayment.isPending || !payAmount}>
-              {recordPayment.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}Record Payment
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </div>
-  )
-}
+// ─── Skeleton ────────────────────────────────────────────────────────────────
 
 function MatterDetailSkeleton() {
   return (

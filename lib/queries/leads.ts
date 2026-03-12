@@ -33,7 +33,7 @@ export const leadKeys = {
 
 export function useLeads(params: LeadListParams) {
   const {
-    tenantId, page = 1, pageSize = 100, pipelineId, stageId,
+    tenantId, page = 1, pageSize = 50, pipelineId, stageId,
     status = 'open', assignedTo, temperature, practiceAreaId,
     sortBy = 'created_at', sortDirection = 'desc',
   } = params
@@ -47,7 +47,7 @@ export function useLeads(params: LeadListParams) {
 
       let query = supabase
         .from('leads')
-        .select('id, tenant_id, contact_id, pipeline_id, stage_id, assigned_to, practice_area_id, status, temperature, source, estimated_value, next_follow_up, stage_entered_at, created_at, updated_at', { count: 'exact' })
+        .select('id, tenant_id, contact_id, pipeline_id, stage_id, assigned_to, practice_area_id, status, temperature, source, estimated_value, next_follow_up, notes, stage_entered_at, created_at, updated_at', { count: 'exact' })
         .eq('tenant_id', tenantId)
 
       if (pipelineId) query = query.eq('pipeline_id', pipelineId)
@@ -114,7 +114,7 @@ export function useCreateLead() {
 
       logAudit({
         tenantId: lead.tenant_id,
-        userId: lead.created_by ?? null,
+        userId: lead.created_by ?? 'system',
         entityType: 'lead',
         entityId: lead.id,
         action: 'created',
@@ -150,7 +150,7 @@ export function useUpdateLead() {
 
       logAudit({
         tenantId: data.tenant_id,
-        userId: data.created_by ?? null,
+        userId: data.created_by ?? 'system',
         entityType: 'lead',
         entityId: data.id,
         action: 'updated',
@@ -167,7 +167,7 @@ export function useUpdateLeadStage() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async ({ id, stageId }: { id: string; stageId: string }) => {
+    mutationFn: async ({ id, stageId }: { id: string; stageId: string; userId?: string }) => {
       const supabase = createClient()
       const { data, error } = await supabase
         .from('leads')
@@ -179,17 +179,17 @@ export function useUpdateLeadStage() {
       if (error) throw error
       return data as Lead
     },
-    onSuccess: (data) => {
+    onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: leadKeys.lists() })
       queryClient.setQueryData(leadKeys.detail(data.id), data)
 
       logAudit({
         tenantId: data.tenant_id,
-        userId: data.created_by ?? null,
+        userId: variables.userId ?? data.created_by ?? 'system',
         entityType: 'lead',
         entityId: data.id,
         action: 'stage_changed',
-        changes: { stage_id: data.stage_id },
+        changes: { stage_id: data.stage_id, stage_name: data.stage_id },
         metadata: { contact_id: data.contact_id },
       })
     },
@@ -266,7 +266,7 @@ export function useConvertLead() {
 
       logAudit({
         tenantId: lead.tenant_id,
-        userId: lead.created_by ?? null,
+        userId: lead.created_by ?? 'system',
         entityType: 'lead',
         entityId: lead.id,
         action: 'converted',
@@ -302,7 +302,7 @@ export function useDeleteLead() {
 
       logAudit({
         tenantId: lead.tenant_id,
-        userId: lead.created_by ?? null,
+        userId: lead.created_by ?? 'system',
         entityType: 'lead',
         entityId: lead.id,
         action: 'archived',

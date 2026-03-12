@@ -13,6 +13,7 @@ import {
 import { useMatters } from '@/lib/queries/matters'
 import { useTenant } from '@/lib/hooks/use-tenant'
 import { useUser } from '@/lib/hooks/use-user'
+import { RequirePermission } from '@/components/require-permission'
 import { formatDate } from '@/lib/utils/formatters'
 import { INVOICE_STATUSES, PAYMENT_METHODS } from '@/lib/utils/constants'
 import { EmptyState } from '@/components/shared/empty-state'
@@ -291,6 +292,14 @@ function QuickTimeEntry({ tenantId, userId }: { tenantId: string; userId: string
 // ── Main Page ────────────────────────────────────────────────────────────────
 
 export default function BillingPage() {
+  return (
+    <RequirePermission entity="billing" action="view">
+      <BillingPageContent />
+    </RequirePermission>
+  )
+}
+
+function BillingPageContent() {
   const { tenant } = useTenant()
   const tenantId = tenant?.id ?? ''
   const { appUser } = useUser()
@@ -409,7 +418,7 @@ export default function BillingPage() {
                   <div
                     key={inv.id}
                     className="grid grid-cols-[80px_1fr_100px_100px_90px_120px] gap-2 px-3 py-2.5 text-sm rounded-md hover:bg-slate-50 cursor-pointer items-center"
-                    onClick={() => router.push(`/matters/${inv.matter_id}?tab=billing`)}
+                    onClick={() => router.push(`/matters/${inv.matter_id}`)}
                   >
                     <span className="font-mono text-xs">{inv.invoice_number}</span>
                     <span className="truncate text-xs">

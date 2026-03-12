@@ -1,15 +1,51 @@
 import { NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { createRateLimiter } from '@/lib/middleware/rate-limit'
+import { isJurisdictionEnabled, DEFAULT_JURISDICTION } from '@/lib/config/jurisdictions'
+import { withTiming } from '@/lib/middleware/request-timing'
+import { z } from 'zod'
 
-export async function POST(request: Request) {
+const signupSchema = z.object({
+  firmName: z.string().min(1, 'Firm name is required').max(255),
+  firstName: z.string().min(1, 'First name is required').max(100),
+  lastName: z.string().min(1, 'Last name is required').max(100),
+  email: z.string().email('Invalid email address'),
+  password: z.string().min(8, 'Password must be at least 8 characters'),
+  jurisdictionCode: z.string().optional(),
+})
+
+// 5 signups per IP per minute
+const signupLimiter = createRateLimiter({ maxRequests: 5, windowMs: 60_000 })
+
+async function handlePost(request: Request) {
+  // Rate limit by IP
+  const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
+  const { allowed, retryAfterMs } = signupLimiter.check(ip)
+  if (!allowed) {
+    return NextResponse.json(
+      { data: null, error: 'Too many signup attempts. Please try again later.' },
+      { status: 429, headers: { 'Retry-After': String(Math.ceil(retryAfterMs / 1000)) } }
+    )
+  }
+
   try {
     const body = await request.json()
-    const { firmName, firstName, lastName, email, password } = body
+    const parsed = signupSchema.safeParse(body)
 
-    // Validate required fields
-    if (!firmName || !firstName || !lastName || !email || !password) {
+    if (!parsed.success) {
       return NextResponse.json(
-        { data: null, error: 'All fields are required.' },
+        { data: null, error: parsed.error.issues[0]?.message ?? 'Invalid input' },
+        { status: 400 }
+      )
+    }
+
+    const { firmName, firstName, lastName, email, password, jurisdictionCode } = parsed.data
+
+    // Validate jurisdiction
+    const jurisdiction = jurisdictionCode || DEFAULT_JURISDICTION
+    if (!isJurisdictionEnabled(jurisdiction)) {
+      return NextResponse.json(
+        { data: null, error: `Jurisdiction '${jurisdiction}' is not currently available.` },
         { status: 400 }
       )
     }
@@ -39,6 +75,9 @@ export async function POST(request: Request) {
     const authUserId = authData.user.id
 
     // Step 2: Create the tenant
+    // Seat-limit exempt: signup creates a new tenant with 0 users, always passes.
+    // max_users is set explicitly (non-null) because the DB trigger (enforce_max_users)
+    // raises an exception when max_users IS NULL.
     const slug = firmName
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
@@ -62,6 +101,7 @@ export async function POST(request: Request) {
         feature_flags: {},
         settings: {},
         portal_branding: {},
+        jurisdiction_code: jurisdiction,
       })
       .select()
       .single()
@@ -152,3 +192,5 @@ export async function POST(request: Request) {
     )
   }
 }
+
+export const POST = withTiming(handlePost, 'POST /api/auth/signup')

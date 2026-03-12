@@ -1,13 +1,13 @@
 import { format, formatDistanceToNow, isToday, isYesterday, isPast, differenceInDays } from 'date-fns'
 
-export function formatDate(date: string | Date | null | undefined, dateFormat = 'dd-MM-yyyy'): string {
+export function formatDate(date: string | Date | null | undefined, dateFormat = 'dd-MMM-yyyy'): string {
   if (!date) return ''
   return format(new Date(date), dateFormat)
 }
 
 export function formatDateTime(date: string | Date | null | undefined): string {
   if (!date) return ''
-  return format(new Date(date), 'dd-MM-yyyy h:mm a')
+  return format(new Date(date), 'dd-MMM-yyyy h:mm a')
 }
 
 export function formatRelativeDate(date: string | Date | null | undefined): string {
@@ -46,6 +46,24 @@ export function formatPhoneNumber(phone: string | null | undefined): string {
     return `+1 (${cleaned.slice(1, 4)}) ${cleaned.slice(4, 7)}-${cleaned.slice(7)}`
   }
   return phone
+}
+
+export function formatElapsed(ms: number): string {
+  const totalSec = Math.floor(ms / 1000)
+  const hrs = Math.floor(totalSec / 3600)
+  const mins = Math.floor((totalSec % 3600) / 60)
+  const secs = totalSec % 60
+  const pad = (n: number) => n.toString().padStart(2, '0')
+  if (hrs > 0) return `${pad(hrs)}:${pad(mins)}:${pad(secs)}`
+  return `${pad(mins)}:${pad(secs)}`
+}
+
+export function formatTimeHM(d: Date): string {
+  return d.toLocaleTimeString('en-CA', {
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+  })
 }
 
 export function isOverdue(date: string | Date | null | undefined): boolean {

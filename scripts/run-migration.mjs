@@ -5,45 +5,56 @@ import { fileURLToPath } from 'url'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
-// Accept a migration file path as CLI argument, default to initial schema
+// Accept a migration file path as CLI argument
 const fileArg = process.argv[2]
 if (!fileArg) {
   console.error('Usage: node scripts/run-migration.mjs <path-to-sql-file>')
+  console.error('Requires env vars: SUPABASE_DB_USER, SUPABASE_DB_PASSWORD, SUPABASE_DB_HOST, SUPABASE_DIRECT_HOST')
   process.exit(1)
 }
 const sqlPath = resolve(fileArg)
 console.log(`📄 Migration file: ${sqlPath}`)
 const sql = readFileSync(sqlPath, 'utf-8')
 
-// Try multiple connection configs
+const user = process.env.SUPABASE_DB_USER
+const password = process.env.SUPABASE_DB_PASSWORD
+const poolerHost = process.env.SUPABASE_DB_HOST || 'aws-0-ca-central-1.pooler.supabase.com'
+const directHost = process.env.SUPABASE_DIRECT_HOST
+
+if (!user || !password) {
+  console.error('Missing required env vars: SUPABASE_DB_USER, SUPABASE_DB_PASSWORD')
+  console.error('Set these in .env.local — see .env.example for the required keys')
+  process.exit(1)
+}
+
 const configs = [
   {
     label: 'Pooler session mode (port 5432)',
-    host: 'aws-0-ca-central-1.pooler.supabase.com',
+    host: poolerHost,
     port: 5432,
-    user: 'postgres.ztsjvsutlrfisnrwdwfl',
-    password: 'MyOakville@143',
+    user,
+    password,
     database: 'postgres',
     ssl: { rejectUnauthorized: false },
   },
   {
     label: 'Pooler transaction mode (port 6543)',
-    host: 'aws-0-ca-central-1.pooler.supabase.com',
+    host: poolerHost,
     port: 6543,
-    user: 'postgres.ztsjvsutlrfisnrwdwfl',
-    password: 'MyOakville@143',
+    user,
+    password,
     database: 'postgres',
     ssl: { rejectUnauthorized: false },
   },
-  {
+  ...(directHost ? [{
     label: 'Direct connection',
-    host: 'db.ztsjvsutlrfisnrwdwfl.supabase.co',
+    host: directHost,
     port: 5432,
     user: 'postgres',
-    password: 'MyOakville@143',
+    password,
     database: 'postgres',
     ssl: { rejectUnauthorized: false },
-  },
+  }] : []),
 ]
 
 async function tryConnect(config) {

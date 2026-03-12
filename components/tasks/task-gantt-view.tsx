@@ -15,6 +15,7 @@ import {
   isToday,
 } from 'date-fns'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { formatDate } from '@/lib/utils/formatters'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { TASK_STATUSES } from '@/lib/utils/constants'
@@ -354,7 +355,7 @@ export function TaskGanttView({ tasks, onTaskClick }: TaskGanttViewProps) {
                         backgroundColor: statusColor,
                       }}
                       onClick={() => onTaskClick(task.id)}
-                      title={`${task.title}\n${format(taskStart, 'MMM d')} - ${format(taskEnd, 'MMM d')}`}
+                      title={`${task.title}\n${formatDate(taskStart)} - ${formatDate(taskEnd)}`}
                     >
                       {barWidth > 60 && (
                         <span className="block truncate px-2 text-[10px] font-medium leading-5 text-white">
@@ -379,7 +380,7 @@ export function TaskGanttView({ tasks, onTaskClick }: TaskGanttViewProps) {
                         top: rowIndex * ROW_HEIGHT + ROW_HEIGHT / 2 - 6,
                       }}
                       onClick={() => onTaskClick(task.id)}
-                      title={`${task.title}\nDue: ${format(taskEnd, 'MMM d, yyyy')}`}
+                      title={`${task.title}\nDue: ${formatDate(taskEnd)}`}
                     >
                       <div
                         className="h-3 w-3 rotate-45 rounded-sm"
@@ -403,7 +404,7 @@ export function TaskGanttView({ tasks, onTaskClick }: TaskGanttViewProps) {
                         top: rowIndex * ROW_HEIGHT + ROW_HEIGHT / 2 - 6,
                       }}
                       onClick={() => onTaskClick(task.id)}
-                      title={`${task.title}\nStart: ${format(taskStart, 'MMM d, yyyy')}`}
+                      title={`${task.title}\nStart: ${formatDate(taskStart)}`}
                     >
                       <div
                         className="h-3 w-3 rotate-45 rounded-sm"

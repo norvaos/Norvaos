@@ -1,6 +1,9 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/lib/types/database'
 import { processAutomationTrigger } from './automation-engine'
+import { generateDocumentSlots } from './document-slot-engine'
+import { generateMatterFolders, assignSlotsToFolders } from './folder-engine'
+import { generateFormInstances } from './form-instance-engine'
 
 type Json = Database['public']['Tables']['activities']['Insert']['metadata']
 
@@ -10,6 +13,10 @@ interface WorkflowKitParams {
   matterId: string
   matterTypeId: string
   userId: string
+  // Optional: user's explicit pipeline/stage selection from the matter form.
+  // If provided, these override the default pipeline / first-stage auto-selection.
+  initialPipelineId?: string
+  initialStageId?: string
 }
 
 interface ImmigrationKitParams {
@@ -28,22 +35,30 @@ interface ImmigrationKitParams {
  * - Triggers matter_created automations
  */
 export async function activateWorkflowKit(params: WorkflowKitParams): Promise<void> {
-  const { supabase, tenantId, matterId, matterTypeId, userId } = params
+  const { supabase, tenantId, matterId, matterTypeId, userId, initialPipelineId, initialStageId } = params
 
-  // 1. Look up default workflow template
-  const { data: workflow } = await supabase
-    .from('workflow_templates')
-    .select('*')
-    .eq('tenant_id', tenantId)
-    .eq('matter_type_id', matterTypeId)
-    .eq('is_default', true)
-    .eq('is_active', true)
-    .maybeSingle()
-
-  // 2. If no workflow, try to find the default pipeline directly
-  let pipelineId: string | null = workflow?.stage_pipeline_id ?? null
+  // 1. Determine pipeline — prefer the user's explicit selection, then workflow default, then matter type default
+  let pipelineId: string | null = initialPipelineId ?? null
+  let workflowTemplate: { task_template_id?: string | null; stage_pipeline_id?: string | null } | null = null
 
   if (!pipelineId) {
+    // Check workflow template for a pipeline
+    const { data: workflow } = await supabase
+      .from('workflow_templates')
+      .select('*')
+      .eq('tenant_id', tenantId)
+      .eq('matter_type_id', matterTypeId)
+      .eq('is_default', true)
+      .eq('is_active', true)
+      .maybeSingle()
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    workflowTemplate = workflow as any
+    pipelineId = (workflow as any)?.stage_pipeline_id ?? null
+  }
+
+  if (!pipelineId) {
+    // Fall back to the matter type's default pipeline
     const { data: defaultPipeline } = await supabase
       .from('matter_stage_pipelines')
       .select('id')
@@ -56,27 +71,40 @@ export async function activateWorkflowKit(params: WorkflowKitParams): Promise<vo
     pipelineId = defaultPipeline?.id ?? null
   }
 
-  // 3. Set initial stage if pipeline found
+  // 2. Determine initial stage — prefer user's explicit selection, then first stage in pipeline
   if (pipelineId) {
-    const { data: firstStage } = await supabase
-      .from('matter_stages')
-      .select('id')
-      .eq('pipeline_id', pipelineId)
-      .order('sort_order', { ascending: true })
-      .limit(1)
-      .maybeSingle()
+    let stageId: string | null = initialStageId ?? null
 
-    if (firstStage) {
+    if (!stageId) {
+      const { data: firstStage } = await supabase
+        .from('matter_stages')
+        .select('id')
+        .eq('pipeline_id', pipelineId)
+        .order('sort_order', { ascending: true })
+        .limit(1)
+        .maybeSingle()
+
+      stageId = firstStage?.id ?? null
+    }
+
+    if (stageId) {
+      // Fetch stage name for history record
+      const { data: stageRow } = await supabase
+        .from('matter_stages')
+        .select('name')
+        .eq('id', stageId)
+        .maybeSingle()
+
       await supabase.from('matter_stage_state').insert({
         tenant_id: tenantId,
         matter_id: matterId,
         pipeline_id: pipelineId,
-        current_stage_id: firstStage.id,
+        current_stage_id: stageId,
         entered_at: new Date().toISOString(),
         stage_history: [
           {
-            stage_id: firstStage.id,
-            stage_name: 'Initial Stage',
+            stage_id: stageId,
+            stage_name: stageRow?.name ?? 'Initial Stage',
             entered_at: new Date().toISOString(),
             user_id: userId,
           },
@@ -86,11 +114,11 @@ export async function activateWorkflowKit(params: WorkflowKitParams): Promise<vo
   }
 
   // 4. Apply task template if configured
-  if (workflow?.task_template_id) {
+  if (workflowTemplate?.task_template_id) {
     const { data: templateItems } = await supabase
       .from('task_template_items')
       .select('*')
-      .eq('template_id', workflow.task_template_id)
+      .eq('template_id', workflowTemplate.task_template_id)
       .order('sort_order')
 
     if (templateItems && templateItems.length > 0) {
@@ -117,7 +145,106 @@ export async function activateWorkflowKit(params: WorkflowKitParams): Promise<vo
     }
   }
 
-  // 5. Trigger matter_created automations
+  // 5. Generate document slots from templates
+  try {
+    await generateDocumentSlots({ supabase, tenantId, matterId, matterTypeId })
+  } catch (err) {
+    console.error('[kit-activation] Failed to generate document slots:', err)
+  }
+
+  // 5b. Generate folder instances from matter type folder templates
+  try {
+    await generateMatterFolders({ supabase, tenantId, matterId, matterTypeId })
+    await assignSlotsToFolders({ supabase, tenantId, matterId, matterTypeId })
+  } catch (err) {
+    console.error('[kit-activation] Failed to generate folders:', err)
+  }
+
+  // 5b-ii. Sync folder structure to OneDrive (non-fatal)
+  try {
+    const { createServiceRoleClient } = await import('@/lib/supabase/server')
+    const adminClient = createServiceRoleClient()
+
+    const { data: conn } = await adminClient
+      .from('microsoft_connections')
+      .select('id, onedrive_enabled')
+      .eq('user_id', userId)
+      .eq('is_active', true)
+      .maybeSingle()
+
+    if (conn?.onedrive_enabled) {
+      const { data: matterInfo } = await supabase
+        .from('matters')
+        .select('matter_number, title')
+        .eq('id', matterId)
+        .single()
+
+      if (matterInfo) {
+        const { ensureMatterSubfolder, syncMatterFoldersToOneDrive } =
+          await import('./microsoft-onedrive')
+
+        const matterFolder = await ensureMatterSubfolder(conn.id, adminClient, {
+          matterId,
+          matterNumber: matterInfo.matter_number,
+          matterTitle: matterInfo.title,
+        })
+
+        await syncMatterFoldersToOneDrive(conn.id, adminClient, {
+          matterId,
+          matterOneDriveFolderId: matterFolder.folderId,
+        })
+      }
+    }
+  } catch (err) {
+    console.warn('[kit-activation] OneDrive folder sync failed (non-fatal):', err)
+  }
+
+  // 5c. Generate form instances from published assignment templates
+  try {
+    await generateFormInstances({ supabase, tenantId, matterId, matterTypeId })
+  } catch (err) {
+    console.error('[kit-activation] Failed to generate form instances:', err)
+  }
+
+  // 6. Auto-create "Complete intake questionnaire" task if matter type has IRCC stream forms
+  try {
+    // Step 1: get form IDs linked to this matter type
+    const { data: streamForms } = await supabase
+      .from('ircc_stream_forms')
+      .select('form_id')
+      .eq('matter_type_id', matterTypeId)
+
+    if (streamForms && streamForms.length > 0) {
+      const formIds = (streamForms as Array<{ form_id: string }>).map((sf) => sf.form_id)
+      // Step 2: check for mapped fields in those forms
+      const { count: mappedFieldCount } = await supabase
+        .from('ircc_form_fields')
+        .select('id', { count: 'exact', head: true })
+        .eq('is_mapped', true)
+        .in('form_id', formIds)
+
+      if (mappedFieldCount && mappedFieldCount > 0) {
+        const dueDate = new Date()
+        dueDate.setDate(dueDate.getDate() + 7)
+        await supabase.from('tasks').insert({
+          tenant_id: tenantId,
+          matter_id: matterId,
+          title: 'Complete client intake questionnaire',
+          description: 'Open the IRCC Intake sheet on this matter and complete all required intake questions with the client.',
+          priority: 'high',
+          due_date: dueDate.toISOString().split('T')[0],
+          status: 'not_started',
+          created_by: userId,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          created_via: 'template' as any,
+        })
+      }
+    }
+  } catch (err) {
+    console.error('[kit-activation] Failed to create intake task:', err)
+  }
+
+  // 7. Trigger matter_created automations
   await processAutomationTrigger({
     supabase,
     tenantId,
@@ -127,7 +254,7 @@ export async function activateWorkflowKit(params: WorkflowKitParams): Promise<vo
     userId,
   })
 
-  // 6. Log activity
+  // 8. Log activity
   await supabase.from('activities').insert({
     tenant_id: tenantId,
     matter_id: matterId,
@@ -216,7 +343,100 @@ export async function activateImmigrationKit(params: ImmigrationKitParams): Prom
     }
   }
 
-  // 3. Trigger matter_created automations
+  // 3. Generate document slots from templates
+  try {
+    await generateDocumentSlots({ supabase, tenantId, matterId, caseTypeId })
+  } catch (err) {
+    console.error('[kit-activation] Failed to generate document slots:', err)
+  }
+
+  // 3b. Generate folder instances from folder templates (if matter_type_id available)
+  // Immigration kit uses caseTypeId, but we try to resolve a matterTypeId for folders
+  let resolvedMatterTypeId: string | null = null
+  try {
+    const { data: matterData } = await supabase
+      .from('matters')
+      .select('matter_type_id')
+      .eq('id', matterId)
+      .single()
+
+    resolvedMatterTypeId = matterData?.matter_type_id ?? null
+
+    if (resolvedMatterTypeId) {
+      await generateMatterFolders({ supabase, tenantId, matterId, matterTypeId: resolvedMatterTypeId })
+      await assignSlotsToFolders({ supabase, tenantId, matterId, matterTypeId: resolvedMatterTypeId })
+    }
+  } catch (err) {
+    console.error('[kit-activation] Failed to generate folders:', err)
+  }
+
+  // 3b-ii. Sync folder structure to OneDrive (non-fatal)
+  try {
+    const { createServiceRoleClient } = await import('@/lib/supabase/server')
+    const adminClient = createServiceRoleClient()
+
+    const { data: conn } = await adminClient
+      .from('microsoft_connections')
+      .select('id, onedrive_enabled')
+      .eq('user_id', userId)
+      .eq('is_active', true)
+      .maybeSingle()
+
+    if (conn?.onedrive_enabled) {
+      const { data: matterInfo } = await supabase
+        .from('matters')
+        .select('matter_number, title')
+        .eq('id', matterId)
+        .single()
+
+      if (matterInfo) {
+        const { ensureMatterSubfolder, syncMatterFoldersToOneDrive } =
+          await import('./microsoft-onedrive')
+
+        const matterFolder = await ensureMatterSubfolder(conn.id, adminClient, {
+          matterId,
+          matterNumber: matterInfo.matter_number,
+          matterTitle: matterInfo.title,
+        })
+
+        await syncMatterFoldersToOneDrive(conn.id, adminClient, {
+          matterId,
+          matterOneDriveFolderId: matterFolder.folderId,
+        })
+      }
+    }
+  } catch (err) {
+    console.warn('[kit-activation] OneDrive folder sync failed (non-fatal):', err)
+  }
+
+  // 3c. Generate form instances from published assignment templates
+  try {
+    await generateFormInstances({ supabase, tenantId, matterId, caseTypeId })
+  } catch (err) {
+    console.error('[kit-activation] Failed to generate form instances:', err)
+  }
+
+  // 4. Auto-create "Complete intake questionnaire" task for immigration matters
+  try {
+    const dueDate = new Date()
+    dueDate.setDate(dueDate.getDate() + 7)
+    await supabase.from('tasks').insert({
+      tenant_id: tenantId,
+      matter_id: matterId,
+      title: 'Complete client intake questionnaire',
+      description: 'Open the IRCC Intake sheet on this matter and complete all required immigration intake questions with the client.',
+      priority: 'high',
+      due_date: dueDate.toISOString().split('T')[0],
+      status: 'not_started',
+      created_by: userId,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      created_via: 'template' as any,
+    })
+  } catch (err) {
+    console.error('[kit-activation] Failed to create intake task:', err)
+  }
+
+  // 5. Trigger matter_created automations
   await processAutomationTrigger({
     supabase,
     tenantId,
@@ -226,7 +446,7 @@ export async function activateImmigrationKit(params: ImmigrationKitParams): Prom
     userId,
   })
 
-  // 4. Log activity
+  // 6. Log activity
   await supabase.from('activities').insert({
     tenant_id: tenantId,
     matter_id: matterId,

@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server'
 import { authenticateRequest, AuthError } from '@/lib/services/auth'
+import { requirePermission } from '@/lib/services/require-role'
 import { activateWorkflowKit, activateImmigrationKit } from '@/lib/services/kit-activation'
+import { invalidateMatter } from '@/lib/services/cache-invalidation'
+import { withTiming } from '@/lib/middleware/request-timing'
 
 /**
  * POST /api/matters/[id]/activate-kit
@@ -11,13 +14,14 @@ import { activateWorkflowKit, activateImmigrationKit } from '@/lib/services/kit-
  *
  * Body: { matterTypeId?: string, caseTypeId?: string }
  */
-export async function POST(
+async function handlePost(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id: matterId } = await params
     const auth = await authenticateRequest()
+    requirePermission(auth, 'matters', 'edit')
 
     const body = await request.json()
     const { matterTypeId, caseTypeId } = body as {
@@ -61,6 +65,8 @@ export async function POST(
       })
     }
 
+    await invalidateMatter(auth.tenantId, matterId)
+
     return NextResponse.json({ success: true }, { status: 200 })
   } catch (error) {
     if (error instanceof AuthError) {
@@ -77,3 +83,5 @@ export async function POST(
     )
   }
 }
+
+export const POST = withTiming(handlePost, 'POST /api/matters/[id]/activate-kit')

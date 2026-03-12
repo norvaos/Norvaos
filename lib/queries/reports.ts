@@ -50,20 +50,76 @@ async function fetchPracticeAreaMap(
   return Object.fromEntries(data.map((pa) => [pa.id, { name: pa.name, color: pa.color ?? '#6366f1' }]))
 }
 
+// ── Report Filters ──────────────────────────────────────────────────────────────
+
+export interface ReportFilters {
+  practiceAreaId?: string
+  lawyerId?: string
+  billingType?: string
+}
+
+/** Stable serialisation of filters for query keys. */
+function serializeFilters(filters?: ReportFilters): string {
+  if (!filters) return '{}'
+  return JSON.stringify(
+    Object.fromEntries(
+      Object.entries(filters)
+        .filter(([, v]) => v !== undefined && v !== '')
+        .sort(([a], [b]) => a.localeCompare(b))
+    )
+  )
+}
+
+/**
+ * Apply matter-level filters to a Supabase query builder.
+ * Used by all matter-based reports.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function applyMatterFilters(query: any, filters?: ReportFilters) {
+  if (!filters) return query
+  if (filters.practiceAreaId) query = query.eq('practice_area_id', filters.practiceAreaId)
+  if (filters.lawyerId) query = query.eq('responsible_lawyer_id', filters.lawyerId)
+  if (filters.billingType) query = query.eq('billing_type', filters.billingType)
+  return query
+}
+
+/**
+ * Get filtered matter IDs for task-based reports that need to join through matters.
+ * Returns null if no matter-level filters are applied (meaning no restriction needed).
+ */
+async function getFilteredMatterIds(
+  supabase: ReturnType<typeof createClient>,
+  tenantId: string,
+  filters?: ReportFilters
+): Promise<string[] | null> {
+  if (!filters) return null
+  const hasMatterFilter = filters.practiceAreaId || filters.billingType
+  if (!hasMatterFilter) return null
+
+  let query = supabase.from('matters').select('id').eq('tenant_id', tenantId)
+  if (filters.practiceAreaId) query = query.eq('practice_area_id', filters.practiceAreaId)
+  if (filters.billingType) query = query.eq('billing_type', filters.billingType)
+
+  const { data, error } = await query
+  if (error) throw error
+  return (data ?? []).map((m) => m.id)
+}
+
 // ── Query Key Factory ────────────────────────────────────────────────────────────
 
 export const reportKeys = {
   all: ['reports'] as const,
-  matterStats: (tid: string, s: string, e: string) => [...reportKeys.all, 'matter-stats', tid, s, e] as const,
-  taskStats: (tid: string, s: string, e: string) => [...reportKeys.all, 'task-stats', tid, s, e] as const,
-  mattersByPA: (tid: string, s: string, e: string) => [...reportKeys.all, 'matters-by-pa', tid, s, e] as const,
-  mattersTrend: (tid: string) => [...reportKeys.all, 'matters-trend', tid] as const,
-  tasksByAssignee: (tid: string, s: string, e: string) => [...reportKeys.all, 'tasks-by-assignee', tid, s, e] as const,
-  revenueByPA: (tid: string, s: string, e: string) => [...reportKeys.all, 'revenue-by-pa', tid, s, e] as const,
-  revenueByBilling: (tid: string, s: string, e: string) => [...reportKeys.all, 'revenue-by-billing', tid, s, e] as const,
-  revenueTrend: (tid: string) => [...reportKeys.all, 'revenue-trend', tid] as const,
-  mattersByLawyer: (tid: string, s: string, e: string) => [...reportKeys.all, 'matters-by-lawyer', tid, s, e] as const,
-  taskCompletionByUser: (tid: string, s: string, e: string) => [...reportKeys.all, 'task-completion', tid, s, e] as const,
+  matterStats: (tid: string, s: string, e: string, f: string) => [...reportKeys.all, 'matter-stats', tid, s, e, f] as const,
+  taskStats: (tid: string, s: string, e: string, f: string) => [...reportKeys.all, 'task-stats', tid, s, e, f] as const,
+  mattersByPA: (tid: string, s: string, e: string, f: string) => [...reportKeys.all, 'matters-by-pa', tid, s, e, f] as const,
+  mattersTrend: (tid: string, f: string) => [...reportKeys.all, 'matters-trend', tid, f] as const,
+  tasksByAssignee: (tid: string, s: string, e: string, f: string) => [...reportKeys.all, 'tasks-by-assignee', tid, s, e, f] as const,
+  revenueByPA: (tid: string, s: string, e: string, f: string) => [...reportKeys.all, 'revenue-by-pa', tid, s, e, f] as const,
+  revenueByBilling: (tid: string, s: string, e: string, f: string) => [...reportKeys.all, 'revenue-by-billing', tid, s, e, f] as const,
+  revenueTrend: (tid: string, f: string) => [...reportKeys.all, 'revenue-trend', tid, f] as const,
+  mattersByLawyer: (tid: string, s: string, e: string, f: string) => [...reportKeys.all, 'matters-by-lawyer', tid, s, e, f] as const,
+  taskCompletionByUser: (tid: string, s: string, e: string, f: string) => [...reportKeys.all, 'task-completion', tid, s, e, f] as const,
+  teamMembers: (tid: string) => [...reportKeys.all, 'team-members', tid] as const,
 }
 
 // ── Types ────────────────────────────────────────────────────────────────────────
@@ -131,27 +187,67 @@ export interface TaskCompletionByUserData {
   completion_rate: number
 }
 
+export interface TeamMember {
+  id: string
+  first_name: string | null
+  last_name: string | null
+  full_name: string
+}
+
+// ── Hook: Team Members (for filter dropdowns) ────────────────────────────────────
+
+export function useTeamMembers(tenantId: string) {
+  return useQuery({
+    queryKey: reportKeys.teamMembers(tenantId),
+    queryFn: async (): Promise<TeamMember[]> => {
+      const supabase = createClient()
+      const { data, error } = await supabase
+        .from('users')
+        .select('id, first_name, last_name')
+        .eq('tenant_id', tenantId)
+        .eq('is_active', true)
+        .order('first_name')
+      if (error) throw error
+      return (data ?? []).map((u) => ({
+        ...u,
+        full_name: [u.first_name, u.last_name].filter(Boolean).join(' ') || 'Unknown',
+      }))
+    },
+    enabled: !!tenantId,
+    staleTime: 5 * 60 * 1000,
+  })
+}
+
 // ── Hook 1: Matter Stats ─────────────────────────────────────────────────────────
 
-export function useReportMatterStats(tenantId: string, range: DateRange) {
+export function useReportMatterStats(tenantId: string, range: DateRange, filters?: ReportFilters) {
   const s = toDateString(range.start)
   const e = toDateString(range.end)
+  const f = serializeFilters(filters)
 
   return useQuery({
-    queryKey: reportKeys.matterStats(tenantId, s, e),
+    queryKey: reportKeys.matterStats(tenantId, s, e, f),
     queryFn: async (): Promise<MatterStatsData> => {
       const supabase = createClient()
-      const [activeRes, newRes, closedRes, revenueRes] = await Promise.all([
-        supabase.from('matters').select('*', { count: 'exact', head: true })
-          .eq('tenant_id', tenantId).eq('status', 'active'),
-        supabase.from('matters').select('*', { count: 'exact', head: true })
-          .eq('tenant_id', tenantId).gte('date_opened', s).lte('date_opened', e),
-        supabase.from('matters').select('*', { count: 'exact', head: true })
-          .eq('tenant_id', tenantId).not('date_closed', 'is', null)
-          .gte('date_closed', s).lte('date_closed', e),
-        supabase.from('matters').select('total_billed')
-          .eq('tenant_id', tenantId).gte('date_opened', s).lte('date_opened', e),
-      ])
+
+      let activeQ = supabase.from('matters').select('*', { count: 'exact', head: true })
+        .eq('tenant_id', tenantId).eq('status', 'active')
+      activeQ = applyMatterFilters(activeQ, filters)
+
+      let newQ = supabase.from('matters').select('*', { count: 'exact', head: true })
+        .eq('tenant_id', tenantId).gte('date_opened', s).lte('date_opened', e)
+      newQ = applyMatterFilters(newQ, filters)
+
+      let closedQ = supabase.from('matters').select('*', { count: 'exact', head: true })
+        .eq('tenant_id', tenantId).not('date_closed', 'is', null)
+        .gte('date_closed', s).lte('date_closed', e)
+      closedQ = applyMatterFilters(closedQ, filters)
+
+      let revenueQ = supabase.from('matters').select('total_billed')
+        .eq('tenant_id', tenantId).gte('date_opened', s).lte('date_opened', e)
+      revenueQ = applyMatterFilters(revenueQ, filters)
+
+      const [activeRes, newRes, closedRes, revenueRes] = await Promise.all([activeQ, newQ, closedQ, revenueQ])
       if (activeRes.error) throw activeRes.error
       if (newRes.error) throw newRes.error
       if (closedRes.error) throw closedRes.error
@@ -174,38 +270,50 @@ export function useReportMatterStats(tenantId: string, range: DateRange) {
 
 // ── Hook 2: Task Stats ───────────────────────────────────────────────────────────
 
-export function useReportTaskStats(tenantId: string, range: DateRange) {
+export function useReportTaskStats(tenantId: string, range: DateRange, filters?: ReportFilters) {
   const s = toISO(range.start)
   const e = toISO(range.end)
+  const f = serializeFilters(filters)
 
   return useQuery({
-    queryKey: reportKeys.taskStats(tenantId, toDateString(range.start), toDateString(range.end)),
+    queryKey: reportKeys.taskStats(tenantId, toDateString(range.start), toDateString(range.end), f),
     queryFn: async (): Promise<TaskStatsData> => {
       const supabase = createClient()
       const today = toDateString(new Date())
 
-      const [openRes, overdueRes, completedRes, allTasksRes] = await Promise.all([
-        supabase.from('tasks').select('*', { count: 'exact', head: true })
-          .eq('tenant_id', tenantId)
-          .in('status', ['not_started', 'working_on_it', 'stuck'])
-          .neq('is_deleted', true),
-        supabase.from('matter_deadlines').select('*', { count: 'exact', head: true })
-          .eq('tenant_id', tenantId)
-          .lt('due_date', today)
-          .not('status', 'in', '("completed","cancelled","dismissed")'),
-        supabase.from('tasks').select('*', { count: 'exact', head: true })
-          .eq('tenant_id', tenantId).eq('status', 'done')
-          .gte('completed_at', s).lte('completed_at', e),
-        supabase.from('tasks').select('status')
-          .eq('tenant_id', tenantId).neq('is_deleted', true)
-          .gte('created_at', s).lte('created_at', e),
-      ])
+      // Get filtered matter IDs if matter-level filters are active
+      const matterIds = await getFilteredMatterIds(supabase, tenantId, filters)
+
+      let openQ = supabase.from('tasks').select('*', { count: 'exact', head: true })
+        .eq('tenant_id', tenantId)
+        .in('status', ['not_started', 'working_on_it', 'stuck'])
+        .neq('is_deleted', true)
+      if (filters?.lawyerId) openQ = openQ.eq('assigned_to', filters.lawyerId)
+      if (matterIds) openQ = openQ.in('matter_id', matterIds)
+
+      const overdueQ = supabase.from('matter_deadlines').select('*', { count: 'exact', head: true })
+        .eq('tenant_id', tenantId)
+        .lt('due_date', today)
+        .not('status', 'in', '(completed,cancelled,dismissed)')
+
+      let completedQ = supabase.from('tasks').select('*', { count: 'exact', head: true })
+        .eq('tenant_id', tenantId).eq('status', 'done')
+        .gte('completed_at', s).lte('completed_at', e)
+      if (filters?.lawyerId) completedQ = completedQ.eq('assigned_to', filters.lawyerId)
+      if (matterIds) completedQ = completedQ.in('matter_id', matterIds)
+
+      let allTasksQ = supabase.from('tasks').select('status')
+        .eq('tenant_id', tenantId).neq('is_deleted', true)
+        .gte('created_at', s).lte('created_at', e)
+      if (filters?.lawyerId) allTasksQ = allTasksQ.eq('assigned_to', filters.lawyerId)
+      if (matterIds) allTasksQ = allTasksQ.in('matter_id', matterIds)
+
+      const [openRes, overdueRes, completedRes, allTasksRes] = await Promise.all([openQ, overdueQ, completedQ, allTasksQ])
       if (openRes.error) throw openRes.error
       if (overdueRes.error) throw overdueRes.error
       if (completedRes.error) throw completedRes.error
       if (allTasksRes.error) throw allTasksRes.error
 
-      // Status breakdown
       const statusCounts: Record<string, number> = {}
       for (const t of allTasksRes.data ?? []) {
         statusCounts[t.status] = (statusCounts[t.status] || 0) + 1
@@ -231,21 +339,24 @@ export function useReportTaskStats(tenantId: string, range: DateRange) {
 
 // ── Hook 3: Matters by Practice Area ─────────────────────────────────────────────
 
-export function useReportMattersByPracticeArea(tenantId: string, range: DateRange) {
+export function useReportMattersByPracticeArea(tenantId: string, range: DateRange, filters?: ReportFilters) {
   const s = toDateString(range.start)
   const e = toDateString(range.end)
+  const f = serializeFilters(filters)
 
   return useQuery({
-    queryKey: reportKeys.mattersByPA(tenantId, s, e),
+    queryKey: reportKeys.mattersByPA(tenantId, s, e, f),
     queryFn: async (): Promise<MattersByPAData[]> => {
       const supabase = createClient()
-      const { data, error } = await supabase
+      let query = supabase
         .from('matters')
         .select('practice_area_id')
         .eq('tenant_id', tenantId)
         .eq('status', 'active')
         .not('practice_area_id', 'is', null)
+      query = applyMatterFilters(query, filters)
 
+      const { data, error } = await query
       if (error) throw error
       const counts: Record<string, number> = {}
       for (const m of data ?? []) {
@@ -268,9 +379,11 @@ export function useReportMattersByPracticeArea(tenantId: string, range: DateRang
 
 // ── Hook 4: Matters Opened vs Closed (6-month trend) ─────────────────────────────
 
-export function useReportMattersOpenedVsClosed(tenantId: string) {
+export function useReportMattersOpenedVsClosed(tenantId: string, filters?: ReportFilters) {
+  const f = serializeFilters(filters)
+
   return useQuery({
-    queryKey: reportKeys.mattersTrend(tenantId),
+    queryKey: reportKeys.mattersTrend(tenantId, f),
     queryFn: async (): Promise<MatterTrendData[]> => {
       const supabase = createClient()
       const now = new Date()
@@ -287,13 +400,17 @@ export function useReportMattersOpenedVsClosed(tenantId: string) {
       }
 
       const sixMonthsAgo = months[0].start
-      const [openedRes, closedRes] = await Promise.all([
-        supabase.from('matters').select('date_opened')
-          .eq('tenant_id', tenantId).gte('date_opened', sixMonthsAgo),
-        supabase.from('matters').select('date_closed')
-          .eq('tenant_id', tenantId).not('date_closed', 'is', null)
-          .gte('date_closed', sixMonthsAgo),
-      ])
+
+      let openedQ = supabase.from('matters').select('date_opened')
+        .eq('tenant_id', tenantId).gte('date_opened', sixMonthsAgo)
+      openedQ = applyMatterFilters(openedQ, filters)
+
+      let closedQ = supabase.from('matters').select('date_closed')
+        .eq('tenant_id', tenantId).not('date_closed', 'is', null)
+        .gte('date_closed', sixMonthsAgo)
+      closedQ = applyMatterFilters(closedQ, filters)
+
+      const [openedRes, closedRes] = await Promise.all([openedQ, closedQ])
       if (openedRes.error) throw openedRes.error
       if (closedRes.error) throw closedRes.error
 
@@ -314,23 +431,30 @@ export function useReportMattersOpenedVsClosed(tenantId: string) {
 
 // ── Hook 5: Tasks by Assignee ────────────────────────────────────────────────────
 
-export function useReportTasksByAssignee(tenantId: string, range: DateRange) {
+export function useReportTasksByAssignee(tenantId: string, range: DateRange, filters?: ReportFilters) {
   const s = toDateString(range.start)
   const e = toDateString(range.end)
+  const f = serializeFilters(filters)
 
   return useQuery({
-    queryKey: reportKeys.tasksByAssignee(tenantId, s, e),
+    queryKey: reportKeys.tasksByAssignee(tenantId, s, e, f),
     queryFn: async (): Promise<TasksByAssigneeData[]> => {
       const supabase = createClient()
       const today = toDateString(new Date())
-      const { data, error } = await supabase
+
+      const matterIds = await getFilteredMatterIds(supabase, tenantId, filters)
+
+      let query = supabase
         .from('tasks')
         .select('assigned_to, status, due_date')
         .eq('tenant_id', tenantId)
         .neq('is_deleted', true)
         .not('assigned_to', 'is', null)
         .limit(5000)
+      if (filters?.lawyerId) query = query.eq('assigned_to', filters.lawyerId)
+      if (matterIds) query = query.in('matter_id', matterIds)
 
+      const { data, error } = await query
       if (error) throw error
       const grouped: Record<string, { overdue: number; completed: number; open: number }> = {}
       for (const t of data ?? []) {
@@ -361,20 +485,23 @@ export function useReportTasksByAssignee(tenantId: string, range: DateRange) {
 
 // ── Hook 6: Revenue by Practice Area ─────────────────────────────────────────────
 
-export function useReportRevenueByPracticeArea(tenantId: string, range: DateRange) {
+export function useReportRevenueByPracticeArea(tenantId: string, range: DateRange, filters?: ReportFilters) {
   const s = toDateString(range.start)
   const e = toDateString(range.end)
+  const f = serializeFilters(filters)
 
   return useQuery({
-    queryKey: reportKeys.revenueByPA(tenantId, s, e),
+    queryKey: reportKeys.revenueByPA(tenantId, s, e, f),
     queryFn: async (): Promise<RevenueByPAData[]> => {
       const supabase = createClient()
-      const { data, error } = await supabase
+      let query = supabase
         .from('matters')
         .select('practice_area_id, total_billed')
         .eq('tenant_id', tenantId)
         .not('practice_area_id', 'is', null)
+      query = applyMatterFilters(query, filters)
 
+      const { data, error } = await query
       if (error) throw error
       const grouped: Record<string, number> = {}
       for (const m of data ?? []) {
@@ -400,20 +527,23 @@ export function useReportRevenueByPracticeArea(tenantId: string, range: DateRang
 
 // ── Hook 7: Revenue by Billing Type ──────────────────────────────────────────────
 
-export function useReportRevenueByBillingType(tenantId: string, range: DateRange) {
+export function useReportRevenueByBillingType(tenantId: string, range: DateRange, filters?: ReportFilters) {
   const s = toDateString(range.start)
   const e = toDateString(range.end)
+  const f = serializeFilters(filters)
 
   return useQuery({
-    queryKey: reportKeys.revenueByBilling(tenantId, s, e),
+    queryKey: reportKeys.revenueByBilling(tenantId, s, e, f),
     queryFn: async (): Promise<RevenueByBillingData[]> => {
       const supabase = createClient()
-      const { data, error } = await supabase
+      let query = supabase
         .from('matters')
         .select('billing_type, total_billed')
         .eq('tenant_id', tenantId)
         .not('billing_type', 'is', null)
+      query = applyMatterFilters(query, filters)
 
+      const { data, error } = await query
       if (error) throw error
       const grouped: Record<string, number> = {}
       for (const m of data ?? []) {
@@ -439,9 +569,11 @@ export function useReportRevenueByBillingType(tenantId: string, range: DateRange
 
 // ── Hook 8: Revenue Trend (12 months) ────────────────────────────────────────────
 
-export function useReportRevenueTrend(tenantId: string) {
+export function useReportRevenueTrend(tenantId: string, filters?: ReportFilters) {
+  const f = serializeFilters(filters)
+
   return useQuery({
-    queryKey: reportKeys.revenueTrend(tenantId),
+    queryKey: reportKeys.revenueTrend(tenantId, f),
     queryFn: async (): Promise<RevenueTrendData[]> => {
       const supabase = createClient()
       const now = new Date()
@@ -458,12 +590,14 @@ export function useReportRevenueTrend(tenantId: string) {
       }
 
       const twelveMonthsAgo = months[0].start
-      const { data, error } = await supabase
+      let query = supabase
         .from('matters')
         .select('date_opened, total_billed')
         .eq('tenant_id', tenantId)
         .gte('date_opened', twelveMonthsAgo)
+      query = applyMatterFilters(query, filters)
 
+      const { data, error } = await query
       if (error) throw error
       return months.map((m) => ({
         month: m.label,
@@ -479,21 +613,24 @@ export function useReportRevenueTrend(tenantId: string) {
 
 // ── Hook 9: Matters by Lawyer ────────────────────────────────────────────────────
 
-export function useReportMattersByLawyer(tenantId: string, range: DateRange) {
+export function useReportMattersByLawyer(tenantId: string, range: DateRange, filters?: ReportFilters) {
   const s = toDateString(range.start)
   const e = toDateString(range.end)
+  const f = serializeFilters(filters)
 
   return useQuery({
-    queryKey: reportKeys.mattersByLawyer(tenantId, s, e),
+    queryKey: reportKeys.mattersByLawyer(tenantId, s, e, f),
     queryFn: async (): Promise<MattersByLawyerData[]> => {
       const supabase = createClient()
-      const { data, error } = await supabase
+      let query = supabase
         .from('matters')
         .select('responsible_lawyer_id')
         .eq('tenant_id', tenantId)
         .eq('status', 'active')
         .not('responsible_lawyer_id', 'is', null)
+      query = applyMatterFilters(query, filters)
 
+      const { data, error } = await query
       if (error) throw error
       const counts: Record<string, number> = {}
       for (const m of data ?? []) {
@@ -515,15 +652,18 @@ export function useReportMattersByLawyer(tenantId: string, range: DateRange) {
 
 // ── Hook 10: Task Completion by User ─────────────────────────────────────────────
 
-export function useReportTaskCompletionByUser(tenantId: string, range: DateRange) {
+export function useReportTaskCompletionByUser(tenantId: string, range: DateRange, filters?: ReportFilters) {
   const s = toISO(range.start)
   const e = toISO(range.end)
+  const f = serializeFilters(filters)
 
   return useQuery({
-    queryKey: reportKeys.taskCompletionByUser(tenantId, toDateString(range.start), toDateString(range.end)),
+    queryKey: reportKeys.taskCompletionByUser(tenantId, toDateString(range.start), toDateString(range.end), f),
     queryFn: async (): Promise<TaskCompletionByUserData[]> => {
       const supabase = createClient()
-      const { data, error } = await supabase
+      const matterIds = await getFilteredMatterIds(supabase, tenantId, filters)
+
+      let query = supabase
         .from('tasks')
         .select('assigned_to, status')
         .eq('tenant_id', tenantId)
@@ -532,7 +672,10 @@ export function useReportTaskCompletionByUser(tenantId: string, range: DateRange
         .gte('created_at', s)
         .lte('created_at', e)
         .limit(5000)
+      if (filters?.lawyerId) query = query.eq('assigned_to', filters.lawyerId)
+      if (matterIds) query = query.in('matter_id', matterIds)
 
+      const { data, error } = await query
       if (error) throw error
       const grouped: Record<string, { completed: number; total: number }> = {}
       for (const t of data ?? []) {

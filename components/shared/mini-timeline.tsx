@@ -15,6 +15,8 @@ import {
   History,
   Mail,
   Phone,
+  PhoneIncoming,
+  PhoneOutgoing,
   Calendar,
   FileText,
   MessageSquare,
@@ -59,6 +61,8 @@ function getIcon(type: string, action: string) {
   switch (action) {
     case 'email': return Mail
     case 'phone_call': return Phone
+    case 'phone_inbound': return PhoneIncoming
+    case 'phone_outbound': return PhoneOutgoing
     case 'meeting': return Calendar
     case 'document': return FileText
     case 'note': return MessageSquare
@@ -80,7 +84,14 @@ function getColorClass(type: string, action: string): string {
       default: return 'text-slate-500 bg-slate-50'
     }
   }
-  return 'text-blue-500 bg-blue-50'
+  // activity types
+  switch (action) {
+    case 'phone_inbound': return 'text-green-600 bg-green-50'
+    case 'phone_outbound': return 'text-blue-600 bg-blue-50'
+    case 'phone_call': return 'text-emerald-600 bg-emerald-50'
+    case 'meeting': return 'text-purple-600 bg-purple-50'
+    default: return 'text-blue-500 bg-blue-50'
+  }
 }
 
 function formatAuditTitle(action: string, entityType: string): string {

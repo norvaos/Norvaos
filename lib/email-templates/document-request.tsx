@@ -12,6 +12,7 @@ import {
   Link,
 } from '@react-email/components'
 import { render } from '@react-email/components'
+import { getTranslations, t, type PortalLocale } from '@/lib/utils/portal-translations'
 
 interface DocumentRequestEmailProps {
   firmName: string
@@ -22,6 +23,7 @@ interface DocumentRequestEmailProps {
   documentNames: string[]
   portalUrl?: string
   message?: string
+  language?: PortalLocale
 }
 
 export function DocumentRequestEmail({
@@ -33,15 +35,24 @@ export function DocumentRequestEmail({
   documentNames,
   portalUrl,
   message,
+  language = 'en',
 }: DocumentRequestEmailProps) {
-  const greeting = clientFirstName ? `Dear ${clientFirstName}` : 'Dear Client'
+  const tr = getTranslations(language)
+
+  const greeting = clientFirstName
+    ? t(tr.email_greeting, { name: clientFirstName })
+    : tr.email_greeting_fallback
+
+  const bodyText = documentNames.length > 1
+    ? t(tr.email_body, { matterReference })
+    : t(tr.email_body_singular, { matterReference })
+
+  const subject = t(tr.email_subject, { matterReference })
 
   return (
     <Html>
       <Head />
-      <Preview>
-        Documents needed for your case {matterReference}
-      </Preview>
+      <Preview>{subject}</Preview>
       <Body style={bodyStyle}>
         <Container style={containerStyle}>
           {/* Header */}
@@ -67,8 +78,7 @@ export function DocumentRequestEmail({
             <Text style={greetingStyle}>{greeting},</Text>
 
             <Text style={paragraphStyle}>
-              We need the following document{documentNames.length > 1 ? 's' : ''} for your
-              case <strong>{matterReference}</strong>:
+              {bodyText}
             </Text>
 
             {/* Document list */}
@@ -87,25 +97,25 @@ export function DocumentRequestEmail({
             {portalUrl && (
               <>
                 <Text style={paragraphStyle}>
-                  Please upload the requested documents through your secure client portal:
+                  {tr.email_portal_instruction}
                 </Text>
                 <Section style={{ textAlign: 'center', margin: '24px 0' }}>
                   <Button
                     href={portalUrl}
                     style={{ ...buttonStyle, backgroundColor: primaryColor }}
                   >
-                    Upload Documents
+                    {tr.email_cta_button}
                   </Button>
                 </Section>
               </>
             )}
 
             <Text style={paragraphStyle}>
-              If you have any questions or need assistance, please contact our office.
+              {tr.email_help}
             </Text>
 
             <Text style={signoffStyle}>
-              Best regards,
+              {tr.email_signoff}
               <br />
               {firmName}
             </Text>
@@ -116,10 +126,10 @@ export function DocumentRequestEmail({
           {/* Footer */}
           <Section style={footerStyle}>
             <Text style={footerTextStyle}>
-              You are receiving this email because you are a client of {firmName}.
+              {t(tr.email_footer, { firmName })}
             </Text>
             <Text style={footerTextStyle}>
-              Powered by <Link href="https://norvaos.com" style={{ color: '#6b7280' }}>NorvaOS</Link>
+              {tr.powered_by.replace('NorvaOS', '')}<Link href="https://norvaos.com" style={{ color: '#6b7280' }}>NorvaOS</Link>
             </Text>
           </Section>
         </Container>
@@ -133,18 +143,30 @@ export async function renderDocumentRequestEmail(props: DocumentRequestEmailProp
   text: string
   subject: string
 }> {
+  const lang = props.language || 'en'
+  const tr = getTranslations(lang)
+
   const html = await render(<DocumentRequestEmail {...props} />)
-  const subject = `Documents Needed: ${props.matterReference}`
+  const subject = t(tr.email_subject, { matterReference: props.matterReference })
+
+  const greeting = props.clientFirstName
+    ? t(tr.email_greeting, { name: props.clientFirstName }) + ','
+    : tr.email_greeting_fallback + ','
+
+  const bodyLine = props.documentNames.length > 1
+    ? t(tr.email_body, { matterReference: props.matterReference })
+    : t(tr.email_body_singular, { matterReference: props.matterReference })
+
   const text = [
-    props.clientFirstName ? `Dear ${props.clientFirstName},` : 'Dear Client,',
+    greeting,
     '',
-    `We need the following documents for your case ${props.matterReference}:`,
+    bodyLine,
     ...props.documentNames.map((n) => `  - ${n}`),
     '',
     props.message ?? '',
-    props.portalUrl ? `Upload documents: ${props.portalUrl}` : '',
+    props.portalUrl ? `${tr.email_cta_button}: ${props.portalUrl}` : '',
     '',
-    `Best regards,`,
+    tr.email_signoff,
     props.firmName,
   ]
     .filter(Boolean)

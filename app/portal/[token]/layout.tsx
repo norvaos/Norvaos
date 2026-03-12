@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { PortalZoomWrapper } from './portal-zoom'
 
 export const metadata: Metadata = {
   title: 'Document Upload Portal',
@@ -6,5 +7,9 @@ export const metadata: Metadata = {
 }
 
 export default function PortalLayout({ children }: { children: React.ReactNode }) {
-  return <>{children}</>
+  return (
+    <div className="portal-force-light">
+      <PortalZoomWrapper>{children}</PortalZoomWrapper>
+    </div>
+  )
 }

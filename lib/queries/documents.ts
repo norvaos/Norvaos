@@ -69,6 +69,12 @@ export function useDocuments(params: DocumentListParams) {
   })
 }
 
+/**
+ * Upload a document via server-side API route.
+ * Routes through /api/documents/upload for enforcement gating.
+ * For enforcement-enabled matters, the server rejects uploads when
+ * intake_status is 'incomplete'.
+ */
 export function useUploadDocument() {
   const queryClient = useQueryClient()
 
@@ -77,65 +83,64 @@ export function useUploadDocument() {
       file,
       metadata,
       displayName,
+      storageLocation,
     }: {
       file: File
       metadata: Omit<DocumentInsert, 'file_name' | 'file_type' | 'file_size' | 'storage_path'>
       displayName?: string
+      storageLocation?: 'local' | 'onedrive'
     }) => {
-      const supabase = createClient()
+      const formData = new FormData()
+      formData.append('file', file)
+      if (metadata.matter_id) formData.append('matter_id', metadata.matter_id)
+      if (metadata.contact_id) formData.append('contact_id', metadata.contact_id)
+      if (metadata.lead_id) formData.append('lead_id', metadata.lead_id)
+      if (metadata.task_id) formData.append('task_id', metadata.task_id)
+      if (metadata.category) formData.append('category', metadata.category)
+      if (metadata.description) formData.append('description', metadata.description)
+      if (displayName) formData.append('display_name', displayName)
+      if (storageLocation) formData.append('storage_location', storageLocation)
 
-      // Upload file to Supabase Storage
-      const fileExt = file.name.split('.').pop()
-      const filePath = `${metadata.tenant_id}/${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`
+      const response = await fetch('/api/documents/upload', {
+        method: 'POST',
+        body: formData,
+      })
 
-      const { error: uploadError } = await supabase.storage
-        .from('documents')
-        .upload(filePath, file)
-
-      if (uploadError) throw uploadError
-
-      // Use displayName if provided, otherwise fall back to original file name
-      const fileName = displayName || file.name
-
-      // Create document record
-      const { data, error } = await supabase
-        .from('documents')
-        .insert({
-          ...metadata,
-          file_name: fileName,
-          file_type: file.type,
-          file_size: file.size,
-          storage_path: filePath,
-        })
-        .select()
-        .single()
-
-      if (error) throw error
-      return data as Document
+      const result = await response.json()
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || 'Upload failed')
+      }
+      return result.document as Document
     },
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: documentKeys.all })
-      toast.success('Document uploaded successfully')
+      const location = variables.storageLocation === 'onedrive' ? 'OneDrive' : 'NorvaOS'
+      toast.success(`Document uploaded to ${location}`)
     },
     onError: (error: Error) => {
-      toast.error(`Failed to upload document: ${error.message}`)
+      toast.error(error.message || 'Failed to upload document')
     },
   })
 }
 
+/**
+ * Delete a document via server-side API route.
+ * Storage deletion requires admin client (storage RLS blocks client-side deletes).
+ */
 export function useDeleteDocument() {
   const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: async ({ id, storagePath }: { id: string; storagePath: string }) => {
-      const supabase = createClient()
-
-      // Delete from storage
-      await supabase.storage.from('documents').remove([storagePath])
-
-      // Delete record
-      const { error } = await supabase.from('documents').delete().eq('id', id)
-      if (error) throw error
+      const res = await fetch('/api/documents/delete', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, storagePath }),
+      })
+      if (!res.ok) {
+        const err = await res.json()
+        throw new Error(err.error || 'Failed to delete document')
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: documentKeys.all })
@@ -147,12 +152,60 @@ export function useDeleteDocument() {
   })
 }
 
+export function useShareDocument() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async ({
+      documentId,
+      share,
+      displayName,
+      category,
+      description,
+    }: {
+      documentId: string
+      share: boolean
+      displayName?: string
+      category?: string
+      description?: string
+    }) => {
+      const res = await fetch('/api/documents/share', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          document_id: documentId,
+          share,
+          display_name: displayName,
+          category,
+          description,
+        }),
+      })
+      if (!res.ok) {
+        const err = await res.json()
+        throw new Error(err.error || 'Failed to share document')
+      }
+      return res.json()
+    },
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: documentKeys.all })
+      toast.success(
+        variables.share
+          ? 'Document shared with client'
+          : 'Document unshared from client'
+      )
+    },
+    onError: () => {
+      toast.error('Failed to update sharing status')
+    },
+  })
+}
+
 export function useDownloadDocument() {
   return useMutation({
-    mutationFn: async (storagePath: string) => {
+    mutationFn: async ({ storagePath, bucket = 'documents' }: { storagePath: string; bucket?: string }) => {
       const supabase = createClient()
       const { data, error } = await supabase.storage
-        .from('documents')
+        .from(bucket)
         .download(storagePath)
       if (error) throw error
       return data
@@ -165,10 +218,10 @@ export function useDownloadDocument() {
 
 export function useDocumentSignedUrl() {
   return useMutation({
-    mutationFn: async (storagePath: string) => {
+    mutationFn: async ({ storagePath, bucket = 'documents' }: { storagePath: string; bucket?: string }) => {
       const supabase = createClient()
       const { data, error } = await supabase.storage
-        .from('documents')
+        .from(bucket)
         .createSignedUrl(storagePath, 3600)
       if (error) throw error
       return data.signedUrl

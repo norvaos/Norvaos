@@ -12,9 +12,12 @@ import {
   type VisibilityState,
 } from '@tanstack/react-table'
 import { format, isToday, isTomorrow, isPast, differenceInDays } from 'date-fns'
+import { formatDate } from '@/lib/utils/formatters'
 import { ChevronDown, ChevronRight, Paperclip, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { TASK_TYPES, TASK_CATEGORIES } from '@/lib/utils/constants'
 import { Checkbox } from '@/components/ui/checkbox'
+import { Badge } from '@/components/ui/badge'
 import {
   Tooltip,
   TooltipContent,
@@ -69,13 +72,13 @@ function formatDueDate(dateStr: string | null): { text: string; className: strin
   if (days <= 7) {
     return { text: format(date, 'EEEE'), className: 'text-foreground' }
   }
-  return { text: format(date, 'MMM d, yyyy'), className: 'text-foreground' }
+  return { text: formatDate(date), className: 'text-foreground' }
 }
 
 function formatTimeline(startDate: string | null, dueDate: string | null): string | null {
   if (!startDate && !dueDate) return null
-  const start = startDate ? format(new Date(startDate + 'T00:00:00'), 'MMM d') : '?'
-  const end = dueDate ? format(new Date(dueDate + 'T00:00:00'), 'MMM d') : '?'
+  const start = startDate ? formatDate(startDate) : '?'
+  const end = dueDate ? formatDate(dueDate) : '?'
   return `${start} \u2192 ${end}`
 }
 
@@ -464,7 +467,74 @@ export function TaskTable({
         },
       },
 
-      // 7. Notes (inline editable)
+      // 7. Task Type
+      {
+        accessorKey: 'task_type',
+        header: ({ column }) => (
+          <SortableHeader
+            label="Type"
+            sorted={column.getIsSorted()}
+            onClick={() => column.toggleSorting()}
+          />
+        ),
+        size: 130,
+        cell: ({ row }) => {
+          const type = row.original.task_type
+          const config = TASK_TYPES.find((t) => t.value === type)
+          if (!config) return <span className="text-xs text-muted-foreground">--</span>
+          return (
+            <Badge variant="outline" className="text-xs font-normal">
+              {config.label}
+            </Badge>
+          )
+        },
+      },
+
+      // 8. Category
+      {
+        accessorKey: 'category',
+        header: ({ column }) => (
+          <SortableHeader
+            label="Category"
+            sorted={column.getIsSorted()}
+            onClick={() => column.toggleSorting()}
+          />
+        ),
+        size: 120,
+        cell: ({ row }) => {
+          const cat = row.original.category
+          const config = TASK_CATEGORIES.find((c) => c.value === cat)
+          if (!config) return <span className="text-xs text-muted-foreground">--</span>
+          return (
+            <span className="inline-flex items-center gap-1.5 text-sm">
+              <span
+                className="h-2 w-2 rounded-full shrink-0"
+                style={{ backgroundColor: config.color }}
+              />
+              {config.label}
+            </span>
+          )
+        },
+      },
+
+      // 9. Billable
+      {
+        accessorKey: 'is_billable',
+        header: 'Billable',
+        size: 70,
+        enableSorting: false,
+        cell: ({ row }) => {
+          const billable = row.original.is_billable
+          if (!billable) return <span className="text-xs text-muted-foreground">--</span>
+          return (
+            <Badge variant="secondary" className="text-[10px] bg-emerald-50 text-emerald-700 border-emerald-200">
+              $
+            </Badge>
+          )
+        },
+      },
+
+      // 10. Notes (inline editable)
       {
         accessorKey: 'notes',
         header: 'Notes',
@@ -536,7 +606,7 @@ export function TaskTable({
         },
       },
     ],
-    [usersMap, documentCounts, onTaskClick, onUpdateTask, handleStatusUpdate, handlePriorityUpdate, handleCheckboxToggle]
+    [usersMap, users, documentCounts, onTaskClick, onUpdateTask, handleStatusUpdate, handlePriorityUpdate, handleCheckboxToggle]
   )
 
   // ---------------------------------------------------------------------------

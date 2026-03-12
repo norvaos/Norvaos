@@ -2,8 +2,9 @@ import { NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { evaluateCondition } from '@/lib/utils/condition-evaluator'
 import type { IntakeField, IntakeFormSettings, FieldCondition } from '@/lib/types/intake-field'
+import { withTiming } from '@/lib/middleware/request-timing'
 
-export async function POST(
+async function handlePost(
   request: Request,
   { params }: { params: Promise<{ slug: string }> }
 ) {
@@ -412,3 +413,5 @@ export async function POST(
     )
   }
 }
+
+export const POST = withTiming(handlePost, 'POST /api/forms/[slug]/submit')

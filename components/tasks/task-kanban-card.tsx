@@ -11,7 +11,8 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip'
 import { cn } from '@/lib/utils'
-import { format, isPast, isToday } from 'date-fns'
+import { isPast, isToday } from 'date-fns'
+import { formatDate } from '@/lib/utils/formatters'
 import type { Database } from '@/lib/types/database'
 
 type Task = Database['public']['Tables']['tasks']['Row']
@@ -81,7 +82,7 @@ export const TaskKanbanCard = memo(function TaskKanbanCard({
 
   const formattedDueDate = useMemo(() => {
     if (!task.due_date) return null
-    return format(new Date(task.due_date), 'MMM d')
+    return formatDate(task.due_date)
   }, [task.due_date])
 
   return (

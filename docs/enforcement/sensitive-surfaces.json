@@ -1,0 +1,224 @@
+{
+  "version": "1.3.0",
+  "description": "Canonical registry of enforcement-sensitive surfaces. CI and tests read ONLY this file. No duplicate lists anywhere.",
+  "surfaces": [
+    {
+      "path": "components/require-permission.tsx",
+      "category": "billing",
+      "reason": "Canonical UI permission gate",
+      "required_controls": ["RequirePermission"]
+    },
+    {
+      "path": "lib/services/billing-permission.ts",
+      "category": "billing",
+      "reason": "Server-side billing check (checkBillingPermission)",
+      "required_controls": ["checkBillingPermission"]
+    },
+    {
+      "path": "lib/hooks/use-can-view-billing.ts",
+      "category": "billing",
+      "reason": "Client-side billing:view hook",
+      "required_controls": ["useCanViewBilling"]
+    },
+    {
+      "path": "lib/utils/permissions.ts",
+      "category": "billing",
+      "reason": "Permission matrix and helpers (hasPermission, canView)",
+      "required_controls": ["hasPermission"]
+    },
+    {
+      "path": "app/(dashboard)/billing/page.tsx",
+      "category": "billing",
+      "reason": "Billing dashboard page",
+      "required_controls": ["RequirePermission"],
+      "gate_entity": "billing",
+      "gate_action": "view"
+    },
+    {
+      "path": "app/(dashboard)/matters/[id]/page.tsx",
+      "category": "billing",
+      "reason": "Matter detail (billing tab + sidebar financial card)",
+      "required_controls": ["RequirePermission"],
+      "gate_entity": "billing",
+      "gate_action": "view"
+    },
+    {
+      "path": "app/(dashboard)/reports/page.tsx",
+      "category": "billing",
+      "reason": "Revenue charts, KPI, exports",
+      "required_controls": ["RequirePermission"],
+      "gate_entity": "billing",
+      "gate_action": "view"
+    },
+    {
+      "path": "app/api/invoices/[id]/pdf/route.ts",
+      "category": "billing",
+      "reason": "Invoice PDF API (server 403 + audit)",
+      "required_controls": ["checkBillingPermission", "server-403"],
+      "gate_entity": "billing",
+      "gate_action": "view"
+    },
+    {
+      "path": "components/command-centre/panels/retainer-builder.tsx",
+      "category": "billing",
+      "reason": "Retainer builder (invoice/payment creation)",
+      "required_controls": ["RequirePermission"],
+      "gate_entity": "billing",
+      "gate_action": "view"
+    },
+    {
+      "path": "scripts/migrations/033-billing-rls-role-check.sql",
+      "category": "billing",
+      "reason": "Billing RLS migration (has_billing_view SECURITY DEFINER)",
+      "required_controls": ["RLS"]
+    },
+    {
+      "path": "lib/services/stage-engine.ts",
+      "category": "stage_gating",
+      "reason": "Stage advancement with gating rules",
+      "required_controls": ["evaluateGatingRules"]
+    },
+    {
+      "path": "lib/services/document-slot-engine.ts",
+      "category": "documents",
+      "reason": "Slot generation, conditions evaluation, regeneration",
+      "required_controls": ["evaluateSlotCondition"]
+    },
+    {
+      "path": "lib/services/document-review-engine.ts",
+      "category": "documents",
+      "reason": "Document version review workflow",
+      "required_controls": ["review_document_version"]
+    },
+    {
+      "path": "app/api/documents/upload/route.ts",
+      "category": "documents",
+      "reason": "Document upload API",
+      "required_controls": ["upload_document_version"]
+    },
+    {
+      "path": "app/api/documents/slots/[slotId]/review/route.ts",
+      "category": "documents",
+      "reason": "Slot review API",
+      "required_controls": ["review_document_version"]
+    },
+    {
+      "path": "app/api/portal/[token]/slot-upload/route.ts",
+      "category": "documents",
+      "reason": "Portal slot upload (token auth)",
+      "required_controls": ["upload_document_version"]
+    },
+    {
+      "path": "scripts/migrations/027-enforcement-enabled-lockdown.sql",
+      "category": "stage_gating",
+      "reason": "Enforcement toggle admin-only lockdown",
+      "required_controls": ["DB_trigger"]
+    },
+    {
+      "path": "scripts/migrations/028-document-engine.sql",
+      "category": "documents",
+      "reason": "Document engine schema + RPCs (immutable versions)",
+      "required_controls": ["RLS", "upload_document_version", "review_document_version"]
+    },
+    {
+      "path": "scripts/migrations/024-uee-phase-a-hardening.sql",
+      "category": "audit",
+      "reason": "Audit immutability triggers (prevent_audit_log_mutation)",
+      "required_controls": ["DB_trigger"]
+    },
+    {
+      "path": "lib/queries/audit-logs.ts",
+      "category": "audit",
+      "reason": "Server-side audit logging",
+      "required_controls": ["logAuditServer"]
+    },
+    {
+      "path": "components/matters/tabs/billing-tab.tsx",
+      "category": "billing",
+      "reason": "Billing tab (imports invoicing hooks, parent-gated by matter detail page)",
+      "required_controls": ["parent-gate"]
+    },
+    {
+      "path": "app/api/matters/[id]/advance-stage/route.ts",
+      "category": "stage_gating",
+      "reason": "Stage advancement API (imports advanceGenericStage/advanceImmigrationStage)",
+      "required_controls": ["evaluateGatingRules"]
+    },
+    {
+      "path": "app/api/matters/[id]/check-gating/route.ts",
+      "category": "stage_gating",
+      "reason": "Gating pre-evaluation API (imports evaluateGatingRules/getEffectiveGatingRules)",
+      "required_controls": ["evaluateGatingRules"]
+    },
+    {
+      "path": "app/api/matters/[id]/document-slots/route.ts",
+      "category": "documents",
+      "reason": "Document slots API (imports regenerateDocumentSlots)",
+      "required_controls": ["regenerateDocumentSlots"]
+    },
+    {
+      "path": "lib/services/intake-revalidate.ts",
+      "category": "documents",
+      "reason": "Intake revalidation (triggers regenerateDocumentSlots)",
+      "required_controls": ["regenerateDocumentSlots"]
+    },
+    {
+      "path": "lib/queries/invoicing.ts",
+      "category": "billing",
+      "reason": "Central billing query layer (.from('invoices'), .from('payments'), .from('invoice_line_items'))",
+      "required_controls": ["RLS"]
+    },
+    {
+      "path": "app/(dashboard)/time-tracking/page.tsx",
+      "category": "billing",
+      "reason": "Time tracking page (imports invoicing hooks, self-gated)",
+      "required_controls": ["RequirePermission"],
+      "gate_entity": "billing",
+      "gate_action": "view"
+    },
+    {
+      "path": "components/billing/billing-stats-cards.tsx",
+      "category": "billing",
+      "reason": "Billing stats cards (imports useBillingStats, self-gated)",
+      "required_controls": ["RequirePermission"],
+      "gate_entity": "billing",
+      "gate_action": "view"
+    },
+    {
+      "path": "components/time-tracking/time-entry-form.tsx",
+      "category": "billing",
+      "reason": "Time entry form (imports invoicing hooks, parent-gated by time-tracking/page.tsx)",
+      "required_controls": ["parent-gate"]
+    },
+    {
+      "path": "components/time-tracking/time-entry-table.tsx",
+      "category": "billing",
+      "reason": "Time entry table (imports invoicing types, parent-gated by time-tracking/page.tsx)",
+      "required_controls": ["parent-gate"]
+    },
+    {
+      "path": "components/time-tracking/timer-widget.tsx",
+      "category": "billing",
+      "reason": "Timer widget (imports useCreateTimeEntry, parent-gated by time-tracking/page.tsx)",
+      "required_controls": ["parent-gate"]
+    },
+    {
+      "path": "lib/services/actions/matter/advance-stage-action.ts",
+      "category": "stage_gating",
+      "reason": "Action-driven stage advancement (wraps advanceGenericStage/advanceImmigrationStage)",
+      "required_controls": ["evaluateGatingRules"]
+    },
+    {
+      "path": "lib/services/form-instance-engine.ts",
+      "category": "documents",
+      "reason": "Form instance engine (imports evaluateSlotCondition from document-slot-engine)",
+      "required_controls": ["evaluateSlotCondition"]
+    },
+    {
+      "path": "lib/types/form-instances.ts",
+      "category": "documents",
+      "reason": "Form instance types (imports SlotConditions type from document-slot-engine)",
+      "required_controls": ["evaluateSlotCondition"]
+    }
+  ]
+}

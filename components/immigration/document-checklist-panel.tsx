@@ -73,7 +73,7 @@ function DocumentActionButton({ document }: { document: Document }) {
 
   const handleView = useCallback(async () => {
     try {
-      const url = await signedUrlMutation.mutateAsync(document.storage_path)
+      const url = await signedUrlMutation.mutateAsync({ storagePath: document.storage_path, bucket: document.storage_bucket ?? undefined })
       window.open(url, '_blank')
     } catch {
       // error toast handled by mutation
@@ -83,7 +83,7 @@ function DocumentActionButton({ document }: { document: Document }) {
   const handleDownload = useCallback(async () => {
     setIsDownloading(true)
     try {
-      const url = await signedUrlMutation.mutateAsync(document.storage_path)
+      const url = await signedUrlMutation.mutateAsync({ storagePath: document.storage_path, bucket: document.storage_bucket ?? undefined })
       const a = window.document.createElement('a')
       a.href = url
       a.download = document.file_name

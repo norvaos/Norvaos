@@ -71,6 +71,7 @@ import {
 import { usePipelines, usePipelineStages } from '@/lib/queries/pipelines'
 import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
+import { formatDateTime } from '@/lib/utils/formatters'
 import type { Database, Json } from '@/lib/types/database'
 
 import { Button } from '@/components/ui/button'
@@ -1181,7 +1182,7 @@ function SubmissionsPanel({ formId, fields }: { formId: string; fields: IntakeFi
                     {displayName || displayEmail || 'Anonymous'}
                   </p>
                   <p className="text-xs text-slate-500">
-                    {new Date(sub.created_at).toLocaleDateString()} {new Date(sub.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    {formatDateTime(sub.created_at)}
                   </p>
                 </div>
                 <Badge

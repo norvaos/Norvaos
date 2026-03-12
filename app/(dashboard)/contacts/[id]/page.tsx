@@ -4,13 +4,14 @@ import { useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { useTenant } from '@/lib/hooks/use-tenant'
 import { useUser } from '@/lib/hooks/use-user'
-import { useContact, useUpdateContact, useDeleteContact } from '@/lib/queries/contacts'
+import { useContact, useUpdateContact, useDeleteContact, useContactDependencies } from '@/lib/queries/contacts'
 import { createClient } from '@/lib/supabase/client'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import type { Database } from '@/lib/types/database'
 import { MATTER_STATUSES, MATTER_CONTACT_ROLES } from '@/lib/utils/constants'
 import {
   formatDate,
+  formatDateTime,
   formatPhoneNumber,
   formatFullName,
   formatInitials,
@@ -18,12 +19,25 @@ import {
 import { ContactForm } from '@/components/contacts/contact-form'
 import type { ContactFormValues } from '@/lib/schemas/contact'
 import { DocumentUpload } from '@/components/shared/document-upload'
+import { useTasks } from '@/lib/queries/tasks'
+import { TaskCreateDialog } from '@/components/tasks/task-create-dialog'
 import { useContactIntakeSubmissions } from '@/lib/queries/intake-forms'
+import { useContactCheckIns } from '@/lib/queries/check-ins'
+import type { KioskQuestion } from '@/lib/types/kiosk-question'
 import { TagManager } from '@/components/shared/tag-manager'
 import { NotesEditor } from '@/components/shared/notes-editor'
 import { ActivityTimeline } from '@/components/shared/activity-timeline'
 import { MiniTimeline } from '@/components/shared/mini-timeline'
 import { useCreateAuditLog } from '@/lib/queries/audit-logs'
+import { ContactBookingsTab } from '@/components/contacts/contact-bookings-tab'
+import { useAppointments } from '@/lib/queries/booking'
+import { ConflictReviewPanel, ConflictStatusBadge } from '@/components/contacts/conflict-review-panel'
+import { ContactTeamManager } from '@/components/contacts/contact-team-manager'
+import { useContactAssignments, getAssignmentRoleLabel } from '@/lib/queries/contact-assignments'
+import { PipelineProgress, PipelineStageBadge } from '@/components/contacts/pipeline-progress'
+import { InteractionsPanel } from '@/components/shared/interactions-panel'
+import { hasPermission } from '@/lib/utils/permissions'
+import { useUserRole } from '@/lib/hooks/use-user-role'
 
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -48,6 +62,7 @@ import {
   SheetDescription,
 } from '@/components/ui/sheet'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -64,7 +79,9 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import {
+  AlertCircle,
   ArrowLeft,
+  LayoutDashboard,
   MoreHorizontal,
   Pencil,
   Archive,
@@ -85,6 +102,12 @@ import {
   Plus,
   Search,
   Link,
+  CheckCircle2,
+  FileStack,
+  UserCircle,
+  CalendarDays,
+  ShieldCheck,
+  Crown,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { MatterCreateSheet } from '@/components/matters/matter-create-sheet'
@@ -145,6 +168,49 @@ function useContactMatters(contactId: string, tenantId: string) {
   })
 }
 
+function useContactStats(contactId: string, tenantId: string) {
+  return useQuery({
+    queryKey: ['contact-stats', contactId],
+    queryFn: async () => {
+      const supabase = createClient()
+      const [mattersRes, leadsRes, tasksRes, docsRes] = await Promise.all([
+        supabase.from('matter_contacts').select('id', { count: 'exact', head: true }).eq('contact_id', contactId),
+        supabase.from('leads').select('id', { count: 'exact', head: true }).eq('contact_id', contactId),
+        supabase.from('tasks').select('id', { count: 'exact', head: true }).eq('contact_id', contactId),
+        supabase.from('documents').select('id', { count: 'exact', head: true }).eq('contact_id', contactId),
+      ])
+      return {
+        matterCount: mattersRes.count ?? 0,
+        leadCount: leadsRes.count ?? 0,
+        taskCount: tasksRes.count ?? 0,
+        documentCount: docsRes.count ?? 0,
+      }
+    },
+    enabled: !!contactId && !!tenantId,
+  })
+}
+
+function useContactActiveLead(contactId: string) {
+  return useQuery({
+    queryKey: ['contact-active-lead', contactId],
+    queryFn: async () => {
+      const supabase = createClient()
+      const { data, error } = await supabase
+        .from('leads')
+        .select('id, status')
+        .eq('contact_id', contactId)
+        .in('status', ['open', 'new', 'contacted', 'qualified', 'pitched'])
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle()
+
+      if (error) throw error
+      return data
+    },
+    enabled: !!contactId,
+  })
+}
+
 // -------------------------------------------------------------------
 // Main page component
 // -------------------------------------------------------------------
@@ -164,6 +230,12 @@ export default function ContactDetailPage() {
 
   const [editOpen, setEditOpen] = useState(false)
   const [deleteOpen, setDeleteOpen] = useState(false)
+  const [activeTab, setActiveTab] = useState('overview')
+  const { data: deps } = useContactDependencies(contactId)
+  const { data: stats } = useContactStats(contactId, tenantId)
+  const { data: activeLead } = useContactActiveLead(contactId)
+  const { data: teamAssignments } = useContactAssignments(contactId)
+  const { role: userRole } = useUserRole()
 
   // Loading state
   if (isLoading) {
@@ -307,7 +379,7 @@ export default function ContactDetailPage() {
             </AvatarFallback>
           </Avatar>
           <div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <h1 className="text-2xl font-semibold text-slate-900">
                 {displayName}
               </h1>
@@ -319,17 +391,74 @@ export default function ContactDetailPage() {
                 )}
                 {isOrganization ? 'Organisation' : 'Individual'}
               </Badge>
+              {(stats?.matterCount ?? 0) > 0 && (
+                <Badge className="gap-1 bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-50">
+                  <Briefcase className="size-3" />
+                  Client
+                </Badge>
+              )}
+              {(stats?.leadCount ?? 0) > 0 && (stats?.matterCount ?? 0) === 0 && (
+                <Badge className="gap-1 bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-50">
+                  <UserCircle className="size-3" />
+                  Lead
+                </Badge>
+              )}
+              {/* Assigned team avatars (tooltip on hover for name + role) */}
+              {teamAssignments && teamAssignments.length > 0 && (
+                <TooltipProvider delayDuration={150}>
+                  <div className="flex items-center gap-1 ml-1 pl-2 border-l border-slate-200">
+                    {teamAssignments.map((a) => {
+                      const name = formatFullName(a.user_first_name, a.user_last_name) || a.user_email || 'Unknown'
+                      const inits = formatInitials(a.user_first_name, a.user_last_name)
+                      return (
+                        <Tooltip key={a.id}>
+                          <TooltipTrigger asChild>
+                            <div className="relative cursor-default">
+                              <Avatar size="sm" className={`size-6 ${a.is_primary ? 'ring-2 ring-amber-400 ring-offset-1' : ''}`}>
+                                <AvatarFallback className="text-[10px]">{inits}</AvatarFallback>
+                              </Avatar>
+                              {a.is_primary && (
+                                <Crown className="absolute -top-1 -right-1 size-2.5 text-amber-500 fill-amber-500" />
+                              )}
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent side="bottom" className="text-xs">
+                            <p className="font-medium">{name}</p>
+                            <p className="text-muted-foreground">{getAssignmentRoleLabel(a.role)}</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      )
+                    })}
+                  </div>
+                </TooltipProvider>
+              )}
             </div>
             {!isOrganization && contact.job_title && (
               <p className="mt-0.5 text-sm text-muted-foreground">
                 {contact.job_title}
+                {contact.organization_name && ` at ${contact.organization_name}`}
               </p>
             )}
-            {contact.email_primary && (
-              <p className="mt-0.5 text-sm text-muted-foreground">
-                {contact.email_primary}
-              </p>
-            )}
+            <div className="mt-1 flex items-center gap-3 text-sm text-muted-foreground">
+              {contact.email_primary && (
+                <a
+                  href={`mailto:${contact.email_primary}`}
+                  className="flex items-center gap-1 hover:text-primary transition-colors"
+                >
+                  <Mail className="size-3.5" />
+                  {contact.email_primary}
+                </a>
+              )}
+              {contact.phone_primary && (
+                <a
+                  href={`tel:${contact.phone_primary}`}
+                  className="flex items-center gap-1 hover:text-primary transition-colors"
+                >
+                  <Phone className="size-3.5" />
+                  {formatPhoneNumber(contact.phone_primary)}
+                </a>
+              )}
+            </div>
             <div className="mt-2">
               <TagManager entityType="contact" entityId={contactId} tenantId={tenantId} />
             </div>
@@ -337,6 +466,15 @@ export default function ContactDetailPage() {
         </div>
 
         <div className="flex items-center gap-2">
+          {activeLead && (
+            <Button
+              size="sm"
+              onClick={() => router.push(`/command/lead/${activeLead.id}`)}
+            >
+              <LayoutDashboard className="mr-1.5 size-4" />
+              Command Centre
+            </Button>
+          )}
           <Button variant="outline" onClick={() => setEditOpen(true)}>
             <Pencil className="mr-2 size-4" />
             Edit
@@ -370,19 +508,23 @@ export default function ContactDetailPage() {
       </div>
 
       {/* Tabs */}
-      <Tabs defaultValue="overview" className="space-y-4">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         <TabsList>
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="matters">Matters</TabsTrigger>
+          <TabsTrigger value="tasks">Tasks</TabsTrigger>
           <TabsTrigger value="documents">Documents</TabsTrigger>
+          <TabsTrigger value="conflict-review">Conflict Review</TabsTrigger>
           <TabsTrigger value="intake">Intake</TabsTrigger>
+          <TabsTrigger value="appointments">Appointments</TabsTrigger>
+          <TabsTrigger value="interactions">Interactions</TabsTrigger>
           <TabsTrigger value="history">History</TabsTrigger>
           <TabsTrigger value="notes">Notes</TabsTrigger>
         </TabsList>
 
         {/* Overview Tab */}
         <TabsContent value="overview" className="space-y-4">
-          <OverviewTab contact={contact} tenantId={tenantId} contactId={contactId} />
+          <OverviewTab contact={contact} tenantId={tenantId} contactId={contactId} stats={stats} onTabChange={setActiveTab} />
         </TabsContent>
 
         {/* Matters Tab */}
@@ -390,14 +532,45 @@ export default function ContactDetailPage() {
           <MattersTab contactId={contactId} tenantId={tenantId} />
         </TabsContent>
 
+        {/* Tasks Tab */}
+        <TabsContent value="tasks">
+          <ContactTasksTab contactId={contactId} tenantId={tenantId} />
+        </TabsContent>
+
         {/* Documents Tab */}
         <TabsContent value="documents" className="space-y-4">
-          <DocumentUpload entityType="contact" entityId={contactId} tenantId={tenantId} />
+          <DocumentUpload entityType="contact" entityId={contactId} tenantId={tenantId} entityName={displayName} />
+        </TabsContent>
+
+        {/* Conflict Review Tab */}
+        <TabsContent value="conflict-review" className="space-y-4">
+          <ContactTeamManager contactId={contactId} tenantId={tenantId} />
+          <ConflictReviewPanel
+            contactId={contactId}
+            conflictScore={contact.conflict_score ?? 0}
+            conflictStatus={contact.conflict_status ?? 'not_run'}
+            canApprove={hasPermission(userRole, 'conflicts', 'approve')}
+          />
         </TabsContent>
 
         {/* Intake Tab */}
         <TabsContent value="intake" className="space-y-4">
-          <IntakeTab contactId={contactId} />
+          <IntakeTab contactId={contactId} tenantSettings={tenant?.settings as Record<string, unknown> | undefined} />
+        </TabsContent>
+
+        {/* Appointments Tab */}
+        <TabsContent value="appointments" className="space-y-4">
+          <ContactBookingsTab contactId={contactId} contactName={displayName} tenantId={tenantId} />
+        </TabsContent>
+
+        {/* Interactions Tab */}
+        <TabsContent value="interactions" className="space-y-4">
+          <InteractionsPanel
+            contactId={contactId}
+            contactName={displayName}
+            tenantId={tenantId}
+            userId={appUser?.id}
+          />
         </TabsContent>
 
         {/* History Tab */}
@@ -437,11 +610,28 @@ export default function ContactDetailPage() {
       <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Delete Contact</DialogTitle>
+            <DialogTitle>Archive Contact</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete {displayName}? This action will archive the contact and they will no longer appear in your contacts list.
+              Are you sure you want to archive {displayName}? They will no longer appear in your contacts list.
             </DialogDescription>
           </DialogHeader>
+          {deps?.hasLinkedRecords && (
+            <div className="rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
+              <p className="font-medium mb-1">This contact has linked records:</p>
+              <ul className="list-disc list-inside space-y-0.5 text-xs">
+                {deps.matterCount > 0 && (
+                  <li>{deps.matterCount} matter{deps.matterCount > 1 ? 's' : ''}</li>
+                )}
+                {deps.leadCount > 0 && (
+                  <li>{deps.leadCount} active lead{deps.leadCount > 1 ? 's' : ''}</li>
+                )}
+                {deps.taskCount > 0 && (
+                  <li>{deps.taskCount} open task{deps.taskCount > 1 ? 's' : ''}</li>
+                )}
+              </ul>
+              <p className="mt-1.5 text-xs">Archiving will not delete these records, but the contact will be hidden from lists.</p>
+            </div>
+          )}
           <DialogFooter>
             <Button variant="outline" onClick={() => setDeleteOpen(false)}>
               Cancel
@@ -455,7 +645,7 @@ export default function ContactDetailPage() {
               disabled={deleteContact.isPending}
             >
               {deleteContact.isPending && <Loader2 className="mr-2 size-4 animate-spin" />}
-              Delete Contact
+              Archive Contact
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -468,16 +658,54 @@ export default function ContactDetailPage() {
 // Overview Tab
 // -------------------------------------------------------------------
 
+/** Fetch individual contacts linked to an organization via organization_id */
+function useOrganizationContacts(orgContactId: string, tenantId: string, isOrg: boolean) {
+  return useQuery({
+    queryKey: ['org-contacts', orgContactId],
+    queryFn: async () => {
+      const supabase = createClient()
+      const { data, error } = await supabase
+        .from('contacts')
+        .select('id, first_name, last_name, job_title, email_primary, phone_primary')
+        .eq('tenant_id', tenantId)
+        .eq('organization_id', orgContactId)
+        .eq('is_archived', false)
+        .order('first_name')
+      if (error) throw error
+      return data ?? []
+    },
+    enabled: !!orgContactId && !!tenantId && isOrg,
+  })
+}
+
 function OverviewTab({
   contact,
   tenantId,
   contactId,
+  stats,
+  onTabChange,
 }: {
   contact: Database['public']['Tables']['contacts']['Row']
   tenantId: string
   contactId: string
+  stats?: { matterCount: number; leadCount: number; taskCount: number; documentCount: number }
+  onTabChange: (tab: string) => void
 }) {
+  const router = useRouter()
   const isOrganization = contact.contact_type === 'organization'
+  const { data: orgContacts } = useOrganizationContacts(contactId, tenantId, isOrganization)
+  const { data: appointments } = useAppointments(tenantId, { contactId, upcoming: true })
+  const updateContact = useUpdateContact()
+
+  // Pipeline stage change handler
+  const handlePipelineStageChange = (newStage: string) => {
+    updateContact.mutate({
+      id: contactId,
+      pipeline_stage: newStage,
+      milestone: newStage,
+      milestone_updated_at: new Date().toISOString(),
+    })
+  }
 
   const hasAddress =
     contact.address_line1 ||
@@ -490,212 +718,467 @@ function OverviewTab({
       ? (contact.custom_fields as Record<string, string>)
       : null
 
-  return (
-    <div className="grid gap-4 md:grid-cols-2">
-      {/* Personal / Organisation Info */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-sm">
-            {isOrganization ? (
-              <Building2 className="size-4 text-muted-foreground" />
-            ) : (
-              <User className="size-4 text-muted-foreground" />
-            )}
-            {isOrganization ? 'Organisation Details' : 'Personal Details'}
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          {isOrganization ? (
-            <>
-              <InfoRow label="Organisation Name" value={contact.organization_name} />
-              <InfoRow label="Website" value={contact.website} />
-            </>
-          ) : (
-            <>
-              <InfoRow
-                label="Full Name"
-                value={formatFullName(contact.first_name, contact.last_name)}
-              />
-              {contact.middle_name && (
-                <InfoRow label="Middle Name" value={contact.middle_name} />
-              )}
-              {contact.preferred_name && (
-                <InfoRow label="Preferred Name" value={contact.preferred_name} />
-              )}
-              {contact.date_of_birth && (
-                <InfoRow
-                  label="Date of Birth"
-                  value={formatDate(contact.date_of_birth, 'dd MMMM yyyy')}
-                />
-              )}
-              {contact.job_title && (
-                <InfoRow label="Job Title" value={contact.job_title} />
-              )}
-            </>
-          )}
-          <Separator />
-          <InfoRow label="Source" value={contact.source} />
-          {contact.source_detail && (
-            <InfoRow label="Source Detail" value={contact.source_detail} />
-          )}
-          <InfoRow
-            label="Created"
-            value={formatDate(contact.created_at, 'dd MMM yyyy')}
-          />
-        </CardContent>
-      </Card>
+  const daysSinceLastContact = contact.last_contacted_at
+    ? Math.floor((Date.now() - new Date(contact.last_contacted_at).getTime()) / (1000 * 60 * 60 * 24))
+    : null
 
-      {/* Contact Details */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-sm">
-            <Phone className="size-4 text-muted-foreground" />
-            Contact Details
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="flex items-start gap-3">
-            <Mail className="mt-0.5 size-4 text-muted-foreground" />
-            <div>
-              <p className="text-xs text-muted-foreground">Primary Email</p>
-              <p className="text-sm text-slate-900">
-                {contact.email_primary ?? '-'}
-              </p>
-            </div>
-          </div>
-          {contact.email_secondary && (
+  return (
+    <div className="grid gap-4 md:grid-cols-3">
+      {/* Left column: Details (spans 2 cols) */}
+      <div className="md:col-span-2 space-y-4">
+        {/* Personal / Organisation Info */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-sm">
+              {isOrganization ? (
+                <Building2 className="size-4 text-muted-foreground" />
+              ) : (
+                <User className="size-4 text-muted-foreground" />
+              )}
+              {isOrganization ? 'Organisation Details' : 'Personal Details'}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {isOrganization ? (
+              <>
+                <InfoRow label="Organisation Name" value={contact.organization_name} />
+                <InfoRow label="Website" value={contact.website} />
+                {orgContacts && orgContacts.length > 0 && (
+                  <>
+                    <Separator />
+                    <div>
+                      <p className="text-xs text-muted-foreground mb-2">Contact Persons</p>
+                      <div className="space-y-2">
+                        {orgContacts.map((person) => (
+                          <div
+                            key={person.id}
+                            className="flex items-center gap-2 text-sm cursor-pointer hover:bg-slate-50 rounded-md p-1.5 -mx-1.5 transition-colors"
+                            onClick={() => router.push(`/contacts/${person.id}`)}
+                          >
+                            <Avatar size="sm">
+                              <AvatarFallback className="text-[10px]">
+                                {formatInitials(person.first_name, person.last_name)}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div className="min-w-0 flex-1">
+                              <p className="text-sm font-medium text-slate-900 truncate">
+                                {formatFullName(person.first_name, person.last_name)}
+                              </p>
+                              {person.job_title && (
+                                <p className="text-xs text-muted-foreground truncate">{person.job_title}</p>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </>
+                )}
+              </>
+            ) : (
+              <>
+                <InfoRow
+                  label="Full Name"
+                  value={formatFullName(contact.first_name, contact.last_name)}
+                />
+                {contact.middle_name && (
+                  <InfoRow label="Middle Name" value={contact.middle_name} />
+                )}
+                {contact.preferred_name && (
+                  <InfoRow label="Preferred Name" value={contact.preferred_name} />
+                )}
+                {contact.date_of_birth && (
+                  <InfoRow
+                    label="Date of Birth"
+                    value={formatDate(contact.date_of_birth)}
+                  />
+                )}
+                {contact.job_title && (
+                  <InfoRow label="Job Title" value={contact.job_title} />
+                )}
+                {contact.organization_name && (
+                  <InfoRow label="Organization" value={contact.organization_name} />
+                )}
+              </>
+            )}
+            <Separator />
+            <InfoRow label="Source" value={contact.source} />
+            {contact.source_detail && (
+              <InfoRow label="Source Detail" value={contact.source_detail} />
+            )}
+            <InfoRow
+              label="Created"
+              value={formatDate(contact.created_at)}
+            />
+          </CardContent>
+        </Card>
+
+        {/* Contact Details */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-sm">
+              <Phone className="size-4 text-muted-foreground" />
+              Contact Details
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
             <div className="flex items-start gap-3">
               <Mail className="mt-0.5 size-4 text-muted-foreground" />
               <div>
-                <p className="text-xs text-muted-foreground">Secondary Email</p>
-                <p className="text-sm text-slate-900">
-                  {contact.email_secondary}
-                </p>
+                <p className="text-xs text-muted-foreground">Primary Email</p>
+                {contact.email_primary ? (
+                  <a href={`mailto:${contact.email_primary}`} className="text-sm text-primary hover:underline">
+                    {contact.email_primary}
+                  </a>
+                ) : (
+                  <p className="text-sm text-slate-900">-</p>
+                )}
               </div>
             </div>
-          )}
-          <div className="flex items-start gap-3">
-            <Phone className="mt-0.5 size-4 text-muted-foreground" />
-            <div>
-              <p className="text-xs text-muted-foreground">
-                Primary Phone ({contact.phone_type_primary})
-              </p>
-              <p className="text-sm text-slate-900">
-                {contact.phone_primary
-                  ? formatPhoneNumber(contact.phone_primary)
-                  : '-'}
-              </p>
-            </div>
-          </div>
-          {contact.phone_secondary && (
+            {contact.email_secondary && (
+              <div className="flex items-start gap-3">
+                <Mail className="mt-0.5 size-4 text-muted-foreground" />
+                <div>
+                  <p className="text-xs text-muted-foreground">Secondary Email</p>
+                  <a href={`mailto:${contact.email_secondary}`} className="text-sm text-primary hover:underline">
+                    {contact.email_secondary}
+                  </a>
+                </div>
+              </div>
+            )}
             <div className="flex items-start gap-3">
               <Phone className="mt-0.5 size-4 text-muted-foreground" />
               <div>
                 <p className="text-xs text-muted-foreground">
-                  Secondary Phone
-                  {contact.phone_type_secondary
-                    ? ` (${contact.phone_type_secondary})`
-                    : ''}
+                  Primary Phone ({contact.phone_type_primary})
                 </p>
-                <p className="text-sm text-slate-900">
-                  {formatPhoneNumber(contact.phone_secondary)}
-                </p>
+                {contact.phone_primary ? (
+                  <a href={`tel:${contact.phone_primary}`} className="text-sm text-primary hover:underline">
+                    {formatPhoneNumber(contact.phone_primary)}
+                  </a>
+                ) : (
+                  <p className="text-sm text-slate-900">-</p>
+                )}
               </div>
             </div>
-          )}
-          {!isOrganization && contact.website && (
+            {contact.phone_secondary && (
+              <div className="flex items-start gap-3">
+                <Phone className="mt-0.5 size-4 text-muted-foreground" />
+                <div>
+                  <p className="text-xs text-muted-foreground">
+                    Secondary Phone
+                    {contact.phone_type_secondary
+                      ? ` (${contact.phone_type_secondary})`
+                      : ''}
+                  </p>
+                  <a href={`tel:${contact.phone_secondary}`} className="text-sm text-primary hover:underline">
+                    {formatPhoneNumber(contact.phone_secondary)}
+                  </a>
+                </div>
+              </div>
+            )}
+            {!isOrganization && contact.website && (
+              <div className="flex items-start gap-3">
+                <Globe className="mt-0.5 size-4 text-muted-foreground" />
+                <div>
+                  <p className="text-xs text-muted-foreground">Website</p>
+                  <p className="text-sm text-slate-900">{contact.website}</p>
+                </div>
+              </div>
+            )}
+            <Separator />
+            {/* Address */}
             <div className="flex items-start gap-3">
-              <Globe className="mt-0.5 size-4 text-muted-foreground" />
+              <MapPin className="mt-0.5 size-4 text-muted-foreground" />
               <div>
-                <p className="text-xs text-muted-foreground">Website</p>
-                <p className="text-sm text-slate-900">{contact.website}</p>
+                <p className="text-xs text-muted-foreground">Address</p>
+                {hasAddress ? (
+                  <div className="space-y-0.5 text-sm">
+                    {contact.address_line1 && (
+                      <p className="text-slate-900">{contact.address_line1}</p>
+                    )}
+                    {contact.address_line2 && (
+                      <p className="text-slate-900">{contact.address_line2}</p>
+                    )}
+                    <p className="text-slate-900">
+                      {[contact.city, contact.province_state].filter(Boolean).join(', ')}
+                      {contact.postal_code ? ` ${contact.postal_code}` : ''}
+                    </p>
+                    {contact.country && (
+                      <p className="text-slate-600">{contact.country}</p>
+                    )}
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground">No address on file</p>
+                )}
               </div>
             </div>
-          )}
-          <Separator />
-          <div className="flex items-center gap-4 text-sm">
-            <div className="flex items-center gap-2">
-              <Mail className="size-3.5 text-muted-foreground" />
-              <span className="text-muted-foreground">Email opt-in:</span>
-              <Badge variant={contact.email_opt_in ? 'default' : 'secondary'} className="text-[10px]">
-                {contact.email_opt_in ? 'Yes' : 'No'}
-              </Badge>
+            <Separator />
+            <div className="flex items-center gap-4 text-sm">
+              <div className="flex items-center gap-2">
+                <Mail className="size-3.5 text-muted-foreground" />
+                <span className="text-muted-foreground">Email opt-in:</span>
+                <Badge variant={contact.email_opt_in ? 'default' : 'secondary'} className="text-[10px]">
+                  {contact.email_opt_in ? 'Yes' : 'No'}
+                </Badge>
+              </div>
+              <div className="flex items-center gap-2">
+                <MessageSquare className="size-3.5 text-muted-foreground" />
+                <span className="text-muted-foreground">SMS opt-in:</span>
+                <Badge variant={contact.sms_opt_in ? 'default' : 'secondary'} className="text-[10px]">
+                  {contact.sms_opt_in ? 'Yes' : 'No'}
+                </Badge>
+              </div>
             </div>
-            <div className="flex items-center gap-2">
-              <MessageSquare className="size-3.5 text-muted-foreground" />
-              <span className="text-muted-foreground">SMS opt-in:</span>
-              <Badge variant={contact.sms_opt_in ? 'default' : 'secondary'} className="text-[10px]">
-                {contact.sms_opt_in ? 'Yes' : 'No'}
-              </Badge>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
 
-      {/* Address */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-sm">
-            <MapPin className="size-4 text-muted-foreground" />
-            Address
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {hasAddress ? (
-            <div className="space-y-1 text-sm">
-              {contact.address_line1 && (
-                <p className="text-slate-900">{contact.address_line1}</p>
-              )}
-              {contact.address_line2 && (
-                <p className="text-slate-900">{contact.address_line2}</p>
-              )}
-              <p className="text-slate-900">
-                {[contact.city, contact.province_state].filter(Boolean).join(', ')}
-                {contact.postal_code ? ` ${contact.postal_code}` : ''}
-              </p>
-              <p className="text-slate-600">{contact.country}</p>
-            </div>
-          ) : (
-            <p className="text-sm text-muted-foreground">No address on file.</p>
-          )}
-        </CardContent>
-      </Card>
+        {/* Custom Fields */}
+        {customFields && Object.keys(customFields).length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-sm">
+                <FileText className="size-4 text-muted-foreground" />
+                Custom Fields
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {Object.entries(customFields).map(([key, value]) => (
+                <InfoRow key={key} label={key} value={String(value)} />
+              ))}
+            </CardContent>
+          </Card>
+        )}
 
-      {/* Custom Fields */}
-      {customFields && Object.keys(customFields).length > 0 && (
+        {/* Recent Activity */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-sm">
-              <FileText className="size-4 text-muted-foreground" />
-              Custom Fields
+              <Clock className="size-4 text-muted-foreground" />
+              Recent Activity
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3">
-            {Object.entries(customFields).map(([key, value]) => (
-              <InfoRow key={key} label={key} value={String(value)} />
-            ))}
+          <CardContent>
+            <MiniTimeline
+              tenantId={tenantId}
+              entityType="contact"
+              entityId={contactId}
+              contactId={contactId}
+              limit={6}
+            />
           </CardContent>
         </Card>
-      )}
+      </div>
 
-      {/* Recent Activity — spans full width */}
-      <Card className="md:col-span-2">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-sm">
-            <Clock className="size-4 text-muted-foreground" />
-            Recent Activity
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <MiniTimeline
-            tenantId={tenantId}
-            entityType="contact"
-            entityId={contactId}
-            contactId={contactId}
-            limit={6}
-          />
-        </CardContent>
-      </Card>
+      {/* Right column: Stats sidebar */}
+      <div className="space-y-4">
+        {/* Pipeline Progress */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center justify-between text-sm">
+              Pipeline
+              <PipelineStageBadge stage={contact.pipeline_stage ?? 'new_lead'} />
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <PipelineProgress
+              currentStage={contact.pipeline_stage ?? 'new_lead'}
+              compact
+              onStageChange={handlePipelineStageChange}
+              isUpdating={updateContact.isPending}
+            />
+          </CardContent>
+        </Card>
+
+        {/* Conflict Status */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center justify-between text-sm">
+              Conflict Check
+              <ConflictStatusBadge status={contact.conflict_status ?? 'not_run'} />
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <button
+              onClick={() => onTabChange('conflict-review')}
+              className="w-full text-left"
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <ShieldCheck className="size-4" />
+                  Risk Score
+                </div>
+                <span className="text-sm font-semibold text-slate-900">{contact.conflict_score ?? 0}/100</span>
+              </div>
+            </button>
+          </CardContent>
+        </Card>
+
+        {/* Quick Stats (clickable) */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm">Quick Stats</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <button
+              onClick={() => onTabChange('matters')}
+              className="flex w-full items-center justify-between hover:bg-slate-50 rounded -mx-1 px-1 py-0.5 transition-colors"
+            >
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Briefcase className="size-4" />
+                Matters
+              </div>
+              <span className="text-sm font-semibold text-slate-900">{stats?.matterCount ?? 0}</span>
+            </button>
+            <button
+              onClick={() => router.push('/leads')}
+              className="flex w-full items-center justify-between hover:bg-slate-50 rounded -mx-1 px-1 py-0.5 transition-colors"
+            >
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <UserCircle className="size-4" />
+                Leads
+              </div>
+              <span className="text-sm font-semibold text-slate-900">{stats?.leadCount ?? 0}</span>
+            </button>
+            <button
+              onClick={() => onTabChange('tasks')}
+              className="flex w-full items-center justify-between hover:bg-slate-50 rounded -mx-1 px-1 py-0.5 transition-colors"
+            >
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <CheckCircle2 className="size-4" />
+                Tasks
+              </div>
+              <span className="text-sm font-semibold text-slate-900">{stats?.taskCount ?? 0}</span>
+            </button>
+            <button
+              onClick={() => onTabChange('documents')}
+              className="flex w-full items-center justify-between hover:bg-slate-50 rounded -mx-1 px-1 py-0.5 transition-colors"
+            >
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <FileStack className="size-4" />
+                Documents
+              </div>
+              <span className="text-sm font-semibold text-slate-900">{stats?.documentCount ?? 0}</span>
+            </button>
+            <Separator />
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <CalendarDays className="size-4" />
+                Last Contacted
+              </div>
+              <span className="text-sm font-semibold text-slate-900">
+                {daysSinceLastContact !== null
+                  ? daysSinceLastContact === 0
+                    ? 'Today'
+                    : `${daysSinceLastContact}d ago`
+                  : 'Never'}
+              </span>
+            </div>
+            <button
+              onClick={() => onTabChange('interactions')}
+              className="flex w-full items-center justify-between hover:bg-slate-50 rounded -mx-1 px-1 py-0.5 transition-colors"
+            >
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <MessageSquare className="size-4" />
+                Interactions
+              </div>
+              <span className="text-sm font-semibold text-slate-900">{contact.interaction_count}</span>
+            </button>
+            {/* Upcoming Appointments (inside Quick Stats — clickable to Appointments tab) */}
+            {appointments && appointments.length > 0 && (
+              <>
+                <Separator />
+                <button
+                  onClick={() => onTabChange('appointments')}
+                  className="w-full text-left hover:bg-slate-50 rounded -mx-1 px-1 py-0.5 transition-colors"
+                >
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+                    <CalendarDays className="size-4" />
+                    Upcoming Appointments
+                  </div>
+                  <div className="space-y-2">
+                    {appointments.slice(0, 3).map((appt) => {
+                      const d = new Date(appt.appointment_date + 'T00:00:00')
+                      const [h, m] = appt.start_time.split(':').map(Number)
+                      const ampm = h >= 12 ? 'PM' : 'AM'
+                      const hour12 = h === 0 ? 12 : h > 12 ? h - 12 : h
+                      const timeStr = `${hour12}:${m.toString().padStart(2, '0')} ${ampm}`
+                      const lawyerName = [appt.user_first_name, appt.user_last_name].filter(Boolean).join(' ')
+                      return (
+                        <div key={appt.id} className="flex items-center gap-2">
+                          <div className="flex h-8 w-8 shrink-0 flex-col items-center justify-center rounded bg-primary/10 text-primary">
+                            <span className="text-[9px] font-medium leading-none">
+                              {d.toLocaleDateString('en-US', { month: 'short' })}
+                            </span>
+                            <span className="text-xs font-bold leading-none">{d.getDate()}</span>
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p className="text-xs font-medium text-slate-900">{timeStr}</p>
+                            <p className="text-[10px] text-muted-foreground truncate">
+                              {lawyerName && `${lawyerName} · `}{appt.duration_minutes} min
+                            </p>
+                          </div>
+                          <Badge variant="secondary" className="text-[9px] bg-emerald-100 text-emerald-700 px-1 py-0">
+                            {appt.status === 'confirmed' ? 'Confirmed' : appt.status}
+                          </Badge>
+                        </div>
+                      )
+                    })}
+                    {appointments.length > 3 && (
+                      <p className="text-[10px] text-muted-foreground text-center">
+                        +{appointments.length - 3} more
+                      </p>
+                    )}
+                  </div>
+                </button>
+              </>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Milestones */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm">Milestones</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              <div className="flex items-start gap-3">
+                <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-blue-50">
+                  <Plus className="size-3 text-blue-600" />
+                </div>
+                <div>
+                  <p className="text-xs font-medium text-slate-700">First Created</p>
+                  <p className="text-xs text-muted-foreground">{formatDate(contact.created_at)}</p>
+                </div>
+              </div>
+              {contact.last_contacted_at && (
+                <div className="flex items-start gap-3">
+                  <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-50">
+                    <Phone className="size-3 text-emerald-600" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-medium text-slate-700">Last Contacted</p>
+                    <p className="text-xs text-muted-foreground">{formatDate(contact.last_contacted_at)}</p>
+                  </div>
+                </div>
+              )}
+              {contact.has_portal_access && contact.portal_last_login && (
+                <div className="flex items-start gap-3">
+                  <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-purple-50">
+                    <Globe className="size-3 text-purple-600" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-medium text-slate-700">Last Portal Login</p>
+                    <p className="text-xs text-muted-foreground">{formatDate(contact.portal_last_login)}</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+      </div>
     </div>
   )
 }
@@ -885,7 +1368,7 @@ function MattersTab({
                         )}
                       </TableCell>
                       <TableCell className="text-slate-600">
-                        {formatDate(matter.date_opened, 'dd MMM yyyy')}
+                        {formatDate(matter.date_opened)}
                       </TableCell>
                     </TableRow>
                   )
@@ -981,6 +1464,142 @@ function MattersTab({
 }
 
 // -------------------------------------------------------------------
+// Tasks Tab
+// -------------------------------------------------------------------
+
+function ContactTasksTab({
+  contactId,
+  tenantId,
+}: {
+  contactId: string
+  tenantId: string
+}) {
+  const [showCompleted, setShowCompleted] = useState(false)
+  const [createOpen, setCreateOpen] = useState(false)
+  const { data, isLoading } = useTasks({
+    tenantId,
+    contactId,
+    showCompleted,
+    pageSize: 50,
+  })
+
+  const tasks = data?.tasks ?? []
+
+  function getPriorityColor(priority: string) {
+    switch (priority) {
+      case 'urgent': return 'text-red-600 bg-red-50 border-red-200'
+      case 'high': return 'text-orange-600 bg-orange-50 border-orange-200'
+      case 'medium': return 'text-yellow-600 bg-yellow-50 border-yellow-200'
+      default: return 'text-slate-600 bg-slate-50 border-slate-200'
+    }
+  }
+
+  function getStatusIcon(status: string) {
+    switch (status) {
+      case 'done': return <CheckCircle2 className="size-4 text-emerald-500" />
+      case 'working_on_it': return <Clock className="size-4 text-blue-500" />
+      case 'stuck': return <AlertCircle className="size-4 text-red-500" />
+      case 'cancelled': return <Archive className="size-4 text-slate-400" />
+      default: return <div className="size-4 rounded-full border-2 border-slate-300" />
+    }
+  }
+
+  return (
+    <>
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <label className="flex items-center gap-2 text-sm text-muted-foreground cursor-pointer">
+              <input
+                type="checkbox"
+                checked={showCompleted}
+                onChange={(e) => setShowCompleted(e.target.checked)}
+                className="rounded border-slate-300"
+              />
+              Show completed
+            </label>
+          </div>
+          <Button size="sm" onClick={() => setCreateOpen(true)}>
+            <Plus className="mr-1.5 size-3.5" />
+            New Task
+          </Button>
+        </div>
+
+        {isLoading ? (
+          <Card>
+            <CardContent className="py-6">
+              <div className="space-y-3">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <Skeleton key={i} className="h-12 w-full rounded-lg" />
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        ) : tasks.length === 0 ? (
+          <Card>
+            <CardContent className="py-12 text-center">
+              <CheckCircle2 className="mx-auto mb-3 size-10 text-muted-foreground/50" />
+              <p className="text-sm font-medium text-slate-900">No tasks</p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {showCompleted ? 'No tasks found for this contact.' : 'No open tasks for this contact.'}
+              </p>
+            </CardContent>
+          </Card>
+        ) : (
+          <Card>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-8" />
+                  <TableHead>Task</TableHead>
+                  <TableHead>Priority</TableHead>
+                  <TableHead>Due Date</TableHead>
+                  <TableHead>Status</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {tasks.map((task) => (
+                  <TableRow key={task.id}>
+                    <TableCell>{getStatusIcon(task.status)}</TableCell>
+                    <TableCell>
+                      <p className={`text-sm font-medium ${task.status === 'done' ? 'line-through text-muted-foreground' : 'text-slate-900'}`}>
+                        {task.title}
+                      </p>
+                      {task.description && (
+                        <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5">{task.description}</p>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="outline" className={`text-[10px] ${getPriorityColor(task.priority)}`}>
+                        {task.priority}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-sm text-slate-600">
+                      {task.due_date ? formatDate(task.due_date) : '-'}
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="secondary" className="text-[10px] capitalize">
+                        {task.status.replace('_', ' ')}
+                      </Badge>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </Card>
+        )}
+      </div>
+
+      <TaskCreateDialog
+        open={createOpen}
+        onOpenChange={setCreateOpen}
+        contactId={contactId}
+      />
+    </>
+  )
+}
+
+// -------------------------------------------------------------------
 // Intake Tab
 // -------------------------------------------------------------------
 
@@ -993,10 +1612,16 @@ interface IntakeField {
   allow_other?: boolean
 }
 
-function IntakeTab({ contactId }: { contactId: string }) {
+function IntakeTab({ contactId, tenantSettings }: { contactId: string; tenantSettings?: Record<string, unknown> }) {
   const { data: submissions, isLoading } = useContactIntakeSubmissions(contactId)
+  const { data: checkIns, isLoading: checkInsLoading } = useContactCheckIns(contactId)
 
-  if (isLoading) {
+  // Build a map of kiosk question IDs → question objects for label resolution
+  const kioskConfig = (tenantSettings?.kiosk_config ?? {}) as Record<string, unknown>
+  const kioskQuestions = (kioskConfig.kiosk_questions ?? []) as KioskQuestion[]
+  const questionMap = new Map(kioskQuestions.map((q) => [q.id, q]))
+
+  if (isLoading || checkInsLoading) {
     return (
       <Card>
         <CardContent className="py-6">
@@ -1010,16 +1635,19 @@ function IntakeTab({ contactId }: { contactId: string }) {
     )
   }
 
-  if (!submissions || submissions.length === 0) {
+  const hasSubmissions = submissions && submissions.length > 0
+  const hasCheckIns = checkIns && checkIns.length > 0
+
+  if (!hasSubmissions && !hasCheckIns) {
     return (
       <Card>
         <CardContent className="py-12 text-center">
           <ClipboardList className="mx-auto mb-3 size-10 text-muted-foreground/50" />
           <p className="text-sm font-medium text-slate-900">
-            No intake submissions
+            No intake submissions or check-in records
           </p>
           <p className="mt-1 text-sm text-muted-foreground">
-            This contact has not submitted any intake forms.
+            This contact has not submitted any intake forms or checked in via the kiosk.
           </p>
         </CardContent>
       </Card>
@@ -1043,60 +1671,120 @@ function IntakeTab({ contactId }: { contactId: string }) {
     return String(val)
   }
 
+  function formatCheckInAnswer(val: unknown): string {
+    if (val === null || val === undefined) return '—'
+    if (Array.isArray(val)) return val.join(', ')
+    if (typeof val === 'boolean') return val ? 'Yes' : 'No'
+    return String(val)
+  }
+
   return (
     <div className="space-y-4">
-      {submissions.map((sub) => {
-        const formInfo = sub.intake_forms
-        const fields = (Array.isArray(formInfo.fields) ? formInfo.fields : []) as unknown as IntakeField[]
-        const data = (sub.data ?? {}) as Record<string, unknown>
+      {/* Check-in sessions (kiosk) */}
+      {hasCheckIns && (
+        <>
+          <h3 className="text-sm font-medium text-muted-foreground">Kiosk Check-Ins</h3>
+          {checkIns!.map((session) => {
+            const meta = (session.metadata ?? {}) as Record<string, unknown>
+            const answers = (meta.answers ?? {}) as Record<string, unknown>
+            const answerEntries = Object.entries(answers).filter(([key]) => !key.startsWith('_'))
 
-        return (
-          <Card key={sub.id}>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-sm">
-                <ClipboardList className="size-4 text-muted-foreground" />
-                {formInfo.name}
-              </CardTitle>
-              <p className="text-xs text-muted-foreground">
-                Submitted on {formatDate(sub.created_at, 'dd MMM yyyy \'at\' HH:mm')}
-              </p>
-            </CardHeader>
-            <CardContent>
-              <div className="divide-y rounded-lg border">
-                {fields
-                  .sort((a, b) => a.sort_order - b.sort_order)
-                  .map((field) => {
-                    const val = data[field.id]
-                    if (val === undefined) return null
-                    const isFile = field.field_type === 'file'
-                    return (
-                      <div key={field.id} className="flex gap-3 px-3 py-2">
-                        <span className="shrink-0 text-xs font-medium text-muted-foreground w-[160px] pt-0.5">
-                          {field.label}
-                        </span>
-                        <span className="text-sm text-slate-800 break-words min-w-0">
-                          {isFile && typeof val === 'string' && val.startsWith('http') ? (
-                            <a
-                              href={val}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-primary hover:underline inline-flex items-center gap-1"
-                            >
-                              <Paperclip className="size-3" />
-                              Download
-                            </a>
-                          ) : (
-                            formatFieldValue(field, val)
-                          )}
-                        </span>
-                      </div>
-                    )
-                  })}
-              </div>
-            </CardContent>
-          </Card>
-        )
-      })}
+            return (
+              <Card key={session.id}>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-sm">
+                    <ClipboardList className="size-4 text-muted-foreground" />
+                    Kiosk Check-In
+                  </CardTitle>
+                  <p className="text-xs text-muted-foreground">
+                    Completed on {formatDateTime(session.completed_at ?? session.created_at)}
+                  </p>
+                </CardHeader>
+                <CardContent>
+                  {answerEntries.length > 0 ? (
+                    <div className="divide-y rounded-lg border">
+                      {answerEntries.map(([qId, val]) => {
+                        const question = questionMap.get(qId)
+                        return (
+                          <div key={qId} className="flex gap-3 px-3 py-2">
+                            <span className="shrink-0 text-xs font-medium text-muted-foreground w-[160px] pt-0.5">
+                              {question?.label ?? qId}
+                            </span>
+                            <span className="text-sm text-slate-800 break-words min-w-0">
+                              {formatCheckInAnswer(val)}
+                            </span>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">No questions were answered during this check-in.</p>
+                  )}
+                </CardContent>
+              </Card>
+            )
+          })}
+        </>
+      )}
+
+      {/* Intake form submissions */}
+      {hasSubmissions && (
+        <>
+          {hasCheckIns && <h3 className="text-sm font-medium text-muted-foreground">Intake Form Submissions</h3>}
+          {submissions!.map((sub) => {
+            const formInfo = sub.intake_forms
+            const fields = (Array.isArray(formInfo.fields) ? formInfo.fields : []) as unknown as IntakeField[]
+            const data = (sub.data ?? {}) as Record<string, unknown>
+
+            return (
+              <Card key={sub.id}>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-sm">
+                    <ClipboardList className="size-4 text-muted-foreground" />
+                    {formInfo.name}
+                  </CardTitle>
+                  <p className="text-xs text-muted-foreground">
+                    Submitted on {formatDateTime(sub.created_at)}
+                  </p>
+                </CardHeader>
+                <CardContent>
+                  <div className="divide-y rounded-lg border">
+                    {fields
+                      .sort((a, b) => a.sort_order - b.sort_order)
+                      .map((field) => {
+                        const val = data[field.id]
+                        if (val === undefined) return null
+                        const isFile = field.field_type === 'file'
+                        return (
+                          <div key={field.id} className="flex gap-3 px-3 py-2">
+                            <span className="shrink-0 text-xs font-medium text-muted-foreground w-[160px] pt-0.5">
+                              {field.label}
+                            </span>
+                            <span className="text-sm text-slate-800 break-words min-w-0">
+                              {isFile && typeof val === 'string' && val.startsWith('http') ? (
+                                <a
+                                  href={val}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-primary hover:underline inline-flex items-center gap-1"
+                                >
+                                  <Paperclip className="size-3" />
+                                  Download
+                                </a>
+                              ) : (
+                                formatFieldValue(field, val)
+                              )}
+                            </span>
+                          </div>
+                        )
+                      })}
+                  </div>
+                </CardContent>
+              </Card>
+            )
+          })}
+        </>
+      )}
     </div>
   )
 }

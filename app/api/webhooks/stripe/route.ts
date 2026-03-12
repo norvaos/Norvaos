@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { stripe } from '@/lib/stripe/config'
 import { createClient } from '@supabase/supabase-js'
+import { withTiming } from '@/lib/middleware/request-timing'
 import type Stripe from 'stripe'
 
 // Use service role client for webhook processing (bypasses RLS)
@@ -45,7 +46,7 @@ function getSubscriptionPeriod(sub: Record<string, unknown>): {
  * POST /api/webhooks/stripe
  * Handles Stripe webhook events for subscription lifecycle
  */
-export async function POST(request: NextRequest) {
+async function handlePost(request: NextRequest) {
   const body = await request.text()
   const signature = request.headers.get('stripe-signature')
 
@@ -301,3 +302,5 @@ async function updateSubscription(
 
   console.log(`Subscription updated for tenant ${tenantId}: ${subscription.status}, plan: ${planTier}`)
 }
+
+export const POST = withTiming(handlePost, 'POST /api/webhooks/stripe')

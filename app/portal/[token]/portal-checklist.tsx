@@ -18,6 +18,14 @@ import {
   Phone,
   User,
 } from 'lucide-react'
+import {
+  getTranslations,
+  t,
+  PORTAL_LOCALES,
+  isRtl,
+  type PortalLocale,
+} from '@/lib/utils/portal-translations'
+import { Globe } from 'lucide-react'
 
 interface ChecklistItem {
   id: string
@@ -48,6 +56,9 @@ interface PortalChecklistProps {
   matterRef: string
   checklistItems: ChecklistItem[]
   portalInfo?: PortalInfo
+  language?: PortalLocale
+  /** When true, skips the header and full-page wrapper (for use inside tabs) */
+  embedded?: boolean
 }
 
 function getStatusConfig(status: string) {
@@ -64,7 +75,11 @@ export function PortalChecklist({
   matterRef,
   checklistItems,
   portalInfo,
+  language: initialLanguage = 'en',
+  embedded = false,
 }: PortalChecklistProps) {
+  const [currentLang, setCurrentLang] = useState<PortalLocale>(initialLanguage)
+  const tr = getTranslations(currentLang)
   const [items, setItems] = useState(checklistItems)
   const [uploadingId, setUploadingId] = useState<string | null>(null)
   const [errors, setErrors] = useState<Record<string, string>>({})
@@ -133,7 +148,7 @@ export function PortalChecklist({
         if (!res.ok || !result.success) {
           setErrors((prev) => ({
             ...prev,
-            [itemId]: result.error || 'Upload failed',
+            [itemId]: result.error || tr.error_upload_failed,
           }))
         } else {
           // Update local state: mark item as received
@@ -149,7 +164,7 @@ export function PortalChecklist({
       } catch {
         setErrors((prev) => ({
           ...prev,
-          [itemId]: 'Network error. Please try again.',
+          [itemId]: tr.error_network,
         }))
       } finally {
         setUploadingId(null)
@@ -171,24 +186,48 @@ export function PortalChecklist({
     })
   }
 
+  // ── Language dropdown helper ──────────────────────────────────
+  const LanguageDropdown = () => (
+    <div className="relative">
+      <select
+        value={currentLang}
+        onChange={(e) => setCurrentLang(e.target.value as PortalLocale)}
+        className="appearance-none bg-white border border-slate-200 rounded-md pl-7 pr-6 py-1.5 text-xs font-medium text-slate-700 cursor-pointer hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+      >
+        {PORTAL_LOCALES.map((loc) => (
+          <option key={loc.value} value={loc.value}>
+            {loc.nativeLabel}
+          </option>
+        ))}
+      </select>
+      <Globe className="absolute left-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400 pointer-events-none" />
+      <ChevronDown className="absolute right-1.5 top-1/2 -translate-y-1/2 h-3 w-3 text-slate-400 pointer-events-none" />
+    </div>
+  )
+
   // Empty state
   if (items.length === 0) {
     return (
-      <div className="min-h-screen bg-slate-50">
-        <header className="bg-white border-b border-slate-200 px-4 py-4">
-          <div className="max-w-2xl mx-auto">
-            <h1
-              className="text-lg font-semibold"
-              style={{ color: tenant.primaryColor }}
-            >
-              {tenant.name}
-            </h1>
-            <p className="text-xs text-slate-500">Document Upload Portal</p>
-          </div>
-        </header>
-        <main className="max-w-2xl mx-auto px-4 py-12 text-center">
+      <div className={embedded ? '' : 'min-h-screen bg-slate-50'}>
+        {!embedded && (
+          <header className="bg-white border-b border-slate-200 px-4 py-4">
+            <div className="max-w-2xl mx-auto flex items-center gap-3">
+              <div className="flex-1">
+                <h1
+                  className="text-lg font-semibold"
+                  style={{ color: tenant.primaryColor }}
+                >
+                  {tenant.name}
+                </h1>
+                <p className="text-xs text-slate-500">{tr.portal_title}</p>
+              </div>
+              <LanguageDropdown />
+            </div>
+          </header>
+        )}
+        <main className={embedded ? 'py-12 text-center' : 'max-w-2xl mx-auto px-4 py-12 text-center'}>
           <p className="text-sm text-slate-600">
-            No documents have been requested yet. Please check back later.
+            {tr.portal_no_documents}
           </p>
         </main>
       </div>
@@ -196,32 +235,35 @@ export function PortalChecklist({
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      {/* Header */}
-      <header className="bg-white border-b border-slate-200 px-4 py-4">
-        <div className="max-w-2xl mx-auto flex items-center gap-3">
-          {tenant.logoUrl && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={tenant.logoUrl}
-              alt={tenant.name}
-              className="h-8 w-auto"
-            />
-          )}
-          <div>
-            <h1
-              className="text-lg font-semibold"
-              style={{ color: tenant.primaryColor }}
-            >
-              {tenant.name}
-            </h1>
-            <p className="text-xs text-slate-500">Document Upload Portal</p>
+    <div className={embedded ? '' : 'min-h-screen bg-slate-50'} dir={isRtl(currentLang) ? 'rtl' : 'ltr'}>
+      {/* Header — hidden in embedded mode (parent provides it) */}
+      {!embedded && (
+        <header className="bg-white border-b border-slate-200 px-4 py-4">
+          <div className="max-w-2xl mx-auto flex items-center gap-3">
+            {tenant.logoUrl && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={tenant.logoUrl}
+                alt={tenant.name}
+                className="h-8 w-auto"
+              />
+            )}
+            <div className="flex-1">
+              <h1
+                className="text-lg font-semibold"
+                style={{ color: tenant.primaryColor }}
+              >
+                {tenant.name}
+              </h1>
+              <p className="text-xs text-slate-500">{tr.portal_title}</p>
+            </div>
+            <LanguageDropdown />
           </div>
-        </div>
-      </header>
+        </header>
+      )}
 
       {/* Main content */}
-      <main className="max-w-2xl mx-auto px-4 py-6 space-y-6">
+      <main className={embedded ? 'space-y-6' : 'max-w-2xl mx-auto px-4 py-6 space-y-6'}>
         {/* Welcome message */}
         {portalInfo?.welcomeMessage && (
           <div className="bg-white rounded-lg border border-slate-200 p-4">
@@ -235,7 +277,7 @@ export function PortalChecklist({
         <div className="bg-white rounded-lg border border-slate-200 p-4 space-y-3">
           <div className="flex items-center justify-between">
             <p className="text-sm text-slate-600">
-              Reference:{' '}
+              {tr.reference_label}:{' '}
               <span className="font-medium text-slate-900">{matterRef}</span>
             </p>
             <span className="text-sm font-semibold text-slate-900">
@@ -256,17 +298,17 @@ export function PortalChecklist({
             />
           </div>
           <p className="text-xs text-slate-500">
-            {receivedOrApproved} of {items.length} documents uploaded
+            {t(tr.legacy_progress, { uploaded: String(receivedOrApproved), total: String(items.length) })}
           </p>
         </div>
 
         {/* Case progress timeline */}
-        <PortalTimeline token={token} primaryColor={tenant.primaryColor} />
+        <PortalTimeline token={token} primaryColor={tenant.primaryColor} language={currentLang} />
 
         {/* Instructions */}
         {portalInfo?.instructions && (
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <p className="text-xs font-medium text-blue-800 mb-1">Instructions</p>
+            <p className="text-xs font-medium text-blue-800 mb-1">{tr.instructions_label}</p>
             <p className="text-sm text-blue-700 whitespace-pre-line">
               {portalInfo.instructions}
             </p>
@@ -276,7 +318,7 @@ export function PortalChecklist({
         {/* Lawyer contact info */}
         {portalInfo && (portalInfo.lawyerName || portalInfo.lawyerEmail || portalInfo.lawyerPhone) && (
           <div className="bg-white rounded-lg border border-slate-200 p-4">
-            <p className="text-xs font-medium text-slate-500 mb-2">Your Contact</p>
+            <p className="text-xs font-medium text-slate-500 mb-2">{tr.your_contact}</p>
             <div className="flex flex-wrap items-center gap-4 text-sm text-slate-700">
               {portalInfo.lawyerName && (
                 <span className="flex items-center gap-1.5">
@@ -311,7 +353,7 @@ export function PortalChecklist({
           ref={fileInputRef}
           type="file"
           className="hidden"
-          accept=".pdf,.jpg,.jpeg,.png,.gif,.webp,.doc,.docx"
+          accept=".pdf,.jpg,.jpeg,.png,.gif,.webp,.doc,.docx,.xls,.xlsx"
           onChange={handleFileSelected}
         />
 
@@ -422,7 +464,7 @@ export function PortalChecklist({
                                 ) : (
                                   <>
                                     <Upload className="h-3.5 w-3.5 mr-1" />
-                                    Upload
+                                    {tr.upload_button}
                                   </>
                                 )}
                               </Button>
@@ -442,18 +484,17 @@ export function PortalChecklist({
           <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-center">
             <CheckCircle2 className="h-8 w-8 text-green-500 mx-auto mb-2" />
             <p className="text-sm font-medium text-green-800">
-              All documents received!
+              {tr.all_done_title}
             </p>
             <p className="text-xs text-green-600 mt-1">
-              Your lawyer will review the uploaded documents. You may close this
-              page.
+              {tr.all_done_message}
             </p>
           </div>
         )}
 
         {/* Footer */}
         <p className="text-center text-xs text-slate-400 pt-4">
-          Powered by NorvaOS
+          {tr.powered_by}
         </p>
       </main>
     </div>

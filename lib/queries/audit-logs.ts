@@ -69,14 +69,14 @@ export function useCreateAuditLog() {
 }
 
 /**
- * Fire-and-forget audit log insertion.
+ * Fire-and-forget audit log insertion (client-side).
  * Call from mutation `onSuccess` handlers where React Query context is
- * not needed. Swallows errors silently — audit logging should never
- * block the primary user operation.
+ * not needed. Errors are logged visibly but never block the primary
+ * user operation.
  */
 export async function logAudit(params: {
   tenantId: string
-  userId: string | null
+  userId: string
   entityType: string
   entityId: string
   action: string
@@ -94,7 +94,47 @@ export async function logAudit(params: {
       changes: (params.changes ?? {}) as AuditLogInsert['changes'],
       metadata: (params.metadata ?? {}) as AuditLogInsert['metadata'],
     })
-  } catch {
-    // Silent: audit log failure must never break the user flow
+  } catch (error) {
+    console.error('[AUDIT] Failed to write audit log:', {
+      action: params.action,
+      entityType: params.entityType,
+      entityId: params.entityId,
+      error,
+    })
+  }
+}
+
+/**
+ * Server-side audit log insertion.
+ * Uses an existing authenticated Supabase client (from API routes).
+ * Errors are logged visibly but never block the primary operation.
+ */
+export async function logAuditServer(params: {
+  supabase: import('@supabase/supabase-js').SupabaseClient<Database>
+  tenantId: string
+  userId: string
+  entityType: string
+  entityId: string
+  action: string
+  changes?: Record<string, unknown>
+  metadata?: Record<string, unknown>
+}): Promise<void> {
+  try {
+    await params.supabase.from('audit_logs').insert({
+      tenant_id: params.tenantId,
+      user_id: params.userId,
+      entity_type: params.entityType,
+      entity_id: params.entityId,
+      action: params.action,
+      changes: (params.changes ?? {}) as AuditLogInsert['changes'],
+      metadata: (params.metadata ?? {}) as AuditLogInsert['metadata'],
+    })
+  } catch (error) {
+    console.error('[AUDIT] Server audit log failed:', {
+      action: params.action,
+      entityType: params.entityType,
+      entityId: params.entityId,
+      error,
+    })
   }
 }

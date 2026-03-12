@@ -4,7 +4,7 @@
 
 export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[]
 
-export interface Database {
+export type Database = {
   public: {
     Tables: {
       tenants: {
@@ -33,6 +33,8 @@ export interface Database {
           max_storage_gb: number
           feature_flags: Json
           settings: Json
+          jurisdiction_code: string
+          status: string
           created_at: string
           updated_at: string
         }
@@ -57,6 +59,8 @@ export interface Database {
           max_storage_gb?: number
           feature_flags?: Json
           settings?: Json
+          jurisdiction_code?: string
+          status?: string
           created_at?: string
           updated_at?: string
           // Optional nullable fields
@@ -193,6 +197,13 @@ export interface Database {
           updated_at: string
           immigration_data: Json
           email_notifications_enabled: boolean
+          responsible_lawyer_id: string | null
+          conflict_score: number
+          conflict_status: string
+          pipeline_stage: string
+          milestone: string
+          milestone_updated_at: string
+          matter_type_id: string | null
         }
         Insert: {
           // Required fields (NOT NULL, no DB default)
@@ -213,6 +224,11 @@ export interface Database {
           is_archived?: boolean
           created_at?: string
           updated_at?: string
+          conflict_score?: number
+          conflict_status?: string
+          pipeline_stage?: string
+          milestone?: string
+          milestone_updated_at?: string
           // Optional nullable fields
           first_name?: string | null
           last_name?: string | null
@@ -245,6 +261,8 @@ export interface Database {
           notes?: string | null
           created_by?: string | null
           immigration_data?: Json
+          responsible_lawyer_id?: string | null
+          matter_type_id?: string | null
         }
         Update: Partial<Database['public']['Tables']['contacts']['Insert']>
       Relationships: []
@@ -387,6 +405,14 @@ export interface Database {
           updated_at: string
           case_type_id: string | null
           matter_type_id: string | null
+          intake_status: string
+          risk_level: string | null
+          onedrive_folder_id: string | null
+          originating_lead_id: string | null
+          person_scope: string
+          matter_stage_pipeline_id: string | null
+          fee_template_id: string | null
+          followup_lawyer_id: string | null
         }
         Insert: {
           // Required fields (NOT NULL, no DB default)
@@ -425,6 +451,14 @@ export interface Database {
           hourly_rate?: number | null
           created_by?: string | null
           case_type_id?: string | null
+          intake_status?: string
+          risk_level?: string | null
+          onedrive_folder_id?: string | null
+          originating_lead_id?: string | null
+          person_scope?: string
+          matter_stage_pipeline_id?: string | null
+          fee_template_id?: string | null
+          followup_lawyer_id?: string | null
         }
         Update: Partial<Database['public']['Tables']['matters']['Insert']>
       Relationships: []
@@ -491,6 +525,15 @@ export interface Database {
           is_deleted: boolean
           deleted_at: string | null
           deleted_by: string | null
+          task_type: string
+          category: string
+          reminder_date: string | null
+          is_billable: boolean
+          completion_note: string | null
+          visibility: string
+          external_id: string | null
+          external_provider: string | null
+          last_synced_at: string | null
         }
         Insert: {
           // Required fields (NOT NULL, no DB default)
@@ -529,6 +572,15 @@ export interface Database {
           is_deleted?: boolean
           deleted_at?: string | null
           deleted_by?: string | null
+          task_type?: string
+          category?: string
+          reminder_date?: string | null
+          is_billable?: boolean
+          completion_note?: string | null
+          visibility?: string
+          external_id?: string | null
+          external_provider?: string | null
+          last_synced_at?: string | null
         }
         Update: Partial<Database['public']['Tables']['tasks']['Insert']>
       Relationships: []
@@ -565,6 +617,32 @@ export interface Database {
           created_by: string | null
           created_at: string
           updated_at: string
+          // Phase 1 intake automation fields
+          current_stage: string | null
+          assigned_intake_staff_id: string | null
+          responsible_lawyer_id: string | null
+          lead_source: string | null
+          campaign_source: string | null
+          referral_source: string | null
+          sub_practice_area: string | null
+          // Derived summary fields (written ONLY by lead-summary-recalculator)
+          qualification_status: string
+          conflict_status: string
+          consultation_status: string
+          retainer_status: string
+          payment_status: string
+          next_required_action: string | null
+          next_required_action_due_at: string | null
+          overdue_task_count: number
+          last_automated_action_at: string | null
+          last_inbound_at: string | null
+          last_outbound_at: string | null
+          is_closed: boolean
+          closure_record_id: string | null
+          intake_profile_id: string | null
+          // Consultation workflow fields
+          matter_type_id: string | null
+          person_scope: string
         }
         Insert: {
           // Required fields (NOT NULL, no DB default)
@@ -582,6 +660,13 @@ export interface Database {
           custom_fields?: Json
           created_at?: string
           updated_at?: string
+          qualification_status?: string
+          conflict_status?: string
+          consultation_status?: string
+          retainer_status?: string
+          payment_status?: string
+          overdue_task_count?: number
+          is_closed?: boolean
           // Optional nullable fields
           source?: string | null
           source_detail?: string | null
@@ -600,6 +685,23 @@ export interface Database {
           next_follow_up?: string | null
           notes?: string | null
           created_by?: string | null
+          current_stage?: string | null
+          assigned_intake_staff_id?: string | null
+          responsible_lawyer_id?: string | null
+          lead_source?: string | null
+          campaign_source?: string | null
+          referral_source?: string | null
+          sub_practice_area?: string | null
+          next_required_action?: string | null
+          next_required_action_due_at?: string | null
+          last_automated_action_at?: string | null
+          last_inbound_at?: string | null
+          last_outbound_at?: string | null
+          closure_record_id?: string | null
+          intake_profile_id?: string | null
+          // Consultation workflow fields
+          matter_type_id?: string | null
+          person_scope?: string
         }
         Update: Partial<Database['public']['Tables']['leads']['Insert']>
       Relationships: []
@@ -857,6 +959,11 @@ export interface Database {
           created_at: string
           updated_at: string
           task_id: string | null
+          external_id: string | null
+          external_provider: string | null
+          onedrive_item_id: string | null
+          onedrive_web_url: string | null
+          storage_bucket: string | null
         }
         Insert: {
           tenant_id: string
@@ -876,6 +983,11 @@ export interface Database {
           file_type?: string | null
           file_size?: number | null
           description?: string | null
+          external_id?: string | null
+          external_provider?: string | null
+          onedrive_item_id?: string | null
+          onedrive_web_url?: string | null
+          storage_bucket?: string | null
         }
         Update: Partial<Database['public']['Tables']['documents']['Insert']>
       Relationships: []
@@ -935,6 +1047,32 @@ export interface Database {
         }
         Update: Partial<Database['public']['Tables']['audit_logs']['Insert']>
       Relationships: []
+      }
+      risk_override_history: {
+        Row: {
+          id: string
+          tenant_id: string
+          matter_id: string
+          intake_id: string
+          previous_level: string | null
+          new_level: string
+          reason: string
+          overridden_by: string
+          created_at: string
+        }
+        Insert: {
+          tenant_id: string
+          matter_id: string
+          intake_id: string
+          new_level: string
+          reason: string
+          overridden_by: string
+          id?: string
+          previous_level?: string | null
+          created_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['risk_override_history']['Insert']>
+        Relationships: []
       }
       subscriptions: {
         Row: {
@@ -1126,6 +1264,9 @@ export interface Database {
           status: string
           cancellation_reason: string | null
           cancelled_at: string | null
+          checked_in_at: string | null
+          started_at: string | null
+          completed_at: string | null
           created_at: string
         }
         Insert: {
@@ -1147,6 +1288,9 @@ export interface Database {
           status?: string
           cancellation_reason?: string | null
           cancelled_at?: string | null
+          checked_in_at?: string | null
+          started_at?: string | null
+          completed_at?: string | null
           created_at?: string
         }
         Update: Partial<Database['public']['Tables']['appointments']['Insert']>
@@ -1400,6 +1544,8 @@ export interface Database {
           is_terminal: boolean
           requires_checklist_complete: boolean
           auto_tasks: Json
+          client_label: string | null
+          notify_client_on_stage_change: boolean
           created_at: string
         }
         Insert: {
@@ -1413,6 +1559,8 @@ export interface Database {
           is_terminal?: boolean
           requires_checklist_complete?: boolean
           auto_tasks?: Json
+          client_label?: string | null
+          notify_client_on_stage_change?: boolean
           created_at?: string
           description?: string | null
         }
@@ -1493,6 +1641,20 @@ export interface Database {
           retainer_amount: number | null
           government_fees: number | null
           internal_notes: string | null
+          program_category: string | null
+          study_program: string | null
+          dli_number: string | null
+          study_level: string | null
+          study_duration_months: number | null
+          letter_of_acceptance: boolean
+          job_title: string | null
+          work_permit_type: string | null
+          sponsor_name: string | null
+          sponsor_relationship: string | null
+          sponsor_status: string | null
+          relationship_start_date: string | null
+          second_language_test_type: string | null
+          second_language_test_scores: Json | null
           created_at: string
           updated_at: string
         }
@@ -1508,6 +1670,7 @@ export interface Database {
           spouse_included?: boolean
           dependents_count?: number
           retainer_signed?: boolean
+          letter_of_acceptance?: boolean
           created_at?: string
           updated_at?: string
           case_type_id?: string | null
@@ -1545,6 +1708,19 @@ export interface Database {
           retainer_amount?: number | null
           government_fees?: number | null
           internal_notes?: string | null
+          program_category?: string | null
+          study_program?: string | null
+          dli_number?: string | null
+          study_level?: string | null
+          study_duration_months?: number | null
+          job_title?: string | null
+          work_permit_type?: string | null
+          sponsor_name?: string | null
+          sponsor_relationship?: string | null
+          sponsor_status?: string | null
+          relationship_start_date?: string | null
+          second_language_test_type?: string | null
+          second_language_test_scores?: Json | null
         }
         Update: Partial<Database['public']['Tables']['matter_immigration']['Insert']>
         Relationships: []
@@ -1683,6 +1859,9 @@ export interface Database {
           icon: string | null
           is_active: boolean
           sort_order: number
+          enforcement_enabled: boolean
+          auto_send_document_request: boolean
+          program_category_key: string | null
           created_at: string
           updated_at: string
         }
@@ -1696,6 +1875,9 @@ export interface Database {
           icon?: string | null
           is_active?: boolean
           sort_order?: number
+          enforcement_enabled?: boolean
+          auto_send_document_request?: boolean
+          program_category_key?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -1741,6 +1923,8 @@ export interface Database {
           auto_close_matter: boolean
           sla_days: number | null
           gating_rules: Json
+          client_label: string | null
+          notify_client_on_stage_change: boolean
           created_at: string
           updated_at: string
         }
@@ -1756,6 +1940,8 @@ export interface Database {
           auto_close_matter?: boolean
           sla_days?: number | null
           gating_rules?: Json
+          client_label?: string | null
+          notify_client_on_stage_change?: boolean
           created_at?: string
           updated_at?: string
         }
@@ -1912,6 +2098,245 @@ export interface Database {
         Update: Partial<Database['public']['Tables']['matter_stage_state']['Insert']>
         Relationships: []
       }
+      matter_intake: {
+        Row: {
+          id: string
+          tenant_id: string
+          matter_id: string
+          processing_stream: string | null
+          program_category: string | null
+          jurisdiction: string
+          intake_status: string
+          completion_pct: number
+          intake_delegation: string
+          risk_score: number | null
+          risk_level: string | null
+          red_flags: Json
+          risk_calculated_at: string | null
+          risk_override_level: string | null
+          risk_override_reason: string | null
+          risk_override_by: string | null
+          risk_override_at: string | null
+          locked_at: string | null
+          locked_by: string | null
+          lock_reason: string | null
+          immigration_intake_status: string
+          imm_status_changed_at: string | null
+          imm_status_changed_by: string | null
+          contradiction_flags: Json
+          contradiction_override_by: string | null
+          contradiction_override_at: string | null
+          contradiction_override_reason: string | null
+          lawyer_review_status: string
+          lawyer_review_by: string | null
+          lawyer_review_at: string | null
+          lawyer_review_notes: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          tenant_id: string
+          matter_id: string
+          id?: string
+          processing_stream?: string | null
+          program_category?: string | null
+          jurisdiction?: string
+          intake_status?: string
+          completion_pct?: number
+          intake_delegation?: string
+          risk_score?: number | null
+          risk_level?: string | null
+          red_flags?: Json
+          risk_calculated_at?: string | null
+          risk_override_level?: string | null
+          risk_override_reason?: string | null
+          risk_override_by?: string | null
+          risk_override_at?: string | null
+          locked_at?: string | null
+          locked_by?: string | null
+          lock_reason?: string | null
+          immigration_intake_status?: string
+          imm_status_changed_at?: string | null
+          imm_status_changed_by?: string | null
+          contradiction_flags?: Json
+          contradiction_override_by?: string | null
+          contradiction_override_at?: string | null
+          contradiction_override_reason?: string | null
+          lawyer_review_status?: string
+          lawyer_review_by?: string | null
+          lawyer_review_at?: string | null
+          lawyer_review_notes?: string | null
+        }
+        Update: {
+          tenant_id?: string
+          matter_id?: string
+          processing_stream?: string | null
+          program_category?: string | null
+          jurisdiction?: string
+          intake_status?: string
+          completion_pct?: number
+          intake_delegation?: string
+          risk_score?: number | null
+          risk_level?: string | null
+          red_flags?: Json
+          risk_calculated_at?: string | null
+          risk_override_level?: string | null
+          risk_override_reason?: string | null
+          risk_override_by?: string | null
+          risk_override_at?: string | null
+          locked_at?: string | null
+          locked_by?: string | null
+          lock_reason?: string | null
+          immigration_intake_status?: string
+          imm_status_changed_at?: string | null
+          imm_status_changed_by?: string | null
+          contradiction_flags?: Json
+          contradiction_override_by?: string | null
+          contradiction_override_at?: string | null
+          contradiction_override_reason?: string | null
+          lawyer_review_status?: string
+          lawyer_review_by?: string | null
+          lawyer_review_at?: string | null
+          lawyer_review_notes?: string | null
+        }
+        Relationships: []
+      }
+      matter_people: {
+        Row: {
+          id: string
+          tenant_id: string
+          matter_id: string
+          contact_id: string | null
+          person_role: string
+          role_label: string | null
+          sort_order: number
+          first_name: string
+          last_name: string
+          middle_name: string | null
+          date_of_birth: string | null
+          gender: string | null
+          nationality: string | null
+          country_of_birth: string | null
+          passport_number: string | null
+          passport_expiry: string | null
+          email: string | null
+          phone: string | null
+          address_line1: string | null
+          address_line2: string | null
+          city: string | null
+          province_state: string | null
+          postal_code: string | null
+          country_of_residence: string | null
+          immigration_status: string | null
+          status_expiry_date: string | null
+          marital_status: string | null
+          previous_marriage: boolean
+          number_of_dependents: number
+          criminal_charges: boolean
+          criminal_details: string | null
+          inadmissibility_flag: boolean
+          inadmissibility_details: string | null
+          travel_history_flag: boolean
+          currently_in_canada: boolean | null
+          employer_name: string | null
+          occupation: string | null
+          work_permit_type: string | null
+          noc_code: string | null
+          relationship_to_pa: string | null
+          section_complete: boolean
+          is_active: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          tenant_id: string
+          matter_id: string
+          first_name: string
+          last_name: string
+          id?: string
+          contact_id?: string | null
+          person_role?: string
+          role_label?: string | null
+          sort_order?: number
+          middle_name?: string | null
+          date_of_birth?: string | null
+          gender?: string | null
+          nationality?: string | null
+          country_of_birth?: string | null
+          passport_number?: string | null
+          passport_expiry?: string | null
+          email?: string | null
+          phone?: string | null
+          address_line1?: string | null
+          address_line2?: string | null
+          city?: string | null
+          province_state?: string | null
+          postal_code?: string | null
+          country_of_residence?: string | null
+          immigration_status?: string | null
+          status_expiry_date?: string | null
+          marital_status?: string | null
+          previous_marriage?: boolean
+          number_of_dependents?: number
+          criminal_charges?: boolean
+          criminal_details?: string | null
+          inadmissibility_flag?: boolean
+          inadmissibility_details?: string | null
+          travel_history_flag?: boolean
+          currently_in_canada?: boolean | null
+          employer_name?: string | null
+          occupation?: string | null
+          work_permit_type?: string | null
+          noc_code?: string | null
+          relationship_to_pa?: string | null
+          section_complete?: boolean
+          is_active?: boolean
+        }
+        Update: {
+          tenant_id?: string
+          matter_id?: string
+          first_name?: string
+          last_name?: string
+          contact_id?: string | null
+          person_role?: string
+          role_label?: string | null
+          sort_order?: number
+          middle_name?: string | null
+          date_of_birth?: string | null
+          gender?: string | null
+          nationality?: string | null
+          country_of_birth?: string | null
+          passport_number?: string | null
+          passport_expiry?: string | null
+          email?: string | null
+          phone?: string | null
+          address_line1?: string | null
+          address_line2?: string | null
+          city?: string | null
+          province_state?: string | null
+          postal_code?: string | null
+          country_of_residence?: string | null
+          immigration_status?: string | null
+          status_expiry_date?: string | null
+          marital_status?: string | null
+          previous_marriage?: boolean
+          number_of_dependents?: number
+          criminal_charges?: boolean
+          criminal_details?: string | null
+          inadmissibility_flag?: boolean
+          inadmissibility_details?: string | null
+          travel_history_flag?: boolean
+          currently_in_canada?: boolean | null
+          employer_name?: string | null
+          occupation?: string | null
+          work_permit_type?: string | null
+          noc_code?: string | null
+          relationship_to_pa?: string | null
+          section_complete?: boolean
+          is_active?: boolean
+        }
+        Relationships: []
+      }
       // ── Intake Forms ───────────────────────────────────────────
       intake_forms: {
         Row: {
@@ -1992,7 +2417,7 @@ export interface Database {
           id: string
           tenant_id: string
           automation_rule_id: string
-          matter_id: string
+          matter_id: string | null
           trigger_event: string
           trigger_context: Json
           actions_executed: Json
@@ -2002,7 +2427,7 @@ export interface Database {
         Insert: {
           tenant_id: string
           automation_rule_id: string
-          matter_id: string
+          matter_id?: string | null
           trigger_event: string
           id?: string
           trigger_context?: Json
@@ -2026,21 +2451,25 @@ export interface Database {
           last_accessed_at: string | null
           access_count: number
           metadata: Json
+          link_type: string
+          permissions: Json
           created_at: string
           updated_at: string
         }
         Insert: {
           tenant_id: string
-          matter_id: string
           token: string
           expires_at: string
           id?: string
+          matter_id?: string | null
           contact_id?: string | null
           is_active?: boolean
           created_by?: string | null
           last_accessed_at?: string | null
           access_count?: number
           metadata?: Json
+          link_type?: string
+          permissions?: Json
           created_at?: string
           updated_at?: string
         }
@@ -2093,6 +2522,2407 @@ export interface Database {
         Update: Partial<Database['public']['Tables']['client_notifications']['Insert']>
         Relationships: []
       }
+      tenant_document_library: {
+        Row: {
+          id: string
+          tenant_id: string
+          slot_name: string
+          slot_slug: string
+          description: string | null
+          description_fr: string | null
+          category: string
+          person_role_scope: string | null
+          is_required: boolean
+          accepted_file_types: string[]
+          max_file_size_bytes: number
+          tags: string[]
+          jurisdiction_code: string
+          platform_slot_id: string | null
+          sort_order: number
+          is_active: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          tenant_id: string
+          slot_name: string
+          slot_slug: string
+          id?: string
+          description?: string | null
+          description_fr?: string | null
+          category?: string
+          person_role_scope?: string | null
+          is_required?: boolean
+          accepted_file_types?: string[]
+          max_file_size_bytes?: number
+          tags?: string[]
+          jurisdiction_code?: string
+          platform_slot_id?: string | null
+          sort_order?: number
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['tenant_document_library']['Insert']>
+        Relationships: []
+      }
+      document_slot_templates: {
+        Row: {
+          id: string
+          tenant_id: string
+          matter_type_id: string | null
+          case_type_id: string | null
+          slot_name: string
+          slot_slug: string
+          description: string | null
+          description_translations: Json
+          category: string
+          person_role_scope: string | null
+          is_required: boolean
+          accepted_file_types: string[]
+          max_file_size_bytes: number
+          conditions: Json
+          sort_order: number
+          is_active: boolean
+          created_at: string
+          updated_at: string
+          folder_template_id: string | null
+          library_slot_id: string | null
+        }
+        Insert: {
+          tenant_id: string
+          slot_name: string
+          slot_slug: string
+          id?: string
+          category?: string
+          person_role_scope?: string | null
+          is_required?: boolean
+          accepted_file_types?: string[]
+          max_file_size_bytes?: number
+          conditions?: Json
+          sort_order?: number
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+          matter_type_id?: string | null
+          case_type_id?: string | null
+          description?: string | null
+          description_translations?: Json
+          folder_template_id?: string | null
+          library_slot_id?: string | null
+        }
+        Update: Partial<Database['public']['Tables']['document_slot_templates']['Insert']>
+        Relationships: []
+      }
+      document_slots: {
+        Row: {
+          id: string
+          tenant_id: string
+          matter_id: string
+          person_id: string | null
+          slot_template_id: string | null
+          slot_name: string
+          slot_slug: string
+          description: string | null
+          category: string
+          person_role: string | null
+          is_required: boolean
+          accepted_file_types: string[]
+          max_file_size_bytes: number
+          status: string
+          current_document_id: string | null
+          current_version: number
+          sort_order: number
+          is_active: boolean
+          deactivated_at: string | null
+          folder_id: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          tenant_id: string
+          matter_id: string
+          slot_name: string
+          slot_slug: string
+          id?: string
+          category?: string
+          person_role?: string | null
+          is_required?: boolean
+          accepted_file_types?: string[]
+          max_file_size_bytes?: number
+          status?: string
+          current_version?: number
+          sort_order?: number
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+          person_id?: string | null
+          slot_template_id?: string | null
+          description?: string | null
+          current_document_id?: string | null
+          deactivated_at?: string | null
+          folder_id?: string | null
+        }
+        Update: Partial<Database['public']['Tables']['document_slots']['Insert']>
+        Relationships: []
+      }
+      document_versions: {
+        Row: {
+          id: string
+          tenant_id: string
+          slot_id: string
+          document_id: string
+          version_number: number
+          storage_path: string
+          file_name: string
+          file_size: number | null
+          file_type: string | null
+          uploaded_by: string | null
+          review_status: string
+          reviewed_by: string | null
+          reviewed_at: string | null
+          review_reason: string | null
+          created_at: string
+        }
+        Insert: {
+          tenant_id: string
+          slot_id: string
+          document_id: string
+          version_number: number
+          storage_path: string
+          file_name: string
+          id?: string
+          review_status?: string
+          created_at?: string
+          file_size?: number | null
+          file_type?: string | null
+          uploaded_by?: string | null
+          reviewed_by?: string | null
+          reviewed_at?: string | null
+          review_reason?: string | null
+        }
+        Update: Partial<Database['public']['Tables']['document_versions']['Insert']>
+        Relationships: []
+      }
+      matter_folder_templates: {
+        Row: {
+          id: string
+          tenant_id: string
+          matter_type_id: string
+          parent_id: string | null
+          name: string
+          slug: string
+          description: string | null
+          description_translations: Json
+          icon: string | null
+          sort_order: number
+          folder_type: string
+          auto_assign_category: string | null
+          is_active: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          tenant_id: string
+          matter_type_id: string
+          name: string
+          slug: string
+          id?: string
+          parent_id?: string | null
+          description?: string | null
+          description_translations?: Json
+          icon?: string | null
+          sort_order?: number
+          folder_type?: string
+          auto_assign_category?: string | null
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['matter_folder_templates']['Insert']>
+        Relationships: []
+      }
+      matter_folders: {
+        Row: {
+          id: string
+          tenant_id: string
+          matter_id: string
+          template_id: string | null
+          parent_id: string | null
+          name: string
+          slug: string
+          sort_order: number
+          is_active: boolean
+          onedrive_folder_id: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          tenant_id: string
+          matter_id: string
+          name: string
+          slug: string
+          id?: string
+          template_id?: string | null
+          parent_id?: string | null
+          sort_order?: number
+          is_active?: boolean
+          onedrive_folder_id?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['matter_folders']['Insert']>
+        Relationships: []
+      }
+      document_requests: {
+        Row: {
+          id: string
+          tenant_id: string
+          matter_id: string
+          contact_id: string | null
+          requested_by: string | null
+          slot_ids: string[]
+          slot_names: string[]
+          message: string | null
+          notification_id: string | null
+          portal_link_id: string | null
+          status: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          tenant_id: string
+          matter_id: string
+          slot_ids: string[]
+          slot_names: string[]
+          id?: string
+          contact_id?: string | null
+          requested_by?: string | null
+          message?: string | null
+          notification_id?: string | null
+          portal_link_id?: string | null
+          status?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['document_requests']['Insert']>
+        Relationships: []
+      }
+      document_reminders: {
+        Row: {
+          id: string
+          tenant_id: string
+          matter_id: string
+          contact_id: string
+          reminder_number: number
+          reminder_type: string
+          outstanding_slot_ids: string[]
+          outstanding_slot_names: string[]
+          notification_id: string | null
+          sent_at: string
+          created_at: string
+        }
+        Insert: {
+          tenant_id: string
+          matter_id: string
+          contact_id: string
+          reminder_number: number
+          outstanding_slot_ids: string[]
+          outstanding_slot_names: string[]
+          id?: string
+          reminder_type?: string
+          notification_id?: string | null
+          sent_at?: string
+          created_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['document_reminders']['Insert']>
+        Relationships: []
+      }
+      document_reminder_configs: {
+        Row: {
+          id: string
+          tenant_id: string
+          matter_type_id: string | null
+          schedule_days: number[]
+          quiet_hours_start: number
+          quiet_hours_end: number
+          max_reminders: number
+          escalation_after_days: number
+          is_active: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          tenant_id: string
+          id?: string
+          matter_type_id?: string | null
+          schedule_days?: number[]
+          quiet_hours_start?: number
+          quiet_hours_end?: number
+          max_reminders?: number
+          escalation_after_days?: number
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['document_reminder_configs']['Insert']>
+        Relationships: []
+      }
+      // ── Retainer Presets ─────────────────────────────────────────
+      retainer_presets: {
+        Row: {
+          id: string
+          tenant_id: string
+          category: string
+          description: string
+          amount: number
+          currency: string
+          sort_order: number
+          is_active: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          tenant_id: string
+          category: string
+          description: string
+          id?: string
+          amount?: number
+          currency?: string
+          sort_order?: number
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['retainer_presets']['Insert']>
+        Relationships: []
+      }
+      // ── Retainer Fee Templates ────────────────────────────────
+      // Phase 1: Fee structure templates ONLY (pricing bundles).
+      // person_scope is a phase-one billing abstraction — not the final domain model.
+      retainer_fee_templates: {
+        Row: {
+          id: string
+          tenant_id: string
+          matter_type_id: string
+          person_scope: string
+          name: string
+          description: string | null
+          is_default: boolean
+          is_active: boolean
+          professional_fees: Json
+          government_fees: Json
+          disbursements: Json
+          hst_applicable: boolean
+          billing_type: string
+          sort_order: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          tenant_id: string
+          matter_type_id: string
+          name: string
+          id?: string
+          person_scope?: string
+          description?: string | null
+          is_default?: boolean
+          is_active?: boolean
+          professional_fees?: Json
+          government_fees?: Json
+          disbursements?: Json
+          hst_applicable?: boolean
+          billing_type?: string
+          sort_order?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['retainer_fee_templates']['Insert']>
+        Relationships: []
+      }
+      // ── IRCC Form Templates ──────────────────────────────────
+      ircc_form_templates: {
+        Row: {
+          id: string
+          tenant_id: string
+          form_code: string
+          form_name: string
+          form_version: string
+          description: string | null
+          sections: unknown
+          pdf_template_path: string | null
+          is_active: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          tenant_id: string
+          form_code: string
+          form_name: string
+          form_version?: string
+          description?: string | null
+          sections?: unknown
+          pdf_template_path?: string | null
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          tenant_id?: string
+          form_code?: string
+          form_name?: string
+          form_version?: string
+          description?: string | null
+          sections?: unknown
+          pdf_template_path?: string | null
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      // ── IRCC Form Assignment Templates ──────────────────────
+      ircc_form_assignment_templates: {
+        Row: {
+          id: string
+          tenant_id: string
+          matter_type_id: string | null
+          case_type_id: string | null
+          form_id: string
+          sort_order: number
+          is_required: boolean
+          person_role_scope: string | null
+          conditions: Json
+          version: number
+          status: string
+          effective_date: string | null
+          published_at: string | null
+          published_by: string | null
+          archived_at: string | null
+          archived_by: string | null
+          is_active: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          tenant_id: string
+          form_id: string
+          matter_type_id?: string | null
+          case_type_id?: string | null
+          sort_order?: number
+          is_required?: boolean
+          person_role_scope?: string | null
+          conditions?: Json
+          version?: number
+          status?: string
+          effective_date?: string | null
+          published_at?: string | null
+          published_by?: string | null
+          archived_at?: string | null
+          archived_by?: string | null
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['ircc_form_assignment_templates']['Insert']>
+        Relationships: []
+      }
+      // ── Matter Form Instances ───────────────────────────────
+      matter_form_instances: {
+        Row: {
+          id: string
+          tenant_id: string
+          matter_id: string
+          person_id: string | null
+          assignment_template_id: string | null
+          form_id: string
+          form_code: string
+          form_name: string
+          form_version_at_creation: number
+          form_checksum_at_creation: string | null
+          person_role: string | null
+          sort_order: number
+          is_required: boolean
+          status: string
+          is_active: boolean
+          deactivated_at: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          tenant_id: string
+          matter_id: string
+          form_id: string
+          form_code: string
+          form_name: string
+          person_id?: string | null
+          assignment_template_id?: string | null
+          form_version_at_creation?: number
+          form_checksum_at_creation?: string | null
+          person_role?: string | null
+          sort_order?: number
+          is_required?: boolean
+          status?: string
+          is_active?: boolean
+          deactivated_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['matter_form_instances']['Insert']>
+        Relationships: []
+      }
+      // ── Form Assignment Template History ────────────────────
+      form_assignment_template_history: {
+        Row: {
+          id: string
+          tenant_id: string
+          template_id: string
+          version: number
+          action: string
+          previous_state: Json
+          new_state: Json
+          changed_by: string | null
+          change_reason: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          tenant_id: string
+          template_id: string
+          version: number
+          action: string
+          previous_state?: Json
+          new_state?: Json
+          changed_by?: string | null
+          change_reason?: string | null
+          created_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['form_assignment_template_history']['Insert']>
+        Relationships: []
+      }
+      // ── IRCC Questionnaire Sessions ──────────────────────────
+      ircc_questionnaire_sessions: {
+        Row: {
+          id: string
+          tenant_id: string
+          contact_id: string
+          matter_id: string | null
+          form_codes: string[]
+          status: string
+          progress: unknown
+          completed_at: string | null
+          portal_link_id: string | null
+          created_by: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          tenant_id: string
+          contact_id: string
+          matter_id?: string | null
+          form_codes: string[]
+          status?: string
+          progress?: unknown
+          completed_at?: string | null
+          portal_link_id?: string | null
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          tenant_id?: string
+          contact_id?: string
+          matter_id?: string | null
+          form_codes?: string[]
+          status?: string
+          progress?: unknown
+          completed_at?: string | null
+          portal_link_id?: string | null
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      // ── Calendar Events ──────────────────────────────────────
+      calendar_events: {
+        Row: {
+          id: string
+          tenant_id: string
+          title: string
+          description: string | null
+          location: string | null
+          start_at: string
+          end_at: string
+          all_day: boolean
+          color: string | null
+          event_type: string
+          matter_id: string | null
+          contact_id: string | null
+          created_by: string
+          recurrence_rule: string | null
+          recurrence_parent_id: string | null
+          recurrence_exception_dates: string[] | null
+          status: string
+          is_active: boolean
+          external_id: string | null
+          external_provider: string | null
+          external_sync_token: string | null
+          last_synced_at: string | null
+          show_as: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          tenant_id: string
+          title: string
+          description?: string | null
+          location?: string | null
+          start_at: string
+          end_at: string
+          all_day?: boolean
+          color?: string | null
+          event_type?: string
+          matter_id?: string | null
+          contact_id?: string | null
+          created_by: string
+          recurrence_rule?: string | null
+          recurrence_parent_id?: string | null
+          recurrence_exception_dates?: string[] | null
+          status?: string
+          is_active?: boolean
+          external_id?: string | null
+          external_provider?: string | null
+          external_sync_token?: string | null
+          last_synced_at?: string | null
+          show_as?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          tenant_id?: string
+          title?: string
+          description?: string | null
+          location?: string | null
+          start_at?: string
+          end_at?: string
+          all_day?: boolean
+          color?: string | null
+          event_type?: string
+          matter_id?: string | null
+          contact_id?: string | null
+          created_by?: string
+          recurrence_rule?: string | null
+          recurrence_parent_id?: string | null
+          recurrence_exception_dates?: string[] | null
+          status?: string
+          is_active?: boolean
+          external_id?: string | null
+          external_provider?: string | null
+          external_sync_token?: string | null
+          last_synced_at?: string | null
+          show_as?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      // ── Calendar Event Attendees ─────────────────────────────
+      calendar_event_attendees: {
+        Row: {
+          id: string
+          tenant_id: string
+          event_id: string
+          user_id: string | null
+          contact_id: string | null
+          email: string | null
+          response_status: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          tenant_id: string
+          event_id: string
+          user_id?: string | null
+          contact_id?: string | null
+          email?: string | null
+          response_status?: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          tenant_id?: string
+          event_id?: string
+          user_id?: string | null
+          contact_id?: string | null
+          email?: string | null
+          response_status?: string
+          created_at?: string
+        }
+        Relationships: []
+      }
+      // ── Email Logs ───────────────────────────────────────────
+      email_logs: {
+        Row: {
+          id: string
+          tenant_id: string
+          direction: string
+          subject: string
+          body: string | null
+          from_address: string
+          to_addresses: string[]
+          cc_addresses: string[] | null
+          bcc_addresses: string[] | null
+          sent_at: string
+          contact_id: string | null
+          matter_id: string | null
+          logged_by: string
+          external_message_id: string | null
+          is_active: boolean
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          tenant_id: string
+          direction: string
+          subject: string
+          body?: string | null
+          from_address: string
+          to_addresses: string[]
+          cc_addresses?: string[] | null
+          bcc_addresses?: string[] | null
+          sent_at?: string
+          contact_id?: string | null
+          matter_id?: string | null
+          logged_by: string
+          external_message_id?: string | null
+          is_active?: boolean
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          tenant_id?: string
+          direction?: string
+          subject?: string
+          body?: string | null
+          from_address?: string
+          to_addresses?: string[]
+          cc_addresses?: string[] | null
+          bcc_addresses?: string[] | null
+          sent_at?: string
+          contact_id?: string | null
+          matter_id?: string | null
+          logged_by?: string
+          external_message_id?: string | null
+          is_active?: boolean
+          created_at?: string
+        }
+        Relationships: []
+      }
+      // ── Chat ─────────────────────────────────────────────────
+      chat_channels: {
+        Row: {
+          id: string
+          tenant_id: string
+          name: string | null
+          channel_type: string
+          matter_id: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          tenant_id: string
+          name?: string | null
+          channel_type?: string
+          matter_id?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          tenant_id?: string
+          name?: string | null
+          channel_type?: string
+          matter_id?: string | null
+          created_at?: string
+        }
+        Relationships: []
+      }
+      chat_channel_members: {
+        Row: {
+          id: string
+          channel_id: string
+          user_id: string
+          last_read_at: string | null
+          joined_at: string
+        }
+        Insert: {
+          id?: string
+          channel_id: string
+          user_id: string
+          last_read_at?: string | null
+          joined_at?: string
+        }
+        Update: {
+          id?: string
+          channel_id?: string
+          user_id?: string
+          last_read_at?: string | null
+          joined_at?: string
+        }
+        Relationships: []
+      }
+      chat_messages: {
+        Row: {
+          id: string
+          tenant_id: string
+          channel_id: string
+          sender_id: string
+          content: string
+          attachments: Json
+          mentions: string[]
+          matter_id: string | null
+          document_id: string | null
+          task_id: string | null
+          is_edited: boolean
+          edited_at: string | null
+          is_deleted: boolean
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          tenant_id: string
+          channel_id: string
+          sender_id: string
+          content: string
+          attachments?: Json
+          mentions?: string[]
+          matter_id?: string | null
+          document_id?: string | null
+          task_id?: string | null
+          is_edited?: boolean
+          edited_at?: string | null
+          is_deleted?: boolean
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          tenant_id?: string
+          channel_id?: string
+          sender_id?: string
+          content?: string
+          attachments?: Json
+          mentions?: string[]
+          matter_id?: string | null
+          document_id?: string | null
+          task_id?: string | null
+          is_edited?: boolean
+          edited_at?: string | null
+          is_deleted?: boolean
+          created_at?: string
+        }
+        Relationships: []
+      }
+      // ── Matter Comments ──────────────────────────────────────
+      matter_comments: {
+        Row: {
+          id: string
+          tenant_id: string
+          matter_id: string
+          parent_id: string | null
+          author_type: string
+          author_user_id: string | null
+          author_contact_id: string | null
+          content: string
+          is_internal: boolean
+          is_active: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          tenant_id: string
+          matter_id: string
+          parent_id?: string | null
+          author_type: string
+          author_user_id?: string | null
+          author_contact_id?: string | null
+          content: string
+          is_internal?: boolean
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          tenant_id?: string
+          matter_id?: string
+          parent_id?: string | null
+          author_type?: string
+          author_user_id?: string | null
+          author_contact_id?: string | null
+          content?: string
+          is_internal?: boolean
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      user_invites: {
+        Row: {
+          id: string
+          tenant_id: string
+          email: string
+          first_name: string
+          last_name: string
+          role_id: string
+          token: string
+          invited_by: string | null
+          status: 'pending' | 'accepted' | 'expired' | 'revoked'
+          expires_at: string
+          accepted_at: string | null
+          created_at: string
+        }
+        Insert: {
+          tenant_id: string
+          email: string
+          first_name: string
+          last_name: string
+          role_id: string
+          token: string
+          id?: string
+          invited_by?: string | null
+          status?: 'pending' | 'accepted' | 'expired' | 'revoked'
+          expires_at?: string
+          accepted_at?: string | null
+          created_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['user_invites']['Insert']>
+        Relationships: []
+      }
+      platform_admins: {
+        Row: {
+          id: string
+          user_id: string
+          email: string
+          granted_by: string
+          granted_at: string
+          revoked_at: string | null
+          created_at: string
+        }
+        Insert: {
+          user_id: string
+          email: string
+          granted_by: string
+          id?: string
+          granted_at?: string
+          revoked_at?: string | null
+          created_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['platform_admins']['Insert']>
+        Relationships: []
+      }
+      platform_admin_audit_logs: {
+        Row: {
+          id: string
+          admin_id: string | null
+          action: string
+          target_type: string
+          target_id: string
+          changes: Json
+          reason: string
+          ip: string | null
+          user_agent: string | null
+          request_id: string | null
+          created_at: string
+        }
+        Insert: {
+          action: string
+          target_type: string
+          target_id: string
+          reason: string
+          id?: string
+          admin_id?: string | null
+          changes?: Json
+          ip?: string | null
+          user_agent?: string | null
+          request_id?: string | null
+          created_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['platform_admin_audit_logs']['Insert']>
+        Relationships: []
+      }
+      // ── Controlled Workflow Tables (Migration 042) ─────────────────────
+      workflow_actions: {
+        Row: {
+          id: string
+          tenant_id: string
+          action_type: string
+          action_config: Json
+          entity_type: string
+          entity_id: string
+          performed_by: string | null
+          status: string
+          error_message: string | null
+          previous_state: Json | null
+          new_state: Json | null
+          source: string
+          idempotency_key: string | null
+          created_at: string
+        }
+        Insert: {
+          tenant_id: string
+          action_type: string
+          entity_type: string
+          entity_id: string
+          id?: string
+          action_config?: Json
+          performed_by?: string | null
+          status?: string
+          error_message?: string | null
+          previous_state?: Json | null
+          new_state?: Json | null
+          source?: string
+          idempotency_key?: string | null
+          created_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['workflow_actions']['Insert']>
+        Relationships: []
+      }
+      check_in_sessions: {
+        Row: {
+          id: string
+          tenant_id: string
+          booking_appointment_id: string | null
+          contact_id: string | null
+          matter_id: string | null
+          kiosk_token: string
+          status: string
+          current_step: string
+          dob_verified: boolean
+          id_scan_path: string | null
+          id_scan_uploaded_at: string | null
+          data_safety_acknowledged: boolean
+          client_name: string | null
+          client_email: string | null
+          client_phone: string | null
+          device_info: Json
+          metadata: Json
+          started_at: string
+          completed_at: string | null
+          created_at: string
+        }
+        Insert: {
+          tenant_id: string
+          kiosk_token: string
+          id?: string
+          booking_appointment_id?: string | null
+          contact_id?: string | null
+          matter_id?: string | null
+          status?: string
+          current_step?: string
+          dob_verified?: boolean
+          id_scan_path?: string | null
+          id_scan_uploaded_at?: string | null
+          data_safety_acknowledged?: boolean
+          client_name?: string | null
+          client_email?: string | null
+          client_phone?: string | null
+          device_info?: Json
+          metadata?: Json
+          started_at?: string
+          completed_at?: string | null
+          created_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['check_in_sessions']['Insert']>
+        Relationships: []
+      }
+      dob_lockouts: {
+        Row: {
+          id: string
+          tenant_id: string
+          contact_id: string
+          attempts: number
+          locked_until: string | null
+          last_attempt_at: string
+          created_at: string
+        }
+        Insert: {
+          tenant_id: string
+          contact_id: string
+          id?: string
+          attempts?: number
+          locked_until?: string | null
+          last_attempt_at?: string
+          created_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['dob_lockouts']['Insert']>
+        Relationships: []
+      }
+      meeting_outcomes: {
+        Row: {
+          id: string
+          tenant_id: string
+          matter_id: string
+          lead_id: string | null
+          contact_id: string | null
+          outcome_type: string
+          outcome_data: Json
+          workflow_action_id: string | null
+          recorded_by: string
+          recorded_at: string
+          notes: string | null
+          created_at: string
+        }
+        Insert: {
+          tenant_id: string
+          matter_id: string
+          outcome_type: string
+          recorded_by: string
+          id?: string
+          lead_id?: string | null
+          contact_id?: string | null
+          outcome_data?: Json
+          workflow_action_id?: string | null
+          recorded_at?: string
+          notes?: string | null
+          created_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['meeting_outcomes']['Insert']>
+        Relationships: []
+      }
+      booking_appointments: {
+        Row: {
+          id: string
+          tenant_id: string
+          booking_page_id: string | null
+          contact_id: string | null
+          matter_id: string | null
+          start_time: string
+          end_time: string
+          status: string
+          booker_name: string | null
+          booker_email: string | null
+          booker_phone: string | null
+          answers: Json
+          check_in_session_id: string | null
+          checked_in_at: string | null
+          assigned_to: string | null
+          metadata: Json
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          tenant_id: string
+          start_time: string
+          end_time: string
+          id?: string
+          booking_page_id?: string | null
+          contact_id?: string | null
+          matter_id?: string | null
+          status?: string
+          booker_name?: string | null
+          booker_email?: string | null
+          booker_phone?: string | null
+          answers?: Json
+          check_in_session_id?: string | null
+          checked_in_at?: string | null
+          assigned_to?: string | null
+          metadata?: Json
+          created_at?: string
+          updated_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['booking_appointments']['Insert']>
+        Relationships: []
+      }
+      form_pack_versions: {
+        Row: {
+          id: string
+          tenant_id: string
+          matter_id: string
+          pack_type: string
+          version_number: number
+          status: string
+          input_snapshot: Json
+          resolved_fields: Json
+          mapping_version: string
+          template_checksum: string
+          validation_result: Json | null
+          generated_by: string | null
+          approved_by: string | null
+          approved_at: string | null
+          idempotency_key: string | null
+          is_stale: boolean
+          stale_reason: string | null
+          stale_at: string | null
+          generation_source: string
+          form_id: string | null
+          created_at: string
+        }
+        Insert: {
+          tenant_id: string
+          matter_id: string
+          pack_type: string
+          version_number: number
+          input_snapshot: Json
+          resolved_fields: Json
+          mapping_version: string
+          template_checksum: string
+          id?: string
+          status?: string
+          created_at?: string
+          validation_result?: Json | null
+          generated_by?: string | null
+          approved_by?: string | null
+          approved_at?: string | null
+          idempotency_key?: string | null
+          is_stale?: boolean
+          stale_reason?: string | null
+          stale_at?: string | null
+          generation_source?: string
+          form_id?: string | null
+        }
+        Update: Partial<Database['public']['Tables']['form_pack_versions']['Insert']>
+        Relationships: []
+      }
+      form_pack_artifacts: {
+        Row: {
+          id: string
+          tenant_id: string
+          pack_version_id: string
+          form_code: string
+          storage_path: string
+          file_name: string
+          file_size: number | null
+          checksum_sha256: string
+          is_final: boolean
+          created_at: string
+        }
+        Insert: {
+          tenant_id: string
+          pack_version_id: string
+          form_code: string
+          storage_path: string
+          file_name: string
+          checksum_sha256: string
+          id?: string
+          file_size?: number | null
+          is_final?: boolean
+          created_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['form_pack_artifacts']['Insert']>
+        Relationships: []
+      }
+      field_verifications: {
+        Row: {
+          id: string
+          tenant_id: string
+          matter_id: string
+          profile_path: string
+          verified_value: Json | null
+          verified_by: string
+          verified_at: string
+          notes: string | null
+        }
+        Insert: {
+          tenant_id: string
+          matter_id: string
+          profile_path: string
+          verified_by: string
+          id?: string
+          verified_value?: Json | null
+          verified_at?: string
+          notes?: string | null
+        }
+        Update: Partial<Database['public']['Tables']['field_verifications']['Insert']>
+        Relationships: []
+      }
+      profile_field_history: {
+        Row: {
+          id: string
+          tenant_id: string
+          contact_id: string
+          profile_path: string
+          old_value: Json | null
+          new_value: Json | null
+          changed_by: string
+          changed_at: string
+        }
+        Insert: {
+          tenant_id: string
+          contact_id: string
+          profile_path: string
+          changed_by: string
+          id?: string
+          old_value?: Json | null
+          new_value?: Json | null
+          changed_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['profile_field_history']['Insert']>
+        Relationships: []
+      }
+      microsoft_connections: {
+        Row: {
+          id: string
+          tenant_id: string
+          user_id: string
+          microsoft_user_id: string
+          microsoft_email: string
+          microsoft_display_name: string | null
+          access_token_encrypted: string
+          refresh_token_encrypted: string
+          token_expires_at: string
+          scopes: string[]
+          calendar_sync_enabled: boolean
+          calendar_delta_link: string | null
+          tasks_sync_enabled: boolean
+          tasks_delta_link: string | null
+          onedrive_enabled: boolean
+          last_calendar_sync_at: string | null
+          last_tasks_sync_at: string | null
+          is_active: boolean
+          error_count: number
+          last_error: string | null
+          last_error_at: string | null
+          created_at: string
+          updated_at: string
+          onedrive_root_folder_id: string | null
+        }
+        Insert: {
+          tenant_id: string
+          user_id: string
+          microsoft_user_id: string
+          microsoft_email: string
+          access_token_encrypted: string
+          refresh_token_encrypted: string
+          token_expires_at: string
+          id?: string
+          microsoft_display_name?: string | null
+          scopes?: string[]
+          calendar_sync_enabled?: boolean
+          calendar_delta_link?: string | null
+          tasks_sync_enabled?: boolean
+          tasks_delta_link?: string | null
+          onedrive_enabled?: boolean
+          last_calendar_sync_at?: string | null
+          last_tasks_sync_at?: string | null
+          is_active?: boolean
+          error_count?: number
+          last_error?: string | null
+          last_error_at?: string | null
+          created_at?: string
+          updated_at?: string
+          onedrive_root_folder_id?: string | null
+        }
+        Update: Partial<Database['public']['Tables']['microsoft_connections']['Insert']>
+        Relationships: []
+      }
+      sync_log: {
+        Row: {
+          id: string
+          tenant_id: string
+          user_id: string
+          connection_id: string
+          sync_type: string
+          direction: string
+          status: string
+          items_created: number
+          items_updated: number
+          items_deleted: number
+          error_message: string | null
+          started_at: string
+          completed_at: string | null
+          metadata: Json
+        }
+        Insert: {
+          tenant_id: string
+          user_id: string
+          connection_id: string
+          sync_type: string
+          direction: string
+          id?: string
+          status?: string
+          items_created?: number
+          items_updated?: number
+          items_deleted?: number
+          error_message?: string | null
+          started_at?: string
+          completed_at?: string | null
+          metadata?: Json
+        }
+        Update: Partial<Database['public']['Tables']['sync_log']['Insert']>
+        Relationships: []
+      }
+      import_batches: {
+        Row: {
+          id: string
+          tenant_id: string
+          source_platform: string
+          entity_type: string
+          status: string
+          file_name: string
+          file_size_bytes: number | null
+          storage_path: string | null
+          total_rows: number
+          processed_rows: number
+          succeeded_rows: number
+          failed_rows: number
+          skipped_rows: number
+          column_mapping: Json
+          validation_errors: Json
+          import_errors: Json
+          duplicate_strategy: string
+          started_at: string | null
+          completed_at: string | null
+          rolled_back_at: string | null
+          rolled_back_by: string | null
+          created_by: string | null
+          created_at: string
+          updated_at: string
+          import_mode: string
+          connection_id: string | null
+        }
+        Insert: {
+          tenant_id: string
+          source_platform: string
+          entity_type: string
+          file_name: string
+          id?: string
+          status?: string
+          file_size_bytes?: number | null
+          storage_path?: string | null
+          total_rows?: number
+          processed_rows?: number
+          succeeded_rows?: number
+          failed_rows?: number
+          skipped_rows?: number
+          column_mapping?: Json
+          validation_errors?: Json
+          import_errors?: Json
+          duplicate_strategy?: string
+          started_at?: string | null
+          completed_at?: string | null
+          rolled_back_at?: string | null
+          rolled_back_by?: string | null
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+          import_mode?: string
+          connection_id?: string | null
+        }
+        Update: Partial<Database['public']['Tables']['import_batches']['Insert']>
+        Relationships: []
+      }
+      import_records: {
+        Row: {
+          id: string
+          tenant_id: string
+          batch_id: string
+          row_number: number
+          source_data: Json
+          source_id: string | null
+          target_entity_type: string
+          target_entity_id: string | null
+          status: string
+          error_message: string | null
+          error_details: Json | null
+          created_at: string
+        }
+        Insert: {
+          tenant_id: string
+          batch_id: string
+          row_number: number
+          target_entity_type: string
+          id?: string
+          source_data?: Json
+          source_id?: string | null
+          target_entity_id?: string | null
+          status?: string
+          error_message?: string | null
+          error_details?: Json | null
+          created_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['import_records']['Insert']>
+        Relationships: []
+      }
+      import_id_map: {
+        Row: {
+          id: string
+          tenant_id: string
+          batch_id: string
+          source_platform: string
+          source_entity_type: string
+          source_id: string
+          target_entity_type: string
+          target_id: string
+          created_at: string
+        }
+        Insert: {
+          tenant_id: string
+          batch_id: string
+          source_platform: string
+          source_entity_type: string
+          source_id: string
+          target_entity_type: string
+          target_id: string
+          id?: string
+          created_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['import_id_map']['Insert']>
+        Relationships: []
+      }
+      platform_connections: {
+        Row: {
+          id: string
+          tenant_id: string
+          platform: string
+          access_token_encrypted: string
+          refresh_token_encrypted: string
+          token_expires_at: string
+          location_id: string | null
+          platform_user_id: string | null
+          platform_user_name: string | null
+          is_active: boolean
+          error_count: number
+          last_error: string | null
+          last_error_at: string | null
+          connected_by: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          tenant_id: string
+          platform: string
+          access_token_encrypted: string
+          refresh_token_encrypted: string
+          token_expires_at: string
+          location_id?: string | null
+          platform_user_id?: string | null
+          platform_user_name?: string | null
+          is_active?: boolean
+          error_count?: number
+          last_error?: string | null
+          last_error_at?: string | null
+          connected_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['platform_connections']['Insert']>
+        Relationships: []
+      }
+      conflict_scans: {
+        Row: {
+          id: string
+          tenant_id: string
+          contact_id: string
+          triggered_by: string | null
+          trigger_type: string
+          score: number
+          match_count: number
+          status: string
+          search_inputs: Json
+          completed_at: string | null
+          created_at: string
+        }
+        Insert: {
+          tenant_id: string
+          contact_id: string
+          id?: string
+          triggered_by?: string | null
+          trigger_type?: string
+          score?: number
+          match_count?: number
+          status?: string
+          search_inputs?: Json
+          completed_at?: string | null
+          created_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['conflict_scans']['Insert']>
+        Relationships: []
+      }
+      conflict_matches: {
+        Row: {
+          id: string
+          tenant_id: string
+          scan_id: string
+          matched_entity_type: string
+          matched_entity_id: string
+          match_category: string
+          match_reasons: Json
+          confidence: number
+          matched_name: string | null
+          matched_role: string | null
+          created_at: string
+        }
+        Insert: {
+          tenant_id: string
+          scan_id: string
+          matched_entity_type: string
+          matched_entity_id: string
+          match_category: string
+          id?: string
+          match_reasons?: Json
+          confidence?: number
+          matched_name?: string | null
+          matched_role?: string | null
+          created_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['conflict_matches']['Insert']>
+        Relationships: []
+      }
+      conflict_decisions: {
+        Row: {
+          id: string
+          tenant_id: string
+          contact_id: string
+          scan_id: string | null
+          decided_by: string
+          decision: string
+          decision_scope: string
+          matter_type_id: string | null
+          notes: string | null
+          internal_note: string | null
+          created_at: string
+        }
+        Insert: {
+          tenant_id: string
+          contact_id: string
+          decided_by: string
+          decision: string
+          id?: string
+          scan_id?: string | null
+          decision_scope?: string
+          matter_type_id?: string | null
+          notes?: string | null
+          internal_note?: string | null
+          created_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['conflict_decisions']['Insert']>
+        Relationships: []
+      }
+      contact_assignments: {
+        Row: {
+          id: string
+          tenant_id: string
+          contact_id: string
+          user_id: string
+          role: string
+          is_primary: boolean
+          notes: string | null
+          assigned_at: string
+          assigned_by: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          tenant_id: string
+          contact_id: string
+          user_id: string
+          role?: string
+          is_primary?: boolean
+          notes?: string | null
+          assigned_at?: string
+          assigned_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['contact_assignments']['Insert']>
+        Relationships: []
+      }
+      // ═══════════════════════════════════════════════════════════════════════
+      // Phase 1 Intake Automation Tables (Migration 075)
+      // ═══════════════════════════════════════════════════════════════════════
+      lead_stage_history: {
+        Row: {
+          id: string
+          tenant_id: string
+          lead_id: string
+          from_stage: string | null
+          to_stage: string
+          from_stage_id: string | null
+          to_stage_id: string | null
+          changed_at: string
+          actor_user_id: string | null
+          actor_type: string
+          reason: string | null
+          metadata: Json
+          created_at: string
+        }
+        Insert: {
+          tenant_id: string
+          lead_id: string
+          to_stage: string
+          id?: string
+          from_stage?: string | null
+          from_stage_id?: string | null
+          to_stage_id?: string | null
+          changed_at?: string
+          actor_user_id?: string | null
+          actor_type?: string
+          reason?: string | null
+          metadata?: Json
+          created_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['lead_stage_history']['Insert']>
+        Relationships: []
+      }
+      lead_intake_profiles: {
+        Row: {
+          id: string
+          tenant_id: string
+          lead_id: string
+          preferred_contact_method: string | null
+          opposing_party_names: Json
+          related_party_names: Json
+          intake_summary: string | null
+          urgency_level: string | null
+          jurisdiction: string | null
+          limitation_risk_flag: boolean
+          capacity_concern_flag: boolean
+          abuse_safety_flag: boolean
+          mandatory_fields_complete: boolean
+          custom_intake_data: Json
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          tenant_id: string
+          lead_id: string
+          id?: string
+          preferred_contact_method?: string | null
+          opposing_party_names?: Json
+          related_party_names?: Json
+          intake_summary?: string | null
+          urgency_level?: string | null
+          jurisdiction?: string | null
+          limitation_risk_flag?: boolean
+          capacity_concern_flag?: boolean
+          abuse_safety_flag?: boolean
+          mandatory_fields_complete?: boolean
+          custom_intake_data?: Json
+          created_at?: string
+          updated_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['lead_intake_profiles']['Insert']>
+        Relationships: []
+      }
+      lead_qualification_decisions: {
+        Row: {
+          id: string
+          tenant_id: string
+          lead_id: string
+          status: string
+          notes: string | null
+          not_fit_reason_code: string | null
+          requires_lawyer_review: boolean
+          decided_at: string | null
+          decided_by: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          tenant_id: string
+          lead_id: string
+          id?: string
+          status?: string
+          notes?: string | null
+          not_fit_reason_code?: string | null
+          requires_lawyer_review?: boolean
+          decided_at?: string | null
+          decided_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['lead_qualification_decisions']['Insert']>
+        Relationships: []
+      }
+      lead_consultations: {
+        Row: {
+          id: string
+          tenant_id: string
+          lead_id: string
+          status: string
+          scheduled_at: string | null
+          duration_minutes: number | null
+          consultation_type: string | null
+          fee_required: boolean
+          fee_amount: number | null
+          fee_paid: boolean
+          fee_paid_at: string | null
+          outcome: string | null
+          outcome_notes: string | null
+          notes_saved: boolean
+          summary_sent: boolean
+          calendar_event_id: string | null
+          booking_appointment_id: string | null
+          conducted_by: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          tenant_id: string
+          lead_id: string
+          id?: string
+          status?: string
+          scheduled_at?: string | null
+          duration_minutes?: number | null
+          consultation_type?: string | null
+          fee_required?: boolean
+          fee_amount?: number | null
+          fee_paid?: boolean
+          fee_paid_at?: string | null
+          outcome?: string | null
+          outcome_notes?: string | null
+          notes_saved?: boolean
+          summary_sent?: boolean
+          calendar_event_id?: string | null
+          booking_appointment_id?: string | null
+          conducted_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['lead_consultations']['Insert']>
+        Relationships: []
+      }
+      lead_retainer_packages: {
+        Row: {
+          id: string
+          tenant_id: string
+          lead_id: string
+          status: string
+          template_type: string | null
+          sent_at: string | null
+          signed_at: string | null
+          amount_requested: number | null
+          payment_status: string
+          payment_received_at: string | null
+          payment_amount: number | null
+          payment_method: string | null
+          id_verification_status: string
+          required_documents_status: string
+          stripe_payment_intent_id: string | null
+          notes: string | null
+          matter_type_id: string | null
+          person_scope: string
+          retainer_fee_template_id: string | null
+          template_customized: boolean
+          responsible_lawyer_id: string | null
+          billing_type: string
+          line_items: unknown[] | null
+          government_fees: unknown[] | null
+          disbursements: unknown[] | null
+          hst_applicable: boolean
+          subtotal_cents: number
+          tax_amount_cents: number
+          total_amount_cents: number
+          payment_terms: string | null
+          payment_plan: unknown | null
+          signing_document_id: string | null
+          signing_request_id: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          tenant_id: string
+          lead_id: string
+          id?: string
+          status?: string
+          template_type?: string | null
+          sent_at?: string | null
+          signed_at?: string | null
+          amount_requested?: number | null
+          payment_status?: string
+          payment_received_at?: string | null
+          payment_amount?: number | null
+          payment_method?: string | null
+          id_verification_status?: string
+          required_documents_status?: string
+          stripe_payment_intent_id?: string | null
+          notes?: string | null
+          matter_type_id?: string | null
+          person_scope?: string
+          retainer_fee_template_id?: string | null
+          template_customized?: boolean
+          responsible_lawyer_id?: string | null
+          billing_type?: string
+          line_items?: unknown[] | null
+          government_fees?: unknown[] | null
+          disbursements?: unknown[] | null
+          hst_applicable?: boolean
+          subtotal_cents?: number
+          tax_amount_cents?: number
+          total_amount_cents?: number
+          payment_terms?: string | null
+          payment_plan?: unknown | null
+          signing_document_id?: string | null
+          signing_request_id?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['lead_retainer_packages']['Insert']>
+        Relationships: []
+      }
+      lead_milestone_groups: {
+        Row: {
+          id: string
+          tenant_id: string
+          lead_id: string
+          group_type: string
+          title: string
+          status: string
+          completion_percent: number
+          completed_at: string | null
+          completed_by: string | null
+          completion_source: string | null
+          created_from_stage: string
+          sort_order: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          tenant_id: string
+          lead_id: string
+          group_type: string
+          title: string
+          created_from_stage: string
+          id?: string
+          status?: string
+          completion_percent?: number
+          completed_at?: string | null
+          completed_by?: string | null
+          completion_source?: string | null
+          sort_order?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['lead_milestone_groups']['Insert']>
+        Relationships: []
+      }
+      lead_milestone_tasks: {
+        Row: {
+          id: string
+          tenant_id: string
+          lead_id: string
+          milestone_group_id: string
+          title: string
+          task_type: string
+          status: string
+          owner_user_id: string | null
+          due_at: string | null
+          completed_at: string | null
+          completed_by: string | null
+          completion_source: string | null
+          linked_communication_event_id: string | null
+          linked_document_id: string | null
+          linked_payment_event_id: string | null
+          notes: string | null
+          skip_reason: string | null
+          sort_order: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          tenant_id: string
+          lead_id: string
+          milestone_group_id: string
+          title: string
+          task_type: string
+          id?: string
+          status?: string
+          owner_user_id?: string | null
+          due_at?: string | null
+          completed_at?: string | null
+          completed_by?: string | null
+          completion_source?: string | null
+          linked_communication_event_id?: string | null
+          linked_document_id?: string | null
+          linked_payment_event_id?: string | null
+          notes?: string | null
+          skip_reason?: string | null
+          sort_order?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['lead_milestone_tasks']['Insert']>
+        Relationships: []
+      }
+      lead_communication_events: {
+        Row: {
+          id: string
+          tenant_id: string
+          lead_id: string
+          contact_id: string | null
+          channel: string
+          direction: string
+          subtype: string | null
+          occurred_at: string
+          actor_user_id: string | null
+          actor_type: string
+          delivery_status: string | null
+          read_status: string | null
+          subject: string | null
+          body_preview: string | null
+          metadata: Json
+          counts_as_contact_attempt: boolean
+          linked_task_id: string | null
+          thread_key: string | null
+          provider_thread_id: string | null
+          provider_message_id: string | null
+          in_reply_to: string | null
+          created_at: string
+        }
+        Insert: {
+          tenant_id: string
+          lead_id: string
+          channel: string
+          direction: string
+          id?: string
+          contact_id?: string | null
+          subtype?: string | null
+          occurred_at?: string
+          actor_user_id?: string | null
+          actor_type?: string
+          delivery_status?: string | null
+          read_status?: string | null
+          subject?: string | null
+          body_preview?: string | null
+          metadata?: Json
+          counts_as_contact_attempt?: boolean
+          linked_task_id?: string | null
+          thread_key?: string | null
+          provider_thread_id?: string | null
+          provider_message_id?: string | null
+          in_reply_to?: string | null
+          created_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['lead_communication_events']['Insert']>
+        Relationships: []
+      }
+      lead_closure_records: {
+        Row: {
+          id: string
+          tenant_id: string
+          lead_id: string
+          closed_stage: string
+          reason_code: string
+          reason_text: string | null
+          closed_at: string
+          closed_by: string
+          created_at: string
+        }
+        Insert: {
+          tenant_id: string
+          lead_id: string
+          closed_stage: string
+          reason_code: string
+          closed_by: string
+          id?: string
+          reason_text?: string | null
+          closed_at?: string
+          created_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['lead_closure_records']['Insert']>
+        Relationships: []
+      }
+      lead_reopen_records: {
+        Row: {
+          id: string
+          tenant_id: string
+          lead_id: string
+          reopened_from_stage: string
+          reopened_to_stage: string
+          reopened_at: string
+          reopened_by: string
+          reopen_reason: string
+          task_reopen_strategy: string
+          closure_record_id: string | null
+          created_at: string
+        }
+        Insert: {
+          tenant_id: string
+          lead_id: string
+          reopened_from_stage: string
+          reopened_to_stage: string
+          reopened_by: string
+          reopen_reason: string
+          id?: string
+          reopened_at?: string
+          task_reopen_strategy?: string
+          closure_record_id?: string | null
+          created_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['lead_reopen_records']['Insert']>
+        Relationships: []
+      }
+      workspace_workflow_config: {
+        Row: {
+          id: string
+          tenant_id: string
+          contact_attempt_cadence_days: Json
+          retainer_followup_cadence_days: Json
+          payment_followup_cadence_days: Json
+          no_show_cadence_days: Json
+          enabled_channels: Json
+          final_closure_messages_mode: string
+          mandatory_tasks_by_stage: Json
+          stage_reopen_permissions: Json
+          lawyer_approval_requirements: Json
+          active_matter_conversion_gates: Json
+          consultation_fee_rules: Json
+          consultation_reminder_hours: Json
+          auto_closure_after_days: number | null
+          automation_message_settings: Json
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          tenant_id: string
+          id?: string
+          contact_attempt_cadence_days?: Json
+          retainer_followup_cadence_days?: Json
+          payment_followup_cadence_days?: Json
+          no_show_cadence_days?: Json
+          enabled_channels?: Json
+          final_closure_messages_mode?: string
+          mandatory_tasks_by_stage?: Json
+          stage_reopen_permissions?: Json
+          lawyer_approval_requirements?: Json
+          active_matter_conversion_gates?: Json
+          consultation_fee_rules?: Json
+          consultation_reminder_hours?: Json
+          auto_closure_after_days?: number | null
+          automation_message_settings?: Json
+          created_at?: string
+          updated_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['workspace_workflow_config']['Insert']>
+        Relationships: []
+      }
+      lead_ai_insights: {
+        Row: {
+          id: string
+          tenant_id: string
+          lead_id: string
+          practice_area_suggestion: string | null
+          intake_summary: string | null
+          qualification_suggestion: string | null
+          missing_data_flags: Json
+          urgency_flags: Json
+          next_action_suggestion: string | null
+          confidence_scores: Json
+          generated_at: string
+          model_info: string | null
+          accepted_by: string | null
+          accepted_at: string | null
+          acceptance_notes: string | null
+          created_at: string
+        }
+        Insert: {
+          tenant_id: string
+          lead_id: string
+          id?: string
+          practice_area_suggestion?: string | null
+          intake_summary?: string | null
+          qualification_suggestion?: string | null
+          missing_data_flags?: Json
+          urgency_flags?: Json
+          next_action_suggestion?: string | null
+          confidence_scores?: Json
+          generated_at?: string
+          model_info?: string | null
+          accepted_by?: string | null
+          accepted_at?: string | null
+          acceptance_notes?: string | null
+          created_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['lead_ai_insights']['Insert']>
+        Relationships: []
+      }
+      lead_workflow_executions: {
+        Row: {
+          id: string
+          tenant_id: string
+          lead_id: string
+          execution_type: string
+          execution_key: string
+          executed_at: string
+          actor_user_id: string | null
+          metadata: Json
+        }
+        Insert: {
+          tenant_id: string
+          lead_id: string
+          execution_type: string
+          execution_key: string
+          id?: string
+          executed_at?: string
+          actor_user_id?: string | null
+          metadata?: Json
+        }
+        Update: Partial<Database['public']['Tables']['lead_workflow_executions']['Insert']>
+        Relationships: []
+      }
+      lead_automation_settings: {
+        Row: {
+          id: string
+          tenant_id: string
+          trigger_key: string
+          is_enabled: boolean
+          enabled_channels: Json
+          practice_area_ids: Json | null
+          settings_overrides: Json
+          updated_by: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          tenant_id: string
+          trigger_key: string
+          is_enabled?: boolean
+          enabled_channels?: Json
+          practice_area_ids?: Json | null
+          settings_overrides?: Json
+          updated_by?: string | null
+          id?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['lead_automation_settings']['Insert']>
+        Relationships: []
+      }
+      lead_message_templates: {
+        Row: {
+          id: string
+          tenant_id: string
+          trigger_key: string
+          channel: string
+          subject: string | null
+          body: string
+          is_active: boolean
+          version: number
+          created_by: string | null
+          updated_by: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          tenant_id: string
+          trigger_key: string
+          channel: string
+          body: string
+          subject?: string | null
+          is_active?: boolean
+          version?: number
+          created_by?: string | null
+          updated_by?: string | null
+          id?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['lead_message_templates']['Insert']>
+        Relationships: []
+      }
+      // ─── Document Engine Tables (Migration 005) ─────────────────────────────
+      docgen_templates: {
+        Row: DocumentTemplateRow
+        Insert: DocumentTemplateInsert
+        Update: Partial<DocumentTemplateInsert>
+        Relationships: []
+      }
+      document_template_versions: {
+        Row: DocumentTemplateVersionRow
+        Insert: DocumentTemplateVersionInsert
+        Update: Partial<DocumentTemplateVersionInsert>
+        Relationships: []
+      }
+      document_template_mappings: {
+        Row: DocumentTemplateMappingRow
+        Insert: DocumentTemplateMappingInsert
+        Update: Partial<DocumentTemplateMappingInsert>
+        Relationships: []
+      }
+      document_template_conditions: {
+        Row: DocumentTemplateConditionRow
+        Insert: DocumentTemplateConditionInsert
+        Update: Partial<DocumentTemplateConditionInsert>
+        Relationships: []
+      }
+      document_clauses: {
+        Row: DocumentClauseRow
+        Insert: DocumentClauseInsert
+        Update: Partial<DocumentClauseInsert>
+        Relationships: []
+      }
+      document_clause_assignments: {
+        Row: DocumentClauseAssignmentRow
+        Insert: DocumentClauseAssignmentInsert
+        Update: Partial<DocumentClauseAssignmentInsert>
+        Relationships: []
+      }
+      document_instances: {
+        Row: DocumentInstanceRow
+        Insert: DocumentInstanceInsert
+        Update: Partial<DocumentInstanceInsert>
+        Relationships: []
+      }
+      document_artifacts: {
+        Row: DocumentArtifactRow
+        Insert: DocumentArtifactInsert
+        Update: Partial<DocumentArtifactInsert>
+        Relationships: []
+      }
+      document_instance_fields: {
+        Row: DocumentInstanceFieldRow
+        Insert: DocumentInstanceFieldInsert
+        Update: Partial<DocumentInstanceFieldInsert>
+        Relationships: []
+      }
+      document_signature_requests: {
+        Row: DocumentSignatureRequestRow
+        Insert: DocumentSignatureRequestInsert
+        Update: Partial<DocumentSignatureRequestInsert>
+        Relationships: []
+      }
+      document_signers: {
+        Row: DocumentSignerRow
+        Insert: DocumentSignerInsert
+        Update: Partial<DocumentSignerInsert>
+        Relationships: []
+      }
+      document_signer_events: {
+        Row: DocumentSignerEventRow
+        Insert: DocumentSignerEventInsert
+        Update: Partial<DocumentSignerEventInsert>
+        Relationships: []
+      }
+      document_status_events: {
+        Row: DocumentStatusEventRow
+        Insert: DocumentStatusEventInsert
+        Update: Partial<DocumentStatusEventInsert>
+        Relationships: []
+      }
+      document_template_audit_log: {
+        Row: DocumentTemplateAuditLogRow
+        Insert: DocumentTemplateAuditLogInsert
+        Update: Partial<DocumentTemplateAuditLogInsert>
+        Relationships: []
+      }
+      document_workflow_rules: {
+        Row: DocumentWorkflowRuleRow
+        Insert: DocumentWorkflowRuleInsert
+        Update: Partial<DocumentWorkflowRuleInsert>
+        Relationships: []
+      }
     }
     Views: Record<string, never>
     Functions: {
@@ -2100,7 +4930,664 @@ export interface Database {
         Args: Record<string, never>
         Returns: string
       }
+      execute_action_atomic: {
+        Args: {
+          p_tenant_id: string
+          p_action_type: string
+          p_action_config: Json
+          p_entity_type: string
+          p_entity_id: string
+          p_performed_by: string | null
+          p_source: string
+          p_idempotency_key?: string | null
+          p_previous_state?: Json | null
+          p_new_state?: Json | null
+          p_activity_type?: string | null
+          p_activity_title?: string | null
+          p_activity_description?: string | null
+          p_activity_metadata?: Json | null
+          p_activity_matter_id?: string | null
+          p_activity_contact_id?: string | null
+          p_action_label?: string | null
+          p_shift_id?: string | null
+        }
+        Returns: Json
+      }
+      acquire_idempotency_lock: {
+        Args: {
+          p_idempotency_key: string | null
+        }
+        Returns: Json
+      }
+      release_idempotency_lock: {
+        Args: {
+          p_idempotency_key: string | null
+        }
+        Returns: undefined
+      }
+      apply_risk_override: {
+        Args: {
+          p_intake_id: string
+          p_tenant_id: string
+          p_matter_id: string
+          p_user_id: string
+          p_override_level: string
+          p_override_reason: string
+          p_previous_level: string | null
+        }
+        Returns: unknown
+      }
+      upload_document_version: {
+        Args: {
+          p_tenant_id: string
+          p_slot_id: string
+          p_document_id: string
+          p_storage_path: string
+          p_file_name: string
+          p_file_size: number
+          p_file_type: string
+          p_uploaded_by: string
+        }
+        Returns: number
+      }
+      review_document_version: {
+        Args: {
+          p_tenant_id: string
+          p_slot_id: string
+          p_user_id: string
+          p_action: string
+          p_reason?: string | null
+        }
+        Returns: Json
+      }
+      create_form_pack_version: {
+        Args: {
+          p_tenant_id: string
+          p_matter_id: string
+          p_pack_type: string
+          p_input_snapshot: Json
+          p_resolved_fields: Json
+          p_mapping_version: string
+          p_template_checksum: string
+          p_validation_result: Json
+          p_generated_by: string
+          p_idempotency_key: string | null
+          p_form_code: string
+          p_storage_path: string
+          p_file_name: string
+          p_file_size: number
+          p_checksum_sha256: string
+          p_is_final: boolean
+        }
+        Returns: Json
+      }
+      add_form_pack_artifact: {
+        Args: {
+          p_tenant_id: string
+          p_version_id: string
+          p_form_code: string
+          p_storage_path: string
+          p_file_name: string
+          p_file_size: number
+          p_checksum_sha256: string
+          p_is_final: boolean
+        }
+        Returns: string
+      }
+      approve_form_pack_version: {
+        Args: {
+          p_tenant_id: string
+          p_version_id: string
+          p_approved_by: string
+        }
+        Returns: Json
+      }
     }
     Enums: Record<string, never>
+    CompositeTypes: Record<string, never>
   }
 }
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// DOCUMENT ENGINE TABLES (Migration 004)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// ─── docgen_templates ───────────────────────────────────────────────────────
+
+export type DocumentTemplateRow = {
+  id: string
+  tenant_id: string
+  template_key: string
+  name: string
+  description: string | null
+  document_family: string
+  practice_area: string | null
+  matter_type_id: string | null
+  jurisdiction_code: string
+  language_code: string
+  status: string
+  current_version_id: string | null
+  is_system_template: boolean
+  requires_review: boolean
+  is_active: boolean
+  sort_order: number
+  created_by: string | null
+  updated_by: string | null
+  created_at: string
+  updated_at: string
+}
+
+export type DocumentTemplateInsert = {
+  tenant_id: string
+  template_key: string
+  name: string
+  description?: string | null
+  document_family: string
+  practice_area?: string | null
+  matter_type_id?: string | null
+  jurisdiction_code?: string
+  language_code?: string
+  status?: string
+  current_version_id?: string | null
+  is_system_template?: boolean
+  requires_review?: boolean
+  is_active?: boolean
+  sort_order?: number
+  created_by?: string | null
+  updated_by?: string | null
+  id?: string
+  created_at?: string
+  updated_at?: string
+}
+
+export type DocumentTemplateUpdate = Partial<Omit<DocumentTemplateInsert, 'tenant_id' | 'template_key'>>
+
+// ─── document_template_versions ─────────────────────────────────────────────
+
+export type DocumentTemplateVersionRow = {
+  id: string
+  tenant_id: string
+  template_id: string
+  version_number: number
+  version_label: string | null
+  template_body: Json
+  change_summary: string | null
+  status: string
+  published_at: string | null
+  published_by: string | null
+  created_by: string | null
+  created_at: string
+}
+
+export type DocumentTemplateVersionInsert = {
+  tenant_id: string
+  template_id: string
+  version_number: number
+  template_body: Json
+  version_label?: string | null
+  change_summary?: string | null
+  status?: string
+  published_at?: string | null
+  published_by?: string | null
+  created_by?: string | null
+  id?: string
+  created_at?: string
+}
+
+export type DocumentTemplateVersionUpdate = Partial<Omit<DocumentTemplateVersionInsert, 'tenant_id' | 'template_id' | 'version_number'>>
+
+// ─── document_template_mappings ─────────────────────────────────────────────
+
+export type DocumentTemplateMappingRow = {
+  id: string
+  tenant_id: string
+  template_version_id: string
+  field_key: string
+  display_name: string
+  source_entity: string
+  source_path: string
+  field_type: string
+  is_required: boolean
+  default_value: string | null
+  format_rule: string | null
+  fallback_rule: string | null
+  sort_order: number
+  created_at: string
+}
+
+export type DocumentTemplateMappingInsert = {
+  tenant_id: string
+  template_version_id: string
+  field_key: string
+  display_name: string
+  source_entity: string
+  source_path: string
+  field_type?: string
+  is_required?: boolean
+  default_value?: string | null
+  format_rule?: string | null
+  fallback_rule?: string | null
+  sort_order?: number
+  id?: string
+  created_at?: string
+}
+
+export type DocumentTemplateMappingUpdate = Partial<Omit<DocumentTemplateMappingInsert, 'tenant_id' | 'template_version_id' | 'field_key'>>
+
+// ─── document_template_conditions ───────────────────────────────────────────
+
+export type DocumentTemplateConditionRow = {
+  id: string
+  tenant_id: string
+  template_version_id: string
+  condition_key: string
+  label: string
+  rules: Json
+  logic_operator: string
+  evaluation_order: number
+  created_at: string
+}
+
+export type DocumentTemplateConditionInsert = {
+  tenant_id: string
+  template_version_id: string
+  condition_key: string
+  label: string
+  rules: Json
+  logic_operator?: string
+  evaluation_order?: number
+  id?: string
+  created_at?: string
+}
+
+export type DocumentTemplateConditionUpdate = Partial<Omit<DocumentTemplateConditionInsert, 'tenant_id' | 'template_version_id' | 'condition_key'>>
+
+// ─── document_clauses ───────────────────────────────────────────────────────
+
+export type DocumentClauseRow = {
+  id: string
+  tenant_id: string
+  clause_key: string
+  name: string
+  description: string | null
+  document_family: string | null
+  practice_area: string | null
+  jurisdiction_code: string
+  language_code: string
+  content: string
+  status: string
+  version_number: number
+  is_active: boolean
+  created_by: string | null
+  updated_by: string | null
+  created_at: string
+  updated_at: string
+}
+
+export type DocumentClauseInsert = {
+  tenant_id: string
+  clause_key: string
+  name: string
+  content: string
+  description?: string | null
+  document_family?: string | null
+  practice_area?: string | null
+  jurisdiction_code?: string
+  language_code?: string
+  status?: string
+  version_number?: number
+  is_active?: boolean
+  created_by?: string | null
+  updated_by?: string | null
+  id?: string
+  created_at?: string
+  updated_at?: string
+}
+
+export type DocumentClauseUpdate = Partial<Omit<DocumentClauseInsert, 'tenant_id' | 'clause_key'>>
+
+// ─── document_clause_assignments ────────────────────────────────────────────
+
+export type DocumentClauseAssignmentRow = {
+  id: string
+  tenant_id: string
+  template_version_id: string
+  clause_id: string
+  placement_key: string
+  sort_order: number
+  is_required: boolean
+  condition_id: string | null
+  created_at: string
+}
+
+export type DocumentClauseAssignmentInsert = {
+  tenant_id: string
+  template_version_id: string
+  clause_id: string
+  placement_key: string
+  sort_order?: number
+  is_required?: boolean
+  condition_id?: string | null
+  id?: string
+  created_at?: string
+}
+
+export type DocumentClauseAssignmentUpdate = Partial<Omit<DocumentClauseAssignmentInsert, 'tenant_id' | 'template_version_id' | 'clause_id'>>
+
+// ─── document_instances ─────────────────────────────────────────────────────
+
+export type DocumentInstanceRow = {
+  id: string
+  tenant_id: string
+  matter_id: string | null
+  contact_id: string | null
+  template_id: string
+  template_version_id: string
+  document_family: string
+  jurisdiction_code: string
+  title: string
+  status: string
+  generation_mode: string
+  source_snapshot_json: Json
+  latest_artifact_id: string | null
+  latest_signature_request_id: string | null
+  supersedes_instance_id: string | null
+  generated_by: string | null
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}
+
+export type DocumentInstanceInsert = {
+  tenant_id: string
+  template_id: string
+  template_version_id: string
+  document_family: string
+  title: string
+  matter_id?: string | null
+  contact_id?: string | null
+  jurisdiction_code?: string
+  status?: string
+  generation_mode?: string
+  source_snapshot_json?: Json
+  latest_artifact_id?: string | null
+  latest_signature_request_id?: string | null
+  supersedes_instance_id?: string | null
+  generated_by?: string | null
+  is_active?: boolean
+  id?: string
+  created_at?: string
+  updated_at?: string
+}
+
+export type DocumentInstanceUpdate = Partial<Omit<DocumentInstanceInsert, 'tenant_id' | 'template_id' | 'template_version_id'>>
+
+// ─── document_artifacts ─────────────────────────────────────────────────────
+
+export type DocumentArtifactRow = {
+  id: string
+  tenant_id: string
+  instance_id: string
+  artifact_type: string
+  storage_path: string
+  file_name: string
+  file_size: number
+  file_type: string
+  checksum_sha256: string
+  is_final: boolean
+  created_by: string | null
+  created_at: string
+}
+
+export type DocumentArtifactInsert = {
+  tenant_id: string
+  instance_id: string
+  artifact_type: string
+  storage_path: string
+  file_name: string
+  file_size: number
+  checksum_sha256: string
+  file_type?: string
+  is_final?: boolean
+  created_by?: string | null
+  id?: string
+  created_at?: string
+}
+
+// No update — INSERT-only table
+
+// ─── document_instance_fields ───────────────────────────────────────────────
+
+export type DocumentInstanceFieldRow = {
+  id: string
+  tenant_id: string
+  document_instance_id: string
+  field_key: string
+  resolved_value_text: string | null
+  resolved_value_json: Json | null
+  resolution_status: string
+  source_path: string | null
+  created_at: string
+}
+
+export type DocumentInstanceFieldInsert = {
+  tenant_id: string
+  document_instance_id: string
+  field_key: string
+  resolved_value_text?: string | null
+  resolved_value_json?: Json | null
+  resolution_status?: string
+  source_path?: string | null
+  id?: string
+  created_at?: string
+}
+
+// No update — fields are frozen at generation time
+
+// ─── document_signature_requests ────────────────────────────────────────────
+
+export type DocumentSignatureRequestRow = {
+  id: string
+  tenant_id: string
+  document_instance_id: string
+  provider: string
+  provider_request_id: string | null
+  status: string
+  sent_at: string | null
+  completed_at: string | null
+  cancelled_at: string | null
+  expires_at: string | null
+  reminder_count: number
+  last_reminder_at: string | null
+  created_by: string | null
+  created_at: string
+  updated_at: string
+}
+
+export type DocumentSignatureRequestInsert = {
+  tenant_id: string
+  document_instance_id: string
+  provider?: string
+  provider_request_id?: string | null
+  status?: string
+  sent_at?: string | null
+  completed_at?: string | null
+  cancelled_at?: string | null
+  expires_at?: string | null
+  reminder_count?: number
+  last_reminder_at?: string | null
+  created_by?: string | null
+  id?: string
+  created_at?: string
+  updated_at?: string
+}
+
+export type DocumentSignatureRequestUpdate = Partial<Omit<DocumentSignatureRequestInsert, 'tenant_id' | 'document_instance_id'>>
+
+// ─── document_signers ───────────────────────────────────────────────────────
+
+export type DocumentSignerRow = {
+  id: string
+  tenant_id: string
+  signature_request_id: string
+  contact_id: string | null
+  role_key: string
+  name: string
+  email: string
+  signing_order: number
+  status: string
+  viewed_at: string | null
+  signed_at: string | null
+  declined_at: string | null
+  decline_reason: string | null
+  provider_signer_id: string | null
+  created_at: string
+  updated_at: string
+}
+
+export type DocumentSignerInsert = {
+  tenant_id: string
+  signature_request_id: string
+  role_key: string
+  name: string
+  email: string
+  contact_id?: string | null
+  signing_order?: number
+  status?: string
+  provider_signer_id?: string | null
+  id?: string
+  created_at?: string
+  updated_at?: string
+}
+
+export type DocumentSignerUpdate = Partial<Omit<DocumentSignerInsert, 'tenant_id' | 'signature_request_id'>>
+
+// ─── document_signer_events ─────────────────────────────────────────────────
+
+export type DocumentSignerEventRow = {
+  id: string
+  tenant_id: string
+  signer_id: string
+  request_id: string
+  event_type: string
+  from_status: string | null
+  to_status: string | null
+  note: string | null
+  performed_by: string | null
+  performed_at: string
+}
+
+export type DocumentSignerEventInsert = {
+  tenant_id: string
+  signer_id: string
+  request_id: string
+  event_type: string
+  from_status?: string | null
+  to_status?: string | null
+  note?: string | null
+  performed_by?: string | null
+  id?: string
+  performed_at?: string
+}
+
+// No update — INSERT-only table
+
+// ─── document_status_events ─────────────────────────────────────────────────
+
+export type DocumentStatusEventRow = {
+  id: string
+  tenant_id: string
+  document_instance_id: string
+  event_type: string
+  from_status: string | null
+  to_status: string | null
+  event_payload_json: Json
+  performed_by: string | null
+  performed_at: string
+}
+
+export type DocumentStatusEventInsert = {
+  tenant_id: string
+  document_instance_id: string
+  event_type: string
+  from_status?: string | null
+  to_status?: string | null
+  event_payload_json?: Json
+  performed_by?: string | null
+  id?: string
+  performed_at?: string
+}
+
+// No update — INSERT-only table
+
+// ─── document_template_audit_log ────────────────────────────────────────────
+
+export type DocumentTemplateAuditLogRow = {
+  id: string
+  tenant_id: string
+  template_id: string
+  template_version_id: string | null
+  event_type: string
+  event_payload_json: Json
+  performed_by: string | null
+  performed_at: string
+}
+
+export type DocumentTemplateAuditLogInsert = {
+  tenant_id: string
+  template_id: string
+  event_type: string
+  template_version_id?: string | null
+  event_payload_json?: Json
+  performed_by?: string | null
+  id?: string
+  performed_at?: string
+}
+
+// No update — INSERT-only table
+
+// ─── document_workflow_rules ────────────────────────────────────────────────
+
+export type DocumentWorkflowRuleRow = {
+  id: string
+  tenant_id: string
+  name: string
+  description: string | null
+  document_family: string
+  matter_type_id: string | null
+  practice_area: string | null
+  jurisdiction_code: string | null
+  trigger_type: string
+  trigger_config_json: Json
+  template_id: string
+  auto_generate: boolean
+  auto_send_for_signature: boolean
+  status: string
+  is_active: boolean
+  created_by: string | null
+  created_at: string
+  updated_at: string
+}
+
+export type DocumentWorkflowRuleInsert = {
+  tenant_id: string
+  name: string
+  document_family: string
+  trigger_type: string
+  template_id: string
+  description?: string | null
+  matter_type_id?: string | null
+  practice_area?: string | null
+  jurisdiction_code?: string | null
+  trigger_config_json?: Json
+  auto_generate?: boolean
+  auto_send_for_signature?: boolean
+  status?: string
+  is_active?: boolean
+  created_by?: string | null
+  id?: string
+  created_at?: string
+  updated_at?: string
+}
+
+export type DocumentWorkflowRuleUpdate = Partial<Omit<DocumentWorkflowRuleInsert, 'tenant_id'>>

@@ -3,14 +3,17 @@
 import { useQuery } from '@tanstack/react-query'
 import { createClient } from '@/lib/supabase/client'
 import { DEADLINE_STATUSES, TASK_STATUSES } from '@/lib/utils/constants'
+import { expandRecurrence } from '@/lib/utils/recurrence'
+import { toTenantDate, toTenantTime } from '@/lib/utils/timezone'
 import type { Database } from '@/lib/types/database'
 
 type MatterDeadline = Database['public']['Tables']['matter_deadlines']['Row']
 type Task = Database['public']['Tables']['tasks']['Row']
+type CalendarEventRow = Database['public']['Tables']['calendar_events']['Row']
 
 // ── Types ───────────────────────────────────────────────────────────────────
 
-export type CalendarEventSource = 'deadline' | 'task'
+export type CalendarEventSource = 'deadline' | 'task' | 'event'
 
 export interface CalendarEvent {
   id: string
@@ -18,6 +21,8 @@ export interface CalendarEvent {
   title: string
   date: string // 'yyyy-MM-dd'
   time: string | null // 'HH:mm' (tasks have due_time)
+  startTime: string | null // full ISO start time for events
+  endTime: string | null // full ISO end time for events
   status: string
   priority: string
   color: string // resolved from status constants
@@ -26,7 +31,9 @@ export interface CalendarEvent {
   contactId: string | null
   contactName: string | null
   deadlineType: string | null // deadline-specific
+  eventType: string | null // event-specific (meeting, consultation, etc.)
   sourceId: string // original row id
+  externalProvider: string | null // 'microsoft' if synced from Outlook
 }
 
 // ── Color Lookups ───────────────────────────────────────────────────────────
@@ -57,9 +64,10 @@ export interface CalendarDateRange {
 export function useCalendarEvents(
   tenantId: string,
   dateRange: CalendarDateRange,
-  options?: { practiceAreaId?: string }
+  options?: { practiceAreaId?: string; timezone?: string }
 ) {
   const practiceAreaId = options?.practiceAreaId
+  const timezone = options?.timezone
 
   return useQuery({
     queryKey: calendarKeys.events(tenantId, dateRange.start, dateRange.end, practiceAreaId),
@@ -78,8 +86,8 @@ export function useCalendarEvents(
         if (matterIds.length === 0) return []
       }
 
-      // Fetch deadlines and tasks in parallel
-      const [deadlinesRes, tasksRes] = await Promise.all([
+      // Fetch deadlines, tasks, and calendar events in parallel
+      const [deadlinesRes, tasksRes, calEventsRes, recurringEventsRes] = await Promise.all([
         // Deadlines — exclude completed/dismissed
         (() => {
           let q = supabase
@@ -112,10 +120,46 @@ export function useCalendarEvents(
           if (matterIds) q = q.in('matter_id', matterIds)
           return q
         })(),
+
+        // Calendar events — only active, within date range (non-recurring)
+        (() => {
+          let q = supabase
+            .from('calendar_events')
+            .select('*')
+            .eq('tenant_id', tenantId)
+            .eq('is_active', true)
+            .is('recurrence_rule', null)
+            .gte('start_at', dateRange.start)
+            .lte('start_at', dateRange.end + 'T23:59:59')
+            .order('start_at', { ascending: true })
+            .limit(200)
+
+          if (matterIds) q = q.in('matter_id', matterIds)
+          return q
+        })(),
+
+        // Recurring calendar events — fetch all active recurring events
+        // Their start_at may be before rangeStart, but occurrences recur into range
+        (() => {
+          let q = supabase
+            .from('calendar_events')
+            .select('*')
+            .eq('tenant_id', tenantId)
+            .eq('is_active', true)
+            .not('recurrence_rule', 'is', null)
+            .lte('start_at', dateRange.end + 'T23:59:59')
+            .order('start_at', { ascending: true })
+            .limit(100)
+
+          if (matterIds) q = q.in('matter_id', matterIds)
+          return q
+        })(),
       ])
 
       if (deadlinesRes.error) throw deadlinesRes.error
       if (tasksRes.error) throw tasksRes.error
+      if (calEventsRes.error) throw calEventsRes.error
+      if (recurringEventsRes.error) throw recurringEventsRes.error
 
       // Normalize deadlines
       const deadlineEvents: CalendarEvent[] = (
@@ -128,6 +172,8 @@ export function useCalendarEvents(
         title: d.title,
         date: d.due_date,
         time: null,
+        startTime: null,
+        endTime: null,
         status: d.status,
         priority: d.priority,
         color: DEADLINE_COLOR_MAP[d.status] ?? '#6b7280',
@@ -136,7 +182,9 @@ export function useCalendarEvents(
         contactId: null,
         contactName: null,
         deadlineType: d.deadline_type,
+        eventType: null,
         sourceId: d.id,
+        externalProvider: null,
       }))
 
       // Normalize tasks
@@ -149,8 +197,10 @@ export function useCalendarEvents(
         id: `task-${t.id}`,
         source: 'task' as const,
         title: t.title,
-        date: (t.due_date ?? '').split('T')[0],
+        date: t.due_date ? toTenantDate(t.due_date, timezone) : '',
         time: t.due_time ?? null,
+        startTime: null,
+        endTime: null,
         status: t.status,
         priority: t.priority ?? 'medium',
         color: TASK_COLOR_MAP[t.status] ?? '#6b7280',
@@ -161,11 +211,47 @@ export function useCalendarEvents(
           ? `${t.contacts.first_name ?? ''} ${t.contacts.last_name ?? ''}`.trim() || null
           : null,
         deadlineType: null,
+        eventType: null,
         sourceId: t.id,
+        externalProvider: (t as unknown as { external_provider: string | null }).external_provider ?? null,
+      }))
+
+      // Expand recurring events into virtual instances within the date range
+      const recurringRows = recurringEventsRes.data as unknown as CalendarEventRow[]
+      const expandedRecurring: CalendarEventRow[] = recurringRows.flatMap((event) =>
+        expandRecurrence(event, dateRange.start, dateRange.end)
+      )
+
+      // Combine non-recurring + expanded recurring events
+      const allCalendarEventRows: CalendarEventRow[] = [
+        ...(calEventsRes.data as unknown as CalendarEventRow[]),
+        ...expandedRecurring,
+      ]
+
+      // Normalize calendar events (no FK joins — types not registered)
+      const calendarEventItems: CalendarEvent[] = allCalendarEventRows.map((row) => ({
+        id: `event-${row.id}`,
+        source: 'event' as const,
+        title: row.title,
+        date: toTenantDate(row.start_at, timezone),
+        time: row.all_day ? null : toTenantTime(row.start_at, timezone),
+        startTime: row.all_day ? null : row.start_at,
+        endTime: row.all_day ? null : row.end_at,
+        status: row.status,
+        priority: 'medium',
+        color: row.color ?? '#3b82f6',
+        matterId: row.matter_id,
+        matterTitle: null,
+        contactId: row.contact_id,
+        contactName: null,
+        deadlineType: null,
+        eventType: row.event_type,
+        sourceId: row.id,
+        externalProvider: row.external_provider ?? null,
       }))
 
       // Merge and sort by date
-      return [...deadlineEvents, ...taskEvents].sort((a, b) =>
+      return [...deadlineEvents, ...taskEvents, ...calendarEventItems].sort((a, b) =>
         a.date.localeCompare(b.date)
       )
     },

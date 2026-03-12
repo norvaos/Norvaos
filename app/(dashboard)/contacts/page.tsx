@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useRef } from 'react'
+import { useState, useCallback, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useTenant } from '@/lib/hooks/use-tenant'
 import { useContacts } from '@/lib/queries/contacts'
@@ -31,6 +31,14 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuCheckboxItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import {
   Search,
   Plus,
   ArrowUpDown,
@@ -42,15 +50,52 @@ import {
   X,
   User,
   Building2,
+  SlidersHorizontal,
 } from 'lucide-react'
 
-type SortField = 'name' | 'email_primary' | 'phone_primary' | 'source' | 'created_at'
+// ─── Column definitions ─────────────────────────────────────────────
 
-// Map user-facing sort field to database column
+interface ColumnDef {
+  id: string
+  label: string
+  sortField?: string
+  defaultVisible: boolean
+  minWidth?: string
+}
+
+const COLUMNS: ColumnDef[] = [
+  { id: 'name', label: 'Name', sortField: 'name', defaultVisible: true },
+  { id: 'email', label: 'Email', sortField: 'email_primary', defaultVisible: true },
+  { id: 'phone', label: 'Phone', sortField: 'phone_primary', defaultVisible: true },
+  { id: 'type', label: 'Type', defaultVisible: true },
+  { id: 'source', label: 'Source', sortField: 'source', defaultVisible: true },
+  { id: 'created', label: 'Created', sortField: 'created_at', defaultVisible: true },
+  { id: 'last_contacted', label: 'Last Contacted', sortField: 'last_contacted_at', defaultVisible: false },
+  { id: 'location', label: 'Location', defaultVisible: false },
+  { id: 'job_title', label: 'Job Title', defaultVisible: false },
+]
+
+const STORAGE_KEY = 'lexcrm:contacts:visible-columns'
+
+function loadVisibleColumns(): Set<string> {
+  if (typeof window === 'undefined') return new Set(COLUMNS.filter((c) => c.defaultVisible).map((c) => c.id))
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY)
+    if (stored) return new Set(JSON.parse(stored))
+  } catch { /* ignore */ }
+  return new Set(COLUMNS.filter((c) => c.defaultVisible).map((c) => c.id))
+}
+
+// ─── Sort helpers ────────────────────────────────────────────────────
+
+type SortField = 'name' | 'email_primary' | 'phone_primary' | 'source' | 'created_at' | 'last_contacted_at'
+
 function mapSortField(field: SortField): string {
   if (field === 'name') return 'last_name'
   return field
 }
+
+// ─── Page component ──────────────────────────────────────────────────
 
 export default function ContactsPage() {
   const router = useRouter()
@@ -65,6 +110,26 @@ export default function ContactsPage() {
   const [page, setPage] = useState(1)
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const [createOpen, setCreateOpen] = useState(false)
+  const [visibleColumns, setVisibleColumns] = useState<Set<string>>(loadVisibleColumns)
+
+  // Persist column visibility
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify([...visibleColumns]))
+  }, [visibleColumns])
+
+  function toggleColumn(columnId: string) {
+    setVisibleColumns((prev) => {
+      const next = new Set(prev)
+      if (next.has(columnId)) {
+        // Don't allow hiding the Name column
+        if (columnId === 'name') return prev
+        next.delete(columnId)
+      } else {
+        next.add(columnId)
+      }
+      return next
+    })
+  }
 
   // Debounced search
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -145,7 +210,7 @@ export default function ContactsPage() {
     setPage(1)
   }
 
-  // Display name for a contact row
+  // Display helpers
   function getDisplayName(contact: typeof contacts[number]): string {
     if (contact.contact_type === 'organization') {
       return contact.organization_name ?? 'Unnamed Organisation'
@@ -159,6 +224,14 @@ export default function ContactsPage() {
     }
     return formatInitials(contact.first_name, contact.last_name)
   }
+
+  function getLocation(contact: typeof contacts[number]): string {
+    const parts = [contact.city, contact.province_state, contact.country].filter(Boolean)
+    return parts.join(', ') || '-'
+  }
+
+  // Visible column set for header rendering
+  const activeColumns = COLUMNS.filter((c) => visibleColumns.has(c.id))
 
   return (
     <div className="space-y-4">
@@ -234,6 +307,30 @@ export default function ContactsPage() {
             Clear filters
           </Button>
         )}
+
+        {/* Column visibility toggle */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="sm" className="ml-auto">
+              <SlidersHorizontal className="mr-1.5 size-3.5" />
+              Columns
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-48">
+            <DropdownMenuLabel>Toggle columns</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            {COLUMNS.map((col) => (
+              <DropdownMenuCheckboxItem
+                key={col.id}
+                checked={visibleColumns.has(col.id)}
+                onCheckedChange={() => toggleColumn(col.id)}
+                disabled={col.id === 'name'}
+              >
+                {col.label}
+              </DropdownMenuCheckboxItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       {/* Results count */}
@@ -290,57 +387,22 @@ export default function ContactsPage() {
                       {...(someSelected && !allSelected ? { 'data-state': 'indeterminate' } : {})}
                     />
                   </TableHead>
-                  <TableHead>
-                    <button
-                      type="button"
-                      className="flex items-center text-xs font-medium hover:text-foreground"
-                      onClick={() => handleSort('name')}
-                    >
-                      Name
-                      <SortIcon field="name" />
-                    </button>
-                  </TableHead>
-                  <TableHead>
-                    <button
-                      type="button"
-                      className="flex items-center text-xs font-medium hover:text-foreground"
-                      onClick={() => handleSort('email_primary')}
-                    >
-                      Email
-                      <SortIcon field="email_primary" />
-                    </button>
-                  </TableHead>
-                  <TableHead>
-                    <button
-                      type="button"
-                      className="flex items-center text-xs font-medium hover:text-foreground"
-                      onClick={() => handleSort('phone_primary')}
-                    >
-                      Phone
-                      <SortIcon field="phone_primary" />
-                    </button>
-                  </TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>
-                    <button
-                      type="button"
-                      className="flex items-center text-xs font-medium hover:text-foreground"
-                      onClick={() => handleSort('source')}
-                    >
-                      Source
-                      <SortIcon field="source" />
-                    </button>
-                  </TableHead>
-                  <TableHead>
-                    <button
-                      type="button"
-                      className="flex items-center text-xs font-medium hover:text-foreground"
-                      onClick={() => handleSort('created_at')}
-                    >
-                      Created
-                      <SortIcon field="created_at" />
-                    </button>
-                  </TableHead>
+                  {activeColumns.map((col) => (
+                    <TableHead key={col.id}>
+                      {col.sortField ? (
+                        <button
+                          type="button"
+                          className="flex items-center text-xs font-medium hover:text-foreground"
+                          onClick={() => handleSort(col.sortField as SortField)}
+                        >
+                          {col.label}
+                          <SortIcon field={col.sortField as SortField} />
+                        </button>
+                      ) : (
+                        <span className="text-xs font-medium">{col.label}</span>
+                      )}
+                    </TableHead>
+                  ))}
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -357,44 +419,79 @@ export default function ContactsPage() {
                         aria-label={`Select ${getDisplayName(contact)}`}
                       />
                     </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        <Avatar size="sm">
-                          <AvatarFallback className="text-[10px]">
-                            {getInitials(contact)}
-                          </AvatarFallback>
-                        </Avatar>
-                        <span className="font-medium text-slate-900">
-                          {getDisplayName(contact)}
-                        </span>
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-slate-600">
-                      {contact.email_primary ?? '-'}
-                    </TableCell>
-                    <TableCell className="text-slate-600">
-                      {contact.phone_primary
-                        ? formatPhoneNumber(contact.phone_primary)
-                        : '-'}
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="secondary" className="gap-1 capitalize">
-                        {contact.contact_type === 'organization' ? (
-                          <Building2 className="size-3" />
-                        ) : (
-                          <User className="size-3" />
+                    {activeColumns.map((col) => (
+                      <TableCell key={col.id} className="text-slate-600">
+                        {col.id === 'name' && (
+                          <div className="flex items-center gap-3">
+                            <Avatar size="sm">
+                              <AvatarFallback className="text-[10px]">
+                                {getInitials(contact)}
+                              </AvatarFallback>
+                            </Avatar>
+                            <span className="font-medium text-slate-900">
+                              {getDisplayName(contact)}
+                            </span>
+                          </div>
                         )}
-                        {contact.contact_type === 'organization'
-                          ? 'Organisation'
-                          : 'Individual'}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-slate-600">
-                      {contact.source ?? '-'}
-                    </TableCell>
-                    <TableCell className="text-slate-600">
-                      {formatDate(contact.created_at, 'dd MMM yyyy')}
-                    </TableCell>
+                        {col.id === 'email' && (
+                          contact.email_primary ? (
+                            <a
+                              href={`mailto:${contact.email_primary}`}
+                              className="text-blue-600 hover:underline"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              {contact.email_primary}
+                            </a>
+                          ) : (
+                            <span>-</span>
+                          )
+                        )}
+                        {col.id === 'phone' && (
+                          contact.phone_primary ? (
+                            <a
+                              href={`tel:${contact.phone_primary}`}
+                              className="text-blue-600 hover:underline"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              {formatPhoneNumber(contact.phone_primary)}
+                            </a>
+                          ) : (
+                            <span>-</span>
+                          )
+                        )}
+                        {col.id === 'type' && (
+                          <Badge variant="secondary" className="gap-1 capitalize">
+                            {contact.contact_type === 'organization' ? (
+                              <Building2 className="size-3" />
+                            ) : (
+                              <User className="size-3" />
+                            )}
+                            {contact.contact_type === 'organization'
+                              ? 'Organisation'
+                              : 'Individual'}
+                          </Badge>
+                        )}
+                        {col.id === 'source' && (
+                          <span>{contact.source ?? '-'}</span>
+                        )}
+                        {col.id === 'created' && (
+                          <span>{formatDate(contact.created_at)}</span>
+                        )}
+                        {col.id === 'last_contacted' && (
+                          <span>
+                            {contact.last_contacted_at
+                              ? formatDate(contact.last_contacted_at)
+                              : '-'}
+                          </span>
+                        )}
+                        {col.id === 'location' && (
+                          <span>{getLocation(contact)}</span>
+                        )}
+                        {col.id === 'job_title' && (
+                          <span>{contact.job_title ?? '-'}</span>
+                        )}
+                      </TableCell>
+                    ))}
                   </TableRow>
                 ))}
               </TableBody>

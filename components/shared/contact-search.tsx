@@ -145,12 +145,15 @@ export function ContactSearch({ value, onChange, tenantId, placeholder = 'Search
             )}
             <div className="flex items-center gap-1">
               {value && (
-                <button
+                <span
+                  role="button"
+                  tabIndex={0}
                   onClick={(e) => { e.stopPropagation(); handleClear() }}
-                  className="rounded-full p-0.5 hover:bg-slate-200"
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.stopPropagation(); handleClear() } }}
+                  className="rounded-full p-0.5 hover:bg-slate-200 cursor-pointer"
                 >
                   <X className="h-3 w-3" />
-                </button>
+                </span>
               )}
               <ChevronDown className="h-4 w-4 shrink-0 opacity-50" />
             </div>

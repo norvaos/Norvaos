@@ -182,7 +182,7 @@ export function CommandPalette() {
               type: 'lead',
               title: name,
               subtitle: l.source ? `Lead · ${l.source}` : 'Lead',
-              url: `/leads/${l.id}`,
+              url: `/command/lead/${l.id}`,
             })
           }
         }

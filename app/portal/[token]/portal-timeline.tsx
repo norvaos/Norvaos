@@ -2,6 +2,11 @@
 
 import { useState, useEffect } from 'react'
 import { CheckCircle2, Circle, Loader2 } from 'lucide-react'
+import { formatDate } from '@/lib/utils/formatters'
+import {
+  getTranslations,
+  type PortalLocale,
+} from '@/lib/utils/portal-translations'
 
 interface TimelineEntry {
   stage_id: string
@@ -13,9 +18,11 @@ interface TimelineEntry {
 interface PortalTimelineProps {
   token: string
   primaryColor: string
+  language?: PortalLocale
 }
 
-export function PortalTimeline({ token, primaryColor }: PortalTimelineProps) {
+export function PortalTimeline({ token, primaryColor, language = 'en' }: PortalTimelineProps) {
+  const tr = getTranslations(language)
   const [timeline, setTimeline] = useState<TimelineEntry[]>([])
   const [currentStageId, setCurrentStageId] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
@@ -38,7 +45,7 @@ export function PortalTimeline({ token, primaryColor }: PortalTimelineProps) {
       <div className="bg-white rounded-lg border border-slate-200 p-4">
         <div className="flex items-center gap-2 text-slate-400">
           <Loader2 className="h-4 w-4 animate-spin" />
-          <span className="text-xs">Loading case progress...</span>
+          <span className="text-xs">{tr.timeline_loading}</span>
         </div>
       </div>
     )
@@ -48,7 +55,7 @@ export function PortalTimeline({ token, primaryColor }: PortalTimelineProps) {
 
   return (
     <div className="bg-white rounded-lg border border-slate-200 p-4">
-      <h3 className="text-sm font-semibold text-slate-700 mb-4">Case Progress</h3>
+      <h3 className="text-sm font-semibold text-slate-700 mb-4">{tr.timeline_title}</h3>
 
       <div className="relative">
         {/* Vertical connecting line */}
@@ -63,11 +70,7 @@ export function PortalTimeline({ token, primaryColor }: PortalTimelineProps) {
             const isCompleted = !!entry.exited_at
             const isLast = i === timeline.length - 1
 
-            const enteredDate = new Date(entry.entered_at).toLocaleDateString('en-CA', {
-              year: 'numeric',
-              month: 'short',
-              day: 'numeric',
-            })
+            const enteredDate = formatDate(entry.entered_at)
 
             return (
               <div key={`${entry.stage_id}-${i}`} className="relative flex items-start gap-3">
@@ -99,7 +102,7 @@ export function PortalTimeline({ token, primaryColor }: PortalTimelineProps) {
                     {entry.stage_name}
                     {isCurrent && (
                       <span className="ml-2 text-xs font-normal text-slate-500">
-                        (Current)
+                        {tr.timeline_current}
                       </span>
                     )}
                   </p>

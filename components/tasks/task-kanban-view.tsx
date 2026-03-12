@@ -19,7 +19,8 @@ import {
 } from '@dnd-kit/sortable'
 import { useDroppable } from '@dnd-kit/core'
 import { CSS } from '@dnd-kit/utilities'
-import { format, isPast, isToday } from 'date-fns'
+import { isPast, isToday } from 'date-fns'
+import { formatDate } from '@/lib/utils/formatters'
 import { Calendar, GripVertical } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { TASK_STATUSES } from '@/lib/utils/constants'
@@ -99,7 +100,7 @@ function SortableCard({ task, user, onTaskClick, isOverlay = false }: SortableCa
 
   const formattedDueDate = useMemo(() => {
     if (!task.due_date) return null
-    return format(new Date(task.due_date), 'MMM d')
+    return formatDate(task.due_date)
   }, [task.due_date])
 
   return (

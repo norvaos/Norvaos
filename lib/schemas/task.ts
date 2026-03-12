@@ -15,6 +15,12 @@ export const taskSchema = z.object({
   notes: z.string().optional().nullable(),
   timeline_end: z.string().optional().nullable(),
   custom_checkbox: z.boolean().optional(),
+  task_type: z.enum(['call', 'document_collection', 'form_filling', 'review', 'follow_up', 'meeting', 'other']).default('other'),
+  category: z.enum(['client_facing', 'internal', 'administrative']).default('internal'),
+  reminder_date: z.string().optional().nullable(),
+  is_billable: z.boolean().optional(),
+  completion_note: z.string().optional().nullable(),
+  visibility: z.enum(['everyone', 'assigned_only', 'team']).default('everyone'),
 })
 
 export type TaskFormValues = z.infer<typeof taskSchema>

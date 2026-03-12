@@ -28,6 +28,9 @@ export const contactKeys = {
   detail: (id: string) => [...contactKeys.details(), id] as const,
 }
 
+/** Columns fetched for contact list views (avoids SELECT *). */
+const CONTACT_LIST_COLUMNS = 'id, tenant_id, first_name, last_name, email_primary, phone_primary, contact_type, source, organization_name, is_archived, created_at, created_by, preferred_name, job_title, city, province_state, country, last_contacted_at' as const
+
 export function useContacts(params: ContactListParams) {
   const { tenantId, page = 1, pageSize = 25, search, sortBy = 'created_at', sortDirection = 'desc', contactType, source } = params
 
@@ -40,7 +43,7 @@ export function useContacts(params: ContactListParams) {
 
       let query = supabase
         .from('contacts')
-        .select('*', { count: 'exact' })
+        .select(CONTACT_LIST_COLUMNS, { count: 'exact' })
         .eq('tenant_id', tenantId)
         .eq('is_archived', false)
 
@@ -100,6 +103,34 @@ export function useCreateContact() {
   return useMutation({
     mutationFn: async (contact: ContactInsert) => {
       const supabase = createClient()
+
+      // Check for duplicate contacts by email or phone before inserting
+      if (contact.email_primary) {
+        const { data: emailDups } = await supabase
+          .from('contacts')
+          .select('id, first_name, last_name')
+          .eq('tenant_id', contact.tenant_id)
+          .eq('email_primary', contact.email_primary)
+          .limit(1)
+        if (emailDups && emailDups.length > 0) {
+          const name = [emailDups[0].first_name, emailDups[0].last_name].filter(Boolean).join(' ')
+          throw new Error(`Duplicate contact: "${name}" already has the email "${contact.email_primary}".`)
+        }
+      }
+
+      if (contact.phone_primary) {
+        const { data: phoneDups } = await supabase
+          .from('contacts')
+          .select('id, first_name, last_name')
+          .eq('tenant_id', contact.tenant_id)
+          .eq('phone_primary', contact.phone_primary)
+          .limit(1)
+        if (phoneDups && phoneDups.length > 0) {
+          const name = [phoneDups[0].first_name, phoneDups[0].last_name].filter(Boolean).join(' ')
+          throw new Error(`Duplicate contact: "${name}" already has the phone number "${contact.phone_primary}".`)
+        }
+      }
+
       const { data, error } = await supabase
         .from('contacts')
         .insert(contact)
@@ -115,7 +146,7 @@ export function useCreateContact() {
 
       logAudit({
         tenantId: contact.tenant_id,
-        userId: contact.created_by ?? null,
+        userId: contact.created_by ?? 'system',
         entityType: 'contact',
         entityId: contact.id,
         action: 'created',
@@ -127,8 +158,8 @@ export function useCreateContact() {
         },
       })
     },
-    onError: () => {
-      toast.error('Failed to create contact')
+    onError: (error: Error) => {
+      toast.error(error.message || 'Failed to create contact')
     },
   })
 }
@@ -156,7 +187,7 @@ export function useUpdateContact() {
 
       logAudit({
         tenantId: data.tenant_id,
-        userId: data.created_by ?? null,
+        userId: data.created_by ?? 'system',
         entityType: 'contact',
         entityId: data.id,
         action: 'updated',
@@ -170,6 +201,41 @@ export function useUpdateContact() {
     onError: () => {
       toast.error('Failed to update contact')
     },
+  })
+}
+
+/** Check what records are linked to a contact before archiving. */
+export function useContactDependencies(contactId: string) {
+  return useQuery({
+    queryKey: [...contactKeys.detail(contactId), 'dependencies'],
+    queryFn: async () => {
+      const supabase = createClient()
+
+      const [mattersRes, leadsRes, tasksRes] = await Promise.all([
+        supabase
+          .from('matter_contacts')
+          .select('id', { count: 'exact', head: true })
+          .eq('contact_id', contactId),
+        supabase
+          .from('leads')
+          .select('id', { count: 'exact', head: true })
+          .eq('contact_id', contactId)
+          .neq('status', 'lost'),
+        supabase
+          .from('tasks')
+          .select('id', { count: 'exact', head: true })
+          .eq('contact_id', contactId)
+          .not('status', 'in', '("completed","cancelled")'),
+      ])
+
+      return {
+        matterCount: mattersRes.count ?? 0,
+        leadCount: leadsRes.count ?? 0,
+        taskCount: tasksRes.count ?? 0,
+        hasLinkedRecords: (mattersRes.count ?? 0) + (leadsRes.count ?? 0) + (tasksRes.count ?? 0) > 0,
+      }
+    },
+    enabled: !!contactId,
   })
 }
 
@@ -195,7 +261,7 @@ export function useDeleteContact() {
 
       logAudit({
         tenantId: contact.tenant_id,
-        userId: contact.created_by ?? null,
+        userId: contact.created_by ?? 'system',
         entityType: 'contact',
         entityId: contact.id,
         action: 'archived',

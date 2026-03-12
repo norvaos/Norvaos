@@ -28,7 +28,6 @@ export function useNotifications(userId: string) {
       return data as Notification[]
     },
     enabled: !!userId,
-    refetchInterval: 60_000, // Poll every 60 seconds
   })
 }
 
@@ -37,17 +36,20 @@ export function useUnreadNotificationCount(userId: string) {
     queryKey: notificationKeys.unreadCount(userId),
     queryFn: async () => {
       const supabase = createClient()
-      const { count, error } = await supabase
+      // Use a lightweight SELECT id with count instead of HEAD (HEAD can 503 on some RLS configs)
+      const { data, error } = await supabase
         .from('notifications')
-        .select('*', { count: 'exact', head: true })
+        .select('id')
         .eq('user_id', userId)
         .eq('is_read', false)
+        .limit(100)
 
       if (error) throw error
-      return count ?? 0
+      return data?.length ?? 0
     },
     enabled: !!userId,
-    refetchInterval: 60_000, // Poll every 60 seconds
+    staleTime: 30_000, // 30s — avoid hammering on every re-render
+    retry: 1, // Don't retry aggressively if notifications fail
   })
 }
 

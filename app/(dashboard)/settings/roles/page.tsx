@@ -102,6 +102,16 @@ const PERMISSION_MODULES = [
     label: 'Settings',
     actions: ['view', 'edit'],
   },
+  {
+    key: 'front_desk',
+    label: 'Front Desk',
+    actions: ['view', 'create', 'edit'],
+  },
+  {
+    key: 'check_ins',
+    label: 'Check-Ins (Kiosk)',
+    actions: ['view', 'create'],
+  },
 ]
 
 function buildDefaultPermissions(): Record<string, Record<string, boolean>> {
@@ -365,12 +375,14 @@ export default function SettingsRolesPage() {
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {roles.map((role) => {
+            const isAdmin = role.name === 'Admin'
             const enabledCount = countEnabledPermissions(role.permissions)
             const total = totalPermissionsCount()
             const isDefault = role.is_system || DEFAULT_ROLE_NAMES.includes(role.name)
+            const permLabel = isAdmin ? 'Full Access (all permissions)' : `Permissions (${enabledCount}/${total})`
 
             return (
-              <Card key={role.id}>
+              <Card key={role.id} data-role={role.name}>
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-2">
@@ -397,10 +409,15 @@ export default function SettingsRolesPage() {
                     <Separator />
                     <div>
                       <p className="mb-1.5 text-xs font-medium text-muted-foreground">
-                        Permissions ({enabledCount}/{total})
+                        {permLabel}
                       </p>
                       <div className="flex flex-wrap gap-1">
-                        {PERMISSION_MODULES.map((mod) => {
+                        {isAdmin && (
+                          <Badge variant="outline" className="text-xs bg-primary/10 text-primary border-primary/20">
+                            All Permissions
+                          </Badge>
+                        )}
+                        {!isAdmin && PERMISSION_MODULES.map((mod) => {
                           const modPerms = role.permissions[mod.key]
                           const hasAny = modPerms && Object.values(modPerms).some(Boolean)
                           if (!hasAny) return null
@@ -413,7 +430,7 @@ export default function SettingsRolesPage() {
                             </Badge>
                           )
                         })}
-                        {enabledCount === 0 && (
+                        {enabledCount === 0 && !isAdmin && (
                           <span className="text-xs text-muted-foreground">
                             No permissions set
                           </span>

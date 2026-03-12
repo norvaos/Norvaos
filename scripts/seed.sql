@@ -1,6 +1,6 @@
 -- ============================================================================
 -- LexCRM Seed Data
--- Canadian law firm demo data for Oakville Legal Associates
+-- Canadian law firm demo data for My Law Office
 -- ============================================================================
 
 -- Use a DO block so we can reference generated IDs
@@ -55,8 +55,8 @@ BEGIN
 -- ============================================================================
 INSERT INTO tenants (name, slug, timezone, currency, date_format, subscription_tier, subscription_status, feature_flags, settings)
 VALUES (
-    'Oakville Legal Associates',
-    'oakville-legal',
+    'My Law Office',
+    'my-law-office',
     'America/Toronto',
     'CAD',
     'YYYY-MM-DD',
@@ -90,23 +90,23 @@ RETURNING id INTO v_clerk_role_id;
 -- 3. USERS (linked to fake auth UUIDs for demo — these won't have real auth)
 -- ============================================================================
 INSERT INTO users (tenant_id, auth_user_id, email, first_name, last_name, role_id, settings)
-VALUES (v_tenant_id, gen_random_uuid(), 'zia@oakvillelegal.ca', 'Zia', 'Waseer', v_admin_role_id, '{}'::jsonb)
+VALUES (v_tenant_id, gen_random_uuid(), 'zia@zia.ca', 'Zia', 'Waseer', v_admin_role_id, '{}'::jsonb)
 RETURNING id INTO v_user_admin;
 
 INSERT INTO users (tenant_id, auth_user_id, email, first_name, last_name, role_id, settings)
-VALUES (v_tenant_id, gen_random_uuid(), 'sarah.chen@oakvillelegal.ca', 'Sarah', 'Chen', v_lawyer_role_id, '{}'::jsonb)
+VALUES (v_tenant_id, gen_random_uuid(), 'sarah.chen@mylawoffice.ca', 'Sarah', 'Chen', v_lawyer_role_id, '{}'::jsonb)
 RETURNING id INTO v_user_lawyer1;
 
 INSERT INTO users (tenant_id, auth_user_id, email, first_name, last_name, role_id, settings)
-VALUES (v_tenant_id, gen_random_uuid(), 'marcus.thompson@oakvillelegal.ca', 'Marcus', 'Thompson', v_lawyer_role_id, '{}'::jsonb)
+VALUES (v_tenant_id, gen_random_uuid(), 'marcus.thompson@mylawoffice.ca', 'Marcus', 'Thompson', v_lawyer_role_id, '{}'::jsonb)
 RETURNING id INTO v_user_lawyer2;
 
 INSERT INTO users (tenant_id, auth_user_id, email, first_name, last_name, role_id, settings)
-VALUES (v_tenant_id, gen_random_uuid(), 'priya.patel@oakvillelegal.ca', 'Priya', 'Patel', v_paralegal_role_id, '{}'::jsonb)
+VALUES (v_tenant_id, gen_random_uuid(), 'priya.patel@mylawoffice.ca', 'Priya', 'Patel', v_paralegal_role_id, '{}'::jsonb)
 RETURNING id INTO v_user_paralegal;
 
 INSERT INTO users (tenant_id, auth_user_id, email, first_name, last_name, role_id, settings)
-VALUES (v_tenant_id, gen_random_uuid(), 'emily.ross@oakvillelegal.ca', 'Emily', 'Ross', v_clerk_role_id, '{}'::jsonb)
+VALUES (v_tenant_id, gen_random_uuid(), 'emily.ross@mylawoffice.ca', 'Emily', 'Ross', v_clerk_role_id, '{}'::jsonb)
 RETURNING id INTO v_user_clerk;
 
 -- ============================================================================
@@ -170,7 +170,7 @@ INSERT INTO pipeline_stages (pipeline_id, tenant_id, name, color, sort_order, is
 
 -- Individual contacts
 INSERT INTO contacts (tenant_id, contact_type, first_name, last_name, email_primary, phone_primary, phone_type_primary, city, province_state, postal_code, country, source, created_by)
-VALUES (v_tenant_id, 'individual', 'Amit', 'Sharma', 'amit.sharma@gmail.com', '+1 (905) 555-0101', 'mobile', 'Oakville', 'Ontario', 'L6H 3A7', 'Canada', 'Referral', v_user_admin)
+VALUES (v_tenant_id, 'individual', 'Amit', 'Sharma', 'amit.sharma@gmail.com', '+1 (905) 555-0101', 'mobile', 'Toronto', 'Ontario', 'M5V 3A7', 'Canada', 'Referral', v_user_admin)
 RETURNING id INTO v_contact1;
 
 INSERT INTO contacts (tenant_id, contact_type, first_name, last_name, email_primary, phone_primary, phone_type_primary, city, province_state, postal_code, country, source, created_by)
@@ -186,7 +186,7 @@ VALUES (v_tenant_id, 'individual', 'Fatima', 'Al-Hassan', 'fatima.alhassan@yahoo
 RETURNING id INTO v_contact4;
 
 INSERT INTO contacts (tenant_id, contact_type, first_name, last_name, email_primary, phone_primary, phone_type_primary, city, province_state, postal_code, country, source, created_by)
-VALUES (v_tenant_id, 'individual', 'David', 'Kim', 'david.kim@proton.me', '+1 (905) 555-0505', 'mobile', 'Oakville', 'Ontario', 'L6J 5A5', 'Canada', 'Walk-in', v_user_admin)
+VALUES (v_tenant_id, 'individual', 'David', 'Kim', 'david.kim@proton.me', '+1 (905) 555-0505', 'mobile', 'Burlington', 'Ontario', 'L7R 5A5', 'Canada', 'Walk-in', v_user_admin)
 RETURNING id INTO v_contact5;
 
 INSERT INTO contacts (tenant_id, contact_type, first_name, last_name, email_primary, phone_primary, phone_type_primary, city, province_state, postal_code, country, source, created_by)
@@ -202,7 +202,7 @@ VALUES (v_tenant_id, 'individual', 'Priya', 'Gupta', 'priya.gupta@hotmail.com', 
 RETURNING id INTO v_contact8;
 
 INSERT INTO contacts (tenant_id, contact_type, first_name, last_name, email_primary, phone_primary, phone_type_primary, city, province_state, postal_code, country, source, created_by)
-VALUES (v_tenant_id, 'individual', 'Michael', 'Chang', 'mchang@rogers.com', '+1 (905) 555-0909', 'mobile', 'Oakville', 'Ontario', 'L6H 6R3', 'Canada', 'Phone Inquiry', v_user_admin)
+VALUES (v_tenant_id, 'individual', 'Michael', 'Chang', 'mchang@rogers.com', '+1 (905) 555-0909', 'mobile', 'Mississauga', 'Ontario', 'L5B 6R3', 'Canada', 'Phone Inquiry', v_user_admin)
 RETURNING id INTO v_contact9;
 
 INSERT INTO contacts (tenant_id, contact_type, first_name, last_name, email_primary, phone_primary, phone_type_primary, city, province_state, postal_code, country, source, created_by)
@@ -353,7 +353,7 @@ INSERT INTO activities (tenant_id, activity_type, entity_type, entity_id, user_i
 VALUES (v_tenant_id, 'meeting_scheduled', 'matter', v_matter5, v_user_lawyer2, 'Initial consultation with O''Brien', 'Scheduled for next Tuesday at 10:00 AM. Will review accident reports.');
 
 INSERT INTO activities (tenant_id, activity_type, entity_type, entity_id, user_id, title, description)
-VALUES (v_tenant_id, 'document_uploaded', 'matter', v_matter4, v_user_clerk, 'Title search uploaded', 'Uploaded title search results for 45 Lakeshore Rd, Oakville.');
+VALUES (v_tenant_id, 'document_uploaded', 'matter', v_matter4, v_user_clerk, 'Title search uploaded', 'Uploaded title search results for 45 Lakeshore Rd.');
 
 INSERT INTO activities (tenant_id, activity_type, entity_type, entity_id, user_id, title, description)
 VALUES (v_tenant_id, 'task_completed', 'matter', v_matter1, v_user_paralegal, 'Passport copies collected', 'All family member passports scanned and filed.');

@@ -22,7 +22,39 @@ interface GatingRuleRequirePreviousStage {
   stage_name: string
 }
 
-type GatingRule = GatingRuleChecklistComplete | GatingRuleRequireDeadlines | GatingRuleRequirePreviousStage
+interface GatingRuleRequireIntakeComplete {
+  type: 'require_intake_complete'
+  minimum_status?: 'complete' | 'validated'
+}
+
+interface GatingRuleRequireRiskReview {
+  type: 'require_risk_review'
+  block_levels?: string[]
+}
+
+interface GatingRuleRequireDocumentSlotsComplete {
+  type: 'require_document_slots_complete'
+}
+
+interface GatingRuleRequireNoContradictions {
+  type: 'require_no_contradictions'
+  severity?: 'blocking'
+}
+
+interface GatingRuleRequireImmIntakeStatus {
+  type: 'require_imm_intake_status'
+  minimum_status: string
+}
+
+export type GatingRule =
+  | GatingRuleChecklistComplete
+  | GatingRuleRequireDeadlines
+  | GatingRuleRequirePreviousStage
+  | GatingRuleRequireIntakeComplete
+  | GatingRuleRequireRiskReview
+  | GatingRuleRequireDocumentSlotsComplete
+  | GatingRuleRequireNoContradictions
+  | GatingRuleRequireImmIntakeStatus
 
 // ─── Result Types ─────────────────────────────────────────────────────────────
 
@@ -45,6 +77,13 @@ interface StageEngineParams {
   tenantId: string
   targetStageId: string
   userId: string
+  /**
+   * When true, the stage engine skips its own activity log insert.
+   * Used when the caller (e.g. action executor) handles activity creation
+   * via the atomic triple-write to avoid duplicate activity records.
+   * Phase 7 Fix 5a.
+   */
+  skipActivityLog?: boolean
 }
 
 // ─── Generic Stage Advancement ────────────────────────────────────────────────
@@ -82,11 +121,12 @@ export async function advanceGenericStage(params: StageEngineParams): Promise<Ad
     return { success: false, error: 'Target stage is not in the same pipeline' }
   }
 
-  // 4. Evaluate gating rules
-  const gatingRules = (Array.isArray(targetStage.gating_rules) ? targetStage.gating_rules : []) as unknown as GatingRule[]
+  // 4. Evaluate gating rules (with default baseline for enforcement-enabled types)
+  const rawGatingRules = (Array.isArray(targetStage.gating_rules) ? targetStage.gating_rules : []) as unknown as GatingRule[]
+  const effectiveRules = await getEffectiveGatingRules(supabase, matterId, rawGatingRules, targetStage.sort_order)
 
-  if (gatingRules.length > 0) {
-    const gateResult = await evaluateGatingRules(supabase, matterId, tenantId, gatingRules, currentState?.stage_history)
+  if (effectiveRules.length > 0) {
+    const gateResult = await evaluateGatingRules(supabase, matterId, tenantId, effectiveRules, currentState?.stage_history)
     if (!gateResult.passed) {
       // Log the blocked attempt
       await logActivity(supabase, {
@@ -170,28 +210,32 @@ export async function advanceGenericStage(params: StageEngineParams): Promise<Ad
       .eq('tenant_id', tenantId)
   }
 
-  // 8. Log activity
-  await logActivity(supabase, {
-    tenantId,
-    matterId,
-    activityType: 'stage_change',
-    title: `Stage advanced to "${targetStage.name}"`,
-    description: currentState
-      ? `Moved from previous stage`
-      : `Initial stage set to "${targetStage.name}"`,
-    userId,
-    metadata: {
-      target_stage_id: targetStageId,
-      target_stage_name: targetStage.name,
-      previous_stage_id: currentState?.current_stage_id ?? null,
-    },
-  })
+  // 8. Log activity (skipped when caller handles via atomic triple-write)
+  if (!params.skipActivityLog) {
+    await logActivity(supabase, {
+      tenantId,
+      matterId,
+      activityType: 'stage_change',
+      title: `Stage advanced to "${targetStage.name}"`,
+      description: currentState
+        ? `Moved from previous stage`
+        : `Initial stage set to "${targetStage.name}"`,
+      userId,
+      metadata: {
+        target_stage_id: targetStageId,
+        target_stage_name: targetStage.name,
+        previous_stage_id: currentState?.current_stage_id ?? null,
+      },
+    })
+  }
 
   // 9. Notify matter stakeholders
   await notifyStageChange(supabase, {
     tenantId,
     matterId,
     newStageName: targetStage.name,
+    clientLabel: targetStage.client_label ?? null,
+    notifyClient: targetStage.notify_client_on_stage_change ?? false,
     previousStageId: currentState?.current_stage_id ?? null,
     userId,
   })
@@ -367,27 +411,31 @@ export async function advanceImmigrationStage(params: StageEngineParams): Promis
   // 7. Auto-initialize checklist if not already done (first stage entry)
   await autoInitializeChecklist(supabase, tenantId, matterId, newStage.case_type_id)
 
-  // 8. Log activity
-  await logActivity(supabase, {
-    tenantId,
-    matterId,
-    activityType: 'stage_change',
-    title: `Stage advanced to "${newStage.name}"`,
-    description: `Immigration case stage updated`,
-    userId,
-    metadata: {
-      target_stage_id: targetStageId,
-      target_stage_name: newStage.name,
-      previous_stage_id: currentMatterImm.current_stage_id,
-      auto_tasks_created: autoTasks.length,
-    },
-  })
+  // 8. Log activity (skipped when caller handles via atomic triple-write)
+  if (!params.skipActivityLog) {
+    await logActivity(supabase, {
+      tenantId,
+      matterId,
+      activityType: 'stage_change',
+      title: `Stage advanced to "${newStage.name}"`,
+      description: `Immigration case stage updated`,
+      userId,
+      metadata: {
+        target_stage_id: targetStageId,
+        target_stage_name: newStage.name,
+        previous_stage_id: currentMatterImm.current_stage_id,
+        auto_tasks_created: autoTasks.length,
+      },
+    })
+  }
 
   // 9. Notify matter stakeholders (responsible + originating lawyer)
   await notifyStageChange(supabase, {
     tenantId,
     matterId,
     newStageName: newStage.name,
+    clientLabel: newStage.client_label ?? null,
+    notifyClient: newStage.notify_client_on_stage_change ?? false,
     previousStageId: currentMatterImm.current_stage_id,
     userId,
   })
@@ -412,7 +460,7 @@ export async function advanceImmigrationStage(params: StageEngineParams): Promis
 
 // ─── Gating Rule Evaluator ────────────────────────────────────────────────────
 
-async function evaluateGatingRules(
+export async function evaluateGatingRules(
   supabase: SupabaseClient<Database>,
   matterId: string,
   tenantId: string,
@@ -469,10 +517,168 @@ async function evaluateGatingRules(
         }
         break
       }
+
+      case 'require_intake_complete': {
+        const { data: intake } = await supabase
+          .from('matter_intake')
+          .select('intake_status')
+          .eq('matter_id', matterId)
+          .maybeSingle()
+
+        const minStatus = rule.minimum_status ?? 'validated'
+        const statusOrder = ['incomplete', 'complete', 'validated', 'locked']
+        const currentIdx = statusOrder.indexOf(intake?.intake_status ?? 'incomplete')
+        const requiredIdx = statusOrder.indexOf(minStatus)
+
+        if (currentIdx < requiredIdx) {
+          failedRules.push(
+            `Core Data Card must be ${minStatus} before advancing. Current status: ${intake?.intake_status ?? 'not started'}`
+          )
+        }
+        break
+      }
+
+      case 'require_risk_review': {
+        const { data: riskIntake } = await supabase
+          .from('matter_intake')
+          .select('risk_level, risk_override_level, risk_override_at')
+          .eq('matter_id', matterId)
+          .maybeSingle()
+
+        const blockLevels = rule.block_levels ?? ['critical']
+        const effectiveLevel = riskIntake?.risk_override_level ?? riskIntake?.risk_level
+
+        if (effectiveLevel && blockLevels.includes(effectiveLevel)) {
+          const hasOverride = !!riskIntake?.risk_override_at
+          if (!hasOverride) {
+            failedRules.push(
+              `Risk level is "${effectiveLevel}". Lawyer review and override required before advancing.`
+            )
+          }
+        }
+        break
+      }
+
+      case 'require_document_slots_complete': {
+        const { data: requiredSlots } = await supabase
+          .from('document_slots')
+          .select('id, slot_name, status')
+          .eq('matter_id', matterId)
+          .eq('is_active', true)
+          .eq('is_required', true)
+
+        if (requiredSlots && requiredSlots.length > 0) {
+          const unaccepted = requiredSlots.filter((s) => s.status !== 'accepted')
+          if (unaccepted.length > 0) {
+            const missingNames = unaccepted.slice(0, 3).map((s) => s.slot_name).join(', ')
+            const suffix = unaccepted.length > 3 ? '...' : ''
+            failedRules.push(
+              `Required documents not yet accepted (${requiredSlots.length - unaccepted.length}/${requiredSlots.length}): ${missingNames}${suffix}`
+            )
+          }
+        }
+        break
+      }
+
+      case 'require_no_contradictions': {
+        const { data: intakeForContra } = await supabase
+          .from('matter_intake')
+          .select('contradiction_flags, contradiction_override_at')
+          .eq('matter_id', matterId)
+          .maybeSingle()
+
+        if (intakeForContra) {
+          const flags = Array.isArray(intakeForContra.contradiction_flags)
+            ? intakeForContra.contradiction_flags
+            : []
+          const blockingSeverity = (rule as GatingRuleRequireNoContradictions).severity ?? 'blocking'
+          const blockingFlags = flags.filter(
+            (f: any) => typeof f === 'object' && f?.severity === blockingSeverity
+          )
+          if (blockingFlags.length > 0 && !intakeForContra.contradiction_override_at) {
+            failedRules.push(
+              `${blockingFlags.length} blocking contradiction(s) must be resolved or overridden before advancing.`
+            )
+          }
+        }
+        break
+      }
+
+      case 'require_imm_intake_status': {
+        const { IMMIGRATION_INTAKE_STATUS_ORDER } = await import('@/lib/config/immigration-playbooks')
+        const requiredStatus = (rule as GatingRuleRequireImmIntakeStatus).minimum_status
+        const requiredIdx = IMMIGRATION_INTAKE_STATUS_ORDER.indexOf(requiredStatus as any)
+
+        const { data: intakeForStatus } = await supabase
+          .from('matter_intake')
+          .select('immigration_intake_status')
+          .eq('matter_id', matterId)
+          .maybeSingle()
+
+        const actualStatus = intakeForStatus?.immigration_intake_status ?? 'not_issued'
+        const actualIdx = IMMIGRATION_INTAKE_STATUS_ORDER.indexOf(actualStatus as any)
+
+        if (requiredIdx >= 0 && actualIdx < requiredIdx) {
+          failedRules.push(
+            `Immigration intake status must be at least "${requiredStatus}". Current: "${actualStatus}".`
+          )
+        }
+        break
+      }
     }
   }
 
   return { passed: failedRules.length === 0, failedRules }
+}
+
+// ─── Default Baseline Gating Resolution ──────────────────────────────────────
+
+/**
+ * Resolves the effective gating rules for a stage.
+ * - If the stage has explicit gating_rules → returns them as-is.
+ * - If gating_rules is empty AND the matter's type has enforcement_enabled = true
+ *   AND the stage is past the early-work threshold (sort_order >= 2) →
+ *   injects default baseline: require_intake_complete (minimum: complete).
+ * - Early stages (sort_order 0–1) are never blocked by default baseline,
+ *   allowing initial consult / intake call work without friction.
+ * - Otherwise returns [] (ungated).
+ *
+ * Both advanceGenericStage() and the check-gating API route call this function,
+ * ensuring enforcement cannot be bypassed by stages that lack explicit configuration.
+ */
+export async function getEffectiveGatingRules(
+  supabase: SupabaseClient<Database>,
+  matterId: string,
+  stageGatingRules: GatingRule[],
+  stageSortOrder?: number
+): Promise<GatingRule[]> {
+  if (stageGatingRules.length > 0) return stageGatingRules
+
+  // Early stages (sort_order 0–1) are intentionally ungated by default
+  // to allow initial consult / intake call stage work without blocking.
+  if (stageSortOrder !== undefined && stageSortOrder < 2) return []
+
+  // No explicit rules — check if matter type has enforcement enabled
+  const { data: matter } = await supabase
+    .from('matters')
+    .select('matter_type_id')
+    .eq('id', matterId)
+    .single()
+
+  if (matter?.matter_type_id) {
+    const { data: matterType } = await supabase
+      .from('matter_types')
+      .select('enforcement_enabled')
+      .eq('id', matter.matter_type_id)
+      .single()
+
+    if (matterType?.enforcement_enabled) {
+      // Default baseline: require intake complete for mid+ stages on enforcement-enabled types
+      return [{ type: 'require_intake_complete', minimum_status: 'complete' } as GatingRule]
+    }
+  }
+
+  return []
 }
 
 // ─── Activity Logger Helper ───────────────────────────────────────────────────
@@ -518,12 +724,17 @@ async function notifyStageChange(
     tenantId: string
     matterId: string
     newStageName: string
+    clientLabel?: string | null
+    notifyClient?: boolean
     previousStageId: string | null
     userId: string
   }
 ): Promise<void> {
   try {
-    const { tenantId, matterId, newStageName, userId } = params
+    const { tenantId, matterId, newStageName, clientLabel, notifyClient, userId } = params
+
+    // Use client_label for client-facing communications (falls back to internal name)
+    const clientFacingName = clientLabel || newStageName
 
     // Fetch matter details for notification context
     const { data: matter } = await supabase
@@ -546,7 +757,7 @@ async function notifyStageChange(
       recipientIds.add(matter.originating_lawyer_id)
     }
 
-    // Create in-app notifications for internal users
+    // Create in-app notifications for internal users (always use internal name)
     const notifications = [...recipientIds].map((recipientId) => ({
       tenant_id: tenantId,
       user_id: recipientId,
@@ -563,7 +774,9 @@ async function notifyStageChange(
       await supabase.from('notifications').insert(notifications)
     }
 
-    // Queue a client-facing notification (for the primary contact)
+    // Client notification: only send when notify_client_on_stage_change is enabled
+    if (!notifyClient) return
+
     // Look up the primary contact from matter_contacts junction table
     const { data: primaryContact } = await supabase
       .from('matter_contacts')
@@ -578,25 +791,25 @@ async function notifyStageChange(
         tenant_id: tenantId,
         matter_id: matterId,
         activity_type: 'client_stage_notification',
-        title: `Client notified: stage moved to "${newStageName}"`,
-        description: `Notification queued for primary contact regarding stage advancement to "${newStageName}"`,
+        title: `Client notified: stage moved to "${clientFacingName}"`,
+        description: `Notification queued for primary contact regarding stage advancement to "${clientFacingName}"`,
         entity_type: 'matter',
         entity_id: matterId,
         user_id: userId,
         metadata: {
           contact_id: primaryContact.contact_id,
-          stage_name: newStageName,
+          stage_name: clientFacingName,
           notification_status: 'queued',
         } as Json,
       })
 
-      // Fire-and-forget email to client (non-blocking)
+      // Fire-and-forget email to client (non-blocking, uses client-facing label)
       sendStageChangeEmail({
         supabase,
         tenantId,
         matterId,
         contactId: primaryContact.contact_id,
-        stageName: newStageName,
+        stageName: clientFacingName,
       }).catch(() => {
         // Email failures never break stage advancement
       })

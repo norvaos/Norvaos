@@ -15,6 +15,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
   Mail,
   Phone,
+  PhoneIncoming,
+  PhoneOutgoing,
   Calendar,
   FileText,
   MessageSquare,
@@ -50,6 +52,8 @@ function getActivityIcon(type: string) {
   switch (type) {
     case 'email': return Mail
     case 'phone_call': return Phone
+    case 'phone_inbound': return PhoneIncoming
+    case 'phone_outbound': return PhoneOutgoing
     case 'meeting': return Calendar
     case 'document': return FileText
     case 'note': return StickyNote
@@ -137,6 +141,24 @@ export function ActivityTimeline({ tenantId, matterId, contactId, entityType, en
   }> = []
 
   activities?.forEach((a) => {
+    // Determine icon and color for phone calls based on direction
+    let icon = getActivityIcon(a.activity_type)
+    let iconColor = 'text-blue-600 bg-blue-50'
+
+    if (a.activity_type === 'phone_call' || a.activity_type === 'phone_inbound' || a.activity_type === 'phone_outbound') {
+      const meta = (a.metadata ?? {}) as Record<string, unknown>
+      const direction = (meta.call_direction ?? meta.direction) as string | undefined
+      if (direction === 'inbound' || a.activity_type === 'phone_inbound') {
+        icon = PhoneIncoming
+        iconColor = 'text-green-600 bg-green-50'
+      } else if (direction === 'outbound' || a.activity_type === 'phone_outbound') {
+        icon = PhoneOutgoing
+        iconColor = 'text-blue-600 bg-blue-50'
+      } else {
+        iconColor = 'text-emerald-600 bg-emerald-50'
+      }
+    }
+
     allItems.push({
       id: `activity-${a.id}`,
       type: 'activity',
@@ -144,8 +166,8 @@ export function ActivityTimeline({ tenantId, matterId, contactId, entityType, en
       description: a.description,
       userId: a.user_id,
       createdAt: a.created_at,
-      icon: getActivityIcon(a.activity_type),
-      iconColor: 'text-blue-600 bg-blue-50',
+      icon,
+      iconColor,
     })
   })
 

@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { format, formatDistanceToNow } from 'date-fns'
+import { formatDistanceToNow } from 'date-fns'
 import {
   CheckCircle2,
   Circle,
@@ -228,6 +228,11 @@ export function TaskDetailSheet({ taskId, open, onOpenChange }: TaskDetailSheetP
       priority: values.priority,
       estimated_minutes: values.estimated_minutes ?? null,
       follow_up_days: values.follow_up_days ?? null,
+      task_type: values.task_type,
+      category: values.category,
+      is_billable: values.is_billable ?? undefined,
+      visibility: values.visibility,
+      reminder_date: values.reminder_date ?? null,
     })
     setEditing(false)
   }
@@ -430,7 +435,7 @@ export function TaskDetailSheet({ taskId, open, onOpenChange }: TaskDetailSheetP
                     {task.due_date ? (
                       <div className="flex items-center gap-2">
                         <span className={cn('text-sm', taskOverdue && 'text-destructive font-medium')}>
-                          {formatDate(task.due_date, 'PPP')}
+                          {formatDate(task.due_date)}
                         </span>
                         {task.due_time && (
                           <span className="text-xs text-muted-foreground">
@@ -449,7 +454,7 @@ export function TaskDetailSheet({ taskId, open, onOpenChange }: TaskDetailSheetP
                   {/* Start Date */}
                   {task.start_date && (
                     <DetailRow label="Start Date" icon={CalendarIcon}>
-                      <span className="text-sm">{formatDate(task.start_date, 'PPP')}</span>
+                      <span className="text-sm">{formatDate(task.start_date)}</span>
                     </DetailRow>
                   )}
 

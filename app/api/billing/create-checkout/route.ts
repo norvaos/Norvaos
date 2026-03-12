@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerSupabaseClient } from '@/lib/supabase/server'
+import { authenticateRequest, AuthError } from '@/lib/services/auth'
+import { requirePermission } from '@/lib/services/require-role'
 import { stripe, getStripePriceId } from '@/lib/stripe/config'
+import { withTiming } from '@/lib/middleware/request-timing'
 
 /**
  * POST /api/billing/create-checkout
@@ -8,30 +10,15 @@ import { stripe, getStripePriceId } from '@/lib/stripe/config'
  *
  * Body: { planTier: 'starter' | 'professional' | 'enterprise', interval: 'monthly' | 'yearly' }
  */
-export async function POST(request: NextRequest) {
+async function handlePost(request: NextRequest) {
   try {
-    const supabase = await createServerSupabaseClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    const auth = await authenticateRequest()
+    requirePermission(auth, 'billing', 'create')
 
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    // Get user's tenant info
-    const { data: userData } = await supabase
-      .from('users')
-      .select('tenant_id')
-      .eq('auth_user_id', user.id)
-      .single()
-
-    if (!userData) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 })
-    }
-
-    const { data: tenant } = await supabase
+    const { data: tenant } = await auth.supabase
       .from('tenants')
       .select('id, name, stripe_customer_id')
-      .eq('id', userData.tenant_id)
+      .eq('id', auth.tenantId)
       .single()
 
     if (!tenant) {
@@ -57,8 +44,15 @@ export async function POST(request: NextRequest) {
     let customerId = tenant.stripe_customer_id
 
     if (!customerId) {
+      // Get user email for Stripe customer
+      const { data: userRecord } = await auth.supabase
+        .from('users')
+        .select('email')
+        .eq('id', auth.userId)
+        .single()
+
       const customer = await stripe.customers.create({
-        email: user.email,
+        email: userRecord?.email ?? '',
         name: tenant.name,
         metadata: {
           tenant_id: tenant.id,
@@ -67,7 +61,7 @@ export async function POST(request: NextRequest) {
       customerId = customer.id
 
       // Store customer ID
-      await supabase
+      await auth.supabase
         .from('tenants')
         .update({ stripe_customer_id: customerId })
         .eq('id', tenant.id)
@@ -101,7 +95,12 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ url: session.url })
   } catch (error) {
+    if (error instanceof AuthError) {
+      return NextResponse.json({ error: error.message }, { status: error.status })
+    }
     console.error('Create checkout error:', error)
     return NextResponse.json({ error: 'Failed to create checkout session' }, { status: 500 })
   }
 }
+
+export const POST = withTiming(handlePost, 'POST /api/billing/create-checkout')

@@ -4,12 +4,15 @@ import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Building2, Loader2, Save } from 'lucide-react'
+import { Building2, Loader2, Lock, MapPin, Phone, Save } from 'lucide-react'
 import { toast } from 'sonner'
+import { TenantNotificationTriggers } from '@/components/settings/tenant-notification-triggers'
 
+import { useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useTenant } from '@/lib/hooks/use-tenant'
-import { firmSchema, type FirmFormValues } from '@/lib/schemas/settings'
+import { firmSchema, type FirmFormValues, firmAddressSchema, type FirmAddressFormValues } from '@/lib/schemas/settings'
+import { JURISDICTIONS } from '@/lib/config/jurisdictions'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -33,21 +36,46 @@ import {
 } from '@/components/ui/form'
 
 const TIMEZONES = [
-  'America/Toronto',
-  'America/Vancouver',
-  'America/Edmonton',
-  'America/Winnipeg',
-  'America/Halifax',
+  // Americas
   'America/St_Johns',
+  'America/Halifax',
+  'America/Toronto',
   'America/New_York',
+  'America/Winnipeg',
   'America/Chicago',
+  'America/Edmonton',
   'America/Denver',
+  'America/Vancouver',
   'America/Los_Angeles',
+  'America/Anchorage',
+  'America/Mexico_City',
+  'America/Sao_Paulo',
+  'America/Argentina/Buenos_Aires',
+  // Europe & Africa
   'Europe/London',
   'Europe/Paris',
+  'Europe/Berlin',
+  'Europe/Amsterdam',
+  'Europe/Madrid',
+  'Europe/Istanbul',
+  'Africa/Cairo',
+  'Africa/Lagos',
+  'Africa/Johannesburg',
+  // Asia & Pacific
+  'Asia/Dubai',
+  'Asia/Karachi',
+  'Asia/Kolkata',
+  'Asia/Dhaka',
+  'Asia/Bangkok',
+  'Asia/Singapore',
+  'Asia/Hong_Kong',
+  'Asia/Shanghai',
+  'Asia/Seoul',
   'Asia/Tokyo',
   'Australia/Sydney',
+  'Australia/Perth',
   'Pacific/Auckland',
+  'Pacific/Honolulu',
 ]
 
 const CURRENCIES = [
@@ -66,6 +94,21 @@ const DATE_FORMATS = [
   { value: 'DD-MM-YYYY', label: 'DD-MM-YYYY (24-02-2026)' },
   { value: 'MMM DD, YYYY', label: 'MMM DD, YYYY (Feb 24, 2026)' },
 ]
+
+function formatTzLabel(tz: string): string {
+  try {
+    const now = new Date()
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone: tz,
+      timeZoneName: 'shortOffset',
+    }).formatToParts(now)
+    const offset = parts.find((p) => p.type === 'timeZoneName')?.value ?? ''
+    const city = tz.split('/').pop()?.replace(/_/g, ' ') ?? tz
+    return `${city} (${offset})`
+  } catch {
+    return tz.replace(/_/g, ' ')
+  }
+}
 
 function ColourPickerField({
   value,
@@ -231,6 +274,31 @@ export default function SettingsFirmPage() {
             </CardContent>
           </Card>
 
+          {/* Jurisdiction (read-only) */}
+          {firmData?.jurisdiction_code && (() => {
+            const j = JURISDICTIONS.find((jd) => jd.code === firmData.jurisdiction_code)
+            return (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    Jurisdiction
+                    <Lock className="h-4 w-4 text-muted-foreground" />
+                  </CardTitle>
+                  <CardDescription>
+                    Set at creation — cannot be changed.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center gap-2 rounded-md border bg-muted/50 px-4 py-3">
+                    <span className="text-lg">{j?.flag ?? ''}</span>
+                    <span className="font-medium">{j?.name ?? firmData.jurisdiction_code}</span>
+                    <span className="text-sm text-muted-foreground">({firmData.jurisdiction_code})</span>
+                  </div>
+                </CardContent>
+              </Card>
+            )
+          })()}
+
           <Card>
             <CardHeader>
               <CardTitle>Branding Colours</CardTitle>
@@ -342,7 +410,7 @@ export default function SettingsFirmPage() {
                         <SelectContent>
                           {TIMEZONES.map((tz) => (
                             <SelectItem key={tz} value={tz}>
-                              {tz.replace(/_/g, ' ')}
+                              {formatTzLabel(tz)}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -417,6 +485,223 @@ export default function SettingsFirmPage() {
           </div>
         </form>
       </Form>
+
+      {/* Notification Triggers (admin) */}
+      <TenantNotificationTriggers />
+
+      {/* Office Address Card */}
+      <FirmAddressCard tenantId={tenant!.id} firmData={firmData} />
     </div>
+  )
+}
+
+// ─── Office Address Card ─────────────────────────────────────────────────────
+
+function FirmAddressCard({
+  tenantId,
+  firmData,
+}: {
+  tenantId: string
+  firmData: Record<string, unknown> | null | undefined
+}) {
+  const queryClient = useQueryClient()
+
+  const form = useForm<FirmAddressFormValues>({
+    resolver: standardSchemaResolver(firmAddressSchema),
+    defaultValues: {
+      address_line1: '',
+      address_line2: '',
+      city: '',
+      province: '',
+      postal_code: '',
+      country: 'Canada',
+      office_phone: '',
+      office_fax: '',
+    },
+  })
+
+  useEffect(() => {
+    if (firmData) {
+      form.reset({
+        address_line1: (firmData.address_line1 as string) ?? '',
+        address_line2: (firmData.address_line2 as string) ?? '',
+        city: (firmData.city as string) ?? '',
+        province: (firmData.province as string) ?? '',
+        postal_code: (firmData.postal_code as string) ?? '',
+        country: (firmData.country as string) ?? 'Canada',
+        office_phone: (firmData.office_phone as string) ?? '',
+        office_fax: (firmData.office_fax as string) ?? '',
+      })
+    }
+  }, [firmData, form])
+
+  const updateAddress = useMutation({
+    mutationFn: async (values: FirmAddressFormValues) => {
+      const supabase = createClient()
+      const { error } = await supabase
+        .from('tenants')
+        .update({
+          address_line1: values.address_line1 || null,
+          address_line2: values.address_line2 || null,
+          city: values.city || null,
+          province: values.province || null,
+          postal_code: values.postal_code || null,
+          country: values.country || 'Canada',
+          office_phone: values.office_phone || null,
+          office_fax: values.office_fax || null,
+        } as never)
+        .eq('id', tenantId)
+      if (error) throw error
+    },
+    onSuccess: () => {
+      toast.success('Office address saved.')
+      queryClient.invalidateQueries({ queryKey: ['settings', 'firm'] })
+    },
+    onError: (error) => {
+      toast.error('Failed to save address.', { description: error.message })
+    },
+  })
+
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit((v) => updateAddress.mutate(v))}>
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <MapPin className="h-5 w-5" />
+              Office Address
+            </CardTitle>
+            <CardDescription>
+              Your office address appears on Use of Representative forms, retainer agreements,
+              and client-facing documents.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <FormField
+              control={form.control}
+              name="address_line1"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Street Address</FormLabel>
+                  <FormControl>
+                    <Input placeholder="123 Legal Street, Suite 400" {...field} value={field.value ?? ''} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="address_line2"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Address Line 2</FormLabel>
+                  <FormControl>
+                    <Input placeholder="PO Box, Floor, Unit (optional)" {...field} value={field.value ?? ''} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <div className="grid gap-4 sm:grid-cols-3">
+              <FormField
+                control={form.control}
+                name="city"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>City</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Toronto" {...field} value={field.value ?? ''} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="province"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Province / State</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Ontario" {...field} value={field.value ?? ''} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="postal_code"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Postal Code</FormLabel>
+                    <FormControl>
+                      <Input placeholder="M5H 2N2" {...field} value={field.value ?? ''} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <FormField
+              control={form.control}
+              name="country"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Country</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Canada" {...field} value={field.value ?? ''} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground pt-2">
+              <Phone className="h-4 w-4" />
+              Contact Numbers
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <FormField
+                control={form.control}
+                name="office_phone"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Office Phone</FormLabel>
+                    <FormControl>
+                      <Input placeholder="+1 (416) 555-0100" {...field} value={field.value ?? ''} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="office_fax"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Fax (optional)</FormLabel>
+                    <FormControl>
+                      <Input placeholder="+1 (416) 555-0199" {...field} value={field.value ?? ''} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          </CardContent>
+          <div className="flex justify-end px-6 pb-6">
+            <Button type="submit" disabled={updateAddress.isPending}>
+              {updateAddress.isPending ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Save className="mr-2 h-4 w-4" />
+              )}
+              Save Address
+            </Button>
+          </div>
+        </Card>
+      </form>
+    </Form>
   )
 }

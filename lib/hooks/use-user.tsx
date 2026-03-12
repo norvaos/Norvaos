@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUIStore } from '@/lib/stores/ui-store'
 import type { User as AuthUser } from '@supabase/supabase-js'
@@ -43,50 +43,77 @@ export function UserProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
-    async function fetchUser() {
-      try {
-        const supabase = createClient()
-        const { data: { user } } = await supabase.auth.getUser()
+  const fetchUser = useCallback(async () => {
+    try {
+      setIsLoading(true)
+      setError(null)
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
 
-        if (!user) {
-          setIsLoading(false)
-          return
-        }
-
-        setAuthUser(user)
-
-        const { data: userData, error: userError } = await supabase
-          .from('users')
-          .select('*')
-          .eq('auth_user_id', user.id)
-          .single()
-
-        if (userError || !userData) {
-          setError('Failed to load user profile')
-          setIsLoading(false)
-          return
-        }
-
-        setAppUser(userData as AppUser)
-
-        // Sync DB practice preference → Zustand on first load
-        // Only when localStorage has no saved state (fresh browser/device)
-        const stored = localStorage.getItem('norvaos-ui')
-        if (!stored && (userData as AppUser).practice_filter_preference) {
-          useUIStore.getState().setActivePracticeFilter(
-            (userData as AppUser).practice_filter_preference!
-          )
-        }
-      } catch {
-        setError('An unexpected error occurred')
-      } finally {
+      if (!user) {
+        setAuthUser(null)
+        setAppUser(null)
         setIsLoading(false)
+        return
       }
-    }
 
-    fetchUser()
+      setAuthUser(user)
+
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('*')
+        .eq('auth_user_id', user.id)
+        .single()
+
+      if (userError || !userData) {
+        setError('Failed to load user profile')
+        setIsLoading(false)
+        return
+      }
+
+      setAppUser(userData as AppUser)
+
+      // Sync DB practice preference → Zustand on first load
+      // Only when localStorage has no saved state (fresh browser/device)
+      const stored = localStorage.getItem('norvaos-ui')
+      if (!stored && (userData as AppUser).practice_filter_preference) {
+        useUIStore.getState().setActivePracticeFilter(
+          (userData as AppUser).practice_filter_preference!
+        )
+      }
+    } catch {
+      setError('An unexpected error occurred')
+    } finally {
+      setIsLoading(false)
+    }
   }, [])
+
+  // Initial fetch on mount
+  useEffect(() => {
+    fetchUser()
+  }, [fetchUser])
+
+  // Listen for auth state changes (login/logout) so the provider
+  // re-fetches automatically after sign-in without needing a hard refresh.
+  useEffect(() => {
+    const supabase = createClient()
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event) => {
+        if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+          fetchUser()
+        }
+        if (event === 'SIGNED_OUT') {
+          setAuthUser(null)
+          setAppUser(null)
+          setError(null)
+        }
+      }
+    )
+
+    return () => {
+      subscription.unsubscribe()
+    }
+  }, [fetchUser])
 
   const fullName = useMemo(
     () =>

@@ -1,5 +1,10 @@
 import { NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { createRateLimiter } from '@/lib/middleware/rate-limit'
+import { withTiming } from '@/lib/middleware/request-timing'
+
+// 30 requests per minute per IP — prevents brute-force token enumeration
+const tokenLookupLimiter = createRateLimiter({ windowMs: 60_000, maxRequests: 30 })
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10 MB
 const ALLOWED_TYPES = [
@@ -10,13 +15,25 @@ const ALLOWED_TYPES = [
   'image/webp',
   'application/msword',
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'application/vnd.ms-excel',
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
 ]
 
-export async function POST(
+async function handlePost(
   request: Request,
   { params }: { params: Promise<{ token: string }> }
 ) {
   try {
+    // Rate limit by IP
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
+    const { allowed, retryAfterMs } = tokenLookupLimiter.check(ip)
+    if (!allowed) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please try again later.' },
+        { status: 429, headers: { 'Retry-After': String(Math.ceil(retryAfterMs / 1000)) } }
+      )
+    }
+
     const { token } = await params
     const admin = createAdminClient()
 
@@ -193,3 +210,5 @@ export async function POST(
     )
   }
 }
+
+export const POST = withTiming(handlePost, 'POST /api/portal/[token]/upload')

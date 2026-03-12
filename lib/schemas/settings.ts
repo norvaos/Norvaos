@@ -9,6 +9,17 @@ export const profileSchema = z.object({
 
 export type ProfileFormValues = z.infer<typeof profileSchema>
 
+export const credentialsSchema = z.object({
+  display_name: z.string().max(200).optional(),
+  title: z.string().max(200).optional(),
+  lso_number: z.string().max(50).optional(),
+  rcic_number: z.string().max(50).optional(),
+  rep_phone: z.string().max(30).optional(),
+  rep_email: z.string().max(255).optional(),
+})
+
+export type CredentialsFormValues = z.infer<typeof credentialsSchema>
+
 export const firmSchema = z.object({
   name: z.string().min(1, 'Firm name is required').max(255),
   primary_color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Invalid colour'),
@@ -21,11 +32,31 @@ export const firmSchema = z.object({
 
 export type FirmFormValues = z.infer<typeof firmSchema>
 
+export const firmAddressSchema = z.object({
+  address_line1: z.string().max(255).optional(),
+  address_line2: z.string().max(255).optional(),
+  city: z.string().max(100).optional(),
+  province: z.string().max(100).optional(),
+  postal_code: z.string().max(20).optional(),
+  country: z.string().max(100).optional(),
+  office_phone: z.string().max(30).optional(),
+  office_fax: z.string().max(30).optional(),
+})
+
+export type FirmAddressFormValues = z.infer<typeof firmAddressSchema>
+
+export const repContactSchema = z.object({
+  rep_phone: z.string().max(30).optional(),
+  rep_email: z.email('Invalid email address').optional().or(z.literal('')),
+})
+
+export type RepContactFormValues = z.infer<typeof repContactSchema>
+
 export const inviteUserSchema = z.object({
   email: z.email('Invalid email address'),
   first_name: z.string().min(1, 'First name is required').max(100),
   last_name: z.string().min(1, 'Last name is required').max(100),
-  role_id: z.string().uuid('Please select a role'),
+  role_id: z.string().uuid('Please select a role').optional(),
 })
 
 export type InviteUserFormValues = z.infer<typeof inviteUserSchema>

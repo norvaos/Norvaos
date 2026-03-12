@@ -9,6 +9,7 @@ import {
   useDownloadDocument,
   type DocumentWithEntity,
 } from '@/lib/queries/documents'
+import { useMicrosoftConnection } from '@/lib/queries/microsoft-integration'
 import { DocumentViewer } from '@/components/shared/document-viewer'
 import { EmptyState } from '@/components/shared/empty-state'
 import { useTenant } from '@/lib/hooks/use-tenant'
@@ -64,6 +65,7 @@ import {
   Tag,
   Briefcase,
   LinkIcon,
+  Cloud,
 } from 'lucide-react'
 
 // ── Constants ───────────────────────────────────────────────────────────────
@@ -146,9 +148,14 @@ function UploadDialog({
   const [fileNames, setFileNames] = useState<Record<number, string>>({})
   const [category, setCategory] = useState('general')
   const [description, setDescription] = useState('')
+  const [storageLocation, setStorageLocation] = useState<'local' | 'onedrive'>('local')
   const [isDragging, setIsDragging] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const uploadMutation = useUploadDocument()
+
+  // Check if OneDrive is connected and enabled
+  const { data: msConnection } = useMicrosoftConnection(userId)
+  const hasOneDrive = !!(msConnection?.is_active && msConnection?.onedrive_enabled)
 
   const handleFiles = useCallback((files: FileList | null) => {
     if (files) {
@@ -193,13 +200,19 @@ function UploadDialog({
       const editedName = fileNames[i]
       const ext = getFileExtension(file.name)
       const displayName = editedName ? `${editedName}${ext}` : file.name
-      await uploadMutation.mutateAsync({ file, metadata: metadataBase, displayName })
+      await uploadMutation.mutateAsync({
+        file,
+        metadata: metadataBase,
+        displayName,
+        storageLocation: hasOneDrive ? storageLocation : undefined,
+      })
     }
 
     setSelectedFiles([])
     setFileNames({})
     setCategory('general')
     setDescription('')
+    setStorageLocation('local')
     onOpenChange(false)
   }
 
@@ -208,6 +221,7 @@ function UploadDialog({
     setFileNames({})
     setCategory('general')
     setDescription('')
+    setStorageLocation('local')
   }
 
   return (
@@ -296,6 +310,38 @@ function UploadDialog({
                 onChange={(e) => setDescription(e.target.value)}
               />
             </div>
+            {hasOneDrive && (
+              <div>
+                <label className="text-sm font-medium">Save to</label>
+                <div className="flex gap-2 mt-1">
+                  <Button
+                    type="button"
+                    variant={storageLocation === 'local' ? 'default' : 'outline'}
+                    size="sm"
+                    className="flex-1"
+                    onClick={() => setStorageLocation('local')}
+                  >
+                    <HardDrive className="h-4 w-4 mr-2" />
+                    NorvaOS
+                  </Button>
+                  <Button
+                    type="button"
+                    variant={storageLocation === 'onedrive' ? 'default' : 'outline'}
+                    size="sm"
+                    className="flex-1"
+                    onClick={() => setStorageLocation('onedrive')}
+                  >
+                    <Cloud className="h-4 w-4 mr-2" />
+                    OneDrive
+                  </Button>
+                </div>
+                {storageLocation === 'onedrive' && (
+                  <p className="text-xs text-muted-foreground mt-1">
+                    File will be saved to your OneDrive in the NorvaOS folder.
+                  </p>
+                )}
+              </div>
+            )}
           </div>
         )}
 
@@ -481,7 +527,7 @@ export default function DocumentsPage() {
 
   // ── Handlers ──
   const handleDownload = async (storagePath: string, fileName: string) => {
-    const blob = await downloadMutation.mutateAsync(storagePath)
+    const blob = await downloadMutation.mutateAsync({ storagePath })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url

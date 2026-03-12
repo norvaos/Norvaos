@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { formatDistanceToNow } from 'date-fns'
 import {
@@ -20,12 +20,14 @@ import {
   useUnreadNotificationCount,
   useMarkNotificationAsRead,
   useMarkAllNotificationsAsRead,
+  notificationKeys,
 } from '@/lib/queries/notifications'
+import { useRealtime } from '@/lib/hooks/use-realtime'
+import { useQueryClient } from '@tanstack/react-query'
 import { cn } from '@/lib/utils'
 
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { Separator } from '@/components/ui/separator'
 import {
   Popover,
   PopoverContent,
@@ -53,12 +55,30 @@ export function NotificationBell() {
   const { appUser } = useUser()
   const userId = appUser?.id ?? ''
   const [open, setOpen] = useState(false)
+  const [mounted, setMounted] = useState(false)
   const router = useRouter()
+  const queryClient = useQueryClient()
+
+  // Prevent hydration mismatch — Radix Popover generates different
+  // aria-controls IDs between SSR and client. Defer rendering until mounted.
+  useEffect(() => { setMounted(true) }, [])
 
   const { data: notifications, isLoading } = useNotifications(userId)
   const { data: unreadCount } = useUnreadNotificationCount(userId)
   const markAsRead = useMarkNotificationAsRead()
   const markAllAsRead = useMarkAllNotificationsAsRead()
+
+  // Realtime: subscribe to new notifications for this user
+  useRealtime<Record<string, unknown>>({
+    table: 'notifications',
+    filter: `user_id=eq.${userId}`,
+    event: 'INSERT',
+    enabled: !!userId,
+    onInsert: () => {
+      queryClient.invalidateQueries({ queryKey: notificationKeys.list(userId) })
+      queryClient.invalidateQueries({ queryKey: notificationKeys.unreadCount(userId) })
+    },
+  })
 
   function handleNotificationClick(notification: {
     id: string
@@ -84,7 +104,7 @@ export function NotificationBell() {
           router.push(`/contacts/${notification.entity_id}`)
           break
         case 'lead':
-          router.push(`/leads/${notification.entity_id}`)
+          router.push(`/command/lead/${notification.entity_id}`)
           break
       }
       setOpen(false)
@@ -93,6 +113,16 @@ export function NotificationBell() {
 
   function handleMarkAllRead() {
     markAllAsRead.mutate(userId)
+  }
+
+  // SSR placeholder — identical layout, no Radix Popover (avoids hydration ID mismatch)
+  if (!mounted) {
+    return (
+      <Button variant="ghost" size="icon" className="relative h-9 w-9">
+        <Bell className="h-5 w-5" />
+        <span className="sr-only">Notifications</span>
+      </Button>
+    )
   }
 
   return (

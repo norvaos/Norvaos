@@ -41,6 +41,7 @@ export function usePipelines(tenantId: string, type?: string) {
       return data as Pipeline[]
     },
     enabled: !!tenantId,
+    staleTime: 5 * 60 * 1000, // 5 min — pipelines rarely change
   })
 }
 
@@ -77,6 +78,7 @@ export function usePipelineStages(pipelineId: string) {
       return data as PipelineStage[]
     },
     enabled: !!pipelineId,
+    staleTime: 5 * 60 * 1000, // 5 min — stages rarely change
   })
 }
 

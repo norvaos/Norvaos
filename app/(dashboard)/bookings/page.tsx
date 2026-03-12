@@ -11,8 +11,12 @@ import {
   MoreHorizontal,
   User,
   Search,
+  AlertTriangle,
+  RefreshCw,
+  Calendar,
 } from 'lucide-react'
-import { format } from 'date-fns'
+import Link from 'next/link'
+import { formatDate } from '@/lib/utils/formatters'
 import { toast } from 'sonner'
 
 import { useTenant } from '@/lib/hooks/use-tenant'
@@ -26,8 +30,8 @@ import {
   useAppointments,
   useUpdateAppointmentStatus,
   type BookingPageWithUser,
-  type AppointmentWithDetails,
 } from '@/lib/queries/booking'
+import { useMicrosoftConnection, useTriggerSync } from '@/lib/queries/microsoft-integration'
 import { APPOINTMENT_STATUSES, BOOKING_DURATIONS } from '@/lib/utils/constants'
 import { cn } from '@/lib/utils'
 
@@ -109,6 +113,10 @@ export default function BookingsPage() {
   const { data: bookingPages, isLoading: pagesLoading } = useBookingPages(tenantId)
   const { data: appointments, isLoading: appointmentsLoading } = useAppointments(tenantId, { upcoming: true })
 
+  // Microsoft calendar sync status
+  const { data: msConnection } = useMicrosoftConnection(userId)
+  const triggerSync = useTriggerSync()
+
   // Mutations
   const createPage = useCreateBookingPage()
   const updatePage = useUpdateBookingPage()
@@ -135,6 +143,11 @@ export default function BookingsPage() {
 
   // Search
   const [appointmentSearch, setAppointmentSearch] = useState('')
+
+  // Calendar sync status helpers
+  const calendarSyncEnabled = msConnection?.calendar_sync_enabled ?? false
+  const msConnected = !!msConnection?.is_active
+  const lastCalendarSync = msConnection?.last_calendar_sync_at
 
   function resetForm() {
     setFormTitle('')
@@ -237,20 +250,88 @@ export default function BookingsPage() {
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Bookings</h1>
           <p className="text-sm text-muted-foreground">
-            Manage booking pages and view appointments
+            Manage appointment types, booking pages, and view upcoming appointments
           </p>
         </div>
         <Button onClick={openCreate}>
           <Plus className="mr-2 h-4 w-4" />
-          Create Booking Page
+          New Appointment Type
         </Button>
       </div>
 
+      {/* ── Calendar Sync Status Banner ── */}
+      {!msConnected && (
+        <div className="flex items-center gap-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3">
+          <AlertTriangle className="h-5 w-5 flex-shrink-0 text-amber-600" />
+          <div className="flex-1">
+            <p className="text-sm font-medium text-amber-800">
+              Outlook Calendar not connected
+            </p>
+            <p className="text-xs text-amber-600">
+              Connect your Microsoft 365 account to automatically block busy times from your Outlook calendar when clients book appointments.
+            </p>
+          </div>
+          <Link href="/settings/integrations">
+            <Button variant="outline" size="sm" className="border-amber-300 text-amber-700 hover:bg-amber-100">
+              Connect
+            </Button>
+          </Link>
+        </div>
+      )}
+      {msConnected && !calendarSyncEnabled && (
+        <div className="flex items-center gap-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3">
+          <Calendar className="h-5 w-5 flex-shrink-0 text-amber-600" />
+          <div className="flex-1">
+            <p className="text-sm font-medium text-amber-800">
+              Calendar sync is disabled
+            </p>
+            <p className="text-xs text-amber-600">
+              Your Microsoft account is connected but calendar sync is turned off. Enable it so your Outlook busy times are reflected in booking availability.
+            </p>
+          </div>
+          <Link href="/settings/integrations">
+            <Button variant="outline" size="sm" className="border-amber-300 text-amber-700 hover:bg-amber-100">
+              Enable Sync
+            </Button>
+          </Link>
+        </div>
+      )}
+      {msConnected && calendarSyncEnabled && (
+        <div className="flex items-center gap-3 rounded-lg border border-green-200 bg-green-50 px-4 py-3">
+          <Calendar className="h-5 w-5 flex-shrink-0 text-green-600" />
+          <div className="flex-1">
+            <p className="text-sm font-medium text-green-800">
+              Outlook Calendar synced
+            </p>
+            <p className="text-xs text-green-600">
+              {lastCalendarSync
+                ? `Last synced: ${new Date(lastCalendarSync).toLocaleString()}`
+                : 'Initial sync pending — will happen automatically on next booking page load.'}
+              {' '}Busy times are automatically blocked in booking availability.
+            </p>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            className="border-green-300 text-green-700 hover:bg-green-100"
+            onClick={() => triggerSync.mutate('calendar')}
+            disabled={triggerSync.isPending}
+          >
+            {triggerSync.isPending ? (
+              <RefreshCw className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <RefreshCw className="mr-1.5 h-3.5 w-3.5" />
+            )}
+            Sync Now
+          </Button>
+        </div>
+      )}
+
       {/* Tabs */}
-      <Tabs defaultValue="pages" className="space-y-4">
+      <Tabs defaultValue="types" className="space-y-4">
         <TabsList>
-          <TabsTrigger value="pages">
-            Booking Pages
+          <TabsTrigger value="types">
+            Appointment Types
             {bookingPages && (
               <Badge variant="secondary" className="ml-2 text-xs">
                 {bookingPages.length}
@@ -267,8 +348,8 @@ export default function BookingsPage() {
           </TabsTrigger>
         </TabsList>
 
-        {/* ── Tab: Booking Pages ── */}
-        <TabsContent value="pages">
+        {/* ── Tab: Appointment Types (Booking Pages) ── */}
+        <TabsContent value="types">
           {pagesLoading ? (
             <div className="grid gap-4 sm:grid-cols-2">
               {Array.from({ length: 4 }).map((_, i) => (
@@ -278,9 +359,9 @@ export default function BookingsPage() {
           ) : !bookingPages || bookingPages.length === 0 ? (
             <EmptyState
               icon={CalendarCheck}
-              title="No booking pages"
-              description="Create a booking page to let clients schedule consultations."
-              actionLabel="Create Booking Page"
+              title="No appointment types"
+              description="Create an appointment type (e.g., 15 min call, 30 min consultation, 60 min full session) to let clients book with you."
+              actionLabel="New Appointment Type"
               onAction={openCreate}
             />
           ) : (
@@ -415,7 +496,7 @@ export default function BookingsPage() {
             <EmptyState
               icon={CalendarCheck}
               title="No upcoming appointments"
-              description="Appointments will appear here once clients book through your booking pages."
+              description="Appointments will appear here once clients book through your appointment types."
             />
           ) : (
             <div className="space-y-4">
@@ -454,7 +535,7 @@ export default function BookingsPage() {
                         <tr key={apt.id} className="border-b last:border-0">
                           <td className="px-4 py-3">
                             <div className="font-medium text-slate-900">
-                              {format(new Date(apt.appointment_date + 'T00:00:00'), 'MMM d, yyyy')}
+                              {formatDate(apt.appointment_date)}
                             </div>
                             <div className="text-xs text-slate-500">
                               {formatTime12(apt.start_time)} – {formatTime12(apt.end_time)}
@@ -540,7 +621,7 @@ export default function BookingsPage() {
         <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-lg">
           <DialogHeader>
             <DialogTitle>
-              {editingPage ? 'Edit Booking Page' : 'Create Booking Page'}
+              {editingPage ? 'Edit Appointment Type' : 'New Appointment Type'}
             </DialogTitle>
           </DialogHeader>
 
@@ -556,6 +637,9 @@ export default function BookingsPage() {
                 }}
                 placeholder="30 Minute Consultation"
               />
+              <p className="mt-1 text-xs text-muted-foreground">
+                This name is shown to clients (e.g., &quot;15 Min Phone Call&quot;, &quot;60 Min Full Consultation&quot;)
+              </p>
             </div>
 
             {/* Slug */}

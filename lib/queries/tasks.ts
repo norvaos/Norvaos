@@ -15,8 +15,11 @@ interface TaskListParams {
   pageSize?: number
   assignedTo?: string
   matterId?: string
+  contactId?: string
   status?: string
   priority?: string
+  search?: string
+  showCompleted?: boolean
   sortBy?: string
   sortDirection?: 'asc' | 'desc'
 }
@@ -30,10 +33,13 @@ export const taskKeys = {
   myTasks: (userId: string) => [...taskKeys.all, 'my', userId] as const,
 }
 
+const TASK_LIST_COLUMNS = 'id, tenant_id, title, description, status, priority, due_date, due_time, start_date, estimated_minutes, assigned_to, assigned_by, matter_id, contact_id, created_at, created_by, completed_at, completed_by, notes, follow_up_days, parent_task_id, created_via, is_deleted, deleted_at, deleted_by, timeline_end, task_type, category, is_billable, visibility, reminder_date, completion_note' as const
+
 export function useTasks(params: TaskListParams) {
   const {
-    tenantId, page = 1, pageSize = 50, assignedTo, matterId,
-    status, priority, sortBy = 'due_date', sortDirection = 'asc',
+    tenantId, page = 1, pageSize = 50, assignedTo, matterId, contactId,
+    status, priority, search, showCompleted = true,
+    sortBy = 'due_date', sortDirection = 'asc',
   } = params
 
   return useQuery({
@@ -45,13 +51,25 @@ export function useTasks(params: TaskListParams) {
 
       let query = supabase
         .from('tasks')
-        .select('*', { count: 'exact' })
+        .select(TASK_LIST_COLUMNS, { count: 'exact' })
         .eq('tenant_id', tenantId)
+        .eq('is_deleted', false)
 
       if (assignedTo) query = query.eq('assigned_to', assignedTo)
       if (matterId) query = query.eq('matter_id', matterId)
+      if (contactId) query = query.eq('contact_id', contactId)
       if (status) query = query.eq('status', status)
       if (priority) query = query.eq('priority', priority)
+
+      // Hide completed/cancelled unless explicitly shown
+      if (!showCompleted) {
+        query = query.not('status', 'in', '("done","cancelled")')
+      }
+
+      // Server-side text search
+      if (search?.trim()) {
+        query = query.or(`title.ilike.%${search.trim()}%,description.ilike.%${search.trim()}%,notes.ilike.%${search.trim()}%`)
+      }
 
       query = query.order(sortBy, { ascending: sortDirection === 'asc', nullsFirst: false }).range(from, to)
 
@@ -131,7 +149,7 @@ export function useCreateTask() {
 
       logAudit({
         tenantId: task.tenant_id,
-        userId: task.created_by ?? null,
+        userId: task.created_by ?? 'system',
         entityType: 'task',
         entityId: task.id,
         action: 'created',
@@ -180,7 +198,7 @@ export function useUpdateTask() {
 
       logAudit({
         tenantId: data.tenant_id,
-        userId: data.created_by ?? null,
+        userId: data.created_by ?? 'system',
         entityType: 'task',
         entityId: data.id,
         action: 'updated',
@@ -241,7 +259,7 @@ export function useCompleteTask() {
 
       logAudit({
         tenantId: task.tenant_id,
-        userId: task.completed_by ?? null,
+        userId: task.completed_by ?? 'system',
         entityType: 'task',
         entityId: task.id,
         action: 'completed',
@@ -267,7 +285,11 @@ export function useCompleteTask() {
   })
 }
 
-// Fetch all non-deleted tasks for client-side table operations
+/**
+ * @deprecated Use `useTasks()` with pagination params instead.
+ * This function loads all tasks into memory and should not be used
+ * for list views. Kept temporarily for components that haven't migrated.
+ */
 export function useAllTasks(tenantId: string) {
   return useQuery({
     queryKey: [...taskKeys.all, 'all-table', tenantId],
@@ -275,10 +297,11 @@ export function useAllTasks(tenantId: string) {
       const supabase = createClient()
       const { data, error } = await supabase
         .from('tasks')
-        .select('*')
+        .select(TASK_LIST_COLUMNS)
         .eq('tenant_id', tenantId)
         .eq('is_deleted', false)
         .order('created_at', { ascending: false })
+        .limit(1000) // Safety cap — use useTasks() with pagination instead
 
       if (error) throw error
       return data as Task[]
@@ -287,18 +310,22 @@ export function useAllTasks(tenantId: string) {
   })
 }
 
-// Get document counts per task for the file column
-export function useTaskDocumentCounts(tenantId: string) {
+/**
+ * Get document counts for specific task IDs (scoped to current page).
+ * Much more efficient than loading all 5000+ documents for the tenant.
+ */
+export function useTaskDocumentCounts(tenantId: string, taskIds?: string[]) {
   return useQuery({
-    queryKey: ['task-document-counts', tenantId],
+    queryKey: ['task-document-counts', tenantId, taskIds],
     queryFn: async () => {
+      if (!taskIds || taskIds.length === 0) return {}
+
       const supabase = createClient()
       const { data, error } = await supabase
         .from('documents')
         .select('task_id')
         .eq('tenant_id', tenantId)
-        .not('task_id', 'is', null)
-        .limit(5000)
+        .in('task_id', taskIds)
 
       if (error) throw error
       const counts: Record<string, number> = {}
@@ -307,7 +334,8 @@ export function useTaskDocumentCounts(tenantId: string) {
       })
       return counts
     },
-    enabled: !!tenantId,
+    enabled: !!tenantId && !!taskIds && taskIds.length > 0,
+    staleTime: 3 * 60 * 1000, // 3 minutes — doc counts don't change frequently
   })
 }
 
@@ -339,7 +367,7 @@ export function useDeleteTask() {
 
       logAudit({
         tenantId: task.tenant_id,
-        userId: task.deleted_by ?? null,
+        userId: task.deleted_by ?? 'system',
         entityType: 'task',
         entityId: task.id,
         action: 'deleted',

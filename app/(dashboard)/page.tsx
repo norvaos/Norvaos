@@ -46,6 +46,18 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { EmptyState } from '@/components/shared/empty-state'
 import { cn } from '@/lib/utils'
 import type { Database } from '@/lib/types/database'
+// Lazy-load today's appointments widget
+const TodaysAppointmentsWidget = dynamic(
+  () => import('@/components/dashboard/todays-appointments-widget').then((m) => ({ default: m.TodaysAppointmentsWidget })),
+  { loading: () => <ImmigrationWidgetSkeleton /> }
+)
+
+// Lazy-load UEE widget
+const RiskOverviewWidget = dynamic(
+  () => import('@/components/dashboard/risk-overview-widget').then((m) => ({ default: m.RiskOverviewWidget })),
+  { loading: () => <ImmigrationWidgetSkeleton /> }
+)
+
 // Lazy-load immigration widgets — only rendered when immigration section is visible
 const ActiveFilesByStageWidget = dynamic(
   () => import('@/components/immigration/dashboard-widgets').then((m) => ({ default: m.ActiveFilesByStageWidget })),
@@ -515,11 +527,12 @@ interface StatCardProps {
   subtitle?: string
   iconBg: string
   iconColor: string
+  href?: string
 }
 
-const StatCard = memo(function StatCard({ icon: Icon, label, value, subtitle, iconBg, iconColor }: StatCardProps) {
-  return (
-    <Card>
+const StatCard = memo(function StatCard({ icon: Icon, label, value, subtitle, iconBg, iconColor, href }: StatCardProps) {
+  const content = (
+    <Card className={href ? 'transition-shadow hover:shadow-md cursor-pointer' : undefined}>
       <CardContent className="pt-6">
         <div className="flex items-center gap-4">
           <div className={cn('flex h-12 w-12 items-center justify-center rounded-lg', iconBg)}>
@@ -536,6 +549,11 @@ const StatCard = memo(function StatCard({ icon: Icon, label, value, subtitle, ic
       </CardContent>
     </Card>
   )
+
+  if (href) {
+    return <Link href={href}>{content}</Link>
+  }
+  return content
 })
 
 // ---------------------------------------------------------------------------
@@ -623,7 +641,7 @@ function MyTasksWidget({
                           : 'text-muted-foreground'
                       )}
                     >
-                      {formatDate(task.due_date, 'MMM d')}
+                      {formatDate(task.due_date)}
                     </span>
                   )}
                 </div>
@@ -790,7 +808,7 @@ function UpcomingDeadlinesWidget({ tenantId }: { tenantId: string }) {
                   <div className="min-w-0 flex-1">
                     <p className="text-sm font-medium truncate">{matter.title}</p>
                     <p className="text-xs text-muted-foreground">
-                      {formatDate(matter.effectiveDeadline!, 'MMM d, yyyy')}
+                      {formatDate(matter.effectiveDeadline!)}
                     </p>
                   </div>
                   <Badge
@@ -878,7 +896,7 @@ function DeadlinesIn14DaysWidget({
                       {dl.description ? ` · ${dl.description}` : ''}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      {formatDate(dl.due_date, 'MMM d, yyyy')}
+                      {formatDate(dl.due_date)}
                     </p>
                   </div>
                   <Badge
@@ -999,7 +1017,7 @@ export default function DashboardPage() {
 
   // Compute greeting and date once per mount (not per render)
   const greeting = useMemo(() => getGreeting(), [])
-  const todayStr = useMemo(() => format(new Date(), 'EEEE, MMMM d, yyyy'), [])
+  const todayStr = useMemo(() => formatDate(new Date()), [])
 
   if (tenantLoading || userLoading) {
     return <DashboardSkeleton />
@@ -1072,6 +1090,7 @@ export default function DashboardPage() {
               subtitle="Currently open"
               iconBg="bg-blue-50"
               iconColor="text-blue-600"
+              href="/matters"
             />
             <StatCard
               icon={CheckSquare}
@@ -1080,6 +1099,7 @@ export default function DashboardPage() {
               subtitle="Assigned to you"
               iconBg="bg-violet-50"
               iconColor="text-violet-600"
+              href="/tasks"
             />
             <StatCard
               icon={Users}
@@ -1088,6 +1108,7 @@ export default function DashboardPage() {
               subtitle="This month"
               iconBg="bg-emerald-50"
               iconColor="text-emerald-600"
+              href="/leads"
             />
             <StatCard
               icon={AlertTriangle}
@@ -1104,6 +1125,7 @@ export default function DashboardPage() {
                   ? 'text-red-600'
                   : 'text-slate-400'
               }
+              href="/tasks"
             />
           </>
         )}
@@ -1119,6 +1141,8 @@ export default function DashboardPage() {
 
         {/* Right column -- narrower */}
         <div className="lg:col-span-2 space-y-6">
+          <TodaysAppointmentsWidget tenantId={tenantId} userId={userId} />
+          <RiskOverviewWidget tenantId={tenantId} practiceAreaId={activePracticeFilter} />
           <DeadlinesIn14DaysWidget tenantId={tenantId} practiceAreaId={activePracticeFilter} />
           <UpcomingDeadlinesWidget tenantId={tenantId} />
           <PipelineSummaryWidget tenantId={tenantId} />

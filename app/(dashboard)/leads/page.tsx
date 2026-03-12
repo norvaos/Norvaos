@@ -23,6 +23,15 @@ import {
   Eye,
   EyeOff,
   ListFilter,
+  LayoutGrid,
+  List,
+  ArrowUpDown,
+  ChevronDown,
+  ChevronUp,
+  Calendar,
+  Phone,
+  Mail,
+  User,
 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -32,7 +41,8 @@ import { usePracticeAreaContext } from '@/lib/hooks/use-practice-area-context'
 import { createClient } from '@/lib/supabase/client'
 import { usePipelines, usePipelineStages } from '@/lib/queries/pipelines'
 import { useLeads, useUpdateLeadStage, leadKeys } from '@/lib/queries/leads'
-import { formatCurrency } from '@/lib/utils/formatters'
+import { formatCurrency, formatDate, isOverdue } from '@/lib/utils/formatters'
+import { cn } from '@/lib/utils'
 import { LEAD_TEMPERATURES, CONTACT_SOURCES } from '@/lib/utils/constants'
 
 import { KanbanColumn, KanbanColumnSkeleton } from '@/components/pipeline/kanban-column'
@@ -57,6 +67,14 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover'
 import { Separator } from '@/components/ui/separator'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 
 import type { Database } from '@/lib/types/database'
 
@@ -140,6 +158,31 @@ export default function LeadsPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [temperatureFilter, setTemperatureFilter] = useState<string>('all')
   const [sourceFilter, setSourceFilter] = useState<string>('all')
+
+  // ---- View mode (persisted in localStorage) --------------------------------
+  const [viewMode, setViewMode] = useState<'kanban' | 'table'>(() => {
+    if (typeof window === 'undefined') return 'kanban'
+    const saved = localStorage.getItem('norvaos-leads-view-mode')
+    if (saved === 'table') return saved
+    return 'kanban'
+  })
+
+  useEffect(() => {
+    localStorage.setItem('norvaos-leads-view-mode', viewMode)
+  }, [viewMode])
+
+  // ---- Table sort ----------------------------------------------------------
+  const [sortField, setSortField] = useState<string>('created_at')
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc')
+
+  const toggleSort = useCallback((field: string) => {
+    if (sortField === field) {
+      setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'))
+    } else {
+      setSortField(field)
+      setSortDir('asc')
+    }
+  }, [sortField])
 
   // ---- Display settings ---------------------------------------------------
   const [showValues, setShowValues] = useState(true)
@@ -295,6 +338,53 @@ export default function LeadsPage() {
     return map
   }, [filteredLeads, stages])
 
+  // ---- Sorted leads for table view -----------------------------------------
+  const sortedLeads = useMemo(() => {
+    const sorted = [...filteredLeads]
+    sorted.sort((a, b) => {
+      let cmp = 0
+      switch (sortField) {
+        case 'contact_name': {
+          const nameA = a.contact_id ? [contactsMap[a.contact_id]?.first_name, contactsMap[a.contact_id]?.last_name].filter(Boolean).join(' ') : ''
+          const nameB = b.contact_id ? [contactsMap[b.contact_id]?.first_name, contactsMap[b.contact_id]?.last_name].filter(Boolean).join(' ') : ''
+          cmp = nameA.localeCompare(nameB)
+          break
+        }
+        case 'temperature': {
+          const temps = ['hot', 'warm', 'cold']
+          cmp = temps.indexOf(a.temperature ?? 'cold') - temps.indexOf(b.temperature ?? 'cold')
+          break
+        }
+        case 'stage': {
+          const stageMap = new Map(stages?.map((s, i) => [s.id, i]))
+          cmp = (stageMap.get(a.stage_id) ?? 0) - (stageMap.get(b.stage_id) ?? 0)
+          break
+        }
+        case 'source':
+          cmp = (a.source ?? '').localeCompare(b.source ?? '')
+          break
+        case 'estimated_value':
+          cmp = (a.estimated_value ?? 0) - (b.estimated_value ?? 0)
+          break
+        case 'next_follow_up':
+          cmp = (a.next_follow_up ?? '').localeCompare(b.next_follow_up ?? '')
+          break
+        case 'assigned_to': {
+          const userA = a.assigned_to ? [usersMap[a.assigned_to]?.first_name, usersMap[a.assigned_to]?.last_name].filter(Boolean).join(' ') : ''
+          const userB = b.assigned_to ? [usersMap[b.assigned_to]?.first_name, usersMap[b.assigned_to]?.last_name].filter(Boolean).join(' ') : ''
+          cmp = userA.localeCompare(userB)
+          break
+        }
+        case 'created_at':
+        default:
+          cmp = (a.created_at ?? '').localeCompare(b.created_at ?? '')
+          break
+      }
+      return sortDir === 'desc' ? -cmp : cmp
+    })
+    return sorted
+  }, [filteredLeads, sortField, sortDir, contactsMap, usersMap, stages])
+
   // ---- Summary stats -------------------------------------------------------
   const totalLeads = leads.length
   const totalValue = useMemo(
@@ -387,7 +477,7 @@ export default function LeadsPage() {
   )
 
   const handleCardClick = useCallback((leadId: string) => {
-    router.push(`/leads/${leadId}`)
+    router.push(`/command/lead/${leadId}`)
   }, [router])
 
   // ---- Active filter count -------------------------------------------------
@@ -472,6 +562,28 @@ export default function LeadsPage() {
                   total value
                 </span>
               )}
+            </div>
+
+            {/* View toggle */}
+            <div className="flex items-center rounded-md border border-slate-200 p-0.5">
+              <Button
+                variant={viewMode === 'kanban' ? 'secondary' : 'ghost'}
+                size="sm"
+                className="h-7 px-2.5"
+                title="Kanban"
+                onClick={() => setViewMode('kanban')}
+              >
+                <LayoutGrid className="h-3.5 w-3.5" />
+              </Button>
+              <Button
+                variant={viewMode === 'table' ? 'secondary' : 'ghost'}
+                size="sm"
+                className="h-7 px-2.5"
+                title="Table"
+                onClick={() => setViewMode('table')}
+              >
+                <List className="h-3.5 w-3.5" />
+              </Button>
             </div>
 
             {/* Add lead button */}
@@ -686,14 +798,22 @@ export default function LeadsPage() {
         </div>
       </div>
 
-      {/* Kanban board */}
+      {/* Main content area — Kanban or Table */}
       <div className="flex-1 overflow-hidden">
         {stagesLoading || leadsLoading ? (
-          <div className="flex gap-4 overflow-x-auto p-4">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <KanbanColumnSkeleton key={i} />
-            ))}
-          </div>
+          viewMode === 'kanban' ? (
+            <div className="flex gap-4 overflow-x-auto p-4">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <KanbanColumnSkeleton key={i} />
+              ))}
+            </div>
+          ) : (
+            <div className="p-4 space-y-2">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <Skeleton key={i} className="h-10 w-full" />
+              ))}
+            </div>
+          )
         ) : !stages || stages.length === 0 ? (
           <div className="flex h-full items-center justify-center">
             <EmptyState
@@ -702,7 +822,7 @@ export default function LeadsPage() {
               description="This pipeline has no stages yet. Add stages in pipeline settings to start organizing leads."
             />
           </div>
-        ) : (
+        ) : viewMode === 'kanban' ? (
           <DndContext
             sensors={sensors}
             collisionDetection={closestCorners}
@@ -760,6 +880,19 @@ export default function LeadsPage() {
               ) : null}
             </DragOverlay>
           </DndContext>
+        ) : (
+          /* ── Table View ── */
+          <LeadsTable
+            leads={sortedLeads}
+            stages={stages}
+            contactsMap={contactsMap}
+            usersMap={usersMap}
+            practiceAreasMap={practiceAreasMap}
+            sortField={sortField}
+            sortDir={sortDir}
+            onSort={toggleSort}
+            onRowClick={handleCardClick}
+          />
         )}
       </div>
 
@@ -773,6 +906,243 @@ export default function LeadsPage() {
           stages={stages}
         />
       )}
+    </div>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// Table view component
+// ---------------------------------------------------------------------------
+
+type PipelineStage = Database['public']['Tables']['pipeline_stages']['Row']
+
+function SortHeader({
+  label,
+  field,
+  currentField,
+  currentDir,
+  onSort,
+}: {
+  label: string
+  field: string
+  currentField: string
+  currentDir: 'asc' | 'desc'
+  onSort: (field: string) => void
+}) {
+  const active = currentField === field
+  return (
+    <button
+      className="flex items-center gap-1 text-left text-xs font-medium text-slate-500 hover:text-slate-700 transition-colors"
+      onClick={() => onSort(field)}
+    >
+      {label}
+      {active ? (
+        currentDir === 'asc' ? (
+          <ChevronUp className="h-3 w-3 text-blue-600" />
+        ) : (
+          <ChevronDown className="h-3 w-3 text-blue-600" />
+        )
+      ) : (
+        <ArrowUpDown className="h-3 w-3 opacity-40" />
+      )}
+    </button>
+  )
+}
+
+function LeadsTable({
+  leads,
+  stages,
+  contactsMap,
+  usersMap,
+  practiceAreasMap,
+  sortField,
+  sortDir,
+  onSort,
+  onRowClick,
+}: {
+  leads: Lead[]
+  stages: PipelineStage[]
+  contactsMap: Record<string, ContactInfo>
+  usersMap: Record<string, UserInfo>
+  practiceAreasMap: Record<string, { id: string; name: string; color: string }>
+  sortField: string
+  sortDir: 'asc' | 'desc'
+  onSort: (field: string) => void
+  onRowClick: (leadId: string) => void
+}) {
+  const stageMap = useMemo(
+    () => new Map(stages.map((s) => [s.id, s])),
+    [stages]
+  )
+
+  if (leads.length === 0) {
+    return (
+      <div className="flex h-64 items-center justify-center">
+        <EmptyState
+          icon={List}
+          title="No leads match your filters"
+          description="Try adjusting your search or filter criteria."
+        />
+      </div>
+    )
+  }
+
+  return (
+    <div className="overflow-auto h-full">
+      <Table>
+        <TableHeader>
+          <TableRow className="bg-slate-50/80 hover:bg-slate-50/80">
+            <TableHead className="w-[200px]">
+              <SortHeader label="Contact" field="contact_name" currentField={sortField} currentDir={sortDir} onSort={onSort} />
+            </TableHead>
+            <TableHead className="w-[100px]">
+              <SortHeader label="Temperature" field="temperature" currentField={sortField} currentDir={sortDir} onSort={onSort} />
+            </TableHead>
+            <TableHead className="w-[140px]">
+              <SortHeader label="Stage" field="stage" currentField={sortField} currentDir={sortDir} onSort={onSort} />
+            </TableHead>
+            <TableHead className="w-[120px]">
+              <SortHeader label="Source" field="source" currentField={sortField} currentDir={sortDir} onSort={onSort} />
+            </TableHead>
+            <TableHead className="w-[110px] text-right">
+              <SortHeader label="Value" field="estimated_value" currentField={sortField} currentDir={sortDir} onSort={onSort} />
+            </TableHead>
+            <TableHead className="w-[140px]">
+              <SortHeader label="Assigned To" field="assigned_to" currentField={sortField} currentDir={sortDir} onSort={onSort} />
+            </TableHead>
+            <TableHead className="w-[120px]">
+              <SortHeader label="Follow-up" field="next_follow_up" currentField={sortField} currentDir={sortDir} onSort={onSort} />
+            </TableHead>
+            <TableHead className="w-[110px]">
+              <SortHeader label="Created" field="created_at" currentField={sortField} currentDir={sortDir} onSort={onSort} />
+            </TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {leads.map((lead) => {
+            const contact = lead.contact_id ? contactsMap[lead.contact_id] : null
+            const contactName = contact
+              ? [contact.first_name, contact.last_name].filter(Boolean).join(' ') || contact.email_primary || '—'
+              : '—'
+            const stage = stageMap.get(lead.stage_id)
+            const tempInfo = LEAD_TEMPERATURES.find((t) => t.value === lead.temperature)
+            const assignee = lead.assigned_to ? usersMap[lead.assigned_to] : null
+            const assigneeName = assignee ? [assignee.first_name, assignee.last_name].filter(Boolean).join(' ') : null
+            const practiceArea = lead.practice_area_id ? practiceAreasMap[lead.practice_area_id] : null
+            const daysInCurrentStage = lead.stage_entered_at
+              ? Math.max(0, Math.floor((Date.now() - new Date(lead.stage_entered_at).getTime()) / 86400000))
+              : null
+
+            return (
+              <TableRow
+                key={lead.id}
+                className="cursor-pointer hover:bg-blue-50/40 transition-colors"
+                onClick={() => onRowClick(lead.id)}
+              >
+                {/* Contact */}
+                <TableCell>
+                  <div>
+                    <span className="text-sm font-medium text-slate-800">{contactName}</span>
+                    {contact?.organization_name && (
+                      <p className="text-[11px] text-slate-400 truncate">{contact.organization_name}</p>
+                    )}
+                  </div>
+                </TableCell>
+
+                {/* Temperature */}
+                <TableCell>
+                  {tempInfo ? (
+                    <Badge
+                      variant="outline"
+                      className="text-[10px] gap-1"
+                      style={{
+                        borderColor: tempInfo.color,
+                        color: tempInfo.color,
+                      }}
+                    >
+                      <span
+                        className="h-1.5 w-1.5 rounded-full"
+                        style={{ backgroundColor: tempInfo.color }}
+                      />
+                      {tempInfo.label}
+                    </Badge>
+                  ) : (
+                    <span className="text-xs text-slate-400">—</span>
+                  )}
+                </TableCell>
+
+                {/* Stage */}
+                <TableCell>
+                  {stage ? (
+                    <div className="flex items-center gap-1.5">
+                      <span
+                        className="h-2 w-2 rounded-full shrink-0"
+                        style={{ backgroundColor: stage.color ?? '#6b7280' }}
+                      />
+                      <span className="text-xs text-slate-700">{stage.name}</span>
+                      {daysInCurrentStage !== null && daysInCurrentStage > 0 && (
+                        <span className="text-[10px] text-slate-400">{daysInCurrentStage}d</span>
+                      )}
+                    </div>
+                  ) : (
+                    <span className="text-xs text-slate-400">—</span>
+                  )}
+                </TableCell>
+
+                {/* Source */}
+                <TableCell>
+                  <span className="text-xs text-slate-600">{lead.source ?? '—'}</span>
+                </TableCell>
+
+                {/* Value */}
+                <TableCell className="text-right">
+                  {lead.estimated_value ? (
+                    <span className="text-xs font-medium text-slate-700 tabular-nums">
+                      {formatCurrency(lead.estimated_value)}
+                    </span>
+                  ) : (
+                    <span className="text-xs text-slate-400">—</span>
+                  )}
+                </TableCell>
+
+                {/* Assigned To */}
+                <TableCell>
+                  {assigneeName ? (
+                    <span className="text-xs text-slate-600">{assigneeName}</span>
+                  ) : (
+                    <span className="text-xs text-slate-400">Unassigned</span>
+                  )}
+                </TableCell>
+
+                {/* Follow-up */}
+                <TableCell>
+                  {lead.next_follow_up ? (
+                    <span
+                      className={cn(
+                        'text-xs tabular-nums',
+                        isOverdue(lead.next_follow_up)
+                          ? 'text-red-600 font-medium'
+                          : 'text-slate-600'
+                      )}
+                    >
+                      {formatDate(lead.next_follow_up)}
+                    </span>
+                  ) : (
+                    <span className="text-xs text-slate-400">—</span>
+                  )}
+                </TableCell>
+
+                {/* Created */}
+                <TableCell>
+                  <span className="text-xs text-slate-500 tabular-nums">
+                    {lead.created_at ? formatDate(lead.created_at) : '—'}
+                  </span>
+                </TableCell>
+              </TableRow>
+            )
+          })}
+        </TableBody>
+      </Table>
     </div>
   )
 }

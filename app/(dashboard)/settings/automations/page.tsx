@@ -34,6 +34,7 @@ import {
   PRIORITIES,
   DEADLINE_TYPES,
 } from '@/lib/utils/constants'
+import { formatDate } from '@/lib/utils/formatters'
 
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -1129,7 +1130,7 @@ function AutomationCard({
             ? `${executionCount} execution${executionCount !== 1 ? 's' : ''} (30d)`
             : 'No executions'}
         </span>
-        <span>{new Date(rule.created_at).toLocaleDateString()}</span>
+        <span>{formatDate(rule.created_at)}</span>
       </div>
     </Card>
   )

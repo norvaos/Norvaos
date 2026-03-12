@@ -1,0 +1,95 @@
+import { redirect } from 'next/navigation'
+import { createServerSupabaseClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
+import { FrontDeskHeader } from '@/components/front-desk/front-desk-header'
+
+/**
+ * Front Desk Layout — restricted interface with NO sidebar.
+ *
+ * Rule #10: Front Desk Mode is a separate locked interface.
+ *           Own route group, no sidebar, enforced by middleware AND server.
+ *           URL typing must not bypass restrictions.
+ *
+ * Requires: front_desk:view permission.
+ *
+ * Feature flag: tenant.feature_flags.front_desk_mode must be enabled.
+ */
+export default async function FrontDeskLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  // Server-side auth check
+  const supabase = await createServerSupabaseClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    redirect('/login')
+  }
+
+  // Get user's tenant and role
+  const admin = createAdminClient()
+
+  const { data: userData } = await admin
+    .from('users')
+    .select('id, first_name, last_name, avatar_url, tenant_id, role_id')
+    .eq('auth_user_id', user.id)
+    .single()
+
+  if (!userData) {
+    redirect('/login')
+  }
+
+  // Check role has front_desk:view permission
+  let hasPermission = false
+  if (userData.role_id) {
+    const { data: role } = await admin
+      .from('roles')
+      .select('name, permissions')
+      .eq('id', userData.role_id)
+      .single()
+
+    if (role) {
+      if (role.name === 'Admin') {
+        hasPermission = true
+      } else {
+        const perms = (role.permissions ?? {}) as Record<string, Record<string, boolean>>
+        hasPermission = perms.front_desk?.view === true
+      }
+    }
+  }
+
+  if (!hasPermission) {
+    redirect('/')
+  }
+
+  // Check feature flag
+  const { data: tenant } = await admin
+    .from('tenants')
+    .select('name, settings')
+    .eq('id', userData.tenant_id)
+    .single()
+
+  const settings = (tenant?.settings ?? {}) as Record<string, unknown>
+  const featureFlags = (settings.feature_flags ?? {}) as Record<string, boolean>
+
+  if (!featureFlags.front_desk_mode) {
+    redirect('/')
+  }
+
+  return (
+    <div className="min-h-screen bg-slate-50 flex flex-col">
+      <FrontDeskHeader
+        userId={userData.id}
+        userName={[userData.first_name, userData.last_name].filter(Boolean).join(' ') || 'User'}
+        avatarUrl={userData.avatar_url}
+        firmName={tenant?.name ?? 'Law Office'}
+      />
+      <main className="flex-1">
+        {children}
+      </main>
+    </div>
+  )
+}

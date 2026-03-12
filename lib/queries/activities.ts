@@ -89,6 +89,39 @@ export function useTaskActivities(taskId: string, tenantId: string) {
   })
 }
 
+/**
+ * Fetch any unresolved template_condition_error activities for a matter.
+ * Used to display a warning banner on the matter detail page so the
+ * responsible lawyer sees the issue inline — not only via notifications.
+ *
+ * Returns the most recent error activity (within the last 7 days) or null.
+ */
+export function useConditionErrors(matterId: string | undefined) {
+  return useQuery({
+    queryKey: [...activityKeys.all, 'condition-errors', matterId],
+    queryFn: async () => {
+      if (!matterId) return null
+      const supabase = createClient()
+      const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
+
+      const { data, error } = await supabase
+        .from('activities')
+        .select('id, description, metadata, created_at, updated_at')
+        .eq('matter_id', matterId)
+        .eq('activity_type', 'template_condition_error')
+        .gte('created_at', sevenDaysAgo)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle()
+
+      if (error) throw error
+      return data
+    },
+    enabled: !!matterId,
+    staleTime: 2 * 60 * 1000, // 2 minutes — don't re-poll too aggressively
+  })
+}
+
 export function useCreateActivity() {
   const queryClient = useQueryClient()
 

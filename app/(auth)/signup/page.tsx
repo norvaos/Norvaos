@@ -18,6 +18,13 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
+import { JURISDICTIONS, DEFAULT_JURISDICTION } from '@/lib/config/jurisdictions'
 
 const signupSchema = z.object({
   firmName: z.string().min(2, 'Firm name must be at least 2 characters'),
@@ -31,6 +38,7 @@ const signupSchema = z.object({
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
       'Password must contain at least one uppercase letter, one lowercase letter, and one number'
     ),
+  jurisdictionCode: z.string().min(1, 'Jurisdiction is required'),
 })
 
 type SignupFormValues = z.infer<typeof signupSchema>
@@ -42,6 +50,8 @@ export default function SignupPage() {
   const {
     register,
     handleSubmit,
+    setValue,
+    watch,
     formState: { errors },
   } = useForm<SignupFormValues>({
     resolver: standardSchemaResolver(signupSchema),
@@ -51,8 +61,11 @@ export default function SignupPage() {
       lastName: '',
       email: '',
       password: '',
+      jurisdictionCode: DEFAULT_JURISDICTION,
     },
   })
+
+  const selectedJurisdiction = watch('jurisdictionCode')
 
   async function onSubmit(data: SignupFormValues) {
     setIsLoading(true)
@@ -105,6 +118,41 @@ export default function SignupPage() {
             {errors.firmName && (
               <p className="text-sm text-destructive">{errors.firmName.message}</p>
             )}
+          </div>
+
+          {/* Jurisdiction selector */}
+          <div className="space-y-2">
+            <Label>Jurisdiction</Label>
+            <TooltipProvider>
+              <div className="flex gap-2">
+                {JURISDICTIONS.map((j) => (
+                  <Tooltip key={j.code}>
+                    <TooltipTrigger asChild>
+                      <button
+                        type="button"
+                        disabled={!j.enabled || isLoading}
+                        onClick={() => j.enabled && setValue('jurisdictionCode', j.code)}
+                        className={`flex items-center gap-2 rounded-md border px-3 py-2 text-sm transition-colors ${
+                          selectedJurisdiction === j.code
+                            ? 'border-primary bg-primary/5 font-medium'
+                            : j.enabled
+                              ? 'border-border hover:border-primary/50'
+                              : 'cursor-not-allowed border-border/50 opacity-50'
+                        }`}
+                      >
+                        <span>{j.flag}</span>
+                        <span>{j.name}</span>
+                      </button>
+                    </TooltipTrigger>
+                    {!j.enabled && j.disabledTooltip && (
+                      <TooltipContent>
+                        <p>{j.disabledTooltip}</p>
+                      </TooltipContent>
+                    )}
+                  </Tooltip>
+                ))}
+              </div>
+            </TooltipProvider>
           </div>
 
           <div className="grid grid-cols-2 gap-4">

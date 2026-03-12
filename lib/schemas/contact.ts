@@ -28,16 +28,31 @@ export const contactSchema = z.object({
   email_opt_in: z.boolean().default(true),
   sms_opt_in: z.boolean().default(false),
   notes: z.string().optional(),
-}).refine(
-  (data) => {
-    if (data.contact_type === 'individual') {
-      return data.first_name && data.last_name
+}).superRefine((data, ctx) => {
+  if (data.contact_type === 'individual') {
+    if (!data.first_name || data.first_name.trim().length === 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'First name is required for individual contacts',
+        path: ['first_name'],
+      })
     }
-    return !!data.organization_name
-  },
-  {
-    message: 'Individual contacts require first and last name. Organisations require an organisation name.',
+    if (!data.last_name || data.last_name.trim().length === 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Last name is required for individual contacts',
+        path: ['last_name'],
+      })
+    }
+  } else {
+    if (!data.organization_name || data.organization_name.trim().length === 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Organisation name is required',
+        path: ['organization_name'],
+      })
+    }
   }
-)
+})
 
 export type ContactFormValues = z.infer<typeof contactSchema>

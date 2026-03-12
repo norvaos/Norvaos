@@ -86,7 +86,10 @@ export function useCreateTimeEntry() {
       return data as TimeEntry
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: invoicingKeys.all })
+      // Targeted invalidation — only bust time-entry and billing-stats caches
+      queryClient.invalidateQueries({ queryKey: ['invoicing', 'time-entries'] })
+      queryClient.invalidateQueries({ queryKey: ['invoicing', 'unbilled-time'] })
+      queryClient.invalidateQueries({ queryKey: ['invoicing', 'billing-stats'] })
       toast.success('Time entry logged')
     },
     onError: (err: Error) => toast.error(`Failed to log time: ${err.message}`),
@@ -108,7 +111,9 @@ export function useUpdateTimeEntry() {
       return data as TimeEntry
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: invoicingKeys.all })
+      queryClient.invalidateQueries({ queryKey: ['invoicing', 'time-entries'] })
+      queryClient.invalidateQueries({ queryKey: ['invoicing', 'unbilled-time'] })
+      queryClient.invalidateQueries({ queryKey: ['invoicing', 'billing-stats'] })
       toast.success('Time entry updated')
     },
     onError: () => toast.error('Failed to update time entry'),
@@ -124,7 +129,9 @@ export function useDeleteTimeEntry() {
       if (error) throw error
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: invoicingKeys.all })
+      queryClient.invalidateQueries({ queryKey: ['invoicing', 'time-entries'] })
+      queryClient.invalidateQueries({ queryKey: ['invoicing', 'unbilled-time'] })
+      queryClient.invalidateQueries({ queryKey: ['invoicing', 'billing-stats'] })
       toast.success('Time entry deleted')
     },
     onError: () => toast.error('Failed to delete time entry'),

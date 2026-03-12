@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { withTiming } from '@/lib/middleware/request-timing'
 
 /**
  * POST /api/booking/[slug]/submit
@@ -7,7 +8,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
  * Public endpoint — creates an appointment + contact + lead.
  * Follows the same pattern as /api/forms/[slug]/submit.
  */
-export async function POST(
+async function handlePost(
   request: Request,
   { params }: { params: Promise<{ slug: string }> }
 ) {
@@ -72,6 +73,52 @@ export async function POST(
       .limit(1)
 
     if (conflicting && conflicting.length > 0) {
+      return NextResponse.json(
+        { success: false, error: 'This time slot is no longer available. Please choose another time.' },
+        { status: 409 }
+      )
+    }
+
+    // 3b. Timezone-safe calendar event conflict check (Outlook/Office 365 sync).
+    //     Calendar events are stored in UTC, but the slot date/time are in the
+    //     booking page's timezone. We query a padded range and filter in code.
+    const tz = page.timezone || 'UTC'
+    const prevDate = shiftDate(date, -1)
+    const nextDate = shiftDate(date, +1)
+
+    const { data: nearbyCalendarEvents } = await admin
+      .from('calendar_events')
+      .select('start_at, end_at, show_as')
+      .eq('created_by', page.user_id)
+      .eq('tenant_id', page.tenant_id)
+      .eq('is_active', true)
+      .neq('status', 'cancelled')
+      .neq('show_as', 'free')
+      .gte('start_at', prevDate + 'T00:00:00')
+      .lte('start_at', nextDate + 'T23:59:59')
+
+    const slotStartMin = timeToMinutes(time)
+    const slotEndMin = timeToMinutes(endTime)
+
+    const hasCalendarConflict = (nearbyCalendarEvents ?? []).some((e) => {
+      const eventStartDate = toLocalDateStr(e.start_at, tz)
+      const eventEndDate = toLocalDateStr(e.end_at, tz)
+
+      // Skip events that don't overlap with the target date at all
+      if (eventStartDate > date && eventEndDate > date) return false
+      if (eventEndDate < date) return false
+
+      const eventStartMin = eventStartDate === date
+        ? isoToMinutesInTimezone(e.start_at, tz)
+        : 0
+      const eventEndMin = eventEndDate === date
+        ? isoToMinutesInTimezone(e.end_at, tz)
+        : 24 * 60
+
+      return slotStartMin < eventEndMin && slotEndMin > eventStartMin
+    })
+
+    if (hasCalendarConflict) {
       return NextResponse.json(
         { success: false, error: 'This time slot is no longer available. Please choose another time.' },
         { status: 409 }
@@ -251,3 +298,32 @@ function addMinutesToTime(time: string, minutes: number): string {
   const m = totalMinutes % 60
   return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`
 }
+
+function timeToMinutes(time: string): number {
+  const parts = time.split(':')
+  return parseInt(parts[0], 10) * 60 + parseInt(parts[1], 10)
+}
+
+function isoToMinutesInTimezone(isoString: string, timezone: string): number {
+  const d = new Date(isoString)
+  const localStr = d.toLocaleString('en-US', {
+    timeZone: timezone,
+    hour12: false,
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+  const [h, m] = localStr.split(':').map(Number)
+  return h * 60 + m
+}
+
+function toLocalDateStr(isoString: string, timezone: string): string {
+  return new Date(isoString).toLocaleDateString('en-CA', { timeZone: timezone })
+}
+
+function shiftDate(dateStr: string, days: number): string {
+  const d = new Date(dateStr + 'T12:00:00Z')
+  d.setUTCDate(d.getUTCDate() + days)
+  return d.toISOString().split('T')[0]
+}
+
+export const POST = withTiming(handlePost, 'POST /api/booking/[slug]/submit')

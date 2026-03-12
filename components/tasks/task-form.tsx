@@ -14,11 +14,12 @@ import {
   Plus,
 } from 'lucide-react'
 import { format } from 'date-fns'
+import { formatDate } from '@/lib/utils/formatters'
 
 import { createClient } from '@/lib/supabase/client'
 import { useTenant } from '@/lib/hooks/use-tenant'
 import { taskSchema, type TaskFormValues } from '@/lib/schemas/task'
-import { PRIORITIES } from '@/lib/utils/constants'
+import { PRIORITIES, TASK_TYPES, TASK_CATEGORIES, TASK_VISIBILITIES } from '@/lib/utils/constants'
 import { cn } from '@/lib/utils'
 
 import { Button } from '@/components/ui/button'
@@ -58,6 +59,7 @@ import {
   DialogDescription,
 } from '@/components/ui/dialog'
 import { Separator } from '@/components/ui/separator'
+import { Checkbox } from '@/components/ui/checkbox'
 import { ContactForm } from '@/components/contacts/contact-form'
 import { MatterForm } from '@/components/matters/matter-form'
 import { useCreateContact } from '@/lib/queries/contacts'
@@ -72,6 +74,7 @@ interface TaskFormProps {
   onSubmit: (values: TaskFormValues) => void
   isLoading?: boolean
   matterId?: string
+  contactId?: string
 }
 
 export function TaskForm({
@@ -80,6 +83,7 @@ export function TaskForm({
   onSubmit,
   isLoading = false,
   matterId,
+  contactId,
 }: TaskFormProps) {
   const { tenant } = useTenant()
   const tenantId = tenant?.id ?? ''
@@ -103,7 +107,7 @@ export function TaskForm({
       title: '',
       description: '',
       matter_id: matterId ?? null,
-      contact_id: null,
+      contact_id: contactId ?? null,
       assigned_to: null,
       due_date: null,
       due_time: null,
@@ -111,6 +115,12 @@ export function TaskForm({
       priority: 'medium',
       estimated_minutes: null,
       follow_up_days: null,
+      task_type: 'other',
+      category: 'internal',
+      reminder_date: null,
+      is_billable: false,
+      completion_note: null,
+      visibility: 'everyone',
       ...defaultValues,
     },
   })
@@ -121,7 +131,7 @@ export function TaskForm({
         title: '',
         description: '',
         matter_id: matterId ?? null,
-        contact_id: null,
+        contact_id: contactId ?? null,
         assigned_to: null,
         due_date: null,
         due_time: null,
@@ -129,10 +139,16 @@ export function TaskForm({
         priority: 'medium',
         estimated_minutes: null,
         follow_up_days: null,
+        task_type: 'other',
+        category: 'internal',
+        reminder_date: null,
+        is_billable: false,
+        completion_note: null,
+        visibility: 'everyone',
         ...defaultValues,
       })
     }
-  }, [defaultValues, matterId, form])
+  }, [defaultValues, matterId, contactId, form])
 
   // Fetch matters for searchable select
   const { data: mattersData, isLoading: mattersLoading } = useQuery({
@@ -531,6 +547,66 @@ export function TaskForm({
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
+          {/* Task Type */}
+          <FormField
+            control={form.control}
+            name="task_type"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Task Type</FormLabel>
+                <Select value={field.value ?? 'other'} onValueChange={field.onChange}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select type" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {TASK_TYPES.map((t) => (
+                      <SelectItem key={t.value} value={t.value}>
+                        {t.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* Category */}
+          <FormField
+            control={form.control}
+            name="category"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Category</FormLabel>
+                <Select value={field.value ?? 'internal'} onValueChange={field.onChange}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select category" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {TASK_CATEGORIES.map((c) => (
+                      <SelectItem key={c.value} value={c.value}>
+                        <div className="flex items-center gap-2">
+                          <span
+                            className="h-2 w-2 rounded-full"
+                            style={{ backgroundColor: c.color }}
+                          />
+                          {c.label}
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2">
           {/* Due Date */}
           <FormField
             control={form.control}
@@ -549,7 +625,7 @@ export function TaskForm({
                         )}
                       >
                         <CalendarIcon className="mr-2 h-4 w-4" />
-                        {field.value ? format(new Date(field.value), 'PPP') : 'Pick a date'}
+                        {field.value ? formatDate(field.value) : 'Pick a date'}
                       </Button>
                     </FormControl>
                   </PopoverTrigger>
@@ -613,7 +689,7 @@ export function TaskForm({
                         )}
                       >
                         <CalendarIcon className="mr-2 h-4 w-4" />
-                        {field.value ? format(new Date(field.value), 'PPP') : 'Pick a date'}
+                        {field.value ? formatDate(field.value) : 'Pick a date'}
                       </Button>
                     </FormControl>
                   </PopoverTrigger>
@@ -687,6 +763,119 @@ export function TaskForm({
             </FormItem>
           )}
         />
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          {/* Reminder Date */}
+          <FormField
+            control={form.control}
+            name="reminder_date"
+            render={({ field }) => (
+              <FormItem className="flex flex-col">
+                <FormLabel>Reminder Date</FormLabel>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <FormControl>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          'w-full justify-start text-left font-normal',
+                          !field.value && 'text-muted-foreground'
+                        )}
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {field.value ? formatDate(field.value) : 'Set reminder'}
+                      </Button>
+                    </FormControl>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={field.value ? new Date(field.value) : undefined}
+                      onSelect={(date) => {
+                        field.onChange(date ? format(date, 'yyyy-MM-dd') : null)
+                      }}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* Visibility */}
+          <FormField
+            control={form.control}
+            name="visibility"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Visibility</FormLabel>
+                <Select value={field.value ?? 'everyone'} onValueChange={field.onChange}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select visibility" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {TASK_VISIBILITIES.map((v) => (
+                      <SelectItem key={v.value} value={v.value}>
+                        {v.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        {/* Billable */}
+        <FormField
+          control={form.control}
+          name="is_billable"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+              <FormControl>
+                <Checkbox
+                  checked={field.value ?? false}
+                  onCheckedChange={field.onChange}
+                />
+              </FormControl>
+              <div className="space-y-1 leading-none">
+                <FormLabel>Billable Task</FormLabel>
+                <FormDescription>
+                  Mark this task as billable for invoicing purposes.
+                </FormDescription>
+              </div>
+            </FormItem>
+          )}
+        />
+
+        {/* Completion Note (only show in edit mode) */}
+        {mode === 'edit' && (
+          <FormField
+            control={form.control}
+            name="completion_note"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Completion Note</FormLabel>
+                <FormControl>
+                  <Textarea
+                    placeholder="Add a note when completing this task..."
+                    className="min-h-[60px] resize-y"
+                    {...field}
+                    value={field.value ?? ''}
+                  />
+                </FormControl>
+                <FormDescription>
+                  Required when marking this task as complete.
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
 
         {/* Submit */}
         <div className="flex justify-end pt-2">

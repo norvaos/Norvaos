@@ -2,17 +2,28 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import dynamic from 'next/dynamic'
+import { usePathname, useRouter } from 'next/navigation'
 import { useUIStore } from '@/lib/stores/ui-store'
+import { useUserRole } from '@/lib/hooks/use-user-role'
 import { navigation } from '@/lib/config/navigation'
 import { Header } from '@/components/layout/header'
-import { CommandPalette } from '@/components/layout/command-palette'
+import { Breadcrumbs } from '@/components/layout/breadcrumbs'
+
+// Lazy-load heavy overlays — CommandPalette is only visible on Cmd+K and
+// imports 13 icons + 4 Supabase queries. Compiling it eagerly on every
+// page navigation is unnecessary.
+const CommandPalette = dynamic(
+  () => import('@/components/layout/command-palette').then(m => ({ default: m.CommandPalette })),
+  { ssr: false },
+)
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import {
   Sheet,
   SheetContent,
+  SheetDescription,
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet'
@@ -23,7 +34,8 @@ import {
 } from '@/components/ui/tooltip'
 import { cn } from '@/lib/utils'
 import { APP_VERSION, BUILD_SHA } from '@/lib/config/version'
-import { Scale, ChevronsLeft, ChevronsRight, ChevronDown } from 'lucide-react'
+import { Scale, ChevronsLeft, ChevronsRight, ChevronDown, Moon, Sun } from 'lucide-react'
+import { useTheme } from 'next-themes'
 import type { NavItem } from '@/lib/config/navigation'
 
 // ---------------------------------------------------------------------------
@@ -241,6 +253,47 @@ function SidebarContent({ collapsed }: { collapsed: boolean }) {
   )
 }
 
+function ThemeToggle({ collapsed }: { collapsed: boolean }) {
+  const { resolvedTheme, setTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => setMounted(true), [])
+
+  if (!mounted) return null
+
+  const isDark = resolvedTheme === 'dark'
+
+  if (collapsed) {
+    return (
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <button
+            type="button"
+            onClick={() => setTheme(isDark ? 'light' : 'dark')}
+            className="flex w-full items-center justify-center rounded-md px-0 py-1.5 text-sidebar-foreground/60 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground transition-colors"
+            aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+          >
+            {isDark ? <Sun className="size-4" /> : <Moon className="size-4" />}
+          </button>
+        </TooltipTrigger>
+        <TooltipContent side="right">{isDark ? 'Light mode' : 'Dark mode'}</TooltipContent>
+      </Tooltip>
+    )
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={() => setTheme(isDark ? 'light' : 'dark')}
+      className="flex w-full items-center gap-1.5 rounded-md px-2 py-1.5 text-sm text-sidebar-foreground/60 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground transition-colors"
+      aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+    >
+      {isDark ? <Sun className="size-4" /> : <Moon className="size-4" />}
+      <span className="text-xs">{isDark ? 'Light mode' : 'Dark mode'}</span>
+    </button>
+  )
+}
+
 function Sidebar() {
   const collapsed = useUIStore((s) => s.sidebarCollapsed)
   const toggleSidebar = useUIStore((s) => s.toggleSidebar)
@@ -274,8 +327,9 @@ function Sidebar() {
     >
       <SidebarContent collapsed={collapsed} />
 
-      {/* Collapse toggle + version */}
-      <div className="border-t border-sidebar-border p-2">
+      {/* Theme toggle + collapse + version */}
+      <div className="border-t border-sidebar-border p-2 space-y-0.5">
+        <ThemeToggle collapsed={collapsed} />
         <button
           type="button"
           className="flex w-full items-center justify-center gap-1.5 rounded-md px-2 py-1.5 text-sm text-sidebar-foreground/60 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground transition-colors"
@@ -320,6 +374,7 @@ function MobileNav() {
             <Scale className="size-5 text-sidebar-primary" />
             NorvaOS
           </SheetTitle>
+          <SheetDescription className="sr-only">Mobile navigation menu</SheetDescription>
         </SheetHeader>
 
         <ScrollArea className="h-[calc(100vh-4rem)]">
@@ -365,6 +420,24 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode
 }) {
+  const router = useRouter()
+  const { role } = useUserRole()
+
+  // ─── Route locking: front-desk-only users cannot access dashboard ──
+  // If a user has front_desk:view but does NOT have matters:view,
+  // they are a front-desk-only user and must be redirected.
+  useEffect(() => {
+    if (!role) return // still loading
+
+    const perms = role.permissions ?? {}
+    const hasFrontDesk = perms.front_desk?.view === true
+    const hasMatters = perms.matters?.view === true || role.name === 'Admin'
+
+    if (hasFrontDesk && !hasMatters) {
+      router.replace('/front-desk')
+    }
+  }, [role, router])
+
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Sidebar (desktop only) */}
@@ -377,6 +450,7 @@ export default function DashboardLayout({
 
         {/* Page content */}
         <main className="flex-1 overflow-y-auto bg-background p-4 lg:p-6">
+          <Breadcrumbs />
           {children}
         </main>
       </div>

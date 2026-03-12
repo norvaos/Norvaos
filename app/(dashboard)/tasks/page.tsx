@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo, useCallback, useEffect } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import {
   LayoutList,
@@ -8,12 +8,16 @@ import {
   Calendar as CalendarIcon,
   GanttChart,
   Palette,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
 } from 'lucide-react'
 
 import { useTenant } from '@/lib/hooks/use-tenant'
 import { useUser } from '@/lib/hooks/use-user'
 import {
-  useAllTasks,
+  useTasks,
   useCompleteTask,
   useUpdateTask,
   useTaskDocumentCounts,
@@ -56,6 +60,22 @@ const VIEWS = [
 
 type ViewKey = (typeof VIEWS)[number]['key']
 
+/** Table view paginates at 50 rows; visual views need more data. */
+const TABLE_PAGE_SIZE = 50
+const VISUAL_VIEW_PAGE_SIZE = 500
+
+// ---------------------------------------------------------------------------
+// Debounce hook — delays search until user stops typing
+// ---------------------------------------------------------------------------
+function useDebouncedValue<T>(value: T, delayMs: number): T {
+  const [debounced, setDebounced] = useState(value)
+  useEffect(() => {
+    const id = setTimeout(() => setDebounced(value), delayMs)
+    return () => clearTimeout(id)
+  }, [value, delayMs])
+  return debounced
+}
+
 // ---------------------------------------------------------------------------
 // Main Tasks Page
 // ---------------------------------------------------------------------------
@@ -70,8 +90,19 @@ export default function TasksPage() {
   const setViewPreference = useUIStore((s) => s.setViewPreference)
   const currentView = (viewPreferences.tasks ?? 'table') as ViewKey
 
-  // Task table store
+  // Task table store (search, filters, grouping)
   const { searchQuery, statusFilter, showCompleted, groupBy } = useTaskTableStore()
+
+  // Debounce search to avoid firing a query on every keystroke
+  const debouncedSearch = useDebouncedValue(searchQuery, 300)
+
+  // Pagination state (table view only)
+  const [page, setPage] = useState(1)
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setPage(1)
+  }, [debouncedSearch, statusFilter, showCompleted, currentView])
 
   // Dialog/sheet state
   const [createOpen, setCreateOpen] = useState(false)
@@ -79,8 +110,31 @@ export default function TasksPage() {
   const [detailOpen, setDetailOpen] = useState(false)
   const [conditionalColorOpen, setConditionalColorOpen] = useState(false)
 
-  // Fetch all tasks (client-side table operations)
-  const { data: allTasks, isLoading: tasksLoading, isError } = useAllTasks(tenantId)
+  // ---------------------------------------------------------------------------
+  // Server-side paginated task query
+  // Table view uses small pages; visual views fetch a larger batch.
+  // ---------------------------------------------------------------------------
+  const isTableView = currentView === 'table'
+  const pageSize = isTableView ? TABLE_PAGE_SIZE : VISUAL_VIEW_PAGE_SIZE
+
+  const {
+    data: taskResult,
+    isLoading: tasksLoading,
+    isError,
+  } = useTasks({
+    tenantId,
+    page: isTableView ? page : 1,
+    pageSize,
+    search: debouncedSearch || undefined,
+    status: statusFilter ?? undefined,
+    showCompleted,
+    sortBy: 'due_date',
+    sortDirection: 'asc',
+  })
+
+  const tasks = taskResult?.tasks ?? []
+  const totalCount = taskResult?.totalCount ?? 0
+  const totalPages = taskResult?.totalPages ?? 1
 
   // Fetch users for assignee display
   const { data: users } = useQuery({
@@ -99,46 +153,15 @@ export default function TasksPage() {
     enabled: !!tenantId,
   })
 
-  // Fetch document counts per task
-  const { data: documentCounts } = useTaskDocumentCounts(tenantId)
+  // Fetch document counts scoped to the current page of task IDs
+  const visibleTaskIds = useMemo(() => tasks.map((t) => t.id), [tasks])
+  const { data: documentCounts } = useTaskDocumentCounts(tenantId, visibleTaskIds)
 
   // Mutations
   const completeTask = useCompleteTask()
   const updateTask = useUpdateTask()
 
   const isLoading = tasksLoading || userLoading
-
-  // ---------------------------------------------------------------------------
-  // Filter tasks based on search, status, and showCompleted
-  // ---------------------------------------------------------------------------
-  const filteredTasks = useMemo(() => {
-    if (!allTasks) return []
-
-    let result = allTasks
-
-    // Status filter (from toolbar status pills)
-    if (statusFilter) {
-      result = result.filter((t) => t.status === statusFilter)
-    }
-
-    // Hide completed if toggled off
-    if (!showCompleted) {
-      result = result.filter((t) => t.status !== 'done' && t.status !== 'cancelled')
-    }
-
-    // Search filter
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase()
-      result = result.filter(
-        (t) =>
-          t.title.toLowerCase().includes(q) ||
-          (t.description && t.description.toLowerCase().includes(q)) ||
-          (t.notes && t.notes.toLowerCase().includes(q))
-      )
-    }
-
-    return result
-  }, [allTasks, statusFilter, showCompleted, searchQuery])
 
   // ---------------------------------------------------------------------------
   // Handlers
@@ -243,9 +266,14 @@ export default function TasksPage() {
         {/* Task count */}
         {!isLoading && (
           <div className="text-sm text-muted-foreground">
-            {filteredTasks.length} {filteredTasks.length === 1 ? 'task' : 'tasks'}
-            {searchQuery && ` matching "${searchQuery}"`}
-            {statusFilter && ` • filtered by status`}
+            {totalCount} {totalCount === 1 ? 'task' : 'tasks'}
+            {debouncedSearch && ` matching "${debouncedSearch}"`}
+            {statusFilter && ` \u2022 filtered by status`}
+            {isTableView && totalPages > 1 && (
+              <span className="ml-2">
+                (page {page} of {totalPages})
+              </span>
+            )}
           </div>
         )}
 
@@ -279,7 +307,7 @@ export default function TasksPage() {
               <>
                 {groupBy ? (
                   <TaskTableGroupBy
-                    tasks={filteredTasks}
+                    tasks={tasks}
                     groupBy={groupBy}
                     renderTable={(groupTasks, groupLabel) => (
                       <TaskTable
@@ -296,7 +324,7 @@ export default function TasksPage() {
                   />
                 ) : (
                   <TaskTable
-                    tasks={filteredTasks}
+                    tasks={tasks}
                     users={users}
                     documentCounts={documentCounts ?? {}}
                     onTaskClick={handleTaskClick}
@@ -305,13 +333,67 @@ export default function TasksPage() {
                     isUpdating={updateTask.isPending}
                   />
                 )}
+
+                {/* Pagination controls */}
+                {totalPages > 1 && (
+                  <div className="flex items-center justify-between border-t pt-4">
+                    <p className="text-sm text-muted-foreground">
+                      Showing {(page - 1) * TABLE_PAGE_SIZE + 1}–{Math.min(page * TABLE_PAGE_SIZE, totalCount)} of {totalCount}
+                    </p>
+                    <div className="flex items-center gap-1">
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="size-8"
+                        disabled={page <= 1}
+                        onClick={() => setPage(1)}
+                        aria-label="First page"
+                      >
+                        <ChevronsLeft className="size-4" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="size-8"
+                        disabled={page <= 1}
+                        onClick={() => setPage((p) => Math.max(1, p - 1))}
+                        aria-label="Previous page"
+                      >
+                        <ChevronLeft className="size-4" />
+                      </Button>
+                      <span className="px-3 text-sm font-medium tabular-nums">
+                        {page} / {totalPages}
+                      </span>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="size-8"
+                        disabled={page >= totalPages}
+                        onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                        aria-label="Next page"
+                      >
+                        <ChevronRight className="size-4" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="size-8"
+                        disabled={page >= totalPages}
+                        onClick={() => setPage(totalPages)}
+                        aria-label="Last page"
+                      >
+                        <ChevronsRight className="size-4" />
+                      </Button>
+                    </div>
+                  </div>
+                )}
               </>
             )}
 
             {/* Kanban View */}
             {currentView === 'kanban' && (
               <TaskKanbanView
-                tasks={filteredTasks}
+                tasks={tasks}
                 users={users}
                 onTaskClick={handleTaskClick}
                 onStatusChange={handleStatusChange}
@@ -321,7 +403,7 @@ export default function TasksPage() {
             {/* Calendar View */}
             {currentView === 'calendar' && (
               <TaskCalendarView
-                tasks={filteredTasks}
+                tasks={tasks}
                 onTaskClick={handleTaskClick}
               />
             )}
@@ -329,13 +411,13 @@ export default function TasksPage() {
             {/* Gantt View */}
             {currentView === 'timeline' && (
               <TaskGanttView
-                tasks={filteredTasks}
+                tasks={tasks}
                 onTaskClick={handleTaskClick}
               />
             )}
 
             {/* Empty state */}
-            {filteredTasks.length === 0 && (
+            {tasks.length === 0 && (
               <div className="rounded-lg border bg-white">
                 <div className="flex flex-col items-center justify-center py-16 text-center">
                   <LayoutList className="mb-3 size-10 text-slate-300" />

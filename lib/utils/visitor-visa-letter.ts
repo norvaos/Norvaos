@@ -1,4 +1,5 @@
-import { format, differenceInDays, parseISO } from 'date-fns'
+import { differenceInDays, parseISO } from 'date-fns'
+import { formatDate } from '@/lib/utils/formatters'
 import type { VisitorVisaFormValues } from '@/lib/schemas/visitor-visa-invitation'
 import {
   getProvinceName,
@@ -14,7 +15,7 @@ import {
 
 function fmtDate(dateStr: string): string {
   try {
-    return format(parseISO(dateStr), 'MMMM d, yyyy')
+    return formatDate(dateStr)
   } catch {
     return dateStr
   }
@@ -31,7 +32,7 @@ function getDuration(arrival: string, departure: string): number {
 export function generateInvitationLetter(data: VisitorVisaFormValues): string {
   const { inviter, visitor, visit, accommodation, additional_visitors } = data
 
-  const today = format(new Date(), 'MMMM d, yyyy')
+  const today = formatDate(new Date())
   const duration = getDuration(visit.arrival_date, visit.departure_date)
   const provinceName = getProvinceName(inviter.province)
   const citizenshipCountry = getCountryName(visitor.country_of_citizenship)

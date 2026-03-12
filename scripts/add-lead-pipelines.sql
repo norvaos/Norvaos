@@ -1,4 +1,4 @@
--- Add practice-area-specific lead pipelines for Oakville Legal Associates
+-- Add practice-area-specific lead pipelines for My Law Office
 -- Run this in Supabase SQL Editor
 
 DO $$
