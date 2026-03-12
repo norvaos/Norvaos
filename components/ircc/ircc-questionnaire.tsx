@@ -808,11 +808,13 @@ function renderField(
             <SelectValue placeholder={field.placeholder || 'Select...'} />
           </SelectTrigger>
           <SelectContent position="popper" className="max-h-[300px]">
-            {(field.options ?? []).map((opt) => (
-              <SelectItem key={opt.value} value={opt.value}>
-                {opt.label}
-              </SelectItem>
-            ))}
+            {(field.options ?? [])
+              .filter((opt) => opt.value && opt.value.length > 0)
+              .map((opt) => (
+                <SelectItem key={opt.value} value={opt.value}>
+                  {opt.label}
+                </SelectItem>
+              ))}
           </SelectContent>
         </Select>
       )

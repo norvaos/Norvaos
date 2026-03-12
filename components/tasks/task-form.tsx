@@ -326,11 +326,13 @@ export function TaskForm({
                         )}
                         disabled={!!matterId}
                       >
-                        {field.value
-                          ? selectedMatter
-                            ? selectedMatter.title
-                            : 'Loading...'
-                          : 'Select matter'}
+                        <span className="truncate min-w-0">
+                          {field.value
+                            ? selectedMatter
+                              ? selectedMatter.title
+                              : 'Loading...'
+                            : 'Select matter'}
+                        </span>
                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                       </Button>
                     </FormControl>
@@ -478,40 +480,81 @@ export function TaskForm({
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
-          {/* Assigned To */}
-          <FormField
-            control={form.control}
-            name="assigned_to"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Assigned To</FormLabel>
-                <Select
-                  value={field.value ?? ''}
-                  onValueChange={(value) => field.onChange(value || null)}
-                >
-                  <FormControl>
-                    <SelectTrigger className={cn(!field.value && 'text-muted-foreground')}>
-                      <SelectValue placeholder="Select team member" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {usersLoading ? (
-                      <div className="flex items-center justify-center py-4">
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      </div>
-                    ) : (
-                      users.map((user) => (
-                        <SelectItem key={user.id} value={user.id}>
-                          {getUserDisplayName(user)}
-                        </SelectItem>
-                      ))
-                    )}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
+          {/* Assigned To — Staff or Client */}
+          <FormItem>
+            <FormLabel>Assigned To</FormLabel>
+            {/* Mode toggle */}
+            <div className="flex rounded-lg border border-input overflow-hidden mb-1">
+              <button
+                type="button"
+                onClick={() => {
+                  form.setValue('category', 'internal')
+                }}
+                className={cn(
+                  'flex-1 px-3 py-1.5 text-sm font-medium transition-colors',
+                  form.watch('category') !== 'client_facing'
+                    ? 'bg-slate-900 text-white'
+                    : 'bg-white text-slate-600 hover:bg-slate-50'
+                )}
+              >
+                Team Member
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  form.setValue('category', 'client_facing')
+                  form.setValue('assigned_to', null)
+                }}
+                className={cn(
+                  'flex-1 px-3 py-1.5 text-sm font-medium transition-colors',
+                  form.watch('category') === 'client_facing'
+                    ? 'bg-slate-900 text-white'
+                    : 'bg-white text-slate-600 hover:bg-slate-50'
+                )}
+              >
+                Client
+              </button>
+            </div>
+
+            {form.watch('category') === 'client_facing' ? (
+              <p className="text-xs text-muted-foreground">
+                This task will appear in the client&apos;s portal. The linked contact is the assignee.
+              </p>
+            ) : (
+              <FormField
+                control={form.control}
+                name="assigned_to"
+                render={({ field }) => (
+                  <FormItem>
+                    <Select
+                      value={field.value ?? ''}
+                      onValueChange={(value) => field.onChange(value || null)}
+                    >
+                      <FormControl>
+                        <SelectTrigger className={cn(!field.value && 'text-muted-foreground')}>
+                          <SelectValue placeholder="Select team member" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {usersLoading ? (
+                          <div className="flex items-center justify-center py-4">
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          </div>
+                        ) : (
+                          users.map((user) => (
+                            <SelectItem key={user.id} value={user.id}>
+                              {getUserDisplayName(user)}
+                            </SelectItem>
+                          ))
+                        )}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             )}
-          />
+          </FormItem>
 
           {/* Priority */}
           <FormField
@@ -573,37 +616,39 @@ export function TaskForm({
             )}
           />
 
-          {/* Category */}
-          <FormField
-            control={form.control}
-            name="category"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Category</FormLabel>
-                <Select value={field.value ?? 'internal'} onValueChange={field.onChange}>
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select category" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {TASK_CATEGORIES.map((c) => (
-                      <SelectItem key={c.value} value={c.value}>
-                        <div className="flex items-center gap-2">
-                          <span
-                            className="h-2 w-2 rounded-full"
-                            style={{ backgroundColor: c.color }}
-                          />
-                          {c.label}
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          {/* Category — hidden when client_facing (controlled by Assigned To toggle) */}
+          {form.watch('category') !== 'client_facing' && (
+            <FormField
+              control={form.control}
+              name="category"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Category</FormLabel>
+                  <Select value={field.value ?? 'internal'} onValueChange={field.onChange}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select category" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {TASK_CATEGORIES.filter((c) => c.value !== 'client_facing').map((c) => (
+                        <SelectItem key={c.value} value={c.value}>
+                          <div className="flex items-center gap-2">
+                            <span
+                              className="h-2 w-2 rounded-full"
+                              style={{ backgroundColor: c.color }}
+                            />
+                            {c.label}
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          )}
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">

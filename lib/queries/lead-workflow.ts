@@ -844,7 +844,7 @@ export function useSaveRetainerPackage() {
 
       if (params.existingPackageId) {
         // Update existing
-        const { data, error } = await supabase
+        const { data, error } = await (supabase as any)
           .from('lead_retainer_packages')
           .update(record)
           .eq('id', params.existingPackageId)
@@ -854,7 +854,7 @@ export function useSaveRetainerPackage() {
         return data
       } else {
         // Create new
-        const { data, error } = await supabase
+        const { data, error } = await (supabase as any)
           .from('lead_retainer_packages')
           .insert(record)
           .select()

@@ -11,9 +11,12 @@ import { KioskConfirmation } from '@/components/kiosk/kiosk-confirmation'
 import { KioskLanguageSelector } from '@/components/kiosk/kiosk-language-selector'
 import { KioskQuestions } from '@/components/kiosk/kiosk-questions'
 import { KioskWalkInInfo } from '@/components/kiosk/kiosk-walk-in-info'
+import { KioskReturningClientSearch } from '@/components/kiosk/kiosk-returning-client-search'
+import { KioskClientPortalView } from '@/components/kiosk/kiosk-client-portal-view'
 import { getKioskTranslations } from '@/lib/utils/kiosk-translations'
 import { isRtl, type PortalLocale } from '@/lib/utils/portal-translations'
 import type { KioskQuestion, ReturningInfo } from '@/lib/types/kiosk-question'
+import type { ReturningClientData } from '@/components/kiosk/kiosk-returning-client-search'
 
 interface KioskBranding {
   firmName: string
@@ -42,7 +45,7 @@ interface AppointmentResult {
   user_last_name?: string
 }
 
-type KioskStep = 'welcome' | 'search' | 'walk_in_info' | 'verify' | 'questions' | 'data_safety' | 'id_scan' | 'completing' | 'confirmation'
+type KioskStep = 'welcome' | 'search' | 'walk_in_info' | 'returning_client_search' | 'returning_client_portal' | 'verify' | 'questions' | 'data_safety' | 'id_scan' | 'completing' | 'confirmation'
 
 interface KioskFlowProps {
   token: string
@@ -75,6 +78,12 @@ export function KioskFlow({ token, tenantId, branding }: KioskFlowProps) {
   const [answers, setAnswers] = useState<Record<string, unknown>>({})
   const [returningInfo, setReturningInfo] = useState<ReturningInfo | null>(null)
   const [isCompleting, setIsCompleting] = useState(false)
+  // Returning client flow state
+  const [returningClientData, setReturningClientData] = useState<ReturningClientData | null>(null)
+  const [returningContactId, setReturningContactId] = useState<string | null>(null)
+  const [returningMatterId, setReturningMatterId] = useState<string | null>(null)
+  const [returningLawyerId, setReturningLawyerId] = useState<string | null>(null)
+  const [isQuickCheckin, setIsQuickCheckin] = useState(false)
   const inactivityTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const t = getKioskTranslations(locale)
@@ -128,6 +137,11 @@ export function KioskFlow({ token, tenantId, branding }: KioskFlowProps) {
     setAnswers({})
     setReturningInfo(null)
     setIsCompleting(false)
+    setReturningClientData(null)
+    setReturningContactId(null)
+    setReturningMatterId(null)
+    setReturningLawyerId(null)
+    setIsQuickCheckin(false)
   }
 
   // ── Step navigation helpers ────────────────────────────────────────────
@@ -185,6 +199,31 @@ export function KioskFlow({ token, tenantId, branding }: KioskFlowProps) {
     setStep('walk_in_info')
   }
 
+  function handleReturnClient() {
+    setStep('returning_client_search')
+  }
+
+  function handleReturningClientFound(data: ReturningClientData) {
+    setReturningClientData(data)
+    setGuestName(data.contact.name)
+    setStep('returning_client_portal')
+  }
+
+  function handleQuickCheckIn(contactId: string, matterId: string, lawyerId: string | null) {
+    // Set state for bookkeeping, then call completeCheckIn with explicit overrides
+    // (state updates are async so we pass values directly to avoid stale closure)
+    setReturningContactId(contactId)
+    setReturningMatterId(matterId)
+    setReturningLawyerId(lawyerId)
+    setIsQuickCheckin(true)
+    completeCheckIn({ contactId, matterId, notifyLawyerId: lawyerId, isQuickCheckin: true })
+  }
+
+  function handleBookAppointment(slug: string) {
+    // Navigate to the public booking page within the same kiosk window
+    window.location.href = `/booking/${slug}`
+  }
+
   function handleWalkInInfoComplete(info: { name: string; email: string; phone: string }) {
     setGuestName(info.name)
     // Store walk-in contact info in answers so it gets saved with the session
@@ -239,7 +278,12 @@ export function KioskFlow({ token, tenantId, branding }: KioskFlowProps) {
     completeCheckIn()
   }
 
-  async function completeCheckIn() {
+  async function completeCheckIn(overrides?: {
+    contactId?: string
+    matterId?: string
+    notifyLawyerId?: string | null
+    isQuickCheckin?: boolean
+  }) {
     setStep('completing')
     setIsCompleting(true)
 
@@ -254,6 +298,11 @@ export function KioskFlow({ token, tenantId, branding }: KioskFlowProps) {
           dataSafetyAcknowledged: true,
           answers: Object.keys(answers).length > 0 ? answers : undefined,
           locale,
+          // Returning client fields — use overrides when provided (avoid stale state)
+          contactId: overrides?.contactId ?? returningContactId ?? undefined,
+          matterId: overrides?.matterId ?? returningMatterId ?? undefined,
+          notifyLawyerId: overrides?.notifyLawyerId ?? returningLawyerId ?? undefined,
+          isQuickCheckin: (overrides?.isQuickCheckin ?? isQuickCheckin) || undefined,
         }),
       })
 
@@ -291,6 +340,8 @@ export function KioskFlow({ token, tenantId, branding }: KioskFlowProps) {
     step === 'data_safety' ? 'id_scan' :
     step === 'completing' ? 'confirmation' :
     step === 'walk_in_info' ? 'search' :
+    step === 'returning_client_search' ? 'search' :
+    step === 'returning_client_portal' ? 'search' :
     step
 
   // ── Render ──────────────────────────────────────────────────────────────
@@ -396,7 +447,30 @@ export function KioskFlow({ token, tenantId, branding }: KioskFlowProps) {
             locale={locale}
             onSelect={handleAppointmentSelected}
             onWalkIn={handleWalkIn}
+            onReturnClient={handleReturnClient}
             onBack={() => setStep('welcome')}
+          />
+        )}
+
+        {step === 'returning_client_search' && (
+          <KioskReturningClientSearch
+            token={token}
+            locale={locale}
+            primaryColor={branding.primaryColor}
+            onFound={handleReturningClientFound}
+            onBack={() => setStep('search')}
+          />
+        )}
+
+        {step === 'returning_client_portal' && returningClientData && (
+          <KioskClientPortalView
+            token={token}
+            data={returningClientData}
+            locale={locale}
+            primaryColor={branding.primaryColor}
+            onQuickCheckIn={handleQuickCheckIn}
+            onBookAppointment={handleBookAppointment}
+            onBack={() => setStep('returning_client_search')}
           />
         )}
 

@@ -56,8 +56,8 @@ export async function POST(request: NextRequest) {
     const recipients: { name: string; email: string }[] = []
 
     type UserRef = { id: string; first_name: string; last_name: string; email: string } | null
-    const lawyer = matter.responsible_lawyer as UserRef
-    const followup = matter.followup_lawyer as UserRef
+    const lawyer = matter.responsible_lawyer as unknown as UserRef
+    const followup = matter.followup_lawyer as unknown as UserRef
 
     if (lawyer?.email) {
       recipients.push({

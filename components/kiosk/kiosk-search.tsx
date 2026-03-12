@@ -26,6 +26,7 @@ interface KioskSearchProps {
   locale: PortalLocale
   onSelect: (appointment: AppointmentResult) => void
   onWalkIn: () => void
+  onReturnClient: () => void
   onBack: () => void
 }
 
@@ -39,7 +40,7 @@ type SearchType = 'name' | 'email' | 'phone'
  * Rule #8: Only shows booker_name before identity verification.
  * No matter/lawyer details exposed at this stage.
  */
-export function KioskSearch({ token, locale, onSelect, onWalkIn, onBack }: KioskSearchProps) {
+export function KioskSearch({ token, locale, onSelect, onWalkIn, onReturnClient, onBack }: KioskSearchProps) {
   const [searchType, setSearchType] = useState<SearchType>('name')
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<AppointmentResult[]>([])
@@ -199,16 +200,29 @@ export function KioskSearch({ token, locale, onSelect, onWalkIn, onBack }: Kiosk
         </div>
       )}
 
-      {/* Walk-in option */}
-      <div className="pt-4 border-t border-slate-200 w-full text-center">
-        <Button
-          variant="ghost"
-          size="lg"
+      {/* Walk-in and returning client options */}
+      <div className="pt-4 border-t border-slate-200 w-full space-y-3">
+        {/* Return Client — prominent, solid button */}
+        <button
+          type="button"
+          onClick={onReturnClient}
+          className="w-full flex items-center justify-center gap-2 py-4 px-6 rounded-2xl text-base font-semibold text-white transition-transform hover:scale-[1.01] active:scale-[0.99]"
+          style={{ backgroundColor: '#1e293b' }}
+        >
+          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
+          </svg>
+          {t.returning_client_button}
+        </button>
+
+        {/* Walk-in — secondary, ghost */}
+        <button
+          type="button"
           onClick={onWalkIn}
-          className="text-slate-500 hover:text-slate-700"
+          className="w-full py-3 px-6 rounded-xl text-sm font-medium text-slate-500 hover:text-slate-700 hover:bg-slate-100 transition-colors"
         >
           {t.search_walk_in}
-        </Button>
+        </button>
       </div>
     </div>
   )

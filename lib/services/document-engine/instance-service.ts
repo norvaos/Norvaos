@@ -57,6 +57,7 @@ export async function generateInstance(
   }
 
   const { template, version, mappings, conditions, clauseAssignments } = templateResult.data
+  if (!version) return { success: false, error: 'No template version found' }
   const templateBody = version.template_body as unknown as TemplateBody
 
   // 2. Build field resolution context

@@ -57,7 +57,8 @@ export async function GET(
 
     if (error) throw error
 
-    const documents: PortalSharedDocument[] = (docs ?? []).map((d) => ({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const documents: PortalSharedDocument[] = ((docs ?? []) as any[]).map((d) => ({
       id: d.id,
       file_name: d.file_name,
       category: d.category ?? null,
@@ -106,7 +107,8 @@ export async function PATCH(
     }
 
     // Verify document belongs to this matter AND is shared with client
-    const { data: doc, error: docError } = await admin
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: doc, error: docError } = await (admin as any)
       .from('documents')
       .select('id, storage_path, client_viewed_at')
       .eq('id', documentId)
@@ -120,7 +122,8 @@ export async function PATCH(
 
     // Record first view only — do not overwrite existing viewed timestamp
     if (!doc.client_viewed_at) {
-      await admin
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await (admin as any)
         .from('documents')
         .update({ client_viewed_at: new Date().toISOString() })
         .eq('id', documentId)

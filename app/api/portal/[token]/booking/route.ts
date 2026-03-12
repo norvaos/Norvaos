@@ -82,7 +82,7 @@ async function computeSlots(
   }))
 
   const calendarBlocks: BusyBlock[] = (calendarEventsRes.data ?? [])
-    .filter((e: { show_as: string }) => e.show_as !== 'free')
+    .filter((e: { show_as: string | null }) => e.show_as !== 'free')
     .map((e: { start_at: string; end_at: string; all_day: boolean }) => eventToBusyBlock(e, date, tz))
     .filter((b: BusyBlock | null): b is BusyBlock => b !== null)
 

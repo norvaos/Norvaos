@@ -402,10 +402,10 @@ export function PortalIRCCQuestionnaire({
           </svg>
         </div>
         <p className="text-sm font-medium text-slate-700">
-          {tr.ircc_no_questionnaire_title ?? 'No questionnaire available'}
+          {(tr as any).ircc_no_questionnaire_title ?? 'No questionnaire available'}
         </p>
         <p className="mt-1 text-sm text-slate-500">
-          {tr.ircc_no_questionnaire_message ?? 'Your legal team has not configured a questionnaire for this matter yet. Please check back later.'}
+          {(tr as any).ircc_no_questionnaire_message ?? 'Your legal team has not configured a questionnaire for this matter yet. Please check back later.'}
         </p>
       </div>
     )

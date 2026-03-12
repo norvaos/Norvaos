@@ -557,7 +557,7 @@ export async function convertLeadToMatter(
             ]
 
             if (allItems.length > 0) {
-              await supabase.from('invoice_line_items').insert(allItems)
+              await (supabase as any).from('invoice_line_items').insert(allItems)
             }
           }
         }
@@ -566,13 +566,13 @@ export async function convertLeadToMatter(
       }
 
       // 5l. Link signing documents/requests to the new matter
-      await supabase
+      await (supabase as any)
         .from('signing_documents')
         .update({ matter_id: matter.id })
         .eq('lead_id', leadId)
         .is('matter_id', null)
 
-      await supabase
+      await (supabase as any)
         .from('signing_requests')
         .update({ matter_id: matter.id })
         .eq('lead_id', leadId)

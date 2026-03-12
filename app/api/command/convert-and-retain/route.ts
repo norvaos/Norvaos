@@ -428,14 +428,16 @@ async function handlePost(request: Request) {
 
     // ── 10c. Link signing documents/requests to the new matter ───
     // Link signing documents to the new matter
-    await supabase
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (supabase as any)
       .from('signing_documents')
       .update({ matter_id: matter.id })
       .eq('lead_id', leadId)
       .is('matter_id', null)
 
     // Link signing requests to the new matter
-    await supabase
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (supabase as any)
       .from('signing_requests')
       .update({ matter_id: matter.id })
       .eq('lead_id', leadId)

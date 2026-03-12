@@ -38,7 +38,7 @@ export function useMatterOnboardingSteps(matterId: string) {
     queryKey: onboardingKeys.matter(matterId),
     queryFn: async () => {
       const supabase = createClient()
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('matter_onboarding_steps')
         .select('step_key, confirmed_at, confirmed_by')
         .eq('matter_id', matterId)
@@ -93,7 +93,7 @@ export function useConfirmOnboardingStep() {
       const supabase = createClient()
       if (!tenant || !appUser) throw new Error('No session')
 
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('matter_onboarding_steps')
         .upsert(
           {
@@ -133,7 +133,7 @@ export function useUnconfirmOnboardingStep() {
       stepKey: OnboardingStepKey
     }) => {
       const supabase = createClient()
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('matter_onboarding_steps')
         .update({ confirmed_at: null, confirmed_by: null })
         .eq('matter_id', matterId)

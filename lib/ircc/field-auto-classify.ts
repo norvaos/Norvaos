@@ -113,7 +113,6 @@ export const SECTION_NAME_MAP: Record<string, string> = {
   EmpRec3: 'Employment Record 3',
   BackgroundInfo: 'Background Information',
   Occupation: 'Occupation / Employment History',
-  DetailsOfVisit: 'Details of Visit',
 }
 
 /** Human descriptions for common sections (used when auto-creating sections) */

@@ -1168,7 +1168,7 @@ export async function executeSignature(
           leadId: req.lead_id as string,
           tenantId,
           targetStage: 'retainer_signed_payment_pending' as never,
-          actorUserId: null,
+          actorUserId: null as unknown as string,
           actorType: 'system',
           reason: 'Retainer signed via e-sign',
         })

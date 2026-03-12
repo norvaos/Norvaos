@@ -22,7 +22,7 @@ interface SigningPageClientProps {
 
 interface SignatureData {
   dataUrl: string
-  mode: 'drawn' | 'typed'
+  mode: 'drawn' | 'typed' | 'uploaded'
   typedName?: string
 }
 
@@ -140,7 +140,7 @@ export function SigningPageClient({
   // ── Handlers ──────────────────────────────────────────────────────────────
 
   const handleSignatureChange = useCallback(
-    (data: { dataUrl: string; mode: 'drawn' | 'typed'; typedName?: string } | null) => {
+    (data: { dataUrl: string; mode: 'drawn' | 'typed' | 'uploaded'; typedName?: string } | null) => {
       setSignatureData(data)
     },
     []

@@ -218,7 +218,7 @@ function useMatterContacts(matterId: string, tenantId: string) {
         .eq('tenant_id', tenantId)
         .order('is_primary', { ascending: false })
       if (error) throw error
-      return data as MatterContact[]
+      return data as unknown as MatterContact[]
     },
     enabled: !!matterId && !!tenantId,
     staleTime: 1000 * 60,
@@ -362,13 +362,13 @@ function useNotificationStatus(matterId: string) {
     queryKey: ['matter-notification-sent', matterId],
     queryFn: async () => {
       const supabase = createClient()
-      const { data } = await supabase
+      const { data } = await (supabase as any)
         .from('matter_onboarding_steps')
         .select('confirmed_at')
         .eq('matter_id', matterId)
         .eq('step_key', 'notifications')
         .maybeSingle()
-      return data?.confirmed_at ?? null
+      return (data as any)?.confirmed_at ?? null
     },
     enabled: !!matterId,
   })

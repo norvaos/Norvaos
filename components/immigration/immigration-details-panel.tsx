@@ -548,10 +548,13 @@ export function ImmigrationDetailsPanel({ matterId, tenantId, fieldConfig }: Imm
     )
   }
 
-  const caseTypeOptions = (caseTypes ?? []).map((ct) => ({
-    value: ct.id,
-    label: ct.name,
-  }))
+  // Filter out any case types with empty/null IDs to avoid Radix SelectItem errors
+  const caseTypeOptions = (caseTypes ?? [])
+    .filter((ct) => ct.id && ct.id.length > 0)
+    .map((ct) => ({
+      value: ct.id,
+      label: ct.name || ct.slug || ct.id,
+    }))
 
   return (
     <div className="space-y-4">

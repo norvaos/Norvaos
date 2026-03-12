@@ -373,7 +373,7 @@ export async function getTemplateWithVersion(
       version: versionResult.data as DocumentTemplateVersionRow,
       mappings: (mappingsResult.data ?? []) as DocumentTemplateMappingRow[],
       conditions: (conditionsResult.data ?? []) as DocumentTemplateConditionRow[],
-      clauseAssignments: (clauseAssignmentsResult.data ?? []) as TemplateWithVersion['clauseAssignments'],
+      clauseAssignments: (clauseAssignmentsResult.data ?? []) as unknown as TemplateWithVersion['clauseAssignments'],
     },
   }
 }
@@ -422,7 +422,7 @@ export async function cloneTemplate(
   const versionResult = await createTemplateVersion(supabase, {
     tenantId: params.tenantId,
     templateId: templateResult.data.id,
-    templateBody: source.data.version.template_body as unknown as TemplateBody,
+    templateBody: source.data.version?.template_body as unknown as TemplateBody,
     versionLabel: 'v1 (cloned)',
     changeSummary: `Cloned from "${source.data.template.name}"`,
     mappings: source.data.mappings.map(({ id, tenant_id, template_version_id, created_at, ...rest }) => rest),

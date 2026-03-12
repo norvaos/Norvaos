@@ -236,23 +236,36 @@ export default function BookingClient({ bookingPage, tenant }: BookingClientProp
               <h2 className="mb-4 text-lg font-semibold text-slate-900">
                 Select a Date
               </h2>
-              <div className="flex justify-center">
+              <div className="w-full">
                 <DayPicker
                   mode="single"
                   selected={selectedDate}
                   onSelect={handleDateSelect}
                   disabled={disabledDays}
                   showOutsideDays={false}
-                  className="rounded-lg border p-3"
                   classNames={{
-                    day: 'h-10 w-10 text-sm rounded-full flex items-center justify-center cursor-pointer hover:bg-slate-100 aria-selected:text-white font-medium',
-                    today: 'font-bold border border-slate-300',
-                    selected: 'text-white',
-                    disabled: 'text-slate-300 cursor-not-allowed hover:bg-transparent',
-                    month_caption: 'text-sm font-semibold text-slate-900 mb-2',
+                    root: 'w-full',
+                    months: 'w-full',
+                    month: 'w-full',
+                    month_caption: 'flex items-center justify-between px-1 mb-3',
+                    caption_label: 'text-base font-semibold text-slate-900',
                     nav: 'flex items-center gap-1',
-                    button_next: 'h-8 w-8 flex items-center justify-center rounded-full hover:bg-slate-100',
-                    button_previous: 'h-8 w-8 flex items-center justify-center rounded-full hover:bg-slate-100',
+                    button_previous: 'h-9 w-9 flex items-center justify-center rounded-full hover:bg-slate-100 text-slate-600 transition-colors',
+                    button_next: 'h-9 w-9 flex items-center justify-center rounded-full hover:bg-slate-100 text-slate-600 transition-colors',
+                    weeks: 'w-full',
+                    weekdays: 'grid grid-cols-7 mb-1',
+                    weekday: 'text-center text-xs font-medium text-slate-400 py-1',
+                    week: 'grid grid-cols-7',
+                    day: 'flex items-center justify-center p-0',
+                    day_button: cn(
+                      'w-full aspect-square flex items-center justify-center rounded-lg text-sm font-medium',
+                      'hover:bg-slate-100 transition-colors cursor-pointer',
+                      'disabled:text-slate-300 disabled:cursor-not-allowed disabled:hover:bg-transparent',
+                    ),
+                    today: 'font-bold ring-1 ring-slate-300 rounded-lg',
+                    selected: 'text-white rounded-lg',
+                    outside: 'opacity-0 pointer-events-none',
+                    disabled: 'text-slate-300 cursor-not-allowed',
                   }}
                   modifiersStyles={{
                     selected: { backgroundColor: themeColor },

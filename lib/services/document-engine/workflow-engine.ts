@@ -61,11 +61,12 @@ export async function evaluateWorkflowRules(
   }
 
   // Fetch matter data for rule matching
-  const { data: matter } = await supabase
+  const { data: matterRaw } = await (supabase as any)
     .from('matters')
     .select('practice_area, matter_type_id, jurisdiction_code')
     .eq('id', ctx.matterId)
     .single()
+  const matter = matterRaw as Record<string, unknown> | null
 
   const matches: WorkflowMatch[] = []
 

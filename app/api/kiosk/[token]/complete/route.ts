@@ -54,6 +54,11 @@ async function handlePost(
       dataSafetyAcknowledged,
       answers,
       locale,
+      // Returning client without appointment
+      contactId: bodyContactId,
+      matterId: bodyMatterId,
+      notifyLawyerId: bodyNotifyLawyerId,
+      isQuickCheckin,
     } = body as {
       sessionId: string | null
       appointmentId: string | null
@@ -61,6 +66,10 @@ async function handlePost(
       dataSafetyAcknowledged: boolean
       answers?: Record<string, unknown>
       locale?: string
+      contactId?: string
+      matterId?: string
+      notifyLawyerId?: string
+      isQuickCheckin?: boolean
     }
 
     // 3. Handle walk-in: if no sessionId, create session first
@@ -72,14 +81,18 @@ async function handlePost(
         .from('check_in_sessions')
         .insert({
           tenant_id: tenantId,
+          contact_id: bodyContactId ?? null,
           kiosk_token: token,
           status: 'started',
-          current_step: 'walk_in',
+          current_step: bodyContactId ? 'returning_client' : 'walk_in',
           data_safety_acknowledged: dataSafetyAcknowledged,
           metadata: {
             guest_name: guestName,
-            is_walk_in: !appointmentId,
+            is_walk_in: !appointmentId && !bodyContactId,
+            is_returning_client: !!bodyContactId,
+            is_quick_checkin: isQuickCheckin ?? false,
             appointment_id: appointmentId,
+            matter_id: bodyMatterId ?? undefined,
             answers: answers ?? undefined,
             locale: locale ?? 'en',
           } as unknown as Json,
@@ -355,6 +368,28 @@ async function handlePost(
     let returningInfo: { type: string; staffName: string; staffAvatarUrl: string | null } | null = null
     const notifyUserIds: string[] = []
 
+    // For returning client quick check-in: notify the known lawyer directly
+    if (bodyNotifyLawyerId && !appointmentId) {
+      notifyUserIds.push(bodyNotifyLawyerId)
+      try {
+        const { data: lawyer } = await admin
+          .from('users')
+          .select('first_name, last_name, avatar_url')
+          .eq('id', bodyNotifyLawyerId)
+          .single()
+
+        if (lawyer) {
+          returningInfo = {
+            type: 'client',
+            staffName: [lawyer.first_name, lawyer.last_name].filter(Boolean).join(' '),
+            staffAvatarUrl: lawyer.avatar_url ?? null,
+          }
+        }
+      } catch {
+        // Non-blocking
+      }
+    }
+
     if (appointmentId) {
       try {
         // Get appointment with contact info
@@ -463,20 +498,31 @@ async function handlePost(
     if (notifyUserIds.length > 0) {
       try {
         const { dispatchNotification } = await import('@/lib/services/notification-engine')
+        let notificationMessage: string
+        if (appointmentId) {
+          notificationMessage = `Your client ${guestName} has checked in via the lobby kiosk for their appointment.`
+        } else if (isQuickCheckin) {
+          notificationMessage = `${guestName} has arrived for a quick 5-minute check-in at the lobby kiosk. Please assist when available.`
+        } else {
+          notificationMessage = `Walk-in client ${guestName} has checked in via the lobby kiosk.`
+        }
+
         dispatchNotification(admin, {
           tenantId,
           eventType: 'client_checked_in',
           recipientUserIds: notifyUserIds,
-          title: `${guestName} has checked in`,
-          message: appointmentId
-            ? `Your client ${guestName} has checked in via the lobby kiosk for their appointment.`
-            : `Walk-in client ${guestName} has checked in via the lobby kiosk.`,
+          title: isQuickCheckin
+            ? `${guestName} — quick check-in`
+            : `${guestName} has checked in`,
+          message: notificationMessage,
           entityType: 'check_in_session',
           entityId: finalSessionId ?? undefined,
           priority: 'high',
           metadata: {
             session_id: finalSessionId,
             appointment_id: appointmentId,
+            matter_id: bodyMatterId ?? undefined,
+            is_quick_checkin: isQuickCheckin ?? false,
           },
         }).catch((err: unknown) => {
           log.error('[kiosk-complete] Notification dispatch error', {

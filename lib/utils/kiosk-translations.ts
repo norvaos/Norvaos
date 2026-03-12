@@ -93,6 +93,25 @@ export interface KioskTranslations {
   step_questions: string
   step_id_scan: string
   step_done: string
+
+  // Returning client flow
+  returning_client_button: string
+  returning_client_title: string
+  returning_client_subtitle: string
+  returning_client_by_email: string
+  returning_client_by_phone: string
+  returning_client_placeholder_email: string
+  returning_client_placeholder_phone: string
+  returning_client_not_found: string
+  returning_client_not_found_hint: string
+  returning_client_portal_title: string
+  returning_client_book_apt: string
+  returning_client_quick_checkin: string
+  returning_client_quick_checkin_desc: string
+  returning_client_pending_docs: string
+  returning_client_pending_tasks: string
+  returning_client_no_matters: string
+  returning_client_no_matters_hint: string
 }
 
 // ─── English (base) ──────────────────────────────────────────────────────────
@@ -172,6 +191,24 @@ const en: KioskTranslations = {
   step_questions: 'Questions',
   step_id_scan: 'ID Scan',
   step_done: 'Done',
+
+  returning_client_button: 'Return Client — No Appointment',
+  returning_client_title: 'Welcome Back',
+  returning_client_subtitle: 'Search by your email or phone number to view your file.',
+  returning_client_by_email: 'Email',
+  returning_client_by_phone: 'Phone',
+  returning_client_placeholder_email: 'Enter your email address',
+  returning_client_placeholder_phone: 'Enter your phone number',
+  returning_client_not_found: 'No active file found.',
+  returning_client_not_found_hint: 'Please see the front desk for assistance.',
+  returning_client_portal_title: 'Your File',
+  returning_client_book_apt: 'Book an Appointment',
+  returning_client_quick_checkin: 'Quick Check-In (5 min)',
+  returning_client_quick_checkin_desc: "Let us know you're here — a team member will be with you shortly.",
+  returning_client_pending_docs: '{count} document(s) pending upload',
+  returning_client_pending_tasks: '{count} action(s) to complete',
+  returning_client_no_matters: 'No active matter on file.',
+  returning_client_no_matters_hint: 'Please see the front desk for assistance.',
 }
 
 // ─── French ──────────────────────────────────────────────────────────────────
@@ -251,6 +288,24 @@ const fr: KioskTranslations = {
   step_questions: 'Questions',
   step_id_scan: 'Identité',
   step_done: 'Terminé',
+
+  returning_client_button: 'Client de retour — Sans rendez-vous',
+  returning_client_title: 'Bon retour',
+  returning_client_subtitle: 'Recherchez par courriel ou téléphone pour consulter votre dossier.',
+  returning_client_by_email: 'Courriel',
+  returning_client_by_phone: 'Téléphone',
+  returning_client_placeholder_email: 'Entrez votre adresse courriel',
+  returning_client_placeholder_phone: 'Entrez votre numéro de téléphone',
+  returning_client_not_found: 'Aucun dossier actif trouvé.',
+  returning_client_not_found_hint: 'Veuillez vous adresser à la réception.',
+  returning_client_portal_title: 'Votre dossier',
+  returning_client_book_apt: 'Prendre un rendez-vous',
+  returning_client_quick_checkin: 'Enregistrement rapide (5 min)',
+  returning_client_quick_checkin_desc: "Faites-nous savoir que vous êtes là — un membre de l'équipe sera avec vous sous peu.",
+  returning_client_pending_docs: '{count} document(s) en attente de téléversement',
+  returning_client_pending_tasks: '{count} action(s) à compléter',
+  returning_client_no_matters: 'Aucun dossier actif au registre.',
+  returning_client_no_matters_hint: 'Veuillez vous adresser à la réception.',
 }
 
 // ─── Spanish ─────────────────────────────────────────────────────────────────
@@ -330,6 +385,24 @@ const es: KioskTranslations = {
   step_questions: 'Preguntas',
   step_id_scan: 'Identidad',
   step_done: 'Listo',
+
+  returning_client_button: 'Cliente anterior — Sin cita',
+  returning_client_title: 'Bienvenido de nuevo',
+  returning_client_subtitle: 'Busque por correo o teléfono para ver su expediente.',
+  returning_client_by_email: 'Correo',
+  returning_client_by_phone: 'Teléfono',
+  returning_client_placeholder_email: 'Ingrese su correo electrónico',
+  returning_client_placeholder_phone: 'Ingrese su número de teléfono',
+  returning_client_not_found: 'No se encontró ningún expediente activo.',
+  returning_client_not_found_hint: 'Por favor, diríjase a la recepción.',
+  returning_client_portal_title: 'Su expediente',
+  returning_client_book_apt: 'Reservar una cita',
+  returning_client_quick_checkin: 'Registro rápido (5 min)',
+  returning_client_quick_checkin_desc: 'Háganos saber que está aquí — un miembro del equipo le atenderá en breve.',
+  returning_client_pending_docs: '{count} documento(s) pendiente(s) de carga',
+  returning_client_pending_tasks: '{count} acción(es) por completar',
+  returning_client_no_matters: 'No hay expediente activo en el sistema.',
+  returning_client_no_matters_hint: 'Por favor, diríjase a la recepción.',
 }
 
 // ─── Arabic ──────────────────────────────────────────────────────────────────
@@ -409,6 +482,24 @@ const ar: KioskTranslations = {
   step_questions: 'أسئلة',
   step_id_scan: 'الهوية',
   step_done: 'تم',
+
+  returning_client_button: 'عميل عائد — بدون موعد',
+  returning_client_title: 'أهلاً بعودتك',
+  returning_client_subtitle: 'ابحث بالبريد الإلكتروني أو الهاتف للوصول إلى ملفك.',
+  returning_client_by_email: 'البريد',
+  returning_client_by_phone: 'الهاتف',
+  returning_client_placeholder_email: 'أدخل بريدك الإلكتروني',
+  returning_client_placeholder_phone: 'أدخل رقم هاتفك',
+  returning_client_not_found: 'لم يتم العثور على ملف نشط.',
+  returning_client_not_found_hint: 'يرجى التوجه إلى مكتب الاستقبال.',
+  returning_client_portal_title: 'ملفك',
+  returning_client_book_apt: 'حجز موعد',
+  returning_client_quick_checkin: 'تسجيل سريع (5 دقائق)',
+  returning_client_quick_checkin_desc: 'أعلمنا بوصولك — سيكون أحد أعضاء الفريق معك قريباً.',
+  returning_client_pending_docs: '{count} وثيقة/وثائق بانتظار الرفع',
+  returning_client_pending_tasks: '{count} إجراء/إجراءات للإكمال',
+  returning_client_no_matters: 'لا يوجد ملف نشط في النظام.',
+  returning_client_no_matters_hint: 'يرجى التوجه إلى مكتب الاستقبال.',
 }
 
 // ─── Locale Map ──────────────────────────────────────────────────────────────

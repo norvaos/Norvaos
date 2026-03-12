@@ -13,9 +13,58 @@
  * Sections that are disabled in the config are hidden.
  */
 
-import { useState, useMemo } from 'react'
-import { ChevronDown, ChevronRight, LayoutList } from 'lucide-react'
+import { useState, useMemo, Component } from 'react'
+import type { ReactNode } from 'react'
+import { ChevronDown, ChevronRight, LayoutList, AlertCircle } from 'lucide-react'
 import { cn } from '@/lib/utils'
+
+// ── Per-section error boundary ────────────────────────────────────────────────
+// Prevents a broken section from crashing the entire Case Config panel.
+
+interface SectionErrorBoundaryState {
+  hasError: boolean
+  message: string
+}
+
+class SectionErrorBoundary extends Component<
+  { children: ReactNode; sectionLabel: string },
+  SectionErrorBoundaryState
+> {
+  constructor(props: { children: ReactNode; sectionLabel: string }) {
+    super(props)
+    this.state = { hasError: false, message: '' }
+  }
+
+  static getDerivedStateFromError(error: unknown) {
+    return {
+      hasError: true,
+      message: error instanceof Error ? error.message : 'An unexpected error occurred.',
+    }
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3 flex items-start gap-3">
+          <AlertCircle className="h-4 w-4 text-destructive mt-0.5 shrink-0" />
+          <div className="min-w-0">
+            <p className="text-sm font-medium text-destructive">
+              {this.props.sectionLabel} could not be loaded
+            </p>
+            <p className="text-xs text-muted-foreground mt-0.5 break-words">{this.state.message}</p>
+            <button
+              className="text-xs underline text-muted-foreground hover:text-foreground mt-1"
+              onClick={() => this.setState({ hasError: false, message: '' })}
+            >
+              Try again
+            </button>
+          </div>
+        </div>
+      )
+    }
+    return this.props.children
+  }
+}
 import { useMatterTypeSectionConfig, useMatterTypeFormIds } from '@/lib/queries/ircc-forms'
 import { useMatterImmigration, useCaseStages } from '@/lib/queries/immigration'
 import { SECTION_DEFINITIONS } from './case-detail-sections'
@@ -165,21 +214,22 @@ function UnifiedCaseDetailsInner({
   return (
     <div className="space-y-3">
       {enabledSections.map((section) => (
-        <SectionRenderer
-          key={section.key}
-          sectionKey={section.key}
-          label={section.label}
-          matterId={matterId}
-          tenantId={tenantId}
-          matterTypeId={matterTypeId}
-          contactId={contactId}
-          caseTypeId={caseTypeId}
-          immigrationData={immigrationData}
-          immigrationStages={immigrationStages}
-          fieldConfig={section.fieldConfig}
-          customFields={section.customFields}
-          navigateToProfilePath={section.key === 'ircc_questionnaire' ? navigateToProfilePath : undefined}
-        />
+        <SectionErrorBoundary key={section.key} sectionLabel={section.label}>
+          <SectionRenderer
+            sectionKey={section.key}
+            label={section.label}
+            matterId={matterId}
+            tenantId={tenantId}
+            matterTypeId={matterTypeId}
+            contactId={contactId}
+            caseTypeId={caseTypeId}
+            immigrationData={immigrationData}
+            immigrationStages={immigrationStages}
+            fieldConfig={section.fieldConfig}
+            customFields={section.customFields}
+            navigateToProfilePath={section.key === 'ircc_questionnaire' ? navigateToProfilePath : undefined}
+          />
+        </SectionErrorBoundary>
       ))}
     </div>
   )

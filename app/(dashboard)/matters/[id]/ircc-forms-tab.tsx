@@ -89,7 +89,9 @@ export function IRCCFormsTab({ matterId, contactId, tenantId, caseTypeId }: IRCC
   const [reviewOpen, setReviewOpen] = useState(false)
 
   // Fetch available forms for this matter's case type (DB-driven)
-  const { data: availableForms = [] } = useAvailableFormsForMatter(caseTypeId, tenantId)
+  // Filter out any forms with empty/null formCodes to avoid Radix SelectItem errors
+  const { data: rawAvailableForms = [] } = useAvailableFormsForMatter(caseTypeId, tenantId)
+  const availableForms = rawAvailableForms.filter((f) => f.formCode && f.formCode.length > 0)
   const [selectedPackType, setSelectedPackType] = useState<string>('')
 
   // Auto-select first available form when forms load

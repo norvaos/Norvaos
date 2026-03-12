@@ -469,7 +469,7 @@ async function handleDelete(
       return NextResponse.json({ error: 'Failed to remove document slot' }, { status: 500 })
     }
 
-    await invalidateGating(matterId)
+    await invalidateGating(auth.tenantId, matterId)
     return NextResponse.json({ success: true })
   } catch (error) {
     if (error instanceof AuthError) {

@@ -549,7 +549,7 @@ function ESignatureCard({ signerName }: { signerName: string }) {
   })
 
   const handleSignatureChange = useCallback(
-    (data: { dataUrl: string; mode: 'drawn' | 'typed'; typedName?: string } | null) => {
+    (data: { dataUrl: string; mode: 'drawn' | 'typed' | 'uploaded'; typedName?: string } | null) => {
       setPendingSignature(data)
     },
     []

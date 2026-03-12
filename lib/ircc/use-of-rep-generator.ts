@@ -87,13 +87,14 @@ export async function buildUseOfRepData(
   if (matterErr || !matter) throw new Error('Matter not found')
 
   // Fetch tenant (firm) info
-  const { data: tenant, error: tenantErr } = await supabase
+  const { data: tenantRaw, error: tenantErr } = await (supabase as any)
     .from('tenants')
     .select('name, address_line1, address_line2, city, province, postal_code, country, office_phone, office_fax')
     .eq('id', tenantId)
     .single()
 
-  if (tenantErr || !tenant) throw new Error('Tenant not found')
+  if (tenantErr || !tenantRaw) throw new Error('Tenant not found')
+  const tenant = tenantRaw as Record<string, string | null>
 
   // Fetch primary contact (applicant)
   const { data: matterContact } = await supabase
@@ -114,7 +115,7 @@ export async function buildUseOfRepData(
     settings: Record<string, unknown> | null
   } | null
 
-  const lawyer = matter.responsible_lawyer as UserRef
+  const lawyer = matter.responsible_lawyer as unknown as UserRef
   const creds = (lawyer?.settings?.professional_credentials ?? {}) as Record<string, string>
   const contact = (matterContact?.contact as { first_name?: string | null; last_name?: string | null; date_of_birth?: string | null } | null)
 
@@ -136,13 +137,13 @@ export async function buildUseOfRepData(
       firmName: tenant.name || '',
     },
     address: {
-      line1: (tenant as Record<string, string | null>).address_line1 ?? '',
-      line2: (tenant as Record<string, string | null>).address_line2 ?? '',
-      city: (tenant as Record<string, string | null>).city ?? '',
-      province: (tenant as Record<string, string | null>).province ?? '',
-      postalCode: (tenant as Record<string, string | null>).postal_code ?? '',
-      country: (tenant as Record<string, string | null>).country ?? 'Canada',
-      fax: (tenant as Record<string, string | null>).office_fax ?? '',
+      line1: tenant.address_line1 ?? '',
+      line2: tenant.address_line2 ?? '',
+      city: tenant.city ?? '',
+      province: tenant.province ?? '',
+      postalCode: tenant.postal_code ?? '',
+      country: tenant.country ?? 'Canada',
+      fax: tenant.office_fax ?? '',
     },
     client: {
       familyName: contact?.last_name ?? '',

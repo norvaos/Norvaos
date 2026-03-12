@@ -438,10 +438,10 @@ function PreviewSection({
                   <p className="text-sm font-medium">{renderContent(signer.label as string)}</p>
                   <p className="text-xs text-muted-foreground">({signer.role as string})</p>
                 </div>
-                {signer.include_date_line && (
+                {!!(signer.include_date_line) && (
                   <p className="text-xs text-muted-foreground">Date: ____________________</p>
                 )}
-                {signer.include_lso_number && (
+                {!!(signer.include_lso_number) && (
                   <p className="text-xs text-muted-foreground">LSO #: ____________________</p>
                 )}
               </div>
@@ -479,7 +479,7 @@ function PreviewSection({
       {/* Document paper preview */}
       <div className="border rounded-lg bg-white dark:bg-zinc-950 shadow-sm">
         {/* Header */}
-        {header && header.content && (
+        {header && !!header.content && (
           <div className={`border-b px-6 py-3 text-xs text-muted-foreground ${header.alignment === 'center' ? 'text-center' : ''}`}>
             {renderContent(header.content as string)}
           </div>
@@ -530,10 +530,10 @@ function PreviewSection({
         </div>
 
         {/* Footer */}
-        {footer && footer.content && (
+        {footer && !!footer.content && (
           <div className="border-t px-6 py-2 text-[10px] text-muted-foreground text-center">
             {renderContent(footer.content as string)}
-            {footer.show_page_numbers && (
+            {!!(footer.show_page_numbers) && (
               <span className="ml-2">{(footer.page_number_format as string) || 'Page {PAGE} of {NUMPAGES}'}</span>
             )}
           </div>
