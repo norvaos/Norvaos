@@ -1093,13 +1093,12 @@ export default async function LandingPage() {
       </section>
 
       {/* CTA */}
-      <section className="relative overflow-hidden py-24 sm:py-32">
+      <section
+        className="relative overflow-hidden py-24 sm:py-32"
+        style={{ background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)' }}
+      >
         <div
-          className="pointer-events-none absolute inset-0 -z-10"
-          style={{ background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)' }}
-        />
-        <div
-          className="pointer-events-none absolute inset-0 -z-10 opacity-20"
+          className="pointer-events-none absolute inset-0 opacity-20"
           style={{
             backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)',
             backgroundSize: '40px 40px',
