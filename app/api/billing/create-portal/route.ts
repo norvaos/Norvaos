@@ -39,4 +39,5 @@ async function handlePost() {
   }
 }
 
+export const dynamic = 'force-dynamic'
 export const POST = withTiming(handlePost, 'POST /api/billing/create-portal')

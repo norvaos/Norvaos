@@ -103,4 +103,5 @@ async function handlePost(request: NextRequest) {
   }
 }
 
+export const dynamic = 'force-dynamic'
 export const POST = withTiming(handlePost, 'POST /api/billing/create-checkout')

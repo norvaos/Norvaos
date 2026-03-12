@@ -303,4 +303,5 @@ async function updateSubscription(
   console.log(`Subscription updated for tenant ${tenantId}: ${subscription.status}, plan: ${planTier}`)
 }
 
+export const dynamic = 'force-dynamic'
 export const POST = withTiming(handlePost, 'POST /api/webhooks/stripe')
