@@ -95,7 +95,7 @@ export default async function LandingPage() {
               </span>
             </h1>
             <p className="mt-6 text-xl leading-8 text-gray-600 max-w-2xl mx-auto">
-              NorvaOS replaces Google Drive, DocuSign, Calendly, and your billing software —
+              NorvaOS replaces your document storage, e-signing, scheduling, and accounting software —
               with automatic document sorting, real-time cloud sync, and every tool your firm
               needs built in. You never leave the platform.
             </p>
@@ -206,24 +206,33 @@ export default async function LandingPage() {
       </section>
 
       {/* Replaces X tools bar */}
-      <section className="border-y border-gray-100 bg-gray-50 py-10">
+      <section className="border-y border-gray-100 bg-gray-50 py-12">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
-          <p className="mb-6 text-center text-sm font-semibold uppercase tracking-widest text-gray-400">
-            NorvaOS replaces all of these
+          <p className="mb-8 text-center text-sm font-semibold uppercase tracking-widest text-gray-400">
+            One platform. Every tool your firm needs.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-3">
             {[
-              'Google Drive', 'OneDrive', 'DocuSign', 'Calendly',
-              'QuickBooks', 'Clio', 'Dropbox', 'Monday.com',
+              { label: 'Practice Management', icon: '⚖️' },
+              { label: 'Document Storage', icon: '📁' },
+              { label: 'Cloud Sync', icon: '☁️' },
+              { label: 'E-Signing', icon: '✍️' },
+              { label: 'Client Scheduling', icon: '📅' },
+              { label: 'Legal Accounting', icon: '💼' },
+              { label: 'Client CRM', icon: '👥' },
+              { label: 'Form Generation', icon: '📋' },
+              { label: 'Client Portal', icon: '🔐' },
+              { label: 'Task Management', icon: '✅' },
             ].map(tool => (
-              <div key={tool} className="flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-1.5 text-sm text-gray-500 shadow-sm line-through decoration-red-400/60">
-                <X className="h-3 w-3 text-red-400 no-underline" style={{ textDecoration: 'none' }} />
-                <span>{tool}</span>
+              <div key={tool.label} className="flex items-center gap-2 rounded-full border border-indigo-100 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm">
+                <span className="text-base leading-none">{tool.icon}</span>
+                <span>{tool.label}</span>
+                <CheckCircle className="h-3.5 w-3.5 text-indigo-500 shrink-0" />
               </div>
             ))}
           </div>
-          <p className="mt-5 text-center text-sm text-gray-500">
-            One subscription. One login. Everything your firm needs.
+          <p className="mt-6 text-center text-sm text-gray-500">
+            One subscription. One login. No app switching. Ever.
           </p>
         </div>
       </section>
@@ -384,56 +393,56 @@ export default async function LandingPage() {
               {
                 icon: PenLine,
                 label: 'Built-in E-Signing',
-                sub: 'No DocuSign needed',
+                sub: 'No separate e-sign tool',
                 color: 'text-indigo-400',
                 bg: 'bg-indigo-500/10',
               },
               {
                 icon: VideoIcon,
                 label: 'Video Consultations',
-                sub: 'No Zoom tab to open',
+                sub: 'No external video app',
                 color: 'text-violet-400',
                 bg: 'bg-violet-500/10',
               },
               {
                 icon: Calendar,
-                label: 'Smart Scheduling',
-                sub: 'No Calendly needed',
+                label: 'Client Scheduling',
+                sub: 'No scheduling software',
                 color: 'text-sky-400',
                 bg: 'bg-sky-500/10',
               },
               {
                 icon: CreditCard,
                 label: 'Invoicing & Payments',
-                sub: 'No QuickBooks tab',
+                sub: 'No accounting software',
                 color: 'text-emerald-400',
                 bg: 'bg-emerald-500/10',
               },
               {
                 icon: FolderOpen,
-                label: 'Document Vault',
-                sub: 'No Drive tab needed',
+                label: 'Document Storage',
+                sub: 'No cloud storage app',
                 color: 'text-amber-400',
                 bg: 'bg-amber-500/10',
               },
               {
                 icon: MessageSquare,
                 label: 'Client Messaging',
-                sub: 'No email back-and-forth',
+                sub: 'No external portal',
                 color: 'text-rose-400',
                 bg: 'bg-rose-500/10',
               },
               {
                 icon: FileText,
                 label: 'Form Generation',
-                sub: 'Auto-filled IRCC forms',
+                sub: 'No form-filling software',
                 color: 'text-cyan-400',
                 bg: 'bg-cyan-500/10',
               },
               {
                 icon: BarChart3,
                 label: 'Financial Reports',
-                sub: 'Real-time AR & revenue',
+                sub: 'No separate reporting tool',
                 color: 'text-purple-400',
                 bg: 'bg-purple-500/10',
               },
@@ -452,6 +461,53 @@ export default async function LandingPage() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Data Migration section */}
+      <section className="border-b border-gray-100 bg-gradient-to-b from-indigo-50/50 to-white py-20">
+        <div className="mx-auto max-w-7xl px-6 lg:px-8">
+          <div className="mx-auto max-w-3xl text-center">
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-indigo-100 bg-white px-3 py-1 text-sm font-semibold text-indigo-700 shadow-sm">
+              <RefreshCw className="h-3.5 w-3.5" />
+              Switching is painless
+            </div>
+            <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+              Already on another platform?
+              <br />
+              <span className="text-indigo-600">Bring everything with you.</span>
+            </h2>
+            <p className="mt-4 text-lg text-gray-600">
+              NorvaOS imports your existing data directly from your current practice
+              management software. Your matters, contacts, documents, and history move over
+              — nothing gets left behind.
+            </p>
+          </div>
+
+          <div className="mt-12 flex flex-wrap items-center justify-center gap-3">
+            <p className="w-full text-center text-sm font-medium uppercase tracking-wider text-gray-400 mb-2">
+              Import from your existing platform
+            </p>
+            {[
+              'Clio', 'Cosmolex', 'Practice Panther', 'MyCase',
+              'Smokeball', 'Filevine', 'AbacusLaw', 'PCLaw',
+            ].map(platform => (
+              <div
+                key={platform}
+                className="flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-600 shadow-sm"
+              >
+                <CheckCircle className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
+                {platform}
+              </div>
+            ))}
+            <div className="flex items-center gap-2 rounded-full border border-dashed border-gray-300 bg-gray-50 px-4 py-2 text-sm font-medium text-gray-400">
+              + others on request
+            </div>
+          </div>
+
+          <p className="mt-8 text-center text-sm text-gray-500">
+            Our team handles the migration. Your firm is live in days, not months.
+          </p>
         </div>
       </section>
 
@@ -479,10 +535,10 @@ export default async function LandingPage() {
                 features: [
                   'Branded client portal with live file status',
                   'Automated SMS & email updates',
-                  'Built-in intake forms — no Typeform',
+                  'Built-in intake forms — no form tool needed',
                   'Document requests with 1-click upload',
-                  'E-signing built in — no DocuSign',
-                  'Appointment booking — no Calendly',
+                  'E-signing built in — no separate tool',
+                  'Appointment booking — no scheduling app',
                 ],
               },
               {
@@ -508,7 +564,7 @@ export default async function LandingPage() {
                 tagline: 'Get paid faster. Stay audit-ready.',
                 features: [
                   'Retainer agreements & invoice generation',
-                  'Online payments — no QuickBooks link',
+                  'Online payments — no accounting software',
                   'Trust accounting & ledger built in',
                   'Disbursement tracking per matter',
                   'AR aging & revenue reports',
