@@ -2,7 +2,6 @@ import Link from 'next/link'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import {
-  Scale,
   FileText,
   Users,
   Calendar,
@@ -29,7 +28,11 @@ import {
   BellRing,
   Layers,
   Building2,
+  Globe,
+  XCircle,
+  AlertCircle,
 } from 'lucide-react'
+import { NorvaLogo } from '@/components/landing/norva-logo'
 
 export default async function LandingPage() {
   const supabase = await createServerSupabaseClient()
@@ -48,9 +51,7 @@ export default async function LandingPage() {
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600">
-                <Scale className="h-4 w-4 text-white" />
-              </div>
+              <NorvaLogo size={32} id="nav" />
               <span className="text-lg font-bold tracking-tight text-gray-900">NorvaOS</span>
             </div>
             <div className="hidden items-center gap-8 md:flex">
@@ -315,8 +316,30 @@ export default async function LandingPage() {
                   </div>
                 </div>
                 <div className="p-4 space-y-2">
+                  {/* Auto-rename preview */}
+                  <div className="rounded-xl border border-indigo-100 bg-indigo-50/60 p-3 mb-3">
+                    <div className="mb-2 flex items-center gap-2 text-xs font-semibold text-indigo-700">
+                      <Brain className="h-3.5 w-3.5" />
+                      Just received — auto-renaming
+                    </div>
+                    <div className="space-y-1.5">
+                      {[
+                        { from: 'scan004.pdf', to: 'Sharma_Passport_2025.pdf' },
+                        { from: 'document_1.pdf', to: 'Marriage_Certificate.pdf' },
+                        { from: 'img_3829.jpg', to: 'Patel_PR_Card_2026.jpg' },
+                      ].map(rename => (
+                        <div key={rename.from} className="flex items-center gap-2 text-xs">
+                          <span className="rounded bg-white/70 px-1.5 py-0.5 font-mono text-gray-400 line-through">{rename.from}</span>
+                          <ArrowRight className="h-3 w-3 text-indigo-400 shrink-0" />
+                          <span className="rounded bg-white/70 px-1.5 py-0.5 font-mono text-gray-700">{rename.to}</span>
+                          <CheckCircle className="ml-auto h-3 w-3 text-emerald-500 shrink-0" />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
                   {[
-                    { folder: 'Identity Documents', files: ['Passport_Sharma.pdf', 'Passport_Patel.pdf', 'PR_Card.pdf'], color: 'text-blue-600', bg: 'bg-blue-50', border: 'border-blue-100' },
+                    { folder: 'Identity Documents', files: ['Sharma_Passport_2025.pdf', 'Patel_PR_Card_2026.jpg', 'Marriage_Certificate.pdf'], color: 'text-blue-600', bg: 'bg-blue-50', border: 'border-blue-100' },
                     { folder: 'Immigration Forms', files: ['IMM5257E_v3_DRAFT.pdf', 'IMM5476E_signed.pdf'], color: 'text-violet-600', bg: 'bg-violet-50', border: 'border-violet-100' },
                     { folder: 'Financial Records', files: ['Bank_Statement_Jan.pdf', 'T4_2025.pdf', 'NOA_2024.pdf'], color: 'text-emerald-600', bg: 'bg-emerald-50', border: 'border-emerald-100' },
                   ].map(group => (
@@ -598,6 +621,186 @@ export default async function LandingPage() {
         </div>
       </section>
 
+      {/* Client Portal */}
+      <section className="bg-gradient-to-b from-slate-50 to-white py-24 sm:py-32">
+        <div className="mx-auto max-w-7xl px-6 lg:px-8">
+          <div className="grid grid-cols-1 items-center gap-16 lg:grid-cols-2">
+
+            {/* Portal mockup */}
+            <div className="relative order-2 lg:order-1">
+              <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-xl">
+                {/* Portal chrome */}
+                <div className="flex items-center justify-between bg-indigo-600 px-4 py-2.5">
+                  <div className="flex items-center gap-2">
+                    <NorvaLogo size={18} id="portal-mock" />
+                    <span className="text-xs font-semibold text-white">Client Portal — NorvaOS</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 rounded-full bg-white/10 px-2.5 py-0.5 text-xs text-white/80">
+                    <div className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                    Secure & Private
+                  </div>
+                </div>
+
+                {/* Matter identity */}
+                <div className="border-b border-gray-100 px-4 py-3">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <p className="text-sm font-semibold text-gray-900">Sharma, Patel</p>
+                      <p className="text-xs text-gray-500">Spousal Sponsorship — PR Application</p>
+                    </div>
+                    <span className="rounded-full border border-amber-100 bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-700">
+                      In Progress
+                    </span>
+                  </div>
+                  {/* Stage progress */}
+                  <div className="mt-3 flex items-center gap-1.5">
+                    {[1, 2, 3, 4, 5].map(i => (
+                      <div key={i} className={`h-1.5 flex-1 rounded-full ${i <= 3 ? 'bg-indigo-600' : 'bg-gray-200'}`} />
+                    ))}
+                    <span className="ml-1 whitespace-nowrap text-xs text-gray-500">Stage 3 of 5</span>
+                  </div>
+                </div>
+
+                {/* Tabs */}
+                <div className="flex border-b border-gray-100 px-4">
+                  <span className="border-b-2 border-indigo-600 px-3 py-2 text-xs font-semibold text-indigo-600">Documents</span>
+                  <span className="px-3 py-2 text-xs text-gray-400">Financial</span>
+                  <span className="px-3 py-2 text-xs text-gray-400">Updates</span>
+                </div>
+
+                {/* Document list */}
+                <div className="space-y-1.5 px-4 py-3">
+                  {[
+                    { name: 'Passport — Sharma', status: 'accepted' },
+                    { name: 'Marriage Certificate', status: 'accepted' },
+                    { name: 'Bank Statement — Jan 2026', status: 'reviewing' },
+                    { name: 'T4 2023 — Sharma', status: 'rejected' },
+                    { name: 'Employment Letter', status: 'requested' },
+                  ].map(doc => (
+                    <div key={doc.name} className="flex items-center justify-between rounded-lg bg-gray-50 px-3 py-2">
+                      <div className="flex items-center gap-2">
+                        <FileText className="h-3.5 w-3.5 shrink-0 text-gray-400" />
+                        <span className="text-xs text-gray-700">{doc.name}</span>
+                      </div>
+                      {doc.status === 'accepted' && (
+                        <span className="flex items-center gap-1 text-xs font-medium text-emerald-600">
+                          <CheckCircle className="h-3 w-3" /> Accepted
+                        </span>
+                      )}
+                      {doc.status === 'reviewing' && (
+                        <span className="flex items-center gap-1 text-xs font-medium text-amber-600">
+                          <Clock className="h-3 w-3" /> Under Review
+                        </span>
+                      )}
+                      {doc.status === 'rejected' && (
+                        <span className="flex items-center gap-1 text-xs font-medium text-red-600">
+                          <XCircle className="h-3 w-3" /> Re-upload
+                        </span>
+                      )}
+                      {doc.status === 'requested' && (
+                        <span className="flex items-center gap-1 text-xs font-medium text-gray-500">
+                          <AlertCircle className="h-3 w-3" /> Requested
+                        </span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+
+                {/* Action banner */}
+                <div className="mx-4 mb-4 rounded-xl border border-red-100 bg-red-50 p-3">
+                  <p className="text-xs font-semibold text-red-800">Action Required</p>
+                  <p className="mt-0.5 text-xs text-red-700">
+                    Please re-upload T4 2023 — must be the original CRA copy. Use the Upload button next to the file above.
+                  </p>
+                </div>
+              </div>
+
+              {/* Floating financial card */}
+              <div className="absolute -right-4 bottom-20 rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-lg">
+                <p className="mb-2 text-xs font-semibold text-gray-900">Financial Summary</p>
+                <div className="space-y-1.5">
+                  {[
+                    { label: 'Retainer', value: '$3,500', paid: true },
+                    { label: 'Invoice #1', value: '$1,800', paid: true },
+                    { label: 'Outstanding', value: '$0.00', paid: null },
+                  ].map(row => (
+                    <div key={row.label} className="flex items-center justify-between gap-8 text-xs">
+                      <span className="text-gray-500">{row.label}</span>
+                      <span className={`font-medium ${row.paid === true ? 'text-emerald-600' : 'text-gray-900'}`}>
+                        {row.value}{row.paid === true ? ' ✓' : ''}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Text */}
+            <div className="order-1 lg:order-2">
+              <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-indigo-100 bg-indigo-50 px-3 py-1 text-sm font-semibold text-indigo-700">
+                <Globe className="h-3.5 w-3.5" />
+                Branded Client Portal
+              </div>
+              <h2 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">
+                Your clients see
+                <br />
+                <span className="bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent">
+                  everything.
+                </span>
+              </h2>
+              <p className="mt-4 text-lg text-gray-600">
+                Every client gets a branded portal showing real-time matter status, document
+                validation, invoice history, and exactly what they need to do next.
+                No phone tag. No emails asking for updates.
+              </p>
+
+              <div className="mt-8 space-y-5">
+                {[
+                  {
+                    icon: CheckCircle,
+                    color: 'text-emerald-600',
+                    bg: 'bg-emerald-50',
+                    title: 'Document validation in real time',
+                    desc: 'Clients see exactly which documents are accepted, under review, or rejected — with a clear reason and a one-click re-upload.',
+                  },
+                  {
+                    icon: CreditCard,
+                    color: 'text-indigo-600',
+                    bg: 'bg-indigo-50',
+                    title: 'Full financial transparency',
+                    desc: 'Retainer balance, invoice history, and outstanding amounts — visible from the portal without calling the office.',
+                  },
+                  {
+                    icon: BellRing,
+                    color: 'text-violet-600',
+                    bg: 'bg-violet-50',
+                    title: 'Automatic follow-up requests',
+                    desc: 'When a document is rejected or missing, clients are notified instantly with instructions. Zero staff involvement.',
+                  },
+                  {
+                    icon: Shield,
+                    color: 'text-amber-600',
+                    bg: 'bg-amber-50',
+                    title: 'Matter progress at a glance',
+                    desc: 'Stage-by-stage progress bar so clients always know where their file is — and what comes next in the process.',
+                  },
+                ].map(item => (
+                  <div key={item.title} className="flex gap-4">
+                    <div className={`mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${item.bg}`}>
+                      <item.icon className={`h-4.5 w-4.5 ${item.color}`} />
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-gray-900">{item.title}</p>
+                      <p className="mt-0.5 text-sm text-gray-500">{item.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Standout features grid */}
       <section id="features" className="bg-gray-50 py-24 sm:py-32">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
@@ -786,9 +989,7 @@ export default async function LandingPage() {
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="flex flex-col items-center justify-between gap-6 md:flex-row">
             <div className="flex items-center gap-2">
-              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-600">
-                <Scale className="h-4 w-4 text-white" />
-              </div>
+              <NorvaLogo size={28} id="footer" />
               <span className="text-base font-bold text-gray-900">NorvaOS</span>
               <span className="ml-2 text-sm text-gray-400">Legal Operations Platform</span>
             </div>
