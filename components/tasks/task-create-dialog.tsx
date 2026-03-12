@@ -58,20 +58,22 @@ export function TaskCreateDialog({ open, onOpenChange, matterId, contactId }: Ta
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
+      <DialogContent className="max-w-2xl flex flex-col max-h-[90vh] p-0 gap-0">
+        <DialogHeader className="px-6 pt-6 pb-4 border-b shrink-0">
           <DialogTitle>Create Task</DialogTitle>
           <DialogDescription>
             Add a new task to your workflow.
           </DialogDescription>
         </DialogHeader>
-        <TaskForm
-          mode="create"
-          onSubmit={handleSubmit}
-          isLoading={createTask.isPending}
-          matterId={matterId}
-          contactId={contactId}
-        />
+        <div className="overflow-y-auto flex-1 px-6 py-4">
+          <TaskForm
+            mode="create"
+            onSubmit={handleSubmit}
+            isLoading={createTask.isPending}
+            matterId={matterId}
+            contactId={contactId}
+          />
+        </div>
       </DialogContent>
     </Dialog>
   )

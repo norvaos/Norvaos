@@ -44,7 +44,6 @@ import {
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
-import { ScrollArea } from '@/components/ui/scroll-area'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
   AlertDialog,
@@ -252,7 +251,7 @@ export function TaskDetailSheet({ taskId, open, onOpenChange }: TaskDetailSheetP
   return (
     <>
       <Sheet open={open} onOpenChange={handleClose}>
-        <SheetContent className="w-full sm:max-w-lg p-0 flex flex-col">
+        <SheetContent className="w-full sm:max-w-lg p-0 flex flex-col gap-0">
           <SheetHeader className="px-6 pt-6 pb-0">
             <div className="flex items-center justify-between">
               <SheetTitle className="text-lg">
@@ -276,7 +275,7 @@ export function TaskDetailSheet({ taskId, open, onOpenChange }: TaskDetailSheetP
             </SheetDescription>
           </SheetHeader>
 
-          <ScrollArea className="flex-1 px-6 py-4">
+          <div className="flex-1 overflow-y-auto min-h-0 px-6 py-4">
             {isLoading ? (
               <TaskDetailSkeleton />
             ) : !task ? (
@@ -544,7 +543,7 @@ export function TaskDetailSheet({ taskId, open, onOpenChange }: TaskDetailSheetP
                 </div>
               </div>
             )}
-          </ScrollArea>
+          </div>
         </SheetContent>
       </Sheet>
 

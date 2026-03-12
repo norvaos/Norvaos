@@ -141,7 +141,7 @@ function ColourPickerField({
 }
 
 export default function SettingsFirmPage() {
-  const { tenant, isLoading: tenantLoading } = useTenant()
+  const { tenant, isLoading: tenantLoading, refreshTenant } = useTenant()
   const queryClient = useQueryClient()
 
   const { data: firmData, isLoading } = useQuery({
@@ -208,6 +208,7 @@ export default function SettingsFirmPage() {
     onSuccess: () => {
       toast.success('Firm settings updated successfully.')
       queryClient.invalidateQueries({ queryKey: ['settings', 'firm'] })
+      refreshTenant()
     },
     onError: (error) => {
       toast.error('Failed to update firm settings.', {

@@ -27,12 +27,14 @@ interface TenantContextType {
   tenant: Tenant | null
   isLoading: boolean
   error: string | null
+  refreshTenant: () => Promise<void>
 }
 
 const TenantContext = createContext<TenantContextType>({
   tenant: null,
   isLoading: true,
   error: null,
+  refreshTenant: async () => {},
 })
 
 export function TenantProvider({ children }: { children: ReactNode }) {
@@ -45,55 +47,42 @@ export function TenantProvider({ children }: { children: ReactNode }) {
   // appUser?.id transitions null → string on login, triggering the re-fetch.
   const userId = appUser?.id ?? null
 
+  async function fetchTenant() {
+    if (!userId) return
+    try {
+      setIsLoading(true)
+      setError(null)
+      const res = await fetch('/api/auth/me')
+      if (!res.ok) {
+        if (res.status === 401) { setIsLoading(false); return }
+        setError('Failed to load firm data')
+        setIsLoading(false)
+        return
+      }
+      const { data: tenantData } = await res.json()
+      if (!tenantData) { setError('Failed to load firm data'); setIsLoading(false); return }
+      setTenant(tenantData as Tenant)
+    } catch {
+      setError('An unexpected error occurred')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   useEffect(() => {
-    // No user yet — reset tenant state but keep loading true
-    // only if we haven't loaded before (avoids flicker on logout)
     if (!userId) {
       setTenant(null)
       setIsLoading(false)
       return
     }
-
-    async function fetchTenant() {
-      try {
-        setIsLoading(true)
-        setError(null)
-        // Use the server-side API route which bypasses RLS via the admin client.
-        // This is more reliable than direct client-side Supabase queries which
-        // depend on RLS policies being correctly configured for every tenant.
-        const res = await fetch('/api/auth/me')
-        if (!res.ok) {
-          if (res.status === 401) {
-            // Not logged in — leave tenant null
-            setIsLoading(false)
-            return
-          }
-          setError('Failed to load firm data')
-          setIsLoading(false)
-          return
-        }
-
-        const { data: tenantData } = await res.json()
-        if (!tenantData) {
-          setError('Failed to load firm data')
-          setIsLoading(false)
-          return
-        }
-
-        setTenant(tenantData as Tenant)
-      } catch {
-        setError('An unexpected error occurred')
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
     fetchTenant()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId])
 
   const value = useMemo(
-    () => ({ tenant, isLoading, error }),
-    [tenant, isLoading, error]
+    () => ({ tenant, isLoading, error, refreshTenant: fetchTenant }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [tenant, isLoading, error, userId]
   )
 
   return (
