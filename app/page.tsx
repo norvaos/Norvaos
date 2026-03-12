@@ -67,7 +67,7 @@ export default async function LandingPage() {
                 href="/signup"
                 className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:bg-indigo-700"
               >
-                Get started
+                Request access
                 <ArrowRight className="h-3.5 w-3.5" />
               </Link>
             </div>
@@ -104,7 +104,7 @@ export default async function LandingPage() {
                 href="/signup"
                 className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-indigo-600 px-8 py-3.5 text-base font-semibold text-white shadow-lg shadow-indigo-200 transition-all hover:bg-indigo-700 hover:shadow-xl hover:shadow-indigo-200 sm:w-auto"
               >
-                Start free trial
+                Request early access
                 <ArrowRight className="h-4 w-4" />
               </Link>
               <Link
@@ -1126,13 +1126,13 @@ export default async function LandingPage() {
                 <div className="mb-3 flex h-12 w-12 mx-auto items-center justify-center rounded-2xl bg-white/20">
                   <Sparkles className="h-6 w-6 text-white" />
                 </div>
-                <h3 className="text-base font-bold text-white">Start Free Trial</h3>
-                <p className="mt-1 text-sm text-indigo-200">Full access, 14 days, no card</p>
+                <h3 className="text-base font-bold text-white">Request Early Access</h3>
+                <p className="mt-1 text-sm text-indigo-200">Invitation-only — be first in line</p>
                 <Link
                   href="/signup"
                   className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-white px-5 py-2.5 text-sm font-semibold text-indigo-700 shadow-lg transition-all hover:bg-indigo-50"
                 >
-                  Get started free
+                  Join the waitlist
                   <ArrowRight className="h-3.5 w-3.5" />
                 </Link>
               </div>
@@ -1162,14 +1162,14 @@ export default async function LandingPage() {
                   href="/signup"
                   className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-white/40 bg-white/10 px-5 py-2.5 text-sm font-semibold text-white transition-all hover:bg-white/20"
                 >
-                  Book a call
+                  Get in touch
                   <ArrowRight className="h-3.5 w-3.5" />
                 </Link>
               </div>
             </div>
 
             <p className="mt-8 text-sm text-indigo-200">
-              No credit card required. 14-day free trial. Full access. Cancel anytime.
+              Invitation-only during launch. Every firm is onboarded personally.
             </p>
           </div>
         </div>
