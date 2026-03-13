@@ -58,6 +58,7 @@ export default async function LandingPage() {
               <a href="#platform" className="text-sm font-medium text-gray-600 transition-colors hover:text-gray-900">Platform</a>
               <a href="#features" className="text-sm font-medium text-gray-600 transition-colors hover:text-gray-900">Features</a>
               <a href="#testimonials" className="text-sm font-medium text-gray-600 transition-colors hover:text-gray-900">Reviews</a>
+              <Link href="/help" target="_blank" className="text-sm font-medium text-gray-600 transition-colors hover:text-gray-900">Help</Link>
             </div>
             <div className="flex items-center gap-3">
               <Link href="/login" className="text-sm font-medium text-gray-600 transition-colors hover:text-gray-900">

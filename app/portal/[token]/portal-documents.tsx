@@ -24,6 +24,11 @@ import {
   isRtl,
   type PortalLocale,
 } from '@/lib/utils/portal-translations'
+import {
+  getRejectionInfo,
+  getRejectionUiLabels,
+  type RejectionReasonCode,
+} from '@/lib/utils/rejection-reason-translations'
 import { track } from '@/lib/utils/portal-analytics'
 
 // ─── Types ──────────────────────────────────────────────────────────────────
@@ -40,6 +45,7 @@ export interface PortalSlot {
   max_file_size_bytes: number
   current_version: number
   latest_review_reason: string | null
+  rejection_reason_code: string | null
 }
 
 interface PortalDocumentsProps {
@@ -441,16 +447,67 @@ export function PortalDocuments({
           </div>
         </div>
 
-        {/* Re-upload reason (shown inline when needs_re_upload or rejected) */}
-        {needsReUpload && slot.latest_review_reason && (
-          <div className="mt-2 flex items-start gap-1.5 rounded-md border border-amber-200 bg-amber-50 px-3 py-2">
-            <AlertTriangle className="mt-0.5 h-3.5 w-3.5 text-amber-600 flex-shrink-0" />
-            <p className="text-xs text-amber-800">
-              <span className="font-medium">{tr.reason_label}:</span>{' '}
-              {slot.latest_review_reason}
-            </p>
-          </div>
-        )}
+        {/* Re-upload reason — structured (with code) or plain text fallback */}
+        {needsReUpload && (() => {
+          const code = slot.rejection_reason_code as RejectionReasonCode | null
+          const info = getRejectionInfo(code, currentLang)
+          const uiLabels = getRejectionUiLabels(currentLang)
+
+          if (info) {
+            return (
+              <div className="mt-2 rounded-md border border-orange-200 bg-orange-50 overflow-hidden">
+                {/* Reason heading */}
+                <div className="flex items-start gap-1.5 px-3 pt-2.5 pb-1.5 border-b border-orange-100">
+                  <AlertTriangle className="mt-0.5 h-3.5 w-3.5 text-orange-600 flex-shrink-0" />
+                  <p className="text-xs font-semibold text-orange-900">{info.label}</p>
+                </div>
+
+                {/* How to fix */}
+                <div className="px-3 pt-2 pb-1">
+                  <p className="text-[11px] font-medium text-orange-800 uppercase tracking-wide mb-0.5">
+                    {uiLabels.how_to_fix}
+                  </p>
+                  <p className="text-xs text-orange-800 leading-relaxed">{info.guidance}</p>
+                </div>
+
+                {/* Best practice tip */}
+                {info.tip && (
+                  <div className="px-3 pt-1 pb-2.5">
+                    <p className="text-[11px] text-orange-700 italic">
+                      <span className="font-medium not-italic">{uiLabels.tip}: </span>
+                      {info.tip}
+                    </p>
+                  </div>
+                )}
+
+                {/* Custom reason text (if staff added extra notes) */}
+                {slot.latest_review_reason && (
+                  <div className="px-3 py-2 bg-orange-100/60 border-t border-orange-100">
+                    <p className="text-xs text-orange-800">
+                      <span className="font-medium">{tr.reason_label}:</span>{' '}
+                      {slot.latest_review_reason}
+                    </p>
+                  </div>
+                )}
+              </div>
+            )
+          }
+
+          // Fallback: plain text reason only
+          if (slot.latest_review_reason) {
+            return (
+              <div className="mt-2 flex items-start gap-1.5 rounded-md border border-amber-200 bg-amber-50 px-3 py-2">
+                <AlertTriangle className="mt-0.5 h-3.5 w-3.5 text-amber-600 flex-shrink-0" />
+                <p className="text-xs text-amber-800">
+                  <span className="font-medium">{tr.reason_label}:</span>{' '}
+                  {slot.latest_review_reason}
+                </p>
+              </div>
+            )
+          }
+
+          return null
+        })()}
 
         {/* In-context upload guidance — shown near upload button for empty/re-upload slots */}
         {canUpload(slot.status) && !isAccepted && !isPending && (

@@ -23,6 +23,7 @@ export interface ReviewParams {
   slotId: string
   action: 'accept' | 'needs_re_upload' | 'reject'
   reason?: string
+  rejectionReasonCode?: string
   notifyClient?: boolean
 }
 
@@ -50,7 +51,7 @@ export interface ReviewResult {
  * Email failure never rolls back the review.
  */
 export async function reviewDocumentSlot(params: ReviewParams): Promise<ReviewResult> {
-  const { supabase, tenantId, userId, slotId, action, reason, notifyClient } = params
+  const { supabase, tenantId, userId, slotId, action, reason, rejectionReasonCode, notifyClient } = params
 
   // 1. Call the review RPC (single atomic transaction)
   const { data, error } = await supabase.rpc('review_document_version', {
@@ -78,6 +79,19 @@ export async function reviewDocumentSlot(params: ReviewParams): Promise<ReviewRe
     return {
       success: false,
       error: rpcResult?.error ?? 'Review failed',
+    }
+  }
+
+  // 1b. Store structured rejection_reason_code if provided (non-blocking, best-effort)
+  if (rejectionReasonCode && rpcResult.version_number) {
+    try {
+      await supabase
+        .from('document_versions')
+        .update({ rejection_reason_code: rejectionReasonCode } as never)
+        .eq('slot_id', slotId)
+        .eq('version_number', rpcResult.version_number)
+    } catch (err) {
+      console.error('[document-review-engine] Failed to store rejection_reason_code:', err)
     }
   }
 

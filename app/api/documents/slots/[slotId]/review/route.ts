@@ -28,7 +28,7 @@ async function handlePost(
     if (!limit.allowed) return rateLimitResponse(limit)
 
     const body = await request.json()
-    const { action, reason, notify_client } = body
+    const { action, reason, rejection_reason_code, notify_client } = body
 
     if (!action || !['accept', 'needs_re_upload', 'reject'].includes(action)) {
       return NextResponse.json(
@@ -44,6 +44,7 @@ async function handlePost(
       slotId,
       action,
       reason,
+      rejectionReasonCode: rejection_reason_code,
       notifyClient: notify_client ?? false,
     })
 

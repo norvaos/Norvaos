@@ -295,21 +295,24 @@ export default async function PortalPage({ params }: Props) {
       (s) => s.status === 'needs_re_upload' || s.status === 'rejected'
     )
 
-    const reasonMap = new Map<string, string | null>()
+    const reasonMap = new Map<string, { review_reason: string | null; rejection_reason_code: string | null }>()
     if (slotsNeedingReason.length > 0) {
       for (const slot of slotsNeedingReason) {
         const { data: latestVersion } = await admin
           .from('document_versions')
-          .select('review_reason')
+          .select('review_reason, rejection_reason_code')
           .eq('slot_id', slot.id)
           .order('version_number', { ascending: false })
           .limit(1)
           .maybeSingle()
-        reasonMap.set(slot.id, latestVersion?.review_reason ?? null)
+        reasonMap.set(slot.id, {
+          review_reason: (latestVersion as { review_reason?: string | null })?.review_reason ?? null,
+          rejection_reason_code: (latestVersion as { rejection_reason_code?: string | null })?.rejection_reason_code ?? null,
+        })
       }
     }
 
-    // Enrich slots with review reason
+    // Enrich slots with review reason and structured rejection code
     const allEnriched = slotList.map((s) => ({
       id: s.id,
       slot_name: s.slot_name,
@@ -321,7 +324,8 @@ export default async function PortalPage({ params }: Props) {
       accepted_file_types: s.accepted_file_types,
       max_file_size_bytes: s.max_file_size_bytes,
       current_version: s.current_version,
-      latest_review_reason: reasonMap.get(s.id) ?? null,
+      latest_review_reason: reasonMap.get(s.id)?.review_reason ?? null,
+      rejection_reason_code: reasonMap.get(s.id)?.rejection_reason_code ?? null,
     }))
 
     // Filter to only show slots that were explicitly requested via document_requests.

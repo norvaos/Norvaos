@@ -50,7 +50,8 @@ export async function updateSession(request: NextRequest) {
     !request.nextUrl.pathname.startsWith('/booking') &&
     !request.nextUrl.pathname.startsWith('/kiosk') &&
     !request.nextUrl.pathname.startsWith('/invite') &&
-    !request.nextUrl.pathname.startsWith('/signing')
+    !request.nextUrl.pathname.startsWith('/signing') &&
+    !request.nextUrl.pathname.startsWith('/help')
   ) {
     const url = request.nextUrl.clone()
     const redirectPath = request.nextUrl.pathname

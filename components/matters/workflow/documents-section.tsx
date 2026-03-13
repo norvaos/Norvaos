@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useMemo, useCallback, useRef } from 'react'
-import { FileText, Check, RotateCcw, Loader2, Upload, Plus, X } from 'lucide-react'
+import { FileText, Check, RotateCcw, Loader2, Upload, Plus, X, Eye } from 'lucide-react'
 import {
   useDocumentSlots,
   useReviewSlot,
@@ -23,10 +23,20 @@ import {
   type SectionMetric,
 } from '@/components/matters/workflow/section-summary-strip'
 import type { ImmigrationReadinessData } from '@/lib/queries/immigration-readiness'
+import { DocumentViewer } from '@/components/shared/document-viewer'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
 import { Skeleton } from '@/components/ui/skeleton'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog'
 import {
   Select,
   SelectContent,
@@ -38,6 +48,61 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { toast } from 'sonner'
+
+// ── Rejection Reason Codes ───────────────────────────────────────────────────
+
+export type RejectionReasonCode =
+  | 'blurry'
+  | 'corner_cut'
+  | 'not_readable'
+  | 'needs_translation'
+  | 'wrong_document'
+  | 'expired'
+  | 'incomplete'
+  | 'other'
+
+const REJECTION_REASON_OPTIONS: { code: RejectionReasonCode; label: string; defaultText: string }[] = [
+  {
+    code: 'blurry',
+    label: 'Blurry or out of focus',
+    defaultText: 'The document appears blurry or out of focus. Please upload a clearer copy.',
+  },
+  {
+    code: 'corner_cut',
+    label: 'Corners or edges cut off',
+    defaultText: 'The document corners or edges are cut off. Please ensure all four borders are fully visible.',
+  },
+  {
+    code: 'not_readable',
+    label: 'Text not readable',
+    defaultText: 'The text in this document is not legible. Please upload a higher quality scan or photo.',
+  },
+  {
+    code: 'needs_translation',
+    label: 'Needs certified translation',
+    defaultText: 'This document requires a certified translation into English or French. Please provide the original document along with a certified translation.',
+  },
+  {
+    code: 'wrong_document',
+    label: 'Wrong document uploaded',
+    defaultText: 'The uploaded document does not match what was requested. Please check the document name and upload the correct document.',
+  },
+  {
+    code: 'expired',
+    label: 'Document has expired',
+    defaultText: 'This document has passed its expiry date. Please obtain and upload a current version.',
+  },
+  {
+    code: 'incomplete',
+    label: 'Incomplete — missing pages',
+    defaultText: 'The document appears to be missing pages or required sections. Please upload the complete document.',
+  },
+  {
+    code: 'other',
+    label: 'Other reason',
+    defaultText: '',
+  },
+]
 
 // ── Types ───────────────────────────────────────────────────────────────────────
 
@@ -559,6 +624,137 @@ function PersonGroup({
   )
 }
 
+// ── Reject Document Dialog ───────────────────────────────────────────────────
+
+function RejectDocumentDialog({
+  slotId,
+  slotName,
+  matterId,
+  open,
+  onOpenChange,
+}: {
+  slotId: string
+  slotName: string
+  matterId: string
+  open: boolean
+  onOpenChange: (open: boolean) => void
+}) {
+  const reviewSlot = useReviewSlot()
+  const [reasonCode, setReasonCode] = useState<RejectionReasonCode | ''>('')
+  const [reasonText, setReasonText] = useState('')
+  const [notifyClient, setNotifyClient] = useState(true)
+
+  const handleReasonCodeChange = useCallback((code: string) => {
+    const typed = code as RejectionReasonCode
+    setReasonCode(typed)
+    const option = REJECTION_REASON_OPTIONS.find((o) => o.code === typed)
+    setReasonText(option?.defaultText ?? '')
+  }, [])
+
+  const handleSubmit = useCallback(() => {
+    if (!reasonCode) return
+    reviewSlot.mutate(
+      {
+        slotId,
+        matterId,
+        action: 'needs_re_upload',
+        reason: reasonText || undefined,
+        rejectionReasonCode: reasonCode,
+        notifyClient,
+      },
+      {
+        onSuccess: () => {
+          onOpenChange(false)
+          setReasonCode('')
+          setReasonText('')
+          setNotifyClient(true)
+        },
+      }
+    )
+  }, [slotId, matterId, reasonCode, reasonText, notifyClient, reviewSlot, onOpenChange])
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle className="text-base">Request Re-upload</DialogTitle>
+          <p className="text-sm text-muted-foreground truncate">{slotName}</p>
+        </DialogHeader>
+
+        <div className="space-y-4 py-1">
+          {/* Rejection reason code */}
+          <div className="space-y-1.5">
+            <Label className="text-sm">Reason for rejection</Label>
+            <Select value={reasonCode} onValueChange={handleReasonCodeChange}>
+              <SelectTrigger className="h-9 text-sm">
+                <SelectValue placeholder="Select a reason…" />
+              </SelectTrigger>
+              <SelectContent>
+                {REJECTION_REASON_OPTIONS.map((opt) => (
+                  <SelectItem key={opt.code} value={opt.code}>
+                    {opt.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Reason text (auto-filled, editable) */}
+          <div className="space-y-1.5">
+            <Label className="text-sm">
+              Message to client
+              <span className="text-muted-foreground font-normal ml-1">(shown in portal)</span>
+            </Label>
+            <Textarea
+              value={reasonText}
+              onChange={(e) => setReasonText(e.target.value)}
+              placeholder="Describe the issue so the client knows how to fix it…"
+              className="text-sm resize-none"
+              rows={3}
+            />
+          </div>
+
+          {/* Notify client toggle */}
+          <div className="flex items-center gap-2">
+            <Checkbox
+              id="notify-client"
+              checked={notifyClient}
+              onCheckedChange={(v) => setNotifyClient(!!v)}
+            />
+            <Label htmlFor="notify-client" className="text-sm font-normal cursor-pointer">
+              Send email notification to client
+            </Label>
+          </div>
+        </div>
+
+        <DialogFooter className="gap-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => onOpenChange(false)}
+            disabled={reviewSlot.isPending}
+          >
+            Cancel
+          </Button>
+          <Button
+            size="sm"
+            className="bg-orange-600 hover:bg-orange-700 text-white"
+            onClick={handleSubmit}
+            disabled={!reasonCode || reviewSlot.isPending}
+          >
+            {reviewSlot.isPending ? (
+              <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <RotateCcw className="mr-1.5 h-3.5 w-3.5" />
+            )}
+            Request Re-upload
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
 // ── Inline Slot Row with Quick-Review + Upload ──────────────────────────────────
 
 function InlineSlotRow({
@@ -578,9 +774,12 @@ function InlineSlotRow({
   const uploadSlot = useUploadToSlot()
   const removeSlot = useRemoveSlot()
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const [viewerOpen, setViewerOpen] = useState(false)
+  const [rejectDialogOpen, setRejectDialogOpen] = useState(false)
   const status = (slot.status as SlotStatus) ?? 'empty'
   const isPending = status === 'pending_review'
   const canUpload = status === 'empty' || status === 'needs_re_upload' || status === 'rejected'
+  const doc = slot.current_document
 
   const handleAccept = useCallback(() => {
     reviewSlot.mutate({
@@ -590,119 +789,145 @@ function InlineSlotRow({
     })
   }, [slot.id, matterId, reviewSlot])
 
-  const handleReUpload = useCallback(() => {
-    reviewSlot.mutate({
-      slotId: slot.id,
-      matterId,
-      action: 'needs_re_upload',
-    })
-  }, [slot.id, matterId, reviewSlot])
-
   const handleFileChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0]
       if (!file) return
       uploadSlot.mutate({ file, slotId: slot.id, matterId })
-      // Reset so the same file can be re-selected if needed
       e.target.value = ''
     },
     [slot.id, matterId, uploadSlot],
   )
 
   return (
-    <div className="flex items-center gap-2 rounded-md border px-3 py-2 text-sm">
-      {/* Checkbox for bulk select */}
-      {showCheckbox && (
-        <Checkbox
-          checked={isSelected}
-          onCheckedChange={onToggle}
-          aria-label={`Select ${slot.slot_name}`}
+    <>
+      <div className="flex items-center gap-2 rounded-md border px-3 py-2 text-sm">
+        {/* Checkbox for bulk select */}
+        {showCheckbox && (
+          <Checkbox
+            checked={isSelected}
+            onCheckedChange={onToggle}
+            aria-label={`Select ${slot.slot_name}`}
+          />
+        )}
+
+        {/* Slot name */}
+        <div className="flex-1 min-w-0">
+          <span className="font-medium text-sm truncate block">{slot.slot_name}</span>
+          {slot.description && (
+            <span className="text-xs text-muted-foreground truncate block">{slot.description}</span>
+          )}
+        </div>
+
+        {/* Status badge */}
+        <StatusBadge status={status} />
+
+        {/* View button — shown whenever a document exists */}
+        {doc && (
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground shrink-0"
+            onClick={() => setViewerOpen(true)}
+            title="View document"
+          >
+            <Eye className="h-3.5 w-3.5" />
+          </Button>
+        )}
+
+        {/* Upload action for empty / needs_re_upload / rejected */}
+        {canUpload && (
+          <>
+            <input
+              ref={fileInputRef}
+              type="file"
+              className="hidden"
+              onChange={handleFileChange}
+              accept="application/pdf,image/*,.doc,.docx"
+            />
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-7 text-xs text-blue-700 border-blue-200 hover:bg-blue-50 shrink-0 ml-1"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploadSlot.isPending}
+            >
+              {uploadSlot.isPending ? (
+                <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+              ) : (
+                <Upload className="mr-1 h-3 w-3" />
+              )}
+              Upload
+            </Button>
+          </>
+        )}
+
+        {/* Quick-review actions for pending_review */}
+        {isPending && (
+          <div className="flex items-center gap-1 shrink-0 ml-1">
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-7 text-xs text-green-700 border-green-200 hover:bg-green-50"
+              onClick={handleAccept}
+              disabled={reviewSlot.isPending}
+            >
+              {reviewSlot.isPending ? (
+                <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+              ) : (
+                <Check className="mr-1 h-3 w-3" />
+              )}
+              Accept
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-7 text-xs text-orange-700 border-orange-200 hover:bg-orange-50"
+              onClick={() => setRejectDialogOpen(true)}
+              disabled={reviewSlot.isPending}
+            >
+              <RotateCcw className="mr-1 h-3 w-3" />
+              Reject
+            </Button>
+          </div>
+        )}
+
+        {/* Remove slot */}
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-7 w-7 p-0 text-muted-foreground hover:text-destructive shrink-0"
+          onClick={() => removeSlot.mutate({ slotId: slot.id, matterId })}
+          disabled={removeSlot.isPending}
+          title="Remove document requirement"
+        >
+          {removeSlot.isPending ? (
+            <Loader2 className="h-3 w-3 animate-spin" />
+          ) : (
+            <X className="h-3 w-3" />
+          )}
+        </Button>
+      </div>
+
+      {/* Document Viewer */}
+      {doc && (
+        <DocumentViewer
+          storagePath={doc.storage_path}
+          fileName={doc.file_name}
+          fileType={doc.file_type}
+          open={viewerOpen}
+          onOpenChange={setViewerOpen}
         />
       )}
 
-      {/* Slot name */}
-      <div className="flex-1 min-w-0">
-        <span className="font-medium text-sm truncate block">{slot.slot_name}</span>
-        {slot.description && (
-          <span className="text-xs text-muted-foreground truncate block">{slot.description}</span>
-        )}
-      </div>
-
-      {/* Status badge */}
-      <StatusBadge status={status} />
-
-      {/* Upload action for empty / needs_re_upload / rejected */}
-      {canUpload && (
-        <>
-          <input
-            ref={fileInputRef}
-            type="file"
-            className="hidden"
-            onChange={handleFileChange}
-            accept="application/pdf,image/*,.doc,.docx"
-          />
-          <Button
-            variant="outline"
-            size="sm"
-            className="h-7 text-xs text-blue-700 border-blue-200 hover:bg-blue-50 shrink-0 ml-1"
-            onClick={() => fileInputRef.current?.click()}
-            disabled={uploadSlot.isPending}
-          >
-            {uploadSlot.isPending ? (
-              <Loader2 className="mr-1 h-3 w-3 animate-spin" />
-            ) : (
-              <Upload className="mr-1 h-3 w-3" />
-            )}
-            Upload
-          </Button>
-        </>
-      )}
-
-      {/* Quick-review actions for pending_review */}
-      {isPending && (
-        <div className="flex items-center gap-1 shrink-0 ml-1">
-          <Button
-            variant="outline"
-            size="sm"
-            className="h-7 text-xs text-green-700 border-green-200 hover:bg-green-50"
-            onClick={handleAccept}
-            disabled={reviewSlot.isPending}
-          >
-            {reviewSlot.isPending ? (
-              <Loader2 className="mr-1 h-3 w-3 animate-spin" />
-            ) : (
-              <Check className="mr-1 h-3 w-3" />
-            )}
-            Accept
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            className="h-7 text-xs text-orange-700 border-orange-200 hover:bg-orange-50"
-            onClick={handleReUpload}
-            disabled={reviewSlot.isPending}
-          >
-            <RotateCcw className="mr-1 h-3 w-3" />
-            Re-upload
-          </Button>
-        </div>
-      )}
-
-      {/* Remove slot */}
-      <Button
-        variant="ghost"
-        size="sm"
-        className="h-7 w-7 p-0 text-muted-foreground hover:text-destructive shrink-0"
-        onClick={() => removeSlot.mutate({ slotId: slot.id, matterId })}
-        disabled={removeSlot.isPending}
-        title="Remove document requirement"
-      >
-        {removeSlot.isPending ? (
-          <Loader2 className="h-3 w-3 animate-spin" />
-        ) : (
-          <X className="h-3 w-3" />
-        )}
-      </Button>
-    </div>
+      {/* Reject / Request Re-upload Dialog */}
+      <RejectDocumentDialog
+        slotId={slot.id}
+        slotName={slot.slot_name}
+        matterId={matterId}
+        open={rejectDialogOpen}
+        onOpenChange={setRejectDialogOpen}
+      />
+    </>
   )
 }

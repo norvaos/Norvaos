@@ -157,6 +157,7 @@ export function useReviewSlot() {
       matterId: string
       action: 'accept' | 'needs_re_upload' | 'reject'
       reason?: string
+      rejectionReasonCode?: string
       clientGuidance?: string
       notifyClient?: boolean
     }) => {
@@ -166,6 +167,7 @@ export function useReviewSlot() {
         body: JSON.stringify({
           action: params.action,
           reason: params.reason,
+          rejection_reason_code: params.rejectionReasonCode,
           client_guidance: params.clientGuidance,
           notify_client: params.notifyClient ?? false,
         }),
