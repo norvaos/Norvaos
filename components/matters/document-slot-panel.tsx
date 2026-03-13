@@ -60,6 +60,7 @@ import {
   XCircle,
   FileDown,
   Plus,
+  Share2,
 } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 
@@ -69,6 +70,10 @@ interface DocumentSlotPanelProps {
   matterId: string
   tenantId: string
   enforcementEnabled: boolean
+  /** Optional search query — filters visible slots by name (case-insensitive) */
+  filterQuery?: string
+  /** Optional status filter — shows only slots matching this status */
+  filterStatus?: string
 }
 
 type SlotStatus = 'empty' | 'pending_review' | 'accepted' | 'needs_re_upload' | 'rejected'
@@ -164,13 +169,31 @@ export function SlotCard({
   const [showUpload, setShowUpload] = useState(false)
   const [showReview, setShowReview] = useState(false)
   const [showViewer, setShowViewer] = useState(false)
+  const [isSharing, setIsSharing] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const uploadMutation = useUploadToSlot()
   const downloadMutation = useDownloadDocument()
 
   const status = (slot.status as SlotStatus) ?? 'empty'
   const hasDocument = !!slot.current_document_id && slot.current_version > 0
-  const currentDoc = (slot as { current_document?: { id: string; file_name: string; file_type: string | null; file_size: number | null; storage_path: string; storage_bucket: string | null; created_at: string } | null }).current_document
+  const currentDoc = (slot as { current_document?: { id: string; file_name: string; file_type: string | null; file_size: number | null; storage_path: string; storage_bucket: string | null; is_shared_with_client?: boolean | null; created_at: string } | null }).current_document
+  const [sharedState, setSharedState] = useState<boolean>(currentDoc?.is_shared_with_client ?? false)
+
+  const handleShareToggle = useCallback(async () => {
+    if (!currentDoc?.id) return
+    setIsSharing(true)
+    try {
+      const newShared = !sharedState
+      const res = await fetch('/api/documents/share', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ document_id: currentDoc.id, share: newShared }),
+      })
+      if (res.ok) setSharedState(newShared)
+    } finally {
+      setIsSharing(false)
+    }
+  }, [currentDoc?.id, sharedState])
 
   const handleFileSelect = useCallback(
     async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -284,6 +307,25 @@ export function SlotCard({
             className="h-7 text-xs"
           >
             Review
+          </Button>
+        )}
+
+        {/* Share with client */}
+        {hasDocument && (
+          <Button
+            variant={sharedState ? 'default' : 'outline'}
+            size="sm"
+            onClick={handleShareToggle}
+            disabled={isSharing}
+            className={sharedState ? 'h-7 text-xs bg-emerald-600 hover:bg-emerald-700 border-emerald-600' : 'h-7 text-xs'}
+            title={sharedState ? 'Shared with client — click to unshare' : 'Share with client via portal'}
+          >
+            {isSharing ? (
+              <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+            ) : (
+              <Share2 className="mr-1 h-3 w-3" />
+            )}
+            {sharedState ? 'Shared' : 'Share'}
           </Button>
         )}
 
@@ -637,8 +679,23 @@ export function DocumentSlotPanel({
   matterId,
   tenantId,
   enforcementEnabled,
+  filterQuery,
+  filterStatus,
 }: DocumentSlotPanelProps) {
-  const { data: slots, isLoading, error } = useDocumentSlots(matterId)
+  const { data: slotsRaw, isLoading, error } = useDocumentSlots(matterId)
+  const slots = useMemo(() => {
+    if (!slotsRaw) return slotsRaw
+    return slotsRaw.filter((s) => {
+      if (filterQuery && !s.slot_name.toLowerCase().includes(filterQuery.toLowerCase())) return false
+      if (filterStatus && filterStatus !== 'all') {
+        if (filterStatus === 'shared') {
+          return (s as { current_document?: { is_shared_with_client?: boolean | null } | null }).current_document?.is_shared_with_client === true
+        }
+        if (s.status !== filterStatus) return false
+      }
+      return true
+    })
+  }, [slotsRaw, filterQuery, filterStatus])
   const { data: folders } = useMatterFolders(matterId)
   const hasFolders = folders && folders.length > 0
   const regenerateMutation = useRegenerateSlots()

@@ -13,7 +13,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { getTranslations, t, type PortalLocale } from '@/lib/utils/portal-translations'
 import { track } from '@/lib/utils/portal-analytics'
-import type { PortalBillingResponse, PortalInvoice } from '@/lib/types/portal'
+import type { PortalBillingResponse, PortalInvoice, PortalRetainerSummary } from '@/lib/types/portal'
 import { cn } from '@/lib/utils'
 
 interface PortalPaymentSectionProps {
@@ -57,10 +57,10 @@ export function PortalPaymentSection({
     )
   }
 
-  if (!data || data.invoices.length === 0) {
+  if (!data || (data.invoices.length === 0 && !data.retainerSummary)) {
     return (
       <p className="text-sm text-slate-500 py-4 text-center">
-        No invoices on file.
+        No billing information on file.
       </p>
     )
   }
@@ -69,7 +69,13 @@ export function PortalPaymentSection({
 
   return (
     <div className="space-y-4">
-      {/* Account Summary Card */}
+      {/* Fee Agreement (retainer package breakdown) */}
+      {data.retainerSummary && (
+        <RetainerFeeCard summary={data.retainerSummary} language={language} />
+      )}
+
+      {/* Account Summary Card — only when invoices exist */}
+      {invoices.length === 0 ? null : (<>{/* Account Summary Card */}
       <div className="rounded-xl border border-slate-200 bg-white overflow-hidden">
         {/* Header */}
         <div className="px-4 py-2.5 bg-slate-50 border-b border-slate-100">
@@ -175,6 +181,111 @@ export function PortalPaymentSection({
           primaryColor={primaryColor}
           invoiceId={invoices[0]?.id}
         />
+      )}
+      </>)}
+    </div>
+  )
+}
+
+// ── Retainer Fee Card ────────────────────────────────────────────────────────
+
+function RetainerFeeCard({
+  summary,
+  language,
+}: {
+  summary: PortalRetainerSummary
+  language: PortalLocale
+}) {
+  const [expanded, setExpanded] = useState(false)
+
+  const profServicesTotal = (summary.lineItems ?? []).reduce(
+    (s, i) => s + (Number(i.amount) || Number(i.unitPrice) * Number(i.quantity) || 0),
+    0,
+  )
+  const govtFeesTotal = (summary.governmentFees ?? []).reduce((s, i) => s + Number(i.amount), 0)
+  const disbTotal = (summary.disbursements ?? []).reduce((s, i) => s + Number(i.amount), 0)
+  const isFullyPaid = summary.paymentStatus === 'paid'
+  const fmt = (cents: number) =>
+    `$${(cents / 100).toLocaleString(language, { minimumFractionDigits: 2 })}`
+
+  return (
+    <div className="rounded-xl border border-slate-200 bg-white overflow-hidden">
+      {/* Header */}
+      <div className="px-4 py-2.5 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
+        <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+          Fee Agreement
+        </h3>
+        <button
+          onClick={() => setExpanded((p) => !p)}
+          className="text-[11px] text-blue-600 hover:text-blue-800"
+        >
+          {expanded ? 'Hide details' : 'View details'}
+        </button>
+      </div>
+
+      {/* Summary row */}
+      <div className="grid grid-cols-3 divide-x divide-slate-100">
+        <div className="px-4 py-3 text-center">
+          <p className="text-[11px] text-slate-400 font-medium mb-0.5">Total Agreed</p>
+          <p className="text-base font-bold text-slate-800">{fmt(summary.totalAmountCents)}</p>
+        </div>
+        <div className="px-4 py-3 text-center">
+          <p className="text-[11px] text-slate-400 font-medium mb-0.5">Paid</p>
+          <p className="text-base font-bold text-green-600">{fmt(summary.paymentAmount)}</p>
+        </div>
+        <div className="px-4 py-3 text-center">
+          <p className="text-[11px] text-slate-400 font-medium mb-0.5">Balance</p>
+          <p className={cn('text-base font-bold', isFullyPaid ? 'text-green-600' : 'text-amber-600')}>
+            {isFullyPaid ? 'Paid ✓' : fmt(summary.balanceCents)}
+          </p>
+        </div>
+      </div>
+
+      {/* Expanded breakdown */}
+      {expanded && (
+        <div className="border-t border-slate-100 divide-y divide-slate-50 text-sm">
+          {profServicesTotal > 0 && (
+            <div className="flex justify-between px-4 py-2">
+              <span className="text-xs text-slate-500">Professional Services</span>
+              <span className="text-xs font-medium text-slate-700">{fmt(profServicesTotal)}</span>
+            </div>
+          )}
+          {govtFeesTotal > 0 && (
+            <div className="flex justify-between px-4 py-2">
+              <span className="text-xs text-slate-500">Government Fees</span>
+              <span className="text-xs font-medium text-slate-700">{fmt(govtFeesTotal)}</span>
+            </div>
+          )}
+          {disbTotal > 0 && (
+            <div className="flex justify-between px-4 py-2">
+              <span className="text-xs text-slate-500">Disbursements</span>
+              <span className="text-xs font-medium text-slate-700">{fmt(disbTotal)}</span>
+            </div>
+          )}
+          {summary.hstApplicable && summary.taxAmountCents > 0 && (
+            <div className="flex justify-between px-4 py-2">
+              <span className="text-xs text-slate-500">HST / Tax</span>
+              <span className="text-xs font-medium text-slate-700">{fmt(summary.taxAmountCents)}</span>
+            </div>
+          )}
+          {summary.paymentTerms && (
+            <div className="px-4 py-2">
+              <span className="text-[11px] text-slate-400">Terms: {summary.paymentTerms}</span>
+            </div>
+          )}
+          {summary.signedAt && (
+            <div className="px-4 py-2">
+              <span className="text-[11px] text-slate-400">
+                Signed:{' '}
+                {new Date(summary.signedAt).toLocaleDateString(language, {
+                  year: 'numeric',
+                  month: 'short',
+                  day: 'numeric',
+                })}
+              </span>
+            </div>
+          )}
+        </div>
       )}
     </div>
   )

@@ -25,6 +25,43 @@ export const invoicingKeys = {
   invoices: (tid: string, mid?: string) => [...invoicingKeys.all, 'invoices', tid, mid] as const,
   invoiceDetail: (id: string) => [...invoicingKeys.all, 'invoice-detail', id] as const,
   billingStats: (tid: string) => [...invoicingKeys.all, 'billing-stats', tid] as const,
+  retainerSummary: (mid: string) => [...invoicingKeys.all, 'retainer-summary', mid] as const,
+}
+
+// ── Retainer Summary Types ────────────────────────────────────────────────────
+
+export interface RetainerLineItem {
+  description: string
+  quantity: number
+  unitPrice: number
+  amount: number
+}
+
+export interface RetainerFeeItem {
+  description: string
+  amount: number
+}
+
+export interface MatterRetainerSummary {
+  id: string
+  leadId: string
+  status: string
+  paymentStatus: string
+  billingType: string
+  lineItems: RetainerLineItem[]
+  governmentFees: RetainerFeeItem[]
+  disbursements: RetainerFeeItem[]
+  hstApplicable: boolean
+  subtotalCents: number
+  taxAmountCents: number
+  totalAmountCents: number
+  paymentAmount: number
+  balanceCents: number
+  paymentMethod: string | null
+  paymentReceivedAt: string | null
+  paymentTerms: string | null
+  paymentPlan: unknown
+  signedAt: string | null
 }
 
 // ── Time Entries ─────────────────────────────────────────────────────────────
@@ -457,5 +494,59 @@ export function useBillingStats(tenantId: string) {
     },
     enabled: !!tenantId,
     staleTime: 2 * 60 * 1000,
+  })
+}
+
+// ── Matter Retainer Summary ───────────────────────────────────────────────────
+
+/**
+ * Fetches the retainer package (fees agreed at signing) linked to a matter
+ * via matters.originating_lead_id → lead_retainer_packages.lead_id.
+ * Returns null if no retainer package exists.
+ */
+export function useMatterRetainerSummary(matterId: string | undefined) {
+  return useQuery({
+    queryKey: invoicingKeys.retainerSummary(matterId ?? ''),
+    queryFn: async (): Promise<MatterRetainerSummary | null> => {
+      const res = await fetch(`/api/matters/${matterId}/retainer-summary`)
+      if (!res.ok) throw new Error('Failed to fetch retainer summary')
+      const data = await res.json()
+      return data.retainerSummary ?? null
+    },
+    enabled: !!matterId,
+    staleTime: 60 * 1000,
+  })
+}
+
+/**
+ * Records a payment against the retainer package from within the matter page.
+ * Does NOT trigger lead-to-matter conversion (already converted).
+ */
+export function useRecordMatterRetainerPayment(matterId: string) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (input: {
+      amount: number        // cents
+      paymentMethod: string
+      reference?: string
+    }) => {
+      const res = await fetch(`/api/matters/${matterId}/retainer-summary`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(input),
+      })
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: 'Payment failed' }))
+        throw new Error(err.error ?? 'Payment failed')
+      }
+      return res.json()
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: invoicingKeys.retainerSummary(matterId) })
+      toast.success('Payment recorded')
+    },
+    onError: (err: Error) => {
+      toast.error(err.message ?? 'Failed to record payment')
+    },
   })
 }

@@ -41,6 +41,8 @@ export function useDocumentSlots(matterId: string | undefined) {
           file_type: string | null
           file_size: number | null
           storage_path: string
+          storage_bucket: string | null
+          is_shared_with_client: boolean | null
           created_at: string
         } | null
       })[]

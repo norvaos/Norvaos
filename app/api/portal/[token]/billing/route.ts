@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { createRateLimiter } from '@/lib/middleware/rate-limit'
-import type { PortalInvoice, PortalBillingResponse, PortalPaymentConfig } from '@/lib/types/portal'
+import type { PortalInvoice, PortalBillingResponse, PortalPaymentConfig, PortalRetainerSummary } from '@/lib/types/portal'
 
 const rateLimiter = createRateLimiter({ windowMs: 60_000, maxRequests: 30 })
 
@@ -127,11 +127,61 @@ export async function GET(
       payment_instructions: matterPaymentConfig.payment_instructions ?? tenantPaymentConfig.payment_instructions,
     }
 
+    // ── Fetch retainer package (fee agreement from signing) ───────────────
+    let retainerSummary: PortalRetainerSummary | null = null
+
+    try {
+      const { data: matter } = await admin
+        .from('matters')
+        .select('originating_lead_id')
+        .eq('id', link.matter_id)
+        .single()
+
+      if (matter?.originating_lead_id) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { data: pkg } = await (admin as any)
+          .from('lead_retainer_packages')
+          .select(
+            'billing_type, line_items, government_fees, disbursements, hst_applicable, subtotal_cents, tax_amount_cents, total_amount_cents, payment_amount, payment_status, payment_terms, signed_at',
+          )
+          .eq('lead_id', matter.originating_lead_id)
+          .eq('tenant_id', link.tenant_id)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .maybeSingle()
+
+        if (pkg) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const p = pkg as any
+          const totalPaidR = Number(p.payment_amount ?? 0)
+          const totalOwedR = Number(p.total_amount_cents ?? 0)
+          retainerSummary = {
+            billingType: p.billing_type ?? 'flat_fee',
+            lineItems: p.line_items ?? [],
+            governmentFees: p.government_fees ?? [],
+            disbursements: p.disbursements ?? [],
+            hstApplicable: p.hst_applicable ?? false,
+            subtotalCents: Number(p.subtotal_cents ?? 0),
+            taxAmountCents: Number(p.tax_amount_cents ?? 0),
+            totalAmountCents: totalOwedR,
+            paymentAmount: totalPaidR,
+            balanceCents: Math.max(totalOwedR - totalPaidR, 0),
+            paymentStatus: p.payment_status ?? 'not_requested',
+            paymentTerms: p.payment_terms ?? null,
+            signedAt: p.signed_at ?? null,
+          }
+        }
+      }
+    } catch {
+      // Non-fatal — portal still works without retainer summary
+    }
+
     const response: PortalBillingResponse = {
       invoices: portalInvoices,
       summary: { totalDue, totalPaid, totalOutstanding, overdueAmount },
       paymentConfig: mergedConfig,
       currency: 'CAD',
+      retainerSummary,
     }
 
     return NextResponse.json(response)

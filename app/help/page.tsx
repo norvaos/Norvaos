@@ -686,6 +686,20 @@ export default function HelpPage() {
                 <p className="text-sm font-semibold text-indigo-700">How clients access the portal</p>
                 <p className="text-xs text-indigo-600 mt-1">Clients receive a secure link by email. No password required — access is via a unique token that expires. You can re-send the link at any time from the matter page.</p>
               </div>
+
+              <div className="border-t border-gray-100 pt-5">
+                <Link
+                  href="/help/client-portal"
+                  target="_blank"
+                  className="flex items-center justify-between rounded-xl bg-indigo-600 px-5 py-4 text-white hover:bg-indigo-700 transition-colors"
+                >
+                  <div>
+                    <p className="font-semibold">Full guide: Client Portal — complete walkthrough</p>
+                    <p className="text-indigo-200 text-sm mt-0.5">Every section explained for both firm staff and clients — with annotated UI mockups, document statuses, IRCC forms, and firm monitoring</p>
+                  </div>
+                  <ArrowRight className="h-5 w-5 text-indigo-300 shrink-0" />
+                </Link>
+              </div>
             </div>
           </section>
 

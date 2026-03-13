@@ -38,6 +38,7 @@ import { useCreateAuditLog } from '@/lib/queries/audit-logs'
 import { RequirePermission } from '@/components/require-permission'
 
 // Unified workspace components
+import { MatterCommandCenter } from '@/components/matters/matter-command-center'
 import { MatterControlHeader } from '@/components/matters/matter-control-header'
 import { CentralActionPanel } from '@/components/matters/central-action-panel'
 import { QuestionsWorkflowSection } from '@/components/matters/workflow/questions-section'
@@ -986,18 +987,26 @@ export default function MatterDetailPage() {
         <CoreDataSummaryPanel matterId={matterId} />
       )}
 
-      {/* ─── Immigration Workspace Layout ─── */}
-      {isImmigrationWorkspace ? (
-        <div className="space-y-3">
-          {/* Row 3: Operational metrics strip */}
-          <MatterControlHeader
-            matterTypeName={matter.matter_type ?? null}
-            readinessData={readinessData}
-          />
-
-          {/* Secondary Access Bar + optional OneDrive sync action */}
-          <div className="flex items-start gap-2">
-            <div className="flex-1 min-w-0">
+      {/* ─── Matter Command Centre ─── */}
+      <MatterCommandCenter
+        matterId={matterId}
+        tenantId={tenantId}
+        userId={userId}
+        matter={matter}
+        users={users}
+        practiceArea={practiceArea}
+        primaryContactId={primaryContactId}
+        enforcementEnabled={enforcementEnabled}
+        isImmigrationWorkspace={isImmigrationWorkspace}
+        hasImmigration={hasImmigration}
+        showCaseDetails={showCaseDetails}
+        intake={intake}
+        immigrationData={immigrationData}
+        formCompletionPct={readinessData?.readinessMatrix?.overallPct ?? null}
+        activePortalLink={activePortalLink ?? null}
+        onedriveAvailable={!!msConnection?.onedrive_enabled}
+        syncingOneDrive={syncOneDrive.isPending}
+        secondaryAccessBar={
           <SecondaryAccessBar
             sheetContent={{
               onboarding: (
@@ -1049,403 +1058,128 @@ export default function MatterDetailPage() {
             externalOpenSheet={externalSheetKey}
             onExternalSheetHandled={clearExternalSheet}
           />
-            </div>
-            <Button
-              variant="outline"
-              size="sm"
-              className="h-auto py-2 px-3 shrink-0 gap-1.5 text-xs text-slate-600"
-              onClick={() => syncOneDrive.mutate()}
-              disabled={syncOneDrive.isPending}
-              title="Sync folder structure to OneDrive"
-            >
-              {syncOneDrive.isPending ? (
-                <Loader2 className="h-3.5 w-3.5 animate-spin" />
-              ) : (
-                <CloudUpload className="h-3.5 w-3.5" />
-              )}
-              OneDrive
-            </Button>
-          </div>
-
-          {/* Central Action Panel: primary + secondary actions */}
-          <CentralActionPanel
-            readinessData={readinessData}
-            intakeStatus={intakeStatus}
-            isLawyer={userRole?.name === 'Lawyer' || userRole?.name === 'Admin'}
-            onOpenDocRequest={() => setDocRequestDialogOpen(true)}
-            onNavigateToSection={handleNavigateToSection}
-            onOpenLawyerReview={() => setLawyerReviewDialogOpen(true)}
-            onOpenContradictionOverride={() => setContradictionOverrideDialogOpen(true)}
-          />
-
-          {/* Client Portal Link — quick copy bar */}
-          {activePortalLink && (
-            <div className="flex items-center gap-2 rounded-lg border bg-slate-50/80 px-3 py-2">
-              <Link2 className="h-3.5 w-3.5 text-slate-500 shrink-0" />
-              <span className="text-[10px] text-muted-foreground uppercase tracking-wider shrink-0">
-                Portal
-              </span>
-              <code className="flex-1 truncate text-xs text-slate-500">
-                {typeof window !== 'undefined'
-                  ? `${window.location.origin}/portal/${activePortalLink.token}`
-                  : `/portal/${activePortalLink.token}`}
-              </code>
-              <Button
-                variant="outline"
-                size="sm"
-                className="h-6 text-[11px] shrink-0 px-2"
-                onClick={() => {
-                  navigator.clipboard.writeText(
-                    `${window.location.origin}/portal/${activePortalLink.token}`
-                  )
-                  toast.success('Portal link copied to clipboard')
-                }}
-              >
-                <Copy className="mr-1 h-3 w-3" />
-                Copy
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-6 w-6 shrink-0"
-                onClick={() =>
-                  window.open(`/portal/${activePortalLink.token}`, '_blank')
-                }
-              >
-                <ExternalLink className="h-3 w-3" />
-              </Button>
-            </div>
-          )}
-
-          {/* Workflow Section 1: Questions & Profile Completeness */}
-          <div id="workflow-section-questions">
-            <QuestionsWorkflowSection
+        }
+        immigrationWorkspaceContent={
+          <div className="space-y-3">
+            {/* Operational metrics strip */}
+            <MatterControlHeader
+              matterTypeName={matter.matter_type ?? null}
               readinessData={readinessData}
-              isExpanded={expandedSections.has('questions')}
-              onToggle={() => toggleSection('questions')}
-              onNavigateToField={handleNavigateToField}
             />
-          </div>
 
-          {/* Workflow Section 2: Documents */}
-          <div id="workflow-section-documents">
-            <DocumentsWorkflowSection
-              matterId={matterId}
-              tenantId={tenantId}
+            {/* Central Action Panel: primary + secondary actions */}
+            <CentralActionPanel
               readinessData={readinessData}
-              isExpanded={expandedSections.has('documents')}
-              onToggle={() => toggleSection('documents')}
-            />
-          </div>
-
-          {/* Workflow Section 3: Review & Blockers */}
-          <div id="workflow-section-review">
-            <ReviewBlockersWorkflowSection
-              readinessData={readinessData}
-              matterId={matterId}
-              slots={documentSlots}
-              isExpanded={expandedSections.has('review')}
-              onToggle={() => toggleSection('review')}
+              intakeStatus={intakeStatus}
+              isLawyer={userRole?.name === 'Lawyer' || userRole?.name === 'Admin'}
+              onOpenDocRequest={() => setDocRequestDialogOpen(true)}
               onNavigateToSection={handleNavigateToSection}
-              onNavigateToField={handleNavigateToField}
               onOpenLawyerReview={() => setLawyerReviewDialogOpen(true)}
               onOpenContradictionOverride={() => setContradictionOverrideDialogOpen(true)}
             />
-          </div>
 
-          {/* Workflow Section 4: Form Packs (gated) */}
-          <div id="workflow-section-formPacks">
-            <FormPacksGateSection
-              readinessData={readinessData}
-              intakeStatus={intakeStatus}
-              renderFormsTab={() => (
-                <IRCCFormsTab
-                  matterId={matterId}
-                  contactId={primaryContactId ?? null}
-                  tenantId={tenantId}
-                  caseTypeId={matter?.case_type_id ?? immigrationData?.case_type_id ?? null}
-                />
-              )}
-              onNavigateToSection={handleNavigateToSection}
-              onOpenIRCCIntake={() => setExternalSheetKey('irccIntake')}
-            />
-          </div>
-
-        </div>
-      ) : (
-        /* ─── Legacy Tab Layout (non-immigration or legacy matters) ─── */
-        <>
-          {/* Immigration Readiness Banner (non-workspace immigration matters) */}
-          {hasImmigration && !isImmigrationWorkspace && readinessData?.readinessMatrix && (() => {
-            const matrix = readinessData.readinessMatrix!
-            const threshold = readinessData.playbook?.readinessThreshold ?? 85
-            const statusMeta = IMMIGRATION_INTAKE_STATUSES.find(
-              (s) => s.value === readinessData.intakeStatus
-            )
-            const pctColor = matrix.overallPct >= threshold
-              ? 'bg-emerald-100 text-emerald-700 border-emerald-300'
-              : matrix.overallPct >= 60
-                ? 'bg-amber-100 text-amber-700 border-amber-300'
-                : 'bg-red-100 text-red-700 border-red-300'
-            const borderColor = matrix.overallPct >= threshold
-              ? 'border-emerald-200'
-              : matrix.overallPct >= 60
-                ? 'border-amber-200'
-                : 'border-red-200'
-            const bgColor = matrix.overallPct >= threshold
-              ? 'bg-emerald-50/50'
-              : matrix.overallPct >= 60
-                ? 'bg-amber-50/50'
-                : 'bg-red-50/50'
-            const topBlockers = [
-              ...matrix.draftingBlockers.slice(0, 2),
-              ...matrix.filingBlockers.slice(0, 2),
-            ].slice(0, 2)
-            return (
-              <div className={cn('flex items-center gap-3 rounded-lg border px-4 py-2.5', borderColor, bgColor)}>
-                <ShieldAlert className="size-4 shrink-0 text-slate-500" />
-                <span className={cn('text-xs font-semibold px-2 py-0.5 rounded-full border', pctColor)}>
-                  {matrix.overallPct}%
+            {/* Client Portal Link — quick copy bar */}
+            {activePortalLink && (
+              <div className="flex items-center gap-2 rounded-lg border bg-slate-50/80 px-3 py-2">
+                <Link2 className="h-3.5 w-3.5 text-slate-500 shrink-0" />
+                <span className="text-[10px] text-muted-foreground uppercase tracking-wider shrink-0">
+                  Portal
                 </span>
-                {statusMeta && (
-                  <span className="text-xs font-medium text-slate-600">
-                    {statusMeta.label}
-                  </span>
-                )}
-                {topBlockers.length > 0 && (
-                  <>
-                    <div className="h-3 w-px bg-slate-300" />
-                    <div className="flex items-center gap-2 flex-1 min-w-0 overflow-hidden">
-                      {topBlockers.map((b, i) => (
-                        <span key={i} className="text-xs text-slate-600 truncate max-w-[200px]">
-                          {b.label}{b.person_name ? ` (${b.person_name})` : ''}
-                        </span>
-                      ))}
-                      {(matrix.draftingBlockers.length + matrix.filingBlockers.length) > 2 && (
-                        <span className="text-xs text-slate-400 shrink-0">
-                          +{matrix.draftingBlockers.length + matrix.filingBlockers.length - 2} more
-                        </span>
-                      )}
-                    </div>
-                  </>
-                )}
-                {readinessData.nextAction && topBlockers.length === 0 && (
-                  <>
-                    <div className="h-3 w-px bg-slate-300" />
-                    <span className="text-xs text-slate-600 truncate flex-1 min-w-0">
-                      {readinessData.nextAction}
-                    </span>
-                  </>
-                )}
-                {activeTab !== 'documents' && (
-                  <button
-                    onClick={() => setActiveTab('documents')}
-                    className="text-xs font-medium text-blue-600 hover:text-blue-800 shrink-0"
-                  >
-                    View details
-                  </button>
-                )}
+                <code className="flex-1 truncate text-xs text-slate-500">
+                  {typeof window !== 'undefined'
+                    ? `${window.location.origin}/portal/${activePortalLink.token}`
+                    : `/portal/${activePortalLink.token}`}
+                </code>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-6 text-[11px] shrink-0 px-2"
+                  onClick={() => {
+                    navigator.clipboard.writeText(
+                      `${window.location.origin}/portal/${activePortalLink.token}`
+                    )
+                    toast.success('Portal link copied to clipboard')
+                  }}
+                >
+                  <Copy className="mr-1 h-3 w-3" />
+                  Copy
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-6 w-6 shrink-0"
+                  onClick={() =>
+                    window.open(`/portal/${activePortalLink.token}`, '_blank')
+                  }
+                >
+                  <ExternalLink className="h-3 w-3" />
+                </Button>
               </div>
-            )
-          })()}
+            )}
 
-          {/* Tabs + OneDrive sync */}
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-2">
-            <div className="flex items-center gap-2">
-            <TabsList className="flex-wrap flex-1">
-              <TabsTrigger value="onboarding" className="relative">
-                Onboarding
-                {onboardingBadgeCount > 0 && (
-                  <span className="ml-1.5 inline-flex items-center justify-center rounded-full bg-amber-500 text-white text-[9px] font-bold leading-none h-4 w-4 shrink-0">
-                    {onboardingBadgeCount}
-                  </span>
-                )}
-              </TabsTrigger>
-              <TabsTrigger value="overview">Overview</TabsTrigger>
-              {showCaseDetails && (
-                <TabsTrigger value="case-details">Case Details</TabsTrigger>
-              )}
-              {!showCaseDetails && enforcementEnabled && (
-                <TabsTrigger value="core-data">Core Data</TabsTrigger>
-              )}
-              <TabsTrigger value="contacts">Contacts</TabsTrigger>
-              <TabsTrigger value="tasks">Tasks</TabsTrigger>
-              <TabsTrigger value="documents">Documents</TabsTrigger>
-              <TabsTrigger value="form-instances">Forms</TabsTrigger>
-              {!showCaseDetails && hasImmigration && (
-                <TabsTrigger value="immigration">Immigration</TabsTrigger>
-              )}
-              {!showCaseDetails && hasImmigration && (
-                <TabsTrigger value="ircc-intake">IRCC Intake</TabsTrigger>
-              )}
-              {!showCaseDetails && hasImmigration && (
-                <TabsTrigger value="ircc-forms">IRCC Forms</TabsTrigger>
-              )}
-              <TabsTrigger value="deadlines">Deadlines</TabsTrigger>
-              <TabsTrigger value="billing">Billing</TabsTrigger>
-              <TabsTrigger value="milestones">Milestones</TabsTrigger>
-              <TabsTrigger value="notes">Notes</TabsTrigger>
-              <TabsTrigger value="discussion">Discussion</TabsTrigger>
-              <TabsTrigger value="history">Audit History</TabsTrigger>
-              <TabsTrigger value="notifications">Notifications</TabsTrigger>
-            </TabsList>
-              <Button
-                variant="outline"
-                size="sm"
-                className="shrink-0 gap-1.5 text-xs text-slate-600"
-                onClick={() => syncOneDrive.mutate()}
-                disabled={syncOneDrive.isPending}
-                title="Sync folder structure to OneDrive"
-              >
-                {syncOneDrive.isPending ? (
-                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                ) : (
-                  <CloudUpload className="h-3.5 w-3.5" />
-                )}
-                OneDrive
-              </Button>
+            {/* Workflow Section 1: Questions & Profile Completeness */}
+            <div id="workflow-section-questions">
+              <QuestionsWorkflowSection
+                readinessData={readinessData}
+                isExpanded={expandedSections.has('questions')}
+                onToggle={() => toggleSection('questions')}
+                onNavigateToField={handleNavigateToField}
+              />
             </div>
 
-            {showCaseDetails && (
-              <TabsContent value="case-details" className="space-y-4">
-                <UnifiedCaseDetailsTab
-                  matterId={matterId}
-                  tenantId={tenantId}
-                  matterTypeId={matter.matter_type_id!}
-                  contactId={primaryContactId ?? null}
-                  caseTypeId={matter?.case_type_id ?? immigrationData?.case_type_id ?? null}
-                />
-              </TabsContent>
-            )}
-
-            {!showCaseDetails && enforcementEnabled && (
-              <TabsContent value="core-data" className="space-y-4">
-                <CoreDataCardTab matterId={matterId} tenantId={tenantId} />
-              </TabsContent>
-            )}
-
-            <TabsContent value="onboarding" className="space-y-4">
-              <OnboardingTab
-                matter={matter}
-                users={users ?? []}
+            {/* Workflow Section 2: Documents */}
+            <div id="workflow-section-documents">
+              <DocumentsWorkflowSection
                 matterId={matterId}
                 tenantId={tenantId}
+                readinessData={readinessData}
+                isExpanded={expandedSections.has('documents')}
+                onToggle={() => toggleSection('documents')}
               />
-            </TabsContent>
+            </div>
 
-            <TabsContent value="overview" className="space-y-4">
-              <OverviewTab matter={matter} users={users} practiceArea={practiceArea} tenantId={tenantId} matterId={matterId} hasImmigration={hasImmigration} immigrationData={immigrationData} />
-            </TabsContent>
+            {/* Workflow Section 3: Review & Blockers */}
+            <div id="workflow-section-review">
+              <ReviewBlockersWorkflowSection
+                readinessData={readinessData}
+                matterId={matterId}
+                slots={documentSlots}
+                isExpanded={expandedSections.has('review')}
+                onToggle={() => toggleSection('review')}
+                onNavigateToSection={handleNavigateToSection}
+                onNavigateToField={handleNavigateToField}
+                onOpenLawyerReview={() => setLawyerReviewDialogOpen(true)}
+                onOpenContradictionOverride={() => setContradictionOverrideDialogOpen(true)}
+              />
+            </div>
 
-            <TabsContent value="contacts">
-              <ContactsTab matterId={matterId} tenantId={tenantId} />
-            </TabsContent>
-
-            <TabsContent value="tasks">
-              <TasksTab matterId={matterId} tenantId={tenantId} users={users} practiceAreaId={matter.practice_area_id ?? null} contactId={primaryContactId ?? undefined} />
-            </TabsContent>
-
-            <TabsContent value="deadlines" className="space-y-4">
-              <DeadlinesTab matterId={matterId} tenantId={tenantId} practiceAreaId={matter.practice_area_id ?? null} />
-            </TabsContent>
-
-            <TabsContent value="documents" className="space-y-4">
-              {enforcementEnabled && intake?.intake_status === 'incomplete' ? (
-                <div className="flex flex-col items-center justify-center py-12 text-center rounded-lg border border-dashed border-amber-300 bg-amber-50/50">
-                  <Shield className="size-8 text-amber-400 mb-3" />
-                  <h3 className="text-sm font-medium text-amber-700">Documents Locked</h3>
-                  <p className="text-sm text-amber-600 mt-1 max-w-md">
-                    Complete the Core Data Card before uploading documents. Switch to the Core Data tab to fill in required information.
-                  </p>
-                </div>
-              ) : enforcementEnabled ? (
-                <>
-                  {hasImmigration && (
-                    <ImmigrationReadinessHub
-                      matterId={matterId}
-                      userId={appUser?.id ?? ''}
-                      userRole="lawyer"
-                    />
-                  )}
-                  <DocumentSlotPanel matterId={matterId} tenantId={tenantId} enforcementEnabled={enforcementEnabled} />
-                </>
-              ) : (
-                <DocumentUpload entityType="matter" entityId={matterId} tenantId={tenantId} />
-              )}
-              <DocumentList matterId={matterId} contactId={primaryContactId ?? undefined} />
-            </TabsContent>
-
-            <TabsContent value="form-instances" className="space-y-4">
-              <FormsTab matterId={matterId} matterStatus={matter.status} />
-            </TabsContent>
-
-            <TabsContent value="billing" className="space-y-4">
-              <RequirePermission entity="billing" action="view" variant="inline">
-                <BillingTab matterId={matterId} tenantId={tenantId} matter={matter} />
-              </RequirePermission>
-            </TabsContent>
-
-            <TabsContent value="milestones" className="space-y-4">
-              <MilestonesTab matterId={matterId} tenantId={tenantId} />
-            </TabsContent>
-
-            <TabsContent value="history" className="space-y-4">
-              <ActivityTimeline tenantId={tenantId} matterId={matterId} entityType="matter" entityId={matterId} />
-            </TabsContent>
-
-            <TabsContent value="notes" className="space-y-4">
-              <NotesEditor tenantId={tenantId} matterId={matterId} />
-            </TabsContent>
-
-            <TabsContent value="discussion" className="space-y-4">
-              <MatterComments matterId={matterId} tenantId={tenantId} />
-            </TabsContent>
-
-            <TabsContent value="notifications" className="space-y-4">
-              <ClientNotificationsTab matterId={matterId} tenantId={tenantId} />
-            </TabsContent>
-
-            {!showCaseDetails && hasImmigration && (
-              <TabsContent value="immigration" className="space-y-6">
-                <CaseInsightsPanel
-                  matterId={matterId}
-                  tenantId={tenantId}
-                  stageEnteredAt={immigrationData?.stage_entered_at}
-                  currentStageName={immigrationStages?.find((s) => s.id === immigrationData?.current_stage_id)?.name}
-                />
-                <ClientProgressPanel matterId={matterId} tenantId={tenantId} />
-                <ImmigrationDetailsPanel matterId={matterId} tenantId={tenantId} />
-                <div className="grid gap-6 lg:grid-cols-2">
-                  <DocumentChecklistPanel matterId={matterId} tenantId={tenantId} />
-                  <DeadlineRiskPanel matterId={matterId} tenantId={tenantId} />
-                </div>
-              </TabsContent>
-            )}
-
-            {!showCaseDetails && hasImmigration && (
-              <TabsContent value="ircc-intake" className="space-y-4">
-                <IRCCIntakeTab
-                  matterId={matterId}
-                  contactId={primaryContactId ?? null}
-                  tenantId={tenantId}
-                  matterTypeId={matter?.matter_type_id ?? null}
-                />
-              </TabsContent>
-            )}
-
-            {!showCaseDetails && hasImmigration && (
-              <TabsContent value="ircc-forms" className="space-y-4">
-                <IRCCFormsTab
-                  matterId={matterId}
-                  contactId={primaryContactId ?? null}
-                  tenantId={tenantId}
-                  caseTypeId={matter?.case_type_id ?? immigrationData?.case_type_id ?? null}
-                />
-              </TabsContent>
-            )}
-          </Tabs>
-        </>
-      )}
+            {/* Workflow Section 4: Form Packs (gated) */}
+            <div id="workflow-section-formPacks">
+              <FormPacksGateSection
+                readinessData={readinessData}
+                intakeStatus={intakeStatus}
+                renderFormsTab={() => (
+                  <IRCCFormsTab
+                    matterId={matterId}
+                    contactId={primaryContactId ?? null}
+                    tenantId={tenantId}
+                    caseTypeId={matter?.case_type_id ?? immigrationData?.case_type_id ?? null}
+                  />
+                )}
+                onNavigateToSection={handleNavigateToSection}
+                onOpenIRCCIntake={() => setExternalSheetKey('irccIntake')}
+              />
+            </div>
+          </div>
+        }
+        onOpenSheet={(key) => setExternalSheetKey(key)}
+        onPortalDialogOpen={() => handlePortalDialogOpen(true)}
+        onDocRequestOpen={() => setDocRequestDialogOpen(true)}
+        onEdit={() => setEditOpen(true)}
+        onArchive={handleArchive}
+        onDelete={() => setDeleteOpen(true)}
+        onSyncOneDrive={() => syncOneDrive.mutate()}
+      />
 
       {/* Edit Sheet */}
       <Sheet open={editOpen} onOpenChange={setEditOpen}>

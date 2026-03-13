@@ -4,6 +4,7 @@ import { useState, useMemo, useCallback, useRef } from 'react'
 import { FileText, Check, RotateCcw, Loader2, Upload, Plus, X, Eye } from 'lucide-react'
 import {
   useDocumentSlots,
+  useDocumentSlotVersions,
   useReviewSlot,
   useUploadToSlot,
   useCreateCustomSlot,
@@ -624,6 +625,62 @@ function PersonGroup({
   )
 }
 
+// ── View Document Dialog (lazy-fetches latest version) ──────────────────────
+
+function ViewDocumentDialog({
+  slotId,
+  slotName,
+  open,
+  onOpenChange,
+}: {
+  slotId: string
+  slotName: string
+  open: boolean
+  onOpenChange: (open: boolean) => void
+}) {
+  const { data: versions, isLoading } = useDocumentSlotVersions(open ? slotId : undefined)
+  const latest = versions?.[0] // versions are sorted descending
+
+  return (
+    <>
+      {/* Trigger loading by rendering dialog open state */}
+      {open && latest && (
+        <DocumentViewer
+          storagePath={latest.storage_path}
+          fileName={latest.file_name}
+          fileType={latest.file_type ?? null}
+          open={open}
+          onOpenChange={onOpenChange}
+        />
+      )}
+      {open && isLoading && (
+        <Dialog open={open} onOpenChange={onOpenChange}>
+          <DialogContent className="sm:max-w-4xl h-[80vh] flex flex-col">
+            <DialogHeader>
+              <DialogTitle className="truncate pr-8">{slotName}</DialogTitle>
+            </DialogHeader>
+            <div className="flex-1 flex items-center justify-center">
+              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
+      {open && !isLoading && !latest && (
+        <Dialog open={open} onOpenChange={onOpenChange}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>{slotName}</DialogTitle>
+            </DialogHeader>
+            <p className="text-sm text-muted-foreground py-4 text-center">
+              No document versions found.
+            </p>
+          </DialogContent>
+        </Dialog>
+      )}
+    </>
+  )
+}
+
 // ── Reject Document Dialog ───────────────────────────────────────────────────
 
 function RejectDocumentDialog({
@@ -779,7 +836,7 @@ function InlineSlotRow({
   const status = (slot.status as SlotStatus) ?? 'empty'
   const isPending = status === 'pending_review'
   const canUpload = status === 'empty' || status === 'needs_re_upload' || status === 'rejected'
-  const doc = slot.current_document
+  const hasDocument = status !== 'empty'
 
   const handleAccept = useCallback(() => {
     reviewSlot.mutate({
@@ -822,8 +879,8 @@ function InlineSlotRow({
         {/* Status badge */}
         <StatusBadge status={status} />
 
-        {/* View button — shown whenever a document exists */}
-        {doc && (
+        {/* View button — shown whenever a document has been uploaded */}
+        {hasDocument && (
           <Button
             variant="ghost"
             size="sm"
@@ -909,16 +966,13 @@ function InlineSlotRow({
         </Button>
       </div>
 
-      {/* Document Viewer */}
-      {doc && (
-        <DocumentViewer
-          storagePath={doc.storage_path}
-          fileName={doc.file_name}
-          fileType={doc.file_type}
-          open={viewerOpen}
-          onOpenChange={setViewerOpen}
-        />
-      )}
+      {/* Document Viewer — lazy-fetches latest version on open */}
+      <ViewDocumentDialog
+        slotId={slot.id}
+        slotName={slot.slot_name}
+        open={viewerOpen}
+        onOpenChange={setViewerOpen}
+      />
 
       {/* Reject / Request Re-upload Dialog */}
       <RejectDocumentDialog

@@ -25,7 +25,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { Plus, Trash2, Loader2, FileDown } from 'lucide-react'
+import { Plus, Trash2, Loader2, FileDown, CheckCircle2, Clock, AlertCircle, DollarSign } from 'lucide-react'
 import { formatDate, formatCurrency } from '@/lib/utils/formatters'
 import { INVOICE_STATUSES, PAYMENT_METHODS } from '@/lib/utils/constants'
 import {
@@ -38,13 +38,195 @@ import {
   useUpdateInvoiceStatus,
   useDeleteInvoice,
   useRecordPayment,
+  useMatterRetainerSummary,
+  useRecordMatterRetainerPayment,
+  type MatterRetainerSummary,
 } from '@/lib/queries/invoicing'
 import type { Database } from '@/lib/types/database'
 
 type MatterRow = Database['public']['Tables']['matters']['Row']
 
 function fmtCents(cents: number): string {
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 }).format(cents / 100)
+  return new Intl.NumberFormat('en-CA', { style: 'currency', currency: 'CAD', minimumFractionDigits: 2 }).format(cents / 100)
+}
+
+// ── Retainer Agreement Card ───────────────────────────────────────────────────
+
+function RetainerAgreementCard({ matterId }: { matterId: string }) {
+  const { data: summary, isLoading } = useMatterRetainerSummary(matterId)
+  const recordPayment = useRecordMatterRetainerPayment(matterId)
+  const [showPayDialog, setShowPayDialog] = useState(false)
+  const [payAmount, setPayAmount] = useState('')
+  const [payMethod, setPayMethod] = useState('e_transfer')
+  const [payRef, setPayRef] = useState('')
+
+  if (isLoading) {
+    return <Skeleton className="h-28 w-full" />
+  }
+
+  if (!summary) return null
+
+  const profServicesTotal = (summary.lineItems ?? []).reduce(
+    (s: number, i: MatterRetainerSummary['lineItems'][number]) => s + (Number(i.amount) || Number(i.unitPrice) * Number(i.quantity) || 0),
+    0,
+  )
+  const govtFeesTotal = (summary.governmentFees ?? []).reduce(
+    (s: number, i: MatterRetainerSummary['governmentFees'][number]) => s + Number(i.amount),
+    0,
+  )
+  const disbTotal = (summary.disbursements ?? []).reduce(
+    (s: number, i: MatterRetainerSummary['disbursements'][number]) => s + Number(i.amount),
+    0,
+  )
+
+  const isFullyPaid = summary.paymentStatus === 'paid'
+  const isPartial = summary.paymentStatus === 'partial'
+
+  const statusBadge = isFullyPaid
+    ? { label: 'Paid in Full', icon: CheckCircle2, cls: 'text-green-700 bg-green-50 border-green-200' }
+    : isPartial
+    ? { label: 'Partial Payment', icon: Clock, cls: 'text-amber-700 bg-amber-50 border-amber-200' }
+    : { label: 'Payment Pending', icon: AlertCircle, cls: 'text-orange-700 bg-orange-50 border-orange-200' }
+
+  const handleRecord = async () => {
+    const cents = Math.round(parseFloat(payAmount) * 100)
+    if (isNaN(cents) || cents <= 0) return
+    await recordPayment.mutateAsync({ amount: cents, paymentMethod: payMethod, reference: payRef || undefined })
+    setShowPayDialog(false)
+    setPayAmount('')
+    setPayRef('')
+  }
+
+  return (
+    <>
+      <Card className="border-blue-200 bg-blue-50/30">
+        <CardHeader className="pb-2 flex flex-row items-center justify-between">
+          <div className="flex items-center gap-2">
+            <CardTitle className="text-sm font-semibold">Retainer Agreement</CardTitle>
+            <span
+              className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-medium ${statusBadge.cls}`}
+            >
+              <statusBadge.icon className="h-3 w-3" />
+              {statusBadge.label}
+            </span>
+          </div>
+          {!isFullyPaid && (
+            <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => setShowPayDialog(true)}>
+              <DollarSign className="mr-1 h-3 w-3" />
+              Record Payment
+            </Button>
+          )}
+        </CardHeader>
+
+        <CardContent className="pt-0">
+          {/* Fee breakdown table */}
+          <div className="rounded-md border border-blue-100 bg-white overflow-hidden text-sm">
+            {profServicesTotal > 0 && (
+              <div className="flex justify-between items-center px-3 py-2 border-b border-slate-100">
+                <span className="text-muted-foreground text-xs">Professional Services</span>
+                <span className="font-medium text-xs">{fmtCents(profServicesTotal)}</span>
+              </div>
+            )}
+            {govtFeesTotal > 0 && (
+              <div className="flex justify-between items-center px-3 py-2 border-b border-slate-100">
+                <span className="text-muted-foreground text-xs">Government Fees</span>
+                <span className="font-medium text-xs">{fmtCents(govtFeesTotal)}</span>
+              </div>
+            )}
+            {disbTotal > 0 && (
+              <div className="flex justify-between items-center px-3 py-2 border-b border-slate-100">
+                <span className="text-muted-foreground text-xs">Disbursements</span>
+                <span className="font-medium text-xs">{fmtCents(disbTotal)}</span>
+              </div>
+            )}
+            {summary.hstApplicable && summary.taxAmountCents > 0 && (
+              <div className="flex justify-between items-center px-3 py-2 border-b border-slate-100">
+                <span className="text-muted-foreground text-xs">HST/Tax</span>
+                <span className="font-medium text-xs">{fmtCents(summary.taxAmountCents)}</span>
+              </div>
+            )}
+            <div className="flex justify-between items-center px-3 py-2 bg-slate-50 border-b border-slate-100">
+              <span className="font-semibold text-xs">Total Agreed</span>
+              <span className="font-bold text-sm">{fmtCents(summary.totalAmountCents)}</span>
+            </div>
+            <div className="flex justify-between items-center px-3 py-2 border-b border-slate-100">
+              <span className="text-green-700 text-xs font-medium">Paid to Date</span>
+              <span className="text-green-700 font-semibold text-xs">{fmtCents(summary.paymentAmount)}</span>
+            </div>
+            <div className="flex justify-between items-center px-3 py-2">
+              <span className={`text-xs font-semibold ${summary.balanceCents > 0 ? 'text-orange-700' : 'text-green-700'}`}>
+                Balance Due
+              </span>
+              <span className={`font-bold text-sm ${summary.balanceCents > 0 ? 'text-orange-700' : 'text-green-700'}`}>
+                {summary.balanceCents > 0 ? fmtCents(summary.balanceCents) : 'Paid in Full'}
+              </span>
+            </div>
+          </div>
+
+          {/* Payment terms */}
+          {summary.paymentTerms && (
+            <p className="text-xs text-muted-foreground mt-2">
+              <span className="font-medium">Terms:</span> {summary.paymentTerms}
+            </p>
+          )}
+
+          {/* Signed date */}
+          {summary.signedAt && (
+            <p className="text-xs text-muted-foreground mt-1">
+              <span className="font-medium">Signed:</span> {new Date(summary.signedAt).toLocaleDateString('en-CA', { year: 'numeric', month: 'short', day: 'numeric' })}
+            </p>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Record Retainer Payment Dialog */}
+      <Dialog open={showPayDialog} onOpenChange={setShowPayDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Record Retainer Payment</DialogTitle>
+            <DialogDescription>
+              Balance remaining: <strong>{fmtCents(summary.balanceCents)}</strong>
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div>
+              <Label className="text-xs">Amount Received ($)</Label>
+              <Input
+                type="number"
+                step="0.01"
+                value={payAmount}
+                onChange={(e) => setPayAmount(e.target.value)}
+                placeholder={`e.g. ${(summary.balanceCents / 100).toFixed(2)}`}
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label className="text-xs">Payment Method</Label>
+              <Select value={payMethod} onValueChange={setPayMethod}>
+                <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {PAYMENT_METHODS.map((pm) => (
+                    <SelectItem key={pm.value} value={pm.value}>{pm.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label className="text-xs">Reference (optional)</Label>
+              <Input value={payRef} onChange={(e) => setPayRef(e.target.value)} className="mt-1" placeholder="Cheque #, transfer ID…" />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowPayDialog(false)}>Cancel</Button>
+            <Button onClick={handleRecord} disabled={recordPayment.isPending || !payAmount}>
+              {recordPayment.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Record Payment
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
+  )
 }
 
 export function BillingTab({ matterId, tenantId, matter }: { matterId: string; tenantId: string; matter: MatterRow }) {
@@ -186,6 +368,9 @@ export function BillingTab({ matterId, tenantId, matter }: { matterId: string; t
 
   return (
     <div className="space-y-6">
+      {/* Retainer Agreement (fee breakdown from signing) */}
+      <RetainerAgreementCard matterId={matterId} />
+
       {/* Summary Cards */}
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <Card><CardContent className="p-4"><p className="text-xs text-muted-foreground">Total Billed</p><p className="text-lg font-semibold">{formatCurrency(matter.total_billed)}</p></CardContent></Card>

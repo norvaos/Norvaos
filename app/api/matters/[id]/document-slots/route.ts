@@ -49,6 +49,8 @@ async function handleGet(
           file_type,
           file_size,
           storage_path,
+          storage_bucket,
+          is_shared_with_client,
           created_at
         )
       `)

@@ -177,6 +177,34 @@ export interface PortalInvoice {
   markedAsSentAt?: string | null
 }
 
+export interface PortalRetainerFeeItem {
+  description: string
+  amount: number
+}
+
+export interface PortalRetainerLineItem {
+  description: string
+  quantity: number
+  unitPrice: number
+  amount: number
+}
+
+export interface PortalRetainerSummary {
+  billingType: string
+  lineItems: PortalRetainerLineItem[]
+  governmentFees: PortalRetainerFeeItem[]
+  disbursements: PortalRetainerFeeItem[]
+  hstApplicable: boolean
+  subtotalCents: number
+  taxAmountCents: number
+  totalAmountCents: number
+  paymentAmount: number
+  balanceCents: number
+  paymentStatus: string
+  paymentTerms: string | null
+  signedAt: string | null
+}
+
 export interface PortalBillingResponse {
   invoices: PortalInvoice[]
   summary: {
@@ -187,4 +215,5 @@ export interface PortalBillingResponse {
   }
   paymentConfig: PortalPaymentConfig
   currency: string
+  retainerSummary: PortalRetainerSummary | null
 }
