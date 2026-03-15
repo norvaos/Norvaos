@@ -10,6 +10,8 @@ type MatterStage = Database['public']['Tables']['matter_stages']['Row']
 type DeadlineType = Database['public']['Tables']['deadline_types']['Row']
 type MatterDeadline = Database['public']['Tables']['matter_deadlines']['Row']
 type MatterStageState = Database['public']['Tables']['matter_stage_state']['Row']
+type MatterTypeSchema = Database['public']['Tables']['matter_type_schema']['Row']
+type MatterCustomData = Database['public']['Tables']['matter_custom_data']['Row']
 
 // ─── Query Key Factory ──────────────────────────────────────────────────────
 
@@ -231,7 +233,6 @@ export function useDeadlineTypes(tenantId: string, practiceAreaId?: string | nul
         .select('*')
         .eq('tenant_id', tenantId)
         .eq('is_active', true)
-        .order('sort_order')
         .order('name')
 
       if (practiceAreaId) {
@@ -441,6 +442,90 @@ export function useDeleteWorkflowTemplate() {
     },
     onError: () => {
       toast.error('Failed to remove workflow template')
+    },
+  })
+}
+
+// ─── Workflow Template Deadlines (Junction) ─────────────────────────────────
+
+type WorkflowTemplateDeadline = Database['public']['Tables']['workflow_template_deadlines']['Row']
+
+export type WorkflowTemplateDeadlineWithType = WorkflowTemplateDeadline & {
+  deadline_types: { id: string; name: string; color: string } | null
+}
+
+export function useWorkflowTemplateDeadlines(workflowTemplateId: string | null | undefined) {
+  return useQuery({
+    queryKey: ['workflow_template_deadlines', workflowTemplateId],
+    queryFn: async () => {
+      const supabase = createClient()
+      // Fetch junction rows
+      const { data: bindings, error } = await supabase
+        .from('workflow_template_deadlines')
+        .select('*')
+        .eq('workflow_template_id', workflowTemplateId!)
+      if (error) throw error
+      if (!bindings || bindings.length === 0) return [] as WorkflowTemplateDeadlineWithType[]
+
+      // Fetch deadline type details
+      const typeIds = bindings.map(b => b.deadline_type_id)
+      const { data: types } = await supabase
+        .from('deadline_types')
+        .select('id, name, color')
+        .in('id', typeIds)
+
+      const typeMap = new Map((types ?? []).map(t => [t.id, t]))
+
+      return bindings.map(b => ({
+        ...b,
+        deadline_types: typeMap.get(b.deadline_type_id) ?? null,
+      })) as WorkflowTemplateDeadlineWithType[]
+    },
+    enabled: !!workflowTemplateId,
+    staleTime: 3 * 60 * 1000,
+  })
+}
+
+export function useAddWorkflowTemplateDeadline() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (input: Database['public']['Tables']['workflow_template_deadlines']['Insert']) => {
+      const supabase = createClient()
+      const { data, error } = await supabase
+        .from('workflow_template_deadlines')
+        .insert(input)
+        .select()
+        .single()
+      if (error) throw error
+      return data as WorkflowTemplateDeadline
+    },
+    onSuccess: (_, vars) => {
+      queryClient.invalidateQueries({ queryKey: ['workflow_template_deadlines', vars.workflow_template_id] })
+      toast.success('Deadline type added to workflow')
+    },
+    onError: () => {
+      toast.error('Failed to add deadline type')
+    },
+  })
+}
+
+export function useRemoveWorkflowTemplateDeadline() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (input: { id: string; workflowTemplateId: string }) => {
+      const supabase = createClient()
+      const { error } = await supabase
+        .from('workflow_template_deadlines')
+        .delete()
+        .eq('id', input.id)
+      if (error) throw error
+    },
+    onSuccess: (_, vars) => {
+      queryClient.invalidateQueries({ queryKey: ['workflow_template_deadlines', vars.workflowTemplateId] })
+      toast.success('Deadline type removed from workflow')
+    },
+    onError: () => {
+      toast.error('Failed to remove deadline type')
     },
   })
 }
@@ -937,6 +1022,7 @@ export function useAdvanceMatterStage() {
       queryClient.invalidateQueries({ queryKey: ['activities'] })
       queryClient.invalidateQueries({ queryKey: ['immigration', 'deadlines', variables.matterId] })
       queryClient.invalidateQueries({ queryKey: gatingKeys.check(variables.matterId) })
+      queryClient.invalidateQueries({ queryKey: ['matters', 'detail'] })
       toast.success(`Stage advanced to ${result.stageName}`)
     },
     onError: (error: Error) => {
@@ -1032,6 +1118,145 @@ export function useUpdateMatterTypeIntakeSchema() {
     },
     onError: () => {
       toast.error('Failed to save intake questions')
+    },
+  })
+}
+
+// ─── Phase 4: Matter Custom Fields ──────────────────────────────────────────
+
+/**
+ * Fetch the active JSON schema for a matter type.
+ */
+export function useMatterTypeSchema(matterTypeId: string | null | undefined) {
+  return useQuery({
+    queryKey: ['matter_type_schema', matterTypeId],
+    queryFn: async () => {
+      const supabase = createClient()
+      const { data, error } = await supabase
+        .from('matter_type_schema')
+        .select('*')
+        .eq('matter_type_id', matterTypeId!)
+        .eq('is_active', true)
+        .order('schema_version', { ascending: false })
+        .limit(1)
+        .maybeSingle()
+      if (error) throw error
+      return data as MatterTypeSchema | null
+    },
+    enabled: !!matterTypeId,
+    staleTime: 3 * 60 * 1000,
+  })
+}
+
+/**
+ * Upsert (create or bump version) a matter type schema.
+ */
+export function useUpsertMatterTypeSchema() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (input: {
+      tenantId: string
+      matterTypeId: string
+      jsonSchema: Record<string, unknown>
+      uiSchema: Record<string, unknown>
+      currentVersion?: number
+    }) => {
+      const supabase = createClient()
+      const nextVersion = (input.currentVersion ?? 0) + 1
+
+      // Deactivate previous versions
+      if (input.currentVersion) {
+        await supabase
+          .from('matter_type_schema')
+          .update({ is_active: false })
+          .eq('matter_type_id', input.matterTypeId)
+          .eq('is_active', true)
+      }
+
+      const { data, error } = await supabase
+        .from('matter_type_schema')
+        .insert({
+          tenant_id: input.tenantId,
+          matter_type_id: input.matterTypeId,
+          schema_version: nextVersion,
+          json_schema: input.jsonSchema as unknown as Database['public']['Tables']['matter_type_schema']['Insert']['json_schema'],
+          ui_schema: input.uiSchema as unknown as Database['public']['Tables']['matter_type_schema']['Insert']['ui_schema'],
+          is_active: true,
+        })
+        .select()
+        .single()
+      if (error) throw error
+      return data as MatterTypeSchema
+    },
+    onSuccess: (_, vars) => {
+      queryClient.invalidateQueries({ queryKey: ['matter_type_schema', vars.matterTypeId] })
+      toast.success('Custom field schema saved')
+    },
+    onError: () => {
+      toast.error('Failed to save custom field schema')
+    },
+  })
+}
+
+/**
+ * Fetch custom field data for a specific matter.
+ */
+export function useMatterCustomData(matterId: string | null | undefined) {
+  return useQuery({
+    queryKey: ['matter_custom_data', matterId],
+    queryFn: async () => {
+      const supabase = createClient()
+      const { data, error } = await supabase
+        .from('matter_custom_data')
+        .select('*')
+        .eq('matter_id', matterId!)
+        .maybeSingle()
+      if (error) throw error
+      return data as MatterCustomData | null
+    },
+    enabled: !!matterId,
+    staleTime: 1 * 60 * 1000,
+  })
+}
+
+/**
+ * Upsert custom field data for a matter. Creates or updates the single row.
+ */
+export function useUpsertMatterCustomData() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (input: {
+      tenantId: string
+      matterId: string
+      matterTypeId: string
+      schemaVersion: number
+      data: Record<string, unknown>
+    }) => {
+      const supabase = createClient()
+      const { data, error } = await supabase
+        .from('matter_custom_data')
+        .upsert(
+          {
+            tenant_id: input.tenantId,
+            matter_id: input.matterId,
+            matter_type_id: input.matterTypeId,
+            schema_version: input.schemaVersion,
+            data: input.data as unknown as Database['public']['Tables']['matter_custom_data']['Insert']['data'],
+            is_valid: true,
+          },
+          { onConflict: 'matter_id' }
+        )
+        .select()
+        .single()
+      if (error) throw error
+      return data as MatterCustomData
+    },
+    onSuccess: (_, vars) => {
+      queryClient.invalidateQueries({ queryKey: ['matter_custom_data', vars.matterId] })
+      toast.success('Custom fields saved')
+    },
+    onError: () => {
+      toast.error('Failed to save custom fields')
     },
   })
 }

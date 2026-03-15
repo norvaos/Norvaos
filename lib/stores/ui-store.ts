@@ -1,6 +1,20 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
+// Workplace drawer panel identifiers
+type DrawerPanel =
+  | 'documents'
+  | 'questionnaire'
+  | 'irccForms'
+  | 'tasks'
+  | 'deadlines'
+  | 'billing'
+  | 'notes'
+  | 'timeline'
+  | 'people'
+  | 'postDecision'
+  | null
+
 interface UIState {
   // Sidebar
   sidebarCollapsed: boolean
@@ -28,6 +42,12 @@ interface UIState {
   activePracticeColor: string | null
   activePracticeName: string | null
   setActivePracticeFilter: (filter: string, color?: string | null, name?: string | null) => void
+
+  // Workplace shell state (Phase C)
+  activeDrawerPanel: DrawerPanel
+  communicationPanelCollapsed: boolean
+  setActiveDrawerPanel: (panel: DrawerPanel) => void
+  toggleCommunicationPanel: () => void
 }
 
 export const useUIStore = create<UIState>()(
@@ -73,6 +93,18 @@ export const useUIStore = create<UIState>()(
           activePracticeColor: filter === 'all' ? null : (color ?? null),
           activePracticeName: filter === 'all' ? null : (name ?? null),
         }),
+
+      // Workplace shell state (Phase C)
+      activeDrawerPanel: null,
+      communicationPanelCollapsed: false,
+      setActiveDrawerPanel: (panel) =>
+        set((state) => ({
+          activeDrawerPanel: state.activeDrawerPanel === panel ? null : panel,
+        })),
+      toggleCommunicationPanel: () =>
+        set((state) => ({
+          communicationPanelCollapsed: !state.communicationPanelCollapsed,
+        })),
     }),
     {
       name: 'norvaos-ui',
@@ -82,6 +114,7 @@ export const useUIStore = create<UIState>()(
         activePracticeFilter: state.activePracticeFilter,
         activePracticeColor: state.activePracticeColor,
         activePracticeName: state.activePracticeName,
+        communicationPanelCollapsed: state.communicationPanelCollapsed,
       }),
     }
   )

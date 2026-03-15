@@ -75,7 +75,8 @@ function SidebarLink({
         isActive
           ? 'bg-sidebar-accent text-sidebar-accent-foreground font-medium'
           : 'text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground',
-        item.comingSoon && 'opacity-50'
+        item.comingSoon && 'opacity-50',
+        item.deprecated && 'opacity-60'
       )}
     >
       <Icon className="size-4 shrink-0" />
@@ -83,6 +84,11 @@ function SidebarLink({
       {!collapsed && item.comingSoon && (
         <span className="ml-auto rounded bg-sidebar-accent px-1.5 py-0.5 text-[10px] font-medium text-sidebar-foreground/60">
           Soon
+        </span>
+      )}
+      {!collapsed && item.deprecated && (
+        <span className="ml-auto rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-medium text-amber-600">
+          Legacy
         </span>
       )}
     </Link>

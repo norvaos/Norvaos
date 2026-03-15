@@ -81,7 +81,17 @@ export function TasksTab({
   contactId?: string
 }) {
   const { appUser } = useUser()
-  const { data: tasks, isLoading } = useMatterTasks(matterId, tenantId)
+  const { data: rawTasks, isLoading } = useMatterTasks(matterId, tenantId)
+
+  // Sort unassigned tasks to the top
+  const tasks = useMemo(() => {
+    if (!rawTasks) return rawTasks
+    return [...rawTasks].sort((a, b) => {
+      if (!a.assigned_to && b.assigned_to) return -1
+      if (a.assigned_to && !b.assigned_to) return 1
+      return 0
+    })
+  }, [rawTasks])
   const { data: templates } = useTaskTemplates(tenantId)
   const applyTemplate = useApplyTemplate()
 
@@ -257,7 +267,13 @@ export function TasksTab({
                       )}
                     </TableCell>
                     <TableCell className="text-slate-600">
-                      {getUserName(task.assigned_to, users)}
+                      {task.assigned_to ? (
+                        getUserName(task.assigned_to, users)
+                      ) : (
+                        <Badge variant="outline" className="text-[10px] px-1.5 py-0 text-amber-600 border-amber-200 bg-amber-50">
+                          Unassigned
+                        </Badge>
+                      )}
                     </TableCell>
                   </TableRow>
                 )

@@ -50,7 +50,17 @@ function getFullName(firstName: string | null, lastName: string | null): string 
 }
 
 export function TaskOwnerAvatar({ userId, users }: TaskOwnerAvatarProps) {
-  if (!userId || !users) {
+  if (!userId) {
+    return (
+      <div className="flex h-7 shrink-0 items-center">
+        <span className="inline-flex items-center rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-[10px] font-medium text-amber-600">
+          Unassigned
+        </span>
+      </div>
+    )
+  }
+
+  if (!users) {
     return null
   }
 

@@ -1,13 +1,11 @@
 import { NextResponse } from 'next/server'
 import { createHash } from 'crypto'
-import { readFile, writeFile, unlink, mkdtemp } from 'fs/promises'
+import { readFile } from 'fs/promises'
 import { join } from 'path'
-import { tmpdir } from 'os'
-import { execFile } from 'child_process'
-import { promisify } from 'util'
 import { authenticateRequest, AuthError } from '@/lib/services/auth'
 import { requirePermission } from '@/lib/services/require-role'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { scanXfa } from '@/lib/services/python-worker-client'
 import type {
   XfaScanResult,
   IrccFormFieldInsert,
@@ -19,22 +17,12 @@ import { classifyField, deriveSectionTitle, deriveSectionDescription } from '@/l
 import { detectDateGroups, buildDateSplitMap } from '@/lib/ircc/date-split-detector'
 import { scannerTypeToFieldType } from '@/lib/ircc/scanner-type-map'
 
-const execFileAsync = promisify(execFile)
-
 /**
- * Shared helper: Run XFA scanner on a PDF buffer and return scan result.
+ * Shared helper: Run XFA scanner on a PDF buffer via the Python worker sidecar.
  */
 async function runXfaScanner(fileBuffer: Buffer): Promise<XfaScanResult> {
-  const tmpDir = await mkdtemp(join(tmpdir(), 'ircc-sync-'))
-  const tmpPdfPath = join(tmpDir, 'template.pdf')
-  await writeFile(tmpPdfPath, fileBuffer)
-
   try {
-    const scriptPath = join(process.cwd(), 'scripts', 'xfa-scanner.py')
-    const { stdout } = await execFileAsync('python3', [scriptPath, tmpPdfPath], {
-      timeout: 30000,
-    })
-    return JSON.parse(stdout)
+    return await scanXfa(fileBuffer, { timeoutMs: 30_000 })
   } catch (scanErr) {
     return {
       root_element: null,
@@ -43,10 +31,6 @@ async function runXfaScanner(fileBuffer: Buffer): Promise<XfaScanResult> {
       fields: [],
       error: scanErr instanceof Error ? scanErr.message : 'Scanner failed',
     }
-  } finally {
-    await unlink(tmpPdfPath).catch(() => {})
-    const { rmdir } = await import('fs/promises')
-    await rmdir(tmpDir).catch(() => {})
   }
 }
 

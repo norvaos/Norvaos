@@ -13,6 +13,8 @@ import {
   ListChecks,
   Zap,
   ArrowRight,
+  Clock,
+  X,
 } from 'lucide-react'
 
 import { useTenant } from '@/lib/hooks/use-tenant'
@@ -25,6 +27,10 @@ import {
   useCreateWorkflowTemplate,
   useUpdateWorkflowTemplate,
   useDeleteWorkflowTemplate,
+  useDeadlineTypes,
+  useWorkflowTemplateDeadlines,
+  useAddWorkflowTemplateDeadline,
+  useRemoveWorkflowTemplateDeadline,
 } from '@/lib/queries/matter-types'
 import { useTaskTemplates } from '@/lib/queries/task-templates'
 import { cn } from '@/lib/utils'
@@ -278,6 +284,7 @@ function WorkflowRow({
                 </Badge>
               </>
             )}
+            <DeadlineCountBadge workflowTemplateId={workflow.id} />
           </div>
         </div>
       </div>
@@ -623,6 +630,22 @@ function WorkflowDialog({
               )}
             />
 
+            {/* Deadline Types (junction — only available when editing) */}
+            {editing ? (
+              <DeadlineBindingsSection
+                workflowTemplateId={editing.id}
+                tenantId={tenantId}
+                practiceAreaId={selectedMatterType?.practice_area_id ?? null}
+              />
+            ) : (
+              <div className="rounded-lg border border-dashed p-3">
+                <p className="text-xs text-slate-400">
+                  <Clock className="inline h-3 w-3 mr-1" />
+                  Deadline types can be added after creating the workflow.
+                </p>
+              </div>
+            )}
+
             {/* Is Default */}
             <FormField
               control={form.control}
@@ -705,6 +728,163 @@ function DeleteWorkflowDialog({
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
+  )
+}
+
+// ─── Deadline Count Badge ───────────────────────────────────────────────────
+
+function DeadlineCountBadge({ workflowTemplateId }: { workflowTemplateId: string }) {
+  const { data: bindings } = useWorkflowTemplateDeadlines(workflowTemplateId)
+  if (!bindings || bindings.length === 0) return null
+
+  return (
+    <Badge variant="outline" className="text-[10px] px-1.5 py-0 font-normal text-amber-600 border-amber-200 bg-amber-50">
+      <Clock className="h-3 w-3 mr-0.5" />
+      {bindings.length} deadline{bindings.length !== 1 ? 's' : ''}
+    </Badge>
+  )
+}
+
+// ─── Deadline Bindings Section ──────────────────────────────────────────────
+
+function DeadlineBindingsSection({
+  workflowTemplateId,
+  tenantId,
+  practiceAreaId,
+}: {
+  workflowTemplateId: string
+  tenantId: string
+  practiceAreaId: string | null
+}) {
+  const { data: bindings, isLoading } = useWorkflowTemplateDeadlines(workflowTemplateId)
+  const { data: allDeadlineTypes } = useDeadlineTypes(tenantId, practiceAreaId)
+  const addMutation = useAddWorkflowTemplateDeadline()
+  const removeMutation = useRemoveWorkflowTemplateDeadline()
+
+  const [addingTypeId, setAddingTypeId] = useState('')
+  const [addingOffset, setAddingOffset] = useState(0)
+
+  // Filter out already-bound deadline types
+  const boundIds = useMemo(
+    () => new Set((bindings ?? []).map((b) => b.deadline_type_id)),
+    [bindings]
+  )
+  const availableTypes = useMemo(
+    () => (allDeadlineTypes ?? []).filter((dt) => !boundIds.has(dt.id)),
+    [allDeadlineTypes, boundIds]
+  )
+
+  const handleAdd = async () => {
+    if (!addingTypeId) return
+    await addMutation.mutateAsync({
+      tenant_id: tenantId,
+      workflow_template_id: workflowTemplateId,
+      deadline_type_id: addingTypeId,
+      days_offset: addingOffset,
+    })
+    setAddingTypeId('')
+    setAddingOffset(0)
+  }
+
+  return (
+    <div className="space-y-2">
+      <label className="text-sm font-medium text-slate-700">
+        <Clock className="inline h-3.5 w-3.5 mr-1 -mt-0.5" />
+        Auto-Create Deadlines
+      </label>
+      <p className="text-xs text-slate-400">
+        Deadlines to create automatically when this workflow triggers.
+      </p>
+
+      {/* Existing bindings */}
+      {isLoading ? (
+        <Skeleton className="h-8 w-full" />
+      ) : (bindings ?? []).length > 0 ? (
+        <div className="space-y-1.5">
+          {bindings!.map((b) => (
+            <div
+              key={b.id}
+              className="flex items-center justify-between rounded-md border px-3 py-1.5 text-sm"
+            >
+              <div className="flex items-center gap-2 min-w-0">
+                <span
+                  className="inline-block h-2 w-2 rounded-full shrink-0"
+                  style={{ backgroundColor: b.deadline_types?.color ?? '#94a3b8' }}
+                />
+                <span className="truncate">{b.deadline_types?.name ?? 'Unknown'}</span>
+                <Badge variant="secondary" className="text-[10px] px-1.5 py-0 shrink-0">
+                  +{b.days_offset}d
+                </Badge>
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-6 w-6 shrink-0"
+                disabled={removeMutation.isPending}
+                onClick={() =>
+                  removeMutation.mutate({
+                    id: b.id,
+                    workflowTemplateId,
+                  })
+                }
+              >
+                <X className="h-3 w-3 text-slate-400" />
+              </Button>
+            </div>
+          ))}
+        </div>
+      ) : null}
+
+      {/* Add new binding */}
+      {availableTypes.length > 0 && (
+        <div className="flex items-end gap-2">
+          <div className="flex-1">
+            <Select value={addingTypeId || '_none'} onValueChange={(v) => setAddingTypeId(v === '_none' ? '' : v)}>
+              <SelectTrigger className="h-8 text-xs">
+                <SelectValue placeholder="Add deadline type..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="_none">Select deadline type...</SelectItem>
+                {availableTypes.map((dt) => (
+                  <SelectItem key={dt.id} value={dt.id}>
+                    <span className="flex items-center gap-2">
+                      <span
+                        className="inline-block h-2 w-2 rounded-full"
+                        style={{ backgroundColor: dt.color }}
+                      />
+                      {dt.name}
+                    </span>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="w-20">
+            <Input
+              type="number"
+              value={addingOffset}
+              onChange={(e) => setAddingOffset(parseInt(e.target.value) || 0)}
+              className="h-8 text-xs"
+              placeholder="Days"
+            />
+          </div>
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            className="h-8 text-xs"
+            onClick={handleAdd}
+            disabled={!addingTypeId || addMutation.isPending}
+          >
+            {addMutation.isPending ? (
+              <Loader2 className="h-3 w-3 animate-spin" />
+            ) : (
+              <Plus className="h-3 w-3" />
+            )}
+          </Button>
+        </div>
+      )}
+    </div>
   )
 }
 

@@ -1,16 +1,10 @@
 import { NextResponse } from 'next/server'
-import { writeFile, unlink, mkdtemp } from 'fs/promises'
-import { join } from 'path'
-import { tmpdir } from 'os'
-import { execFile } from 'child_process'
-import { promisify } from 'util'
 import { authenticateRequest, AuthError } from '@/lib/services/auth'
 import { requirePermission } from '@/lib/services/require-role'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { scanXfa } from '@/lib/services/python-worker-client'
 import type { XfaScanResult } from '@/lib/types/ircc-forms'
 import { deriveClientLabel } from '@/lib/ircc/xfa-label-utils'
-
-const execFileAsync = promisify(execFile)
 
 interface RouteParams {
   params: Promise<{ formId: string }>
@@ -58,28 +52,17 @@ export async function POST(_request: Request, { params }: RouteParams) {
       )
     }
 
-    // 3. Write to temp file and run XFA scanner
-    const tmpDir = await mkdtemp(join(tmpdir(), 'ircc-relabel-'))
-    const tmpPdfPath = join(tmpDir, 'template.pdf')
+    // 3. Run XFA scanner via Python worker sidecar
     const fileBuffer = Buffer.from(await fileData.arrayBuffer())
-    await writeFile(tmpPdfPath, fileBuffer)
 
     let scanResult: XfaScanResult
     try {
-      const scriptPath = join(process.cwd(), 'scripts', 'xfa-scanner.py')
-      const { stdout } = await execFileAsync('python3', [scriptPath, tmpPdfPath], {
-        timeout: 30000,
-      })
-      scanResult = JSON.parse(stdout)
+      scanResult = await scanXfa(fileBuffer, { timeoutMs: 30_000 })
     } catch (scanErr) {
       return NextResponse.json(
         { error: scanErr instanceof Error ? scanErr.message : 'XFA scanner failed' },
         { status: 500 },
       )
-    } finally {
-      await unlink(tmpPdfPath).catch(() => {})
-      const { rmdir } = await import('fs/promises')
-      await rmdir(tmpDir).catch(() => {})
     }
 
     if (!scanResult.fields.length) {

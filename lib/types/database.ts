@@ -413,6 +413,9 @@ export type Database = {
           matter_stage_pipeline_id: string | null
           fee_template_id: string | null
           followup_lawyer_id: string | null
+          is_restricted: boolean
+          restricted_admin_override: boolean
+          preferred_email_account_id: string | null
         }
         Insert: {
           // Required fields (NOT NULL, no DB default)
@@ -433,6 +436,8 @@ export type Database = {
           visibility?: string
           created_at?: string
           updated_at?: string
+          is_restricted?: boolean
+          restricted_admin_override?: boolean
           // Optional nullable fields
           matter_number?: string | null
           description?: string | null
@@ -459,6 +464,7 @@ export type Database = {
           matter_stage_pipeline_id?: string | null
           fee_template_id?: string | null
           followup_lawyer_id?: string | null
+          preferred_email_account_id?: string | null
         }
         Update: Partial<Database['public']['Tables']['matters']['Insert']>
       Relationships: []
@@ -534,6 +540,7 @@ export type Database = {
           external_id: string | null
           external_provider: string | null
           last_synced_at: string | null
+          source_template_item_id: string | null
         }
         Insert: {
           // Required fields (NOT NULL, no DB default)
@@ -581,6 +588,7 @@ export type Database = {
           external_id?: string | null
           external_provider?: string | null
           last_synced_at?: string | null
+          source_template_item_id?: string | null
         }
         Update: Partial<Database['public']['Tables']['tasks']['Insert']>
       Relationships: []
@@ -1033,6 +1041,9 @@ export type Database = {
           changes: Json
           metadata: Json
           created_at: string
+          severity: string
+          ip_address: string | null
+          user_agent: string | null
         }
         Insert: {
           tenant_id: string
@@ -1044,6 +1055,9 @@ export type Database = {
           metadata?: Json
           created_at?: string
           user_id?: string | null
+          severity?: string
+          ip_address?: string | null
+          user_agent?: string | null
         }
         Update: Partial<Database['public']['Tables']['audit_logs']['Insert']>
       Relationships: []
@@ -2068,6 +2082,28 @@ export type Database = {
           updated_at?: string
         }
         Update: Partial<Database['public']['Tables']['workflow_templates']['Insert']>
+        Relationships: []
+      }
+      workflow_template_deadlines: {
+        Row: {
+          id: string
+          tenant_id: string
+          workflow_template_id: string
+          deadline_type_id: string
+          days_offset: number
+          title_override: string | null
+          created_at: string
+        }
+        Insert: {
+          tenant_id: string
+          workflow_template_id: string
+          deadline_type_id: string
+          id?: string
+          days_offset?: number
+          title_override?: string | null
+          created_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['workflow_template_deadlines']['Insert']>
         Relationships: []
       }
       matter_stage_state: {
@@ -4923,6 +4959,223 @@ export type Database = {
         Update: Partial<DocumentWorkflowRuleInsert>
         Relationships: []
       }
+      // ── Job Queue ──────────────────────────────────────────────
+      job_runs: {
+        Row: JobRunRow
+        Insert: JobRunInsert
+        Update: JobRunUpdate
+        Relationships: []
+      }
+      job_run_logs: {
+        Row: JobRunLogRow
+        Insert: JobRunLogInsert
+        Update: Partial<JobRunLogInsert>
+        Relationships: []
+      }
+      // ── Matter-Scoped Access Control (Migration 094) ──────────────
+      user_supervision: {
+        Row: {
+          id: string
+          tenant_id: string
+          supervisor_user_id: string
+          supervisee_user_id: string
+          created_by: string | null
+          created_at: string
+          is_active: boolean
+        }
+        Insert: {
+          tenant_id: string
+          supervisor_user_id: string
+          supervisee_user_id: string
+          id?: string
+          created_by?: string | null
+          created_at?: string
+          is_active?: boolean
+        }
+        Update: Partial<Database['public']['Tables']['user_supervision']['Insert']>
+        Relationships: []
+      }
+      break_glass_access_grants: {
+        Row: {
+          id: string
+          tenant_id: string
+          granted_to: string
+          granted_by: string
+          matter_id: string | null
+          target_user_id: string
+          reason: string
+          granted_at: string
+          expires_at: string
+          revoked_at: string | null
+          revoked_by: string | null
+        }
+        Insert: {
+          tenant_id: string
+          granted_to: string
+          granted_by: string
+          target_user_id: string
+          reason: string
+          expires_at: string
+          id?: string
+          matter_id?: string | null
+          granted_at?: string
+          revoked_at?: string | null
+          revoked_by?: string | null
+        }
+        Update: Partial<Database['public']['Tables']['break_glass_access_grants']['Insert']>
+        Relationships: []
+      }
+      matter_delegations: {
+        Row: {
+          id: string
+          tenant_id: string
+          delegating_user_id: string
+          delegate_user_id: string
+          matter_id: string | null
+          access_level: string
+          reason: string | null
+          starts_at: string
+          expires_at: string | null
+          created_at: string
+        }
+        Insert: {
+          tenant_id: string
+          delegating_user_id: string
+          delegate_user_id: string
+          access_level: string
+          id?: string
+          matter_id?: string | null
+          reason?: string | null
+          starts_at?: string
+          expires_at?: string | null
+          created_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['matter_delegations']['Insert']>
+        Relationships: []
+      }
+      // ── Email Communication Layer (Migration 096) ──────────────
+      email_accounts: {
+        Row: EmailAccountRow
+        Insert: EmailAccountInsert
+        Update: EmailAccountUpdate
+        Relationships: []
+      }
+      email_account_access: {
+        Row: EmailAccountAccessRow
+        Insert: EmailAccountAccessInsert
+        Update: EmailAccountAccessUpdate
+        Relationships: []
+      }
+      email_threads: {
+        Row: EmailThreadRow
+        Insert: EmailThreadInsert
+        Update: EmailThreadUpdate
+        Relationships: []
+      }
+      email_messages: {
+        Row: EmailMessageRow
+        Insert: EmailMessageInsert
+        Update: EmailMessageUpdate
+        Relationships: []
+      }
+      email_attachments: {
+        Row: EmailAttachmentRow
+        Insert: EmailAttachmentInsert
+        Update: Partial<EmailAttachmentInsert>
+        Relationships: []
+      }
+      email_association_events: {
+        Row: EmailAssociationEventRow
+        Insert: EmailAssociationEventInsert
+        Update: Partial<EmailAssociationEventInsert>
+        Relationships: []
+      }
+      unmatched_email_queue: {
+        Row: UnmatchedEmailQueueRow
+        Insert: UnmatchedEmailQueueInsert
+        Update: UnmatchedEmailQueueUpdate
+        Relationships: []
+      }
+      email_send_events: {
+        Row: EmailSendEventRow
+        Insert: EmailSendEventInsert
+        Update: Partial<EmailSendEventInsert>
+        Relationships: []
+      }
+      // ── Canonical Profile System (Migration 095) ──────────────
+      canonical_profiles: {
+        Row: CanonicalProfileRow
+        Insert: CanonicalProfileInsert
+        Update: CanonicalProfileUpdate
+        Relationships: []
+      }
+      canonical_profile_fields: {
+        Row: CanonicalProfileFieldRow
+        Insert: CanonicalProfileFieldInsert
+        Update: CanonicalProfileFieldUpdate
+        Relationships: []
+      }
+      canonical_profile_snapshots: {
+        Row: CanonicalProfileSnapshotRow
+        Insert: CanonicalProfileSnapshotInsert
+        Update: Partial<CanonicalProfileSnapshotInsert>
+        Relationships: []
+      }
+      canonical_profile_conflicts: {
+        Row: CanonicalProfileConflictRow
+        Insert: CanonicalProfileConflictInsert
+        Update: CanonicalProfileConflictUpdate
+        Relationships: []
+      }
+      common_field_registry: {
+        Row: CommonFieldRegistryRow
+        Insert: CommonFieldRegistryInsert
+        Update: Partial<CommonFieldRegistryInsert>
+        Relationships: []
+      }
+      // ── Matter Lifecycle Automation (Migration 097) ──────────────
+      post_submission_document_types: {
+        Row: PostSubmissionDocumentTypeRow
+        Insert: PostSubmissionDocumentTypeInsert
+        Update: PostSubmissionDocumentTypeUpdate
+        Relationships: []
+      }
+      matter_outcome_events: {
+        Row: MatterOutcomeEventRow
+        Insert: MatterOutcomeEventInsert
+        Update: MatterOutcomeEventUpdate
+        Relationships: []
+      }
+      expiry_reminder_rules: {
+        Row: ExpiryReminderRuleRow
+        Insert: ExpiryReminderRuleInsert
+        Update: ExpiryReminderRuleUpdate
+        Relationships: []
+      }
+      extracted_document_fields: {
+        Row: ExtractedDocumentFieldRow
+        Insert: ExtractedDocumentFieldInsert
+        Update: ExtractedDocumentFieldUpdate
+        Relationships: []
+      }
+      contact_status_records: {
+        Row: ContactStatusRecordRow
+        Insert: ContactStatusRecordInsert
+        Update: ContactStatusRecordUpdate
+        Relationships: []
+      }
+      drafting_prep_questions: {
+        Row: DraftingPrepQuestionRow
+        Insert: DraftingPrepQuestionInsert
+        Update: DraftingPrepQuestionUpdate
+        Relationships: []
+      }
+      drafting_prep_responses: {
+        Row: DraftingPrepResponseRow
+        Insert: DraftingPrepResponseInsert
+        Update: DraftingPrepResponseUpdate
+        Relationships: []
+      }
     }
     Views: Record<string, never>
     Functions: {
@@ -5041,6 +5294,25 @@ export type Database = {
           p_approved_by: string
         }
         Returns: Json
+      }
+      check_matter_access: {
+        Args: {
+          p_user_id: string
+          p_matter_id: string
+        }
+        Returns: boolean
+      }
+      seed_post_submission_doc_types: {
+        Args: {
+          p_tenant_id: string
+        }
+        Returns: undefined
+      }
+      seed_expiry_reminder_rules: {
+        Args: {
+          p_tenant_id: string
+        }
+        Returns: undefined
       }
     }
     Enums: Record<string, never>
@@ -5591,3 +5863,711 @@ export type DocumentWorkflowRuleInsert = {
 }
 
 export type DocumentWorkflowRuleUpdate = Partial<Omit<DocumentWorkflowRuleInsert, 'tenant_id'>>
+
+// ─── job_runs ─────────────────────────────────────────────────────────────
+
+export type JobRunRow = {
+  id: string
+  tenant_id: string
+  job_type: string
+  payload: Json
+  status: string
+  priority: number
+  max_retries: number
+  retry_count: number
+  last_error: string | null
+  result: Json | null
+  idempotency_key: string | null
+  locked_by: string | null
+  locked_at: string | null
+  scheduled_for: string
+  started_at: string | null
+  completed_at: string | null
+  created_at: string
+}
+
+export type JobRunInsert = {
+  tenant_id: string
+  job_type: string
+  id?: string
+  payload?: Json
+  status?: string
+  priority?: number
+  max_retries?: number
+  retry_count?: number
+  last_error?: string | null
+  result?: Json | null
+  idempotency_key?: string | null
+  locked_by?: string | null
+  locked_at?: string | null
+  scheduled_for?: string
+  started_at?: string | null
+  completed_at?: string | null
+  created_at?: string
+}
+
+export type JobRunUpdate = Partial<Omit<JobRunInsert, 'tenant_id'>>
+
+// ─── job_run_logs ─────────────────────────────────────────────────────────
+
+export type JobRunLogRow = {
+  id: string
+  job_run_id: string
+  level: string
+  message: string
+  metadata: Json | null
+  created_at: string
+}
+
+export type JobRunLogInsert = {
+  job_run_id: string
+  message: string
+  id?: string
+  level?: string
+  metadata?: Json | null
+  created_at?: string
+}
+
+// No update — INSERT-only table
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// EMAIL COMMUNICATION LAYER (Migration 096)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// ─── email_accounts ─────────────────────────────────────────────────────────
+
+export type EmailAccountRow = {
+  id: string
+  tenant_id: string
+  user_id: string
+  account_type: string
+  provider: string
+  email_address: string
+  display_name: string | null
+  encrypted_access_token: string
+  encrypted_refresh_token: string
+  token_expires_at: string
+  authorized_user_ids: string[]
+  practice_area_id: string | null
+  sync_enabled: boolean
+  delta_link: string | null
+  last_sync_at: string | null
+  error_count: number
+  last_error: string | null
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}
+
+export type EmailAccountInsert = {
+  tenant_id: string
+  user_id: string
+  account_type: string
+  provider: string
+  email_address: string
+  encrypted_access_token: string
+  encrypted_refresh_token: string
+  token_expires_at: string
+  id?: string
+  display_name?: string | null
+  authorized_user_ids?: string[]
+  practice_area_id?: string | null
+  sync_enabled?: boolean
+  delta_link?: string | null
+  last_sync_at?: string | null
+  error_count?: number
+  last_error?: string | null
+  is_active?: boolean
+  created_at?: string
+  updated_at?: string
+}
+
+export type EmailAccountUpdate = Partial<Omit<EmailAccountInsert, 'tenant_id'>>
+
+// ─── email_account_access ───────────────────────────────────────────────────
+
+export type EmailAccountAccessRow = {
+  id: string
+  tenant_id: string
+  email_account_id: string
+  user_id: string
+  access_level: string
+  granted_by: string
+  granted_at: string
+}
+
+export type EmailAccountAccessInsert = {
+  tenant_id: string
+  email_account_id: string
+  user_id: string
+  access_level: string
+  granted_by: string
+  id?: string
+  granted_at?: string
+}
+
+export type EmailAccountAccessUpdate = Partial<Omit<EmailAccountAccessInsert, 'tenant_id'>>
+
+// ─── email_threads ──────────────────────────────────────────────────────────
+
+export type EmailThreadRow = {
+  id: string
+  tenant_id: string
+  conversation_id: string
+  subject: string | null
+  last_message_at: string | null
+  message_count: number
+  participant_emails: string[]
+  matter_id: string | null
+  contact_id: string | null
+  association_confidence: number | null
+  association_method: string | null
+  last_sender_account_id: string | null
+  draft_locked_by: string | null
+  draft_locked_at: string | null
+  is_archived: boolean
+  created_at: string
+  updated_at: string
+}
+
+export type EmailThreadInsert = {
+  tenant_id: string
+  conversation_id: string
+  id?: string
+  subject?: string | null
+  last_message_at?: string | null
+  message_count?: number
+  participant_emails?: string[]
+  matter_id?: string | null
+  contact_id?: string | null
+  association_confidence?: number | null
+  association_method?: string | null
+  last_sender_account_id?: string | null
+  draft_locked_by?: string | null
+  draft_locked_at?: string | null
+  is_archived?: boolean
+  created_at?: string
+  updated_at?: string
+}
+
+export type EmailThreadUpdate = Partial<Omit<EmailThreadInsert, 'tenant_id'>>
+
+// ─── email_messages ─────────────────────────────────────────────────────────
+
+export type EmailMessageRow = {
+  id: string
+  tenant_id: string
+  thread_id: string
+  message_id: string
+  email_account_id: string
+  direction: string
+  from_address: string | null
+  from_name: string | null
+  to_addresses: Json
+  cc_addresses: Json
+  bcc_addresses: Json
+  subject: string | null
+  body_text: string | null
+  body_html: string | null
+  has_attachments: boolean
+  is_read: boolean
+  importance: string
+  received_at: string | null
+  sent_at: string | null
+  synced_at: string
+  created_at: string
+}
+
+export type EmailMessageInsert = {
+  tenant_id: string
+  thread_id: string
+  message_id: string
+  email_account_id: string
+  direction: string
+  id?: string
+  from_address?: string | null
+  from_name?: string | null
+  to_addresses?: Json
+  cc_addresses?: Json
+  bcc_addresses?: Json
+  subject?: string | null
+  body_text?: string | null
+  body_html?: string | null
+  has_attachments?: boolean
+  is_read?: boolean
+  importance?: string
+  received_at?: string | null
+  sent_at?: string | null
+  synced_at?: string
+  created_at?: string
+}
+
+export type EmailMessageUpdate = Partial<Omit<EmailMessageInsert, 'tenant_id'>>
+
+// ─── email_attachments ──────────────────────────────────────────────────────
+
+export type EmailAttachmentRow = {
+  id: string
+  tenant_id: string
+  message_id: string
+  filename: string
+  content_type: string | null
+  size_bytes: number | null
+  storage_path: string | null
+  external_attachment_id: string | null
+  created_at: string
+}
+
+export type EmailAttachmentInsert = {
+  tenant_id: string
+  message_id: string
+  filename: string
+  id?: string
+  content_type?: string | null
+  size_bytes?: number | null
+  storage_path?: string | null
+  external_attachment_id?: string | null
+  created_at?: string
+}
+
+// No update type — attachments are immutable
+
+// ─── email_association_events ───────────────────────────────────────────────
+
+export type EmailAssociationEventRow = {
+  id: string
+  tenant_id: string
+  thread_id: string
+  matter_id: string
+  associated_by: string
+  association_type: string
+  confidence_score: number | null
+  previous_matter_id: string | null
+  created_at: string
+}
+
+export type EmailAssociationEventInsert = {
+  tenant_id: string
+  thread_id: string
+  matter_id: string
+  associated_by: string
+  association_type: string
+  id?: string
+  confidence_score?: number | null
+  previous_matter_id?: string | null
+  created_at?: string
+}
+
+// No update type — INSERT-only audit trail
+
+// ─── unmatched_email_queue ──────────────────────────────────────────────────
+
+export type UnmatchedEmailQueueRow = {
+  id: string
+  tenant_id: string
+  thread_id: string
+  suggested_matter_ids: string[]
+  suggested_contact_ids: string[]
+  reason: string | null
+  status: string
+  resolved_by: string | null
+  resolved_at: string | null
+  created_at: string
+}
+
+export type UnmatchedEmailQueueInsert = {
+  tenant_id: string
+  thread_id: string
+  id?: string
+  suggested_matter_ids?: string[]
+  suggested_contact_ids?: string[]
+  reason?: string | null
+  status?: string
+  resolved_by?: string | null
+  resolved_at?: string | null
+  created_at?: string
+}
+
+export type UnmatchedEmailQueueUpdate = Partial<Omit<UnmatchedEmailQueueInsert, 'tenant_id'>>
+
+// ─── email_send_events ──────────────────────────────────────────────────────
+
+export type EmailSendEventRow = {
+  id: string
+  tenant_id: string
+  message_id: string
+  email_account_id: string
+  matter_id: string
+  sent_by: string
+  sent_at: string
+  created_at: string
+}
+
+export type EmailSendEventInsert = {
+  tenant_id: string
+  message_id: string
+  email_account_id: string
+  matter_id: string
+  sent_by: string
+  id?: string
+  sent_at?: string
+  created_at?: string
+}
+
+// No update type — INSERT-only audit trail (email_send_events)
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// CANONICAL PROFILE SYSTEM (Migration 095)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// ─── canonical_profiles ─────────────────────────────────────────────────────
+
+export type CanonicalProfileRow = {
+  id: string
+  tenant_id: string
+  contact_id: string
+  created_at: string
+  updated_at: string
+}
+
+export type CanonicalProfileInsert = {
+  tenant_id: string
+  contact_id: string
+  id?: string
+  created_at?: string
+  updated_at?: string
+}
+
+export type CanonicalProfileUpdate = Partial<Omit<CanonicalProfileInsert, 'tenant_id' | 'contact_id'>>
+
+// ─── canonical_profile_fields ───────────────────────────────────────────────
+
+export type CanonicalProfileFieldRow = {
+  id: string
+  profile_id: string
+  domain: string
+  field_key: string
+  value: Json
+  effective_from: string
+  effective_to: string | null
+  source: string
+  source_document_id: string | null
+  verification_status: string
+  verified_by: string | null
+  verified_at: string | null
+  created_at: string
+  updated_at: string
+}
+
+export type CanonicalProfileFieldInsert = {
+  profile_id: string
+  domain: string
+  field_key: string
+  value: Json
+  effective_from: string
+  source: string
+  id?: string
+  effective_to?: string | null
+  source_document_id?: string | null
+  verification_status?: string
+  verified_by?: string | null
+  verified_at?: string | null
+  created_at?: string
+  updated_at?: string
+}
+
+export type CanonicalProfileFieldUpdate = Partial<Omit<CanonicalProfileFieldInsert, 'profile_id'>>
+
+// ─── canonical_profile_snapshots ────────────────────────────────────────────
+
+export type CanonicalProfileSnapshotRow = {
+  id: string
+  profile_id: string
+  matter_id: string
+  snapshot_data: Json
+  created_at: string
+}
+
+export type CanonicalProfileSnapshotInsert = {
+  profile_id: string
+  matter_id: string
+  snapshot_data: Json
+  id?: string
+  created_at?: string
+}
+
+// No update — upsert via INSERT ON CONFLICT
+
+// ─── canonical_profile_conflicts ────────────────────────────────────────────
+
+export type CanonicalProfileConflictRow = {
+  id: string
+  profile_id: string
+  field_key: string
+  existing_value: Json
+  new_value: Json
+  new_source: string
+  resolution: string
+  resolved_by: string | null
+  resolved_at: string | null
+  created_at: string
+}
+
+export type CanonicalProfileConflictInsert = {
+  profile_id: string
+  field_key: string
+  existing_value: Json
+  new_value: Json
+  new_source: string
+  id?: string
+  resolution?: string
+  resolved_by?: string | null
+  resolved_at?: string | null
+  created_at?: string
+}
+
+export type CanonicalProfileConflictUpdate = Partial<
+  Pick<CanonicalProfileConflictInsert, 'resolution' | 'resolved_by' | 'resolved_at'>
+>
+
+// ─── common_field_registry ──────────────────────────────────────────────────
+
+export type CommonFieldRegistryRow = {
+  id: string
+  canonical_key: string
+  label: string
+  data_type: string
+  domain: string
+  participant_scope: string
+  validation_rules: Json
+  source_priority: Json
+  is_canonical: boolean
+  mapped_form_count: number
+  conflict_detection_rules: Json
+  created_at: string
+}
+
+export type CommonFieldRegistryInsert = {
+  canonical_key: string
+  label: string
+  domain: string
+  id?: string
+  data_type?: string
+  participant_scope?: string
+  validation_rules?: Json
+  source_priority?: Json
+  is_canonical?: boolean
+  mapped_form_count?: number
+  conflict_detection_rules?: Json
+  created_at?: string
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// MATTER LIFECYCLE AUTOMATION (Migration 097)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// ─── post_submission_document_types ───────────────────────────────────────
+
+export type PostSubmissionDocumentTypeRow = {
+  id: string
+  tenant_id: string
+  key: string
+  label: string
+  stage_change_target: string | null
+  creates_deadline: boolean
+  deadline_days: number | null
+  creates_task: boolean
+  task_template_id: string | null
+  triggers_communication: boolean
+  communication_template_id: string | null
+  is_active: boolean
+  sort_order: number
+  created_at: string
+}
+
+export type PostSubmissionDocumentTypeInsert = {
+  tenant_id: string
+  key: string
+  label: string
+  id?: string
+  stage_change_target?: string | null
+  creates_deadline?: boolean
+  deadline_days?: number | null
+  creates_task?: boolean
+  task_template_id?: string | null
+  triggers_communication?: boolean
+  communication_template_id?: string | null
+  is_active?: boolean
+  sort_order?: number
+  created_at?: string
+}
+
+export type PostSubmissionDocumentTypeUpdate = Partial<Omit<PostSubmissionDocumentTypeInsert, 'tenant_id'>>
+
+// ─── matter_outcome_events ────────────────────────────────────────────────
+
+export type MatterOutcomeEventRow = {
+  id: string
+  tenant_id: string
+  matter_id: string
+  event_type: string
+  document_id: string | null
+  outcome_data: Json
+  next_action: string | null
+  next_matter_id: string | null
+  created_by: string
+  created_at: string
+}
+
+export type MatterOutcomeEventInsert = {
+  tenant_id: string
+  matter_id: string
+  event_type: string
+  created_by: string
+  id?: string
+  document_id?: string | null
+  outcome_data?: Json
+  next_action?: string | null
+  next_matter_id?: string | null
+  created_at?: string
+}
+
+export type MatterOutcomeEventUpdate = Partial<Omit<MatterOutcomeEventInsert, 'tenant_id'>>
+
+// ─── expiry_reminder_rules ────────────────────────────────────────────────
+
+export type ExpiryReminderRuleRow = {
+  id: string
+  tenant_id: string
+  reminder_offset_days: number
+  reminder_type: string
+  template_id: string | null
+  is_active: boolean
+  created_at: string
+}
+
+export type ExpiryReminderRuleInsert = {
+  tenant_id: string
+  reminder_offset_days: number
+  reminder_type: string
+  id?: string
+  template_id?: string | null
+  is_active?: boolean
+  created_at?: string
+}
+
+export type ExpiryReminderRuleUpdate = Partial<Omit<ExpiryReminderRuleInsert, 'tenant_id'>>
+
+// ─── extracted_document_fields ────────────────────────────────────────────
+
+export type ExtractedDocumentFieldRow = {
+  id: string
+  tenant_id: string
+  document_id: string
+  field_key: string
+  extracted_value: string
+  confidence_score: number
+  confirmed_by: string | null
+  confirmed_at: string | null
+  mapped_to_canonical_key: string | null
+  created_at: string
+}
+
+export type ExtractedDocumentFieldInsert = {
+  tenant_id: string
+  document_id: string
+  field_key: string
+  extracted_value: string
+  id?: string
+  confidence_score?: number
+  confirmed_by?: string | null
+  confirmed_at?: string | null
+  mapped_to_canonical_key?: string | null
+  created_at?: string
+}
+
+export type ExtractedDocumentFieldUpdate = Partial<Omit<ExtractedDocumentFieldInsert, 'tenant_id'>>
+
+// ─── contact_status_records ───────────────────────────────────────────────
+
+export type ContactStatusRecordRow = {
+  id: string
+  tenant_id: string
+  contact_id: string
+  status_type: string
+  issue_date: string
+  expiry_date: string
+  document_reference: string
+  matter_id: string | null
+  created_at: string
+  updated_at: string
+}
+
+export type ContactStatusRecordInsert = {
+  tenant_id: string
+  contact_id: string
+  status_type: string
+  issue_date: string
+  expiry_date: string
+  id?: string
+  document_reference?: string
+  matter_id?: string | null
+  created_at?: string
+  updated_at?: string
+}
+
+export type ContactStatusRecordUpdate = Partial<Omit<ContactStatusRecordInsert, 'tenant_id'>>
+
+// ─── drafting_prep_questions ──────────────────────────────────────────────
+
+export type DraftingPrepQuestionRow = {
+  id: string
+  tenant_id: string
+  matter_type_id: string | null
+  question_key: string
+  question_text: string
+  display_order: number
+  is_required: boolean
+  applies_when: Json | null
+  created_at: string
+}
+
+export type DraftingPrepQuestionInsert = {
+  tenant_id: string
+  question_key: string
+  question_text: string
+  id?: string
+  matter_type_id?: string | null
+  display_order?: number
+  is_required?: boolean
+  applies_when?: Json | null
+  created_at?: string
+}
+
+export type DraftingPrepQuestionUpdate = Partial<Omit<DraftingPrepQuestionInsert, 'tenant_id'>>
+
+// ─── drafting_prep_responses ──────────────────────────────────────────────
+
+export type DraftingPrepResponseRow = {
+  id: string
+  tenant_id: string
+  matter_id: string
+  question_id: string
+  response: string
+  responded_by: string
+  responded_at: string
+  created_at: string
+}
+
+export type DraftingPrepResponseInsert = {
+  tenant_id: string
+  matter_id: string
+  question_id: string
+  responded_by: string
+  id?: string
+  response?: string
+  responded_at?: string
+  created_at?: string
+}
+
+export type DraftingPrepResponseUpdate = Partial<Omit<DraftingPrepResponseInsert, 'tenant_id'>>

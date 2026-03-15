@@ -21,6 +21,8 @@ import {
   MonitorSmartphone,
   Upload,
   FileStack,
+  Inbox,
+  Key,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { APP_VERSION, BUILD_SHA, CORE_ENFORCEMENT_SPEC_VERSION } from '@/lib/config/version'
@@ -78,6 +80,20 @@ const settingsCards: { section: string; items: SettingsCard[] }[] = [
         href: '/settings/billing-plan',
         icon: CreditCard,
         color: 'text-slate-600 bg-slate-100',
+      },
+      {
+        title: 'Email Accounts',
+        description: 'Manage personal and shared mailbox connections',
+        href: '/settings/email-accounts',
+        icon: Inbox,
+        color: 'text-sky-600 bg-sky-50',
+      },
+      {
+        title: 'Access Control',
+        description: 'Supervision, delegations, and break-glass access',
+        href: '/settings/access-control',
+        icon: Key,
+        color: 'text-red-600 bg-red-50',
       },
     ],
   },
@@ -151,6 +167,20 @@ const settingsCards: { section: string; items: SettingsCard[] }[] = [
         href: '/settings/data-import',
         icon: Upload,
         color: 'text-emerald-600 bg-emerald-50',
+      },
+      {
+        title: 'Automation Rules',
+        description: 'Post-submission document types and trigger configuration',
+        href: '/settings/automation-rules',
+        icon: Zap,
+        color: 'text-orange-600 bg-orange-50',
+      },
+      {
+        title: 'Expiry Reminders',
+        description: 'Configure reminder timing rules for expiry dates',
+        href: '/settings/expiry-reminders',
+        icon: Bell,
+        color: 'text-amber-600 bg-amber-50',
       },
     ],
   },

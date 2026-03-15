@@ -900,75 +900,220 @@ async function applyStageWorkflowTemplates(
 
     if (!workflows || workflows.length === 0) return
 
-    let totalTasksCreated = 0
-
     for (const workflow of workflows) {
-      if (!workflow.task_template_id) continue
+      let tasksCreated = 0
+      let deadlinesCreated = 0
 
-      // Fetch template items
-      const { data: templateItems } = await supabase
-        .from('task_template_items')
-        .select('*')
-        .eq('template_id', workflow.task_template_id)
-        .order('sort_order')
+      // ── Task auto-creation (best-effort) ──
+      try {
+        if (workflow.task_template_id) {
+          const { data: templateItems } = await supabase
+            .from('task_template_items')
+            .select('*')
+            .eq('template_id', workflow.task_template_id)
+            .order('sort_order')
 
-      if (!templateItems || templateItems.length === 0) continue
+          if (templateItems && templateItems.length > 0) {
+            for (const item of templateItems) {
+              const dueDate = new Date()
+              if (item.due_days_offset) {
+                dueDate.setDate(dueDate.getDate() + item.due_days_offset)
+              }
 
-      // Build task inserts with idempotency check
-      for (const item of templateItems) {
-        // Skip if task already exists (idempotent — handles stage revisits)
-        const { data: existing } = await supabase
-          .from('tasks')
-          .select('id')
-          .eq('matter_id', matterId)
-          .eq('title', item.title)
-          .eq('created_via', 'template')
-          .limit(1)
+              // Idempotent insert via source_template_item_id unique index
+              // ON CONFLICT DO NOTHING — if task already exists for this
+              // template item + matter, the insert silently skips
+              const { data: inserted } = await supabase
+                .from('tasks')
+                .insert({
+                  tenant_id: tenantId,
+                  matter_id: matterId,
+                  title: item.title,
+                  description: item.description ?? null,
+                  priority: item.priority ?? 'medium',
+                  due_date: dueDate.toISOString().split('T')[0],
+                  created_by: userId,
+                  created_via: 'template',
+                  status: 'not_started',
+                  source_template_item_id: item.id,
+                })
+                .select('id')
+                .maybeSingle()
 
-        if (existing && existing.length > 0) continue
-
-        const dueDate = new Date()
-        if (item.due_days_offset) {
-          dueDate.setDate(dueDate.getDate() + item.due_days_offset)
+              if (inserted) tasksCreated++
+            }
+          }
         }
-
-        await supabase.from('tasks').insert({
-          tenant_id: tenantId,
-          matter_id: matterId,
-          title: item.title,
-          description: item.description ?? null,
-          priority: item.priority ?? 'medium',
-          due_date: dueDate.toISOString().split('T')[0],
-          created_by: userId,
-          created_via: 'template',
-          status: 'not_started',
-        })
-
-        totalTasksCreated++
+      } catch (taskErr) {
+        console.error('[stage-engine] Task auto-creation failed for workflow', workflow.id, taskErr)
       }
 
-      // Log activity for each applied workflow
-      if (totalTasksCreated > 0) {
-        await supabase.from('activities').insert({
-          tenant_id: tenantId,
-          matter_id: matterId,
-          activity_type: 'workflow_tasks_created',
-          title: `Tasks auto-created from "${workflow.name}"`,
-          description: `${totalTasksCreated} task(s) created from workflow template on stage entry`,
-          entity_type: 'matter',
-          entity_id: matterId,
-          user_id: userId,
-          metadata: {
-            workflow_template_id: workflow.id,
-            workflow_name: workflow.name,
-            task_template_id: workflow.task_template_id,
-            tasks_created: totalTasksCreated,
-            trigger_stage_id: targetStageId,
-          } as Json,
-        })
+      // ── Deadline auto-creation (best-effort) ──
+      try {
+        const { data: deadlineBindings } = await supabase
+          .from('workflow_template_deadlines')
+          .select('deadline_type_id, days_offset, title_override')
+          .eq('workflow_template_id', workflow.id)
+
+        if (deadlineBindings && deadlineBindings.length > 0) {
+          // Fetch the deadline type details for each binding
+          const deadlineTypeIds = deadlineBindings.map(b => b.deadline_type_id)
+          const { data: deadlineTypes } = await supabase
+            .from('deadline_types')
+            .select('id, name, priority:color, is_hard')
+            .in('id', deadlineTypeIds)
+
+          const typeMap = new Map(
+            (deadlineTypes ?? []).map(dt => [dt.id, dt])
+          )
+
+          for (const binding of deadlineBindings) {
+            const dt = typeMap.get(binding.deadline_type_id)
+            if (!dt) continue
+
+            const dueDate = new Date()
+            dueDate.setDate(dueDate.getDate() + (binding.days_offset ?? 0))
+
+            // Idempotent insert via (matter_id, deadline_type_id) WHERE auto_generated=TRUE
+            // ON CONFLICT DO NOTHING — if deadline already exists, silently skip
+            const { data: inserted } = await supabase
+              .from('matter_deadlines')
+              .insert({
+                tenant_id: tenantId,
+                matter_id: matterId,
+                deadline_type_id: binding.deadline_type_id,
+                deadline_type: 'workflow',
+                title: binding.title_override ?? dt.name,
+                due_date: dueDate.toISOString().split('T')[0],
+                priority: dt.is_hard ? 'high' : 'medium',
+                auto_generated: true,
+                status: 'upcoming',
+              })
+              .select('id')
+              .maybeSingle()
+
+            if (inserted) deadlinesCreated++
+          }
+        }
+      } catch (deadlineErr) {
+        console.error('[stage-engine] Deadline auto-creation failed for workflow', workflow.id, deadlineErr)
+      }
+
+      // ── Activity log ──
+      const totalCreated = tasksCreated + deadlinesCreated
+      if (totalCreated > 0) {
+        try {
+          await supabase.from('activities').insert({
+            tenant_id: tenantId,
+            matter_id: matterId,
+            activity_type: 'workflow_tasks_created',
+            title: `Auto-created from "${workflow.name}"`,
+            description: `${tasksCreated} task(s) and ${deadlinesCreated} deadline(s) created on stage entry`,
+            entity_type: 'matter',
+            entity_id: matterId,
+            user_id: userId,
+            metadata: {
+              workflow_template_id: workflow.id,
+              workflow_name: workflow.name,
+              task_template_id: workflow.task_template_id,
+              tasks_created: tasksCreated,
+              deadlines_created: deadlinesCreated,
+              trigger_stage_id: targetStageId,
+            } as Json,
+          })
+        } catch {
+          // Activity logging is non-critical
+        }
       }
     }
-  } catch {
-    // Non-blocking — task auto-creation failure shouldn't break stage advance
+  } catch (err) {
+    // Non-blocking — workflow auto-creation failure must never break stage advance
+    console.error('[stage-engine] applyStageWorkflowTemplates failed:', err)
   }
+}
+
+// ─── Post-Submission Stage Detection ─────────────────────────────────────────
+
+/**
+ * Names of stages that indicate a matter has been submitted to IRCC.
+ * When a matter is past any of these stages, post-submission document
+ * classification is enabled.
+ */
+const POST_SUBMISSION_STAGE_NAMES = [
+  'submitted',
+  'filed',
+  'application submitted',
+  'awaiting decision',
+  'in review',
+  'processing',
+]
+
+/**
+ * Check whether a matter is in a post-submission stage.
+ * When true, the UI should enable post-submission document classification,
+ * outcome capture, and the next-step wizard.
+ *
+ * Checks both immigration and generic pipelines.
+ */
+export async function isPostSubmissionStage(
+  supabase: SupabaseClient<Database>,
+  matterId: string
+): Promise<boolean> {
+  // Check immigration pipeline
+  const { data: immRecord } = await supabase
+    .from('matter_immigration')
+    .select('current_stage_id, stage_history')
+    .eq('matter_id', matterId)
+    .maybeSingle()
+
+  if (immRecord) {
+    // Check if current stage or any history entry is a post-submission stage
+    const history = (Array.isArray(immRecord.stage_history) ? immRecord.stage_history : []) as { stage_name?: string }[]
+    const reachedSubmission = history.some(
+      (entry) => entry.stage_name && POST_SUBMISSION_STAGE_NAMES.includes(entry.stage_name.toLowerCase())
+    )
+    if (reachedSubmission) return true
+
+    // Also check current stage name directly
+    if (immRecord.current_stage_id) {
+      const { data: currentStage } = await supabase
+        .from('case_stage_definitions')
+        .select('name')
+        .eq('id', immRecord.current_stage_id)
+        .maybeSingle()
+
+      if (currentStage?.name && POST_SUBMISSION_STAGE_NAMES.includes(currentStage.name.toLowerCase())) {
+        return true
+      }
+    }
+  }
+
+  // Check generic pipeline
+  const { data: stageState } = await supabase
+    .from('matter_stage_state')
+    .select('current_stage_id, stage_history')
+    .eq('matter_id', matterId)
+    .maybeSingle()
+
+  if (stageState) {
+    const history = (Array.isArray(stageState.stage_history) ? stageState.stage_history : []) as { stage_name?: string }[]
+    const reachedSubmission = history.some(
+      (entry) => entry.stage_name && POST_SUBMISSION_STAGE_NAMES.includes(entry.stage_name.toLowerCase())
+    )
+    if (reachedSubmission) return true
+
+    if (stageState.current_stage_id) {
+      const { data: currentStage } = await supabase
+        .from('matter_stages')
+        .select('name')
+        .eq('id', stageState.current_stage_id)
+        .maybeSingle()
+
+      if (currentStage?.name && POST_SUBMISSION_STAGE_NAMES.includes(currentStage.name.toLowerCase())) {
+        return true
+      }
+    }
+  }
+
+  return false
 }

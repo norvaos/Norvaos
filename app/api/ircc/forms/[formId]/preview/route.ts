@@ -1,16 +1,13 @@
 import { NextResponse } from 'next/server'
-import { writeFile, unlink, mkdtemp } from 'fs/promises'
-import { join, resolve } from 'path'
+import { writeFile, mkdtemp } from 'fs/promises'
+import { join } from 'path'
 import { tmpdir } from 'os'
-import { execFile } from 'child_process'
-import { promisify } from 'util'
 import { authenticateRequest, AuthError } from '@/lib/services/auth'
 import { requirePermission } from '@/lib/services/require-role'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { createRateLimiter } from '@/lib/middleware/rate-limit'
 import { fillXFAFormFromDB } from '@/lib/ircc/xfa-filler-db-server'
-
-const execFileAsync = promisify(execFile)
+import { renderPreview } from '@/lib/services/python-worker-client'
 
 // 10 preview requests per minute per user
 const previewLimiter = createRateLimiter({ windowMs: 60_000, maxRequests: 10 })
@@ -146,38 +143,15 @@ export async function POST(request: Request, { params }: RouteParams) {
       )
     }
 
-    // 5. Write filled PDF and input JSON to temp files
-    const tempPdfPath = join(tempDir, `preview_${formCode}.pdf`)
-    const tempInputPath = join(tempDir, 'input.json')
-    await writeFile(tempPdfPath, filledBytes.bytes)
-    await writeFile(tempInputPath, JSON.stringify({
-      pdf_path: tempPdfPath,
-      pages: [pageIndex],
+    // 5. Render preview via Python worker sidecar
+    const result = await renderPreview(filledBytes.bytes, pageIndex, {
+      timeoutMs: 30_000,
       dpi: 150,
-    }))
-
-    // 6. Run PyMuPDF preview script (reads JSON from file argument)
-    const scriptPath = resolve(process.cwd(), 'scripts/pdf-preview.py')
-
-    const { stdout, stderr } = await execFileAsync('python3', [scriptPath, tempInputPath], {
-      maxBuffer: 20 * 1024 * 1024, // 20 MB — PNG can be large at 150dpi
-      timeout: 30_000,
     })
 
-    if (stderr) {
-      console.warn('[preview] python stderr:', stderr)
-    }
-
-    // 7. Parse and return result
-    const result = JSON.parse(stdout) as {
-      images: { page: number; base64_png?: string; width?: number; height?: number; error?: string }[]
-      page_count: number
-      error?: string
-    }
-
-    if (result.error) {
+    if ('error' in result && result.error) {
       return NextResponse.json(
-        { error: `Preview render failed: ${result.error}` },
+        { error: `Preview render failed: ${(result as { error: string }).error}` },
         { status: 502 },
       )
     }

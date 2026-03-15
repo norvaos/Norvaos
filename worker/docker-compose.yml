@@ -1,0 +1,10 @@
+services:
+  python-worker:
+    build: .
+    ports:
+      - "8100:8000"
+    environment:
+      - WORKER_SECRET=${PYTHON_WORKER_SECRET}
+    volumes:
+      - ./:/app
+    restart: unless-stopped

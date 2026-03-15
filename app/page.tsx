@@ -36,39 +36,42 @@ import { DashboardSlideshow } from '@/components/landing/dashboard-slideshow'
 export default async function LandingPage() {
   const supabase = await createServerSupabaseClient()
   const {
-    data: { user },
-  } = await supabase.auth.getUser()
+    data: { session },
+  } = await supabase.auth.getSession()
 
-  if (user) {
+  if (session?.user) {
     redirect('/dashboards')
   }
 
   return (
-    <div className="min-h-screen bg-white text-gray-900">
+    <div className="min-h-screen bg-[#F5F5F7] text-[#0A0A0A]">
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 border-b border-gray-100 bg-white shadow-sm">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2.5">
               <NorvaLogo size={32} id="nav" />
               <span className="text-lg font-bold tracking-tight text-gray-900">NorvaOS</span>
+              <div className="hidden lg:block ml-2">
+                <span
+                  className="-rotate-[15deg] inline-block rounded-sm bg-indigo-600 px-2 py-[3px] text-[9px] font-bold uppercase tracking-widest text-white shadow-sm"
+                >A complete legal<br />operating system</span>
+              </div>
             </div>
             <div className="hidden items-center gap-8 md:flex">
-              <a href="#documents" className="text-sm font-medium text-gray-600 transition-colors hover:text-gray-900">Documents</a>
-              <a href="#platform" className="text-sm font-medium text-gray-600 transition-colors hover:text-gray-900">Platform</a>
-              <a href="#features" className="text-sm font-medium text-gray-600 transition-colors hover:text-gray-900">Features</a>
-              <a href="#testimonials" className="text-sm font-medium text-gray-600 transition-colors hover:text-gray-900">Reviews</a>
-              <Link href="/help" target="_blank" className="text-sm font-medium text-gray-600 transition-colors hover:text-gray-900">Help</Link>
+              <a href="#platform" className="text-sm font-medium text-gray-900 transition-colors hover:text-black">Platform</a>
+              <a href="#features" className="text-sm font-medium text-gray-900 transition-colors hover:text-black">Features</a>
+              <Link href="/help" target="_blank" className="text-sm font-medium text-gray-900 transition-colors hover:text-black">Help</Link>
             </div>
             <div className="flex items-center gap-3">
-              <Link href="/login" className="text-sm font-medium text-gray-600 transition-colors hover:text-gray-900">
+              <Link href="/login" className="text-sm font-medium text-gray-900 transition-colors hover:text-black">
                 Sign in
               </Link>
               <Link
                 href="/signup"
-                className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:bg-indigo-700"
+                className="inline-flex items-center gap-1.5 rounded-lg bg-[#0F172A] px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:bg-[#1e293b]"
               >
-                Request access
+                Book a demo
                 <ArrowRight className="h-3.5 w-3.5" />
               </Link>
             </div>
@@ -88,34 +91,33 @@ export default async function LandingPage() {
               <Sparkles className="h-3.5 w-3.5" />
               Not a CRM. A complete legal operating system.
             </div>
-            <h1 className="text-5xl font-bold tracking-tight text-gray-900 sm:text-6xl lg:text-[4.5rem] lg:leading-[1.1]">
-              Your entire firm.
+            <h1 className="text-5xl font-bold tracking-tight text-black sm:text-6xl lg:text-[4.5rem] lg:leading-[1.1]">
+              Your Entire Practice.
               <br />
               <span className="bg-gradient-to-r from-indigo-600 via-violet-600 to-purple-600 bg-clip-text text-transparent">
                 One tab. Zero compromises.
               </span>
             </h1>
-            <p className="mt-6 text-xl leading-8 text-gray-600 max-w-2xl mx-auto">
-              NorvaOS replaces your document storage, e-signing, scheduling, and accounting software —
-              with automatic document sorting, real-time cloud sync, and every tool your firm
-              needs built in. You never leave the platform.
+            <p className="mt-6 text-xl leading-8 text-gray-900 max-w-2xl mx-auto">
+              Most Canadian immigration practices run on five disconnected tools. NorvaOS replaces all of them — matters, documents, deadlines, client communication, and billing in one place, built specifically for Canadian immigration law.
             </p>
             <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Link
                 href="/signup"
-                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-indigo-600 px-8 py-3.5 text-base font-semibold text-white shadow-lg shadow-indigo-200 transition-all hover:bg-indigo-700 hover:shadow-xl hover:shadow-indigo-200 sm:w-auto"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#0F172A] px-8 py-3.5 text-base font-semibold text-white shadow-lg shadow-gray-900/20 transition-all hover:bg-[#1e293b] hover:shadow-xl sm:w-auto"
               >
-                Request early access
+                Book a 20-minute demo
                 <ArrowRight className="h-4 w-4" />
               </Link>
               <Link
                 href="/login"
-                className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-8 py-3.5 text-base font-semibold text-gray-700 shadow-sm transition-all hover:border-gray-300 hover:shadow-md sm:w-auto"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-gray-300 bg-white px-8 py-3.5 text-base font-medium text-gray-900 shadow-sm transition-all hover:border-gray-400 hover:text-gray-800 sm:w-auto"
               >
                 Sign in to your firm
               </Link>
             </div>
-            <p className="mt-4 text-sm text-gray-500">No credit card · 14-day trial · Full access · Cancel anytime</p>
+            <p className="mt-4 text-sm text-gray-700">Starting from $99/month for solo practices. Annual plans available.</p>
+            <p className="mt-3 text-sm text-gray-600">🇨🇦 Data stored in Canada · PIPEDA-compliant · Encrypted at rest &amp; in transit · Setup in under 48 hours</p>
           </div>
 
           {/* Dashboard preview slideshow */}
@@ -126,8 +128,8 @@ export default async function LandingPage() {
       {/* Replaces X tools bar */}
       <section className="border-y border-gray-100 bg-gray-50 py-12">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
-          <p className="mb-8 text-center text-sm font-semibold uppercase tracking-widest text-gray-400">
-            One platform. Every tool your firm needs.
+          <p className="mb-8 text-center text-sm font-medium text-gray-400">
+            Every tool your practice needs. All crossed off your vendor list.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-3">
             {[
@@ -142,14 +144,14 @@ export default async function LandingPage() {
               { label: 'Client Portal', icon: '🔐' },
               { label: 'Task Management', icon: '✅' },
             ].map(tool => (
-              <div key={tool.label} className="flex items-center gap-2 rounded-full border border-indigo-100 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm">
-                <span className="text-base leading-none">{tool.icon}</span>
-                <span>{tool.label}</span>
-                <CheckCircle className="h-3.5 w-3.5 text-indigo-500 shrink-0" />
+              <div key={tool.label} className="flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-400 shadow-sm">
+                <span className="text-base leading-none opacity-50">{tool.icon}</span>
+                <span className="line-through">{tool.label}</span>
+                <CheckCircle className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
               </div>
             ))}
           </div>
-          <p className="mt-6 text-center text-sm text-gray-500">
+          <p className="mt-6 text-center text-sm text-gray-700">
             One subscription. One login. No app switching. Ever.
           </p>
         </div>
@@ -165,14 +167,14 @@ export default async function LandingPage() {
                 <Brain className="h-3.5 w-3.5" />
                 Smart Document Intelligence
               </div>
-              <h2 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">
+              <h2 className="text-4xl font-bold tracking-tight text-black sm:text-5xl">
                 Documents sort
                 <br />
                 <span className="bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent">
                   themselves.
                 </span>
               </h2>
-              <p className="mt-4 text-lg text-gray-600">
+              <p className="mt-4 text-lg text-gray-900">
                 Upload once — NorvaOS reads the document, identifies what it is, and
                 files it into the right folder automatically. No renaming. No dragging.
                 No folders to manage.
@@ -215,7 +217,7 @@ export default async function LandingPage() {
                     </div>
                     <div>
                       <p className="text-sm font-semibold text-gray-900">{item.title}</p>
-                      <p className="mt-0.5 text-sm text-gray-500">{item.desc}</p>
+                      <p className="mt-0.5 text-sm text-gray-700">{item.desc}</p>
                     </div>
                   </div>
                 ))}
@@ -315,14 +317,14 @@ export default async function LandingPage() {
               <Layers className="h-3.5 w-3.5" />
               Everything in one platform
             </div>
-            <h2 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">
+            <h2 className="text-4xl font-bold tracking-tight text-black sm:text-5xl">
               Stop switching tabs.
               <br />
               <span className="bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent">
                 Start practising law.
               </span>
             </h2>
-            <p className="mt-4 text-lg text-gray-600">
+            <p className="mt-4 text-lg text-gray-900">
               Every tool your firm needs lives inside NorvaOS. Intake to invoice,
               without a single external app.
             </p>
@@ -452,12 +454,12 @@ export default async function LandingPage() {
               <RefreshCw className="h-3.5 w-3.5" />
               Switching is painless
             </div>
-            <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+            <h2 className="text-3xl font-bold tracking-tight text-black sm:text-4xl">
               Already on another platform?
               <br />
               <span className="text-indigo-600">Bring everything with you.</span>
             </h2>
-            <p className="mt-4 text-lg text-gray-600">
+            <p className="mt-4 text-lg text-gray-900">
               NorvaOS imports your existing data directly from your current practice
               management software. Your matters, contacts, documents, and history move over
               — nothing gets left behind.
@@ -485,7 +487,7 @@ export default async function LandingPage() {
             </div>
           </div>
 
-          <p className="mt-8 text-center text-sm text-gray-500">
+          <p className="mt-8 text-center text-sm text-gray-700">
             Our team handles the migration. Your firm is live in days, not months.
           </p>
         </div>
@@ -496,11 +498,11 @@ export default async function LandingPage() {
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
             <p className="text-base font-semibold text-indigo-600">How NorvaOS works</p>
-            <h2 className="mt-2 text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">
+            <h2 className="mt-2 text-4xl font-bold tracking-tight text-black sm:text-5xl">
               Intake. Work. Deliver.
             </h2>
-            <p className="mt-4 text-lg text-gray-600">
-              Three pillars. Every module talks to every other. One source of truth across your entire firm.
+            <p className="mt-4 text-lg text-gray-900">
+              Three pillars. Every module talks to every other. One source of truth across your entire practice.
             </p>
           </div>
 
@@ -522,7 +524,7 @@ export default async function LandingPage() {
                   'E-signing built in, no separate tool',
                   'Appointment booking, no scheduling app',
                 ].map(f => (
-                  <li key={f} className="flex items-start gap-3 text-sm text-gray-600">
+                  <li key={f} className="flex items-start gap-3 text-sm text-gray-900">
                     <CheckCircle className="mt-0.5 h-4 w-4 shrink-0 text-indigo-500" />
                     {f}
                   </li>
@@ -550,7 +552,7 @@ export default async function LandingPage() {
                   'AI-powered deadline tracking',
                   'Conflict check before every new matter',
                 ].map(f => (
-                  <li key={f} className="flex items-start gap-3 text-sm text-gray-600">
+                  <li key={f} className="flex items-start gap-3 text-sm text-gray-900">
                     <CheckCircle className="mt-0.5 h-4 w-4 shrink-0 text-violet-500" />
                     {f}
                   </li>
@@ -578,7 +580,7 @@ export default async function LandingPage() {
                   'AR aging, revenue reports',
                   'Stripe-powered checkout in 1 click',
                 ].map(f => (
-                  <li key={f} className="flex items-start gap-3 text-sm text-gray-600">
+                  <li key={f} className="flex items-start gap-3 text-sm text-gray-900">
                     <CheckCircle className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
                     {f}
                   </li>
@@ -733,14 +735,14 @@ export default async function LandingPage() {
                 <Globe className="h-3.5 w-3.5" />
                 Branded Client Portal
               </div>
-              <h2 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">
+              <h2 className="text-4xl font-bold tracking-tight text-black sm:text-5xl">
                 Your clients see
                 <br />
                 <span className="bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent">
                   everything.
                 </span>
               </h2>
-              <p className="mt-4 text-lg text-gray-600">
+              <p className="mt-4 text-lg text-gray-900">
                 Every client gets a branded portal showing real-time matter status, document
                 validation, invoice history, and exactly what they need to do next.
                 No phone tag. No emails asking for updates.
@@ -783,7 +785,7 @@ export default async function LandingPage() {
                     </div>
                     <div>
                       <p className="text-sm font-semibold text-gray-900">{item.title}</p>
-                      <p className="mt-0.5 text-sm text-gray-500">{item.desc}</p>
+                      <p className="mt-0.5 text-sm text-gray-700">{item.desc}</p>
                     </div>
                   </div>
                 ))}
@@ -798,7 +800,7 @@ export default async function LandingPage() {
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
             <p className="text-base font-semibold text-indigo-600">What sets us apart</p>
-            <h2 className="mt-2 text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">
+            <h2 className="mt-2 text-4xl font-bold tracking-tight text-black sm:text-5xl">
               Built for law. Not bolted on.
             </h2>
           </div>
@@ -844,8 +846,8 @@ export default async function LandingPage() {
                 icon: Users,
                 color: 'text-sky-600',
                 bg: 'bg-sky-50',
-                title: 'Multi-Practice Area Support',
-                desc: 'Immigration, Family Law, Real Estate, Civil Litigation — each with its own pipelines, intake forms, deadline types, and workflow templates.',
+                title: 'Built for Canadian Immigration',
+                desc: 'Spousal sponsorship, work permits, study permits, PR applications, refugee claims — each with its own pipelines, intake forms, IRCC deadline types, and workflow templates.',
               },
               {
                 icon: BellRing,
@@ -874,7 +876,7 @@ export default async function LandingPage() {
                   <feature.icon className={`h-5 w-5 ${feature.color}`} />
                 </div>
                 <h3 className="text-base font-semibold text-gray-900">{feature.title}</h3>
-                <p className="mt-2 text-sm leading-6 text-gray-600">{feature.desc}</p>
+                <p className="mt-2 text-sm leading-6 text-gray-900">{feature.desc}</p>
               </div>
             ))}
           </div>
@@ -891,14 +893,14 @@ export default async function LandingPage() {
                 <Building2 className="h-3.5 w-3.5" />
                 Front Desk Kiosk Mode
               </div>
-              <h2 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">
+              <h2 className="text-4xl font-bold tracking-tight text-black sm:text-5xl">
                 Walk-in ready.
                 <br />
                 <span className="bg-gradient-to-r from-pink-600 to-rose-600 bg-clip-text text-transparent">
                   Your front desk runs itself.
                 </span>
               </h2>
-              <p className="mt-4 text-lg text-gray-600">
+              <p className="mt-4 text-lg text-gray-900">
                 Place a tablet or print a QR code at reception. Clients tap their name, confirm their appointment,
                 sign consent forms, and upload documents — all before they sit down.
                 Your team is notified instantly, so staff can focus on higher-value work.
@@ -948,7 +950,7 @@ export default async function LandingPage() {
                     </div>
                     <div>
                       <p className="text-sm font-semibold text-gray-900">{item.title}</p>
-                      <p className="mt-0.5 text-sm text-gray-500">{item.desc}</p>
+                      <p className="mt-0.5 text-sm text-gray-700">{item.desc}</p>
                     </div>
                   </div>
                 ))}
@@ -1047,48 +1049,51 @@ export default async function LandingPage() {
         </div>
       </section>
 
+      {/* Founder Section */}
+      <section className="bg-gray-50 py-24 sm:py-32 border-t border-gray-100">
+        <div className="mx-auto max-w-7xl px-6 lg:px-8">
+          <div className="mx-auto max-w-2xl text-center">
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-indigo-100 bg-white px-4 py-1.5 text-sm font-medium text-indigo-700 shadow-sm">
+              Who built this
+            </div>
+            <h2 className="text-4xl font-bold tracking-tight text-black sm:text-5xl">
+              Built by someone who saw the problem firsthand.
+            </h2>
+            <p className="mt-4 text-lg text-gray-900">
+              NorvaOS was built after watching Canadian immigration practices manage hundreds of client files across disconnected tools — and seeing what happens when one falls through.
+              We built the system we wish existed. Canadian-built, Canadian-hosted, and designed specifically for how Canadian legal practices work.
+            </p>
+            <div className="mt-10 flex flex-col items-center gap-3">
+              {/* Replace this div with an actual <img> tag pointing to your photo */}
+              <div className="founder-photo h-20 w-20 rounded-full bg-gray-200 border border-gray-300" />
+              <div>
+                <p className="text-sm font-bold text-gray-900">[Founder Name]</p>
+                <p className="text-sm text-gray-700">Founder, NorvaOS</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Testimonials */}
       <section id="testimonials" className="py-24 sm:py-32">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
-            <p className="text-base font-semibold text-indigo-600">What firms say</p>
-            <h2 className="mt-2 text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">
-              Law firms love NorvaOS
+            <p className="text-base font-semibold text-indigo-600">What our founding firms say</p>
+            <h2 className="mt-2 text-4xl font-bold tracking-tight text-black sm:text-5xl">
+              Early access firms share their experience.
             </h2>
-          </div>
-          <div className="mt-16 grid grid-cols-1 gap-8 lg:grid-cols-3">
-            {[
-              {
-                quote: 'Documents used to pile up and staff spent hours renaming and filing. Now everything sorts itself the moment it arrives. It\'s genuinely magical.',
-                author: 'Sarah M.',
-                role: 'Managing Partner, Immigration Firm, Toronto',
-              },
-              {
-                quote: 'We killed seven subscriptions the day we went live on NorvaOS. One platform. One login. Our team stopped complaining about switching tabs.',
-                author: 'Daniel K.',
-                role: 'Principal Solicitor, Family Law, Vancouver',
-              },
-              {
-                quote: 'The OneDrive sync means our lawyers can still work the way they always have, but everything is automatically organised in NorvaOS. Best of both worlds.',
-                author: 'Priya R.',
-                role: 'Office Manager, Boutique Immigration Firm, Ottawa',
-              },
-            ].map(t => (
-              <div key={t.author} className="rounded-2xl border border-gray-200 bg-white p-8 shadow-sm">
-                <div className="mb-4 flex gap-0.5">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="h-4 w-4 fill-amber-400 text-amber-400" />
-                  ))}
-                </div>
-                <blockquote className="text-base leading-7 text-gray-700">
-                  &ldquo;{t.quote}&rdquo;
-                </blockquote>
-                <div className="mt-6 border-t border-gray-100 pt-4">
-                  <p className="text-sm font-semibold text-gray-900">{t.author}</p>
-                  <p className="text-sm text-gray-500">{t.role}</p>
-                </div>
-              </div>
-            ))}
+            <p className="mt-4 text-lg text-gray-800">
+              We&rsquo;re onboarding founding firms now. Case studies and testimonials coming as they go live.
+            </p>
+            <div className="mt-8">
+              <Link
+                href="/signup"
+                className="inline-flex items-center gap-2 rounded-xl border border-gray-300 bg-white px-6 py-3 text-sm font-medium text-gray-900 shadow-sm transition-all hover:border-gray-400 hover:shadow-md"
+              >
+                Become a founding firm →
+              </Link>
+            </div>
           </div>
         </div>
       </section>
@@ -1106,72 +1111,34 @@ export default async function LandingPage() {
           }}
         />
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
-          <div className="mx-auto max-w-3xl text-center">
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-sm font-medium text-white">
-              <Zap className="h-3.5 w-3.5" />
-              Set up in under 30 minutes
-            </div>
+          <div className="mx-auto max-w-2xl text-center">
             <h2 className="text-4xl font-bold tracking-tight text-white sm:text-5xl">
-              Ready to run your firm
-              <br />
-              <span className="text-indigo-200">the smart way?</span>
+              Your practice deserves one system.
             </h2>
             <p className="mt-4 text-xl leading-8 text-indigo-100">
-              Import your existing files, connect your cloud storage, and go live today.
-              Your team will wonder how they ever worked without it.
+              Book a 20-minute demo. We&rsquo;ll show you exactly how it works for your practice area.
             </p>
 
-            {/* Three CTA options */}
-            <div className="mt-12 grid grid-cols-1 gap-4 sm:grid-cols-3">
-              <div className="rounded-2xl border border-white/20 bg-white/10 p-6 text-center backdrop-blur-sm">
-                <div className="mb-3 flex h-12 w-12 mx-auto items-center justify-center rounded-2xl bg-white/20">
-                  <Sparkles className="h-6 w-6 text-white" />
-                </div>
-                <h3 className="text-base font-bold text-white">Request Early Access</h3>
-                <p className="mt-1 text-sm text-indigo-200">Invitation-only — be first in line</p>
-                <Link
-                  href="/signup"
-                  className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-white px-5 py-2.5 text-sm font-semibold text-indigo-700 shadow-lg transition-all hover:bg-indigo-50"
-                >
-                  Join the waitlist
-                  <ArrowRight className="h-3.5 w-3.5" />
-                </Link>
-              </div>
-
-              <div className="rounded-2xl border border-white/20 bg-white/10 p-6 text-center backdrop-blur-sm">
-                <div className="mb-3 flex h-12 w-12 mx-auto items-center justify-center rounded-2xl bg-white/20">
-                  <Building2 className="h-6 w-6 text-white" />
-                </div>
-                <h3 className="text-base font-bold text-white">Sign In to Your Firm</h3>
-                <p className="mt-1 text-sm text-indigo-200">Already a NorvaOS firm</p>
-                <Link
-                  href="/login"
-                  className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-white/40 bg-white/10 px-5 py-2.5 text-sm font-semibold text-white transition-all hover:bg-white/20"
-                >
-                  Sign in
-                  <ArrowRight className="h-3.5 w-3.5" />
-                </Link>
-              </div>
-
-              <div className="rounded-2xl border border-white/20 bg-white/10 p-6 text-center backdrop-blur-sm">
-                <div className="mb-3 flex h-12 w-12 mx-auto items-center justify-center rounded-2xl bg-white/20">
-                  <MessageSquare className="h-6 w-6 text-white" />
-                </div>
-                <h3 className="text-base font-bold text-white">Talk to Us</h3>
-                <p className="mt-1 text-sm text-indigo-200">Migration help, custom setup</p>
-                <Link
-                  href="/signup"
-                  className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-white/40 bg-white/10 px-5 py-2.5 text-sm font-semibold text-white transition-all hover:bg-white/20"
-                >
-                  Get in touch
-                  <ArrowRight className="h-3.5 w-3.5" />
-                </Link>
-              </div>
+            <div className="mt-10">
+              <Link
+                href="/signup"
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-8 py-3.5 text-base font-semibold text-indigo-700 shadow-lg transition-all hover:bg-indigo-50 hover:shadow-xl"
+              >
+                Book a 20-minute demo →
+              </Link>
             </div>
 
-            <p className="mt-8 text-sm text-indigo-200">
-              Invitation-only during launch. Every firm is onboarded personally.
+            <p className="mt-6 text-sm font-medium text-white">
+              Invitation-only during launch. Every firm is onboarded personally by our team.
             </p>
+
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-6 text-sm text-indigo-200">
+              <span>🇨🇦 Canadian data storage</span>
+              <span className="text-indigo-400">|</span>
+              <span>PIPEDA-compliant</span>
+              <span className="text-indigo-400">|</span>
+              <span>Setup in under 48 hours</span>
+            </div>
           </div>
         </div>
       </section>
@@ -1183,15 +1150,15 @@ export default async function LandingPage() {
             <div className="flex items-center gap-2">
               <NorvaLogo size={28} id="footer" />
               <span className="text-base font-bold text-gray-900">NorvaOS</span>
-              <span className="ml-2 text-sm text-gray-400">Legal Operations Platform</span>
+              <span className="ml-2 text-sm text-gray-600">A complete legal operating system</span>
             </div>
-            <div className="flex flex-wrap items-center gap-6 text-sm text-gray-500">
+            <div className="flex flex-wrap items-center gap-6 text-sm text-gray-700">
               <a href="#" className="hover:text-gray-900">Privacy Policy</a>
               <a href="#" className="hover:text-gray-900">Terms of Service</a>
               <a href="#" className="hover:text-gray-900">Security</a>
               <Link href="/login" className="hover:text-gray-900">Sign in</Link>
             </div>
-            <p className="text-sm text-gray-400">© 2026 NorvaOS. All rights reserved.</p>
+            <p className="text-sm text-gray-600">© 2026 NorvaOS. All rights reserved.</p>
           </div>
         </div>
       </footer>

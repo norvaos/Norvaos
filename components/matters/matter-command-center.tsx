@@ -125,10 +125,8 @@ export function MatterCommandCenter({
   }, [onDocRequestOpen])
 
   const handleAddDocument = useCallback(() => {
-    if (enforcementEnabled) {
-      setActiveMainTab('documents')
-    }
-  }, [enforcementEnabled])
+    setActiveMainTab('documents')
+  }, [])
 
   return (
     <div className="space-y-2">
@@ -177,6 +175,7 @@ export function MatterCommandCenter({
           docTotal={docTotal}
           onOpenSheet={onOpenSheet}
           onPortalDialogOpen={onPortalDialogOpen}
+          onMainTabChange={setActiveMainTab}
           className="sticky top-3 self-start"
         />
 

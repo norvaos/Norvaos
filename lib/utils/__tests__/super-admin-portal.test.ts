@@ -213,6 +213,9 @@ describe('Super Admin Portal — API routes use platform admin auth (auto-discov
   // NOT platform admin auth. Exclude them from this test.
   const TENANT_ADMIN_ROUTES = [
     'app/api/admin/front-desk-kpis',
+    'app/api/admin/break-glass',
+    'app/api/admin/delegations',
+    'app/api/admin/supervision',
   ]
 
   const discoveredRoutes = discoverAdminRoutes(resolve(ROOT, 'app/api/admin'))

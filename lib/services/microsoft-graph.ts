@@ -35,6 +35,8 @@ export const MICROSOFT_SCOPES = [
   'email',
   'offline_access',
   'User.Read',
+  'Mail.ReadWrite',
+  'Mail.Send',
   'Calendars.ReadWrite',
   'Tasks.ReadWrite',
   'Files.ReadWrite.All',

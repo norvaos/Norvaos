@@ -17,6 +17,10 @@ import {
   Globe,
   Building2,
   MonitorSmartphone,
+  Inbox,
+  Zap,
+  Bell,
+  Shield,
   type LucideIcon,
 } from 'lucide-react'
 
@@ -27,6 +31,8 @@ export interface NavItem {
   featureFlag?: string
   comingSoon?: boolean
   badge?: string
+  /** Mark as deprecated — still shown but with a visual indicator */
+  deprecated?: boolean
   /** Sub-items rendered as a collapsible dropdown in the sidebar */
   children?: NavItem[]
 }
@@ -66,7 +72,7 @@ export const navigation: NavSection[] = [
   {
     title: 'Communicate',
     items: [
-      { title: 'Email', href: '/communications', icon: Mail },
+      { title: 'Email', href: '/communications', icon: Mail, deprecated: true },
       { title: 'Phone', href: '/communications/phone', icon: Phone, comingSoon: true, featureFlag: 'phone' },
       { title: 'Chat', href: '/chat', icon: MessageSquare, comingSoon: true },
     ],
@@ -89,7 +95,18 @@ export const navigation: NavSection[] = [
   {
     title: 'Admin',
     items: [
-      { title: 'Settings', href: '/settings', icon: Settings },
+      {
+        title: 'Settings',
+        href: '/settings',
+        icon: Settings,
+        children: [
+          { title: 'All Settings', href: '/settings', icon: Settings },
+          { title: 'Email Accounts', href: '/settings/email-accounts', icon: Inbox },
+          { title: 'Automation Rules', href: '/settings/automation-rules', icon: Zap },
+          { title: 'Expiry Reminders', href: '/settings/expiry-reminders', icon: Bell },
+          { title: 'Access Control', href: '/settings/access-control', icon: Shield },
+        ],
+      },
       { title: 'Tenants', href: '/admin/tenants', icon: Building2 },
     ],
   },

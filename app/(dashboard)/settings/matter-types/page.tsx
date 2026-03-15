@@ -67,6 +67,8 @@ import {
   useReorderMatterStages,
   useMatterTypeIntakeSchema,
   useUpdateMatterTypeIntakeSchema,
+  useMatterTypeSchema,
+  useUpsertMatterTypeSchema,
   type IntakeQuestion,
 } from '@/lib/queries/matter-types'
 import {
@@ -91,6 +93,7 @@ import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { Checkbox } from '@/components/ui/checkbox'
+import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
 import { ScrollArea } from '@/components/ui/scroll-area'
@@ -2655,6 +2658,11 @@ function PipelineSection({
         <IntakeQuestionsSection matterTypeId={matterType.id} />
       </div>
 
+      {/* Custom Fields Schema Builder */}
+      <div className="mt-3">
+        <CustomFieldSchemaSection matterTypeId={matterType.id} tenantId={tenantId} />
+      </div>
+
       <PipelineDialog
         open={pipelineDialogOpen}
         onOpenChange={(open) => {
@@ -3577,6 +3585,266 @@ function IntakeQuestionsSection({ matterTypeId }: { matterTypeId: string }) {
               >
                 {updateSchema.isPending ? <Loader2 className="h-3.5 w-3.5 mr-1 animate-spin" /> : <Save className="h-3.5 w-3.5 mr-1" />}
                 Save Questions
+              </Button>
+            )}
+          </div>
+        </div>
+      )}
+    </Card>
+  )
+}
+
+// ==========================================================
+// Custom Field Schema Builder (Phase 4)
+// ==========================================================
+
+const FIELD_TYPE_OPTIONS = [
+  { value: 'string', label: 'Text' },
+  { value: 'number', label: 'Number' },
+  { value: 'integer', label: 'Integer' },
+  { value: 'boolean', label: 'Checkbox' },
+  { value: 'string:date', label: 'Date' },
+  { value: 'string:select', label: 'Dropdown' },
+] as const
+
+interface CustomFieldDraft {
+  key: string
+  title: string
+  fieldType: string // 'string' | 'number' | 'integer' | 'boolean' | 'string:date' | 'string:select'
+  required: boolean
+  description: string
+  enumOptions: string // comma-separated for 'string:select'
+}
+
+function parseSchemaToFields(jsonSchema: Record<string, unknown> | null): CustomFieldDraft[] {
+  if (!jsonSchema) return []
+  const props = (jsonSchema as { properties?: Record<string, Record<string, unknown>> }).properties
+  if (!props) return []
+  const required = new Set(((jsonSchema as { required?: string[] }).required) ?? [])
+  const order = Object.keys(props)
+
+  return order.map((key) => {
+    const p = props[key]
+    let fieldType = (p.type as string) ?? 'string'
+    if (fieldType === 'string' && p.format === 'date') fieldType = 'string:date'
+    if (fieldType === 'string' && Array.isArray(p.enum)) fieldType = 'string:select'
+
+    return {
+      key,
+      title: (p.title as string) ?? key,
+      fieldType,
+      required: required.has(key),
+      description: (p.description as string) ?? '',
+      enumOptions: Array.isArray(p.enum) ? (p.enum as string[]).join(', ') : '',
+    }
+  })
+}
+
+function fieldsToSchema(fields: CustomFieldDraft[]): { jsonSchema: Record<string, unknown>; uiSchema: Record<string, unknown> } {
+  const properties: Record<string, Record<string, unknown>> = {}
+  const requiredArr: string[] = []
+  const uiOrder: string[] = []
+
+  for (const f of fields) {
+    if (!f.key.trim()) continue
+    const key = f.key.trim().replace(/\s+/g, '_').toLowerCase()
+    uiOrder.push(key)
+
+    const prop: Record<string, unknown> = { title: f.title || key }
+    if (f.description) prop.description = f.description
+
+    if (f.fieldType === 'string:date') {
+      prop.type = 'string'
+      prop.format = 'date'
+    } else if (f.fieldType === 'string:select') {
+      prop.type = 'string'
+      prop.enum = f.enumOptions.split(',').map((s) => s.trim()).filter(Boolean)
+    } else {
+      prop.type = f.fieldType
+    }
+
+    if (f.required) requiredArr.push(key)
+    properties[key] = prop
+  }
+
+  return {
+    jsonSchema: {
+      $schema: 'http://json-schema.org/draft-07/schema#',
+      type: 'object',
+      properties,
+      ...(requiredArr.length > 0 ? { required: requiredArr } : {}),
+    },
+    uiSchema: { 'ui:order': uiOrder },
+  }
+}
+
+function CustomFieldSchemaSection({ matterTypeId, tenantId }: { matterTypeId: string; tenantId: string }) {
+  const { data: schema, isLoading } = useMatterTypeSchema(matterTypeId)
+  const upsertSchema = useUpsertMatterTypeSchema()
+  const [fields, setFields] = useState<CustomFieldDraft[]>([])
+  const [dirty, setDirty] = useState(false)
+  const [collapsed, setCollapsed] = useState(true)
+
+  // Use schema id + version as dep to avoid infinite re-render when object ref changes
+  const schemaId = schema?.id
+  const schemaVersion = schema?.schema_version
+  useEffect(() => {
+    if (schema) {
+      setFields(parseSchemaToFields(schema.json_schema as Record<string, unknown> | null))
+    } else {
+      setFields([])
+    }
+    setDirty(false)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [schemaId, schemaVersion])
+
+  function handleAddField() {
+    const newField: CustomFieldDraft = {
+      key: `field_${Date.now()}`,
+      title: '',
+      fieldType: 'string',
+      required: false,
+      description: '',
+      enumOptions: '',
+    }
+    setFields([...fields, newField])
+    setDirty(true)
+  }
+
+  function handleUpdateField(idx: number, updates: Partial<CustomFieldDraft>) {
+    const next = fields.map((f, i) => (i === idx ? { ...f, ...updates } : f))
+    setFields(next)
+    setDirty(true)
+  }
+
+  function handleRemoveField(idx: number) {
+    setFields(fields.filter((_, i) => i !== idx))
+    setDirty(true)
+  }
+
+  function handleSave() {
+    const { jsonSchema, uiSchema } = fieldsToSchema(fields)
+    upsertSchema.mutate({
+      tenantId,
+      matterTypeId,
+      jsonSchema,
+      uiSchema,
+      currentVersion: schema?.schema_version,
+    })
+    setDirty(false)
+  }
+
+  return (
+    <Card className="p-3">
+      <button
+        type="button"
+        className="flex w-full items-center justify-between text-left"
+        onClick={() => setCollapsed(!collapsed)}
+      >
+        <div className="flex items-center gap-2">
+          {collapsed ? <ChevronRight className="h-4 w-4 text-slate-400" /> : <ChevronDown className="h-4 w-4 text-slate-400" />}
+          <span className="text-sm font-medium">Custom Fields</span>
+          <Badge variant="secondary" className="text-xs h-5">
+            {fields.length}
+          </Badge>
+          {schema && (
+            <span className="text-xs text-muted-foreground">v{schema.schema_version}</span>
+          )}
+        </div>
+      </button>
+
+      {!collapsed && (
+        <div className="mt-3 space-y-2">
+          {isLoading ? (
+            <div className="flex items-center justify-center py-6">
+              <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+            </div>
+          ) : fields.length === 0 ? (
+            <p className="text-xs text-muted-foreground py-2">
+              No custom fields defined. Add fields that will appear on matters of this type.
+            </p>
+          ) : (
+            <div className="space-y-2">
+              {fields.map((field, idx) => (
+                <div key={idx} className="rounded-md border p-2.5 bg-white space-y-2">
+                  <div className="flex items-center gap-2">
+                    <Input
+                      value={field.title}
+                      onChange={(e) => handleUpdateField(idx, { title: e.target.value, key: e.target.value.replace(/\s+/g, '_').toLowerCase() || field.key })}
+                      placeholder="Field label"
+                      className="h-7 text-sm flex-1"
+                    />
+                    <Select
+                      value={field.fieldType}
+                      onValueChange={(v) => handleUpdateField(idx, { fieldType: v, enumOptions: v === 'string:select' ? field.enumOptions : '' })}
+                    >
+                      <SelectTrigger className="h-7 text-xs w-[120px]">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {FIELD_TYPE_OPTIONS.map((opt) => (
+                          <SelectItem key={opt.value} value={opt.value}>
+                            {opt.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <div className="flex items-center gap-1">
+                      <Checkbox
+                        checked={field.required}
+                        onCheckedChange={(c) => handleUpdateField(idx, { required: !!c })}
+                        id={`cf-req-${idx}`}
+                      />
+                      <Label htmlFor={`cf-req-${idx}`} className="text-xs text-muted-foreground cursor-pointer">
+                        Req.
+                      </Label>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6 p-0 text-destructive hover:text-destructive"
+                      onClick={() => handleRemoveField(idx)}
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </Button>
+                  </div>
+
+                  {field.fieldType === 'string:select' && (
+                    <Input
+                      value={field.enumOptions}
+                      onChange={(e) => handleUpdateField(idx, { enumOptions: e.target.value })}
+                      placeholder="Options (comma-separated): e.g. Option A, Option B, Option C"
+                      className="h-7 text-xs"
+                    />
+                  )}
+
+                  <Input
+                    value={field.description}
+                    onChange={(e) => handleUpdateField(idx, { description: e.target.value })}
+                    placeholder="Description (optional)"
+                    className="h-7 text-xs"
+                  />
+                </div>
+              ))}
+            </div>
+          )}
+
+          <div className="flex items-center gap-2 pt-1">
+            <Button type="button" variant="outline" size="sm" className="h-7 text-xs" onClick={handleAddField}>
+              <Plus className="h-3.5 w-3.5 mr-1" />
+              Add Field
+            </Button>
+            {dirty && (
+              <Button
+                type="button"
+                size="sm"
+                className="h-7 text-xs"
+                onClick={handleSave}
+                disabled={upsertSchema.isPending}
+              >
+                {upsertSchema.isPending ? <Loader2 className="h-3.5 w-3.5 mr-1 animate-spin" /> : <Save className="h-3.5 w-3.5 mr-1" />}
+                Save Fields
               </Button>
             )}
           </div>

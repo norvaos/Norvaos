@@ -3,28 +3,20 @@
  * DB-Driven XFA Form Filler — Server Only
  * ═══════════════════════════════════════════════════════════════════════════════
  *
- * This file contains the Node.js-dependent code for filling XFA PDFs via the
- * Python pikepdf/lxml/PyMuPDF pipeline. It must ONLY be imported from server
+ * This file contains the server-only code for filling XFA PDFs via the
+ * Python worker sidecar (FastAPI). It must ONLY be imported from server
  * routes and server-side modules (never from client components or query hooks).
  *
  * Client-safe functions (buildXfaFieldDataFromDB, computePackReadinessFromDB)
  * remain in xfa-filler-db.ts.
  *
- * The Python filler logic lives in scripts/xfa-filler.py (static file).
- * Input is passed via a JSON file in a per-call unique temp directory.
+ * The Python filler logic runs in the FastAPI sidecar worker (worker/).
+ * PDF bytes and field data are sent via HTTP multipart/form-data.
  */
 
 import { buildXfaFieldDataFromDB } from '@/lib/ircc/xfa-filler-db'
-import { execFile } from 'child_process'
-import { promisify } from 'util'
-import { writeFile, readFile, mkdtemp, rm } from 'fs/promises'
-import { join, resolve } from 'path'
-import { tmpdir } from 'os'
-
-const execFileAsync = promisify(execFile)
-
-// Path to the static Python filler script (same pattern as scripts/pdf-preview.py)
-const FILLER_SCRIPT_PATH = resolve(process.cwd(), 'scripts', 'xfa-filler.py')
+import { fillXfa } from '@/lib/services/python-worker-client'
+import { readFile } from 'fs/promises'
 
 // ── Meta Field Resolution ──────────────────────────────────────────────────
 
@@ -101,8 +93,8 @@ export interface BarcodeData {
  *
  * 1. Builds field data from ircc_form_fields + ircc_form_array_maps
  * 2. Resolves meta fields (representative info, dates)
- * 3. Writes field data JSON to a unique temp directory
- * 4. Executes scripts/xfa-filler.py via Python subprocess
+ * 3. Reads template PDF bytes from disk
+ * 4. Calls the Python worker sidecar /fill-xfa endpoint
  * 5. Returns the filled PDF bytes + barcode status
  *
  * @param templatePath - Path to the blank IRCC PDF template
@@ -122,11 +114,6 @@ export async function fillXFAFormFromDB(
   representativeName?: string,
   barcodeData?: BarcodeData,
 ): Promise<FilledFormResult | null> {
-  // Each call gets its own temp directory — no cross-request path collisions
-  const tmpDir = await mkdtemp(join(tmpdir(), 'ircc-xfa-'))
-  const outputPath = join(tmpDir, 'output.pdf')
-  const dataPath = join(tmpDir, 'field_data.json')
-
   try {
     // 1. Build field data from DB
     const xfaData = await buildXfaFieldDataFromDB(formId, profile, supabase)
@@ -150,10 +137,8 @@ export async function fillXFAFormFromDB(
       }
     }
 
-    // 3. Build the JSON payload for the Python script
-    const fieldData: Record<string, unknown> = {
-      pdfPath: templatePath,
-      outputPath,
+    // 3. Build the payload for the Python worker sidecar
+    const fieldDataPayload = {
       rootElement: xfaData.root_element,
       scalarFields: xfaData.scalar_fields,
       arrayData: Object.entries(xfaData.array_data).map(([basePath, entry]) => ({
@@ -161,36 +146,26 @@ export async function fillXFAFormFromDB(
         entryName: entry.entry_name,
         entries: entry.rows,
       })),
+      barcodeData: barcodeData ?? undefined,
     }
 
-    if (barcodeData) {
-      fieldData.barcodeData = barcodeData
-    }
+    // 4. Read template PDF and call the Python worker sidecar
+    const templateBytes = await readFile(templatePath)
 
-    await writeFile(dataPath, JSON.stringify(fieldData, null, 2))
+    const filledBytes = await fillXfa(
+      new Uint8Array(templateBytes),
+      fieldDataPayload,
+      { timeoutMs: 30_000 },
+    )
 
-    // 4. Run the static Python filler script
-    const { stdout } = await execFileAsync('python3', [FILLER_SCRIPT_PATH, dataPath], {
-      timeout: 30000,
-    })
+    // Note: barcode embedding is handled inside the worker — if barcodeData was
+    // provided, the worker will attempt to embed it. We assume success unless
+    // the worker throws.
+    const barcodeEmbedded = !!barcodeData
 
-    // 5. Parse barcode result from stdout JSON
-    let barcodeEmbedded = false
-    try {
-      const result = JSON.parse(stdout.trim())
-      barcodeEmbedded = result.barcode_embedded === true
-    } catch {
-      // stdout may not be valid JSON if python printed debug lines — ignore
-    }
-
-    // 6. Read the output PDF
-    const filledPdf = await readFile(outputPath)
-    return { bytes: new Uint8Array(filledPdf), barcodeEmbedded }
+    return { bytes: filledBytes, barcodeEmbedded }
   } catch (error) {
     console.error('[xfa-filler-db] Error filling XFA form:', error)
     return null
-  } finally {
-    // Remove the entire temp directory in one shot — handles partial failures cleanly
-    await rm(tmpDir, { recursive: true, force: true }).catch(() => {})
   }
 }

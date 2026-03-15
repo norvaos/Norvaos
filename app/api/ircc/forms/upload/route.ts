@@ -1,13 +1,9 @@
 import { NextResponse } from 'next/server'
 import { createHash } from 'crypto'
-import { writeFile, unlink, mkdtemp } from 'fs/promises'
-import { join } from 'path'
-import { tmpdir } from 'os'
-import { execFile } from 'child_process'
-import { promisify } from 'util'
 import { authenticateRequest, AuthError } from '@/lib/services/auth'
 import { requirePermission } from '@/lib/services/require-role'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { scanXfa } from '@/lib/services/python-worker-client'
 import type { XfaScanResult, IrccFormFieldInsert } from '@/lib/types/ircc-forms'
 import { classifyField, deriveSectionTitle, deriveSectionDescription } from '@/lib/ircc/field-auto-classify'
 import { detectDateGroups, buildDateSplitMap } from '@/lib/ircc/date-split-detector'
@@ -18,8 +14,6 @@ import { deriveClientLabel } from '@/lib/ircc/xfa-label-utils'
 // Allow large PDF uploads (up to 50MB) and longer processing time for XFA scanning
 export const maxDuration = 60
 export const dynamic = 'force-dynamic'
-
-const execFileAsync = promisify(execFile)
 
 /**
  * POST /api/ircc/forms/upload
@@ -87,18 +81,10 @@ export async function POST(request: Request) {
       )
     }
 
-    // 4. Run XFA scanner
-    const tmpDir = await mkdtemp(join(tmpdir(), 'ircc-scan-'))
-    const tmpPdfPath = join(tmpDir, 'template.pdf')
-    await writeFile(tmpPdfPath, fileBuffer)
-
+    // 4. Run XFA scanner via Python worker sidecar
     let scanResult: XfaScanResult
     try {
-      const scriptPath = join(process.cwd(), 'scripts', 'xfa-scanner.py')
-      const { stdout } = await execFileAsync('python3', [scriptPath, tmpPdfPath], {
-        timeout: 30000,
-      })
-      scanResult = JSON.parse(stdout)
+      scanResult = await scanXfa(fileBuffer, { timeoutMs: 30_000 })
     } catch (scanErr) {
       scanResult = {
         root_element: null,
@@ -107,10 +93,6 @@ export async function POST(request: Request) {
         fields: [],
         error: scanErr instanceof Error ? scanErr.message : 'Scanner failed',
       }
-    } finally {
-      await unlink(tmpPdfPath).catch(() => {})
-      const { rmdir } = await import('fs/promises')
-      await rmdir(tmpDir).catch(() => {})
     }
 
     const scanStatus = scanResult.error ? 'error' : 'scanned'

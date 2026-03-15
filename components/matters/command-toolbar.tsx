@@ -3,10 +3,11 @@
 /**
  * CommandToolbar — always-visible action bar at the top of the matter command centre.
  *
- * Provides quick access to: Add Document, Send to Client, Schedule, Document Search,
- * OneDrive Sync, and matter actions (Edit, Archive, Delete).
+ * Provides quick access to: Add Document (with real file upload), Send to Client,
+ * Schedule, Document Search, OneDrive Sync, and matter actions.
  */
 
+import { useRef } from 'react'
 import {
   FolderPlus,
   SendHorizonal,
@@ -22,6 +23,7 @@ import {
   Link2,
   FileText,
   Loader2,
+  X,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -33,6 +35,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { cn } from '@/lib/utils'
+import { useUploadDocument } from '@/lib/queries/documents'
 
 export interface CommandToolbarProps {
   matterId: string
@@ -65,6 +68,8 @@ export interface CommandToolbarProps {
 }
 
 export function CommandToolbar({
+  matterId,
+  tenantId,
   enforcementEnabled,
   onedriveAvailable,
   docSearchQuery,
@@ -79,6 +84,22 @@ export function CommandToolbar({
   syncingOneDrive,
   className,
 }: CommandToolbarProps) {
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const uploadDoc = useUploadDocument()
+
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    uploadDoc.mutate({
+      file,
+      metadata: { matter_id: matterId, tenant_id: tenantId },
+    })
+    // Reset so the same file can be re-selected
+    e.target.value = ''
+    // Also switch to documents tab so the user sees the result
+    onAddDocument()
+  }
+
   return (
     <div
       className={cn(
@@ -86,18 +107,31 @@ export function CommandToolbar({
         className,
       )}
     >
+      {/* Hidden file input for direct upload */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        className="hidden"
+        onChange={handleFileChange}
+        accept="*/*"
+      />
+
       {/* ── Left: Primary Actions ── */}
       <div className="flex items-center gap-1.5">
         {/* Add Document */}
         <DropdownMenu modal={false}>
           <DropdownMenuTrigger asChild>
-            <Button variant="default" size="sm" className="h-8 gap-1.5 text-xs">
-              <FolderPlus className="h-3.5 w-3.5" />
-              Add Document
+            <Button variant="default" size="sm" className="h-8 gap-1.5 text-xs" disabled={uploadDoc.isPending}>
+              {uploadDoc.isPending ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <FolderPlus className="h-3.5 w-3.5" />
+              )}
+              {uploadDoc.isPending ? 'Uploading…' : 'Add Document'}
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="z-[100]">
-            <DropdownMenuItem onClick={onAddDocument}>
+            <DropdownMenuItem onClick={() => fileInputRef.current?.click()}>
               <Upload className="mr-2 h-4 w-4" />
               Upload File
             </DropdownMenuItem>
@@ -159,8 +193,16 @@ export function CommandToolbar({
           value={docSearchQuery}
           onChange={(e) => onDocSearchChange(e.target.value)}
           placeholder="Search documents…"
-          className="h-8 pl-8 text-xs"
+          className="h-8 pl-8 pr-7 text-xs"
         />
+        {docSearchQuery && (
+          <button
+            onClick={() => onDocSearchChange('')}
+            className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+          >
+            <X className="h-3.5 w-3.5" />
+          </button>
+        )}
       </div>
 
       {/* ── Right: Secondary Actions ── */}

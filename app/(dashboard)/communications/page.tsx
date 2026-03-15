@@ -1,11 +1,13 @@
 'use client'
 
 import { useState, useCallback, useRef } from 'react'
+import Link from 'next/link'
 import { useTenant } from '@/lib/hooks/use-tenant'
 import { useUser } from '@/lib/hooks/use-user'
 import { useEmailLogs, useDeleteEmailLog } from '@/lib/queries/email-logs'
 import { LogEmailDialog } from '@/components/communications/log-email-dialog'
 import { EmailLogTable } from '@/components/communications/email-log-table'
+import { UnmatchedEmailTriage } from '@/components/communications/unmatched-email-triage'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -23,6 +25,8 @@ import {
   X,
   ChevronLeft,
   ChevronRight,
+  AlertTriangle,
+  ArrowRight,
 } from 'lucide-react'
 
 const PAGE_SIZE = 25
@@ -79,6 +83,27 @@ export default function CommunicationsPage() {
 
   return (
     <div className="space-y-4">
+      {/* Unmatched Email Triage Queue */}
+      <UnmatchedEmailTriage />
+
+      {/* Deprecation Banner */}
+      <div className="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4">
+        <AlertTriangle className="mt-0.5 size-5 shrink-0 text-amber-600" />
+        <div className="flex-1">
+          <p className="text-sm font-medium text-amber-900">
+            This view has been deprecated
+          </p>
+          <p className="mt-1 text-sm text-amber-800">
+            This view has been replaced by the Communication Panel in the Matter Workplace.
+            Navigate to any matter to access the new email experience.
+          </p>
+          <Link href="/matters" className="mt-2 inline-flex items-center gap-1.5 text-sm font-medium text-amber-700 hover:text-amber-900 transition-colors">
+            Go to Matters
+            <ArrowRight className="size-3.5" />
+          </Link>
+        </div>
+      </div>
+
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>

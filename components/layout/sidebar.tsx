@@ -98,7 +98,8 @@ function NavItemButton({
         isActive
           ? 'bg-primary/10 text-primary'
           : 'text-muted-foreground hover:bg-muted hover:text-foreground',
-        isCollapsed && 'justify-center px-0'
+        isCollapsed && 'justify-center px-0',
+        item.deprecated && 'opacity-60'
       )}
     >
       <span className="flex size-5 shrink-0 items-center justify-center">
@@ -113,6 +114,12 @@ function NavItemButton({
 
       {!isCollapsed && item.comingSoon && (
         <Lock className="ml-auto size-3.5 shrink-0 text-muted-foreground/60" />
+      )}
+
+      {!isCollapsed && item.deprecated && (
+        <span className="ml-auto rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-medium text-amber-600">
+          Legacy
+        </span>
       )}
     </Link>
   )
