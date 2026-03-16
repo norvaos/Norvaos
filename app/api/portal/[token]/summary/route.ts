@@ -6,28 +6,9 @@ import type {
   PortalSectionCounts,
   PortalSummaryResponse,
 } from '@/lib/types/portal'
+import { validatePortalToken, PortalAuthError } from '@/lib/services/portal-auth'
 
 const rateLimiter = createRateLimiter({ windowMs: 60_000, maxRequests: 30 })
-
-// ── Token Validation ─────────────────────────────────────────────────────────
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function validateToken(admin: any, token: string) {
-  const { data: link, error } = await admin
-    .from('portal_links')
-    .select('id, matter_id, tenant_id, contact_id, expires_at, is_active, client_read_at')
-    .eq('token', token)
-    .eq('is_active', true)
-    .single()
-
-  if (error || !link) {
-    return { error: NextResponse.json({ error: 'Invalid token' }, { status: 404 }) }
-  }
-  if (new Date(link.expires_at) < new Date()) {
-    return { error: NextResponse.json({ error: 'Link expired' }, { status: 410 }) }
-  }
-  return { link }
-}
 
 // ── GET /api/portal/[token]/summary ──────────────────────────────────────────
 
@@ -46,12 +27,28 @@ export async function GET(
     }
 
     const { token } = await params
+
+    let link: Awaited<ReturnType<typeof validatePortalToken>>
+    try {
+      link = await validatePortalToken(token)
+    } catch (error) {
+      if (error instanceof PortalAuthError) {
+        return NextResponse.json({ error: error.message }, { status: error.status })
+      }
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    }
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const admin = createAdminClient() as any
 
-    const result = await validateToken(admin, token)
-    if (result.error) return result.error
-    const { link } = result
+    // Fetch client_read_at (not included in shared PortalLink type)
+    const { data: linkExtra } = await admin
+      .from('portal_links')
+      .select('client_read_at')
+      .eq('id', link.id)
+      .single()
+
+    const clientReadAtRaw = linkExtra?.client_read_at ?? null
 
     const now = new Date()
     const matterId = link.matter_id
@@ -304,7 +301,7 @@ export async function GET(
       .order('created_at', { ascending: false })
 
     const allMessages: Array<{ id: string; created_at: string }> = messages ?? []
-    const clientReadAt = link.client_read_at ? new Date(link.client_read_at) : null
+    const clientReadAt = clientReadAtRaw ? new Date(clientReadAtRaw) : null
     const unreadMessages = clientReadAt
       ? allMessages.filter((m) => new Date(m.created_at) > clientReadAt)
       : allMessages // If never read, all are "unread"

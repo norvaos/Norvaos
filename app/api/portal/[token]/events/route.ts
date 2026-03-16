@@ -3,6 +3,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { createRateLimiter } from '@/lib/middleware/rate-limit'
 import { withTiming } from '@/lib/middleware/request-timing'
 import type { PortalEventType } from '@/lib/types/portal'
+import { validatePortalToken, PortalAuthError } from '@/lib/services/portal-auth'
 
 const rateLimiter = createRateLimiter({ windowMs: 60_000, maxRequests: 60 })
 
@@ -34,25 +35,6 @@ const VALID_EVENT_TYPES = new Set<PortalEventType>([
 const MAX_EVENTS_PER_BATCH = 20
 const MAX_EVENT_DATA_SIZE = 2048 // 2KB per event
 
-// ── Token Validation ─────────────────────────────────────────────────────────
-
-async function validateToken(admin: ReturnType<typeof createAdminClient>, token: string) {
-  const { data: link, error } = await admin
-    .from('portal_links')
-    .select('id, matter_id, tenant_id, contact_id, expires_at, is_active')
-    .eq('token', token)
-    .eq('is_active', true)
-    .single()
-
-  if (error || !link) {
-    return { error: NextResponse.json({ error: 'Invalid token' }, { status: 404 }) }
-  }
-  if (new Date(link.expires_at) < new Date()) {
-    return { error: NextResponse.json({ error: 'Link expired' }, { status: 410 }) }
-  }
-  return { link }
-}
-
 // ── POST /api/portal/[token]/events ──────────────────────────────────────────
 
 async function handlePost(
@@ -70,11 +52,18 @@ async function handlePost(
     }
 
     const { token } = await params
-    const admin = createAdminClient()
 
-    const result = await validateToken(admin, token)
-    if (result.error) return result.error
-    const { link } = result
+    let link: Awaited<ReturnType<typeof validatePortalToken>>
+    try {
+      link = await validatePortalToken(token)
+    } catch (error) {
+      if (error instanceof PortalAuthError) {
+        return NextResponse.json({ error: error.message }, { status: error.status })
+      }
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    }
+
+    const admin = createAdminClient()
 
     // Parse body
     const body = await request.json().catch(() => null)

@@ -71,6 +71,13 @@ export function UserProvider({ children }: { children: ReactNode }) {
         return
       }
 
+      // Client-side deactivation detection: sign out immediately if account disabled
+      if ((userData as AppUser).is_active === false) {
+        await supabase.auth.signOut()
+        window.location.href = '/login?error=account_deactivated'
+        return
+      }
+
       setAppUser(userData as AppUser)
 
       // Sync DB practice preference → Zustand on first load

@@ -4,6 +4,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { log } from '@/lib/utils/logger'
 import { checkKioskRateLimit } from '@/lib/middleware/kiosk-limiter'
 import { withTiming } from '@/lib/middleware/request-timing'
+import { IMPORT_REVERTED_STATUS } from '@/lib/utils/matter-status'
 
 /**
  * POST /api/kiosk/[token]/client-lookup
@@ -155,6 +156,7 @@ async function handlePost(
       .select('id, matter_number, title, status, matter_type_id, responsible_lawyer_id')
       .in('id', [...matterIdSet])
       .neq('status', 'archived')
+      .neq('status', IMPORT_REVERTED_STATUS)
       .order('created_at', { ascending: false })
       .limit(5)
 

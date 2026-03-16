@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { authenticateRequest, AuthError } from '@/lib/services/auth'
+import { requirePermission } from '@/lib/services/require-role'
 import type { TemplateBody } from '@/lib/types/document-engine'
 import type { RetainerPdfData } from '@/lib/utils/retainer-pdf'
 
@@ -20,6 +21,7 @@ import type { RetainerPdfData } from '@/lib/utils/retainer-pdf'
 export async function POST(request: NextRequest) {
   try {
     const auth = await authenticateRequest()
+    requirePermission(auth, 'leads', 'view')
     const supabase = await createServerSupabaseClient()
 
     const { leadId, markAsSent } = await request.json()

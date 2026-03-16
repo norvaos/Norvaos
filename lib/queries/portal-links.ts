@@ -89,6 +89,13 @@ export function useCreatePortalLink() {
       // Generate a crypto-safe token (73 chars, cryptographically random)
       const token = crypto.randomUUID() + '-' + crypto.randomUUID()
 
+      // Hash token for secure storage (SHA-256 via Web Crypto API)
+      const encoder = new TextEncoder()
+      const hashBuffer = await crypto.subtle.digest('SHA-256', encoder.encode(token))
+      const tokenHash = Array.from(new Uint8Array(hashBuffer))
+        .map(b => b.toString(16).padStart(2, '0'))
+        .join('')
+
       const expiresAt = new Date()
       expiresAt.setDate(expiresAt.getDate() + expiryDays)
 
@@ -98,16 +105,19 @@ export function useCreatePortalLink() {
           tenant_id: tenantId,
           matter_id: matterId,
           contact_id: contactId ?? null,
-          token,
+          token: 'REDACTED',
+          token_hash: tokenHash,
           expires_at: expiresAt.toISOString(),
           created_by: createdBy,
           metadata: (metadata ?? {}) as unknown as Database['public']['Tables']['portal_links']['Insert']['metadata'],
-        })
+        } as any)
         .select()
         .single()
 
       if (error) throw error
-      return data as PortalLink
+
+      // Return the data with the plain token (not stored in DB) so the UI can show the link
+      return { ...data, token } as PortalLink
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: portalLinkKeys.byMatter(data.matter_id) })

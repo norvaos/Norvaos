@@ -95,6 +95,8 @@ export type Database = {
           practice_filter_preference: string
           created_at: string
           updated_at: string
+          cost_rate_cents: number
+          utilization_target_hours: number
         }
         Insert: {
           // Required fields (NOT NULL, no DB default)
@@ -110,6 +112,8 @@ export type Database = {
           practice_filter_preference?: string
           created_at?: string
           updated_at?: string
+          cost_rate_cents?: number
+          utilization_target_hours?: number
           // Optional nullable fields
           auth_user_id?: string | null
           first_name?: string | null
@@ -416,6 +420,7 @@ export type Database = {
           is_restricted: boolean
           restricted_admin_override: boolean
           preferred_email_account_id: string | null
+          is_trust_admin: boolean
         }
         Insert: {
           // Required fields (NOT NULL, no DB default)
@@ -438,6 +443,7 @@ export type Database = {
           updated_at?: string
           is_restricted?: boolean
           restricted_admin_override?: boolean
+          is_trust_admin?: boolean
           // Optional nullable fields
           matter_number?: string | null
           description?: string | null
@@ -1353,12 +1359,39 @@ export type Database = {
           contact_id: string | null
           issue_date: string
           due_date: string
-          subtotal: number
-          tax_amount: number
-          total_amount: number
-          amount_paid: number
-          status: string
+          subtotal: number                    // cents — all four categories combined
+          tax_amount: number                  // cents — total tax
+          total_amount: number                // cents — final invoice total
+          amount_paid: number                 // cents — trust_applied + direct payments
+          status: InvoiceStatus
           notes: string | null
+          aging_bucket: string
+          aging_updated_at: string | null
+          last_reminder_at: string | null
+          reminder_count: number
+          sent_at: string | null
+          sent_to_email: string | null
+          receipt_sent_at: string | null
+          // Billing module fields (added migration 107)
+          billing_period_start: string | null
+          billing_period_end: string | null
+          template_id: string | null
+          tax_profile_id: string | null
+          currency_code: string
+          subtotal_fees: number               // cents — professional fees only
+          subtotal_disbursements: number      // cents — disbursements only
+          subtotal_soft_costs: number         // cents — soft costs only
+          subtotal_hard_costs: number         // cents — hard costs only
+          total_adjustments: number           // cents — approved discounts/write-downs
+          taxable_subtotal: number            // cents — taxable portion before tax
+          total_trust_applied: number         // cents — confirmed trust allocations
+          total_payments_applied: number      // cents — direct cash payments
+          finalized_by: string | null
+          finalized_at: string | null
+          voided_by: string | null
+          voided_at: string | null
+          void_reason: string | null
+          internal_memo: string | null
           created_at: string
           updated_at: string
         }
@@ -1374,8 +1407,34 @@ export type Database = {
           tax_amount?: number
           total_amount?: number
           amount_paid?: number
-          status?: string
+          status?: InvoiceStatus
           notes?: string | null
+          aging_bucket?: string
+          aging_updated_at?: string | null
+          last_reminder_at?: string | null
+          reminder_count?: number
+          sent_at?: string | null
+          sent_to_email?: string | null
+          receipt_sent_at?: string | null
+          billing_period_start?: string | null
+          billing_period_end?: string | null
+          template_id?: string | null
+          tax_profile_id?: string | null
+          currency_code?: string
+          subtotal_fees?: number
+          subtotal_disbursements?: number
+          subtotal_soft_costs?: number
+          subtotal_hard_costs?: number
+          total_adjustments?: number
+          taxable_subtotal?: number
+          total_trust_applied?: number
+          total_payments_applied?: number
+          finalized_by?: string | null
+          finalized_at?: string | null
+          voided_by?: string | null
+          voided_at?: string | null
+          void_reason?: string | null
+          internal_memo?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -1389,10 +1448,28 @@ export type Database = {
           invoice_id: string
           description: string
           quantity: number
-          unit_price: number
-          amount: number
+          unit_price: number                  // cents per unit (legacy field, keep)
+          amount: number                      // cents (quantity × unit_price)
           time_entry_id: string | null
           sort_order: number
+          // Billing module fields (added migration 107)
+          line_category: InvoiceLineCategory
+          line_type: InvoiceLineType
+          date_of_service: string | null
+          staff_id: string | null
+          tax_code_id: string | null
+          tax_rate: number                    // decimal rate e.g. 0.13 = 13%
+          tax_amount: number                  // cents
+          is_taxable: boolean
+          discount_amount: number             // cents — line-level discount
+          net_amount: number                  // cents = amount - discount_amount
+          source_type: InvoiceLineSourceType
+          source_id: string | null
+          is_recoverable: boolean | null
+          disbursement_category_id: string | null
+          receipt_document_id: string | null
+          created_by: string | null
+          deleted_at: string | null
           created_at: string
         }
         Insert: {
@@ -1405,6 +1482,23 @@ export type Database = {
           amount?: number
           time_entry_id?: string | null
           sort_order?: number
+          line_category?: InvoiceLineCategory
+          line_type?: InvoiceLineType
+          date_of_service?: string | null
+          staff_id?: string | null
+          tax_code_id?: string | null
+          tax_rate?: number
+          tax_amount?: number
+          is_taxable?: boolean
+          discount_amount?: number
+          net_amount?: number
+          source_type?: InvoiceLineSourceType
+          source_id?: string | null
+          is_recoverable?: boolean | null
+          disbursement_category_id?: string | null
+          receipt_document_id?: string | null
+          created_by?: string | null
+          deleted_at?: string | null
           created_at?: string
         }
         Update: Partial<Database['public']['Tables']['invoice_line_items']['Insert']>
@@ -1415,11 +1509,17 @@ export type Database = {
           id: string
           tenant_id: string
           invoice_id: string
-          amount: number
+          amount: number                      // cents
           payment_date: string
           payment_method: string
           reference: string | null
           notes: string | null
+          trust_transaction_id: string | null
+          // Billing module fields (added migration 107)
+          payment_source: PaymentSource
+          voided_at: string | null
+          voided_by: string | null
+          void_reason: string | null
           created_at: string
         }
         Insert: {
@@ -1431,6 +1531,11 @@ export type Database = {
           payment_method?: string
           reference?: string | null
           notes?: string | null
+          trust_transaction_id?: string | null
+          payment_source?: PaymentSource
+          voided_at?: string | null
+          voided_by?: string | null
+          void_reason?: string | null
           created_at?: string
         }
         Update: Partial<Database['public']['Tables']['payments']['Insert']>
@@ -4155,6 +4260,28 @@ export type Database = {
         Update: Partial<Database['public']['Tables']['platform_connections']['Insert']>
         Relationships: []
       }
+      tenant_onboarding: {
+        Row: {
+          id: string
+          tenant_id: string
+          phase: 'account_creation' | 'configuration' | 'user_setup' | 'integration_setup' | 'data_migration' | 'training' | 'go_live_verification'
+          status: 'pending' | 'in_progress' | 'complete' | 'skipped'
+          notes: string | null
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          id?: string
+          tenant_id: string
+          phase: 'account_creation' | 'configuration' | 'user_setup' | 'integration_setup' | 'data_migration' | 'training' | 'go_live_verification'
+          status?: 'pending' | 'in_progress' | 'complete' | 'skipped'
+          notes?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: Partial<Database['public']['Tables']['tenant_onboarding']['Insert']>
+        Relationships: []
+      }
       conflict_scans: {
         Row: {
           id: string
@@ -5176,6 +5303,110 @@ export type Database = {
         Update: DraftingPrepResponseUpdate
         Relationships: []
       }
+      // ─── Phase 7: Trust Accounting Tables ─────────────────────────────
+      operating_bank_accounts: {
+        Row: OperatingBankAccountRow
+        Insert: OperatingBankAccountInsert
+        Update: OperatingBankAccountUpdate
+        Relationships: []
+      }
+      trust_bank_accounts: {
+        Row: TrustBankAccountRow
+        Insert: TrustBankAccountInsert
+        Update: TrustBankAccountUpdate
+        Relationships: []
+      }
+      trust_transactions: {
+        Row: TrustTransactionRow
+        Insert: TrustTransactionInsert
+        Update: never
+        Relationships: []
+      }
+      trust_reconciliations: {
+        Row: TrustReconciliationRow
+        Insert: TrustReconciliationInsert
+        Update: TrustReconciliationUpdate
+        Relationships: []
+      }
+      trust_reconciliation_items: {
+        Row: TrustReconciliationItemRow
+        Insert: TrustReconciliationItemInsert
+        Update: TrustReconciliationItemUpdate
+        Relationships: []
+      }
+      trust_holds: {
+        Row: TrustHoldRow
+        Insert: TrustHoldInsert
+        Update: TrustHoldUpdate
+        Relationships: []
+      }
+      trust_audit_log: {
+        Row: TrustAuditLogRow
+        Insert: TrustAuditLogInsert
+        Update: never
+        Relationships: []
+      }
+      trust_disbursement_requests: {
+        Row: TrustDisbursementRequestRow
+        Insert: TrustDisbursementRequestInsert
+        Update: TrustDisbursementRequestUpdate
+        Relationships: []
+      }
+      cheques: {
+        Row: ChequeRow
+        Insert: ChequeInsert
+        Update: ChequeUpdate
+        Relationships: []
+      }
+      bank_feed_transactions: {
+        Row: BankFeedTransactionRow
+        Insert: BankFeedTransactionInsert
+        Update: BankFeedTransactionUpdate
+        Relationships: []
+      }
+      qbo_sync_mappings: {
+        Row: QboSyncMappingRow
+        Insert: QboSyncMappingInsert
+        Update: QboSyncMappingUpdate
+        Relationships: []
+      }
+      qbo_sync_log: {
+        Row: QboSyncLogRow
+        Insert: QboSyncLogInsert
+        Update: QboSyncLogUpdate
+        Relationships: []
+      }
+      // ─── Phase 8: Financial Analytics Tables ─────────────────────────────
+      collection_actions: {
+        Row: CollectionActionRow
+        Insert: CollectionActionInsert
+        Update: CollectionActionUpdate
+        Relationships: []
+      }
+      payment_plans: {
+        Row: PaymentPlanRow
+        Insert: PaymentPlanInsert
+        Update: PaymentPlanUpdate
+        Relationships: []
+      }
+      revenue_snapshots: {
+        Row: RevenueSnapshotRow
+        Insert: RevenueSnapshotInsert
+        Update: never
+        Relationships: []
+      }
+      tenant_setup_log: {
+        Row: TenantSetupLogRow
+        Insert: TenantSetupLogInsert
+        Update: Partial<TenantSetupLogInsert>
+        Relationships: []
+      }
+      tenant_onboarding_checklist: {
+        Row: TenantOnboardingChecklistRow
+        Insert: TenantOnboardingChecklistInsert
+        Update: Partial<TenantOnboardingChecklistInsert>
+        Relationships: []
+      }
     }
     Views: Record<string, never>
     Functions: {
@@ -5341,6 +5572,7 @@ export type DocumentTemplateRow = {
   current_version_id: string | null
   is_system_template: boolean
   requires_review: boolean
+  generation_tier: string
   is_active: boolean
   sort_order: number
   created_by: string | null
@@ -5363,6 +5595,7 @@ export type DocumentTemplateInsert = {
   current_version_id?: string | null
   is_system_template?: boolean
   requires_review?: boolean
+  generation_tier?: string
   is_active?: boolean
   sort_order?: number
   created_by?: string | null
@@ -5423,6 +5656,7 @@ export type DocumentTemplateMappingRow = {
   default_value: string | null
   format_rule: string | null
   fallback_rule: string | null
+  max_length: number | null
   sort_order: number
   created_at: string
 }
@@ -5439,6 +5673,7 @@ export type DocumentTemplateMappingInsert = {
   default_value?: string | null
   format_rule?: string | null
   fallback_rule?: string | null
+  max_length?: number | null
   sort_order?: number
   id?: string
   created_at?: string
@@ -6571,3 +6806,1312 @@ export type DraftingPrepResponseInsert = {
 }
 
 export type DraftingPrepResponseUpdate = Partial<Omit<DraftingPrepResponseInsert, 'tenant_id'>>
+
+// ─── Phase 7: Trust Accounting & IOLTA Compliance ───────────────────────────
+
+// 1. operating_bank_accounts
+export type OperatingBankAccountRow = {
+  id: string
+  tenant_id: string
+  account_name: string
+  bank_name: string
+  account_number_encrypted: string
+  transit_number: string | null
+  institution_number: string | null
+  currency: string
+  is_default: boolean
+  is_active: boolean
+  next_cheque_number: number
+  created_at: string
+  updated_at: string
+}
+
+export type OperatingBankAccountInsert = {
+  tenant_id: string
+  account_name: string
+  bank_name: string
+  account_number_encrypted: string
+  id?: string
+  transit_number?: string | null
+  institution_number?: string | null
+  currency?: string
+  is_default?: boolean
+  is_active?: boolean
+  next_cheque_number?: number
+  created_at?: string
+  updated_at?: string
+}
+
+export type OperatingBankAccountUpdate = Partial<Omit<OperatingBankAccountInsert, 'tenant_id'>>
+
+// 2. trust_bank_accounts
+export type TrustBankAccountRow = {
+  id: string
+  tenant_id: string
+  account_name: string
+  account_type: 'general' | 'specific'
+  bank_name: string
+  account_number_encrypted: string
+  transit_number: string | null
+  institution_number: string | null
+  currency: string
+  jurisdiction_code: string
+  matter_id: string | null
+  admin_matter_id: string | null
+  is_active: boolean
+  opened_date: string
+  closed_date: string | null
+  default_hold_days_cheque: number
+  default_hold_days_eft: number
+  next_cheque_number: number
+  created_by: string | null
+  created_at: string
+  updated_at: string
+}
+
+export type TrustBankAccountInsert = {
+  tenant_id: string
+  account_name: string
+  bank_name: string
+  account_number_encrypted: string
+  id?: string
+  account_type?: 'general' | 'specific'
+  transit_number?: string | null
+  institution_number?: string | null
+  currency?: string
+  jurisdiction_code?: string
+  matter_id?: string | null
+  admin_matter_id?: string | null
+  is_active?: boolean
+  opened_date?: string
+  closed_date?: string | null
+  default_hold_days_cheque?: number
+  default_hold_days_eft?: number
+  next_cheque_number?: number
+  created_by?: string | null
+  created_at?: string
+  updated_at?: string
+}
+
+export type TrustBankAccountUpdate = Partial<Omit<TrustBankAccountInsert, 'tenant_id'>>
+
+// 3. trust_transactions (append-only)
+export type TrustTransactionType =
+  | 'deposit' | 'disbursement' | 'transfer_in' | 'transfer_out'
+  | 'refund' | 'reversal' | 'interest' | 'bank_fee' | 'adjustment'
+  | 'opening_balance'
+
+export type TrustPaymentMethod =
+  | 'cheque' | 'wire' | 'eft' | 'cash' | 'bank_draft' | 'interac' | 'credit_card'
+
+export type TrustTransactionRow = {
+  id: string
+  tenant_id: string
+  trust_account_id: string
+  matter_id: string
+  contact_id: string | null
+  transaction_type: TrustTransactionType
+  amount_cents: number
+  running_balance_cents: number
+  description: string
+  client_description: string | null
+  reference_number: string | null
+  payment_method: TrustPaymentMethod | null
+  invoice_id: string | null
+  operating_account_id: string | null
+  reversal_of_id: string | null
+  hold_release_date: string | null
+  is_cleared: boolean
+  authorized_by: string
+  recorded_by: string
+  effective_date: string
+  notes: string | null
+  created_at: string
+}
+
+export type TrustTransactionInsert = {
+  tenant_id: string
+  trust_account_id: string
+  matter_id: string
+  transaction_type: TrustTransactionType
+  amount_cents: number
+  description: string
+  authorized_by: string
+  recorded_by: string
+  id?: string
+  contact_id?: string | null
+  running_balance_cents?: number
+  client_description?: string | null
+  reference_number?: string | null
+  payment_method?: TrustPaymentMethod | null
+  invoice_id?: string | null
+  operating_account_id?: string | null
+  reversal_of_id?: string | null
+  hold_release_date?: string | null
+  is_cleared?: boolean
+  effective_date?: string
+  notes?: string | null
+  created_at?: string
+}
+
+// No TrustTransactionUpdate — append-only (immutable via trigger)
+
+// 4. trust_reconciliations
+export type TrustReconciliationStatus = 'draft' | 'completed' | 'reviewed' | 'flagged'
+
+export type TrustReconciliationRow = {
+  id: string
+  tenant_id: string
+  trust_account_id: string
+  period_start: string
+  period_end: string
+  bank_statement_balance_cents: number | null
+  book_balance_cents: number | null
+  client_listing_total_cents: number | null
+  outstanding_deposits_cents: number | null
+  outstanding_cheques_cents: number | null
+  adjusted_bank_balance_cents: number | null
+  is_balanced: boolean | null
+  status: TrustReconciliationStatus
+  completed_by: string | null
+  completed_at: string | null
+  reviewed_by: string | null
+  reviewed_at: string | null
+  notes: string | null
+  created_at: string
+  updated_at: string
+}
+
+export type TrustReconciliationInsert = {
+  tenant_id: string
+  trust_account_id: string
+  period_start: string
+  period_end: string
+  id?: string
+  bank_statement_balance_cents?: number | null
+  book_balance_cents?: number | null
+  client_listing_total_cents?: number | null
+  outstanding_deposits_cents?: number | null
+  outstanding_cheques_cents?: number | null
+  adjusted_bank_balance_cents?: number | null
+  is_balanced?: boolean | null
+  status?: TrustReconciliationStatus
+  completed_by?: string | null
+  completed_at?: string | null
+  reviewed_by?: string | null
+  reviewed_at?: string | null
+  notes?: string | null
+  created_at?: string
+  updated_at?: string
+}
+
+export type TrustReconciliationUpdate = Partial<Omit<TrustReconciliationInsert, 'tenant_id'>>
+
+// 5. trust_reconciliation_items
+export type TrustReconciliationItemType =
+  | 'outstanding_cheque' | 'deposit_in_transit' | 'bank_error'
+  | 'book_error' | 'unmatched_bank_item' | 'unmatched_book_item' | 'other'
+
+export type TrustReconciliationItemRow = {
+  id: string
+  tenant_id: string
+  reconciliation_id: string
+  item_type: TrustReconciliationItemType
+  description: string
+  amount_cents: number
+  transaction_id: string | null
+  resolved: boolean
+  resolved_at: string | null
+  created_at: string
+}
+
+export type TrustReconciliationItemInsert = {
+  tenant_id: string
+  reconciliation_id: string
+  item_type: TrustReconciliationItemType
+  description: string
+  amount_cents: number
+  id?: string
+  transaction_id?: string | null
+  resolved?: boolean
+  resolved_at?: string | null
+  created_at?: string
+}
+
+export type TrustReconciliationItemUpdate = Partial<Omit<TrustReconciliationItemInsert, 'tenant_id'>>
+
+// 6. trust_holds
+export type TrustHoldStatus = 'held' | 'released' | 'cancelled'
+
+export type TrustHoldRow = {
+  id: string
+  tenant_id: string
+  transaction_id: string
+  matter_id: string
+  amount_cents: number
+  hold_start_date: string
+  hold_release_date: string
+  status: TrustHoldStatus
+  released_at: string | null
+  created_at: string
+}
+
+export type TrustHoldInsert = {
+  tenant_id: string
+  transaction_id: string
+  matter_id: string
+  amount_cents: number
+  hold_release_date: string
+  id?: string
+  hold_start_date?: string
+  status?: TrustHoldStatus
+  released_at?: string | null
+  created_at?: string
+}
+
+export type TrustHoldUpdate = Partial<Omit<TrustHoldInsert, 'tenant_id'>>
+
+// 7. trust_audit_log (immutable)
+export type TrustAuditLogRow = {
+  id: string
+  tenant_id: string
+  action: string
+  entity_type: string
+  entity_id: string
+  matter_id: string | null
+  user_id: string
+  metadata: Json
+  created_at: string
+}
+
+export type TrustAuditLogInsert = {
+  tenant_id: string
+  action: string
+  entity_type: string
+  entity_id: string
+  user_id: string
+  id?: string
+  matter_id?: string | null
+  metadata?: Json
+  created_at?: string
+}
+
+// No TrustAuditLogUpdate — immutable via trigger
+
+// 8. trust_disbursement_requests
+export type TrustDisbursementRequestStatus = 'pending_approval' | 'approved' | 'rejected' | 'cancelled'
+export type TrustDisbursementRequestType = 'disbursement' | 'transfer' | 'refund'
+export type TrustAuthorizationType = 'engagement_letter' | 'settlement_direction' | 'written_instruction' | 'verbal_confirmed'
+
+export type TrustDisbursementRequestRow = {
+  id: string
+  tenant_id: string
+  trust_account_id: string
+  matter_id: string
+  amount_cents: number
+  payee_name: string
+  description: string
+  client_description: string | null
+  payment_method: TrustPaymentMethod
+  reference_number: string | null
+  invoice_id: string | null
+  request_type: TrustDisbursementRequestType
+  status: TrustDisbursementRequestStatus
+  prepared_by: string
+  prepared_at: string
+  approved_by: string | null
+  approved_at: string | null
+  rejected_by: string | null
+  rejection_reason: string | null
+  trust_transaction_id: string | null
+  authorization_type: TrustAuthorizationType | null
+  authorization_ref: string | null
+  created_at: string
+  updated_at: string
+}
+
+export type TrustDisbursementRequestInsert = {
+  tenant_id: string
+  trust_account_id: string
+  matter_id: string
+  amount_cents: number
+  payee_name: string
+  description: string
+  payment_method: TrustPaymentMethod
+  prepared_by: string
+  id?: string
+  client_description?: string | null
+  reference_number?: string | null
+  invoice_id?: string | null
+  request_type?: TrustDisbursementRequestType
+  status?: TrustDisbursementRequestStatus
+  prepared_at?: string
+  approved_by?: string | null
+  approved_at?: string | null
+  rejected_by?: string | null
+  rejection_reason?: string | null
+  trust_transaction_id?: string | null
+  authorization_type?: TrustAuthorizationType | null
+  authorization_ref?: string | null
+  created_at?: string
+  updated_at?: string
+}
+
+export type TrustDisbursementRequestUpdate = Partial<Omit<TrustDisbursementRequestInsert, 'tenant_id'>>
+
+// 9. cheques
+export type ChequeAccountType = 'trust' | 'operating'
+export type ChequeStatus = 'draft' | 'issued' | 'cleared' | 'void' | 'stale_dated' | 'stop_payment'
+
+export type ChequeRow = {
+  id: string
+  tenant_id: string
+  account_type: ChequeAccountType
+  trust_account_id: string | null
+  operating_account_id: string | null
+  cheque_number: number
+  matter_id: string | null
+  payee_name: string
+  amount_cents: number
+  memo: string | null
+  status: ChequeStatus
+  issued_date: string | null
+  cleared_date: string | null
+  void_reason: string | null
+  voided_at: string | null
+  voided_by: string | null
+  trust_transaction_id: string | null
+  trust_disbursement_request_id: string | null
+  prepared_by: string
+  approved_by: string | null
+  printed_at: string | null
+  created_at: string
+  updated_at: string
+}
+
+export type ChequeInsert = {
+  tenant_id: string
+  account_type: ChequeAccountType
+  cheque_number: number
+  payee_name: string
+  amount_cents: number
+  prepared_by: string
+  id?: string
+  trust_account_id?: string | null
+  operating_account_id?: string | null
+  matter_id?: string | null
+  memo?: string | null
+  status?: ChequeStatus
+  issued_date?: string | null
+  cleared_date?: string | null
+  void_reason?: string | null
+  voided_at?: string | null
+  voided_by?: string | null
+  trust_transaction_id?: string | null
+  trust_disbursement_request_id?: string | null
+  approved_by?: string | null
+  printed_at?: string | null
+  created_at?: string
+  updated_at?: string
+}
+
+export type ChequeUpdate = Partial<Omit<ChequeInsert, 'tenant_id'>>
+
+// 10. bank_feed_transactions (future-compat)
+export type BankFeedSource = 'plaid' | 'ofx_import' | 'csv_import' | 'manual'
+export type BankFeedMatchStatus = 'unmatched' | 'auto_matched' | 'manually_matched' | 'excluded' | 'duplicate'
+
+export type BankFeedTransactionRow = {
+  id: string
+  tenant_id: string
+  bank_account_id: string
+  feed_source: BankFeedSource
+  external_txn_id: string | null
+  amount_cents: number
+  txn_date: string
+  posted_date: string | null
+  description: string | null
+  payee_name: string | null
+  bank_reference: string | null
+  raw_data: Json | null
+  import_batch_id: string | null
+  match_status: BankFeedMatchStatus
+  matched_transaction_id: string | null
+  matched_at: string | null
+  matched_by: string | null
+  excluded_reason: string | null
+  created_at: string
+}
+
+export type BankFeedTransactionInsert = {
+  tenant_id: string
+  bank_account_id: string
+  feed_source: BankFeedSource
+  amount_cents: number
+  txn_date: string
+  id?: string
+  external_txn_id?: string | null
+  posted_date?: string | null
+  description?: string | null
+  payee_name?: string | null
+  bank_reference?: string | null
+  raw_data?: Json | null
+  import_batch_id?: string | null
+  match_status?: BankFeedMatchStatus
+  matched_transaction_id?: string | null
+  matched_at?: string | null
+  matched_by?: string | null
+  excluded_reason?: string | null
+  created_at?: string
+}
+
+export type BankFeedTransactionUpdate = Partial<Omit<BankFeedTransactionInsert, 'tenant_id'>>
+
+// 11. qbo_sync_mappings (future-compat)
+export type QboSyncDirection = 'push' | 'pull' | 'bidirectional'
+export type QboSyncStatus = 'pending' | 'synced' | 'error' | 'stale'
+
+export type QboSyncMappingRow = {
+  id: string
+  tenant_id: string
+  norva_entity_type: string
+  norva_entity_id: string
+  qbo_entity_type: string
+  qbo_entity_id: string | null
+  sync_direction: QboSyncDirection
+  sync_status: QboSyncStatus
+  last_synced_at: string | null
+  sync_error: string | null
+  created_at: string
+}
+
+export type QboSyncMappingInsert = {
+  tenant_id: string
+  norva_entity_type: string
+  norva_entity_id: string
+  qbo_entity_type: string
+  id?: string
+  qbo_entity_id?: string | null
+  sync_direction?: QboSyncDirection
+  sync_status?: QboSyncStatus
+  last_synced_at?: string | null
+  sync_error?: string | null
+  created_at?: string
+}
+
+export type QboSyncMappingUpdate = Partial<Omit<QboSyncMappingInsert, 'tenant_id'>>
+
+// 12. qbo_sync_log (future-compat)
+export type QboSyncLogRow = {
+  id: string
+  tenant_id: string
+  mapping_id: string | null
+  action: string
+  status: string
+  error: string | null
+  request_payload: Json | null
+  response_payload: Json | null
+  created_at: string
+}
+
+export type QboSyncLogInsert = {
+  tenant_id: string
+  action: string
+  status: string
+  id?: string
+  mapping_id?: string | null
+  error?: string | null
+  request_payload?: Json | null
+  response_payload?: Json | null
+  created_at?: string
+}
+
+export type QboSyncLogUpdate = Partial<Omit<QboSyncLogInsert, 'tenant_id'>>
+
+// ─── Phase 8: Financial Analytics & Firm Intelligence ─────────────────────
+
+export type CollectionActionType =
+  | 'reminder_sent' | 'phone_call' | 'email_sent'
+  | 'demand_letter' | 'payment_plan_offered'
+  | 'write_off_requested' | 'write_off_approved' | 'write_off_rejected'
+  | 'escalated' | 'note'
+
+export type PaymentPlanFrequency = 'weekly' | 'biweekly' | 'monthly'
+export type PaymentPlanStatus = 'active' | 'completed' | 'defaulted' | 'cancelled'
+export type AgingBucket = 'current' | '31_60' | '61_90' | '91_120' | '120_plus'
+
+// 1. collection_actions
+export type CollectionActionRow = {
+  id: string
+  tenant_id: string
+  invoice_id: string
+  matter_id: string | null
+  action_type: CollectionActionType
+  notes: string | null
+  performed_by: string
+  performed_at: string
+  next_follow_up_date: string | null
+  is_active: boolean
+  created_at: string
+}
+
+export type CollectionActionInsert = {
+  tenant_id: string
+  invoice_id: string
+  action_type: CollectionActionType
+  performed_by: string
+  id?: string
+  matter_id?: string | null
+  notes?: string | null
+  performed_at?: string
+  next_follow_up_date?: string | null
+  is_active?: boolean
+  created_at?: string
+}
+
+export type CollectionActionUpdate = Partial<Omit<CollectionActionInsert, 'tenant_id'>>
+
+// 2. payment_plans
+export type PaymentPlanRow = {
+  id: string
+  tenant_id: string
+  invoice_id: string
+  matter_id: string | null
+  client_contact_id: string
+  total_amount_cents: number
+  instalment_amount_cents: number
+  frequency: PaymentPlanFrequency
+  start_date: string
+  next_due_date: string
+  instalments_paid: number
+  instalments_total: number
+  status: PaymentPlanStatus
+  created_by: string
+  approved_by: string | null
+  notes: string | null
+  created_at: string
+  updated_at: string
+}
+
+export type PaymentPlanInsert = {
+  tenant_id: string
+  invoice_id: string
+  client_contact_id: string
+  total_amount_cents: number
+  instalment_amount_cents: number
+  frequency: PaymentPlanFrequency
+  start_date: string
+  next_due_date: string
+  instalments_total: number
+  created_by: string
+  id?: string
+  matter_id?: string | null
+  instalments_paid?: number
+  status?: PaymentPlanStatus
+  approved_by?: string | null
+  notes?: string | null
+  created_at?: string
+  updated_at?: string
+}
+
+export type PaymentPlanUpdate = Partial<Omit<PaymentPlanInsert, 'tenant_id'>>
+
+// 3. revenue_snapshots (immutable — no Update type)
+export type RevenueSnapshotRow = {
+  id: string
+  tenant_id: string
+  snapshot_date: string
+  practice_area_id: string | null
+  total_billed_cents: number
+  total_collected_cents: number
+  total_wip_cents: number
+  total_outstanding_cents: number
+  matter_count: number
+  active_matter_count: number
+  created_at: string
+}
+
+export type RevenueSnapshotInsert = {
+  tenant_id: string
+  snapshot_date: string
+  id?: string
+  practice_area_id?: string | null
+  total_billed_cents?: number
+  total_collected_cents?: number
+  total_wip_cents?: number
+  total_outstanding_cents?: number
+  matter_count?: number
+  active_matter_count?: number
+  created_at?: string
+}
+
+// ============================================================================
+// Billing Module Types (Migration 107)
+// All monetary amounts are INTEGER (cents) unless noted.
+// Tax rates are number (decimal, e.g. 0.13 = 13%).
+// ============================================================================
+
+// ── Enums / Union Types ───────────────────────────────────────────────────────
+
+export type InvoiceStatus =
+  | 'draft'
+  | 'finalized'
+  | 'sent'
+  | 'viewed'
+  | 'partially_paid'
+  | 'paid'
+  | 'overdue'
+  | 'cancelled'
+  | 'void'
+  | 'written_off'
+
+export type InvoiceLineCategory = 'fee' | 'disbursement' | 'soft_cost' | 'hard_cost'
+
+export type InvoiceLineType =
+  | 'hourly'
+  | 'flat_fee'
+  | 'manual_fee'
+  | 'disbursement_external'
+  | 'soft_cost_internal'
+  | 'hard_cost_direct'
+  | 'manual'
+
+export type InvoiceLineSourceType =
+  | 'time_entry'
+  | 'disbursement_entry'
+  | 'soft_cost_entry'
+  | 'hard_cost_entry'
+  | 'manual'
+
+export type AdjustmentType = 'discount' | 'write_down' | 'write_off' | 'credit_note'
+export type AdjustmentScope = 'invoice_level' | 'line_level' | 'category_level'
+export type AdjustmentApprovalStatus = 'pending' | 'approved' | 'rejected' | 'auto_approved'
+export type AdjustmentCalculationType = 'percentage' | 'fixed_amount'
+
+export type TrustAllocationStatus =
+  | 'pending'
+  | 'confirmed'
+  | 'rejected'
+  | 'cancelled'
+  | 'reversed'
+
+export type PaymentSource = 'direct' | 'trust_applied' | 'credit_note'
+export type DeliveryMethod = 'email' | 'portal' | 'manual'
+export type DeliveryStatus = 'sent' | 'delivered' | 'failed' | 'viewed'
+
+export type InvoiceAuditEventType =
+  | 'created'
+  | 'draft_saved'
+  | 'line_added'
+  | 'line_edited'
+  | 'line_deleted'
+  | 'adjustment_added'
+  | 'adjustment_approved'
+  | 'adjustment_rejected'
+  | 'finalized'
+  | 'sent'
+  | 'resent'
+  | 'delivery_failed'
+  | 'payment_recorded'
+  | 'payment_voided'
+  | 'trust_applied'
+  | 'trust_confirmed'
+  | 'trust_rejected'
+  | 'trust_cancelled'
+  | 'voided'
+  | 'status_changed'
+  | 'pdf_downloaded'
+  | 'viewed'
+  | 'template_applied'
+  | 'payment_plan_created'
+  | 'payment_plan_approved'
+  | 'payment_plan_cancelled'
+  | 'payment_plan_completed'
+  | 'instalment_paid'
+
+// ── billing_categories ────────────────────────────────────────────────────────
+
+export type BillingCategoryRow = {
+  id: string
+  code: InvoiceLineCategory
+  label: string
+  description: string | null
+  sort_order: number
+  is_active: boolean
+}
+
+// ── disbursement_categories ───────────────────────────────────────────────────
+
+export type DisbursementCategoryRow = {
+  id: string
+  tenant_id: string | null   // null = system default
+  code: string
+  label: string
+  default_is_taxable: boolean
+  default_is_recoverable: boolean
+  is_active: boolean
+  created_at: string
+}
+
+export type DisbursementCategoryInsert = {
+  tenant_id: string | null
+  code: string
+  label: string
+  id?: string
+  default_is_taxable?: boolean
+  default_is_recoverable?: boolean
+  is_active?: boolean
+  created_at?: string
+}
+
+export type DisbursementCategoryUpdate = Partial<DisbursementCategoryInsert>
+
+// ── tax_jurisdictions ─────────────────────────────────────────────────────────
+
+export type TaxJurisdictionRow = {
+  id: string
+  code: string               // CA-ON, CA-AB, CA-BC, CA-QC, GENERIC, etc.
+  name: string
+  country_code: string
+  region_code: string | null
+  is_active: boolean
+}
+
+// ── tax_profiles ──────────────────────────────────────────────────────────────
+
+export type TaxProfileRow = {
+  id: string
+  tenant_id: string
+  jurisdiction_id: string
+  name: string
+  description: string | null
+  is_default: boolean
+  effective_from: string | null
+  effective_to: string | null
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}
+
+export type TaxProfileInsert = {
+  tenant_id: string
+  jurisdiction_id: string
+  name: string
+  id?: string
+  description?: string | null
+  is_default?: boolean
+  effective_from?: string | null
+  effective_to?: string | null
+  is_active?: boolean
+  created_at?: string
+  updated_at?: string
+}
+
+export type TaxProfileUpdate = Partial<TaxProfileInsert>
+
+// ── tax_codes ─────────────────────────────────────────────────────────────────
+
+export type TaxCodeRow = {
+  id: string
+  tenant_id: string
+  tax_profile_id: string
+  code: string               // HST, GST, PST, QST, EXEMPT, ZERO
+  label: string              // Display label on invoice
+  rate: number               // decimal e.g. 0.13 for 13%
+  applies_to_fees: boolean
+  applies_to_disbursements: boolean
+  applies_to_soft_costs: boolean
+  applies_to_hard_costs: boolean
+  is_default_for_profile: boolean
+  is_active: boolean
+}
+
+export type TaxCodeInsert = {
+  tenant_id: string
+  tax_profile_id: string
+  code: string
+  label: string
+  id?: string
+  rate?: number
+  applies_to_fees?: boolean
+  applies_to_disbursements?: boolean
+  applies_to_soft_costs?: boolean
+  applies_to_hard_costs?: boolean
+  is_default_for_profile?: boolean
+  is_active?: boolean
+}
+
+export type TaxCodeUpdate = Partial<TaxCodeInsert>
+
+// ── tax_registrations ─────────────────────────────────────────────────────────
+
+export type TaxRegistrationRow = {
+  id: string
+  tenant_id: string
+  jurisdiction_id: string
+  registration_number: string
+  registration_type: string  // HST, GST, QST, etc.
+  effective_from: string | null
+  effective_to: string | null
+  is_active: boolean
+  created_at: string
+}
+
+export type TaxRegistrationInsert = {
+  tenant_id: string
+  jurisdiction_id: string
+  registration_number: string
+  registration_type: string
+  id?: string
+  effective_from?: string | null
+  effective_to?: string | null
+  is_active?: boolean
+  created_at?: string
+}
+
+export type TaxRegistrationUpdate = Partial<TaxRegistrationInsert>
+
+// ── invoice_number_sequences ──────────────────────────────────────────────────
+
+export type InvoiceNumberSequenceRow = {
+  id: string
+  tenant_id: string
+  year: number
+  next_val: number
+}
+
+// ── invoice_templates ─────────────────────────────────────────────────────────
+
+export type InvoiceTemplateType = 'firm_default' | 'matter_type' | 'practice_area' | 'custom'
+
+export type InvoiceTemplateRow = {
+  id: string
+  tenant_id: string
+  name: string
+  template_type: InvoiceTemplateType
+  matter_type_code: string | null
+  practice_area_code: string | null
+  default_tax_profile_id: string | null
+  logo_url: string | null
+  header_html: string | null
+  footer_html: string | null
+  payment_instructions: string | null
+  trust_statement_wording: string | null
+  overdue_wording: string | null
+  standard_notes: string | null
+  lawyer_signature_block: string | null
+  is_default: boolean
+  is_active: boolean
+  created_by: string | null
+  created_at: string
+  updated_at: string
+}
+
+export type InvoiceTemplateInsert = {
+  tenant_id: string
+  name: string
+  id?: string
+  template_type?: InvoiceTemplateType
+  matter_type_code?: string | null
+  practice_area_code?: string | null
+  default_tax_profile_id?: string | null
+  logo_url?: string | null
+  header_html?: string | null
+  footer_html?: string | null
+  payment_instructions?: string | null
+  trust_statement_wording?: string | null
+  overdue_wording?: string | null
+  standard_notes?: string | null
+  lawyer_signature_block?: string | null
+  is_default?: boolean
+  is_active?: boolean
+  created_by?: string | null
+  created_at?: string
+  updated_at?: string
+}
+
+export type InvoiceTemplateUpdate = Partial<InvoiceTemplateInsert>
+
+// ── invoice_template_soft_cost_rates ─────────────────────────────────────────
+
+export type SoftCostRateRow = {
+  id: string
+  template_id: string
+  tenant_id: string
+  description: string
+  unit_label: string
+  default_rate: number       // cents per unit
+  default_tax_code_id: string | null
+  sort_order: number
+  is_active: boolean
+}
+
+export type SoftCostRateInsert = {
+  template_id: string
+  tenant_id: string
+  description: string
+  unit_label: string
+  id?: string
+  default_rate?: number
+  default_tax_code_id?: string | null
+  sort_order?: number
+  is_active?: boolean
+}
+
+export type SoftCostRateUpdate = Partial<SoftCostRateInsert>
+
+// ── discount_approval_thresholds ──────────────────────────────────────────────
+
+export type DiscountApprovalThresholdRow = {
+  id: string
+  tenant_id: string
+  threshold_type: 'percentage' | 'fixed_amount'
+  threshold_value: number    // percentage: 0.15 = 15%; fixed_amount: cents
+  approver_role: string
+  applies_to_adjustment_types: AdjustmentType[]
+  is_active: boolean
+  created_at: string
+}
+
+export type DiscountApprovalThresholdInsert = {
+  tenant_id: string
+  threshold_type: 'percentage' | 'fixed_amount'
+  threshold_value: number
+  approver_role: string
+  id?: string
+  applies_to_adjustment_types?: AdjustmentType[]
+  is_active?: boolean
+  created_at?: string
+}
+
+// ── invoice_adjustments ───────────────────────────────────────────────────────
+
+export type InvoiceAdjustmentRow = {
+  id: string
+  tenant_id: string
+  invoice_id: string
+  matter_id: string
+  adjustment_type: AdjustmentType
+  scope: AdjustmentScope
+  line_item_id: string | null
+  applies_to_category: InvoiceLineCategory | null
+  calculation_type: AdjustmentCalculationType
+  percentage_value: number | null     // decimal e.g. 0.10 = 10%
+  fixed_amount_cents: number | null   // cents
+  calculated_amount_cents: number     // cents — always populated
+  is_pre_tax: boolean
+  reason_code: string
+  reason_note: string | null
+  applied_by: string
+  approved_by: string | null
+  approval_status: AdjustmentApprovalStatus
+  requires_approval: boolean
+  approval_threshold_id: string | null
+  created_at: string
+  updated_at: string
+}
+
+export type InvoiceAdjustmentInsert = {
+  tenant_id: string
+  invoice_id: string
+  matter_id: string
+  adjustment_type: AdjustmentType
+  scope: AdjustmentScope
+  calculation_type: AdjustmentCalculationType
+  calculated_amount_cents: number
+  reason_code: string
+  applied_by: string
+  id?: string
+  line_item_id?: string | null
+  applies_to_category?: InvoiceLineCategory | null
+  percentage_value?: number | null
+  fixed_amount_cents?: number | null
+  is_pre_tax?: boolean
+  reason_note?: string | null
+  approved_by?: string | null
+  approval_status?: AdjustmentApprovalStatus
+  requires_approval?: boolean
+  approval_threshold_id?: string | null
+  created_at?: string
+  updated_at?: string
+}
+
+export type InvoiceAdjustmentUpdate = Partial<InvoiceAdjustmentInsert>
+
+// ── invoice_trust_allocations ─────────────────────────────────────────────────
+
+export type InvoiceTrustAllocationRow = {
+  id: string
+  tenant_id: string
+  invoice_id: string
+  matter_id: string
+  amount_cents: number                 // BIGINT in DB
+  trust_account_id: string
+  trust_transaction_id: string | null  // set by trust module on confirmation
+  allocation_status: TrustAllocationStatus
+  requested_by: string
+  requested_at: string
+  confirmed_at: string | null
+  confirmed_by: string | null
+  notes: string | null
+  created_at: string
+  updated_at: string
+}
+
+export type InvoiceTrustAllocationInsert = {
+  tenant_id: string
+  invoice_id: string
+  matter_id: string
+  amount_cents: number
+  trust_account_id: string
+  requested_by: string
+  id?: string
+  trust_transaction_id?: string | null
+  allocation_status?: TrustAllocationStatus
+  requested_at?: string
+  confirmed_at?: string | null
+  confirmed_by?: string | null
+  notes?: string | null
+  created_at?: string
+  updated_at?: string
+}
+
+export type InvoiceTrustAllocationUpdate = Partial<InvoiceTrustAllocationInsert>
+
+// ── invoice_delivery_logs ─────────────────────────────────────────────────────
+
+export type InvoiceDeliveryLogRow = {
+  id: string
+  tenant_id: string
+  invoice_id: string
+  delivery_method: DeliveryMethod
+  recipient_email: string
+  recipient_name: string | null
+  sent_at: string
+  sent_by: string
+  delivery_status: DeliveryStatus
+  viewed_at: string | null
+  message_subject: string | null
+  message_body_snapshot: string | null
+  comms_message_id: string | null
+  created_at: string
+}
+
+export type InvoiceDeliveryLogInsert = {
+  tenant_id: string
+  invoice_id: string
+  recipient_email: string
+  sent_by: string
+  id?: string
+  delivery_method?: DeliveryMethod
+  recipient_name?: string | null
+  sent_at?: string
+  delivery_status?: DeliveryStatus
+  viewed_at?: string | null
+  message_subject?: string | null
+  message_body_snapshot?: string | null
+  comms_message_id?: string | null
+  created_at?: string
+}
+
+// ── invoice_audit_log ─────────────────────────────────────────────────────────
+
+export type InvoiceAuditLogRow = {
+  id: string
+  tenant_id: string
+  invoice_id: string
+  matter_id: string
+  event_type: InvoiceAuditEventType
+  event_description: string
+  changed_fields: Record<string, { before: unknown; after: unknown }> | null
+  performed_by: string
+  performed_at: string
+  ip_address: string | null
+  user_agent: string | null
+}
+
+export type InvoiceAuditLogInsert = {
+  tenant_id: string
+  invoice_id: string
+  matter_id: string
+  event_type: InvoiceAuditEventType
+  event_description: string
+  performed_by: string
+  id?: string
+  changed_fields?: Record<string, { before: unknown; after: unknown }> | null
+  performed_at?: string
+  ip_address?: string | null
+  user_agent?: string | null
+}
+
+// ── Composite view types (used by query hooks and UI) ────────────────────────
+
+/** Full invoice with joined template and tax profile name */
+export type InvoiceRow = Database['public']['Tables']['invoices']['Row']
+export type InvoiceInsert = Database['public']['Tables']['invoices']['Insert']
+export type InvoiceUpdate = Database['public']['Tables']['invoices']['Update']
+export type InvoiceLineItemRow = Database['public']['Tables']['invoice_line_items']['Row']
+export type InvoiceLineItemInsert = Database['public']['Tables']['invoice_line_items']['Insert']
+export type InvoiceLineItemUpdate = Database['public']['Tables']['invoice_line_items']['Update']
+export type PaymentRow = Database['public']['Tables']['payments']['Row']
+export type PaymentInsert = Database['public']['Tables']['payments']['Insert']
+export type PaymentUpdate = Database['public']['Tables']['payments']['Update']
+
+/** Summary used in dashboard and list views */
+export type InvoiceSummary = {
+  id: string
+  invoice_number: string
+  matter_id: string
+  matter_title: string
+  contact_id: string | null
+  contact_name: string | null
+  status: InvoiceStatus
+  issue_date: string
+  due_date: string
+  total_amount: number      // cents
+  amount_paid: number       // cents
+  balance_due: number       // cents = total_amount - amount_paid
+  currency_code: string
+}
+
+/** Full invoice detail with all related records */
+export type InvoiceDetail = InvoiceRow & {
+  matter: { id: string; title: string; matter_number: string }
+  contact: { id: string; first_name: string | null; last_name: string | null; organization_name: string | null } | null
+  line_items: InvoiceLineItemRow[]
+  adjustments: InvoiceAdjustmentRow[]
+  payments: PaymentRow[]
+  trust_allocations: InvoiceTrustAllocationRow[]
+  delivery_logs: InvoiceDeliveryLogRow[]
+  template: InvoiceTemplateRow | null
+  tax_profile: TaxProfileRow | null
+}
+
+/** Used in invoice builder for live tax calculation */
+export type TaxLineCalculation = {
+  tax_code_id: string
+  tax_code_label: string
+  tax_rate: number
+  taxable_base: number    // cents
+  tax_amount: number      // cents
+}
+
+/** Result from calculate_invoice_totals() RPC */
+export type InvoiceTotalsResult = {
+  invoice_id: string
+  subtotal_fees: number
+  subtotal_disbursements: number
+  subtotal_soft_costs: number
+  subtotal_hard_costs: number
+  subtotal: number
+  total_adjustments: number
+  taxable_subtotal: number
+  tax_amount: number
+  total_amount: number
+  total_trust_applied: number
+  total_payments_applied: number
+  amount_paid: number
+  balance_due: number
+}
+
+/** Individual instalment record within a payment plan */
+export type PaymentPlanInstalmentRow = {
+  id: string
+  tenant_id: string
+  payment_plan_id: string
+  invoice_id: string
+  instalment_number: number
+  due_date: string
+  amount_cents: number
+  status: 'pending' | 'paid' | 'cancelled'
+  payment_id: string | null
+  paid_at: string | null
+  created_at: string
+  updated_at: string
+  /** Derived at query time — not stored in DB */
+  is_overdue?: boolean
+}
+
+export type PaymentPlanInstalmentInsert = {
+  tenant_id: string
+  payment_plan_id: string
+  invoice_id: string
+  instalment_number: number
+  due_date: string
+  amount_cents: number
+  id?: string
+  status?: 'pending' | 'paid' | 'cancelled'
+  payment_id?: string | null
+  paid_at?: string | null
+}
+
+/** Idempotency log for processed Stripe webhook events */
+export type StripeProcessedEventRow = {
+  id: string
+  event_id: string
+  event_type: string
+  tenant_id: string | null
+  processed_at: string
+}
+
+export type StripeProcessedEventInsert = {
+  event_id: string
+  event_type: string
+  tenant_id?: string | null
+  id?: string
+  processed_at?: string
+}
+
+/** Idempotency log for platform-admin bootstrap actions */
+export type TenantSetupLogRow = {
+  id: string
+  tenant_id: string
+  action: string
+  starter_pack: string | null
+  applied_at: string
+  applied_by: string
+  result: Json | null
+}
+
+export type TenantSetupLogInsert = {
+  tenant_id: string
+  action: string
+  starter_pack?: string | null
+  id?: string
+  applied_at?: string
+  applied_by?: string
+  result?: Json | null
+}
+
+/** Manual onboarding checklist completions (auto-detected items are never stored) */
+export type TenantOnboardingChecklistRow = {
+  id: string
+  tenant_id: string
+  item_key: string
+  completed_at: string
+  completed_by: string | null
+  notes: string | null
+}
+
+export type TenantOnboardingChecklistInsert = {
+  tenant_id: string
+  item_key: string
+  completed_by?: string | null
+  id?: string
+  completed_at?: string
+  notes?: string | null
+}
+
+/** Billing dashboard summary */
+export type BillingDashboardStats = {
+  draft_count: number
+  finalized_count: number
+  sent_count: number
+  overdue_count: number
+  partially_paid_count: number
+  paid_count: number
+  total_outstanding_cents: number
+  total_overdue_cents: number
+  total_collected_this_month_cents: number
+  credit_balance_count: number
+}

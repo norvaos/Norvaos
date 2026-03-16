@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/client'
 import type { Database } from '@/lib/types/database'
 import { logAudit } from '@/lib/queries/audit-logs'
 import { toast } from 'sonner'
+import { IMPORT_REVERTED_STATUS } from '@/lib/utils/matter-status'
 
 type Matter = Database['public']['Tables']['matters']['Row']
 type MatterInsert = Database['public']['Tables']['matters']['Insert']
@@ -50,6 +51,7 @@ export function useMatters(params: MatterListParams) {
         .select('id, tenant_id, title, matter_number, status, priority, practice_area_id, matter_type_id, matter_type, pipeline_id, stage_id, stage_entered_at, responsible_lawyer_id, originating_lawyer_id, date_opened, date_closed, billing_type, estimated_value, total_billed, total_paid, case_type_id, intake_status, risk_level, created_at, updated_at', { count: 'exact' })
         .eq('tenant_id', tenantId)
         .neq('status', 'archived')
+        .neq('status', IMPORT_REVERTED_STATUS)
 
       if (search) {
         query = query.or(`title.ilike.%${search}%,matter_number.ilike.%${search}%`)

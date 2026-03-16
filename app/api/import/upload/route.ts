@@ -7,8 +7,9 @@ import { log } from '@/lib/utils/logger'
 import { uploadImportSchema } from '@/lib/schemas/data-import'
 import { validateCSVFile, parseCSVPreview, autoMapColumns } from '@/lib/services/import/csv-parser'
 import { getAdapter } from '@/lib/services/import/adapters'
-import type { Json } from '@/lib/types/database'
+import { logAuditServer } from '@/lib/queries/audit-logs'
 import type { SourcePlatform, ImportEntityType } from '@/lib/services/import/types'
+import type { Json } from '@/lib/types/database'
 
 /**
  * POST /api/import/upload
@@ -106,17 +107,15 @@ async function handlePost(request: Request) {
     }
 
     // Audit log
-    admin
-      .from('audit_logs')
-      .insert({
-        tenant_id: auth.tenantId,
-        user_id: auth.userId,
-        action: 'import_upload',
-        entity_type: 'import_batch',
-        entity_id: batch.id,
-        metadata: { platform, entityType, fileName: file.name, totalRows: preview.totalRows } as unknown as Json,
-      })
-      .then(() => {})
+    logAuditServer({
+      supabase: auth.supabase,
+      tenantId: auth.tenantId,
+      userId: auth.userId,
+      entityType: 'import_batch',
+      entityId: batch.id,
+      action: 'import_upload',
+      changes: { platform, entityType, fileName: file.name, totalRows: preview.totalRows },
+    }).catch(() => {})
 
     return NextResponse.json({
       batchId: batch.id,

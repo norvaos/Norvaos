@@ -258,6 +258,113 @@ export async function publishVersion(
     return { success: false, error: `Cannot publish version in "${version.status}" status` }
   }
 
+  // ── REDLINE 4: Mandatory publish validation (6 checks) ─────────────────────
+  const publishErrors: string[] = []
+
+  // Fetch version data for validation
+  const { data: fullVersion } = await supabase
+    .from('document_template_versions')
+    .select('template_body')
+    .eq('id', params.versionId)
+    .single()
+
+  const { data: vMappings } = await supabase
+    .from('document_template_mappings')
+    .select('field_key')
+    .eq('template_version_id', params.versionId)
+
+  const { data: vConditions } = await supabase
+    .from('document_template_conditions')
+    .select('condition_key, rules')
+    .eq('template_version_id', params.versionId)
+
+  const { data: vClauseAssignments } = await supabase
+    .from('document_clause_assignments')
+    .select('placement_key, clause_id')
+    .eq('template_version_id', params.versionId)
+
+  if (fullVersion?.template_body) {
+    const body = fullVersion.template_body as unknown as { sections?: { elements?: { type?: string; content?: string; clause_placement_key?: string; condition_key?: string }[]; condition_key?: string }[] }
+    const bodyJson = JSON.stringify(body)
+    const mappingKeys = new Set((vMappings ?? []).map(m => m.field_key))
+    const conditionKeys = new Set((vConditions ?? []).map(c => c.condition_key))
+
+    // Check 1: Unmapped fields — placeholders in body not in mappings
+    const placeholderRegex = /\{\{([^}]+)\}\}/g
+    const bodyPlaceholders = new Set<string>()
+    let pm: RegExpExecArray | null
+    while ((pm = placeholderRegex.exec(bodyJson)) !== null) {
+      bodyPlaceholders.add(pm[1].trim())
+    }
+    const unmapped = [...bodyPlaceholders].filter(p => !mappingKeys.has(p))
+    if (unmapped.length > 0) {
+      publishErrors.push(`Unmapped placeholders: ${unmapped.join(', ')}`)
+    }
+
+    // Check 2: Orphan placeholders — mappings not referenced in body
+    const orphans = [...mappingKeys].filter(k => !bodyPlaceholders.has(k))
+    if (orphans.length > 0) {
+      publishErrors.push(`Orphan mappings (not in template body): ${orphans.join(', ')}`)
+    }
+
+    // Check 3: Invalid conditions — conditions referenced in body but not defined
+    const bodyConditions = new Set<string>()
+    if (body.sections) {
+      for (const section of body.sections) {
+        if (section.condition_key) bodyConditions.add(section.condition_key)
+        if (section.elements) {
+          for (const el of section.elements) {
+            if (el.condition_key) bodyConditions.add(el.condition_key)
+          }
+        }
+      }
+    }
+    const invalidConditions = [...bodyConditions].filter(c => !conditionKeys.has(c))
+    if (invalidConditions.length > 0) {
+      publishErrors.push(`Invalid conditions (referenced but not defined): ${invalidConditions.join(', ')}`)
+    }
+
+    // Check 4: Broken clause slots — slots with no assignments
+    const clauseSlots = new Set<string>()
+    if (body.sections) {
+      for (const section of body.sections) {
+        if (section.elements) {
+          for (const el of section.elements) {
+            if (el.type === 'clause_placeholder' && el.clause_placement_key) {
+              clauseSlots.add(el.clause_placement_key)
+            }
+          }
+        }
+      }
+    }
+    const assignedSlots = new Set((vClauseAssignments ?? []).map(a => a.placement_key))
+    const brokenSlots = [...clauseSlots].filter(s => !assignedSlots.has(s))
+    if (brokenSlots.length > 0) {
+      publishErrors.push(`Clause slots with no assignments: ${brokenSlots.join(', ')}`)
+    }
+
+    // Check 5: Preview validation — body must be valid JSON structure
+    if (!body.sections || !Array.isArray(body.sections)) {
+      publishErrors.push('Template body missing sections array')
+    }
+
+    // Check 6: Structure check — sections must have required properties
+    if (body.sections) {
+      for (let i = 0; i < body.sections.length; i++) {
+        const s = body.sections[i]
+        if (!s.elements || !Array.isArray(s.elements)) {
+          publishErrors.push(`Section ${i + 1} missing elements array`)
+        }
+      }
+    }
+  } else {
+    publishErrors.push('Template body is empty or could not be loaded')
+  }
+
+  if (publishErrors.length > 0) {
+    return { success: false, error: `Publish validation failed:\n${publishErrors.map((e, i) => `${i + 1}. ${e}`).join('\n')}` }
+  }
+
   // Supersede the current published version (if any)
   await supabase
     .from('document_template_versions')

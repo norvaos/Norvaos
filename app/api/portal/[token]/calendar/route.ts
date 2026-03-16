@@ -1,29 +1,9 @@
 import { NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { createRateLimiter } from '@/lib/middleware/rate-limit'
+import { validatePortalToken, PortalAuthError } from '@/lib/services/portal-auth'
 
 const tokenLookupLimiter = createRateLimiter({ windowMs: 60_000, maxRequests: 30 })
-
-// ── Token Validation ──────────────────────────────────────────────────────
-
-async function validateToken(admin: ReturnType<typeof createAdminClient>, token: string) {
-  const { data: link, error: linkError } = await admin
-    .from('portal_links')
-    .select('id, matter_id, tenant_id, contact_id, expires_at, is_active')
-    .eq('token', token)
-    .eq('is_active', true)
-    .single()
-
-  if (linkError || !link) {
-    return { error: NextResponse.json({ error: 'Invalid token' }, { status: 404 }) }
-  }
-
-  if (new Date(link.expires_at) < new Date()) {
-    return { error: NextResponse.json({ error: 'Link expired' }, { status: 410 }) }
-  }
-
-  return { link }
-}
 
 // ── GET /api/portal/[token]/calendar ──────────────────────────────────────
 
@@ -46,11 +26,19 @@ async function handleGet(
     }
 
     const { token } = await params
-    const admin = createAdminClient()
-    const result = await validateToken(admin, token)
-    if (result.error) return result.error
 
-    const { link } = result
+    let link: Awaited<ReturnType<typeof validatePortalToken>>
+    try {
+      link = await validatePortalToken(token)
+    } catch (error) {
+      if (error instanceof PortalAuthError) {
+        return NextResponse.json({ error: error.message }, { status: error.status })
+      }
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const admin = createAdminClient()
 
     // Fetch upcoming calendar events for this matter (next 90 days)
     const now = new Date().toISOString()

@@ -50,6 +50,11 @@ const DEFAULT_TRIGGERS: Record<string, ChannelConfig> = {
   new_message:          { in_app: true, email: true,  push: true  },
   deadline_approaching: { in_app: true, email: true,  push: true  },
   matter_updated:       { in_app: true, email: false, push: false },
+  invoice_sent:          { in_app: true, email: false, push: false },
+  invoice_overdue:       { in_app: true, email: true,  push: false },
+  payment_received:      { in_app: true, email: false, push: false },
+  payment_plan_created:  { in_app: true, email: false, push: false },
+  write_off_approved:    { in_app: true, email: true,  push: false },
 }
 
 // ─── Core Dispatch ──────────────────────────────────────────────────────────

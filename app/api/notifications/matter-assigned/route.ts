@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { authenticateRequest } from '@/lib/services/auth'
 import { requirePermission } from '@/lib/services/require-role'
 import { sendInternalEmail } from '@/lib/services/email-service'
+import { log } from '@/lib/utils/logger'
 
 /**
  * POST /api/notifications/matter-assigned
@@ -94,7 +95,9 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ sent: recipients.length, matterRef })
   } catch (err) {
-    console.error('[matter-assigned] Error:', err)
+    log.error('notifications.matter_assigned.error', {
+      error_message: err instanceof Error ? err.message : 'Unknown error',
+    })
     return NextResponse.json({ error: 'Failed to send notifications' }, { status: 500 })
   }
 }

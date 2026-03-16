@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
-import { createServerSupabaseClient as createClient } from '@/lib/supabase/server'
+import { authenticateRequest, AuthError } from '@/lib/services/auth'
+import { requirePermission } from '@/lib/services/require-role'
 import { sendDocumentRequest } from '@/lib/services/document-request-service'
 import { withTiming } from '@/lib/middleware/request-timing'
 import { syncImmigrationIntakeStatus } from '@/lib/services/immigration-status-engine'
@@ -14,29 +15,10 @@ async function handlePost(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  // TODO: Refactor to use authenticateRequest() + requirePermission()
   try {
     const { id: matterId } = await params
-    const supabase = await createClient()
-
-    // Auth
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    // Get tenant
-    const { data: appUser } = await supabase
-      .from('users')
-      .select('tenant_id')
-      .eq('auth_user_id', user.id)
-      .single()
-
-    if (!appUser) {
-      return NextResponse.json({ error: 'User not found' }, { status: 401 })
-    }
+    const auth = await authenticateRequest()
+    requirePermission(auth, 'matters', 'edit')
 
     // Parse body
     const body = await request.json()
@@ -50,11 +32,11 @@ async function handlePost(
     }
 
     // Verify matter belongs to tenant
-    const { data: matter } = await supabase
+    const { data: matter } = await auth.supabase
       .from('matters')
       .select('id')
       .eq('id', matterId)
-      .eq('tenant_id', appUser.tenant_id)
+      .eq('tenant_id', auth.tenantId)
       .single()
 
     if (!matter) {
@@ -62,7 +44,7 @@ async function handlePost(
     }
 
     // Validate all slot_ids belong to this matter, are active, required, not accepted
-    const { data: validSlots } = await supabase
+    const { data: validSlots } = await auth.supabase
       .from('document_slots')
       .select('id, status')
       .in('id', slot_ids)
@@ -81,19 +63,12 @@ async function handlePost(
       )
     }
 
-    // Get user ID from users table
-    const { data: userRow } = await supabase
-      .from('users')
-      .select('id')
-      .eq('auth_user_id', user.id)
-      .single()
-
     const result = await sendDocumentRequest({
-      supabase,
-      tenantId: appUser.tenant_id,
+      supabase: auth.supabase,
+      tenantId: auth.tenantId,
       matterId,
       slotIds: outstandingSlotIds,
-      requestedBy: userRow?.id ?? user.id,
+      requestedBy: auth.userId,
       message,
       language,
     })
@@ -105,7 +80,7 @@ async function handlePost(
     // Sync immigration intake status — portal link/request now exists, so
     // the matter can advance from not_issued → issued automatically.
     try {
-      await syncImmigrationIntakeStatus(supabase, matterId, userRow?.id ?? user.id)
+      await syncImmigrationIntakeStatus(auth.supabase, matterId, auth.userId)
     } catch (err) {
       console.error('[document-request] Status sync failed (non-fatal):', err)
     }
@@ -116,6 +91,9 @@ async function handlePost(
       slots_requested: outstandingSlotIds.length,
     })
   } catch (error) {
+    if (error instanceof AuthError) {
+      return NextResponse.json({ error: error.message }, { status: error.status })
+    }
     console.error('[document-request] Error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
@@ -129,19 +107,12 @@ async function handleGet(
   _request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  // TODO: Refactor to use authenticateRequest() + requirePermission()
   try {
     const { id: matterId } = await params
-    const supabase = await createClient()
+    const auth = await authenticateRequest()
+    requirePermission(auth, 'matters', 'edit')
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    const { data: requests, error } = await supabase
+    const { data: requests, error } = await auth.supabase
       .from('document_requests')
       .select('*')
       .eq('matter_id', matterId)
@@ -154,6 +125,9 @@ async function handleGet(
 
     return NextResponse.json({ requests: requests ?? [] })
   } catch (error) {
+    if (error instanceof AuthError) {
+      return NextResponse.json({ error: error.message }, { status: error.status })
+    }
     console.error('[document-request] GET error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }

@@ -235,12 +235,25 @@ export async function getValidAccessToken(
 
 // ─── Graph API Client ────────────────────────────────────────────────────────
 
+// Maximum 429 retry attempts before giving up. Does not count the initial request.
+const MAX_GRAPH_RATE_LIMIT_RETRIES = 5
+
 export interface GraphFetchOptions {
   method?: 'GET' | 'POST' | 'PATCH' | 'DELETE'
   body?: unknown
   params?: Record<string, string>
 }
 
+/**
+ * Make an authenticated request to the Microsoft Graph API.
+ *
+ * 429 handling: respects Retry-After, bounded to MAX_GRAPH_RATE_LIMIT_RETRIES
+ * attempts. Replaces the previous unbounded recursive retry that could exhaust
+ * the call stack under sustained Graph API throttling.
+ *
+ * Non-429 4xx responses are thrown immediately as GraphError (non-retryable).
+ * The proactive token refresh in getValidAccessToken is not changed.
+ */
 export async function graphFetch<T = unknown>(
   connectionId: string,
   adminClient: SupabaseClient<Database>,
@@ -261,34 +274,45 @@ export async function graphFetch<T = unknown>(
     'Content-Type': 'application/json',
   }
 
-  const res = await fetch(url, {
-    method,
-    headers,
-    body: body ? JSON.stringify(body) : undefined,
-  })
+  let rateLimit429Count = 0
 
-  // Handle rate limiting
-  if (res.status === 429) {
-    const retryAfter = parseInt(res.headers.get('Retry-After') || '5', 10)
-    await new Promise((resolve) => setTimeout(resolve, retryAfter * 1000))
-    return graphFetch<T>(connectionId, adminClient, path, options)
+  while (true) {
+    const res = await fetch(url, {
+      method,
+      headers,
+      body: body ? JSON.stringify(body) : undefined,
+    })
+
+    // Rate limiting — bounded retry respecting Retry-After header
+    if (res.status === 429) {
+      if (rateLimit429Count >= MAX_GRAPH_RATE_LIMIT_RETRIES) {
+        throw new GraphError(
+          `Graph API rate limit exhausted after ${MAX_GRAPH_RATE_LIMIT_RETRIES} retries`,
+          429,
+        )
+      }
+      rateLimit429Count++
+      const retryAfterSec = parseInt(res.headers.get('Retry-After') || '5', 10)
+      await new Promise<void>((resolve) => setTimeout(resolve, retryAfterSec * 1000))
+      continue
+    }
+
+    // Handle 204 No Content (common for DELETE)
+    if (res.status === 204) {
+      return undefined as T
+    }
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}))
+      throw new GraphError(
+        err.error?.message || `Graph API error: ${res.status}`,
+        res.status,
+        err.error?.code
+      )
+    }
+
+    return res.json()
   }
-
-  // Handle 204 No Content (common for DELETE)
-  if (res.status === 204) {
-    return undefined as T
-  }
-
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}))
-    throw new GraphError(
-      err.error?.message || `Graph API error: ${res.status}`,
-      res.status,
-      err.error?.code
-    )
-  }
-
-  return res.json()
 }
 
 // ─── Microsoft Profile ───────────────────────────────────────────────────────

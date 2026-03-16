@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { createRateLimiter } from '@/lib/middleware/rate-limit'
+import { validatePortalToken, PortalAuthError } from '@/lib/services/portal-auth'
 
 const limiter = createRateLimiter({ windowMs: 60_000, maxRequests: 15 })
 
@@ -34,23 +35,18 @@ export async function GET(
     }
 
     const { token } = await params
+
+    let link: Awaited<ReturnType<typeof validatePortalToken>>
+    try {
+      link = await validatePortalToken(token)
+    } catch (error) {
+      if (error instanceof PortalAuthError) {
+        return NextResponse.json({ error: error.message }, { status: error.status })
+      }
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    }
+
     const admin = createAdminClient()
-
-    // Validate token
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: link, error: linkError } = await (admin as any)
-      .from('portal_links')
-      .select('matter_id, expires_at, is_active')
-      .eq('token', token)
-      .eq('is_active', true)
-      .single()
-
-    if (linkError || !link) {
-      return NextResponse.json({ error: 'Invalid token' }, { status: 404 })
-    }
-    if (new Date(link.expires_at) < new Date()) {
-      return NextResponse.json({ error: 'Token expired' }, { status: 410 })
-    }
 
     // Fetch client-submitted documents for this matter
     const { data: docs } = await admin
@@ -84,23 +80,18 @@ export async function POST(
     }
 
     const { token } = await params
+
+    let link: Awaited<ReturnType<typeof validatePortalToken>>
+    try {
+      link = await validatePortalToken(token)
+    } catch (error) {
+      if (error instanceof PortalAuthError) {
+        return NextResponse.json({ error: error.message }, { status: error.status })
+      }
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    }
+
     const admin = createAdminClient()
-
-    // Validate token
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: link, error: linkError } = await (admin as any)
-      .from('portal_links')
-      .select('matter_id, tenant_id, contact_id, expires_at, is_active')
-      .eq('token', token)
-      .eq('is_active', true)
-      .single()
-
-    if (linkError || !link) {
-      return NextResponse.json({ error: 'Invalid token' }, { status: 404 })
-    }
-    if (new Date(link.expires_at) < new Date()) {
-      return NextResponse.json({ error: 'Token expired' }, { status: 410 })
-    }
 
     // Parse form data
     const formData = await request.formData()

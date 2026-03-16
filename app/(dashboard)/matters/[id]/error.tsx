@@ -4,6 +4,7 @@ import { useEffect } from 'react'
 import { AlertTriangle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
+import { reportError } from '@/lib/monitoring/error-reporter'
 
 export default function MatterDetailError({
   error,
@@ -14,6 +15,7 @@ export default function MatterDetailError({
 }) {
   useEffect(() => {
     console.error('Matter detail error:', error)
+    reportError(error, { route: 'matters/[id]', metadata: { digest: error.digest } })
   }, [error])
 
   return (

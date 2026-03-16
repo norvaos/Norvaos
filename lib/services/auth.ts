@@ -87,10 +87,10 @@ export async function authenticateRequest(): Promise<AuthContext> {
     // Cache failures never break auth
   }
 
-  // 3. DB query (cache miss path) — now includes role_id for zero-cost permission checks
+  // 3. DB query (cache miss path) — now includes role_id + is_active for zero-cost permission checks
   const { data: appUser, error: userError } = await supabase
     .from('users')
-    .select('id, tenant_id, role_id')
+    .select('id, tenant_id, role_id, is_active')
     .eq('auth_user_id', authUser.id)
     .single()
 
@@ -100,6 +100,11 @@ export async function authenticateRequest(): Promise<AuthContext> {
 
   if (!appUser.tenant_id) {
     throw new AuthError('No tenant associated with user', 403)
+  }
+
+  // Block deactivated users — immediate enforcement regardless of session state
+  if (appUser.is_active === false) {
+    throw new AuthError('Account deactivated', 403)
   }
 
   // 4. Fetch role + permissions in parallel with nothing (single extra call, not sequential)

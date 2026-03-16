@@ -5,7 +5,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { withTiming } from '@/lib/middleware/request-timing'
 import { log } from '@/lib/utils/logger'
 import { rollbackBatch } from '@/lib/services/import/rollback-engine'
-import type { Json } from '@/lib/types/database'
+import { logAuditServer } from '@/lib/queries/audit-logs'
 
 /**
  * POST /api/import/[batchId]/rollback
@@ -44,22 +44,20 @@ async function handlePost(
 
     const result = await rollbackBatch(admin, auth.tenantId, batchId, auth.userId)
 
-    // Audit log
-    admin
-      .from('audit_logs')
-      .insert({
-        tenant_id: auth.tenantId,
-        user_id: auth.userId,
-        action: 'import_rollback',
-        entity_type: 'import_batch',
-        entity_id: batchId,
-        metadata: {
-          platform: batch.source_platform,
-          entityType: batch.entity_type,
-          rolledBackCount: result.rolledBackCount,
-        } as unknown as Json,
-      })
-      .then(() => {})
+    // Audit log — batch-level rollback event (per-matter events written by rollback-engine)
+    logAuditServer({
+      supabase: auth.supabase,
+      tenantId: auth.tenantId,
+      userId: auth.userId,
+      entityType: 'import_batch',
+      entityId: batchId,
+      action: 'import_rollback',
+      changes: {
+        platform: batch.source_platform,
+        entityType: batch.entity_type,
+        rolledBackCount: result.rolledBackCount,
+      },
+    }).catch(() => {})
 
     return NextResponse.json({
       batchId,

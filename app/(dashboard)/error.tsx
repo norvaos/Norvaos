@@ -3,6 +3,7 @@
 import { useEffect } from 'react'
 import { AlertTriangle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { reportError } from '@/lib/monitoring/error-reporter'
 
 export default function DashboardError({
   error,
@@ -12,8 +13,8 @@ export default function DashboardError({
   reset: () => void
 }) {
   useEffect(() => {
-    // Log to error reporting service
     console.error('Dashboard error boundary caught:', error)
+    reportError(error, { route: 'dashboard', metadata: { digest: error.digest } })
   }, [error])
 
   return (

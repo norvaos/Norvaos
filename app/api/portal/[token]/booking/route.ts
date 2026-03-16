@@ -1,30 +1,9 @@
 import { NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { createRateLimiter } from '@/lib/middleware/rate-limit'
+import { validatePortalToken, PortalAuthError } from '@/lib/services/portal-auth'
 
 const tokenLookupLimiter = createRateLimiter({ windowMs: 60_000, maxRequests: 30 })
-
-// ── Token Validation ──────────────────────────────────────────────────────
-
-async function validateToken(admin: ReturnType<typeof createAdminClient>, token: string) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: link, error: linkError } = await (admin as any)
-    .from('portal_links')
-    .select('id, matter_id, tenant_id, contact_id, expires_at, is_active')
-    .eq('token', token)
-    .eq('is_active', true)
-    .single()
-
-  if (linkError || !link) {
-    return { error: NextResponse.json({ error: 'Invalid token' }, { status: 404 }) }
-  }
-
-  if (new Date(link.expires_at) < new Date()) {
-    return { error: NextResponse.json({ error: 'Link expired' }, { status: 410 }) }
-  }
-
-  return { link }
-}
 
 // ── Slot Computation (from /api/booking/[slug]/route.ts) ────────────────
 
@@ -268,10 +247,18 @@ async function handleGet(
     }
 
     const { token } = await params
+
+    let link: Awaited<ReturnType<typeof validatePortalToken>>
+    try {
+      link = await validatePortalToken(token)
+    } catch (error) {
+      if (error instanceof PortalAuthError) {
+        return NextResponse.json({ error: error.message }, { status: error.status })
+      }
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    }
+
     const admin = createAdminClient()
-    const result = await validateToken(admin, token)
-    if (result.error) return result.error
-    const { link } = result
 
     // 1. Get matter's responsible lawyer
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -448,10 +435,18 @@ async function handlePost(
     }
 
     const { token } = await params
+
+    let link: Awaited<ReturnType<typeof validatePortalToken>>
+    try {
+      link = await validatePortalToken(token)
+    } catch (error) {
+      if (error instanceof PortalAuthError) {
+        return NextResponse.json({ error: error.message }, { status: error.status })
+      }
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    }
+
     const admin = createAdminClient()
-    const result = await validateToken(admin, token)
-    if (result.error) return result.error
-    const { link } = result
 
     const body = await request.json()
     const { date, time, meeting_type, notes } = body as {

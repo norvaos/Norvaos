@@ -1,5 +1,6 @@
 import type { NextConfig } from "next";
 import { execSync } from "child_process";
+import { withSentryConfig } from "@sentry/nextjs";
 
 // Get git SHA at build time
 let gitSha = "unknown";
@@ -58,7 +59,7 @@ const nextConfig: NextConfig = {
               "style-src 'self' 'unsafe-inline'",
               "img-src 'self' data: blob: https://*.supabase.co https://*.supabase.in",
               "font-src 'self' data:",
-              "connect-src 'self' https://*.supabase.co https://*.supabase.in https://api.stripe.com",
+              "connect-src 'self' https://*.supabase.co https://*.supabase.in https://api.stripe.com https://*.ingest.sentry.io",
               "frame-src 'self' https://js.stripe.com https://hooks.stripe.com",
               "frame-ancestors 'none'",
               "form-action 'self'",
@@ -93,4 +94,16 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default withSentryConfig(nextConfig, {
+  // Suppress Sentry CLI output during builds
+  silent: true,
+
+  // Sentry organisation and project (used for source map uploads)
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
+
+  // Upload source maps for readable stack traces in Sentry
+  sourcemaps: {
+    deleteSourcemapsAfterUpload: true,
+  },
+});

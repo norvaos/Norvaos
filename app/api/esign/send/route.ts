@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { authenticateRequest, AuthError } from '@/lib/services/auth'
+import { requirePermission } from '@/lib/services/require-role'
 import { createAdminClient } from '@/lib/supabase/admin'
 import {
   freezeDocument,
@@ -22,6 +23,8 @@ async function handlePost(request: Request) {
     }
     return NextResponse.json({ error: 'Authentication failed' }, { status: 401 })
   }
+
+  requirePermission(auth, 'documents', 'edit')
 
   const { supabase, tenantId, userId } = auth
 

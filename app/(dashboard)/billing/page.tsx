@@ -8,6 +8,8 @@ import {
   useCreateTimeEntry,
   useUpdateInvoiceStatus,
   useRecordPayment,
+  useSendInvoice,
+  useSendReceipt,
   type InvoiceWithMatter,
 } from '@/lib/queries/invoicing'
 import { useMatters } from '@/lib/queries/matters'
@@ -309,10 +311,8 @@ function BillingPageContent() {
   const { data: stats, isLoading: statsLoading } = useBillingStats(tenantId)
   const { data: invoices, isLoading: invoicesLoading } = useInvoices(tenantId)
   const updateStatus = useUpdateInvoiceStatus()
-
-  const handleMarkSent = (inv: InvoiceWithMatter) => {
-    updateStatus.mutate({ id: inv.id, status: 'sent' })
-  }
+  const sendInvoice = useSendInvoice()
+  const sendReceipt = useSendReceipt()
 
   return (
     <div className="space-y-6 p-6">
@@ -324,6 +324,9 @@ function BillingPageContent() {
             Track time, manage invoices, and record payments
           </p>
         </div>
+        <Button onClick={() => router.push('/billing/invoices/new')}>
+          <Plus className="h-4 w-4 mr-1" /> New Invoice
+        </Button>
       </div>
 
       {/* ── Stats Row ── */}
@@ -418,9 +421,9 @@ function BillingPageContent() {
                   <div
                     key={inv.id}
                     className="grid grid-cols-[80px_1fr_100px_100px_90px_120px] gap-2 px-3 py-2.5 text-sm rounded-md hover:bg-slate-50 cursor-pointer items-center"
-                    onClick={() => router.push(`/matters/${inv.matter_id}`)}
+                    onClick={() => router.push(`/billing/invoices/${inv.id}`)}
                   >
-                    <span className="font-mono text-xs">{inv.invoice_number}</span>
+                    <span className="font-mono text-xs">{inv.invoice_number || 'Draft'}</span>
                     <span className="truncate text-xs">
                       {inv.matter_number ? `${inv.matter_number} — ` : ''}{inv.matter_title}
                     </span>
@@ -434,18 +437,19 @@ function BillingPageContent() {
                       {getStatusLabel(inv.status)}
                     </Badge>
                     <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
-                      {inv.status === 'draft' && (
+                      {inv.status === 'finalized' && (
                         <Button
                           variant="ghost"
                           size="sm"
                           className="h-6 text-xs px-2"
-                          onClick={() => handleMarkSent(inv)}
-                          disabled={updateStatus.isPending}
+                          onClick={() => sendInvoice.mutate({ invoiceId: inv.id })}
+                          disabled={sendInvoice.isPending}
                         >
+                          {sendInvoice.isPending ? <Loader2 className="mr-1 h-3 w-3 animate-spin" /> : null}
                           Send
                         </Button>
                       )}
-                      {['sent', 'viewed', 'overdue'].includes(inv.status) && (
+                      {['sent', 'viewed', 'overdue', 'partially_paid'].includes(inv.status) && (
                         <Button
                           variant="ghost"
                           size="sm"
@@ -453,6 +457,18 @@ function BillingPageContent() {
                           onClick={() => setPaymentInvoice(inv)}
                         >
                           Pay
+                        </Button>
+                      )}
+                      {inv.status === 'paid' && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-6 text-xs px-2"
+                          onClick={() => sendReceipt.mutate({ invoiceId: inv.id })}
+                          disabled={sendReceipt.isPending}
+                        >
+                          {sendReceipt.isPending ? <Loader2 className="mr-1 h-3 w-3 animate-spin" /> : null}
+                          Send Receipt
                         </Button>
                       )}
                     </div>

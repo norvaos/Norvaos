@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { authenticateRequest, AuthError } from '@/lib/services/auth'
+import { requirePermission } from '@/lib/services/require-role'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { withTiming } from '@/lib/middleware/request-timing'
 import { manualAssociate, getAssociationSuggestions } from '@/lib/services/email-association'
@@ -17,6 +18,7 @@ async function handlePost(
 ) {
   try {
     const auth = await authenticateRequest()
+    requirePermission(auth, 'communications', 'edit')
     const { threadId } = await params
     const { matter_id } = await request.json()
 
@@ -73,6 +75,7 @@ async function handleGet(
 ) {
   try {
     const auth = await authenticateRequest()
+    requirePermission(auth, 'communications', 'edit')
     const { threadId } = await params
     const admin = createAdminClient()
 

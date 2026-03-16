@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { authenticateRequest, AuthError } from '@/lib/services/auth'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { requirePermission } from '@/lib/services/require-role'
 import { log } from '@/lib/utils/logger'
 
 // ── GET /api/settings/signature ────────────────────────────────────────────
@@ -9,6 +10,7 @@ import { log } from '@/lib/utils/logger'
 async function handleGet() {
   try {
     const auth = await authenticateRequest()
+    requirePermission(auth, 'settings', 'view')
     const admin = createAdminClient()
 
     // Fetch user's settings JSONB
@@ -61,6 +63,7 @@ async function handleGet() {
 async function handlePut(request: Request) {
   try {
     const auth = await authenticateRequest()
+    requirePermission(auth, 'settings', 'edit')
     const admin = createAdminClient()
 
     const body = await request.json()
@@ -171,6 +174,7 @@ async function handlePut(request: Request) {
 async function handleDelete() {
   try {
     const auth = await authenticateRequest()
+    requirePermission(auth, 'settings', 'edit')
     const admin = createAdminClient()
 
     // Fetch current settings to get storage path

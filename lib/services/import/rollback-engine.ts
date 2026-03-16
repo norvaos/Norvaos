@@ -8,6 +8,8 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/lib/types/database'
 import { log } from '@/lib/utils/logger'
+import { IMPORT_REVERTED_STATUS } from '@/lib/utils/matter-status'
+import { logAuditServer } from '@/lib/queries/audit-logs'
 
 const SOFT_DELETE_TABLES = new Set(['contacts', 'tasks'])
 const HARD_DELETE_TABLES = new Set(['notes', 'leads', 'documents', 'time_entries', 'pipeline_stages'])
@@ -77,13 +79,66 @@ export async function rollbackBatch(
             .in('id', batch)
         }
 
-        // Also delete matter_contacts junction rows if rolling back matters
+        // Mark rolled-back imported matters with 'import_reverted' so they are
+        // distinguishable from legitimately closed matters (closed_won / closed_lost).
+        // Only matters imported in this specific batch are affected — matched by id
+        // from import_records where target_entity_type = 'matters'.
         if (entityType === 'matters') {
-          await admin
+          const revertedAt = new Date().toISOString()
+
+          // Fetch current status of each matter so the audit trail records
+          // the exact before-state for every rolled-back record.
+          const { data: currentMatters } = await admin
             .from('matters')
-            .update({ status: 'closed' } as never)
+            .select('id, status')
             .eq('tenant_id', tenantId)
             .in('id', batch)
+
+          const previousStatusMap: Record<string, string> = {}
+          for (const m of currentMatters ?? []) {
+            previousStatusMap[m.id] = m.status
+          }
+
+          const { error: revertErr } = await admin
+            .from('matters')
+            .update({
+              status: IMPORT_REVERTED_STATUS,
+              updated_at: revertedAt,
+            } as never)
+            .eq('tenant_id', tenantId)
+            .in('id', batch)
+
+          if (revertErr) {
+            log.error('[import-rollback] Failed to set import_reverted status on matters', {
+              error_message: revertErr.message,
+              tenant_id: tenantId,
+              batch_id: batchId,
+            })
+            throw new Error(`Failed to revert matter statuses: ${revertErr.message}`)
+          }
+
+          // Write one audit record per matter so the full event is traceable.
+          for (const matterId of batch) {
+            await logAuditServer({
+              supabase: admin,
+              tenantId,
+              userId,
+              entityType: 'matter',
+              entityId: matterId,
+              action: 'import_reverted',
+              changes: {
+                status: {
+                  from: previousStatusMap[matterId] ?? 'unknown',
+                  to: IMPORT_REVERTED_STATUS,
+                },
+              },
+              metadata: {
+                import_batch_id: batchId,
+                reverted_by: userId,
+                reverted_at: revertedAt,
+              },
+            })
+          }
         }
 
         rolledBackCount += batch.length

@@ -1,8 +1,10 @@
 import { NextResponse } from 'next/server'
+import { z } from 'zod'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { log } from '@/lib/utils/logger'
 import { withPlatformAdmin } from '@/lib/services/with-platform-admin'
 import { withTiming } from '@/lib/middleware/request-timing'
+import { logPlatformAdminAction } from '@/lib/services/platform-admin'
 
 /**
  * GET /api/admin/tenants
@@ -99,3 +101,92 @@ const handleGet = withPlatformAdmin(async (request) => {
 })
 
 export const GET = withTiming(handleGet, 'GET /api/admin/tenants')
+
+// ── POST /api/admin/tenants ───────────────────────────────────────────────────
+
+const createTenantSchema = z.object({
+  name: z.string().min(2).max(100),
+  slug: z.string().min(2).max(60).regex(/^[a-z0-9-]+$/, 'Slug must be lowercase letters, numbers, and hyphens only').optional(),
+  subscription_tier: z.enum(['starter', 'professional', 'enterprise']).default('starter'),
+  max_users: z.number().int().min(1).max(1000).default(10),
+  timezone: z.string().default('America/Toronto'),
+})
+
+/**
+ * POST /api/admin/tenants
+ *
+ * Platform-admin ONLY — create a new tenant.
+ * Slug auto-generated from name if not provided.
+ * Duplicate slug returns 409.
+ */
+const handlePost = withPlatformAdmin(async (request, ctx) => {
+  const body = await request.json().catch(() => null)
+  if (!body) return NextResponse.json({ error: 'Invalid JSON body.' }, { status: 400 })
+
+  const parsed = createTenantSchema.safeParse(body)
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: parsed.error.issues[0]?.message ?? 'Invalid input.' },
+      { status: 400 },
+    )
+  }
+
+  const { name, subscription_tier, max_users, timezone } = parsed.data
+
+  // Auto-generate slug from name if not provided
+  const slug = parsed.data.slug
+    ?? name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60)
+
+  const admin = createAdminClient()
+
+  // Duplicate slug check
+  const { data: existing } = await admin
+    .from('tenants')
+    .select('id')
+    .eq('slug', slug)
+    .single()
+
+  if (existing) {
+    return NextResponse.json(
+      { error: `A tenant with slug "${slug}" already exists.` },
+      { status: 409 },
+    )
+  }
+
+  const { data: tenant, error: createErr } = await admin
+    .from('tenants')
+    .insert({
+      name,
+      slug,
+      subscription_tier,
+      subscription_status: 'trialing',
+      max_users,
+      timezone,
+      status: 'active',
+    })
+    .select('id, name, slug, subscription_tier, max_users, status, created_at')
+    .single()
+
+  if (createErr || !tenant) {
+    log.error('[admin/tenants] Failed to create tenant', { error_code: createErr?.code })
+    return NextResponse.json({ error: 'Failed to create tenant.' }, { status: 500 })
+  }
+
+  logPlatformAdminAction({
+    tenant_id: tenant.id,
+    action: 'tenant_created',
+    entity_type: 'tenant',
+    entity_id: tenant.id,
+    changes: { name, slug, subscription_tier, max_users, timezone },
+    reason: 'Tenant created via platform-admin API',
+    ip: ctx.ip,
+    user_agent: ctx.userAgent,
+    request_id: ctx.requestId,
+  }).catch(() => {})
+
+  log.info('[admin/tenants] Tenant created', { tenant_id: tenant.id, slug })
+
+  return NextResponse.json({ data: tenant, error: null }, { status: 201 })
+})
+
+export const POST = withTiming(handlePost, 'POST /api/admin/tenants')

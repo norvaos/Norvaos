@@ -85,7 +85,16 @@ jobs:
       - name: Security audit
         run: pnpm audit --audit-level=high || echo "::warning::Security vulnerabilities found — review pnpm audit output above"
 
-      - name: Type Check & Build
+      - name: Type Check
+        run: pnpm type-check
+
+      - name: Schema drift check
+        run: node scripts/check-schema-drift.mjs
+        env:
+          SUPABASE_DB_URL: ${{ secrets.STAGING_DB_URL }}
+        continue-on-error: ${{ github.event_name == 'push' }}
+
+      - name: Build
         run: pnpm build
         env:
           # Provide dummy env vars for build (not real secrets)

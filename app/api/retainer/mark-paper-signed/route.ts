@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from 'next/server'
 import { createServerSupabaseClient, createServiceRoleClient } from '@/lib/supabase/server'
 import { authenticateRequest, AuthError } from '@/lib/services/auth'
 import { convertLeadToMatter } from '@/lib/services/lead-conversion-executor'
+import { requirePermission } from '@/lib/services/require-role'
 import { recalculateLeadSummary } from '@/lib/services/lead-summary-recalculator'
 import { advanceLeadStage } from '@/lib/services/lead-stage-engine'
 
@@ -20,6 +21,7 @@ import { advanceLeadStage } from '@/lib/services/lead-stage-engine'
 export async function POST(request: NextRequest) {
   try {
     const auth = await authenticateRequest()
+    requirePermission(auth, 'leads', 'edit')
     const supabase = await createServerSupabaseClient()
 
     const formData = await request.formData()

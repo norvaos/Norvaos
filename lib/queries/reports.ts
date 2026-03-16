@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query'
 import { createClient } from '@/lib/supabase/client'
 import type { DateRange } from '@/lib/hooks/use-period-filter'
 import { BILLING_TYPES, TASK_STATUSES } from '@/lib/utils/constants'
+import { IMPORT_REVERTED_STATUS } from '@/lib/utils/matter-status'
 
 // ── Helpers ──────────────────────────────────────────────────────────────────────
 
@@ -96,7 +97,10 @@ async function getFilteredMatterIds(
   const hasMatterFilter = filters.practiceAreaId || filters.billingType
   if (!hasMatterFilter) return null
 
+  // Exclude import-reverted matters so that task-level reports joining through
+  // this function never include tasks belonging to rolled-back import artifacts.
   let query = supabase.from('matters').select('id').eq('tenant_id', tenantId)
+    .neq('status', IMPORT_REVERTED_STATUS)
   if (filters.practiceAreaId) query = query.eq('practice_area_id', filters.practiceAreaId)
   if (filters.billingType) query = query.eq('billing_type', filters.billingType)
 
@@ -236,15 +240,18 @@ export function useReportMatterStats(tenantId: string, range: DateRange, filters
 
       let newQ = supabase.from('matters').select('*', { count: 'exact', head: true })
         .eq('tenant_id', tenantId).gte('date_opened', s).lte('date_opened', e)
+        .neq('status', IMPORT_REVERTED_STATUS)
       newQ = applyMatterFilters(newQ, filters)
 
       let closedQ = supabase.from('matters').select('*', { count: 'exact', head: true })
         .eq('tenant_id', tenantId).not('date_closed', 'is', null)
         .gte('date_closed', s).lte('date_closed', e)
+        .neq('status', IMPORT_REVERTED_STATUS)
       closedQ = applyMatterFilters(closedQ, filters)
 
       let revenueQ = supabase.from('matters').select('total_billed')
         .eq('tenant_id', tenantId).gte('date_opened', s).lte('date_opened', e)
+        .neq('status', IMPORT_REVERTED_STATUS)
       revenueQ = applyMatterFilters(revenueQ, filters)
 
       const [activeRes, newRes, closedRes, revenueRes] = await Promise.all([activeQ, newQ, closedQ, revenueQ])
@@ -403,11 +410,13 @@ export function useReportMattersOpenedVsClosed(tenantId: string, filters?: Repor
 
       let openedQ = supabase.from('matters').select('date_opened')
         .eq('tenant_id', tenantId).gte('date_opened', sixMonthsAgo)
+        .neq('status', IMPORT_REVERTED_STATUS)
       openedQ = applyMatterFilters(openedQ, filters)
 
       let closedQ = supabase.from('matters').select('date_closed')
         .eq('tenant_id', tenantId).not('date_closed', 'is', null)
         .gte('date_closed', sixMonthsAgo)
+        .neq('status', IMPORT_REVERTED_STATUS)
       closedQ = applyMatterFilters(closedQ, filters)
 
       const [openedRes, closedRes] = await Promise.all([openedQ, closedQ])
@@ -499,6 +508,7 @@ export function useReportRevenueByPracticeArea(tenantId: string, range: DateRang
         .select('practice_area_id, total_billed')
         .eq('tenant_id', tenantId)
         .not('practice_area_id', 'is', null)
+        .neq('status', IMPORT_REVERTED_STATUS)
       query = applyMatterFilters(query, filters)
 
       const { data, error } = await query
@@ -541,6 +551,7 @@ export function useReportRevenueByBillingType(tenantId: string, range: DateRange
         .select('billing_type, total_billed')
         .eq('tenant_id', tenantId)
         .not('billing_type', 'is', null)
+        .neq('status', IMPORT_REVERTED_STATUS)
       query = applyMatterFilters(query, filters)
 
       const { data, error } = await query
@@ -595,6 +606,7 @@ export function useReportRevenueTrend(tenantId: string, filters?: ReportFilters)
         .select('date_opened, total_billed')
         .eq('tenant_id', tenantId)
         .gte('date_opened', twelveMonthsAgo)
+        .neq('status', IMPORT_REVERTED_STATUS)
       query = applyMatterFilters(query, filters)
 
       const { data, error } = await query

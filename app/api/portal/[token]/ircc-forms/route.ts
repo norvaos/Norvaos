@@ -4,30 +4,9 @@ import { createRateLimiter } from '@/lib/middleware/rate-limit'
 import { withTiming } from '@/lib/middleware/request-timing'
 import { computePerFormProgress } from '@/lib/ircc/questionnaire-engine-db'
 import type { IRCCProfile } from '@/lib/types/ircc-profile'
+import { validatePortalToken, PortalAuthError } from '@/lib/services/portal-auth'
 
 const rateLimiter = createRateLimiter({ windowMs: 60_000, maxRequests: 30 })
-
-// ── Token Validation Helper ──────────────────────────────────────────────────
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function validateToken(admin: any, token: string) {
-  const { data: link, error: linkError } = await admin
-    .from('portal_links')
-    .select('id, matter_id, tenant_id, metadata, expires_at, is_active')
-    .eq('token', token)
-    .eq('is_active', true)
-    .single()
-
-  if (linkError || !link) {
-    return { error: NextResponse.json({ error: 'Invalid token' }, { status: 404 }) }
-  }
-
-  if (new Date(link.expires_at) < new Date()) {
-    return { error: NextResponse.json({ error: 'Link expired' }, { status: 410 }) }
-  }
-
-  return { link }
-}
 
 // ── GET /api/portal/[token]/ircc-forms ──────────────────────────────────────
 
@@ -52,13 +31,19 @@ async function handleGet(
     }
 
     const { token } = await params
+
+    let link: Awaited<ReturnType<typeof validatePortalToken>>
+    try {
+      link = await validatePortalToken(token)
+    } catch (error) {
+      if (error instanceof PortalAuthError) {
+        return NextResponse.json({ error: error.message }, { status: error.status })
+      }
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    }
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const admin = createAdminClient() as any
-
-    // Validate token
-    const result = await validateToken(admin, token)
-    if (result.error) return result.error
-    const { link } = result
 
     const matterId = link.matter_id
 

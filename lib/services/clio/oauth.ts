@@ -8,6 +8,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/lib/types/database'
 import type { TokenResponse } from '@/lib/services/oauth/types'
 import { encryptToken, decryptToken, signState, verifyState } from '@/lib/services/oauth/encryption'
+import { log } from '@/lib/utils/logger'
 
 const CLIO_AUTH_URL = 'https://app.clio.com/oauth/authorize'
 const CLIO_TOKEN_URL = 'https://app.clio.com/oauth/token'
@@ -93,9 +94,30 @@ export async function refreshClioToken(encryptedRefreshToken: string): Promise<T
   return res.json()
 }
 
+/**
+ * Thrown when a Clio connection cannot be used because the token is invalid
+ * and refresh has either failed or been exhausted.
+ * The connection is marked disconnected in platform_connections before this is thrown.
+ */
+export class ClioConnectionError extends Error {
+  constructor(message: string) {
+    super(message)
+    this.name = 'ClioConnectionError'
+  }
+}
+
+/**
+ * Returns a valid Clio access token for the given connection, refreshing
+ * proactively (5-minute buffer) or on demand when force=true.
+ *
+ * If the refresh token is revoked or expired, marks the connection as
+ * disconnected (status='disconnected', is_active=false) and throws
+ * ClioConnectionError. Callers must not retry after this error.
+ */
 export async function getValidClioToken(
   connectionId: string,
   admin: SupabaseClient<Database>,
+  { force = false }: { force?: boolean } = {},
 ): Promise<string> {
   const { data: conn } = await admin
     .from('platform_connections')
@@ -106,30 +128,54 @@ export async function getValidClioToken(
     .single()
 
   if (!conn) {
-    throw new Error('Clio connection not found or inactive')
+    throw new ClioConnectionError('Clio connection not found or inactive')
   }
 
   const expiresAt = new Date(conn.token_expires_at).getTime()
   const bufferMs = 5 * 60 * 1000
 
-  if (Date.now() < expiresAt - bufferMs) {
+  if (!force && Date.now() < expiresAt - bufferMs) {
     return decryptToken(conn.access_token_encrypted)
   }
 
-  const tokens = await refreshClioToken(conn.refresh_token_encrypted)
-  const newExpiresAt = new Date(Date.now() + tokens.expires_in * 1000).toISOString()
+  // Refresh the token — wrap in try/catch to catch revoked/expired refresh tokens
+  try {
+    const tokens = await refreshClioToken(conn.refresh_token_encrypted)
+    const newExpiresAt = new Date(Date.now() + tokens.expires_in * 1000).toISOString()
 
-  await admin
-    .from('platform_connections')
-    .update({
-      access_token_encrypted: encryptToken(tokens.access_token),
-      refresh_token_encrypted: encryptToken(tokens.refresh_token),
-      token_expires_at: newExpiresAt,
-      updated_at: new Date().toISOString(),
+    await admin
+      .from('platform_connections')
+      .update({
+        access_token_encrypted: encryptToken(tokens.access_token),
+        refresh_token_encrypted: encryptToken(tokens.refresh_token),
+        token_expires_at: newExpiresAt,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', connectionId)
+
+    return tokens.access_token
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err)
+
+    // Mark the connection inactive so subsequent calls fail fast without looping
+    await admin
+      .from('platform_connections')
+      .update({
+        status: 'disconnected',
+        is_active: false,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', connectionId)
+
+    log.error('clio.oauth.refresh_failed', {
+      connection_id: connectionId,
+      error_message: message,
     })
-    .eq('id', connectionId)
 
-  return tokens.access_token
+    throw new ClioConnectionError(
+      `Clio connection disconnected: token refresh failed — ${message}`,
+    )
+  }
 }
 
 /**

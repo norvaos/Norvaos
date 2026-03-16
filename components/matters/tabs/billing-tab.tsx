@@ -38,6 +38,8 @@ import {
   useUpdateInvoiceStatus,
   useDeleteInvoice,
   useRecordPayment,
+  useSendInvoice,
+  useSendReceipt,
   useMatterRetainerSummary,
   useRecordMatterRetainerPayment,
   type MatterRetainerSummary,
@@ -261,6 +263,8 @@ export function BillingTab({ matterId, tenantId, matter }: { matterId: string; t
   const updateStatus = useUpdateInvoiceStatus()
   const deleteInvoice = useDeleteInvoice()
   const recordPayment = useRecordPayment()
+  const sendInvoice = useSendInvoice()
+  const sendReceipt = useSendReceipt()
 
   const [downloadingPdf, setDownloadingPdf] = useState<string | null>(null)
 
@@ -446,14 +450,21 @@ export function BillingTab({ matterId, tenantId, matter }: { matterId: string; t
                     {invoiceStatusLabel(inv.status)}
                   </Badge>
                   <div className="flex gap-1">
+                    {inv.status === 'finalized' && (
+                      <Button variant="ghost" size="sm" className="h-6 text-xs px-2" disabled={sendInvoice.isPending} onClick={() => sendInvoice.mutate({ invoiceId: inv.id })}>
+                        {sendInvoice.isPending ? <Loader2 className="mr-1 h-3 w-3 animate-spin" /> : null}Send Invoice
+                      </Button>
+                    )}
                     {inv.status === 'draft' && (
-                      <>
-                        <Button variant="ghost" size="sm" className="h-6 text-xs px-2" onClick={() => updateStatus.mutate({ id: inv.id, status: 'sent' })}>Send</Button>
-                        <Button variant="ghost" size="sm" className="h-6 text-xs px-2 text-red-500" onClick={() => deleteInvoice.mutate(inv.id)}>Delete</Button>
-                      </>
+                      <Button variant="ghost" size="sm" className="h-6 text-xs px-2 text-red-500" onClick={() => deleteInvoice.mutate(inv.id)}>Delete</Button>
                     )}
                     {['sent', 'viewed', 'overdue'].includes(inv.status) && (
                       <Button variant="ghost" size="sm" className="h-6 text-xs px-2" onClick={() => setShowPayment(inv.id)}>Record Payment</Button>
+                    )}
+                    {inv.status === 'paid' && (
+                      <Button variant="ghost" size="sm" className="h-6 text-xs px-2" disabled={sendReceipt.isPending} onClick={() => sendReceipt.mutate({ invoiceId: inv.id })}>
+                        {sendReceipt.isPending ? <Loader2 className="mr-1 h-3 w-3 animate-spin" /> : null}Send Receipt
+                      </Button>
                     )}
                     <Button
                       variant="ghost"

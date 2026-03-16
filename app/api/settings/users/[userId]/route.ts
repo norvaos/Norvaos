@@ -5,13 +5,15 @@ import { requirePermission } from '@/lib/services/require-role'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { withTiming } from '@/lib/middleware/request-timing'
 import { log } from '@/lib/utils/logger'
-import { logAudit } from '@/lib/queries/audit-logs'
+import { logAuditServer } from '@/lib/queries/audit-logs'
 
 const updateUserSchema = z.object({
   first_name: z.string().min(1).max(100).optional(),
   last_name: z.string().min(1).max(100).optional(),
   password: z.string().min(8, 'Password must be at least 8 characters').optional(),
   email: z.string().email('Invalid email address').optional(),
+  is_active: z.boolean().optional(),
+  role_id: z.string().regex(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i, 'Invalid role ID').optional(),
 })
 
 async function handlePatch(request: Request, { params }: { params: Promise<{ userId: string }> }) {
@@ -29,9 +31,9 @@ async function handlePatch(request: Request, { params }: { params: Promise<{ use
       )
     }
 
-    const { first_name, last_name, password, email } = parsed.data
+    const { first_name, last_name, password, email, is_active, role_id } = parsed.data
 
-    if (!first_name && !last_name && !password && !email) {
+    if (!first_name && !last_name && !password && !email && is_active === undefined && !role_id) {
       return NextResponse.json({ error: 'Nothing to update' }, { status: 400 })
     }
 
@@ -40,7 +42,7 @@ async function handlePatch(request: Request, { params }: { params: Promise<{ use
     // Verify user belongs to this tenant
     const { data: targetUser, error: findErr } = await admin
       .from('users')
-      .select('id, first_name, last_name, email, auth_user_id')
+      .select('id, first_name, last_name, email, auth_user_id, is_active, role_id')
       .eq('id', userId)
       .eq('tenant_id', auth.tenantId)
       .single()
@@ -86,7 +88,6 @@ async function handlePatch(request: Request, { params }: { params: Promise<{ use
 
     // Update email via auth admin API + users table
     if (email) {
-      // Best-effort: update auth user if possible (may not exist for pending invites)
       if (targetUser.auth_user_id) {
         const { error: authErr } = await admin.auth.admin.updateUserById(targetUser.auth_user_id, {
           email,
@@ -99,7 +100,6 @@ async function handlePatch(request: Request, { params }: { params: Promise<{ use
           log.warn('[update-user] Auth user not found for email update — updating DB only', { userId })
         }
       }
-      // Always update the users table
       const { error: emailUpdateErr } = await admin
         .from('users')
         .update({ email })
@@ -112,16 +112,106 @@ async function handlePatch(request: Request, { params }: { params: Promise<{ use
       changes.email = { from: targetUser.email, to: email }
     }
 
-    logAudit({
+    // Reactivate: set is_active = true (soft-delete reversal)
+    if (is_active === true && targetUser.is_active === false) {
+      const { error: reactivateErr } = await admin
+        .from('users')
+        .update({ is_active: true })
+        .eq('id', userId)
+        .eq('tenant_id', auth.tenantId)
+
+      if (reactivateErr) {
+        log.error('[update-user] Failed to reactivate user', { error_code: reactivateErr.code })
+        return NextResponse.json({ error: 'Failed to reactivate user.' }, { status: 500 })
+      }
+
+      changes.is_active = { from: false, to: true }
+
+      await logAuditServer({
+        supabase: auth.supabase,
+        tenantId: auth.tenantId,
+        userId: auth.userId,
+        entityType: 'user',
+        entityId: userId,
+        action: 'user_reactivated',
+        changes,
+      })
+
+      log.info('[update-user] User reactivated', { tenant_id: auth.tenantId, target_user_id: userId })
+      return NextResponse.json({ error: null })
+    }
+
+    // Role update
+    if (role_id && role_id !== targetUser.role_id) {
+      // Verify role belongs to this tenant
+      const { data: newRole, error: roleErr } = await admin
+        .from('roles')
+        .select('id, name')
+        .eq('id', role_id)
+        .eq('tenant_id', auth.tenantId)
+        .single()
+
+      if (roleErr || !newRole) {
+        return NextResponse.json({ error: 'Role not found.' }, { status: 404 })
+      }
+
+      // Guard: cannot remove the last active Admin by changing their role away from Admin
+      if (targetUser.role_id) {
+        const { data: currentRole } = await admin
+          .from('roles')
+          .select('name')
+          .eq('id', targetUser.role_id)
+          .eq('tenant_id', auth.tenantId)
+          .single()
+
+        if (currentRole?.name === 'Admin' && newRole.name !== 'Admin') {
+          const { count } = await admin
+            .from('users')
+            .select('id', { count: 'exact', head: true })
+            .eq('tenant_id', auth.tenantId)
+            .eq('is_active', true)
+            .eq('role_id', targetUser.role_id)
+
+          if ((count ?? 0) <= 1) {
+            return NextResponse.json(
+              { error: 'Cannot change the role of the last active Admin.' },
+              { status: 400 }
+            )
+          }
+        }
+      }
+
+      const { error: roleUpdateErr } = await admin
+        .from('users')
+        .update({ role_id })
+        .eq('id', userId)
+        .eq('tenant_id', auth.tenantId)
+
+      if (roleUpdateErr) {
+        log.error('[update-user] Failed to update role', { error_code: roleUpdateErr.code })
+        return NextResponse.json({ error: 'Failed to update role.' }, { status: 500 })
+      }
+
+      changes.role_id = { from: targetUser.role_id, to: role_id, new_role_name: newRole.name }
+    }
+
+    if (Object.keys(changes).length === 0) {
+      return NextResponse.json({ error: null })
+    }
+
+    const action = 'role_id' in changes ? 'role_changed' : 'user_updated'
+
+    await logAuditServer({
+      supabase: auth.supabase,
       tenantId: auth.tenantId,
       userId: auth.userId,
       entityType: 'user',
       entityId: userId,
-      action: 'user_updated',
+      action,
       changes,
-    }).catch(() => {})
+    })
 
-    log.info('[update-user] User updated', { tenant_id: auth.tenantId, target_user_id: userId })
+    log.info('[update-user] User updated', { tenant_id: auth.tenantId, target_user_id: userId, action })
 
     return NextResponse.json({ error: null })
   } catch (err) {

@@ -112,12 +112,22 @@ export async function updateSession(request: NextRequest) {
         try {
           const { data: userData } = await supabase
             .from('users')
-            .select('role_id, roles!inner(name, permissions)')
+            .select('role_id, is_active, roles!inner(name, permissions)')
             .eq('auth_user_id', user.id)
             .limit(1)
             .maybeSingle()
 
           if (userData) {
+            // Block deactivated users at navigation level
+            if (userData.is_active === false) {
+              const url = request.nextUrl.clone()
+              url.pathname = '/login'
+              url.searchParams.set('error', 'account_deactivated')
+              // Clear the session cookie so they can't keep navigating
+              supabaseResponse.cookies.delete('__fd_role')
+              return NextResponse.redirect(url)
+            }
+
             const role = (userData as any).roles as { name: string; permissions: Record<string, any> } | null
             const perms = role?.permissions ?? {}
             const hasFrontDesk = perms.front_desk?.view === true

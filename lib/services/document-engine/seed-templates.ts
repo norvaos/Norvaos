@@ -1168,48 +1168,48 @@ function disengagementBody(): TemplateBody {
 
 function seedMappings(family: string) {
   const common = [
-    { field_key: 'current_date', display_name: 'Current Date', source_entity: 'custom', source_path: 'current_date', field_type: 'date', is_required: false, default_value: null, format_rule: 'date_long', fallback_rule: null, sort_order: 0 },
-    { field_key: 'client_name', display_name: 'Client Name', source_entity: 'contact', source_path: 'full_name', field_type: 'text', is_required: true, default_value: null, format_rule: null, fallback_rule: null, sort_order: 1 },
-    { field_key: 'client_address', display_name: 'Client Address', source_entity: 'contact', source_path: 'address', field_type: 'address', is_required: false, default_value: null, format_rule: null, fallback_rule: null, sort_order: 2 },
-    { field_key: 'client_email', display_name: 'Client Email', source_entity: 'contact', source_path: 'email', field_type: 'text', is_required: false, default_value: null, format_rule: null, fallback_rule: null, sort_order: 3 },
-    { field_key: 'firm_name', display_name: 'Firm Name', source_entity: 'tenant', source_path: 'name', field_type: 'text', is_required: true, default_value: null, format_rule: null, fallback_rule: null, sort_order: 4 },
-    { field_key: 'firm_address', display_name: 'Firm Address', source_entity: 'tenant', source_path: 'firm_address', field_type: 'text', is_required: false, default_value: null, format_rule: null, fallback_rule: null, sort_order: 5 },
-    { field_key: 'firm_phone', display_name: 'Firm Phone', source_entity: 'tenant', source_path: 'firm_phone', field_type: 'text', is_required: false, default_value: null, format_rule: null, fallback_rule: null, sort_order: 6 },
-    { field_key: 'matter_title', display_name: 'Matter Title', source_entity: 'matter', source_path: 'title', field_type: 'text', is_required: true, default_value: null, format_rule: null, fallback_rule: null, sort_order: 7 },
-    { field_key: 'practice_area', display_name: 'Practice Area', source_entity: 'matter', source_path: 'practice_area', field_type: 'text', is_required: false, default_value: null, format_rule: 'titlecase', fallback_rule: null, sort_order: 8 },
-    { field_key: 'lawyer_name', display_name: 'Lawyer Name', source_entity: 'user', source_path: 'full_name', field_type: 'text', is_required: false, default_value: null, format_rule: null, fallback_rule: null, sort_order: 9 },
-    { field_key: 'lawyer_email', display_name: 'Lawyer Email', source_entity: 'user', source_path: 'email', field_type: 'text', is_required: false, default_value: null, format_rule: null, fallback_rule: null, sort_order: 10 },
+    { field_key: 'current_date', display_name: 'Current Date', source_entity: 'custom', source_path: 'current_date', field_type: 'date', is_required: false, default_value: null, format_rule: 'date_long', fallback_rule: null, max_length: null, sort_order: 0 },
+    { field_key: 'client_name', display_name: 'Client Name', source_entity: 'contact', source_path: 'full_name', field_type: 'text', is_required: true, default_value: null, format_rule: null, fallback_rule: null, max_length: null, sort_order: 1 },
+    { field_key: 'client_address', display_name: 'Client Address', source_entity: 'contact', source_path: 'address', field_type: 'address', is_required: false, default_value: null, format_rule: null, fallback_rule: null, max_length: null, sort_order: 2 },
+    { field_key: 'client_email', display_name: 'Client Email', source_entity: 'contact', source_path: 'email', field_type: 'text', is_required: false, default_value: null, format_rule: null, fallback_rule: null, max_length: null, sort_order: 3 },
+    { field_key: 'firm_name', display_name: 'Firm Name', source_entity: 'tenant', source_path: 'name', field_type: 'text', is_required: true, default_value: null, format_rule: null, fallback_rule: null, max_length: null, sort_order: 4 },
+    { field_key: 'firm_address', display_name: 'Firm Address', source_entity: 'tenant', source_path: 'firm_address', field_type: 'text', is_required: false, default_value: null, format_rule: null, fallback_rule: null, max_length: null, sort_order: 5 },
+    { field_key: 'firm_phone', display_name: 'Firm Phone', source_entity: 'tenant', source_path: 'firm_phone', field_type: 'text', is_required: false, default_value: null, format_rule: null, fallback_rule: null, max_length: null, sort_order: 6 },
+    { field_key: 'matter_title', display_name: 'Matter Title', source_entity: 'matter', source_path: 'title', field_type: 'text', is_required: true, default_value: null, format_rule: null, fallback_rule: null, max_length: null, sort_order: 7 },
+    { field_key: 'practice_area', display_name: 'Practice Area', source_entity: 'matter', source_path: 'practice_area', field_type: 'text', is_required: false, default_value: null, format_rule: 'titlecase', fallback_rule: null, max_length: null, sort_order: 8 },
+    { field_key: 'lawyer_name', display_name: 'Lawyer Name', source_entity: 'user', source_path: 'full_name', field_type: 'text', is_required: false, default_value: null, format_rule: null, fallback_rule: null, max_length: null, sort_order: 9 },
+    { field_key: 'lawyer_email', display_name: 'Lawyer Email', source_entity: 'user', source_path: 'email', field_type: 'text', is_required: false, default_value: null, format_rule: null, fallback_rule: null, max_length: null, sort_order: 10 },
   ]
 
   if (family === 'engagement') {
     return [
       ...common,
-      { field_key: 'lawyer_lso_number', display_name: 'LSO Number', source_entity: 'user', source_path: 'lso_number', field_type: 'text', is_required: false, default_value: null, format_rule: null, fallback_rule: null, sort_order: 11 },
-      { field_key: 'billing_type', display_name: 'Billing Type', source_entity: 'billing', source_path: 'billing_type', field_type: 'text', is_required: false, default_value: null, format_rule: null, fallback_rule: null, sort_order: 12 },
-      { field_key: 'hourly_rate', display_name: 'Hourly Rate', source_entity: 'billing', source_path: 'hourly_rate', field_type: 'currency', is_required: false, default_value: null, format_rule: 'currency', fallback_rule: null, sort_order: 13 },
-      { field_key: 'professional_fees', display_name: 'Professional Fees', source_entity: 'billing', source_path: 'professional_fees', field_type: 'currency', is_required: false, default_value: null, format_rule: 'currency', fallback_rule: null, sort_order: 14 },
-      { field_key: 'ircc_fees', display_name: 'IRCC Government Processing Fees', source_entity: 'billing', source_path: 'government_fees', field_type: 'currency', is_required: false, default_value: null, format_rule: 'currency', fallback_rule: null, sort_order: 15 },
-      { field_key: 'disbursements', display_name: 'Estimated Disbursements', source_entity: 'billing', source_path: 'disbursements', field_type: 'currency', is_required: false, default_value: null, format_rule: 'currency', fallback_rule: null, sort_order: 16 },
-      { field_key: 'hst_amount', display_name: 'HST Amount', source_entity: 'billing', source_path: 'hst_amount', field_type: 'currency', is_required: false, default_value: null, format_rule: 'currency', fallback_rule: null, sort_order: 17 },
-      { field_key: 'total_amount', display_name: 'Total Amount', source_entity: 'billing', source_path: 'total_amount', field_type: 'currency', is_required: false, default_value: null, format_rule: 'currency', fallback_rule: null, sort_order: 18 },
-      { field_key: 'trust_amount', display_name: 'Trust Retainer', source_entity: 'billing', source_path: 'trust_balance', field_type: 'currency', is_required: false, default_value: null, format_rule: 'currency', fallback_rule: null, sort_order: 19 },
+      { field_key: 'lawyer_lso_number', display_name: 'LSO Number', source_entity: 'user', source_path: 'lso_number', field_type: 'text', is_required: false, default_value: null, format_rule: null, fallback_rule: null, max_length: null, sort_order: 11 },
+      { field_key: 'billing_type', display_name: 'Billing Type', source_entity: 'billing', source_path: 'billing_type', field_type: 'text', is_required: false, default_value: null, format_rule: null, fallback_rule: null, max_length: null, sort_order: 12 },
+      { field_key: 'hourly_rate', display_name: 'Hourly Rate', source_entity: 'billing', source_path: 'hourly_rate', field_type: 'currency', is_required: false, default_value: null, format_rule: 'currency', fallback_rule: null, max_length: null, sort_order: 13 },
+      { field_key: 'professional_fees', display_name: 'Professional Fees', source_entity: 'billing', source_path: 'professional_fees', field_type: 'currency', is_required: false, default_value: null, format_rule: 'currency', fallback_rule: null, max_length: null, sort_order: 14 },
+      { field_key: 'ircc_fees', display_name: 'IRCC Government Processing Fees', source_entity: 'billing', source_path: 'government_fees', field_type: 'currency', is_required: false, default_value: null, format_rule: 'currency', fallback_rule: null, max_length: null, sort_order: 15 },
+      { field_key: 'disbursements', display_name: 'Estimated Disbursements', source_entity: 'billing', source_path: 'disbursements', field_type: 'currency', is_required: false, default_value: null, format_rule: 'currency', fallback_rule: null, max_length: null, sort_order: 16 },
+      { field_key: 'hst_amount', display_name: 'HST Amount', source_entity: 'billing', source_path: 'hst_amount', field_type: 'currency', is_required: false, default_value: null, format_rule: 'currency', fallback_rule: null, max_length: null, sort_order: 17 },
+      { field_key: 'total_amount', display_name: 'Total Amount', source_entity: 'billing', source_path: 'total_amount', field_type: 'currency', is_required: false, default_value: null, format_rule: 'currency', fallback_rule: null, max_length: null, sort_order: 18 },
+      { field_key: 'trust_amount', display_name: 'Trust Retainer', source_entity: 'billing', source_path: 'trust_balance', field_type: 'currency', is_required: false, default_value: null, format_rule: 'currency', fallback_rule: null, max_length: null, sort_order: 19 },
       // Payment schedule installment fields (up to 4 installments)
-      { field_key: 'installment_1_amount', display_name: 'Installment 1 Amount', source_entity: 'billing', source_path: 'installment_1_amount', field_type: 'currency', is_required: false, default_value: null, format_rule: 'currency', fallback_rule: null, sort_order: 20 },
-      { field_key: 'installment_1_due', display_name: 'Installment 1 Due', source_entity: 'billing', source_path: 'installment_1_due', field_type: 'text', is_required: false, default_value: null, format_rule: null, fallback_rule: null, sort_order: 21 },
-      { field_key: 'installment_2_amount', display_name: 'Installment 2 Amount', source_entity: 'billing', source_path: 'installment_2_amount', field_type: 'currency', is_required: false, default_value: null, format_rule: 'currency', fallback_rule: null, sort_order: 22 },
-      { field_key: 'installment_2_due', display_name: 'Installment 2 Due', source_entity: 'billing', source_path: 'installment_2_due', field_type: 'text', is_required: false, default_value: null, format_rule: null, fallback_rule: null, sort_order: 23 },
-      { field_key: 'installment_3_amount', display_name: 'Installment 3 Amount', source_entity: 'billing', source_path: 'installment_3_amount', field_type: 'currency', is_required: false, default_value: null, format_rule: 'currency', fallback_rule: null, sort_order: 24 },
-      { field_key: 'installment_3_due', display_name: 'Installment 3 Due', source_entity: 'billing', source_path: 'installment_3_due', field_type: 'text', is_required: false, default_value: null, format_rule: null, fallback_rule: null, sort_order: 25 },
-      { field_key: 'installment_4_amount', display_name: 'Installment 4 Amount', source_entity: 'billing', source_path: 'installment_4_amount', field_type: 'currency', is_required: false, default_value: null, format_rule: 'currency', fallback_rule: null, sort_order: 26 },
-      { field_key: 'installment_4_due', display_name: 'Installment 4 Due', source_entity: 'billing', source_path: 'installment_4_due', field_type: 'text', is_required: false, default_value: null, format_rule: null, fallback_rule: null, sort_order: 27 },
+      { field_key: 'installment_1_amount', display_name: 'Installment 1 Amount', source_entity: 'billing', source_path: 'installment_1_amount', field_type: 'currency', is_required: false, default_value: null, format_rule: 'currency', fallback_rule: null, max_length: null, sort_order: 20 },
+      { field_key: 'installment_1_due', display_name: 'Installment 1 Due', source_entity: 'billing', source_path: 'installment_1_due', field_type: 'text', is_required: false, default_value: null, format_rule: null, fallback_rule: null, max_length: null, sort_order: 21 },
+      { field_key: 'installment_2_amount', display_name: 'Installment 2 Amount', source_entity: 'billing', source_path: 'installment_2_amount', field_type: 'currency', is_required: false, default_value: null, format_rule: 'currency', fallback_rule: null, max_length: null, sort_order: 22 },
+      { field_key: 'installment_2_due', display_name: 'Installment 2 Due', source_entity: 'billing', source_path: 'installment_2_due', field_type: 'text', is_required: false, default_value: null, format_rule: null, fallback_rule: null, max_length: null, sort_order: 23 },
+      { field_key: 'installment_3_amount', display_name: 'Installment 3 Amount', source_entity: 'billing', source_path: 'installment_3_amount', field_type: 'currency', is_required: false, default_value: null, format_rule: 'currency', fallback_rule: null, max_length: null, sort_order: 24 },
+      { field_key: 'installment_3_due', display_name: 'Installment 3 Due', source_entity: 'billing', source_path: 'installment_3_due', field_type: 'text', is_required: false, default_value: null, format_rule: null, fallback_rule: null, max_length: null, sort_order: 25 },
+      { field_key: 'installment_4_amount', display_name: 'Installment 4 Amount', source_entity: 'billing', source_path: 'installment_4_amount', field_type: 'currency', is_required: false, default_value: null, format_rule: 'currency', fallback_rule: null, max_length: null, sort_order: 26 },
+      { field_key: 'installment_4_due', display_name: 'Installment 4 Due', source_entity: 'billing', source_path: 'installment_4_due', field_type: 'text', is_required: false, default_value: null, format_rule: null, fallback_rule: null, max_length: null, sort_order: 27 },
     ]
   }
 
   if (family === 'disengagement') {
     return [
       ...common,
-      { field_key: 'lawyer_lso_number', display_name: 'LSO Number', source_entity: 'user', source_path: 'lso_number', field_type: 'text', is_required: false, default_value: null, format_rule: null, fallback_rule: null, sort_order: 11 },
-      { field_key: 'trust_balance', display_name: 'Trust Balance', source_entity: 'billing', source_path: 'trust_balance', field_type: 'currency', is_required: false, default_value: null, format_rule: 'currency', fallback_rule: null, sort_order: 12 },
+      { field_key: 'lawyer_lso_number', display_name: 'LSO Number', source_entity: 'user', source_path: 'lso_number', field_type: 'text', is_required: false, default_value: null, format_rule: null, fallback_rule: null, max_length: null, sort_order: 11 },
+      { field_key: 'trust_balance', display_name: 'Trust Balance', source_entity: 'billing', source_path: 'trust_balance', field_type: 'currency', is_required: false, default_value: null, format_rule: 'currency', fallback_rule: null, max_length: null, sort_order: 12 },
     ]
   }
 

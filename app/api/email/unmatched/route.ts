@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { authenticateRequest, AuthError } from '@/lib/services/auth'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { requirePermission } from '@/lib/services/require-role'
 import { withTiming } from '@/lib/middleware/request-timing'
 
 /**
@@ -13,6 +14,7 @@ import { withTiming } from '@/lib/middleware/request-timing'
 async function handleGet(request: NextRequest) {
   try {
     const auth = await authenticateRequest()
+    requirePermission(auth, 'communications', 'view')
     const admin = createAdminClient()
 
     const { searchParams } = new URL(request.url)
@@ -70,6 +72,7 @@ async function handleGet(request: NextRequest) {
 async function handlePost(request: NextRequest) {
   try {
     const auth = await authenticateRequest()
+    requirePermission(auth, 'communications', 'edit')
     const { id, action, matter_id } = await request.json()
 
     if (!id || !action) {

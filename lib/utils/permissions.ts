@@ -184,6 +184,8 @@ export const ENTITIES = [
   'conflicts',
   'document_templates',
   'document_generation',
+  'trust_accounting',
+  'analytics',
 ] as const
 
 export const ACTIONS = ['view', 'create', 'edit', 'delete', 'approve', 'export'] as const

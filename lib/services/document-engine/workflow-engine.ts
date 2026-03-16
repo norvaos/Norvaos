@@ -12,6 +12,8 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/lib/types/database'
 import type { DocumentWorkflowRuleRow } from '@/lib/types/database'
+import { generateInstance } from './instance-service'
+import { logInstanceEvent } from './audit-service'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -63,7 +65,7 @@ export async function evaluateWorkflowRules(
   // Fetch matter data for rule matching
   const { data: matterRaw } = await (supabase as any)
     .from('matters')
-    .select('practice_area, matter_type_id, jurisdiction_code')
+    .select('practice_area_id, matter_type_id')
     .eq('id', ctx.matterId)
     .single()
   const matter = matterRaw as Record<string, unknown> | null
@@ -99,12 +101,102 @@ export async function processDocumentWorkflowTrigger(
   let generated = 0
   let suggested = 0
 
+  // ── REDLINE 5: Suppress all auto triggers for closed matters ───────────────
+  const { data: matterForStatus } = await supabase
+    .from('matters')
+    .select('id, status')
+    .eq('id', ctx.matterId)
+    .single()
+
+  if (matterForStatus && matterForStatus.status !== 'active') {
+    // Closed matters: no auto-generation at all
+    return {
+      success: true,
+      data: { matchedRules: matchResult.data.length, generated: 0, suggested: 0 },
+    }
+  }
+
   for (const match of matchResult.data) {
-    if (match.autoGenerate) {
-      // Auto-generation will be called by the instance service
-      // For Phase 1, we log it as a suggestion instead
+    // ── REDLINE 3: generation_tier enforcement ─────────────────────────────────
+    // Fetch the template to check its generation_tier
+    const { data: templateData } = await supabase
+      .from('docgen_templates')
+      .select('id, generation_tier')
+      .eq('id', match.templateId)
+      .single()
+
+    const tier = templateData?.generation_tier ?? 'manual_only'
+
+    // Check idempotency: skip if an active instance already exists for this matter+template
+    const { data: existingInstances } = await supabase
+      .from('document_instances')
+      .select('id')
+      .eq('matter_id', ctx.matterId)
+      .eq('template_id', match.templateId)
+      .eq('is_active', true)
+      .in('status', ['draft', 'pending_review', 'approved', 'sent'])
+      .limit(1)
+
+    if (existingInstances && existingInstances.length > 0) {
+      // Already has an active instance — skip to avoid duplicates
       suggested++
+      continue
+    }
+
+    if (!match.autoGenerate || tier === 'manual_only') {
+      // Manual-only: surface as suggestion, do not auto-generate
+      suggested++
+      continue
+    }
+
+    if (tier === 'auto_draft') {
+      // Auto-draft: generate immediately in draft status
+      const result = await generateInstance(supabase, {
+        tenantId: ctx.tenantId,
+        templateId: match.templateId,
+        matterId: ctx.matterId,
+        contactId: ctx.contactId,
+        generationMode: 'workflow_trigger',
+        generatedBy: match.rule.created_by ?? '',
+      })
+      if (result.success) {
+        generated++
+      } else {
+        // Auto-generation failed — fall back to suggestion
+        suggested++
+      }
+    } else if (tier === 'auto_draft_with_review') {
+      // Auto-draft with review: generate then transition to pending_review
+      const result = await generateInstance(supabase, {
+        tenantId: ctx.tenantId,
+        templateId: match.templateId,
+        matterId: ctx.matterId,
+        contactId: ctx.contactId,
+        generationMode: 'workflow_trigger',
+        generatedBy: match.rule.created_by ?? '',
+      })
+      if (result.success && result.data) {
+        // Transition from draft → pending_review
+        await supabase
+          .from('document_instances')
+          .update({ status: 'pending_review' } as never)
+          .eq('id', result.data.id)
+
+        await logInstanceEvent(supabase, {
+          tenantId: ctx.tenantId,
+          instanceId: result.data.id,
+          eventType: 'status_changed',
+          fromStatus: 'draft',
+          toStatus: 'pending_review',
+          eventPayload: { reason: 'Auto-generated with review required (generation_tier: auto_draft_with_review)' },
+          performedBy: 'workflow_engine',
+        })
+        generated++
+      } else {
+        suggested++
+      }
     } else {
+      // Unknown tier — treat as suggestion
       suggested++
     }
   }
@@ -128,8 +220,8 @@ function matchesRule(
 ): boolean {
   if (!matter) return false
 
-  // Match practice area (if specified)
-  if (rule.practice_area && matter.practice_area !== rule.practice_area) {
+  // Match practice area (if specified on rule, compare to matter's practice_area_id)
+  if (rule.practice_area && matter.practice_area_id !== rule.practice_area) {
     return false
   }
 
@@ -138,8 +230,8 @@ function matchesRule(
     return false
   }
 
-  // Match jurisdiction (if specified)
-  if (rule.jurisdiction_code && matter.jurisdiction_code !== rule.jurisdiction_code) {
+  // Match jurisdiction (if specified on rule — matters may not have this column)
+  if (rule.jurisdiction_code && (matter as Record<string, unknown>).jurisdiction_code !== rule.jurisdiction_code) {
     return false
   }
 

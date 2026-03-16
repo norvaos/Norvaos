@@ -2,30 +2,10 @@ import { NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { createRateLimiter } from '@/lib/middleware/rate-limit'
 import { withTiming } from '@/lib/middleware/request-timing'
+import { validatePortalToken, PortalAuthError } from '@/lib/services/portal-auth'
 
 // 30 requests per minute per IP — prevents brute-force token enumeration
 const tokenLookupLimiter = createRateLimiter({ windowMs: 60_000, maxRequests: 30 })
-
-// ── Token Validation Helper ──────────────────────────────────────────────────
-
-async function validateToken(admin: ReturnType<typeof createAdminClient>, token: string) {
-  const { data: link, error: linkError } = await admin
-    .from('portal_links')
-    .select('id, matter_id, tenant_id, contact_id, expires_at, is_active')
-    .eq('token', token)
-    .eq('is_active', true)
-    .single()
-
-  if (linkError || !link) {
-    return { error: NextResponse.json({ error: 'Invalid token' }, { status: 404 }) }
-  }
-
-  if (new Date(link.expires_at) < new Date()) {
-    return { error: NextResponse.json({ error: 'Link expired' }, { status: 410 }) }
-  }
-
-  return { link }
-}
 
 // ── GET /api/portal/[token]/messages ─────────────────────────────────────────
 
@@ -49,12 +29,18 @@ async function handleGet(
     }
 
     const { token } = await params
-    const admin = createAdminClient()
 
-    // Validate token
-    const result = await validateToken(admin, token)
-    if (result.error) return result.error
-    const { link } = result
+    let link: Awaited<ReturnType<typeof validatePortalToken>>
+    try {
+      link = await validatePortalToken(token)
+    } catch (error) {
+      if (error instanceof PortalAuthError) {
+        return NextResponse.json({ error: error.message }, { status: error.status })
+      }
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    }
+
+    const admin = createAdminClient()
 
     // Fetch all client-visible, active comments for this matter
     const { data: comments, error: commentsError } = await admin
@@ -165,12 +151,18 @@ async function handlePost(
     }
 
     const { token } = await params
-    const admin = createAdminClient()
 
-    // Validate token
-    const result = await validateToken(admin, token)
-    if (result.error) return result.error
-    const { link } = result
+    let link: Awaited<ReturnType<typeof validatePortalToken>>
+    try {
+      link = await validatePortalToken(token)
+    } catch (error) {
+      if (error instanceof PortalAuthError) {
+        return NextResponse.json({ error: error.message }, { status: error.status })
+      }
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    }
+
+    const admin = createAdminClient()
 
     // Parse body
     const body = await request.json()
@@ -280,11 +272,18 @@ async function handlePatch(
     }
 
     const { token } = await params
-    const admin = createAdminClient()
 
-    const result = await validateToken(admin, token)
-    if (result.error) return result.error
-    const { link } = result
+    let link: Awaited<ReturnType<typeof validatePortalToken>>
+    try {
+      link = await validatePortalToken(token)
+    } catch (error) {
+      if (error instanceof PortalAuthError) {
+        return NextResponse.json({ error: error.message }, { status: error.status })
+      }
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    }
+
+    const admin = createAdminClient()
 
     // Update client_read_at to now
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { authenticateRequest, AuthError } from '@/lib/services/auth'
+import { requirePermission } from '@/lib/services/require-role'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { withTiming } from '@/lib/middleware/request-timing'
 import { sendEmailViaProvider } from '@/lib/services/email-send'
@@ -14,6 +15,7 @@ import { sendEmailViaProvider } from '@/lib/services/email-send'
 async function handlePost(request: NextRequest) {
   try {
     const auth = await authenticateRequest()
+    requirePermission(auth, 'communications', 'edit')
     const {
       accountId,
       to,

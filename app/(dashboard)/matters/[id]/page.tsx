@@ -30,6 +30,7 @@ import { ContactsTab } from '@/components/matters/tabs/contacts-tab'
 import { TasksTab } from '@/components/matters/tabs/tasks-tab'
 import { DeadlinesTab } from '@/components/matters/tabs/deadlines-tab'
 import { BillingTab } from '@/components/matters/tabs/billing-tab'
+import { TrustTab } from '@/components/matters/tabs/trust-tab'
 import { OnboardingTab } from '@/components/matters/tabs/onboarding-tab'
 import { useOnboardingBadgeCount } from '@/lib/queries/matter-onboarding'
 import { ClientReviewPanel } from '@/components/ircc/client-review-panel'
@@ -1039,6 +1040,11 @@ export default function MatterDetailPage() {
           billing: (
             <RequirePermission entity="billing" action="view" variant="inline">
               <BillingTab matterId={matterId} tenantId={tenantId} matter={matter} />
+            </RequirePermission>
+          ),
+          trust: (
+            <RequirePermission entity="trust_accounting" action="view" variant="inline">
+              <TrustTab matterId={matterId} tenantId={tenantId} matter={matter} />
             </RequirePermission>
           ),
           notes: <NotesEditor tenantId={tenantId} matterId={matterId} />,

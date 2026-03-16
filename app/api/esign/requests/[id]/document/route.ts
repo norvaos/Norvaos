@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { authenticateRequest, AuthError } from '@/lib/services/auth'
+import { requirePermission } from '@/lib/services/require-role'
 
 // ── GET /api/esign/requests/[id]/document ────────────────────────────────────
 // Downloads the source PDF for a signing request (authenticated users only).
@@ -23,6 +24,8 @@ async function handleGet(
     }
     return NextResponse.json({ error: 'Authentication failed' }, { status: 401 })
   }
+
+  requirePermission(auth, 'documents', 'view')
 
   const { supabase, tenantId } = auth
 

@@ -10,6 +10,7 @@ import { authenticateRequest, AuthError } from '@/lib/services/auth'
 import { recalculateLeadSummary } from '@/lib/services/lead-summary-recalculator'
 import { advanceLeadStage } from '@/lib/services/lead-stage-engine'
 import { convertLeadToMatter } from '@/lib/services/lead-conversion-executor'
+import { requirePermission } from '@/lib/services/require-role'
 import type { Json } from '@/lib/types/database'
 
 // ── Request Type ───────────────────────────────────────────────────────────
@@ -28,6 +29,7 @@ interface RecordPaymentBody {
 async function handlePost(request: Request) {
   try {
     const auth = await authenticateRequest()
+    requirePermission(auth, 'leads', 'edit')
     const { supabase, tenantId, userId } = auth
 
     const body = (await request.json()) as RecordPaymentBody

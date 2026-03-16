@@ -60,6 +60,26 @@ export async function generateInstance(
   if (!version) return { success: false, error: 'No template version found' }
   const templateBody = version.template_body as unknown as TemplateBody
 
+  // ── REDLINE 5: Closed-matter check ──────────────────────────────────────────
+  const { data: matter } = await supabase
+    .from('matters')
+    .select('id, status')
+    .eq('id', matterId)
+    .single()
+
+  if (matter && matter.status !== 'active') {
+    const allowedClosedFamilies = ['general', 'correspondence']
+    const isOverrideAllowed = allowedClosedFamilies.includes(template.document_family)
+    const hasOverride = params.generationMode === 'closed_matter_override'
+
+    if (!isOverrideAllowed) {
+      return { success: false, error: `Cannot generate documents for closed matters (family: ${template.document_family}). Only general and correspondence documents are permitted with override.` }
+    }
+    if (!hasOverride) {
+      return { success: false, error: 'This matter is closed. Generation requires explicit override confirmation for general/correspondence documents.' }
+    }
+  }
+
   // 2. Build field resolution context
   const fieldContext = await buildFieldContext(supabase, { tenantId, matterId, contactId })
 
@@ -75,6 +95,42 @@ export async function generateInstance(
     return {
       success: false,
       error: `Missing required fields: ${missing.map((m) => m.display_name).join(', ')}`,
+    }
+  }
+
+  // ── REDLINE 1: Unresolved placeholders block final generation ───────────────
+  const fieldMap = buildFieldMap(resolved)
+  const allContent = JSON.stringify(templateBody)
+  const placeholderRegex = /\{\{([^}]+)\}\}/g
+  const unresolvedPlaceholders: string[] = []
+  let match: RegExpExecArray | null
+  while ((match = placeholderRegex.exec(allContent)) !== null) {
+    const key = match[1].trim()
+    if (!(key in fieldMap)) {
+      unresolvedPlaceholders.push(key)
+    }
+  }
+  if (unresolvedPlaceholders.length > 0) {
+    return {
+      success: false,
+      error: `Unresolved placeholders block generation: ${[...new Set(unresolvedPlaceholders)].join(', ')}. All placeholders must be mapped before final generation.`,
+    }
+  }
+
+  // ── REDLINE 2: No silent truncation — max_length enforcement ────────────────
+  const oversizedFields: string[] = []
+  for (const mapping of mappings) {
+    if (mapping.max_length && mapping.max_length > 0) {
+      const value = fieldMap[mapping.field_key] ?? ''
+      if (value.length > mapping.max_length) {
+        oversizedFields.push(`${mapping.display_name} (${value.length} chars, max ${mapping.max_length})`)
+      }
+    }
+  }
+  if (oversizedFields.length > 0) {
+    return {
+      success: false,
+      error: `Fields exceed maximum length: ${oversizedFields.join('; ')}. Shorten the source data before generating.`,
     }
   }
 
@@ -129,7 +185,9 @@ export async function generateInstance(
       jurisdiction_code: template.jurisdiction_code,
       title: documentTitle,
       status: 'draft',
-      generation_mode: params.generationMode ?? 'manual',
+      generation_mode: (['manual', 'auto', 'workflow_trigger'].includes(params.generationMode ?? '')
+        ? params.generationMode
+        : 'manual') as never,
       source_snapshot_json: { fieldContext, templateBody } as unknown as Record<string, unknown>,
       generated_by: generatedBy,
       is_active: true,
@@ -168,7 +226,7 @@ export async function generateInstance(
   }
 
   // 9. Save resolved fields
-  const fieldMap = buildFieldMap(renderResult.resolvedFields)
+  const resolvedFieldMap = buildFieldMap(renderResult.resolvedFields)
   const fieldInserts = renderResult.resolvedFields.map((f) => ({
     tenant_id: tenantId,
     document_instance_id: instance.id,
@@ -544,7 +602,11 @@ async function buildFieldContext(
   const contactId = params.contactId ?? (matter as Record<string, unknown>).primary_contact_id
   if (contactId) {
     const { data } = await supabase.from('contacts').select('*').eq('id', contactId as string).single()
-    contact = data ?? {}
+    contact = (data ?? {}) as Record<string, unknown>
+    // Compute full_name from first_name + last_name if not present
+    if (!contact.full_name && (contact.first_name || contact.last_name)) {
+      contact.full_name = [contact.first_name, contact.last_name].filter(Boolean).join(' ')
+    }
   }
 
   // Fetch billing info for the matter

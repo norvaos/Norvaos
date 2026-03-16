@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { authenticateRequest, AuthError } from '@/lib/services/auth'
+import { requirePermission } from '@/lib/services/require-role'
 import { convertLeadToMatter } from '@/lib/services/lead-conversion-executor'
 
 /**
@@ -18,6 +19,7 @@ import { convertLeadToMatter } from '@/lib/services/lead-conversion-executor'
 export async function POST(request: NextRequest) {
   try {
     const auth = await authenticateRequest()
+    requirePermission(auth, 'leads', 'edit')
     const supabase = await createServerSupabaseClient()
 
     const body = await request.json()

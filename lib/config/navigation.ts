@@ -21,6 +21,8 @@ import {
   Zap,
   Bell,
   Shield,
+  Landmark,
+  TrendingUp,
   type LucideIcon,
 } from 'lucide-react'
 
@@ -82,7 +84,16 @@ export const navigation: NavSection[] = [
     items: [
       { title: 'Time Tracking', href: '/time-tracking', icon: Clock },
       { title: 'Billing', href: '/billing', icon: DollarSign },
+      { title: 'Trust Accounting', href: '/trust', icon: Landmark },
       { title: 'Reports', href: '/reports', icon: BarChart3, featureFlag: 'advanced_reporting' },
+    ],
+  },
+  {
+    title: 'Analytics',
+    items: [
+      { title: 'KPI Scorecard', href: '/analytics/scorecard', icon: TrendingUp },
+      { title: 'Financial Analytics', href: '/analytics', icon: BarChart3 },
+      { title: 'Trust Compliance', href: '/analytics/trust-compliance', icon: Landmark },
     ],
   },
   {
@@ -105,6 +116,7 @@ export const navigation: NavSection[] = [
           { title: 'Automation Rules', href: '/settings/automation-rules', icon: Zap },
           { title: 'Expiry Reminders', href: '/settings/expiry-reminders', icon: Bell },
           { title: 'Access Control', href: '/settings/access-control', icon: Shield },
+          { title: 'Trust Accounts', href: '/settings/trust-accounts', icon: Landmark },
         ],
       },
       { title: 'Tenants', href: '/admin/tenants', icon: Building2 },

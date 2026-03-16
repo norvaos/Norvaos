@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { authenticateRequest, AuthError } from '@/lib/services/auth'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { requirePermission } from '@/lib/services/require-role'
 import { withTiming } from '@/lib/middleware/request-timing'
 
 /**
@@ -16,6 +17,7 @@ import { withTiming } from '@/lib/middleware/request-timing'
 async function handleGet(request: NextRequest) {
   try {
     const auth = await authenticateRequest()
+    requirePermission(auth, 'documents', 'view')
 
     const { searchParams } = new URL(request.url)
     const storagePath = searchParams.get('path')

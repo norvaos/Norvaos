@@ -2,7 +2,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { createClient } from '@/lib/supabase/client'
-import type { Database } from '@/lib/types/database'
+import type { Database, PaymentPlanRow, PaymentPlanInstalmentRow } from '@/lib/types/database'
 import { toast } from 'sonner'
 
 type TimeEntry = Database['public']['Tables']['time_entries']['Row']
@@ -334,7 +334,8 @@ export function useUpdateInvoiceStatus() {
       const supabase = createClient()
       const { data, error } = await supabase
         .from('invoices')
-        .update({ status })
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .update({ status } as any)
         .eq('id', id)
         .select()
         .single()
@@ -548,5 +549,647 @@ export function useRecordMatterRetainerPayment(matterId: string) {
     onError: (err: Error) => {
       toast.error(err.message ?? 'Failed to record payment')
     },
+  })
+}
+
+// ── Phase 9: Invoice Lifecycle Hooks ──────────────────────────────────────────
+
+/** Send an invoice via email */
+export function useSendInvoice() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ invoiceId, emailOverride }: { invoiceId: string; emailOverride?: string }) => {
+      const res = await fetch(`/api/invoices/${invoiceId}/send`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email_override: emailOverride }),
+      })
+      if (!res.ok) {
+        const data = await res.json()
+        throw new Error(data.error || 'Failed to send invoice')
+      }
+      return res.json()
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: invoicingKeys.all })
+    },
+  })
+}
+
+/** Send a payment receipt */
+export function useSendReceipt() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ invoiceId, emailOverride }: { invoiceId: string; emailOverride?: string }) => {
+      const res = await fetch(`/api/invoices/${invoiceId}/receipt`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email_override: emailOverride }),
+      })
+      if (!res.ok) {
+        const data = await res.json()
+        throw new Error(data.error || 'Failed to send receipt')
+      }
+      return res.json()
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: invoicingKeys.all })
+    },
+  })
+}
+
+/** Batch send multiple invoices */
+export function useBatchSendInvoices() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (invoiceIds: string[]) => {
+      const res = await fetch('/api/invoices/batch-send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ invoice_ids: invoiceIds }),
+      })
+      if (!res.ok) {
+        const data = await res.json()
+        throw new Error(data.error || 'Batch send failed')
+      }
+      return res.json() as Promise<{ sent: string[]; failed: { id: string; reason: string }[] }>
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: invoicingKeys.all })
+    },
+  })
+}
+
+/** Fetch client statement */
+export function useClientStatement(contactId: string, dateRange?: { from?: string; to?: string }) {
+  return useQuery({
+    queryKey: ['client-statement', contactId, dateRange],
+    queryFn: async () => {
+      const params = new URLSearchParams()
+      if (dateRange?.from) params.set('from', dateRange.from)
+      if (dateRange?.to) params.set('to', dateRange.to)
+      const qs = params.toString()
+      const res = await fetch(`/api/contacts/${contactId}/statement${qs ? `?${qs}` : ''}`)
+      if (!res.ok) {
+        const data = await res.json()
+        throw new Error(data.error || 'Failed to fetch statement')
+      }
+      return res.json()
+    },
+    enabled: !!contactId,
+    staleTime: 1000 * 60 * 2,
+  })
+}
+
+// ── Phase 9 Billing Module: Extended Keys ─────────────────────────────────────
+
+export const billingKeys = {
+  ...invoicingKeys,
+  adjustments: (invoiceId: string) => ['invoicing', 'adjustments', invoiceId] as const,
+  trustAllocations: (invoiceId: string) => ['invoicing', 'trust-allocations', invoiceId] as const,
+  auditLog: (invoiceId: string) => ['invoicing', 'audit-log', invoiceId] as const,
+  lineItems: (invoiceId: string) => ['invoicing', 'line-items', invoiceId] as const,
+  paymentPlan: (invoiceId: string) => ['invoicing', 'payment-plan', invoiceId] as const,
+}
+
+// ── Finalize Invoice ──────────────────────────────────────────────────────────
+
+export function useFinalizeInvoice() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async ({
+      invoiceId,
+      overrideTaxCheck = false,
+    }: {
+      invoiceId: string
+      overrideTaxCheck?: boolean
+    }) => {
+      const res = await fetch(`/api/billing/invoices/${invoiceId}/finalize`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ override_tax_check: overrideTaxCheck }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error ?? 'Failed to finalise invoice')
+      return data as { invoiceNumber: string }
+    },
+    onSuccess: (_data, { invoiceId }) => {
+      qc.invalidateQueries({ queryKey: invoicingKeys.invoiceDetail(invoiceId) })
+      qc.invalidateQueries({ queryKey: ['invoicing', 'invoices'] })
+      toast.success('Invoice finalised')
+    },
+    onError: (err: Error) => toast.error(err.message),
+  })
+}
+
+// ── Void Invoice ──────────────────────────────────────────────────────────────
+
+export function useVoidInvoice() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ invoiceId, reason }: { invoiceId: string; reason: string }) => {
+      const res = await fetch(`/api/billing/invoices/${invoiceId}/void`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reason }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error ?? 'Failed to void invoice')
+      return data
+    },
+    onSuccess: (_data, { invoiceId }) => {
+      qc.invalidateQueries({ queryKey: invoicingKeys.invoiceDetail(invoiceId) })
+      qc.invalidateQueries({ queryKey: ['invoicing', 'invoices'] })
+      toast.success('Invoice voided')
+    },
+    onError: (err: Error) => toast.error(err.message),
+  })
+}
+
+// ── Invoice Line Items (v2 — category-aware) ──────────────────────────────────
+
+export function useInvoiceLineItems(invoiceId: string | null) {
+  return useQuery({
+    queryKey: billingKeys.lineItems(invoiceId ?? ''),
+    queryFn: async () => {
+      const supabase = createClient()
+      const { data, error } = await supabase
+        .from('invoice_line_items')
+        .select('*')
+        .eq('invoice_id', invoiceId!)
+        .is('deleted_at', null)
+        .order('sort_order')
+      if (error) throw error
+      return data as InvoiceLineItem[]
+    },
+    enabled: !!invoiceId,
+    staleTime: 30 * 1000,
+  })
+}
+
+export function useAddLineItem() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async ({
+      invoiceId,
+      ...payload
+    }: { invoiceId: string } & InvoiceLineItemInsert) => {
+      const res = await fetch(`/api/billing/invoices/${invoiceId}/lines`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error ?? 'Failed to add line item')
+      return data
+    },
+    onSuccess: (_data, { invoiceId }) => {
+      qc.invalidateQueries({ queryKey: billingKeys.lineItems(invoiceId) })
+      qc.invalidateQueries({ queryKey: invoicingKeys.invoiceDetail(invoiceId) })
+    },
+    onError: (err: Error) => toast.error(err.message),
+  })
+}
+
+export function useDeleteLineItem() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ invoiceId, lineItemId }: { invoiceId: string; lineItemId: string }) => {
+      const res = await fetch(`/api/billing/invoices/${invoiceId}/lines/${lineItemId}`, {
+        method: 'DELETE',
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error ?? 'Failed to remove line item')
+      return data
+    },
+    onSuccess: (_data, { invoiceId }) => {
+      qc.invalidateQueries({ queryKey: billingKeys.lineItems(invoiceId) })
+      qc.invalidateQueries({ queryKey: invoicingKeys.invoiceDetail(invoiceId) })
+    },
+    onError: (err: Error) => toast.error(err.message),
+  })
+}
+
+// ── Adjustments ───────────────────────────────────────────────────────────────
+
+export interface AdjustmentRow {
+  id: string
+  invoice_id: string
+  adjustment_type: string
+  scope: string
+  amount_cents: number
+  description: string
+  approval_status: string
+  requested_by: string | null
+  approved_by: string | null
+  approved_at: string | null
+  created_at: string
+}
+
+export function useInvoiceAdjustments(invoiceId: string | null) {
+  return useQuery({
+    queryKey: billingKeys.adjustments(invoiceId ?? ''),
+    queryFn: async () => {
+      const supabase = createClient()
+      /* eslint-disable @typescript-eslint/no-explicit-any */
+      const { data, error } = await (supabase as any)
+        .from('invoice_adjustments')
+        .select('*')
+        .eq('invoice_id', invoiceId!)
+        .order('created_at', { ascending: false })
+      /* eslint-enable @typescript-eslint/no-explicit-any */
+      if (error) throw error
+      return (data ?? []) as AdjustmentRow[]
+    },
+    enabled: !!invoiceId,
+    staleTime: 30 * 1000,
+  })
+}
+
+export function useApplyAdjustment() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async ({
+      invoiceId,
+      ...payload
+    }: {
+      invoiceId: string
+      adjustmentType: string
+      scope: string
+      amountCents: number
+      description: string
+      lineItemId?: string | null
+    }) => {
+      const res = await fetch(`/api/billing/invoices/${invoiceId}/adjustments`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error ?? 'Failed to apply adjustment')
+      return data as { adjustmentId: string; requiresApproval: boolean }
+    },
+    onSuccess: (_data, { invoiceId }) => {
+      qc.invalidateQueries({ queryKey: billingKeys.adjustments(invoiceId) })
+      qc.invalidateQueries({ queryKey: invoicingKeys.invoiceDetail(invoiceId) })
+      toast.success('Adjustment applied')
+    },
+    onError: (err: Error) => toast.error(err.message),
+  })
+}
+
+export function useApproveAdjustment() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async ({
+      invoiceId,
+      adjustmentId,
+    }: {
+      invoiceId: string
+      adjustmentId: string
+    }) => {
+      const res = await fetch(
+        `/api/billing/invoices/${invoiceId}/adjustments/${adjustmentId}/approve`,
+        { method: 'POST', headers: { 'Content-Type': 'application/json' } },
+      )
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error ?? 'Failed to approve adjustment')
+      return data
+    },
+    onSuccess: (_data, { invoiceId }) => {
+      qc.invalidateQueries({ queryKey: billingKeys.adjustments(invoiceId) })
+      qc.invalidateQueries({ queryKey: invoicingKeys.invoiceDetail(invoiceId) })
+      toast.success('Adjustment approved')
+    },
+    onError: (err: Error) => toast.error(err.message),
+  })
+}
+
+// ── Trust Allocations ─────────────────────────────────────────────────────────
+
+export interface TrustAllocationRow {
+  id: string
+  invoice_id: string
+  trust_account_id: string
+  amount_cents: number
+  allocation_status: string
+  requested_by: string | null
+  notes: string | null
+  created_at: string
+  updated_at: string
+}
+
+export function useInvoiceTrustAllocations(invoiceId: string | null) {
+  return useQuery({
+    queryKey: billingKeys.trustAllocations(invoiceId ?? ''),
+    queryFn: async () => {
+      const supabase = createClient()
+      /* eslint-disable @typescript-eslint/no-explicit-any */
+      const { data, error } = await (supabase as any)
+        .from('invoice_trust_allocations')
+        .select('*')
+        .eq('invoice_id', invoiceId!)
+        .order('created_at', { ascending: false })
+      /* eslint-enable @typescript-eslint/no-explicit-any */
+      if (error) throw error
+      return (data ?? []) as TrustAllocationRow[]
+    },
+    enabled: !!invoiceId,
+    staleTime: 30 * 1000,
+  })
+}
+
+export function useRequestTrustAllocation() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async ({
+      invoiceId,
+      ...payload
+    }: {
+      invoiceId: string
+      trustAccountId: string
+      amountCents: number
+      notes?: string | null
+    }) => {
+      const res = await fetch(`/api/billing/invoices/${invoiceId}/trust`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error ?? 'Failed to request trust allocation')
+      return data as { allocationId: string }
+    },
+    onSuccess: (_data, { invoiceId }) => {
+      qc.invalidateQueries({ queryKey: billingKeys.trustAllocations(invoiceId) })
+      qc.invalidateQueries({ queryKey: invoicingKeys.invoiceDetail(invoiceId) })
+      toast.success('Trust allocation requested')
+    },
+    onError: (err: Error) => toast.error(err.message),
+  })
+}
+
+// ── Invoice Audit Log ─────────────────────────────────────────────────────────
+
+export interface AuditLogEntry {
+  id: string
+  invoice_id: string
+  matter_id: string
+  event_type: string
+  event_description: string
+  changed_fields: Record<string, { before: unknown; after: unknown }> | null
+  performed_by: string
+  performed_at: string
+}
+
+export function useInvoiceAuditLog(invoiceId: string | null) {
+  return useQuery({
+    queryKey: billingKeys.auditLog(invoiceId ?? ''),
+    queryFn: async () => {
+      const supabase = createClient()
+      /* eslint-disable @typescript-eslint/no-explicit-any */
+      const { data, error } = await (supabase as any)
+        .from('invoice_audit_log')
+        .select('id, invoice_id, matter_id, event_type, event_description, changed_fields, performed_by, performed_at')
+        .eq('invoice_id', invoiceId!)
+        .order('performed_at', { ascending: false })
+        .limit(100)
+      /* eslint-enable @typescript-eslint/no-explicit-any */
+      if (error) throw error
+      return (data ?? []) as AuditLogEntry[]
+    },
+    enabled: !!invoiceId,
+    staleTime: 60 * 1000,
+  })
+}
+
+// ── Payment Plans ─────────────────────────────────────────────────────────────
+
+export type { PaymentPlanRow, PaymentPlanInstalmentRow }
+
+export interface PaymentPlanWithInstalments extends PaymentPlanRow {
+  instalments: (PaymentPlanInstalmentRow & { is_overdue: boolean })[]
+}
+
+export function useInvoicePaymentPlan(invoiceId: string | null) {
+  return useQuery({
+    queryKey: billingKeys.paymentPlan(invoiceId ?? ''),
+    queryFn: async (): Promise<PaymentPlanWithInstalments | null> => {
+      /* eslint-disable @typescript-eslint/no-explicit-any */
+      const supabase = createClient()
+      const { data: plan, error } = await (supabase as any)
+        .from('payment_plans')
+        .select('*')
+        .eq('invoice_id', invoiceId!)
+        .eq('status', 'active')
+        .maybeSingle()
+      /* eslint-enable @typescript-eslint/no-explicit-any */
+      if (error) throw error
+      if (!plan) return null
+
+      const res = await fetch(`/api/billing/payment-plans/${plan.id}`)
+      if (!res.ok) throw new Error('Failed to load payment plan')
+      return res.json() as Promise<PaymentPlanWithInstalments>
+    },
+    enabled: !!invoiceId,
+    staleTime: 30 * 1000,
+  })
+}
+
+export function useCreatePaymentPlan() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (payload: {
+      invoiceId: string
+      clientContactId: string
+      totalAmountCents: number
+      instalmentAmountCents: number
+      instalmentCount: number
+      frequency: 'weekly' | 'biweekly' | 'monthly'
+      startDate: string
+      notes?: string | null
+    }) => {
+      const res = await fetch('/api/billing/payment-plans', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          invoice_id: payload.invoiceId,
+          client_contact_id: payload.clientContactId,
+          total_amount_cents: payload.totalAmountCents,
+          instalment_amount_cents: payload.instalmentAmountCents,
+          instalment_count: payload.instalmentCount,
+          frequency: payload.frequency,
+          start_date: payload.startDate,
+          notes: payload.notes ?? null,
+        }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error ?? 'Failed to create payment plan')
+      return data as { planId: string; instalmentCount: number }
+    },
+    onSuccess: (_data, { invoiceId }) => {
+      qc.invalidateQueries({ queryKey: billingKeys.paymentPlan(invoiceId) })
+      qc.invalidateQueries({ queryKey: invoicingKeys.invoiceDetail(invoiceId) })
+      toast.success('Payment plan created')
+    },
+    onError: (err: Error) => toast.error(err.message),
+  })
+}
+
+export function useApprovePaymentPlan() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ planId }: { planId: string; invoiceId: string }) => {
+      const res = await fetch(`/api/billing/payment-plans/${planId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'approve' }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error ?? 'Failed to approve payment plan')
+      return data
+    },
+    onSuccess: (_data, { invoiceId }) => {
+      qc.invalidateQueries({ queryKey: billingKeys.paymentPlan(invoiceId) })
+      toast.success('Payment plan approved')
+    },
+    onError: (err: Error) => toast.error(err.message),
+  })
+}
+
+export function useCancelPaymentPlan() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ planId, reason }: { planId: string; invoiceId: string; reason?: string }) => {
+      const res = await fetch(`/api/billing/payment-plans/${planId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'cancel', reason: reason ?? null }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error ?? 'Failed to cancel payment plan')
+      return data
+    },
+    onSuccess: (_data, { invoiceId }) => {
+      qc.invalidateQueries({ queryKey: billingKeys.paymentPlan(invoiceId) })
+      qc.invalidateQueries({ queryKey: invoicingKeys.invoiceDetail(invoiceId) })
+      toast.success('Payment plan cancelled')
+    },
+    onError: (err: Error) => toast.error(err.message),
+  })
+}
+
+export function usePayInstalment() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async ({
+      planId,
+      instalmentId,
+      paymentMethod,
+      notes,
+    }: {
+      planId: string
+      instalmentId: string
+      invoiceId: string
+      paymentMethod: string
+      notes?: string | null
+    }) => {
+      const res = await fetch(
+        `/api/billing/payment-plans/${planId}/instalments/${instalmentId}/pay`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ payment_method: paymentMethod, notes: notes ?? null }),
+        },
+      )
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error ?? 'Failed to record payment')
+      return data as { paymentId: string }
+    },
+    onSuccess: (_data, { invoiceId, planId }) => {
+      qc.invalidateQueries({ queryKey: billingKeys.paymentPlan(invoiceId) })
+      qc.invalidateQueries({ queryKey: invoicingKeys.invoiceDetail(invoiceId) })
+      qc.invalidateQueries({ queryKey: ['invoicing', 'invoices'] })
+      toast.success('Instalment payment recorded')
+    },
+    onError: (err: Error) => toast.error(err.message),
+  })
+}
+
+// ── Extended Billing Stats (includes finalized) ───────────────────────────────
+
+export const billingKeys2 = {
+  dashboardStats: (tid: string) => ['billing-dashboard-stats', tid] as const,
+}
+
+export interface BillingDashboardStats {
+  totalOutstandingCents: number
+  totalOverdueCents: number
+  collectedThisMonthCents: number
+  unbilledHours: number
+  draftCount: number
+  finalizedCount: number
+  overdueCount: number
+}
+
+export function useBillingDashboardStats(tenantId: string) {
+  return useQuery({
+    queryKey: billingKeys2.dashboardStats(tenantId),
+    queryFn: async (): Promise<BillingDashboardStats> => {
+      const supabase = createClient()
+      const today = new Date().toISOString().split('T')[0]
+      const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1)
+        .toISOString()
+        .split('T')[0]
+
+      const [invoicesRes, paymentsRes, unbilledRes] = await Promise.all([
+        supabase
+          .from('invoices')
+          .select('status, total_amount, amount_paid, due_date')
+          .eq('tenant_id', tenantId)
+          .in('status', ['draft', 'finalized', 'sent', 'viewed', 'partially_paid', 'overdue']),
+        supabase
+          .from('payments')
+          .select('amount')
+          .eq('tenant_id', tenantId)
+          .gte('payment_date', monthStart)
+          .is('voided_at', null),
+        supabase
+          .from('time_entries')
+          .select('duration_minutes')
+          .eq('tenant_id', tenantId)
+          .eq('is_billable', true)
+          .eq('is_billed', false),
+      ])
+
+      const invoices = invoicesRes.data ?? []
+      const outstanding = invoices
+        .filter((i) => ['sent', 'viewed', 'partially_paid', 'overdue'].includes(i.status))
+        .reduce((sum, i) => sum + ((i.total_amount ?? 0) - (i.amount_paid ?? 0)), 0)
+      const overdue = invoices
+        .filter((i) => i.status === 'overdue' || (i.due_date && i.due_date < today && ['sent', 'viewed', 'partially_paid'].includes(i.status)))
+        .reduce((sum, i) => sum + ((i.total_amount ?? 0) - (i.amount_paid ?? 0)), 0)
+      const collected = (paymentsRes.data ?? []).reduce((sum, p) => sum + (p.amount ?? 0), 0)
+      const unbilledMinutes = (unbilledRes.data ?? []).reduce(
+        (sum, t) => sum + (t.duration_minutes ?? 0),
+        0,
+      )
+
+      return {
+        totalOutstandingCents: outstanding,
+        totalOverdueCents: overdue,
+        collectedThisMonthCents: collected,
+        unbilledHours: Math.round((unbilledMinutes / 60) * 10) / 10,
+        draftCount: invoices.filter((i) => i.status === 'draft').length,
+        finalizedCount: invoices.filter((i) => i.status === 'finalized').length,
+        overdueCount: invoices.filter(
+          (i) =>
+            i.status === 'overdue' ||
+            (i.due_date && i.due_date < today && ['sent', 'viewed', 'partially_paid'].includes(i.status)),
+        ).length,
+      }
+    },
+    enabled: !!tenantId,
+    staleTime: 2 * 60 * 1000,
   })
 }

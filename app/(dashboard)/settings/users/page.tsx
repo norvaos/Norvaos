@@ -11,6 +11,7 @@ import {
   Send,
   Shield,
   UserMinus,
+  UserCheck,
   Users,
   XCircle,
   Clock,
@@ -24,8 +25,6 @@ import { formatDistanceToNow } from 'date-fns'
 
 import { createClient } from '@/lib/supabase/client'
 import { useTenant } from '@/lib/hooks/use-tenant'
-import { useUser } from '@/lib/hooks/use-user'
-import { logAudit } from '@/lib/queries/audit-logs'
 import { inviteUserSchema, type InviteUserFormValues } from '@/lib/schemas/settings'
 
 import { Button } from '@/components/ui/button'
@@ -101,7 +100,6 @@ function getStatusBadge(user: UserRow) {
 
 export default function SettingsUsersPage() {
   const { tenant, isLoading: tenantLoading } = useTenant()
-  const { appUser } = useUser()
   const queryClient = useQueryClient()
   const [inviteOpen, setInviteOpen] = useState(false)
   const [editRoleOpen, setEditRoleOpen] = useState(false)
@@ -203,23 +201,12 @@ export default function SettingsUsersPage() {
       }
       return data
     },
-    onSuccess: (_data, variables) => {
+    onSuccess: () => {
       toast.success('Invitation sent successfully.')
       queryClient.invalidateQueries({ queryKey: ['settings', 'users'] })
       queryClient.invalidateQueries({ queryKey: ['settings', 'invites'] })
       setInviteOpen(false)
       inviteForm.reset()
-
-      if (tenant && appUser) {
-        logAudit({
-          tenantId: tenant.id,
-          userId: appUser.id,
-          entityType: 'user',
-          entityId: 'invite',
-          action: 'user_invited',
-          changes: { email: variables.email, first_name: variables.first_name, last_name: variables.last_name },
-        })
-      }
     },
     onError: (error: any) => {
       if (error.code === 'SEAT_LIMIT_REACHED') {
@@ -240,12 +227,11 @@ export default function SettingsUsersPage() {
 
   const revokeInvite = useMutation({
     mutationFn: async (inviteId: string) => {
-      const supabase = createClient()
-      const { error } = await supabase
-        .from('user_invites')
-        .update({ status: 'revoked' })
-        .eq('id', inviteId)
-      if (error) throw error
+      const res = await fetch(`/api/settings/users/invites/${inviteId}/revoke`, {
+        method: 'POST',
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error ?? 'Failed to revoke invitation')
     },
     onSuccess: () => {
       toast.success('Invitation revoked.')
@@ -258,29 +244,18 @@ export default function SettingsUsersPage() {
 
   const updateRole = useMutation({
     mutationFn: async ({ userId, roleId }: { userId: string; roleId: string }) => {
-      const supabase = createClient()
-      const { error } = await supabase
-        .from('users')
-        .update({ role_id: roleId })
-        .eq('id', userId)
-      if (error) throw error
+      const res = await fetch(`/api/settings/users/${userId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ role_id: roleId }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error ?? 'Failed to update role')
     },
-    onSuccess: (_data, variables) => {
+    onSuccess: () => {
       toast.success('User role updated successfully.')
       queryClient.invalidateQueries({ queryKey: ['settings', 'users'] })
       setEditRoleOpen(false)
-
-      if (tenant && appUser && editingUser) {
-        logAudit({
-          tenantId: tenant.id,
-          userId: appUser.id,
-          entityType: 'user',
-          entityId: variables.userId,
-          action: 'role_changed',
-          changes: { role_id: { from: editingUser.role_id, to: variables.roleId }, user_email: editingUser.email },
-        })
-      }
-
       setEditingUser(null)
     },
     onError: (error) => {
@@ -290,27 +265,15 @@ export default function SettingsUsersPage() {
 
   const deactivateUser = useMutation({
     mutationFn: async (userId: string) => {
-      const supabase = createClient()
-      const { error } = await supabase
-        .from('users')
-        .update({ is_active: false, status: 'deactivated' })
-        .eq('id', userId)
-      if (error) throw error
+      const res = await fetch(`/api/settings/users/${userId}/deactivate`, {
+        method: 'POST',
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error ?? 'Failed to deactivate user')
     },
-    onSuccess: (_data, userId) => {
+    onSuccess: () => {
       toast.success('User deactivated successfully.')
       queryClient.invalidateQueries({ queryKey: ['settings', 'users'] })
-
-      if (tenant && appUser) {
-        logAudit({
-          tenantId: tenant.id,
-          userId: appUser.id,
-          entityType: 'user',
-          entityId: userId,
-          action: 'user_deactivated',
-          changes: { is_active: { from: true, to: false } },
-        })
-      }
     },
     onError: (error) => {
       toast.error('Failed to deactivate user.', { description: error.message })
@@ -357,6 +320,25 @@ export default function SettingsUsersPage() {
     },
     onError: (error) => {
       toast.error('Failed to change password.', { description: error.message })
+    },
+  })
+
+  const reactivateUser = useMutation({
+    mutationFn: async (userId: string) => {
+      const res = await fetch(`/api/settings/users/${userId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ is_active: true }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error ?? 'Failed to reactivate user')
+    },
+    onSuccess: () => {
+      toast.success('User reactivated successfully.')
+      queryClient.invalidateQueries({ queryKey: ['settings', 'users'] })
+    },
+    onError: (error) => {
+      toast.error('Failed to reactivate user.', { description: error.message })
     },
   })
 
@@ -646,6 +628,15 @@ export default function SettingsUsersPage() {
                           <UserMinus className="mr-2 h-4 w-4" />
                           Deactivate
                         </DropdownMenuItem>
+                        {!user.is_active && (
+                          <DropdownMenuItem
+                            onClick={() => reactivateUser.mutate(user.id)}
+                            disabled={reactivateUser.isPending}
+                          >
+                            <UserCheck className="mr-2 h-4 w-4" />
+                            Reactivate
+                          </DropdownMenuItem>
+                        )}
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>

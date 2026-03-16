@@ -44,7 +44,11 @@ function getSubscriptionPeriod(sub: Record<string, unknown>): {
 
 /**
  * POST /api/webhooks/stripe
- * Handles Stripe webhook events for subscription lifecycle
+ * Handles Stripe webhook events for subscription lifecycle.
+ *
+ * Idempotency: uses stripe_processed_events table keyed on event.id.
+ * First delivery processes normally. Duplicate delivery returns
+ * { received: true, deduplicated: true } without re-processing.
  */
 async function handlePost(request: NextRequest) {
   const body = await request.text()
@@ -69,6 +73,25 @@ async function handlePost(request: NextRequest) {
   }
 
   const supabase = getAdminClient()
+
+  // ── Idempotency check ────────────────────────────────────────────────────
+  // Attempt to record this event atomically. A UNIQUE violation (code 23505)
+  // means this event.id was already processed — return deduplicated success
+  // without re-running any side effects.
+  const { error: dedupErr } = await supabase
+    .from('stripe_processed_events')
+    .insert({ event_id: event.id, event_type: event.type })
+
+  if (dedupErr) {
+    if (dedupErr.code === '23505') {
+      // Already processed — safe to acknowledge without re-processing
+      console.log(`[webhook] Deduplicated event ${event.id} (${event.type})`)
+      return NextResponse.json({ received: true, deduplicated: true })
+    }
+    // Non-dedup DB error: log but continue processing to avoid silently
+    // dropping events that genuinely need handling
+    console.error('[webhook] Failed to record event in stripe_processed_events:', dedupErr.message)
+  }
 
   try {
     switch (event.type) {
@@ -191,8 +214,10 @@ async function handlePost(request: NextRequest) {
           const periodStart = invoiceRaw.period_start as number | undefined
           const periodEnd = invoiceRaw.period_end as number | undefined
 
-          // Record payment
-          await supabase.from('billing_invoices').insert({
+          // Record payment — secondary guard: partial UNIQUE index on
+          // billing_invoices(stripe_invoice_id) WHERE status='paid' prevents
+          // duplicate rows even if stripe_processed_events dedup is bypassed.
+          const { error: insertErr } = await supabase.from('billing_invoices').insert({
             tenant_id: tenant.id,
             stripe_invoice_id: invoice.id,
             amount: invoice.amount_paid,
@@ -207,6 +232,16 @@ async function handlePost(request: NextRequest) {
               ? new Date(periodEnd * 1000).toISOString()
               : null,
           })
+
+          if (insertErr) {
+            // Secondary guard fired — partial UNIQUE violation means this
+            // invoice was already recorded as paid. Safe to continue.
+            if (insertErr.code === '23505') {
+              console.log(`[webhook] billing_invoices secondary guard: invoice ${invoice.id} already recorded as paid`)
+            } else {
+              console.error('[webhook] Failed to insert billing_invoice:', insertErr.message)
+            }
+          }
 
           // Ensure subscription is active
           await supabase

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { authenticateRequest, AuthError } from '@/lib/services/auth'
+import { requirePermission } from '@/lib/services/require-role'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { withTiming } from '@/lib/middleware/request-timing'
 
@@ -14,6 +15,7 @@ async function handleGet(
 ) {
   try {
     const auth = await authenticateRequest()
+    requirePermission(auth, 'communications', 'view')
     const admin = createAdminClient()
     const { threadId } = await params
 

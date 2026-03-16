@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { authenticateRequest, AuthError } from '@/lib/services/auth'
 import { getMatterAccessInfo } from '@/lib/services/matter-access'
+import { requirePermission } from '@/lib/services/require-role'
 import { withTiming } from '@/lib/middleware/request-timing'
 
 /**
@@ -16,6 +17,7 @@ async function handleGet(
   try {
     const { id: matterId } = await params
     const auth = await authenticateRequest()
+    requirePermission(auth, 'matters', 'view')
 
     const access = await getMatterAccessInfo(auth.supabase, auth.userId, matterId)
 

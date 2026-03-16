@@ -1,6 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/lib/types/database'
 import { graphFetch } from '@/lib/services/microsoft-graph'
+import { log } from '@/lib/utils/logger'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -303,9 +304,10 @@ export async function syncInboundEmails(
       .eq('id', emailAccountId)
 
     if (newErrorCount >= MAX_CONSECUTIVE_ERRORS) {
-      console.error(
-        `[email-sync] Email account ${emailAccountId} disabled after ${MAX_CONSECUTIVE_ERRORS} consecutive errors`
-      )
+      log.error('email.sync.account_disabled', {
+        email_account_id: emailAccountId,
+        error_count: newErrorCount,
+      })
     }
 
     result.errors.push({ messageId: 'sync', message: errorMessage })

@@ -1,5 +1,8 @@
 'use client'
 
+import { useEffect } from 'react'
+import { reportError } from '@/lib/monitoring/error-reporter'
+
 export default function GlobalError({
   error,
   reset,
@@ -7,6 +10,10 @@ export default function GlobalError({
   error: Error & { digest?: string }
   reset: () => void
 }) {
+  useEffect(() => {
+    reportError(error, { route: 'global-error', metadata: { digest: error.digest } })
+  }, [error])
+
   return (
     <html lang="en">
       <body className="flex min-h-screen items-center justify-center bg-background font-sans antialiased">

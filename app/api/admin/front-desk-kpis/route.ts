@@ -3,6 +3,7 @@ import { authenticateRequest, AuthError } from '@/lib/services/auth'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { buildKpiValues } from '@/lib/services/front-desk-kpis'
 import { log } from '@/lib/utils/logger'
+import { requirePermission } from '@/lib/services/require-role'
 import { withTiming } from '@/lib/middleware/request-timing'
 
 /**
@@ -18,6 +19,7 @@ type AdminRpc = { rpc: (fn: string, params: Record<string, unknown>) => Promise<
 async function handleGet(request: Request) {
   try {
     const auth = await authenticateRequest()
+    requirePermission(auth, 'settings', 'view')
     const admin = createAdminClient()
 
     // Verify admin role

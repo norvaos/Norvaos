@@ -4,6 +4,7 @@ import { createRateLimiter } from '@/lib/middleware/rate-limit'
 import { withTiming } from '@/lib/middleware/request-timing'
 import { buildClientQuestionnaireFromDB } from '@/lib/ircc/questionnaire-engine-db'
 import type { IRCCProfile } from '@/lib/types/ircc-profile'
+import { validatePortalToken, PortalAuthError } from '@/lib/services/portal-auth'
 
 const rateLimiter = createRateLimiter({ windowMs: 60_000, maxRequests: 30 })
 
@@ -28,24 +29,18 @@ async function handleGet(
     }
 
     const { token } = await params
+
+    let link: Awaited<ReturnType<typeof validatePortalToken>>
+    try {
+      link = await validatePortalToken(token)
+    } catch (error) {
+      if (error instanceof PortalAuthError) {
+        return NextResponse.json({ error: error.message }, { status: error.status })
+      }
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    }
+
     const admin = createAdminClient()
-
-    // Validate token
-    const { data: link, error: linkError } = await admin
-      .from('portal_links')
-      .select('id, matter_id, tenant_id, expires_at, is_active')
-      .eq('token', token)
-      .eq('is_active', true)
-      .single()
-
-    if (linkError || !link) {
-      return NextResponse.json({ error: 'Invalid token' }, { status: 404 })
-    }
-
-    if (new Date(link.expires_at) < new Date()) {
-      return NextResponse.json({ error: 'Link expired' }, { status: 410 })
-    }
-
     const matterId = link.matter_id
 
     // Get the matter's matter_type_id

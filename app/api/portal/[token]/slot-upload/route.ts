@@ -3,6 +3,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { buildAutoRenamedPath } from '@/lib/services/document-slot-engine'
 import { createRateLimiter } from '@/lib/middleware/rate-limit'
 import { withTiming } from '@/lib/middleware/request-timing'
+import { validatePortalToken, PortalAuthError } from '@/lib/services/portal-auth'
 
 // 30 requests per minute per IP — prevents brute-force token enumeration
 const tokenLookupLimiter = createRateLimiter({ windowMs: 60_000, maxRequests: 30 })
@@ -32,29 +33,18 @@ async function handlePost(
     }
 
     const { token } = await params
+
+    let link: Awaited<ReturnType<typeof validatePortalToken>>
+    try {
+      link = await validatePortalToken(token)
+    } catch (error) {
+      if (error instanceof PortalAuthError) {
+        return NextResponse.json({ success: false, error: error.message }, { status: error.status })
+      }
+      return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 })
+    }
+
     const admin = createAdminClient()
-
-    // ── 1. Validate token ──────────────────────────────────────────────
-    const { data: link, error: linkError } = await admin
-      .from('portal_links')
-      .select('*')
-      .eq('token', token)
-      .eq('is_active', true)
-      .single()
-
-    if (linkError || !link) {
-      return NextResponse.json(
-        { success: false, error: 'Invalid or expired portal link' },
-        { status: 404 }
-      )
-    }
-
-    if (new Date(link.expires_at) < new Date()) {
-      return NextResponse.json(
-        { success: false, error: 'This portal link has expired' },
-        { status: 410 }
-      )
-    }
 
     // ── 2. Parse FormData ──────────────────────────────────────────────
     const formData = await request.formData()
@@ -248,15 +238,6 @@ async function handlePost(
         portal_link_id: link.id,
       },
     })
-
-    // ── 11. Update portal link access tracking ─────────────────────────
-    await admin
-      .from('portal_links')
-      .update({
-        last_accessed_at: new Date().toISOString(),
-        access_count: (link.access_count ?? 0) + 1,
-      })
-      .eq('id', link.id)
 
     return NextResponse.json(
       { success: true, document_id: doc.id, version_number: versionNumber },

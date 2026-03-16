@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { authenticateRequest, AuthError } from '@/lib/services/auth'
+import { requirePermission } from '@/lib/services/require-role'
 
 // ── GET /api/esign/requests?matterId=...&leadId=... ──────────────────────────
 
@@ -17,6 +18,8 @@ async function handleGet(request: Request) {
     }
     return NextResponse.json({ error: 'Authentication failed' }, { status: 401 })
   }
+
+  requirePermission(auth, 'documents', 'view')
 
   const { supabase, tenantId } = auth
 

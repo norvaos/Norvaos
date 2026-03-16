@@ -7,7 +7,7 @@ import { log } from '@/lib/utils/logger'
 import { executeImportSchema } from '@/lib/schemas/data-import'
 import { executeImport } from '@/lib/services/import/import-engine'
 import { executeApiImport } from '@/lib/services/import/api-import-engine'
-import type { Json } from '@/lib/types/database'
+import { logAuditServer } from '@/lib/queries/audit-logs'
 import type { SourcePlatform, ImportEntityType, DuplicateStrategy, ColumnMapping } from '@/lib/services/import/types'
 
 /**
@@ -66,17 +66,15 @@ async function handlePost(request: Request) {
       .eq('id', batchId)
 
     // Audit log
-    admin
-      .from('audit_logs')
-      .insert({
-        tenant_id: auth.tenantId,
-        user_id: auth.userId,
-        action: 'import_execute',
-        entity_type: 'import_batch',
-        entity_id: batchId,
-        metadata: { platform: batch.source_platform, entityType: batch.entity_type, duplicateStrategy, importMode: isApiMode ? 'api' : 'csv' } as unknown as Json,
-      })
-      .then(() => {})
+    logAuditServer({
+      supabase: auth.supabase,
+      tenantId: auth.tenantId,
+      userId: auth.userId,
+      entityType: 'import_batch',
+      entityId: batchId,
+      action: 'import_execute',
+      changes: { platform: batch.source_platform, entityType: batch.entity_type, duplicateStrategy, importMode: isApiMode ? 'api' : 'csv' },
+    }).catch(() => {})
 
     if (isApiMode) {
       // API import: rows already stored as JSON in storage

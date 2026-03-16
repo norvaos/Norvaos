@@ -1,6 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/lib/types/database'
 import { graphFetch } from '@/lib/services/microsoft-graph'
+import { log } from '@/lib/utils/logger'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -136,7 +137,10 @@ export async function sendEmailViaProvider(
     return { success: true, messageId: null, error: null }
   } catch (err) {
     const errorMessage = err instanceof Error ? err.message : 'Failed to send email'
-    console.error('[email-send] Error sending email:', errorMessage)
+    log.error('email.send.error', {
+      account_id: accountId,
+      error_message: errorMessage,
+    })
     return { success: false, messageId: null, error: errorMessage }
   }
 }
