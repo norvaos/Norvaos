@@ -21,6 +21,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useQuery } from '@tanstack/react-query'
 import { useMatterRiskFlagCount } from '@/lib/queries/stage-transitions'
 import { useLatestRetainerAgreement } from '@/lib/queries/retainer-agreements'
+import { useMatterSLA } from '@/lib/queries/sla'
 import { RetainerGenerationModal } from '@/components/retainer/RetainerGenerationModal'
 import type { Database } from '@/lib/types/database'
 
@@ -109,6 +110,13 @@ export function ZoneA({ matter, tenantId, onFlagClick, onNotesClick }: ZoneAProp
   // Open risk-flag count
   const { data: riskFlagCount = 0 } = useMatterRiskFlagCount(matter.id)
 
+  // Most critical active SLA (first by due_at)
+  const { data: activeSLAs = [] } = useMatterSLA(matter.id)
+  const criticalSLA = activeSLAs[0] ?? null
+  const criticalSLARemaining = criticalSLA
+    ? Math.max(0, Math.round((new Date(criticalSLA.due_at).getTime() - Date.now()) / (1000 * 60 * 60)))
+    : null
+
   const statusCfg  = STATUS_CONFIG[matter.status ?? 'active'] ?? { label: matter.status ?? 'Unknown', className: 'bg-slate-100 text-slate-700 border-slate-300' }
   const priorityDot = PRIORITY_DOT[matter.priority ?? 'medium'] ?? PRIORITY_DOT.medium
   const riskLevelCfg = matter.risk_level ? RISK_LEVEL_CONFIG[matter.risk_level] : null
@@ -192,6 +200,22 @@ export function ZoneA({ matter, tenantId, onFlagClick, onNotesClick }: ZoneAProp
               <span className="text-[10px] text-muted-foreground">
                 {lawyerName}
               </span>
+            )}
+
+            {criticalSLA && (
+              <Badge
+                variant="outline"
+                className={cn(
+                  'text-[10px] px-1.5 py-0 border font-medium',
+                  criticalSLA.status === 'breached'
+                    ? 'bg-red-50 text-red-700 border-red-300'
+                    : criticalSLARemaining !== null && criticalSLARemaining <= (criticalSLA ? Math.round(0.2 * (new Date(criticalSLA.due_at).getTime() - new Date(criticalSLA.started_at).getTime()) / (1000 * 60 * 60)) : 48)
+                      ? 'bg-amber-50 text-amber-700 border-amber-300'
+                      : 'bg-blue-50 text-blue-700 border-blue-300',
+                )}
+              >
+                {criticalSLA.status === 'breached' ? 'SLA: BREACHED' : `SLA: ${criticalSLARemaining}h`}
+              </Badge>
             )}
 
           </div>

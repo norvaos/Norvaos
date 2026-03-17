@@ -17,6 +17,7 @@
  */
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { format, differenceInCalendarDays, isPast, parseISO } from 'date-fns'
 import {
   ChevronLeft,
@@ -49,6 +50,8 @@ import { createClient } from '@/lib/supabase/client'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useMatterRiskFlagsAll } from '@/lib/queries/stage-transitions'
 import { useLatestRetainerAgreement } from '@/lib/queries/retainer-agreements'
+import { useMatterSLA } from '@/lib/queries/sla'
+import type { MatterSLATrackingRow } from '@/lib/types/database'
 import { RetainerGenerationModal } from '@/components/retainer/RetainerGenerationModal'
 import { toast } from 'sonner'
 import type { Database } from '@/lib/types/database'
@@ -151,6 +154,7 @@ export function ZoneC({ matter, tenantId }: ZoneCProps) {
   const [collapsed, setCollapsed] = useState(false)
   const [selectedContact, setSelectedContact] = useState<MatterPersonWithContact | null>(null)
   const [retainerModalOpen, setRetainerModalOpen] = useState(false)
+  const router = useRouter()
 
   const supabase = createClient()
   const qc = useQueryClient()
@@ -245,6 +249,9 @@ export function ZoneC({ matter, tenantId }: ZoneCProps) {
     },
     onError: () => toast.error('Failed to mark task complete'),
   })
+
+  // ── Active SLAs ─────────────────────────────────────────────────────────
+  const { data: activeSLAs = [] } = useMatterSLA(matter.id)
 
   // ── Risk flags ──────────────────────────────────────────────────────────
   const { data: riskFlags = [] } = useMatterRiskFlagsAll(matter.id)
@@ -399,6 +406,11 @@ export function ZoneC({ matter, tenantId }: ZoneCProps) {
             />
           )}
 
+          {/* ── SLA panel ─────────────────────────────────────────────── */}
+          {activeSLAs.length > 0 && (
+            <SLAPanel slas={activeSLAs} />
+          )}
+
           {/* ── People panel ──────────────────────────────────────────── */}
           {people.length > 0 && (
             <PeoplePanel
@@ -468,6 +480,17 @@ export function ZoneC({ matter, tenantId }: ZoneCProps) {
           </SheetHeader>
           {selectedContact?.contacts && (
             <ContactDetailBody contact={selectedContact.contacts} />
+          )}
+          {selectedContact?.contacts?.id && (
+            <div className="px-4 pb-4">
+              <button
+                type="button"
+                onClick={() => router.push(`/contacts/${selectedContact.contacts!.id}`)}
+                className="w-full text-center text-xs font-medium text-primary hover:underline py-2"
+              >
+                View Full Profile →
+              </button>
+            </div>
           )}
         </SheetContent>
       </Sheet>
@@ -838,6 +861,78 @@ function BillingRow({
       <span className={cn('font-medium tabular-nums', colour)}>
         ${Number(value).toLocaleString('en-CA', { minimumFractionDigits: 0 })}
       </span>
+    </div>
+  )
+}
+
+// ── SLA Panel ─────────────────────────────────────────────────────────────────
+
+const SLA_LABELS: Record<string, string> = {
+  CLIENT_RESPONSE:   'Client Response',
+  DOCUMENT_REVIEW:   'Document Review',
+  LAWYER_REVIEW:     'Lawyer Review',
+  BILLING_CLEARANCE: 'Billing Clearance',
+  FILING:            'Filing',
+  IRCC_RESPONSE:     'IRCC Response',
+}
+
+const SLA_TOTAL_HOURS: Record<string, number> = {
+  CLIENT_RESPONSE:   120,
+  DOCUMENT_REVIEW:    24,
+  LAWYER_REVIEW:      48,
+  BILLING_CLEARANCE:  72,
+  FILING:             48,
+  IRCC_RESPONSE:     336,
+}
+
+function SLAPanel({ slas }: { slas: MatterSLATrackingRow[] }) {
+  const now = Date.now()
+
+  return (
+    <div className="space-y-2">
+      <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1">
+        <Clock className="h-3 w-3 text-blue-500" />
+        Active SLAs ({slas.length})
+      </p>
+
+      {slas.map(sla => {
+        const isBreached = sla.status === 'breached'
+        const dueMs      = new Date(sla.due_at).getTime()
+        const startMs    = new Date(sla.started_at).getTime()
+        const totalMs    = (SLA_TOTAL_HOURS[sla.sla_class] ?? 48) * 60 * 60 * 1000
+        const elapsedMs  = Math.min(now - startMs, totalMs)
+        const pct        = Math.min(Math.round((elapsedMs / totalMs) * 100), 100)
+        const isAmber    = !isBreached && pct >= 80
+        const remainingH = Math.max(0, Math.round((dueMs - now) / (1000 * 60 * 60)))
+        const label      = SLA_LABELS[sla.sla_class] ?? sla.sla_class
+
+        return (
+          <div key={sla.id} className="space-y-1">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-medium text-foreground truncate pr-1">
+                {label}
+              </span>
+              {isBreached ? (
+                <span className="text-[10px] font-bold text-red-600 shrink-0">BREACHED</span>
+              ) : (
+                <span className={cn('text-[10px] shrink-0', isAmber ? 'text-amber-600 font-medium' : 'text-muted-foreground')}>
+                  {remainingH}h left
+                </span>
+              )}
+            </div>
+            {/* Progress bar */}
+            <div className="w-full h-1.5 rounded-full bg-muted overflow-hidden">
+              <div
+                className={cn(
+                  'h-full rounded-full transition-all',
+                  isBreached ? 'bg-red-500' : isAmber ? 'bg-amber-400' : 'bg-blue-400',
+                )}
+                style={{ width: `${pct}%` }}
+              />
+            </div>
+          </div>
+        )
+      })}
     </div>
   )
 }

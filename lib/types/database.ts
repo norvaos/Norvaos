@@ -12244,9 +12244,11 @@ export type Database = {
       }
       matter_risk_flags: {
         Row: {
+          auto_detected: boolean | null
           created_at: string
           detected_at: string
           detected_by: string
+          evidence: Json | null
           flag_type: string
           id: string
           matter_id: string
@@ -12256,13 +12258,16 @@ export type Database = {
           resolved_by: string | null
           severity: string
           status: string
+          suggested_action: string | null
           tenant_id: string
           updated_at: string
         }
         Insert: {
+          auto_detected?: boolean | null
           created_at?: string
           detected_at?: string
           detected_by?: string
+          evidence?: Json | null
           flag_type: string
           id?: string
           matter_id: string
@@ -12272,13 +12277,16 @@ export type Database = {
           resolved_by?: string | null
           severity?: string
           status?: string
+          suggested_action?: string | null
           tenant_id: string
           updated_at?: string
         }
         Update: {
+          auto_detected?: boolean | null
           created_at?: string
           detected_at?: string
           detected_by?: string
+          evidence?: Json | null
           flag_type?: string
           id?: string
           matter_id?: string
@@ -12288,6 +12296,7 @@ export type Database = {
           resolved_by?: string | null
           severity?: string
           status?: string
+          suggested_action?: string | null
           tenant_id?: string
           updated_at?: string
         }
@@ -19302,6 +19311,7 @@ export interface MatterRiskFlagRow {
   matter_id: string
   flag_type: string
   severity: RiskFlagSeverity
+  auto_detected: boolean | null
   detected_at: string
   detected_by: string
   status: RiskFlagStatus
@@ -19309,6 +19319,10 @@ export interface MatterRiskFlagRow {
   resolved_by: string | null
   resolved_at: string | null
   override_reason: string | null
+  /** Structured evidence captured by the auto-detection engine. */
+  evidence: Json | null
+  /** Human-readable suggested remediation action from the auto-detection engine. */
+  suggested_action: string | null
   created_at: string
   updated_at: string
 }
@@ -19318,12 +19332,15 @@ export interface MatterRiskFlagInsert {
   matter_id: string
   flag_type: string
   severity?: RiskFlagSeverity
+  auto_detected?: boolean | null
   detected_by?: string
   status?: RiskFlagStatus
   resolution_note?: string | null
   resolved_by?: string | null
   resolved_at?: string | null
   override_reason?: string | null
+  evidence?: Json | null
+  suggested_action?: string | null
   id?: string
   detected_at?: string
   created_at?: string
@@ -19331,7 +19348,7 @@ export interface MatterRiskFlagInsert {
 }
 
 export type MatterRiskFlagUpdate = Partial<
-  Pick<MatterRiskFlagRow, 'status' | 'resolution_note' | 'resolved_by' | 'resolved_at' | 'override_reason' | 'severity'>
+  Pick<MatterRiskFlagRow, 'status' | 'resolution_note' | 'resolved_by' | 'resolved_at' | 'override_reason' | 'severity' | 'evidence' | 'suggested_action'>
 >
 
 // ── Document Engine Row Aliases ───────────────────────────────────────────────
@@ -19563,3 +19580,222 @@ export interface RetainerAgreementUpdate {
   updated_by?: string | null
   updated_at?: string
 }
+
+// ── matter_sla_tracking ───────────────────────────────────────────────────────
+
+export interface MatterSLATrackingRow {
+  id: string
+  tenant_id: string
+  matter_id: string
+  sla_class: string
+  started_at: string
+  due_at: string
+  status: string
+  context_ref: string | null
+  created_by: string | null
+  completed_at: string | null
+  breached_at: string | null
+  created_at: string
+}
+
+export interface MatterSLATrackingInsert {
+  id?: string
+  tenant_id: string
+  matter_id: string
+  sla_class: string
+  started_at: string
+  due_at: string
+  status?: string
+  context_ref?: string | null
+  created_by?: string | null
+  completed_at?: string | null
+  breached_at?: string | null
+  created_at?: string
+}
+
+export interface MatterSLATrackingUpdate {
+  status?: string
+  completed_at?: string | null
+  breached_at?: string | null
+}
+
+// ── ircc_correspondence ────────────────────────────────────────────────────────
+
+export interface IrccCorrespondenceRow {
+  id: string
+  tenant_id: string
+  matter_id: string
+  item_type: string
+  item_date: string | null
+  status: string
+  decision_type: string | null
+  notes: string | null
+  document_path: string | null
+  created_by: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface IrccCorrespondenceInsert {
+  id?: string
+  tenant_id: string
+  matter_id: string
+  item_type: string
+  item_date?: string | null
+  status?: string
+  decision_type?: string | null
+  notes?: string | null
+  document_path?: string | null
+  created_by?: string | null
+  created_at?: string
+  updated_at?: string
+}
+
+export interface IrccCorrespondenceUpdate {
+  item_type?: string
+  item_date?: string | null
+  status?: string
+  decision_type?: string | null
+  notes?: string | null
+  document_path?: string | null
+  updated_at?: string
+}
+
+// ── matter_sla_tracking ───────────────────────────────────────────────────────
+
+export interface MatterSLATrackingRow {
+  id: string
+  tenant_id: string
+  matter_id: string
+  sla_class: string
+  started_at: string
+  due_at: string
+  breached_at: string | null
+  status: string
+  completed_at: string | null
+  context_ref: string | null
+  created_by: string | null
+  created_at: string
+}
+
+export interface MatterSLATrackingInsert {
+  id?: string
+  tenant_id: string
+  matter_id: string
+  sla_class: string
+  started_at?: string
+  due_at: string
+  breached_at?: string | null
+  status?: string
+  completed_at?: string | null
+  context_ref?: string | null
+  created_by?: string | null
+  created_at?: string
+}
+
+export interface MatterSLATrackingUpdate {
+  sla_class?: string
+  started_at?: string
+  due_at?: string
+  breached_at?: string | null
+  status?: string
+  completed_at?: string | null
+  context_ref?: string | null
+}
+
+// ── matter_billing_milestones ──────────────────────────────────────────────────
+
+export interface MatterBillingMilestoneRow {
+  id: string
+  tenant_id: string
+  matter_id: string
+  name: string
+  amount_cents: number
+  due_date: string | null
+  status: string
+  completed_at: string | null
+  billed_at: string | null
+  invoice_id: string | null
+  sort_order: number
+  notes: string | null
+  created_by: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface MatterBillingMilestoneInsert {
+  id?: string
+  tenant_id: string
+  matter_id: string
+  name: string
+  amount_cents?: number
+  due_date?: string | null
+  status?: string
+  completed_at?: string | null
+  billed_at?: string | null
+  invoice_id?: string | null
+  sort_order?: number
+  notes?: string | null
+  created_by?: string | null
+  created_at?: string
+  updated_at?: string
+}
+
+export interface MatterBillingMilestoneUpdate {
+  name?: string
+  amount_cents?: number
+  due_date?: string | null
+  status?: string
+  completed_at?: string | null
+  billed_at?: string | null
+  invoice_id?: string | null
+  sort_order?: number
+  notes?: string | null
+  updated_at?: string
+}
+
+// ── lead_outcomes ──────────────────────────────────────────────────────────────
+
+export type LeadOutcome =
+  | 'RETAIN'
+  | 'FOLLOW_UP'
+  | 'NOT_QUALIFIED'
+  | 'REFERRED_OUT'
+  | 'NO_SHOW'
+  | 'DECLINED'
+  | 'DUPLICATE'
+
+export interface LeadOutcomeRow {
+  id: string
+  tenant_id: string
+  lead_id: string
+  outcome: LeadOutcome
+  outcome_at: string
+  notes: string | null
+  follow_up_date: string | null
+  referral_target: string | null
+  duplicate_of: string | null
+  actioned_by: string | null
+  created_at: string
+}
+
+export interface LeadOutcomeInsert {
+  id?: string
+  tenant_id: string
+  lead_id: string
+  outcome: LeadOutcome
+  outcome_at?: string
+  notes?: string | null
+  follow_up_date?: string | null
+  referral_target?: string | null
+  duplicate_of?: string | null
+  actioned_by?: string | null
+  created_at?: string
+}
+
+// ── contact_relationships — convenience aliases ─────────────────────────────
+// The table uses contact_id_a / contact_id_b (original schema from migration 001).
+// These aliases expose the Database row/insert types under predictable names.
+export type ContactRelationshipRow    = Database['public']['Tables']['contact_relationships']['Row']
+export type ContactRelationshipInsert = Database['public']['Tables']['contact_relationships']['Insert']
+export type ContactRelationshipUpdate = Database['public']['Tables']['contact_relationships']['Update']
