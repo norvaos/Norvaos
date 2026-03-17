@@ -15,6 +15,12 @@ on:
   push:
     branches: [main]
     tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: 'Reason for manual trigger'
+        required: false
+        default: 'Manual CI gate verification'
 
 env:
   NODE_VERSION: '20'
