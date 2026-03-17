@@ -154,7 +154,7 @@ export function useUpdateMatterType() {
     mutationFn: async (input: {
       id: string
       tenantId: string
-      updates: Partial<Pick<MatterType, 'name' | 'description' | 'color' | 'sort_order' | 'is_active'>>
+      updates: Partial<Pick<MatterType, 'name' | 'description' | 'color' | 'sort_order' | 'is_active' | 'practice_area_id' | 'icon' | 'matter_type_config'>>
     }) => {
       const supabase = createClient()
       const { error } = await supabase
@@ -1281,5 +1281,378 @@ export function useMatterTypeNamingTemplate(matterTypeId: string | null | undefi
     },
     enabled: !!matterTypeId,
     staleTime: 5 * 60 * 1000,
+  })
+}
+
+// ─── Admin: Matter Type Config Engine ────────────────────────────────────────
+
+export type MatterTypeWithPracticeArea = MatterType & {
+  practice_areas: { id: string; name: string; color: string }
+  stage_count: number
+}
+
+/**
+ * Fetch all matter types (active + archived) with practice area join.
+ * Used by the admin matter-types list page.
+ */
+export function useAdminMatterTypes(tenantId: string, practiceAreaFilter?: string | null) {
+  return useQuery({
+    queryKey: ['admin_matter_types', tenantId, practiceAreaFilter ?? 'all'],
+    queryFn: async () => {
+      const supabase = createClient()
+      let q = supabase
+        .from('matter_types')
+        .select(`
+          *,
+          practice_areas!inner(id, name, color)
+        `)
+        .eq('tenant_id', tenantId)
+        .order('sort_order')
+        .order('name')
+
+      if (practiceAreaFilter && practiceAreaFilter !== 'all') {
+        q = q.eq('practice_area_id', practiceAreaFilter)
+      }
+
+      const { data, error } = await q
+      if (error) throw error
+
+      // Fetch stage counts for each matter type via pipelines
+      const matterTypeIds = (data ?? []).map((mt) => mt.id)
+      let stageCounts: Record<string, number> = {}
+
+      if (matterTypeIds.length > 0) {
+        const { data: pipelines } = await supabase
+          .from('matter_stage_pipelines')
+          .select('matter_type_id, id')
+          .in('matter_type_id', matterTypeIds)
+          .eq('is_active', true)
+
+        const pipelineIds = (pipelines ?? []).map((p) => p.id)
+
+        if (pipelineIds.length > 0) {
+          const { data: stages } = await supabase
+            .from('matter_stages')
+            .select('pipeline_id')
+            .in('pipeline_id', pipelineIds)
+
+          const pipelineToMatterType = new Map(
+            (pipelines ?? []).map((p) => [p.id, p.matter_type_id])
+          )
+
+          for (const stage of stages ?? []) {
+            const mtId = pipelineToMatterType.get(stage.pipeline_id)
+            if (mtId) {
+              stageCounts[mtId] = (stageCounts[mtId] ?? 0) + 1
+            }
+          }
+        }
+      }
+
+      return (data ?? []).map((mt) => ({
+        ...mt,
+        stage_count: stageCounts[mt.id] ?? 0,
+      })) as MatterTypeWithPracticeArea[]
+    },
+    enabled: !!tenantId,
+    staleTime: 60 * 1000,
+  })
+}
+
+/**
+ * Fetch a single matter type with full config, practice area, and stages.
+ */
+export function useAdminMatterType(id: string | null | undefined) {
+  return useQuery({
+    queryKey: ['admin_matter_type', id],
+    queryFn: async () => {
+      const supabase = createClient()
+      const { data, error } = await supabase
+        .from('matter_types')
+        .select(`
+          *,
+          practice_areas!inner(id, name, color)
+        `)
+        .eq('id', id!)
+        .single()
+      if (error) throw error
+      return data as MatterType & {
+        practice_areas: { id: string; name: string; color: string }
+      }
+    },
+    enabled: !!id,
+    staleTime: 30 * 1000,
+  })
+}
+
+/**
+ * Archive (soft-delete) or restore a matter type by toggling is_active.
+ */
+export function useArchiveMatterType() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (input: { id: string; tenantId: string; archive: boolean }) => {
+      const supabase = createClient()
+      const { error } = await supabase
+        .from('matter_types')
+        .update({ is_active: !input.archive })
+        .eq('id', input.id)
+        .eq('tenant_id', input.tenantId)
+      if (error) throw error
+    },
+    onSuccess: (_, vars) => {
+      queryClient.invalidateQueries({ queryKey: ['admin_matter_types', vars.tenantId] })
+      queryClient.invalidateQueries({ queryKey: ['admin_matter_type', vars.id] })
+      queryClient.invalidateQueries({ queryKey: ['matter_types', vars.tenantId] })
+      toast.success(vars.archive ? 'Matter type archived' : 'Matter type restored')
+    },
+    onError: () => {
+      toast.error('Failed to update matter type')
+    },
+  })
+}
+
+// ─── Document Slot Templates (Tab 2 — Document Checklist) ────────────────────
+
+type DocumentSlotTemplate = Database['public']['Tables']['document_slot_templates']['Row']
+
+export function useDocumentSlotsForMatterType(matterTypeId: string | null | undefined) {
+  return useQuery({
+    queryKey: ['doc_slot_templates', 'matter_type', matterTypeId],
+    queryFn: async () => {
+      const supabase = createClient()
+      const { data, error } = await supabase
+        .from('document_slot_templates')
+        .select('*')
+        .eq('matter_type_id', matterTypeId!)
+        .eq('is_active', true)
+        .order('sort_order')
+        .order('slot_name')
+      if (error) throw error
+      return data as DocumentSlotTemplate[]
+    },
+    enabled: !!matterTypeId,
+    staleTime: 30 * 1000,
+  })
+}
+
+export function useCreateDocumentSlot() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (input: {
+      tenantId: string
+      matterTypeId: string
+      slotName: string
+      description?: string | null
+      category?: string
+      isRequired?: boolean
+      sortOrder?: number
+    }) => {
+      const supabase = createClient()
+      const slug = input.slotName
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '_')
+        .replace(/^_|_$/g, '')
+      const { data, error } = await supabase
+        .from('document_slot_templates')
+        .insert({
+          tenant_id: input.tenantId,
+          matter_type_id: input.matterTypeId,
+          slot_name: input.slotName,
+          slot_slug: slug,
+          description: input.description ?? null,
+          category: input.category ?? 'general',
+          is_required: input.isRequired ?? false,
+          sort_order: input.sortOrder ?? 0,
+          is_active: true,
+        })
+        .select()
+        .single()
+      if (error) throw error
+      return data as DocumentSlotTemplate
+    },
+    onSuccess: (_, vars) => {
+      queryClient.invalidateQueries({ queryKey: ['doc_slot_templates', 'matter_type', vars.matterTypeId] })
+      toast.success('Document slot added')
+    },
+    onError: () => {
+      toast.error('Failed to add document slot')
+    },
+  })
+}
+
+export function useUpdateDocumentSlot() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (input: {
+      id: string
+      matterTypeId: string
+      updates: Partial<Pick<DocumentSlotTemplate, 'slot_name' | 'description' | 'category' | 'is_required' | 'sort_order'>>
+    }) => {
+      const supabase = createClient()
+      const { error } = await supabase
+        .from('document_slot_templates')
+        .update(input.updates)
+        .eq('id', input.id)
+      if (error) throw error
+    },
+    onSuccess: (_, vars) => {
+      queryClient.invalidateQueries({ queryKey: ['doc_slot_templates', 'matter_type', vars.matterTypeId] })
+      toast.success('Document slot updated')
+    },
+    onError: () => {
+      toast.error('Failed to update document slot')
+    },
+  })
+}
+
+export function useDeleteDocumentSlot() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (input: { id: string; matterTypeId: string }) => {
+      const supabase = createClient()
+      const { error } = await supabase
+        .from('document_slot_templates')
+        .update({ is_active: false })
+        .eq('id', input.id)
+      if (error) throw error
+    },
+    onSuccess: (_, vars) => {
+      queryClient.invalidateQueries({ queryKey: ['doc_slot_templates', 'matter_type', vars.matterTypeId] })
+      toast.success('Document slot removed')
+    },
+    onError: () => {
+      toast.error('Failed to remove document slot')
+    },
+  })
+}
+
+// ─── Task Templates per Matter Type (Tab 3) ──────────────────────────────────
+// task_templates does not have matter_type_id; we use workflow_templates
+// linked to the matter type, and task_template_items within them.
+// For the admin editor we surface template items directly from the
+// workflow_template that is bound to this matter type.
+
+type TaskTemplateItem = Database['public']['Tables']['task_template_items']['Row']
+
+export type AdminTaskTemplateItem = TaskTemplateItem & {
+  workflow_template_id: string
+}
+
+export function useTaskTemplatesForMatterType(tenantId: string, matterTypeId: string | null | undefined) {
+  return useQuery({
+    queryKey: ['admin_task_template_items', tenantId, matterTypeId],
+    queryFn: async () => {
+      const supabase = createClient()
+      // Get the default workflow template for this matter type
+      const { data: wts } = await supabase
+        .from('workflow_templates')
+        .select('id')
+        .eq('tenant_id', tenantId)
+        .eq('matter_type_id', matterTypeId!)
+        .eq('is_active', true)
+        .order('is_default', { ascending: false })
+        .limit(1)
+
+      const wtId = wts?.[0]?.id ?? null
+      if (!wtId) return [] as AdminTaskTemplateItem[]
+
+      const { data: items, error } = await supabase
+        .from('task_template_items')
+        .select('*')
+        .eq('template_id', wtId)
+        .order('sort_order')
+      if (error) throw error
+      return (items ?? []).map((i) => ({ ...i, workflow_template_id: wtId })) as AdminTaskTemplateItem[]
+    },
+    enabled: !!tenantId && !!matterTypeId,
+    staleTime: 30 * 1000,
+  })
+}
+
+export function useCreateTaskTemplateItem() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (input: {
+      tenantId: string
+      matterTypeId: string
+      workflowTemplateId: string   // the parent workflow_template.id
+      title: string
+      description?: string | null
+      assignedRole?: string | null
+      dueDaysOffset?: number | null
+      sortOrder?: number
+    }) => {
+      const supabase = createClient()
+      const { data, error } = await supabase
+        .from('task_template_items')
+        .insert({
+          template_id: input.workflowTemplateId,
+          title: input.title,
+          description: input.description ?? null,
+          assign_to_role: input.assignedRole ?? null,
+          days_offset: input.dueDaysOffset ?? null,
+          sort_order: input.sortOrder ?? 0,
+          priority: 'medium',
+        })
+        .select()
+        .single()
+      if (error) throw error
+      return data as TaskTemplateItem
+    },
+    onSuccess: (_, vars) => {
+      queryClient.invalidateQueries({ queryKey: ['admin_task_template_items', vars.tenantId, vars.matterTypeId] })
+      toast.success('Task template added')
+    },
+    onError: () => {
+      toast.error('Failed to add task template')
+    },
+  })
+}
+
+export function useUpdateTaskTemplateItem() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (input: {
+      id: string
+      tenantId: string
+      matterTypeId: string
+      updates: Partial<Pick<TaskTemplateItem, 'title' | 'description' | 'assign_to_role' | 'days_offset' | 'sort_order' | 'priority'>>
+    }) => {
+      const supabase = createClient()
+      const { error } = await supabase
+        .from('task_template_items')
+        .update(input.updates)
+        .eq('id', input.id)
+      if (error) throw error
+    },
+    onSuccess: (_, vars) => {
+      queryClient.invalidateQueries({ queryKey: ['admin_task_template_items', vars.tenantId, vars.matterTypeId] })
+      toast.success('Task template updated')
+    },
+    onError: () => {
+      toast.error('Failed to update task template')
+    },
+  })
+}
+
+export function useDeleteTaskTemplateItem() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (input: { id: string; tenantId: string; matterTypeId: string }) => {
+      const supabase = createClient()
+      const { error } = await supabase
+        .from('task_template_items')
+        .delete()
+        .eq('id', input.id)
+      if (error) throw error
+    },
+    onSuccess: (_, vars) => {
+      queryClient.invalidateQueries({ queryKey: ['admin_task_template_items', vars.tenantId, vars.matterTypeId] })
+      toast.success('Task template removed')
+    },
+    onError: () => {
+      toast.error('Failed to remove task template')
+    },
   })
 }

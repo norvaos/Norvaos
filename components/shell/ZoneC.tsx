@@ -34,6 +34,7 @@ import {
   Phone,
   Building2,
   FileText,
+  RefreshCw,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
@@ -60,15 +61,6 @@ type Matter = Database['public']['Tables']['matters']['Row']
 type ContactRow = Database['public']['Tables']['contacts']['Row']
 
 // ── Derived types ─────────────────────────────────────────────────────────────
-
-interface NextActionTask {
-  id: string
-  title: string
-  due_date: string | null
-  status: string | null
-  assigned_to: string | null
-  priority: string | null
-}
 
 interface MatterPersonWithContact {
   id: string
@@ -115,6 +107,24 @@ function relativeDate(dueDateStr: string): { label: string; isOverdue: boolean }
   if (diff === 0) return { label: 'Due today', isOverdue: false }
   if (diff === 1) return { label: 'Due tomorrow', isOverdue: false }
   return { label: `Due in ${diff} days`, isOverdue: false }
+}
+
+/** Relative label for a full ISO timestamp (hours-aware). */
+function relativeTimestamp(isoStr: string): { label: string; isOverdue: boolean } {
+  const now = new Date()
+  const due = parseISO(isoStr)
+  const diffMs = due.getTime() - now.getTime()
+  if (diffMs < 0) {
+    const absDays = Math.floor(Math.abs(diffMs) / (1000 * 60 * 60 * 24))
+    const absHours = Math.floor(Math.abs(diffMs) / (1000 * 60 * 60))
+    if (absDays >= 1) return { label: `Overdue by ${absDays} day${absDays === 1 ? '' : 's'}`, isOverdue: true }
+    return { label: `Overdue by ${absHours}h`, isOverdue: true }
+  }
+  const hours = Math.floor(diffMs / (1000 * 60 * 60))
+  if (hours < 1) return { label: 'Due in < 1 hour', isOverdue: false }
+  if (hours < 24) return { label: `Due in ${hours}h`, isOverdue: false }
+  const days = Math.floor(hours / 24)
+  return { label: `Due in ${days} day${days === 1 ? '' : 's'}`, isOverdue: false }
 }
 
 const SEVERITY_STYLES: Record<string, string> = {
@@ -182,73 +192,22 @@ export function ZoneC({ matter, tenantId }: ZoneCProps) {
     staleTime: 10 * 60 * 1000,
   })
 
-  // ── Next action (highest-priority open task) ────────────────────────────
-  const { data: nextTask } = useQuery({
-    queryKey: ['next-action', matter.id],
-    queryFn: async () => {
-      const today = new Date().toISOString().split('T')[0]
-      // First try overdue tasks
-      const { data: overdue } = await supabase
-        .from('tasks')
-        .select('id, title, due_date, status, assigned_to, priority')
-        .eq('matter_id', matter.id)
-        .not('status', 'eq', 'done')
-        .not('status', 'eq', 'cancelled')
-        .lt('due_date', today)
-        .order('due_date', { ascending: true })
-        .limit(1)
-      if (overdue && overdue.length > 0) return overdue[0] as NextActionTask
+  // ── Next action — reads from matter.next_action_* columns ──────────────
+  // Values are pre-computed by the Next Action Engine and stored on the matter row.
+  // The "Refresh" button calls POST /api/matters/[id]/next-action to recompute.
+  const [isRefreshingNextAction, setIsRefreshingNextAction] = useState(false)
 
-      // Then nearest upcoming task
-      const { data: upcoming } = await supabase
-        .from('tasks')
-        .select('id, title, due_date, status, assigned_to, priority')
-        .eq('matter_id', matter.id)
-        .not('status', 'eq', 'done')
-        .not('status', 'eq', 'cancelled')
-        .order('due_date', { ascending: true, nullsFirst: false })
-        .limit(1)
-      return (upcoming?.[0] ?? null) as NextActionTask | null
-    },
-    enabled: !!matter.id,
-    staleTime: 2 * 60 * 1000,
-  })
-
-  // Assignee display name for next task
-  const { data: taskAssignee } = useQuery({
-    queryKey: ['user_display', nextTask?.assigned_to],
-    queryFn: async () => {
-      const { data } = await supabase
-        .from('users')
-        .select('id, first_name, last_name, email')
-        .eq('id', nextTask!.assigned_to!)
-        .single()
-      return (data ?? null) as {
-        id: string
-        first_name: string | null
-        last_name: string | null
-        email: string
-      } | null
-    },
-    enabled: !!nextTask?.assigned_to,
-    staleTime: 10 * 60 * 1000,
-  })
-
-  // Mark complete mutation
-  const markCompleteMutation = useMutation({
-    mutationFn: async (taskId: string) => {
-      const { error } = await supabase
-        .from('tasks')
-        .update({ status: 'done', completed_at: new Date().toISOString() })
-        .eq('id', taskId)
-      if (error) throw error
-    },
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['next-action', matter.id] })
-      toast.success('Task marked complete')
-    },
-    onError: () => toast.error('Failed to mark task complete'),
-  })
+  async function refreshNextAction() {
+    setIsRefreshingNextAction(true)
+    try {
+      await fetch(`/api/matters/${matter.id}/next-action`, { method: 'POST' })
+      qc.invalidateQueries({ queryKey: ['matter', matter.id] })
+    } catch {
+      toast.error('Failed to refresh next action')
+    } finally {
+      setIsRefreshingNextAction(false)
+    }
+  }
 
   // ── Active SLAs ─────────────────────────────────────────────────────────
   const { data: activeSLAs = [] } = useMatterSLA(matter.id)
@@ -311,9 +270,14 @@ export function ZoneC({ matter, tenantId }: ZoneCProps) {
           </div>
         )}
 
-        {nextTask && (
-          <span title={`Next action: ${nextTask.title}`}>
-            <Clock className="h-3.5 w-3.5 text-amber-500" aria-hidden />
+        {matter.next_action_type && matter.next_action_type !== 'no_action' && (
+          <span title={`Next action: ${matter.next_action_description ?? ''}`}>
+            <Clock className={cn(
+              'h-3.5 w-3.5',
+              matter.next_action_escalation === 'critical' ? 'text-red-500' :
+              matter.next_action_escalation === 'red'      ? 'text-red-400' :
+              'text-amber-500',
+            )} aria-hidden />
           </span>
         )}
 
@@ -383,18 +347,14 @@ export function ZoneC({ matter, tenantId }: ZoneCProps) {
           )}
 
           {/* ── Next Action panel ─────────────────────────────────────── */}
-          {nextTask && (
-            <NextActionPanel
-              task={nextTask}
-              assigneeName={
-                taskAssignee
-                  ? [taskAssignee.first_name, taskAssignee.last_name].filter(Boolean).join(' ') || taskAssignee.email
-                  : null
-              }
-              onMarkComplete={() => markCompleteMutation.mutate(nextTask.id)}
-              isCompleting={markCompleteMutation.isPending}
-            />
-          )}
+          <NextActionPanel
+            actionType={matter.next_action_type ?? null}
+            description={matter.next_action_description ?? null}
+            dueAt={matter.next_action_due_at ?? null}
+            escalation={(matter.next_action_escalation ?? 'none') as 'none' | 'amber' | 'red' | 'critical'}
+            onRefresh={refreshNextAction}
+            isRefreshing={isRefreshingNextAction}
+          />
 
           {/* ── Risk Flags panel ──────────────────────────────────────── */}
           {totalFlags > 0 && (
@@ -508,57 +468,110 @@ export function ZoneC({ matter, tenantId }: ZoneCProps) {
 
 // ── Next Action Panel ─────────────────────────────────────────────────────────
 
+const ESCALATION_CARD: Record<string, string> = {
+  none:     'border-border bg-card',
+  amber:    'border-amber-300 bg-amber-50',
+  red:      'border-red-300 bg-red-50',
+  critical: 'border-red-400 bg-red-50',
+}
+
+const ESCALATION_LABEL: Record<string, string> = {
+  none:     'text-muted-foreground',
+  amber:    'text-amber-700',
+  red:      'text-red-700',
+  critical: 'text-red-700',
+}
+
+const ESCALATION_TEXT: Record<string, string> = {
+  none:     'text-foreground',
+  amber:    'text-amber-900',
+  red:      'text-red-900',
+  critical: 'text-red-900',
+}
+
+const OWNER_BADGE: Record<string, string> = {
+  lawyer:          'bg-indigo-100 text-indigo-700',
+  legal_assistant: 'bg-blue-100 text-blue-700',
+  client:          'bg-green-100 text-green-700',
+  billing:         'bg-yellow-100 text-yellow-700',
+}
+
+const ACTION_TYPE_LABEL: Record<string, string> = {
+  critical_blocker: 'Critical Blocker',
+  sla_breach:       'SLA Breach',
+  overdue_task:     'Overdue Task',
+  upcoming_deadline:'Upcoming Deadline',
+  missing_document: 'Missing Document',
+  pending_review:   'Pending Review',
+  retainer_unsigned:'Retainer Unsigned',
+  readiness_gap:    'Readiness Gap',
+  no_action:        'Next Action',
+}
+
 function NextActionPanel({
-  task,
-  assigneeName,
-  onMarkComplete,
-  isCompleting,
+  actionType,
+  description,
+  dueAt,
+  escalation,
+  onRefresh,
+  isRefreshing,
 }: {
-  task: NextActionTask
-  assigneeName: string | null
-  onMarkComplete: () => void
-  isCompleting: boolean
+  actionType: string | null
+  description: string | null
+  dueAt: string | null
+  escalation: 'none' | 'amber' | 'red' | 'critical'
+  onRefresh: () => void
+  isRefreshing: boolean
 }) {
-  const rel = task.due_date ? relativeDate(task.due_date) : null
+  const rel = dueAt ? relativeTimestamp(dueAt) : null
+  const label = actionType ? (ACTION_TYPE_LABEL[actionType] ?? 'Next Action') : 'Next Action'
+  const isCritical = escalation === 'critical'
 
   return (
-    <div className="rounded-md border border-amber-200 bg-amber-50 p-2.5 space-y-1.5">
-      <p className="text-[10px] font-semibold uppercase tracking-wider text-amber-700">
-        Next Action
-      </p>
-      <p className="text-xs text-amber-900 line-clamp-2 leading-snug">
-        {task.title}
+    <div className={cn('rounded-md border p-2.5 space-y-1.5', ESCALATION_CARD[escalation])}>
+      {/* Header row */}
+      <div className="flex items-center justify-between gap-1">
+        <div className="flex items-center gap-1.5">
+          {isCritical && (
+            <span
+              className="inline-block h-2 w-2 rounded-full bg-red-500 animate-pulse shrink-0"
+              aria-hidden
+            />
+          )}
+          <p className={cn('text-[10px] font-semibold uppercase tracking-wider', ESCALATION_LABEL[escalation])}>
+            {label}
+          </p>
+        </div>
+        <button
+          type="button"
+          title="Refresh next action"
+          onClick={onRefresh}
+          disabled={isRefreshing}
+          className={cn(
+            'p-0.5 rounded hover:bg-black/10 transition-colors disabled:opacity-50',
+            ESCALATION_LABEL[escalation],
+          )}
+        >
+          <RefreshCw className={cn('h-3 w-3', isRefreshing && 'animate-spin')} />
+        </button>
+      </div>
+
+      {/* Description */}
+      <p className={cn('text-xs line-clamp-3 leading-snug', ESCALATION_TEXT[escalation])}>
+        {description ?? 'All caught up!'}
       </p>
 
+      {/* Due at + owner row */}
       <div className="flex items-center gap-1.5 flex-wrap">
-        {task.priority && PRIORITY_STYLES[task.priority] && (
-          <span className={cn('text-[10px] px-1.5 py-0.5 rounded font-medium', PRIORITY_STYLES[task.priority])}>
-            {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
-          </span>
-        )}
         {rel && (
-          <span className={cn('text-[10px]', rel.isOverdue ? 'text-red-600 font-medium' : 'text-amber-600')}>
+          <span className={cn(
+            'text-[10px] font-medium',
+            rel.isOverdue ? 'text-red-600' : ESCALATION_LABEL[escalation],
+          )}>
             {rel.label}
           </span>
         )}
       </div>
-
-      {assigneeName && (
-        <p className="text-[10px] text-amber-700 flex items-center gap-1">
-          <User className="h-2.5 w-2.5" />
-          {assigneeName}
-        </p>
-      )}
-
-      <button
-        type="button"
-        onClick={onMarkComplete}
-        disabled={isCompleting}
-        className="mt-1 flex items-center gap-1 text-[10px] text-amber-700 hover:text-amber-900 font-medium disabled:opacity-50 transition-colors"
-      >
-        <CheckCircle2 className="h-3 w-3" />
-        {isCompleting ? 'Saving…' : 'Mark Complete'}
-      </button>
     </div>
   )
 }

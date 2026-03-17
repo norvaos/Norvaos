@@ -12,6 +12,7 @@ import { toast } from 'sonner'
 import { useTenant } from '@/lib/hooks/use-tenant'
 import { createClient } from '@/lib/supabase/client'
 import { logAudit } from '@/lib/queries/audit-logs'
+import { compositeReadinessKeys } from '@/lib/queries/readiness'
 import type {
   FormAssignmentTemplate,
   MatterFormInstance,
@@ -129,6 +130,8 @@ export function useUpdateFormInstanceStatus() {
     },
     onSuccess: (_data, vars) => {
       qc.invalidateQueries({ queryKey: KEYS.matterFormInstances(vars.matterId) })
+      qc.invalidateQueries({ queryKey: compositeReadinessKeys.detail(vars.matterId) })
+      fetch(`/api/matters/${vars.matterId}/readiness`, { method: 'POST' }).catch(console.error)
       toast.success('Form instance status updated')
     },
     onError: (err: Error) => {

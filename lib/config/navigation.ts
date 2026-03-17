@@ -26,6 +26,8 @@ import {
   PhoneCall,
   Scale,
   User,
+  Layers,
+  AlertTriangle,
   type LucideIcon,
 } from 'lucide-react'
 
@@ -104,6 +106,7 @@ export const navigation: NavSection[] = [
     items: [
       { title: 'Front Desk', href: '/front-desk', icon: MonitorSmartphone, featureFlag: 'front_desk_mode' },
       { title: 'Command Centre', href: '/leads', icon: LayoutDashboard },
+      { title: 'Critical Actions', href: '/admin/critical-actions', icon: AlertTriangle },
     ],
   },
   {
@@ -141,6 +144,7 @@ export const navigation: NavSection[] = [
           { title: 'Trust Accounts', href: '/settings/trust-accounts', icon: Landmark },
         ],
       },
+      { title: 'Matter Types', href: '/admin/matter-types', icon: Layers },
       { title: 'Tenants', href: '/admin/tenants', icon: Building2 },
     ],
   },

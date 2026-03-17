@@ -36,19 +36,29 @@ export default function ClientWorkspace() {
 
   const contactId = linkedContact?.id ?? ''
 
-  // Client's active matters
+  // Client's active matters — scoped to matters where this contact appears in matter_contacts.
+  // This enforces that authenticated clients only see their own matters.
   const { data: clientMatters = [] } = useQuery({
     queryKey: ['workspace-cl-matters', tenantId, contactId],
     queryFn: async () => {
+      if (!contactId) return []
+      // Fetch matter IDs linked to this contact via matter_contacts junction table
+      const { data: links } = await supabase
+        .from('matter_contacts')
+        .select('matter_id')
+        .eq('contact_id', contactId)
+      const matterIds = (links ?? []).map((r) => r.matter_id).filter(Boolean) as string[]
+      if (matterIds.length === 0) return []
       const { data } = await supabase
         .from('matters')
         .select('id, title, matter_number, status, intake_status, stage_id, created_at')
         .eq('tenant_id', tenantId)
+        .in('id', matterIds)
         .neq('status', 'closed_lost')
         .limit(5)
       return data ?? []
     },
-    enabled: !!tenantId,
+    enabled: !!tenantId && !!contactId,
   })
 
   // Stage state for first active matter
@@ -151,6 +161,31 @@ export default function ClientWorkspace() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const currentStage = stageState?.matter_stages as any
 
+  // If the user's email could not be matched to a contact record, show a clear empty state.
+  // This prevents accidentally showing another client's matters if the contact link is missing.
+  if (!linkedContact && !!tenantId && !!authUser?.email) {
+    return (
+      <div className="space-y-6 p-6">
+        <div>
+          <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
+            <User className="size-6 text-primary" />
+            Client Portal
+          </h1>
+        </div>
+        <Card className="border-amber-200 bg-amber-50">
+          <CardContent className="pt-6 pb-6 text-center">
+            <p className="text-sm font-medium text-amber-900">
+              Your account is not yet linked to any matters.
+            </p>
+            <p className="text-sm text-amber-700 mt-1">
+              Please contact your lawyer to have your account linked to your file.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-6 p-6">
       <div>
@@ -162,6 +197,20 @@ export default function ClientWorkspace() {
           Your matter status, documents, appointments, and invoices.
         </p>
       </div>
+
+      {/* No matters linked to this contact */}
+      {linkedContact && clientMatters.length === 0 && (
+        <Card className="border-amber-200 bg-amber-50">
+          <CardContent className="pt-6 pb-6 text-center">
+            <p className="text-sm font-medium text-amber-900">
+              Your account is not yet linked to any matters.
+            </p>
+            <p className="text-sm text-amber-700 mt-1">
+              Please contact your lawyer to have your account linked to your file.
+            </p>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Matter Status Summary */}
       {primaryMatter && (

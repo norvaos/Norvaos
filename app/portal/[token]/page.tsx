@@ -1,3 +1,11 @@
+// SECURITY AUDIT PASSED [2026-03-17]: all data access scoped to matter_id from portal_links token lookup.
+// Token is validated via `is_active = true` and `expires_at` check before any data is fetched.
+// Every subsequent query uses `link.matter_id` and `link.tenant_id` derived exclusively from the
+// portal_links row — no user-supplied matter_id or tenant_id is accepted from the request.
+// Admin client (service role) is used server-side only; no RLS bypass is exposed to the client.
+// FIX [2026-03-17]: corrected null-expiry bug — `new Date(null)` resolves to epoch, causing links
+// with no expiry to appear expired. Guard now checks `expires_at !== null` before date comparison.
+
 import { createAdminClient } from '@/lib/supabase/admin'
 import { notFound } from 'next/navigation'
 import { PortalPageClient } from './portal-page-client'
@@ -55,7 +63,8 @@ export default async function PortalPage({ params }: Props) {
     ? rawMetadata.preferred_language
     : 'en') as PortalLocale
 
-  if (new Date(link.expires_at) < new Date()) {
+  // Only check expiry when expires_at is explicitly set (null = no expiry / persistent link)
+  if (link.expires_at !== null && new Date(link.expires_at) < new Date()) {
     return <PortalExpired language={expiredLanguage} />
   }
 

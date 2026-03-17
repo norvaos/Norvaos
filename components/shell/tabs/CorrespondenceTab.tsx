@@ -11,6 +11,7 @@
  *   Outside Canada → 60 days from decision date
  */
 
+import React from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { format, differenceInDays } from 'date-fns'
 import {
@@ -109,6 +110,9 @@ interface MilestoneRowProps {
   status?: MilestoneStatus
   onStatusChange?: (v: MilestoneStatus) => void
   showStatus?: boolean
+  onAttach?: (file: File) => Promise<void>
+  uploading?: boolean
+  attachedPath?: string | null
   children?: React.ReactNode
 }
 
@@ -120,9 +124,26 @@ function MilestoneRow({
   status,
   onStatusChange,
   showStatus = false,
+  onAttach,
+  uploading = false,
+  attachedPath,
   children,
 }: MilestoneRowProps) {
   const hasDate = !!date
+
+  const handleAttachClick = () => {
+    if (uploading) return
+    const input = document.createElement('input')
+    input.type = 'file'
+    input.accept = '.pdf,.doc,.docx,.jpg,.png'
+    input.onchange = async () => {
+      const file = input.files?.[0]
+      if (file && onAttach) {
+        await onAttach(file)
+      }
+    }
+    input.click()
+  }
 
   return (
     <div className="flex gap-4 py-3">
@@ -149,6 +170,11 @@ function MilestoneRow({
           {hasDate && (
             <span className="text-xs text-muted-foreground">
               {format(new Date(date), 'MMM d, yyyy')}
+            </span>
+          )}
+          {attachedPath && (
+            <span className="text-xs text-green-600 font-medium">
+              &#10003; Document attached
             </span>
           )}
         </div>
@@ -186,36 +212,25 @@ function MilestoneRow({
             </div>
           )}
 
-          {/* File attach button */}
-          <div className="flex flex-col gap-1">
-            <Label className="text-xs text-muted-foreground opacity-0 select-none">
-              Attach
-            </Label>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              className="h-7 text-xs gap-1 px-2"
-              onClick={() => {
-                // File picker — uploads to correspondence-docs bucket (future)
-                const input = document.createElement('input')
-                input.type = 'file'
-                input.accept = '.pdf,.doc,.docx,.jpg,.png'
-                input.onchange = () => {
-                  // TODO: wire to Supabase storage upload when bucket exists
-                  if (input.files?.[0]) {
-                    window.alert(
-                      `File "${input.files[0].name}" selected.\n\nStorage upload will be wired when the correspondence-docs bucket is provisioned.`
-                    )
-                  }
-                }
-                input.click()
-              }}
-            >
-              <Upload className="h-3 w-3" />
-              Attach
-            </Button>
-          </div>
+          {/* File attach button — uploads to matter-documents bucket */}
+          {onAttach && (
+            <div className="flex flex-col gap-1">
+              <Label className="text-xs text-muted-foreground opacity-0 select-none">
+                Attach
+              </Label>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="h-7 text-xs gap-1 px-2"
+                disabled={uploading}
+                onClick={handleAttachClick}
+              >
+                <Upload className="h-3 w-3" />
+                {uploading ? 'Uploading…' : 'Attach'}
+              </Button>
+            </div>
+          )}
         </div>
 
         {children}
@@ -231,7 +246,7 @@ interface CorrespondenceTabProps {
   tenantId: string
 }
 
-// ── Mutation hook ─────────────────────────────────────────────────────────────
+// ── Mutation hooks ────────────────────────────────────────────────────────────
 
 function useCreateCorrespondenceItem(matterId: string, tenantId: string) {
   const qc = useQueryClient()
@@ -267,10 +282,59 @@ function useCreateCorrespondenceItem(matterId: string, tenantId: string) {
   })
 }
 
+function useUpdateCorrespondencePath(matterId: string, tenantId: string) {
+  const qc = useQueryClient()
+  const supabase = createClient()
+
+  return useMutation({
+    mutationFn: async (payload: { item_type: string; document_path: string }) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error } = await (supabase as any)
+        .from('ircc_correspondence')
+        .upsert(
+          {
+            matter_id: matterId,
+            tenant_id: tenantId,
+            item_type: payload.item_type,
+            document_path: payload.document_path,
+            updated_at: new Date().toISOString(),
+          },
+          { onConflict: 'matter_id,item_type' }
+        )
+      if (error) throw error
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['ircc-correspondence', matterId] })
+    },
+  })
+}
+
+/**
+ * Upload a correspondence document to the matter-documents Storage bucket.
+ * Path: {matterId}/correspondence/{timestamp}-{fileName}
+ * Returns the storage path on success, or throws on error.
+ */
+async function uploadCorrespondenceFile(
+  supabase: ReturnType<typeof createClient>,
+  matterId: string,
+  file: File
+): Promise<string> {
+  const sanitizedName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_')
+  const filePath = `${matterId}/correspondence/${Date.now()}-${sanitizedName}`
+  const { error } = await supabase.storage
+    .from('matter-documents')
+    .upload(filePath, file, { contentType: file.type, upsert: false })
+  if (error) throw error
+  return filePath
+}
+
 // ── Component ─────────────────────────────────────────────────────────────────
 
 export function CorrespondenceTab({ matterId, tenantId }: CorrespondenceTabProps) {
   const supabase = createClient()
+
+  // Track which item_type is currently uploading
+  const [uploadingType, setUploadingType] = React.useState<string | null>(null)
 
   const { data: correspondence, isLoading } = useQuery({
     queryKey: ['ircc-correspondence', matterId],
@@ -287,6 +351,23 @@ export function CorrespondenceTab({ matterId, tenantId }: CorrespondenceTabProps
   })
 
   const upsert = useCreateCorrespondenceItem(matterId, tenantId)
+  const updatePath = useUpdateCorrespondencePath(matterId, tenantId)
+
+  /**
+   * Upload a file for a specific correspondence item_type to matter-documents
+   * bucket and persist the returned storage path in ircc_correspondence.document_path.
+   */
+  async function handleAttach(itemType: string, file: File) {
+    setUploadingType(itemType)
+    try {
+      const path = await uploadCorrespondenceFile(supabase, matterId, file)
+      updatePath.mutate({ item_type: itemType, document_path: path })
+    } catch (err) {
+      console.error('[CorrespondenceTab] Upload failed:', err)
+    } finally {
+      setUploadingType(null)
+    }
+  }
 
   // Helper: find a record by item_type
   function byType(type: string): IrccCorrespondenceRow | undefined {
@@ -358,6 +439,9 @@ export function CorrespondenceTab({ matterId, tenantId }: CorrespondenceTabProps
             label="Application Received (AOR)"
             date={dateFor('AOR')}
             onDateChange={v => upsert.mutate({ item_type: 'AOR', item_date: v || null })}
+            onAttach={(file) => handleAttach('AOR', file)}
+            uploading={uploadingType === 'AOR'}
+            attachedPath={byType('AOR')?.document_path}
           />
 
           {/* 2 — Biometrics Request */}
@@ -377,6 +461,9 @@ export function CorrespondenceTab({ matterId, tenantId }: CorrespondenceTabProps
               item_date: dateFor('biometrics_request') || null,
               status: v,
             })}
+            onAttach={(file) => handleAttach('biometrics_request', file)}
+            uploading={uploadingType === 'biometrics_request'}
+            attachedPath={byType('biometrics_request')?.document_path}
           />
 
           {/* 3 — Medical Request */}
@@ -396,6 +483,9 @@ export function CorrespondenceTab({ matterId, tenantId }: CorrespondenceTabProps
               item_date: dateFor('medical_request') || null,
               status: v,
             })}
+            onAttach={(file) => handleAttach('medical_request', file)}
+            uploading={uploadingType === 'medical_request'}
+            attachedPath={byType('medical_request')?.document_path}
           />
 
           {/* 4 — Additional Documents Request */}
@@ -415,6 +505,9 @@ export function CorrespondenceTab({ matterId, tenantId }: CorrespondenceTabProps
               item_date: dateFor('additional_docs_request') || null,
               status: v,
             })}
+            onAttach={(file) => handleAttach('additional_docs_request', file)}
+            uploading={uploadingType === 'additional_docs_request'}
+            attachedPath={byType('additional_docs_request')?.document_path}
           />
 
           {/* 5 — Decision Notice */}
@@ -503,32 +596,38 @@ export function CorrespondenceTab({ matterId, tenantId }: CorrespondenceTabProps
                   </div>
                 )}
 
-                {/* Attach */}
+                {/* Attach — uploads to matter-documents bucket */}
                 <div className="flex flex-col gap-1">
                   <Label className="text-xs text-muted-foreground opacity-0 select-none">
                     Attach
                   </Label>
+                  {decisionRecord?.document_path && (
+                    <span className="text-xs text-green-600 font-medium self-center">
+                      &#10003; Attached
+                    </span>
+                  )}
                   <Button
                     type="button"
                     variant="outline"
                     size="sm"
                     className="h-7 text-xs gap-1 px-2"
+                    disabled={uploadingType === 'decision_notice'}
                     onClick={() => {
+                      if (uploadingType === 'decision_notice') return
                       const input = document.createElement('input')
                       input.type = 'file'
                       input.accept = '.pdf,.doc,.docx,.jpg,.png'
-                      input.onchange = () => {
-                        if (input.files?.[0]) {
-                          window.alert(
-                            `File "${input.files[0].name}" selected.\n\nStorage upload will be wired when the correspondence-docs bucket is provisioned.`
-                          )
+                      input.onchange = async () => {
+                        const file = input.files?.[0]
+                        if (file) {
+                          await handleAttach('decision_notice', file)
                         }
                       }
                       input.click()
                     }}
                   >
                     <Upload className="h-3 w-3" />
-                    Attach
+                    {uploadingType === 'decision_notice' ? 'Uploading…' : 'Attach'}
                   </Button>
                 </div>
               </div>

@@ -6,6 +6,7 @@ import { revalidateIntake } from '@/lib/services/intake-revalidate'
 import { invalidateMattersList } from '@/lib/services/cache-invalidation'
 import { withTiming } from '@/lib/middleware/request-timing'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { captureRuleSnapshots } from '@/lib/services/rule-snapshot-engine'
 import { z } from 'zod'
 
 const createMatterSchema = z.object({
@@ -252,6 +253,11 @@ async function handlePost(request: Request) {
     })
 
     await invalidateMattersList(auth.tenantId)
+
+    // 7. Fire-and-forget rule snapshot capture — non-blocking
+    captureRuleSnapshots(matter.id, auth.tenantId, auth.supabase).catch(
+      (e) => console.error('[matters] Rule snapshot capture failed (non-fatal):', e)
+    )
 
     return NextResponse.json({ success: true, matter }, { status: 201 })
   } catch (error) {

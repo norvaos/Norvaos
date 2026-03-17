@@ -13,15 +13,18 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { useRouter, usePathname } from 'next/navigation'
 import { ArrowLeft, Flag, StickyNote, Share2, AlertTriangle, FileText } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/lib/utils'
 import { createClient } from '@/lib/supabase/client'
 import { useQuery } from '@tanstack/react-query'
 import { useMatterRiskFlagCount } from '@/lib/queries/stage-transitions'
 import { useLatestRetainerAgreement } from '@/lib/queries/retainer-agreements'
 import { useMatterSLA } from '@/lib/queries/sla'
+import { useReadinessScore } from '@/lib/queries/readiness'
 import { RetainerGenerationModal } from '@/components/retainer/RetainerGenerationModal'
 import type { Database } from '@/lib/types/database'
 
@@ -67,7 +70,12 @@ export interface ZoneAProps {
 
 export function ZoneA({ matter, tenantId, onFlagClick, onNotesClick }: ZoneAProps) {
   const supabase = createClient()
+  const router = useRouter()
+  const pathname = usePathname()
   const [retainerModalOpen, setRetainerModalOpen] = useState(false)
+
+  // Composite readiness score
+  const { data: readiness, isLoading: readinessLoading } = useReadinessScore(matter.id)
 
   // Determine if retainer is already signed — used to decide button label/style
   const { data: latestRetainer } = useLatestRetainerAgreement(matter.id)
@@ -217,6 +225,27 @@ export function ZoneA({ matter, tenantId, onFlagClick, onNotesClick }: ZoneAProp
                 {criticalSLA.status === 'breached' ? 'SLA: BREACHED' : `SLA: ${criticalSLARemaining}h`}
               </Badge>
             )}
+
+            {/* Readiness score pill */}
+            {readinessLoading ? (
+              <Skeleton className="h-4 w-16 rounded-full" />
+            ) : readiness ? (
+              <Badge
+                variant="outline"
+                className={cn(
+                  'text-[10px] px-1.5 py-0 border font-medium cursor-pointer',
+                  readiness.total >= 80
+                    ? 'bg-green-50 text-green-700 border-green-300'
+                    : readiness.total >= 40
+                      ? 'bg-amber-50 text-amber-700 border-amber-300'
+                      : 'bg-red-50 text-red-700 border-red-300',
+                )}
+                onClick={() => router.push(`${pathname}?tab=details#readiness`)}
+                title={`Readiness: ${readiness.focus_area} needs attention`}
+              >
+                {readiness.total}% Ready
+              </Badge>
+            ) : null}
 
           </div>
         </div>

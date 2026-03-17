@@ -128,6 +128,18 @@ async function handlePost(
       evaluateRiskFlags(auth.supabase, auth.tenantId, matterId)
         .catch((e) => console.error('[advance-stage] Risk flag evaluation failed:', e))
 
+      // 6b-ii. Fire-and-forget readiness recompute — forward auth cookie.
+      fetch(`${process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'}/api/matters/${matterId}/readiness`, {
+        method: 'POST',
+        headers: { cookie: request.headers.get('cookie') ?? '' },
+      }).catch((e: unknown) => console.error('[advance-stage] Readiness recompute failed:', e))
+
+      // 6b-iii. Fire-and-forget next action recompute.
+      fetch(`${process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'}/api/matters/${matterId}/next-action`, {
+        method: 'POST',
+        headers: { cookie: request.headers.get('cookie') ?? '' },
+      }).catch((e: unknown) => console.error('[advance-stage] Next action recompute failed:', e))
+
       // 6c. Write to stage_transition_log — fire-and-forget, non-fatal.
       //     Zone E (audit rail) reads from this table.
       //     gate_snapshot now carries the full per-condition evaluation result.

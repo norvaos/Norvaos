@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/client'
 import type { Database } from '@/lib/types/database'
 import { gatingKeys } from '@/lib/queries/matter-types'
 import { readinessKeys } from '@/lib/queries/immigration-readiness'
+import { compositeReadinessKeys } from '@/lib/queries/readiness'
 import { toast } from 'sonner'
 
 type DocumentSlot = Database['public']['Tables']['document_slots']['Row']
@@ -138,6 +139,8 @@ export function useUploadToSlot() {
       queryClient.invalidateQueries({ queryKey: slotKeys.list(variables.matterId) })
       queryClient.invalidateQueries({ queryKey: gatingKeys.check(variables.matterId) })
       queryClient.invalidateQueries({ queryKey: readinessKeys.detail(variables.matterId) })
+      queryClient.invalidateQueries({ queryKey: compositeReadinessKeys.detail(variables.matterId) })
+      fetch(`/api/matters/${variables.matterId}/readiness`, { method: 'POST' }).catch(console.error)
     },
     onError: (error: Error) => {
       toast.error(error.message || 'Failed to upload document')

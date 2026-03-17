@@ -12759,6 +12759,7 @@ export type Database = {
           intake_question_schema: Json | null
           ircc_question_set_codes: string[] | null
           is_active: boolean
+          matter_type_config: Json
           name: string
           portal_instructions: string | null
           practice_area_id: string
@@ -12780,6 +12781,7 @@ export type Database = {
           intake_question_schema?: Json | null
           ircc_question_set_codes?: string[] | null
           is_active?: boolean
+          matter_type_config?: Json
           name: string
           portal_instructions?: string | null
           practice_area_id: string
@@ -12801,6 +12803,7 @@ export type Database = {
           intake_question_schema?: Json | null
           ircc_question_set_codes?: string[] | null
           is_active?: boolean
+          matter_type_config?: Json
           name?: string
           portal_instructions?: string | null
           practice_area_id?: string
@@ -12848,6 +12851,10 @@ export type Database = {
           matter_stage_pipeline_id: string | null
           matter_type: string | null
           matter_type_id: string | null
+          next_action_description: string | null
+          next_action_due_at: string | null
+          next_action_escalation: string | null
+          next_action_type: string | null
           next_deadline: string | null
           onboarding_completed_at: string | null
           onedrive_folder_id: string | null
@@ -12858,6 +12865,9 @@ export type Database = {
           practice_area_id: string | null
           preferred_email_account_id: string | null
           priority: string | null
+          readiness_breakdown: Json | null
+          readiness_focus_area: string | null
+          readiness_score: number | null
           responsible_lawyer_id: string | null
           restricted_admin_override: boolean | null
           risk_level: string | null
@@ -12896,6 +12906,10 @@ export type Database = {
           matter_stage_pipeline_id?: string | null
           matter_type?: string | null
           matter_type_id?: string | null
+          next_action_description?: string | null
+          next_action_due_at?: string | null
+          next_action_escalation?: string | null
+          next_action_type?: string | null
           next_deadline?: string | null
           onboarding_completed_at?: string | null
           onedrive_folder_id?: string | null
@@ -12906,6 +12920,9 @@ export type Database = {
           practice_area_id?: string | null
           preferred_email_account_id?: string | null
           priority?: string | null
+          readiness_breakdown?: Json | null
+          readiness_focus_area?: string | null
+          readiness_score?: number | null
           responsible_lawyer_id?: string | null
           restricted_admin_override?: boolean | null
           risk_level?: string | null
@@ -12944,6 +12961,10 @@ export type Database = {
           matter_stage_pipeline_id?: string | null
           matter_type?: string | null
           matter_type_id?: string | null
+          next_action_description?: string | null
+          next_action_due_at?: string | null
+          next_action_escalation?: string | null
+          next_action_type?: string | null
           next_deadline?: string | null
           onboarding_completed_at?: string | null
           onedrive_folder_id?: string | null
@@ -12954,6 +12975,9 @@ export type Database = {
           practice_area_id?: string | null
           preferred_email_account_id?: string | null
           priority?: string | null
+          readiness_breakdown?: Json | null
+          readiness_focus_area?: string | null
+          readiness_score?: number | null
           responsible_lawyer_id?: string | null
           restricted_admin_override?: boolean | null
           risk_level?: string | null
@@ -19882,3 +19906,114 @@ export interface LeadOutcomeInsert {
 export type ContactRelationshipRow    = Database['public']['Tables']['contact_relationships']['Row']
 export type ContactRelationshipInsert = Database['public']['Tables']['contact_relationships']['Insert']
 export type ContactRelationshipUpdate = Database['public']['Tables']['contact_relationships']['Update']
+
+// ── matter_rule_snapshots ─────────────────────────────────────────────────────
+export type RuleType = 'matter_type_config' | 'sla_config' | 'billing_config' | 'document_checklist' | 'task_templates' | 'form_pack_config'
+
+export interface MatterRuleSnapshotRow {
+  id: string
+  tenant_id: string
+  matter_id: string
+  rule_type: RuleType
+  snapshot_data: Record<string, unknown>
+  version_hash: string
+  captured_at: string
+}
+
+export interface MatterRuleSnapshotInsert {
+  id?: string
+  tenant_id: string
+  matter_id: string
+  rule_type: RuleType
+  snapshot_data: Record<string, unknown>
+  version_hash: string
+  captured_at?: string
+}
+
+// ── Onboarding Wizard — 7-step simplified wizard types (Agent 2 additions) ────
+// Lines 19914–19963 added 2026-03-17 by the onboarding wizard agent.
+// These supplement the existing WizardAnswers / TenantOnboardingWizardRow types
+// and add types specific to the simplified 7-step onboarding flow.
+
+/** Practice area keys accepted by the 7-step onboarding wizard. */
+export type OnboardingPracticeArea =
+  | 'Immigration'
+  | 'Real Estate'
+  | 'Family Law'
+  | 'Corporate'
+  | 'Wills & Estates'
+
+/** Role options available when inviting team members during onboarding (Step 6). */
+export type OnboardingInviteRole =
+  | 'lawyer'
+  | 'legal_assistant'
+  | 'front_desk'
+  | 'billing'
+  | 'admin'
+
+/** A single team-invite entry collected in Step 6. */
+export interface OnboardingInviteEntry {
+  email: string
+  role:  OnboardingInviteRole
+}
+
+/**
+ * Request body shape for POST /api/onboarding/apply-setup.
+ * Collapses the 7 wizard steps into a single activation payload.
+ */
+export interface OnboardingApplySetupBody {
+  firmName:           string
+  logoUrl?:           string | null
+  practiceAreas?:     OnboardingPracticeArea[]
+  currency?:          'CAD' | 'USD'
+  flatFeeDefault?:    number | null
+  hourlyRateDefault?: number | null
+  primaryColour?:     string
+  emailFooter?:       string
+  seedMatterTypes?:   boolean
+  lawyerFirstName?:   string
+  lawyerLastName?:    string
+  lawyerEmail?:       string
+  lawyerBarNumber?:   string
+}
+
+/** Result shape for individual invite attempts in Step 6. */
+export interface OnboardingInviteResult {
+  email:    string
+  ok:       boolean
+  skipped?: boolean
+  error?:   string
+}
+
+// ── readiness score ──────────────────────────────────────────────────────────
+export type ReadinessLevel = 'critical' | 'low' | 'medium' | 'high' | 'ready'
+
+export interface ReadinessDomain {
+  name: string
+  score: number
+  weight: number
+  weighted: number
+  detail: string
+}
+
+export interface ReadinessResult {
+  total: number
+  domains: ReadinessDomain[]
+  focus_area: string
+  level: ReadinessLevel
+}
+
+// ── next action engine ────────────────────────────────────────────────────────
+export type EscalationLevel = 'none' | 'amber' | 'red' | 'critical'
+export type NextActionType =
+  | 'critical_blocker' | 'sla_breach' | 'overdue_task'
+  | 'upcoming_deadline' | 'missing_document' | 'pending_review'
+  | 'retainer_unsigned' | 'readiness_gap' | 'no_action'
+
+export interface NextAction {
+  action_type: NextActionType
+  description: string
+  due_at: string | null
+  owner_role: string
+  escalation_level: EscalationLevel
+}

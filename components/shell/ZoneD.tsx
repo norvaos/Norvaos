@@ -35,6 +35,7 @@ import { useImmigrationReadiness }      from '@/lib/queries/immigration-readines
 import { ReviewTab }              from '@/components/shell/tabs/ReviewTab'
 import { CommunicationsTab }      from '@/components/shell/tabs/CommunicationsTab'
 import { CorrespondenceTab }      from '@/components/shell/tabs/CorrespondenceTab'
+import { RulesAtOpeningPanel }    from '@/components/matters/rules-at-opening-panel'
 import type { Database } from '@/lib/types/database'
 
 type Matter = Database['public']['Tables']['matters']['Row']
@@ -177,13 +178,23 @@ export function ZoneD({ matter, tenantId, initialTab = 'details' }: ZoneDProps) 
 
         {/* 1 — Details */}
         <TabsContent value="details" className="flex-1 overflow-y-auto m-0 p-0">
-          <UnifiedCaseDetailsTab
-            matterId={matter.id}
-            tenantId={tenantId}
-            matterTypeId={matter.matter_type_id ?? null}
-            contactId={null}
-            caseTypeId={matter.case_type_id ?? null}
-          />
+          <div className="space-y-3 p-0">
+            <UnifiedCaseDetailsTab
+              matterId={matter.id}
+              tenantId={tenantId}
+              matterTypeId={matter.matter_type_id ?? null}
+              contactId={null}
+              caseTypeId={matter.case_type_id ?? null}
+            />
+            {/* Rules at Opening — bottom of details tab */}
+            <div className="px-4 pb-4">
+              <RulesAtOpeningPanel
+                matterId={matter.id}
+                tenantId={tenantId}
+                matterTypeId={matter.matter_type_id ?? null}
+              />
+            </div>
+          </div>
         </TabsContent>
 
         {/* 2 — Documents */}

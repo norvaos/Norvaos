@@ -162,6 +162,72 @@ export async function updateSession(request: NextRequest) {
     }
   }
 
+  // ── Onboarding Gate ─────────────────────────────────────────────────────────
+  // If a logged-in user's tenant hasn't completed onboarding, redirect them to
+  // /onboarding unless they're already on an /onboarding* or /api* route.
+  // Uses a short-lived cookie cache (__ob_done) to avoid a DB query on every
+  // page navigation. TTL 10 min (sufficient to get through the wizard in one go).
+  if (user) {
+    const pathname = request.nextUrl.pathname
+
+    const isOnboardingRoute = pathname.startsWith('/onboarding')
+    const isApiRoute        = pathname.startsWith('/api')
+    const isSystemRoute     = (
+      pathname.startsWith('/front-desk') ||
+      pathname.startsWith('/auth') ||
+      pathname.startsWith('/portal') ||
+      pathname.startsWith('/kiosk') ||
+      pathname.startsWith('/booking') ||
+      pathname.startsWith('/forms') ||
+      pathname.startsWith('/invite') ||
+      pathname.startsWith('/signing') ||
+      pathname.startsWith('/_next')
+    )
+
+    if (!isOnboardingRoute && !isApiRoute && !isSystemRoute) {
+      const obDone = request.cookies.get('__ob_done')?.value
+
+      if (obDone !== '1') {
+        // Check wizard status in DB
+        try {
+          // RLS policy on tenant_onboarding_wizard scopes by auth.uid(),
+          // so no explicit tenant_id filter is needed here.
+          const { data: wizard } = await supabase
+            .from('tenant_onboarding_wizard')
+            .select('status')
+            .limit(1)
+            .maybeSingle()
+
+          // RLS returns the row only if it belongs to the current user's tenant.
+          // Supabase anon client RLS uses auth.uid() which the getSession() call
+          // above already refreshed in the cookie.
+          // If no wizard row exists (never started) treat as not complete.
+          const isComplete =
+            wizard?.status === 'activated' || wizard?.status === 'default_applied'
+
+          if (isComplete) {
+            // Cache the result so we don't query on every navigation
+            supabaseResponse.cookies.set('__ob_done', '1', {
+              httpOnly: true,
+              secure:   process.env.NODE_ENV === 'production',
+              sameSite: 'lax',
+              maxAge:   600, // 10 minutes
+              path:     '/',
+            })
+          } else {
+            // Redirect to onboarding gate page
+            const url = request.nextUrl.clone()
+            url.pathname = '/onboarding'
+            return NextResponse.redirect(url)
+          }
+        } catch {
+          // If the onboarding check fails, let the user through rather than
+          // blocking them. The wizard page itself will handle the state.
+        }
+      }
+    }
+  }
+
   // ── Security Headers ────────────────────────────────────────────────────────
   // Applied to all responses for defense-in-depth.
   supabaseResponse.headers.set('X-Content-Type-Options', 'nosniff')

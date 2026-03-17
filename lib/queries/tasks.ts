@@ -267,6 +267,13 @@ export function useCompleteTask() {
         metadata: { title: task.title },
       })
 
+      // Recompute next action for the matter (fire-and-forget)
+      if (task.matter_id) {
+        fetch(`/api/matters/${task.matter_id}/next-action`, { method: 'POST' })
+          .then(() => queryClient.invalidateQueries({ queryKey: ['matter', task.matter_id] }))
+          .catch(() => {}) // Non-fatal
+      }
+
       // Notify the person who assigned the task
       if (task.assigned_by && task.assigned_by !== task.completed_by) {
         createTaskNotification({
