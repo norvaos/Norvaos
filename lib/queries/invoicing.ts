@@ -276,7 +276,7 @@ export function useCreateInvoice() {
           tenant_id: input.tenantId,
           matter_id: input.matterId,
           invoice_number: input.invoiceNumber,
-          contact_id: input.contactId ?? null,
+          contact_id: input.contactId ?? '',
           issue_date: input.issueDate,
           due_date: input.dueDate,
           subtotal,
@@ -400,19 +400,21 @@ export function useRecordPayment() {
       if (payError) throw payError
 
       // Update invoice amount_paid
-      const { data: invoice } = await supabase
-        .from('invoices')
-        .select('amount_paid, total_amount')
-        .eq('id', input.invoice_id)
-        .single()
+      if (input.invoice_id) {
+        const { data: invoice } = await supabase
+          .from('invoices')
+          .select('amount_paid, total_amount')
+          .eq('id', input.invoice_id)
+          .single()
 
-      if (invoice) {
-        const newAmountPaid = (invoice.amount_paid ?? 0) + input.amount
-        const updateData: Record<string, unknown> = { amount_paid: newAmountPaid }
-        if (newAmountPaid >= invoice.total_amount) {
-          updateData.status = 'paid'
+        if (invoice) {
+          const newAmountPaid = (invoice.amount_paid ?? 0) + input.amount
+          const updateData: Record<string, unknown> = { amount_paid: newAmountPaid }
+          if (newAmountPaid >= invoice.total_amount) {
+            updateData.status = 'paid'
+          }
+          await supabase.from('invoices').update(updateData).eq('id', input.invoice_id)
         }
-        await supabase.from('invoices').update(updateData).eq('id', input.invoice_id)
       }
 
       return payment as Payment
@@ -1164,10 +1166,10 @@ export function useBillingDashboardStats(tenantId: string) {
 
       const invoices = invoicesRes.data ?? []
       const outstanding = invoices
-        .filter((i) => ['sent', 'viewed', 'partially_paid', 'overdue'].includes(i.status))
+        .filter((i) => ['sent', 'viewed', 'partially_paid', 'overdue'].includes(i.status ?? ''))
         .reduce((sum, i) => sum + ((i.total_amount ?? 0) - (i.amount_paid ?? 0)), 0)
       const overdue = invoices
-        .filter((i) => i.status === 'overdue' || (i.due_date && i.due_date < today && ['sent', 'viewed', 'partially_paid'].includes(i.status)))
+        .filter((i) => i.status === 'overdue' || (i.due_date && i.due_date < today && ['sent', 'viewed', 'partially_paid'].includes(i.status ?? '')))
         .reduce((sum, i) => sum + ((i.total_amount ?? 0) - (i.amount_paid ?? 0)), 0)
       const collected = (paymentsRes.data ?? []).reduce((sum, p) => sum + (p.amount ?? 0), 0)
       const unbilledMinutes = (unbilledRes.data ?? []).reduce(
@@ -1185,7 +1187,7 @@ export function useBillingDashboardStats(tenantId: string) {
         overdueCount: invoices.filter(
           (i) =>
             i.status === 'overdue' ||
-            (i.due_date && i.due_date < today && ['sent', 'viewed', 'partially_paid'].includes(i.status)),
+            (i.due_date && i.due_date < today && ['sent', 'viewed', 'partially_paid'].includes(i.status ?? '')),
         ).length,
       }
     },

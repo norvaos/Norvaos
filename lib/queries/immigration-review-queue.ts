@@ -258,7 +258,7 @@ export function useImmigrationReviewQueue(params: ReviewQueueParams) {
           contradictionCount: blockingCount,
           stalePacks: staleByMatter[m.id] ?? 0,
           lastActivityAt: intake?.imm_status_changed_at ?? m.updated_at,
-          createdAt: m.created_at,
+          createdAt: m.created_at ?? '',
         }
       })
 

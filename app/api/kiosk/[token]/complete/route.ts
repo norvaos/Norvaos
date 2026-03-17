@@ -410,11 +410,12 @@ async function handlePost(
 
           // Path 1: Contact has a responsible_lawyer_id → returning client
           if (appointment.contact_id) {
-            const { data: contact } = await admin
+            const { data: contactRaw } = await admin
               .from('contacts')
-              .select('responsible_lawyer_id')
+              .select('id')
               .eq('id', appointment.contact_id)
               .single()
+            const contact = contactRaw as (typeof contactRaw & { responsible_lawyer_id?: string | null }) | null
 
             if (contact?.responsible_lawyer_id) {
               const { data: lawyer } = await admin

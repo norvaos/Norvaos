@@ -93,11 +93,11 @@ async function handleGet(
       .select('*')
       .eq('invoice_id', invoiceId)
       .eq('tenant_id', tenantId)
-      .order('payment_date', { ascending: false }),
+      .order('created_at', { ascending: false }),
     supabase
       .from('matters')
       .select('id, title, matter_number, tenant_id')
-      .eq('id', invoice.matter_id)
+      .eq('id', invoice.matter_id ?? '')
       .eq('tenant_id', tenantId)
       .single(),
     supabase
@@ -122,7 +122,7 @@ async function handleGet(
 
   // ── 4. Fetch bill-to contact (optional) ──────────────────────
 
-  let billToName = matter.title
+  let billToName = matter.title ?? ''
   let billToEmail: string | null = null
   let billToPhone: string | null = null
   let billToAddress: string | null = null
@@ -154,7 +154,7 @@ async function handleGet(
     const { data: primaryContact } = await supabase
       .from('matter_contacts')
       .select('contact_id')
-      .eq('matter_id', invoice.matter_id)
+      .eq('matter_id', invoice.matter_id ?? '')
       .eq('tenant_id', tenantId)
       .eq('is_primary', true)
       .limit(1)
@@ -197,35 +197,36 @@ async function handleGet(
   const pdfData: InvoicePdfData = {
     firmName: tenant.name,
     firmAddress,
-    invoiceNumber: invoice.invoice_number,
-    issueDate: invoice.issue_date,
-    dueDate: invoice.due_date,
-    status: invoice.status,
+    invoiceNumber: invoice.invoice_number ?? '',
+    issueDate: invoice.issue_date ?? '',
+    dueDate: invoice.due_date ?? '',
+    status: invoice.status ?? '',
     billTo: {
-      name: billToName,
+      name: billToName ?? '',
       email: billToEmail,
       phone: billToPhone,
       address: billToAddress,
     },
-    matterTitle: matter.title,
-    matterNumber: matter.matter_number,
+    matterTitle: matter.title ?? '',
+    matterNumber: matter.matter_number ?? null,
     lineItems: lineItems.map((li) => ({
-      description: li.description,
+      description: li.description ?? '',
       quantity: Number(li.quantity),
-      unit_price: li.unit_price,
-      amount: li.amount,
+      unit_price: li.unit_price ?? 0,
+      amount: li.amount ?? 0,
     })),
-    subtotal: invoice.subtotal,
-    taxAmount: invoice.tax_amount,
-    totalAmount: invoice.total_amount,
-    amountPaid: invoice.amount_paid,
+    subtotal: invoice.subtotal ?? 0,
+    taxAmount: invoice.tax_amount ?? 0,
+    totalAmount: invoice.total_amount ?? 0,
+    amountPaid: invoice.amount_paid ?? 0,
     payments: payments.map((p) => ({
-      payment_date: p.payment_date,
-      payment_method: p.payment_method,
-      amount: p.amount,
-      reference: p.reference,
+      payment_date: p.created_at ?? '',
+      payment_method: p.payment_method ?? '',
+      amount: p.amount ?? 0,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      reference: (p as any).external_payment_id ?? null,
     })),
-    notes: invoice.notes,
+    notes: invoice.notes ?? null,
     currency,
   }
 

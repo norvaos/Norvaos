@@ -59,6 +59,8 @@ export async function generateInstance(
   const { template, version, mappings, conditions, clauseAssignments } = templateResult.data
   if (!version) return { success: false, error: 'No template version found' }
   const templateBody = version.template_body as unknown as TemplateBody
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const templateExt = template as unknown as Record<string, any>
 
   // ── REDLINE 5: Closed-matter check ──────────────────────────────────────────
   const { data: matter } = await supabase
@@ -69,11 +71,11 @@ export async function generateInstance(
 
   if (matter && matter.status !== 'active') {
     const allowedClosedFamilies = ['general', 'correspondence']
-    const isOverrideAllowed = allowedClosedFamilies.includes(template.document_family)
+    const isOverrideAllowed = allowedClosedFamilies.includes(templateExt.document_family)
     const hasOverride = params.generationMode === 'closed_matter_override'
 
     if (!isOverrideAllowed) {
-      return { success: false, error: `Cannot generate documents for closed matters (family: ${template.document_family}). Only general and correspondence documents are permitted with override.` }
+      return { success: false, error: `Cannot generate documents for closed matters (family: ${templateExt.document_family}). Only general and correspondence documents are permitted with override.` }
     }
     if (!hasOverride) {
       return { success: false, error: 'This matter is closed. Generation requires explicit override confirmation for general/correspondence documents.' }
@@ -181,8 +183,8 @@ export async function generateInstance(
       contact_id: contactId ?? null,
       template_id: templateId,
       template_version_id: version.id,
-      document_family: template.document_family,
-      jurisdiction_code: template.jurisdiction_code,
+      document_family: templateExt.document_family,
+      jurisdiction_code: templateExt.jurisdiction_code,
       title: documentTitle,
       status: 'draft',
       generation_mode: (['manual', 'auto', 'workflow_trigger'].includes(params.generationMode ?? '')
@@ -533,7 +535,7 @@ export async function listInstances(
 
   if (params.matterId) query = query.eq('matter_id', params.matterId)
   if (params.contactId) query = query.eq('contact_id', params.contactId)
-  if (params.status) query = query.eq('status', params.status)
+  if (params.status) query = query.eq('status', params.status as never)
   if (params.documentFamily) query = query.eq('document_family', params.documentFamily)
 
   const { data, error } = await query

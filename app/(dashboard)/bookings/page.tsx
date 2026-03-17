@@ -199,7 +199,7 @@ export default function BookingsPage() {
       description: formDescription.trim() || null,
       duration_minutes: formDuration,
       buffer_minutes: formBuffer,
-      working_hours: { start: formStartTime, end: formEndTime, days: formDays } as unknown,
+      working_hours: { start: formStartTime, end: formEndTime, days: formDays } as import('@/lib/types/database').Json,
       max_days_ahead: formMaxDays,
       min_notice_hours: formMinNotice,
       theme_color: formColor,

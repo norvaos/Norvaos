@@ -204,7 +204,7 @@ export default function EmailAccountsSettingsPage() {
 
   function handleConnectAccount() {
     // Trigger Microsoft OAuth flow
-    window.location.href = '/api/email/oauth/microsoft/connect'
+    window.location.href = '/api/integrations/microsoft/connect'
   }
 
   function handleToggleSync(accountId: string, currentSync: boolean) {

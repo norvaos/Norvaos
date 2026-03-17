@@ -77,7 +77,7 @@ function getGroupDefinitions(groupBy: string): GroupDefinition[] {
 // ---------------------------------------------------------------------------
 function getTaskGroupKey(task: Task, groupBy: string): string {
   if (groupBy === 'status') {
-    return task.status
+    return task.status ?? ''
   }
 
   if (groupBy === 'priority') {

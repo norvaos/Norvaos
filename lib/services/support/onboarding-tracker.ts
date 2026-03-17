@@ -67,8 +67,8 @@ function computeOverallStatus(phases: OnboardingPhaseRecord[]): TenantOnboarding
 
 function rowToPhaseRecord(row: Database['public']['Tables']['tenant_onboarding']['Row']): OnboardingPhaseRecord {
   return {
-    phase: row.phase,
-    status: row.status,
+    phase: row.phase as OnboardingPhase,
+    status: row.status as OnboardingStatus,
     notes: row.notes,
     updatedAt: row.updated_at,
     updatedBy: row.updated_by,

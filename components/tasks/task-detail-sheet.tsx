@@ -244,8 +244,8 @@ export function TaskDetailSheet({ taskId, open, onOpenChange }: TaskDetailSheetP
   }
 
   const isComplete = task?.status === 'done'
-  const statusConfig = task ? getStatusConfig(task.status) : null
-  const priorityConfig = task ? getPriorityConfig(task.priority) : null
+  const statusConfig = task ? getStatusConfig(task.status ?? '') : null
+  const priorityConfig = task ? getPriorityConfig(task.priority ?? '') : null
   const taskOverdue = task?.due_date && !isComplete ? isOverdue(task.due_date) : false
 
   return (
@@ -503,11 +503,11 @@ export function TaskDetailSheet({ taskId, open, onOpenChange }: TaskDetailSheetP
 
                 {/* Timestamps */}
                 <div className="text-xs text-muted-foreground space-y-1">
-                  <p>Created {formatDistanceToNow(new Date(task.created_at), { addSuffix: true })}</p>
+                  <p>Created {formatDistanceToNow(new Date(task.created_at ?? ''), { addSuffix: true })}</p>
                   {task.completed_at && (
                     <p>Completed {formatDistanceToNow(new Date(task.completed_at), { addSuffix: true })}</p>
                   )}
-                  <p>Last updated {formatDistanceToNow(new Date(task.updated_at), { addSuffix: true })}</p>
+                  <p>Last updated {formatDistanceToNow(new Date(task.updated_at ?? ''), { addSuffix: true })}</p>
                 </div>
 
                 <Separator />

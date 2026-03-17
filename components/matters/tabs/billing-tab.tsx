@@ -345,12 +345,14 @@ export function BillingTab({ matterId, tenantId, matter }: { matterId: string; t
     if (!showPayment) return
     const amountCents = Math.round(parseFloat(payAmount) * 100)
     if (isNaN(amountCents) || amountCents <= 0) return
+    const payInvoice = invoices.find((inv) => inv.id === showPayment)
     await recordPayment.mutateAsync({
       tenant_id: tenantId,
       invoice_id: showPayment,
+      contact_id: payInvoice?.contact_id ?? '',
       amount: amountCents,
       payment_method: payMethod,
-      reference: payRef || undefined,
+      external_payment_id: payRef || undefined,
     })
     setPayAmount(''); setPayRef(''); setShowPayment(null)
   }
@@ -412,8 +414,8 @@ export function BillingTab({ matterId, tenantId, matter }: { matterId: string; t
                     <span className="text-xs">{te.hourly_rate ? `$${Number(te.hourly_rate).toFixed(0)}` : '—'}</span>
                     <span className="text-xs font-medium">{amount > 0 ? `$${amount.toFixed(2)}` : '—'}</span>
                     <span className="text-xs truncate">{te.description}</span>
-                    <span>{te.is_billable ? <Badge variant="outline" className="text-xs py-0">{te.is_billed ? 'Billed' : 'Yes'}</Badge> : <span className="text-xs text-muted-foreground">No</span>}</span>
-                    <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => deleteTimeEntry.mutate(te.id)} disabled={te.is_billed}><Trash2 className="h-3 w-3" /></Button>
+                    <span>{te.is_billable ? <Badge variant="outline" className="text-xs py-0">{te.invoice_id ? 'Billed' : 'Yes'}</Badge> : <span className="text-xs text-muted-foreground">No</span>}</span>
+                    <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => deleteTimeEntry.mutate(te.id)} disabled={!!te.invoice_id}><Trash2 className="h-3 w-3" /></Button>
                   </div>
                 )
               })}
@@ -444,10 +446,10 @@ export function BillingTab({ matterId, tenantId, matter }: { matterId: string; t
                 <div key={inv.id} className="grid grid-cols-[90px_80px_90px_90px_80px_1fr] gap-2 px-2 py-2 text-sm items-center rounded hover:bg-slate-50">
                   <span className="font-mono text-xs">{inv.invoice_number}</span>
                   <span className="text-xs">{formatDate(inv.issue_date)}</span>
-                  <span className="text-xs font-medium">{fmtCents(inv.total_amount)}</span>
-                  <span className="text-xs">{fmtCents(inv.amount_paid)}</span>
-                  <Badge variant="outline" className="text-xs py-0 w-fit" style={{ borderColor: invoiceStatusColor(inv.status), color: invoiceStatusColor(inv.status) }}>
-                    {invoiceStatusLabel(inv.status)}
+                  <span className="text-xs font-medium">{fmtCents(inv.total_amount ?? 0)}</span>
+                  <span className="text-xs">{fmtCents(inv.amount_paid ?? 0)}</span>
+                  <Badge variant="outline" className="text-xs py-0 w-fit" style={{ borderColor: invoiceStatusColor(inv.status ?? ''), color: invoiceStatusColor(inv.status ?? '') }}>
+                    {invoiceStatusLabel(inv.status ?? '')}
                   </Badge>
                   <div className="flex gap-1">
                     {inv.status === 'finalized' && (
@@ -458,7 +460,7 @@ export function BillingTab({ matterId, tenantId, matter }: { matterId: string; t
                     {inv.status === 'draft' && (
                       <Button variant="ghost" size="sm" className="h-6 text-xs px-2 text-red-500" onClick={() => deleteInvoice.mutate(inv.id)}>Delete</Button>
                     )}
-                    {['sent', 'viewed', 'overdue'].includes(inv.status) && (
+                    {['sent', 'viewed', 'overdue'].includes(inv.status ?? '') && (
                       <Button variant="ghost" size="sm" className="h-6 text-xs px-2" onClick={() => setShowPayment(inv.id)}>Record Payment</Button>
                     )}
                     {inv.status === 'paid' && (

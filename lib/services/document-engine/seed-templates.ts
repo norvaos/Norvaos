@@ -54,9 +54,9 @@ export async function seedDefaultTemplates(
 
       // Count existing versions to determine next label
       const { count } = await supabase
-        .from('docgen_template_versions')
-        .select('id', { count: 'exact', head: true })
-        .eq('template_id', existingId) as any
+        .from('docgen_template_versions' as never)
+        .select('id', { count: 'exact', head: true } as never)
+        .eq('template_id', existingId)
 
       const nextVersion = `v${(count ?? 0) + 1}`
 
@@ -66,7 +66,7 @@ export async function seedDefaultTemplates(
         templateBody: tmpl.body,
         versionLabel: nextVersion,
         changeSummary: 'Seed update — LawPRO-safe, IRCC fees, payment schedule',
-        mappings: seedMappings(tmpl.family),
+        mappings: seedMappings(tmpl.family) as never,
         conditions,
         clauseAssignments: [],
         createdBy,
@@ -107,7 +107,7 @@ export async function seedDefaultTemplates(
       templateBody: tmpl.body,
       versionLabel: 'v1',
       changeSummary: 'Default seed template',
-      mappings: seedMappings(tmpl.family),
+      mappings: seedMappings(tmpl.family) as never,
       conditions,
       clauseAssignments: [],
       createdBy,

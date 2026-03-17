@@ -670,9 +670,9 @@ export default function MattersPage() {
                             </TableCell>
                           )
                         case 'status':
-                          return <TableCell key={col.id}>{getStatusBadge(matter.status)}</TableCell>
+                          return <TableCell key={col.id}>{getStatusBadge(matter.status ?? '')}</TableCell>
                         case 'priority':
-                          return <TableCell key={col.id}>{getPriorityBadge(matter.priority)}</TableCell>
+                          return <TableCell key={col.id}>{getPriorityBadge(matter.priority ?? '')}</TableCell>
                         case 'risk':
                           return <TableCell key={col.id}><RiskBadge level={(matter as any).risk_level} size="sm" /></TableCell>
                         case 'intake':

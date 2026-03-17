@@ -124,8 +124,8 @@ export async function activateWorkflowKit(params: WorkflowKitParams): Promise<vo
     if (templateItems && templateItems.length > 0) {
       const taskInserts = templateItems.map((item) => {
         const dueDate = new Date()
-        if (item.due_days_offset) {
-          dueDate.setDate(dueDate.getDate() + item.due_days_offset)
+        if (item.days_offset) {
+          dueDate.setDate(dueDate.getDate() + item.days_offset)
         }
 
         return {

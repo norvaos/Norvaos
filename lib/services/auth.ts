@@ -122,7 +122,7 @@ export async function authenticateRequest(): Promise<AuthContext> {
         id: roleData.id,
         name: roleData.name,
         permissions: (roleData.permissions ?? {}) as Record<string, Record<string, boolean>>,
-        is_system: roleData.is_system,
+        is_system: roleData.is_system ?? false,
       }
     }
   }

@@ -446,7 +446,7 @@ export function useFrontDeskTasks(tenantId: string, currentUserId: string, staff
           .order('due_date', { ascending: true })
           .limit(50)
         if (error) throw error
-        tasks = data ?? []
+        tasks = (data ?? []) as typeof tasks
       } else if (staffFilter !== '__mine') {
         // Specific staff member's tasks
         const { data, error } = await supabase
@@ -458,7 +458,7 @@ export function useFrontDeskTasks(tenantId: string, currentUserId: string, staff
           .order('due_date', { ascending: true })
           .limit(25)
         if (error) throw error
-        tasks = data ?? []
+        tasks = (data ?? []) as typeof tasks
       } else {
         // Default: my tasks (assigned to me + created by me for others)
         const [assignedRes, createdRes] = await Promise.all([
@@ -488,7 +488,7 @@ export function useFrontDeskTasks(tenantId: string, currentUserId: string, staff
         for (const t of createdRes.data ?? []) {
           if (!taskMap.has(t.id)) taskMap.set(t.id, t)
         }
-        tasks = Array.from(taskMap.values())
+        tasks = Array.from(taskMap.values()) as typeof tasks
       }
       if (tasks.length === 0) return []
 

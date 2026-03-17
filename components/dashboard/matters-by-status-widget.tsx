@@ -42,7 +42,7 @@ function useMattersByStatus(tenantId: string) {
 
       const counts: Record<string, number> = {}
       for (const row of data ?? []) {
-        counts[row.status] = (counts[row.status] || 0) + 1
+        counts[row.status ?? ''] = (counts[row.status ?? ''] || 0) + 1
       }
 
       return MATTER_STATUSES

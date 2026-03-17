@@ -76,7 +76,7 @@ export async function sendInvoiceEmail(
     // Fetch tenant, matter, contact, line items, payments in parallel
     const [tenantRes, matterRes, lineItemsRes, paymentsRes] = await Promise.all([
       supabase.from('tenants').select('id, name, currency, settings').eq('id', tenantId).single(),
-      supabase.from('matters').select('id, title, matter_number').eq('id', invoice.matter_id).eq('tenant_id', tenantId).single(),
+      supabase.from('matters').select('id, title, matter_number').eq('id', invoice.matter_id ?? '').eq('tenant_id', tenantId).single(),
       supabase.from('invoice_line_items').select('*').eq('invoice_id', invoiceId).eq('tenant_id', tenantId).order('sort_order'),
       supabase.from('payments').select('*').eq('invoice_id', invoiceId).eq('tenant_id', tenantId).order('created_at', { ascending: false }),
     ])
@@ -134,9 +134,9 @@ export async function sendInvoiceEmail(
     const pdfData: InvoicePdfData = {
       firmName: tenant.name,
       firmAddress,
-      invoiceNumber: invoice.invoice_number,
-      issueDate: invoice.issue_date,
-      dueDate: invoice.due_date,
+      invoiceNumber: invoice.invoice_number ?? '',
+      issueDate: invoice.issue_date ?? '',
+      dueDate: invoice.due_date ?? '',
       status: 'sent', // PDF is generated pre-transition; client sees 'Sent' (the post-send status)
       billTo: { name: billToName, email: billToEmail, phone: billToPhone, address: billToAddress },
       matterTitle: matter.title,
@@ -145,17 +145,17 @@ export async function sendInvoiceEmail(
         description: li.description,
         quantity: Number(li.quantity),
         unit_price: li.unit_price,
-        amount: li.amount,
+        amount: li.amount ?? 0,
       })),
-      subtotal: invoice.subtotal,
-      taxAmount: invoice.tax_amount,
-      totalAmount: invoice.total_amount,
-      amountPaid: invoice.amount_paid,
+      subtotal: invoice.subtotal ?? 0,
+      taxAmount: invoice.tax_amount ?? 0,
+      totalAmount: invoice.total_amount ?? 0,
+      amountPaid: invoice.amount_paid ?? 0,
       payments: payments.map((p) => ({
-        payment_date: p.created_at,
-        payment_method: p.payment_method,
+        payment_date: p.created_at ?? '',
+        payment_method: p.payment_method ?? '',
         amount: p.amount,
-        reference: p.notes,
+        reference: p.notes ?? null,
       })),
       notes: invoice.notes,
       currency,
@@ -294,20 +294,20 @@ export async function sendReceiptEmail(
     const pdfBytes = await generateReceiptPdf({
       firmName: tenant.name,
       firmAddress,
-      invoiceNumber: invoice.invoice_number,
+      invoiceNumber: invoice.invoice_number ?? '',
       billToName,
       payments: payments.map((p) => ({
-        payment_date: p.created_at,
-        payment_method: p.payment_method,
+        payment_date: p.created_at ?? '',
+        payment_method: p.payment_method ?? '',
         amount: p.amount,
-        reference: p.notes,
+        reference: p.notes ?? null,
       })),
-      totalPaid: invoice.amount_paid,
+      totalPaid: invoice.amount_paid ?? 0,
       invoiceTotal: invoice.total_amount,
       currency,
     })
 
-    const totalFormatted = new Intl.NumberFormat('en-CA', { style: 'currency', currency }).format(invoice.amount_paid / 100)
+    const totalFormatted = new Intl.NumberFormat('en-CA', { style: 'currency', currency }).format((invoice.amount_paid ?? 0) / 100)
 
     const { error: sendError } = await resend.emails.send({
       from: getFromAddress(tenant.name),
@@ -377,7 +377,7 @@ export async function sendReminderEmail(
     const tenant = tenantRes.data
     const currency = tenant.currency || 'CAD'
 
-    if (!['sent', 'viewed', 'overdue', 'partially_paid'].includes(invoice.status)) {
+    if (!['sent', 'viewed', 'overdue', 'partially_paid'].includes(invoice.status ?? '')) {
       return { success: false, error: `Cannot send reminder for invoice with status '${invoice.status}'` }
     }
 
@@ -416,7 +416,7 @@ export async function sendReminderEmail(
       return { success: false, error: 'No recipient email available' }
     }
 
-    const amountDue = invoice.total_amount - invoice.amount_paid
+    const amountDue = (invoice.total_amount ?? 0) - (invoice.amount_paid ?? 0)
     const amountFormatted = new Intl.NumberFormat('en-CA', { style: 'currency', currency }).format(amountDue / 100)
     const reminderNum = (invoice.reminder_count ?? 0) + 1
 

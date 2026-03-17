@@ -133,7 +133,7 @@ export async function createTemplate(
     performedBy: params.createdBy,
   })
 
-  return { success: true, data }
+  return { success: true, data: data as unknown as DocumentTemplateRow }
 }
 
 // ─── Create Version ──────────────────────────────────────────────────────────
@@ -436,7 +436,7 @@ export async function getTemplateWithVersion(
     return {
       success: true,
       data: {
-        template: template as DocumentTemplateRow,
+        template: template as unknown as DocumentTemplateRow,
         version: (latestVersion ?? null) as DocumentTemplateVersionRow | null,
         mappings: [] as DocumentTemplateMappingRow[],
         conditions: [] as DocumentTemplateConditionRow[],
@@ -476,7 +476,7 @@ export async function getTemplateWithVersion(
   return {
     success: true,
     data: {
-      template: template as DocumentTemplateRow,
+      template: template as unknown as DocumentTemplateRow,
       version: versionResult.data as DocumentTemplateVersionRow,
       mappings: (mappingsResult.data ?? []) as DocumentTemplateMappingRow[],
       conditions: (conditionsResult.data ?? []) as DocumentTemplateConditionRow[],
@@ -507,17 +507,18 @@ export async function cloneTemplate(
   }
 
   // Create new template
+  const sourceTemplate = source.data.template as unknown as Record<string, unknown>
   const templateResult = await createTemplate(supabase, {
     tenantId: params.tenantId,
     templateKey: params.newTemplateKey,
     name: params.newName,
-    description: source.data.template.description ?? undefined,
-    documentFamily: source.data.template.document_family,
-    practiceArea: source.data.template.practice_area ?? undefined,
-    matterTypeId: source.data.template.matter_type_id ?? undefined,
-    jurisdictionCode: source.data.template.jurisdiction_code ?? undefined,
-    languageCode: source.data.template.language_code ?? undefined,
-    requiresReview: source.data.template.requires_review,
+    description: (sourceTemplate.description as string) ?? undefined,
+    documentFamily: sourceTemplate.document_family as string,
+    practiceArea: (sourceTemplate.practice_area as string) ?? undefined,
+    matterTypeId: (sourceTemplate.matter_type_id as string) ?? undefined,
+    jurisdictionCode: (sourceTemplate.jurisdiction_code as string) ?? undefined,
+    languageCode: (sourceTemplate.language_code as string) ?? undefined,
+    requiresReview: sourceTemplate.requires_review as boolean,
     createdBy: params.clonedBy,
   })
 
@@ -719,7 +720,7 @@ export async function listTemplates(
   }
 
   if (params.status) {
-    query = query.eq('status', params.status)
+    query = (query as unknown as typeof query).eq('status', params.status as never)
   }
 
   const { data, error } = await query
@@ -728,5 +729,5 @@ export async function listTemplates(
     return { success: false, error: error.message }
   }
 
-  return { success: true, data: (data ?? []) as DocumentTemplateRow[] }
+  return { success: true, data: (data ?? []) as unknown as DocumentTemplateRow[] }
 }

@@ -240,12 +240,12 @@ export function Header() {
               {practiceAreas.map((pa) => (
                 <DropdownMenuItem
                   key={pa.id}
-                  onClick={() => handlePracticeFilterChange(pa.id, pa.color, pa.name)}
+                  onClick={() => handlePracticeFilterChange(pa.id, pa.color ?? undefined, pa.name)}
                   className="gap-2"
                 >
                   <span
                     className="size-2.5 rounded-full shrink-0"
-                    style={{ backgroundColor: pa.color }}
+                    style={{ backgroundColor: pa.color ?? undefined }}
                   />
                   <span>{pa.name}</span>
                   {activePracticeFilter === pa.id && (

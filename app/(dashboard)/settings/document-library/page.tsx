@@ -299,10 +299,10 @@ function EntryRow({
           <p className="text-xs text-slate-500 mt-0.5 line-clamp-2">{entry.description}</p>
         )}
         <div className="flex items-center gap-3 mt-1.5">
-          {entry.tags.length > 0 && (
+          {(entry.tags ?? []).length > 0 && (
             <div className="flex items-center gap-1 flex-wrap">
               <Tag className="h-3 w-3 text-slate-300" />
-              {entry.tags.map((t) => (
+              {(entry.tags ?? []).map((t) => (
                 <span key={t} className="text-[10px] text-slate-400 bg-slate-50 border rounded px-1">
                   {BUNDLE_LABELS[t] ?? t}
                 </span>
@@ -372,7 +372,7 @@ export default function DocumentLibraryPage() {
   const allTags = useMemo(() => {
     const tags = new Set<string>()
     for (const e of entries ?? []) {
-      for (const t of e.tags) tags.add(t)
+      for (const t of (e.tags ?? [])) tags.add(t)
     }
     return Array.from(tags).sort()
   }, [entries])
@@ -382,7 +382,7 @@ export default function DocumentLibraryPage() {
     return entries.filter((e) => {
       if (!showInactive && !e.is_active) return false
       if (filterCategory !== 'all' && e.category !== filterCategory) return false
-      if (filterTag !== 'all' && !e.tags.includes(filterTag)) return false
+      if (filterTag !== 'all' && !(e.tags ?? []).includes(filterTag)) return false
       if (search) {
         const q = search.toLowerCase()
         return e.slot_name.toLowerCase().includes(q) || (e.description ?? '').toLowerCase().includes(q)

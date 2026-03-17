@@ -57,7 +57,7 @@ async function handlePost(request: Request) {
         stats.remindersChecked++
 
         // 3. Calculate days overdue
-        const dueDate = new Date(invoice.due_date)
+        const dueDate = new Date(invoice.due_date ?? '')
         const daysOverdue = Math.ceil((now.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24))
 
         if (daysOverdue <= 0) continue

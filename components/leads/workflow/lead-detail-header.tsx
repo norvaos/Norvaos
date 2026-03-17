@@ -54,7 +54,7 @@ export function LeadDetailHeader({
   const isTerminal = isTerminalStage(currentStage)
   const isClosed = isClosedStage(currentStage)
   const isConverted = currentStage === LEAD_STAGES.CONVERTED
-  const tempBadge = TEMP_BADGES[lead.temperature] ?? TEMP_BADGES.warm
+  const tempBadge = TEMP_BADGES[lead.temperature ?? ''] ?? TEMP_BADGES.warm
 
   const contactName = contact
     ? formatFullName(contact.first_name, contact.last_name)

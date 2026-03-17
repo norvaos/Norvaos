@@ -87,12 +87,12 @@ async function getLeadContext(
   return {
     id: lead.id,
     tenantId: lead.tenant_id,
-    currentStage: lead.current_stage,
-    qualificationStatus: lead.qualification_status,
-    conflictStatus: lead.conflict_status,
-    consultationStatus: lead.consultation_status,
-    retainerStatus: lead.retainer_status,
-    paymentStatus: lead.payment_status,
+    currentStage: lead.current_stage ?? '',
+    qualificationStatus: lead.qualification_status ?? '',
+    conflictStatus: lead.conflict_status ?? '',
+    consultationStatus: lead.consultation_status ?? '',
+    retainerStatus: lead.retainer_status ?? '',
+    paymentStatus: lead.payment_status ?? '',
   }
 }
 

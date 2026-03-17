@@ -25,7 +25,7 @@ export function createAdminClient(): SupabaseClient<Database> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ;(client as any).from = (table: string) => {
     incrementDbCalls()
-    return originalFrom(table)
+    return (originalFrom as (table: string) => unknown)(table)
   }
 
   return client

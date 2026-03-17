@@ -166,7 +166,7 @@ export function CommandPalette() {
               id: m.id,
               type: 'matter',
               title: m.title,
-              subtitle: m.matter_number ? `#${m.matter_number} · ${m.status}` : m.status,
+              subtitle: m.matter_number ? `#${m.matter_number} · ${m.status ?? ''}` : (m.status ?? ''),
               url: `/matters/${m.id}`,
             })
           }
@@ -194,7 +194,7 @@ export function CommandPalette() {
               id: t.id,
               type: 'task',
               title: t.title,
-              subtitle: `${t.status.replace(/_/g, ' ')} · ${t.priority}`,
+              subtitle: `${(t.status ?? '').replace(/_/g, ' ')} · ${t.priority ?? ''}`,
               url: '/tasks',
             })
           }

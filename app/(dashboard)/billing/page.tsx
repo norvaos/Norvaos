@@ -91,7 +91,7 @@ function RecordPaymentDialog({
 
   if (!invoice) return null
 
-  const remaining = invoice.total_amount - invoice.amount_paid
+  const remaining = invoice.total_amount - (invoice.amount_paid ?? 0)
 
   const handleSubmit = async () => {
     const amountCents = Math.round(parseFloat(amount) * 100)
@@ -100,9 +100,10 @@ function RecordPaymentDialog({
     await recordPayment.mutateAsync({
       tenant_id: tenantId,
       invoice_id: invoice.id,
+      contact_id: invoice.contact_id ?? '',
       amount: amountCents,
       payment_method: method,
-      reference: reference || undefined,
+      external_payment_id: reference || undefined,
     })
     onClose()
   }
@@ -428,13 +429,13 @@ function BillingPageContent() {
                       {inv.matter_number ? `${inv.matter_number} — ` : ''}{inv.matter_title}
                     </span>
                     <span className="text-right font-medium text-xs">{fmtCents(inv.total_amount)}</span>
-                    <span className="text-right text-xs text-muted-foreground">{fmtCents(inv.amount_paid)}</span>
+                    <span className="text-right text-xs text-muted-foreground">{fmtCents(inv.amount_paid ?? 0)}</span>
                     <Badge
                       variant="outline"
                       className="text-xs py-0 w-fit"
-                      style={{ borderColor: getStatusColor(inv.status), color: getStatusColor(inv.status) }}
+                      style={{ borderColor: getStatusColor(inv.status ?? ''), color: getStatusColor(inv.status ?? '') }}
                     >
-                      {getStatusLabel(inv.status)}
+                      {getStatusLabel(inv.status ?? '')}
                     </Badge>
                     <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
                       {inv.status === 'finalized' && (
@@ -449,7 +450,7 @@ function BillingPageContent() {
                           Send
                         </Button>
                       )}
-                      {['sent', 'viewed', 'overdue', 'partially_paid'].includes(inv.status) && (
+                      {['sent', 'viewed', 'overdue', 'partially_paid'].includes(inv.status ?? '') && (
                         <Button
                           variant="ghost"
                           size="sm"

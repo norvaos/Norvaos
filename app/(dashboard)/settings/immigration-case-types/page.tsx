@@ -520,8 +520,8 @@ function CaseStageDialog({
   const updateMutation = useUpdateCaseStage()
   const isEditing = !!stage
 
-  const form = useForm<StageFormValues>({
-    resolver: zodResolver(stageFormSchema),
+  const form = useForm<StageFormValues, unknown, StageFormValues>({
+    resolver: zodResolver(stageFormSchema) as any,
     defaultValues: stage
       ? {
           name: stage.name,
@@ -529,7 +529,7 @@ function CaseStageDialog({
           description: stage.description ?? '',
           is_terminal: stage.is_terminal,
           client_label: stage.client_label ?? '',
-          notify_client_on_stage_change: stage.notify_client_on_stage_change,
+          notify_client_on_stage_change: stage.notify_client_on_stage_change ?? false,
         }
       : {
           name: '',
@@ -1343,7 +1343,7 @@ function DocumentSlotTemplatesSection({
   const allTags = useMemo(() => {
     const tags = new Set<string>()
     for (const e of libraryEntries ?? []) {
-      for (const t of e.tags) tags.add(t)
+      for (const t of (e.tags ?? [])) tags.add(t)
     }
     return Array.from(tags).sort()
   }, [libraryEntries])
@@ -1351,7 +1351,7 @@ function DocumentSlotTemplatesSection({
   const filteredLibrary = useMemo(() => {
     if (!libraryEntries) return []
     return libraryEntries.filter((e) => {
-      if (filterTag !== 'all' && !e.tags.includes(filterTag)) return false
+      if (filterTag !== 'all' && !(e.tags ?? []).includes(filterTag)) return false
       if (search) {
         const q = search.toLowerCase()
         return e.slot_name.toLowerCase().includes(q) || (e.description ?? '').toLowerCase().includes(q)

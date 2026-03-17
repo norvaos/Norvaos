@@ -109,9 +109,9 @@ export function MatterStatusPanel() {
             <div className="flex items-center justify-between">
               <Badge
                 variant="outline"
-                className={STATUS_CONFIG[data.matter.status]?.color ?? 'bg-slate-50 text-slate-500'}
+                className={STATUS_CONFIG[data.matter.status ?? '']?.color ?? 'bg-slate-50 text-slate-500'}
               >
-                {STATUS_CONFIG[data.matter.status]?.label ?? data.matter.status}
+                {STATUS_CONFIG[data.matter.status ?? '']?.label ?? data.matter.status}
               </Badge>
 
               <div className="flex items-center gap-3 text-xs text-slate-500">

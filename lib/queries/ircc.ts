@@ -123,7 +123,7 @@ export function useUpdateIRCCSession() {
       const supabase = createClient()
       const { data, error } = await supabase
         .from('ircc_questionnaire_sessions')
-        .update({ ...updates, updated_at: new Date().toISOString() })
+        .update({ ...updates, updated_at: new Date().toISOString() } as never)
         .eq('id', id)
         .select()
         .single()

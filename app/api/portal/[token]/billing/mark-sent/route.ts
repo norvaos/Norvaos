@@ -45,7 +45,7 @@ export async function POST(
     // Verify invoice belongs to this matter
     const { data: invoice, error: invError } = await admin
       .from('invoices')
-      .select('id, invoice_number, total_amount, amount_paid, matter_id')
+      .select('id, invoice_number, total_amount, amount_paid, matter_id, contact_id')
       .eq('id', invoiceId)
       .eq('matter_id', link.matter_id)
       .single()
@@ -80,9 +80,10 @@ export async function POST(
         tenant_id: link.tenant_id,
         invoice_id: invoiceId,
         amount: remainingBalance,
-        payment_date: new Date().toISOString().split('T')[0], // date only
+        created_at: new Date().toISOString(),
         payment_method: 'e_transfer_pending',
-        reference: 'Client marked as sent via portal',
+        external_payment_id: 'Client marked as sent via portal',
+        contact_id: invoice.contact_id ?? '',
         notes: `Portal submission at ${nowIso} for Invoice #${invoice.invoice_number ?? invoiceId.slice(0, 8)}`,
       })
 

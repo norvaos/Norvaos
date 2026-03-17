@@ -92,7 +92,7 @@ async function handlePost(
         userRole = {
           name: roleData.name,
           permissions: (roleData.permissions ?? {}) as Record<string, Record<string, boolean>>,
-          is_system: roleData.is_system,
+          is_system: roleData.is_system ?? false,
         }
       }
     }

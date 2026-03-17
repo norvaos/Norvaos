@@ -264,7 +264,7 @@ function TrustAccountsContent() {
             description="Update the trust account details."
             initialValues={{
               accountName: trustEditTarget.account_name,
-              accountType: trustEditTarget.account_type,
+              accountType: trustEditTarget.account_type as 'general' | 'specific',
               bankName: trustEditTarget.bank_name,
               accountNumberEncrypted: trustEditTarget.account_number_encrypted,
               transitNumber: trustEditTarget.transit_number ?? '',

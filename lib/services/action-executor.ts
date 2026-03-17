@@ -281,19 +281,19 @@ export async function executeAction<TInput, TResult>(
         p_action_config: validatedInput as unknown as Json,
         p_entity_type: def.entityType,
         p_entity_id: entityId,
-        p_performed_by: userId,
-        p_source: source,
-        p_idempotency_key: idempotencyKey ?? null,
+        p_performed_by: userId ?? '',
+        p_source: source ?? undefined,
+        p_idempotency_key: idempotencyKey ?? undefined,
         p_previous_state: (previousState ?? null) as unknown as Json,
         p_new_state: (result.newState ?? null) as unknown as Json,
         p_activity_type: result.activity.activityType,
         p_activity_title: result.activity.title,
-        p_activity_description: result.activity.description ?? null,
+        p_activity_description: result.activity.description ?? undefined,
         p_activity_metadata: (result.activity.metadata ?? null) as unknown as Json,
-        p_activity_matter_id: result.activity.matterId ?? null,
-        p_activity_contact_id: result.activity.contactId ?? null,
-        p_action_label: def.label,
-        p_shift_id: resolvedShiftId,
+        p_activity_matter_id: result.activity.matterId ?? undefined,
+        p_activity_contact_id: result.activity.contactId ?? undefined,
+        p_action_label: def.label ?? undefined,
+        p_shift_id: resolvedShiftId ?? undefined,
       }
     )
 
@@ -371,7 +371,7 @@ export async function executeAction<TInput, TResult>(
 
     // Release advisory lock before returning
     if (idempotencyLockHeld) {
-      void supabase.rpc('release_idempotency_lock', { p_idempotency_key: idempotencyKey ?? null }).then(() => {}, () => {})
+      void supabase.rpc('release_idempotency_lock', { p_idempotency_key: idempotencyKey ?? '' }).then(() => {}, () => {})
     }
 
     // Action was executed successfully — audit trail failure should not block the user.
@@ -385,7 +385,7 @@ export async function executeAction<TInput, TResult>(
 
   // Release advisory lock after successful triple-write
   if (idempotencyLockHeld) {
-    void supabase.rpc('release_idempotency_lock', { p_idempotency_key: idempotencyKey ?? null }).then(() => {}, () => {})
+    void supabase.rpc('release_idempotency_lock', { p_idempotency_key: idempotencyKey ?? '' }).then(() => {}, () => {})
   }
 
   const actionDuration = Math.round(performance.now() - actionStart)

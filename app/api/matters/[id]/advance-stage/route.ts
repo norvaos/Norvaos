@@ -5,6 +5,7 @@ import { advanceGenericStage, advanceImmigrationStage } from '@/lib/services/sta
 import { invalidateGating, invalidateMatter } from '@/lib/services/cache-invalidation'
 import { dispatchNotification } from '@/lib/services/notification-engine'
 import { withTiming } from '@/lib/middleware/request-timing'
+import { evaluateRiskFlags } from '@/lib/services/risk-flag-engine'
 import type { NorvaOSGateFailure } from '@/lib/types/errors'
 
 /**
@@ -123,7 +124,11 @@ async function handlePost(
         invalidateMatter(auth.tenantId, matterId),
       ])
 
-      // 6b. Write to stage_transition_log — fire-and-forget, non-fatal.
+      // 6b. Fire-and-forget risk flag evaluation on every successful stage advance.
+      evaluateRiskFlags(auth.supabase, auth.tenantId, matterId)
+        .catch((e) => console.error('[advance-stage] Risk flag evaluation failed:', e))
+
+      // 6c. Write to stage_transition_log — fire-and-forget, non-fatal.
       //     Zone E (audit rail) reads from this table.
       //     gate_snapshot now carries the full per-condition evaluation result.
       auth.supabase
@@ -146,7 +151,7 @@ async function handlePost(
           }
         })
 
-      // 6c. Notify responsible lawyer
+      // 6d. Notify responsible lawyer
       const { data: matterDetail } = await auth.supabase
         .from('matters')
         .select('responsible_lawyer_id')

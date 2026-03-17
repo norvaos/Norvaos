@@ -120,7 +120,7 @@ export function useCreatePortalLink() {
       return { ...data, token } as PortalLink
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: portalLinkKeys.byMatter(data.matter_id) })
+      queryClient.invalidateQueries({ queryKey: portalLinkKeys.byMatter(data.matter_id ?? '') })
       toast.success('Portal link generated')
     },
     onError: () => {

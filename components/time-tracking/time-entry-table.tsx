@@ -76,7 +76,7 @@ export function TimeEntryTable({ entries, onEdit, onDelete }: TimeEntryTableProp
                       Non-billable
                     </Badge>
                   )}
-                  {entry.is_billed && (
+                  {!!entry.invoice_id && (
                     <Badge className="text-xs bg-emerald-100 text-emerald-700 hover:bg-emerald-100">
                       Billed
                     </Badge>
@@ -90,7 +90,7 @@ export function TimeEntryTable({ entries, onEdit, onDelete }: TimeEntryTableProp
                     size="icon"
                     className="size-7"
                     onClick={() => onEdit(entry)}
-                    disabled={entry.is_billed}
+                    disabled={!!entry.invoice_id}
                   >
                     <Pencil className="size-3.5" />
                   </Button>
@@ -99,7 +99,7 @@ export function TimeEntryTable({ entries, onEdit, onDelete }: TimeEntryTableProp
                     size="icon"
                     className="size-7 text-destructive hover:text-destructive"
                     onClick={() => onDelete(entry.id)}
-                    disabled={entry.is_billed}
+                    disabled={!!entry.invoice_id}
                   >
                     <Trash2 className="size-3.5" />
                   </Button>

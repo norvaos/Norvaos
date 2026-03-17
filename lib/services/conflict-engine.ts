@@ -375,11 +375,12 @@ export async function recordConflictDecision(
 
   // 4. Notify assigned staff (fire-and-forget)
   try {
-    const { data: contact } = await supabase
+    const { data: contactRaw } = await supabase
       .from('contacts')
-      .select('responsible_lawyer_id')
+      .select('id')
       .eq('id', contactId)
       .single()
+    const contact = contactRaw as (typeof contactRaw & { responsible_lawyer_id?: string | null }) | null
 
     if (contact?.responsible_lawyer_id && contact.responsible_lawyer_id !== decidedBy) {
       const { dispatchNotification } = await import('@/lib/services/notification-engine')

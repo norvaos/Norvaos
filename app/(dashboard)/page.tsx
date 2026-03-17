@@ -606,7 +606,7 @@ function MyTasksWidget({
           <div className="space-y-1">
             {tasks.map((task) => {
               const overdue = task.due_date ? isOverdue(task.due_date) : false
-              const priorityColor = getPriorityColor(task.priority)
+              const priorityColor = getPriorityColor(task.priority ?? '')
               const matterTitle = (task as Record<string, unknown>).matter_title as string | null
 
               return (
@@ -622,7 +622,7 @@ function MyTasksWidget({
                   <div
                     className="h-2 w-2 rounded-full shrink-0"
                     style={{ backgroundColor: priorityColor }}
-                    title={task.priority}
+                    title={task.priority ?? ''}
                   />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium truncate">{task.title}</p>
@@ -682,7 +682,7 @@ function RecentActivityWidget({ tenantId }: { tenantId: string }) {
         type: 'activity',
         title: a.title,
         description: a.description,
-        createdAt: a.created_at,
+        createdAt: a.created_at ?? '',
         icon: getActivityIcon(a.activity_type),
         iconColor: 'text-muted-foreground bg-muted',
       })
@@ -698,7 +698,7 @@ function RecentActivityWidget({ tenantId }: { tenantId: string }) {
         type: 'audit',
         title: formatAuditTitle(log.action, log.entity_type),
         description: desc,
-        createdAt: log.created_at,
+        createdAt: log.created_at ?? '',
         icon: getAuditIcon(log.action),
         iconColor: getAuditIconColor(log.action),
       })
@@ -967,7 +967,7 @@ function PipelineSummaryWidget({ tenantId }: { tenantId: string }) {
                     className="h-full rounded transition-all duration-500"
                     style={{
                       width: `${Math.max((stage.count / maxCount) * 100, stage.count > 0 ? 8 : 0)}%`,
-                      backgroundColor: stage.color,
+                      backgroundColor: stage.color ?? undefined,
                     }}
                   />
                 </div>

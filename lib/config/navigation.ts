@@ -120,6 +120,7 @@ export const navigation: NavSection[] = [
           { title: 'Billing', href: '/workspace/billing', icon: DollarSign },
           { title: 'Admin', href: '/workspace/admin', icon: Settings },
           { title: 'Client Portal', href: '/workspace/client', icon: User },
+          { title: 'Partner', href: '/workspace/partner', icon: BarChart3 },
         ],
       },
     ],

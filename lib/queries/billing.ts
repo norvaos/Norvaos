@@ -142,7 +142,7 @@ export function useCheckFeatureAccess(tenantId: string, featureKey: string) {
       const { data: feature, error: featureError } = await supabase
         .from('plan_features')
         .select('*')
-        .eq('plan_tier', tier)
+        .eq('plan_tier', tier ?? '')
         .eq('feature_key', featureKey)
         .single()
 

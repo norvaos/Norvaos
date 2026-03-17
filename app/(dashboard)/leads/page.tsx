@@ -32,6 +32,7 @@ import {
   Phone,
   Mail,
   User,
+  ClipboardList,
 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -281,7 +282,7 @@ export default function LeadsPage() {
       if (error) throw error
       const map: Record<string, { id: string; name: string; color: string }> = {}
       for (const pa of data ?? []) {
-        map[pa.id] = pa
+        map[pa.id] = { id: pa.id, name: pa.name, color: pa.color ?? '' }
       }
       return map
     },
@@ -1016,6 +1017,7 @@ function LeadsTable({
             <TableHead className="w-[110px]">
               <SortHeader label="Created" field="created_at" currentField={sortField} currentDir={sortDir} onSort={onSort} />
             </TableHead>
+            <TableHead className="w-[90px] text-center">Consult</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -1137,6 +1139,18 @@ function LeadsTable({
                   <span className="text-xs text-slate-500 tabular-nums">
                     {lead.created_at ? formatDate(lead.created_at) : '—'}
                   </span>
+                </TableCell>
+
+                {/* Consult */}
+                <TableCell className="text-center">
+                  <Link
+                    href={`/leads/${lead.id}/consultation`}
+                    onClick={(e) => e.stopPropagation()}
+                    className="inline-flex items-center gap-1 rounded-md border border-blue-200 bg-blue-50 px-2 py-1 text-[11px] font-medium text-blue-700 hover:bg-blue-100 hover:border-blue-300 transition-colors"
+                  >
+                    <ClipboardList className="h-3 w-3" />
+                    Consult
+                  </Link>
                 </TableCell>
               </TableRow>
             )

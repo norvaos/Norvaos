@@ -210,8 +210,8 @@ export function TasksTab({
             </TableHeader>
             <TableBody>
               {tasks.map((task) => {
-                const taskStatusConfig = getTaskStatusConfig(task.status)
-                const taskPriorityConfig = getPriorityConfig(task.priority)
+                const taskStatusConfig = getTaskStatusConfig(task.status ?? '')
+                const taskPriorityConfig = getPriorityConfig(task.priority ?? '')
                 return (
                   <TableRow
                     key={task.id}

@@ -200,7 +200,7 @@ export function TaskActivityLog({ taskId, tenantId }: TaskActivityLogProps) {
                 </p>
               )}
               <p className="mt-1 text-xs text-muted-foreground">
-                {formatTimestamp(activity.created_at)}
+                {formatTimestamp(activity.created_at ?? '')}
               </p>
             </div>
           </div>

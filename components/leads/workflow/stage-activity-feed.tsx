@@ -34,7 +34,7 @@ export function StageActivityFeed({ stageHistory, activities, users }: StageActi
     ...activities.map((act): FeedItem => ({
       type: 'activity',
       data: act,
-      timestamp: act.created_at,
+      timestamp: act.created_at ?? '',
     })),
   ].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
 

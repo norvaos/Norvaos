@@ -63,7 +63,7 @@ export default async function PortalPage({ params }: Props) {
   const { data: matter } = await admin
     .from('matters')
     .select('id, matter_number, title, matter_type_id, status, responsible_lawyer_id')
-    .eq('id', link.matter_id)
+    .eq('id', link.matter_id ?? "")
     .single()
 
   if (!matter) notFound()
@@ -145,9 +145,9 @@ export default async function PortalPage({ params }: Props) {
   }
 
   const tenantBranding = {
-    name: tenant.name,
-    logoUrl: tenant.logo_url,
-    primaryColor: tenant.primary_color,
+    name: tenant.name ?? '',
+    logoUrl: tenant.logo_url ?? null,
+    primaryColor: (tenant.primary_color as string | null) ?? '#2563eb',
   }
 
   const matterRef = matter.matter_number || `Case #${matter.id.slice(0, 8)}`
@@ -159,7 +159,7 @@ export default async function PortalPage({ params }: Props) {
   let { data: irccSession } = await admin
     .from('ircc_questionnaire_sessions')
     .select('id, status')
-    .eq('matter_id', link.matter_id)
+    .eq('matter_id', link.matter_id ?? "")
     .order('created_at', { ascending: false })
     .limit(1)
     .maybeSingle()
@@ -201,7 +201,7 @@ export default async function PortalPage({ params }: Props) {
       const { data: person } = await admin
         .from('matter_people')
         .select('contact_id')
-        .eq('matter_id', link.matter_id)
+        .eq('matter_id', link.matter_id ?? "")
         .eq('person_role', role)
         .eq('is_active', true)
         .limit(1)
@@ -240,7 +240,7 @@ export default async function PortalPage({ params }: Props) {
   const { count: taskCount } = await admin
     .from('tasks')
     .select('id', { count: 'exact', head: true })
-    .eq('matter_id', link.matter_id)
+    .eq('matter_id', link.matter_id ?? "")
     .eq('is_deleted', false)
     .in('category', ['client_facing'])
 
@@ -254,7 +254,7 @@ export default async function PortalPage({ params }: Props) {
   const { count: eventCount } = await (admin as any)
     .from('calendar_events')
     .select('id', { count: 'exact', head: true })
-    .eq('matter_id', link.matter_id)
+    .eq('matter_id', link.matter_id ?? "")
     .eq('is_active', true)
     .eq('is_client_visible', true)
     .neq('status', 'cancelled')
@@ -283,7 +283,7 @@ export default async function PortalPage({ params }: Props) {
       .select(
         'id, slot_name, description, category, person_role, is_required, status, accepted_file_types, max_file_size_bytes, current_version'
       )
-      .eq('matter_id', link.matter_id)
+      .eq('matter_id', link.matter_id ?? "")
       .eq('is_active', true)
       .order('sort_order')
       .order('slot_name')
@@ -315,15 +315,15 @@ export default async function PortalPage({ params }: Props) {
     // Enrich slots with review reason and structured rejection code
     const allEnriched = slotList.map((s) => ({
       id: s.id,
-      slot_name: s.slot_name,
+      slot_name: s.slot_name ?? '',
       description: s.description,
-      category: s.category,
+      category: s.category ?? '',
       person_role: s.person_role,
-      is_required: s.is_required,
-      status: s.status,
-      accepted_file_types: s.accepted_file_types,
-      max_file_size_bytes: s.max_file_size_bytes,
-      current_version: s.current_version,
+      is_required: s.is_required ?? false,
+      status: s.status ?? 'empty',
+      accepted_file_types: (s.accepted_file_types as string[] | null) ?? [],
+      max_file_size_bytes: s.max_file_size_bytes ?? 0,
+      current_version: s.current_version ?? 0,
       latest_review_reason: reasonMap.get(s.id)?.review_reason ?? null,
       rejection_reason_code: reasonMap.get(s.id)?.rejection_reason_code ?? null,
     }))
@@ -335,7 +335,7 @@ export default async function PortalPage({ params }: Props) {
     const { data: docRequests } = await (admin as any)
       .from('document_requests')
       .select('slot_ids')
-      .eq('matter_id', link.matter_id)
+      .eq('matter_id', link.matter_id ?? "")
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     if (docRequests && (docRequests as any[]).length > 0) {
@@ -360,7 +360,7 @@ export default async function PortalPage({ params }: Props) {
     const { data: items } = await admin
       .from('matter_checklist_items')
       .select('*')
-      .eq('matter_id', link.matter_id)
+      .eq('matter_id', link.matter_id ?? "")
       .order('sort_order', { ascending: true })
 
     checklistItems = items ?? []
@@ -370,7 +370,7 @@ export default async function PortalPage({ params }: Props) {
   const { count: invoiceCount } = await admin
     .from('invoices')
     .select('id', { count: 'exact', head: true })
-    .eq('matter_id', link.matter_id)
+    .eq('matter_id', link.matter_id ?? "")
     .not('status', 'in', '("draft","cancelled","void")')
 
   const tenantBrandingFull = (tenant.portal_branding ?? {}) as Record<string, unknown>
@@ -384,7 +384,7 @@ export default async function PortalPage({ params }: Props) {
   const { count: sharedDocCount } = await admin
     .from('documents')
     .select('id', { count: 'exact', head: true })
-    .eq('matter_id', link.matter_id)
+    .eq('matter_id', link.matter_id ?? "")
     .eq('is_shared_with_client', true)
 
   const hasSharedDocuments = (sharedDocCount ?? 0) > 0

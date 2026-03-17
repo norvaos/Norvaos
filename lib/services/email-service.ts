@@ -163,7 +163,7 @@ export async function sendStageChangeEmail(params: SendStageChangeEmailParams): 
     const { html, text, subject } = await renderStageChangeEmail({
       firmName: tenant.name,
       firmLogoUrl: tenant.logo_url,
-      primaryColor: tenant.primary_color,
+      primaryColor: tenant.primary_color ?? "",
       clientFirstName: contact.first_name,
       matterReference: matterRef,
       newStageName: stageName,
@@ -314,7 +314,7 @@ export async function sendClientEmail(params: SendClientEmailParams): Promise<vo
         const rendered = await renderStageChangeEmail({
           firmName: tenant.name,
           firmLogoUrl: tenant.logo_url,
-          primaryColor: tenant.primary_color,
+          primaryColor: tenant.primary_color ?? "",
           clientFirstName: contact.first_name,
           matterReference: matterRef,
           newStageName: (templateData.stage_name as string) || 'Updated',
@@ -331,7 +331,7 @@ export async function sendClientEmail(params: SendClientEmailParams): Promise<vo
         const rendered = await renderDocumentRequestEmail({
           firmName: tenant.name,
           firmLogoUrl: tenant.logo_url,
-          primaryColor: tenant.primary_color,
+          primaryColor: tenant.primary_color ?? "",
           clientFirstName: contact.first_name,
           matterReference: matterRef,
           documentNames: (templateData.document_names as string[]) || [],
@@ -349,7 +349,7 @@ export async function sendClientEmail(params: SendClientEmailParams): Promise<vo
         const rendered = await renderDeadlineAlertEmail({
           firmName: tenant.name,
           firmLogoUrl: tenant.logo_url,
-          primaryColor: tenant.primary_color,
+          primaryColor: tenant.primary_color ?? "",
           clientFirstName: contact.first_name,
           matterReference: matterRef,
           deadlineTitle: (templateData.deadline_title as string) || 'Upcoming Deadline',
@@ -370,7 +370,7 @@ export async function sendClientEmail(params: SendClientEmailParams): Promise<vo
         const rendered = await renderGeneralNotificationEmail({
           firmName: tenant.name,
           firmLogoUrl: tenant.logo_url,
-          primaryColor: tenant.primary_color,
+          primaryColor: tenant.primary_color ?? "",
           clientFirstName: contact.first_name,
           matterReference: matterRef,
           subject: (templateData.subject as string) || `Update on your case`,
@@ -493,7 +493,7 @@ export async function sendInternalEmail(params: SendInternalEmailParams): Promis
     const { html, text, subject } = await renderInternalNotificationEmail({
       firmName: tenant.name,
       firmLogoUrl: tenant.logo_url,
-      primaryColor: tenant.primary_color,
+      primaryColor: tenant.primary_color ?? "",
       recipientName,
       title,
       message,

@@ -94,7 +94,7 @@ export function TagManager({ entityType, entityId, tenantId }: TagManagerProps) 
           key={tag.id}
           variant="outline"
           className="gap-1 pr-1"
-          style={{ borderColor: tag.color, color: tag.color }}
+          style={{ borderColor: tag.color ?? undefined, color: tag.color ?? undefined }}
         >
           {tag.name}
           <button
@@ -133,7 +133,7 @@ export function TagManager({ entityType, entityId, tenantId }: TagManagerProps) 
                   >
                     <div
                       className="h-3 w-3 rounded-full flex-shrink-0"
-                      style={{ backgroundColor: tag.color }}
+                      style={{ backgroundColor: tag.color ?? undefined }}
                     />
                     {tag.name}
                   </button>

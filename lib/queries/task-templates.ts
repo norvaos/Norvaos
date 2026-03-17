@@ -289,8 +289,8 @@ export function useApplyTemplate() {
 
       // Create tasks from template items
       const tasksToCreate = typedItems.map((item) => {
-        const dueDate = item.due_days_offset
-          ? new Date(today.getTime() + item.due_days_offset * 86400000)
+        const dueDate = item.days_offset
+          ? new Date(today.getTime() + item.days_offset * 86400000)
               .toISOString()
               .split('T')[0]
           : null

@@ -219,7 +219,7 @@ export async function generateFormPack(
         p_template_checksum: templateChecksum,
         p_validation_result: validationResult as unknown as Json,
         p_generated_by: userId,
-        p_idempotency_key: idempotencyKey ?? null,
+        p_idempotency_key: idempotencyKey ?? '',
         p_form_code: formCode,
         p_storage_path: '', // Updated after upload
         p_file_name: '', // Updated after upload

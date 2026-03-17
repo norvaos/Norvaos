@@ -45,7 +45,7 @@ interface TaskPillProps {
 }
 
 function TaskPill({ task, onClick }: TaskPillProps) {
-  const color = STATUS_COLOR_MAP[task.status] ?? '#6b7280'
+  const color = STATUS_COLOR_MAP[task.status ?? ''] ?? '#6b7280'
 
   return (
     <button

@@ -96,7 +96,7 @@ export function useMatterFormInstances(matterId: string | null) {
       const supabase = createClient()
 
       const { data, error } = await supabase
-        .from('matter_form_instances')
+        .from('matter_form_instances' as never)
         .select('*')
         .eq('matter_id', matterId!)
         .eq('is_active', true)
@@ -121,8 +121,8 @@ export function useUpdateFormInstanceStatus() {
       const supabase = createClient()
 
       const { error } = await supabase
-        .from('matter_form_instances')
-        .update({ status: params.status })
+        .from('matter_form_instances' as never)
+        .update({ status: params.status } as never)
         .eq('id', params.instanceId)
 
       if (error) throw new Error(error.message)
@@ -148,7 +148,7 @@ export function useFormAssignmentTemplateHistory(templateId: string | null) {
       const supabase = createClient()
 
       const { data, error } = await supabase
-        .from('form_assignment_template_history')
+        .from('form_assignment_template_history' as never)
         .select('*')
         .eq('template_id', templateId!)
         .order('created_at', { ascending: false })
@@ -328,7 +328,7 @@ export function useCheckMoveImpact() {
 
       // Count active matters that have instances from this template
       const { data, error } = await supabase
-        .from('matter_form_instances')
+        .from('matter_form_instances' as never)
         .select('matter_id', { count: 'exact', head: true })
         .eq('assignment_template_id', params.templateId)
         .eq('is_active', true)

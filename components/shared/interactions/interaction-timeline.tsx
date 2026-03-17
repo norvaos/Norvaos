@@ -122,7 +122,7 @@ export function InteractionTimeline({ contactId, matterId, tenantId }: Interacti
     return INTERACTION_GROUPS.map((group) => {
       const items = interactionActivities
         .filter((a) => group.activityTypes.includes(a.activity_type))
-        .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+        .sort((a, b) => new Date(b.created_at ?? '').getTime() - new Date(a.created_at ?? '').getTime())
 
       return { group, items }
     })
@@ -225,10 +225,10 @@ interface GroupSectionProps {
   items: Array<{
     id: string
     activity_type: string
-    title: string
+    title: string | null
     description: string | null
     metadata: unknown
-    created_at: string
+    created_at: string | null
     user_id: string | null
   }>
   expanded: boolean

@@ -279,8 +279,8 @@ function computeExpectedSlots(
         category: template.category,
         personRole: null,
         isRequired: template.is_required,
-        acceptedFileTypes: template.accepted_file_types,
-        maxFileSizeBytes: template.max_file_size_bytes,
+        acceptedFileTypes: template.accepted_file_types ?? [],
+        maxFileSizeBytes: template.max_file_size_bytes ?? 0,
         sortOrder: template.sort_order,
       })
     } else if (template.person_role_scope === 'any') {
@@ -298,8 +298,8 @@ function computeExpectedSlots(
           category: template.category,
           personRole: person.person_role,
           isRequired: template.is_required,
-          acceptedFileTypes: template.accepted_file_types,
-          maxFileSizeBytes: template.max_file_size_bytes,
+          acceptedFileTypes: template.accepted_file_types ?? [],
+          maxFileSizeBytes: template.max_file_size_bytes ?? 0,
           sortOrder: template.sort_order,
         })
       }
@@ -322,8 +322,8 @@ function computeExpectedSlots(
           category: template.category,
           personRole: person.person_role,
           isRequired: template.is_required,
-          acceptedFileTypes: template.accepted_file_types,
-          maxFileSizeBytes: template.max_file_size_bytes,
+          acceptedFileTypes: template.accepted_file_types ?? [],
+          maxFileSizeBytes: template.max_file_size_bytes ?? 0,
           sortOrder: template.sort_order,
         })
       }

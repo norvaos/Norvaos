@@ -130,7 +130,7 @@ function SortableCard({ task, user, onTaskClick, isOverlay = false }: SortableCa
             {/* Priority dot */}
             <span
               className="mt-0.5 inline-block h-2.5 w-2.5 flex-shrink-0 rounded-full"
-              style={{ backgroundColor: PRIORITY_COLORS[task.priority] ?? '#c3c6d4' }}
+              style={{ backgroundColor: PRIORITY_COLORS[task.priority ?? ''] ?? '#c3c6d4' }}
               title={`${task.priority} priority`}
             />
             <span className="truncate text-sm font-medium text-slate-900">
@@ -272,7 +272,7 @@ export function TaskKanbanView({
       map[s.value] = []
     }
     for (const task of tasks) {
-      if (map[task.status]) {
+      if (task.status && map[task.status]) {
         map[task.status].push(task)
       }
     }

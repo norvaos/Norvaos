@@ -163,9 +163,9 @@ function DeadlineTypeRow({
               variant="secondary"
               className="text-[10px] px-1.5 py-0"
               style={{
-                backgroundColor: `${practiceArea.color}15`,
-                color: practiceArea.color,
-                borderColor: `${practiceArea.color}30`,
+                backgroundColor: `${practiceArea.color ?? ''}15`,
+                color: practiceArea.color ?? undefined,
+                borderColor: `${practiceArea.color ?? ''}30`,
               }}
             >
               {practiceArea.name}

@@ -407,7 +407,7 @@ function InvoiceDetailContent() {
     )
   }
 
-  const status = invoice.status
+  const status = invoice.status ?? ''
   const statusBadge = STATUS_BADGE[status] ?? { label: status, variant: 'secondary' as const }
   const canFinalize = status === 'draft'
   const canSend = status === 'finalized'
@@ -528,7 +528,13 @@ function InvoiceDetailContent() {
         <TabsContent value="lines" className="mt-4">
           <Card>
             <CardContent className="pt-4">
-              <LineItemsTable items={invoice.line_items} />
+              <LineItemsTable items={invoice.line_items.map((li) => ({
+                description: li.description,
+                quantity: li.quantity ?? 0,
+                unit_price: li.unit_price ?? 0,
+                amount: li.amount ?? 0,
+                line_category: li.line_category,
+              }))} />
               <Separator className="my-4" />
               <div className="space-y-1 text-sm max-w-xs ml-auto">
                 <div className="flex justify-between">
@@ -554,7 +560,13 @@ function InvoiceDetailContent() {
         <TabsContent value="payments" className="mt-4">
           <Card>
             <CardContent className="pt-4">
-              <PaymentsTable payments={invoice.payments} />
+              <PaymentsTable payments={invoice.payments.map((p) => ({
+                payment_date: p.created_at ?? '',
+                payment_method: p.payment_method ?? '',
+                amount: p.amount ?? 0,
+                reference: p.external_payment_id ?? null,
+                voided_at: p.voided_at ?? null,
+              }))} />
             </CardContent>
           </Card>
         </TabsContent>

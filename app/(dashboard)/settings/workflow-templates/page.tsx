@@ -163,7 +163,7 @@ export default function WorkflowTemplatesPage() {
               <TabsTrigger key={pa.id} value={pa.id}>
                 <span
                   className="mr-1.5 inline-block h-2 w-2 rounded-full"
-                  style={{ backgroundColor: pa.color }}
+                  style={{ backgroundColor: pa.color ?? undefined }}
                 />
                 {pa.name}
               </TabsTrigger>
@@ -345,7 +345,7 @@ function WorkflowDialog({
   onOpenChange: (open: boolean) => void
   editing: WorkflowTemplate | null
   tenantId: string
-  practiceAreas: { id: string; name: string; color: string }[]
+  practiceAreas: { id: string; name: string; color: string | null }[]
   allMatterTypes: MatterType[]
   taskTemplates: { id: string; name: string }[]
 }) {

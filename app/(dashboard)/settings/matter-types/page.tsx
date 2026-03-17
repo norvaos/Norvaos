@@ -1313,7 +1313,7 @@ function DocumentSlotSection({
   const allTags = useMemo(() => {
     const tags = new Set<string>()
     for (const e of libraryEntries ?? []) {
-      for (const t of e.tags) tags.add(t)
+      for (const t of (e.tags ?? [])) tags.add(t)
     }
     return Array.from(tags).sort()
   }, [libraryEntries])
@@ -1321,7 +1321,7 @@ function DocumentSlotSection({
   const filteredLibrary = useMemo(() => {
     if (!libraryEntries) return []
     return libraryEntries.filter((e) => {
-      if (filterTag !== 'all' && !e.tags.includes(filterTag)) return false
+      if (filterTag !== 'all' && !(e.tags ?? []).includes(filterTag)) return false
       if (search) {
         const q = search.toLowerCase()
         return e.slot_name.toLowerCase().includes(q) || (e.description ?? '').toLowerCase().includes(q)
@@ -3035,7 +3035,7 @@ function PracticeAreasSection({ tenantId, onPracticeAreasChange }: { tenantId: s
             const isToggling = toggleMutation.isPending && (toggleMutation.variables as { id: string } | undefined)?.id === pa.id
             return (
               <div key={pa.id} className={cn('flex items-center gap-3 px-4 py-2.5 transition-colors hover:bg-slate-50', !enabled && 'opacity-60')}>
-                <div className="h-3 w-3 shrink-0 rounded-full" style={{ backgroundColor: pa.color }} />
+                <div className="h-3 w-3 shrink-0 rounded-full" style={{ backgroundColor: pa.color ?? undefined }} />
                 <span className="flex-1 text-sm font-medium text-slate-900">{pa.name}</span>
                 {!enabled && <Badge variant="secondary" className="text-xs">Disabled</Badge>}
                 <div className="flex items-center gap-1.5">
@@ -3081,7 +3081,7 @@ function PracticeAreasSection({ tenantId, onPracticeAreasChange }: { tenantId: s
           onOpenChange={(open) => { if (!open) setEditTarget(null) }}
           title="Edit Practice Area"
           description="Update the name or colour for this practice area."
-          initialValues={{ name: editTarget.name, color: editTarget.color }}
+          initialValues={{ name: editTarget.name, color: editTarget.color ?? '' }}
           onSubmit={(values) => updateMutation.mutate({ id: editTarget.id, values })}
           isLoading={updateMutation.isPending}
         />

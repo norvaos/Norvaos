@@ -158,7 +158,7 @@ async function handlePost(request: NextRequest) {
         )
       }
 
-      slotData = slot
+      slotData = { ...slot, accepted_file_types: slot.accepted_file_types ?? [], max_file_size_bytes: slot.max_file_size_bytes ?? 0 }
 
       // Fetch matter number for auto-rename
       const { data: matterRow } = await auth.supabase

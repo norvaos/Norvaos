@@ -42,14 +42,16 @@ async function handlePost(request: Request) {
 
     // 2. Parse + validate body
     const body = await request.json()
-    const { contactId, formCode } = body as {
+    const { contactId, matterId, personRole = 'principal_applicant', formCode } = body as {
       contactId?: string
+      matterId?: string   // preferred — reads matter-scoped profile
+      personRole?: string // which person in the matter (default: principal_applicant)
       formCode?: string
     }
 
-    if (!contactId || typeof contactId !== 'string') {
+    if (!contactId && !matterId) {
       return NextResponse.json(
-        { success: false, error: 'contactId is required' },
+        { success: false, error: 'Either contactId or matterId is required' },
         { status: 400 },
       )
     }
@@ -82,32 +84,94 @@ async function handlePost(request: Request) {
       )
     }
 
-    // 4. Fetch contact's immigration_data and the current user's name for signature
-    const { data: contact, error: contactError } = await auth.supabase
-      .from('contacts')
-      .select('id, first_name, last_name, immigration_data')
-      .eq('id', contactId)
-      .single()
+    // 4. Resolve profile — matter-scoped takes priority over contact canonical
+    //
+    //   Path A (preferred): matterId provided → read matter_people.profile_data
+    //     for the specified person_role. This is the matter-scoped snapshot.
+    //
+    //   Path B (legacy fallback): only contactId provided → read
+    //     contacts.immigration_data. Kept for backward compatibility.
+
+    let profile: Record<string, unknown> = {}
+    let contactFirstName = ''
+    let contactLastName = ''
 
     // Fetch current user's name for the "Use of Representative" signature
-    const { data: currentUser } = await auth.supabase
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: currentUser } = await (auth.supabase as any)
       .from('users')
       .select('first_name, last_name')
       .eq('auth_user_id', auth.userId)
-      .single()
+      .single() as { data: { first_name: string | null; last_name: string | null } | null; error: unknown }
     const representativeName = currentUser
       ? [currentUser.first_name, currentUser.last_name].filter(Boolean).join(' ')
       : ''
 
-    if (contactError || !contact) {
-      return NextResponse.json(
-        { success: false, error: 'Contact not found' },
-        { status: 404 },
-      )
-    }
+    if (matterId) {
+      // Path A: matter-scoped profile
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: person, error: personError } = await (auth.supabase as any)
+        .from('matter_people')
+        .select('id, first_name, last_name, profile_data, is_locked, contact_id')
+        .eq('matter_id', matterId)
+        .eq('person_role', personRole)
+        .eq('is_active', true)
+        .maybeSingle() as {
+          data: { id: string; first_name: string; last_name: string; profile_data: Record<string, unknown> | null; is_locked: boolean; contact_id: string | null } | null
+          error: Error | null
+        }
 
-    const profile =
-      (contact.immigration_data as Record<string, unknown>) ?? {}
+      if (personError || !person) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: `No ${personRole} found in matter ${matterId}. Add the person to the matter first.`,
+          },
+          { status: 404 },
+        )
+      }
+
+      profile = (person.profile_data as Record<string, unknown>) ?? {}
+      contactFirstName = person.first_name
+      contactLastName  = person.last_name
+
+      // If profile_data is empty but a contact_id exists, fall back to
+      // contacts.immigration_data as a one-time convenience. Staff should
+      // run snapshot_contact_profile_to_matter to populate properly.
+      if (Object.keys(profile).length === 0 && person.contact_id) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { data: fallback } = await (auth.supabase as any)
+          .from('contacts')
+          .select('immigration_data')
+          .eq('id', person.contact_id)
+          .single() as { data: { immigration_data: Record<string, unknown> | null } | null; error: unknown }
+        if (fallback?.immigration_data) {
+          profile = fallback.immigration_data
+        }
+      }
+    } else {
+      // Path B: legacy — contact-level canonical profile
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: contact, error: contactError } = await (auth.supabase as any)
+        .from('contacts')
+        .select('id, first_name, last_name, immigration_data')
+        .eq('id', contactId as string)
+        .single() as {
+          data: { id: string; first_name: string | null; last_name: string | null; immigration_data: Record<string, unknown> | null } | null
+          error: Error | null
+        }
+
+      if (contactError || !contact) {
+        return NextResponse.json(
+          { success: false, error: 'Contact not found' },
+          { status: 404 },
+        )
+      }
+
+      profile          = contact.immigration_data ?? {}
+      contactFirstName = contact.first_name ?? ''
+      contactLastName  = contact.last_name  ?? ''
+    }
 
     // 5. Load blank PDF template
     //    Try local public/ircc-forms/ first (dev convenience), then Supabase Storage.
@@ -191,7 +255,7 @@ async function handlePost(request: Request) {
     }
 
     // 6. Build filename
-    const clientName = [contact.first_name, contact.last_name]
+    const clientName = [contactFirstName, contactLastName]
       .filter(Boolean)
       .join('_')
       .replace(/\s+/g, '_') || 'client'

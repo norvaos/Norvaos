@@ -127,7 +127,7 @@ async function handleGet() {
     channelResults.sort((a, b) => {
       const aTime = a.last_message?.created_at ?? a.created_at
       const bTime = b.last_message?.created_at ?? b.created_at
-      return new Date(bTime).getTime() - new Date(aTime).getTime()
+      return new Date(bTime ?? '').getTime() - new Date(aTime ?? '').getTime()
     })
 
     return NextResponse.json({ channels: channelResults })

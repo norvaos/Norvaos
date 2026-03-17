@@ -23,8 +23,11 @@ import type {
 
 // ─── Types ──────────────────────────────────────────────────────────────────────
 
-type AssignmentTemplateRow = Database['public']['Tables']['ircc_form_assignment_templates']['Row']
-type FormInstanceInsert = Database['public']['Tables']['matter_form_instances']['Insert']
+// Tables not yet deployed to production DB — typed as any until migration lands
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AssignmentTemplateRow = any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type FormInstanceInsert = any
 
 /**
  * Internal identity type for diffing expected vs. current instances.
@@ -219,7 +222,8 @@ async function fetchEngineData(
   caseTypeId?: string | null
 ) {
   // 1. Fetch published assignment templates
-  let templateQuery = supabase
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let templateQuery = (supabase as any)
     .from('ircc_form_assignment_templates')
     .select('*')
     .eq('tenant_id', tenantId)
@@ -240,7 +244,7 @@ async function fetchEngineData(
   }
 
   // 2. Fetch referenced forms for snapshot data
-  const formIds = [...new Set(templates.map((t) => t.form_id))]
+  const formIds = [...new Set(templates.map((t: { form_id: string }) => t.form_id))]
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data: formRows } = await (supabase as any)
     .from('ircc_forms')
@@ -332,7 +336,8 @@ export async function generateFormInstances(params: GenerateFormInstancesParams)
     is_active: true,
   }))
 
-  await supabase
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  await (supabase as any)
     .from('matter_form_instances')
     .upsert(inserts, {
       onConflict: 'matter_id,assignment_template_id,person_id',
@@ -414,7 +419,8 @@ export async function regenerateFormInstances(
   }
 
   // Fetch current instance set (both active and inactive for reactivation check)
-  const { data: currentInstances } = await supabase
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: currentInstances } = await (supabase as any)
     .from('matter_form_instances')
     .select('*')
     .eq('matter_id', matterId)
@@ -445,7 +451,8 @@ export async function regenerateFormInstances(
     } else if (currentInactiveMap.has(key)) {
       // Exists but inactive — reactivate
       const existing = currentInactiveMap.get(key)!
-      await supabase
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await (supabase as any)
         .from('matter_form_instances')
         .update({ is_active: true, deactivated_at: null })
         .eq('id', existing.id)
@@ -456,7 +463,8 @@ export async function regenerateFormInstances(
       })
     } else {
       // New — insert
-      await supabase.from('matter_form_instances').insert({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await (supabase as any).from('matter_form_instances').insert({
         tenant_id: tenantId,
         matter_id: matterId,
         person_id: expected.personId,
@@ -483,7 +491,8 @@ export async function regenerateFormInstances(
   // Current active instances not in expected set → soft-deactivate
   for (const [key, existing] of currentActiveMap) {
     if (!expectedMap.has(key)) {
-      await supabase
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await (supabase as any)
         .from('matter_form_instances')
         .update({
           is_active: false,

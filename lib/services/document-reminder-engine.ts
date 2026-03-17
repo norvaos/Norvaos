@@ -213,7 +213,7 @@ async function processMatterReminder(
   }
 
   // 4. Calculate days since request
-  const requestDate = new Date(latestRequest.created_at)
+  const requestDate = new Date(latestRequest.created_at ?? '')
   const daysSinceRequest = Math.floor(
     (now.getTime() - requestDate.getTime()) / (1000 * 60 * 60 * 24)
   )
@@ -263,7 +263,7 @@ async function processMatterReminder(
   const isEscalation = daysSinceRequest >= config.escalationAfterDays
 
   if (isEscalation) {
-    await sendStaffEscalation(supabase, tenantId, matterId, slotInfo, matter?.responsible_lawyer_id ?? null, reminderNumber, latestRequest.created_at)
+    await sendStaffEscalation(supabase, tenantId, matterId, slotInfo, matter?.responsible_lawyer_id ?? null, reminderNumber, latestRequest.created_at ?? '')
     stats.staffEscalations++
     return
   }

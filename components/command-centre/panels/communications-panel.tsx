@@ -129,7 +129,7 @@ export function CommunicationsPanel() {
                     <div className="flex items-center gap-2 mt-1">
                       <span className="text-xs text-slate-400 flex items-center gap-1">
                         <Clock className="h-3 w-3" />
-                        {new Date(comm.created_at).toLocaleString('en-US', {
+                        {new Date(comm.created_at ?? '').toLocaleString('en-US', {
                           month: 'short',
                           day: 'numeric',
                           hour: 'numeric',

@@ -251,7 +251,7 @@ async function handlePost(request: Request) {
     }
 
     // ── Fetch pipeline stages for stage moves ─────────────────────
-    let stages: { id: string; name: string; is_win_stage: boolean; is_lost_stage: boolean }[] = []
+    let stages: { id: string; name: string; is_win_stage: boolean | null; is_lost_stage: boolean | null }[] = []
     if (lead.pipeline_id) {
       const { data: stageData } = await supabase
         .from('pipeline_stages')

@@ -261,7 +261,7 @@ export default function PracticeAreasPage() {
           }}
           title="Edit Practice Area"
           description="Update the name or colour for this practice area."
-          initialValues={{ name: editTarget.name, color: editTarget.color }}
+          initialValues={{ name: editTarget.name, color: editTarget.color ?? '' }}
           onSubmit={(values) => updateMutation.mutate({ id: editTarget.id, values })}
           isLoading={updateMutation.isPending}
         />
@@ -327,7 +327,7 @@ function PracticeAreaRow({
       {/* Colour swatch */}
       <div
         className="h-3 w-3 shrink-0 rounded-full"
-        style={{ backgroundColor: pa.color }}
+        style={{ backgroundColor: pa.color ?? undefined }}
         aria-hidden="true"
       />
 

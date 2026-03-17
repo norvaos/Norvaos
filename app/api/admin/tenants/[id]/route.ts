@@ -87,7 +87,7 @@ const handleGet = withPlatformAdmin(async (_request, { params }) => {
   }))
 
   const recentAudit = [...tenantAudit, ...platformAudit]
-    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+    .sort((a, b) => new Date(b.created_at ?? '').getTime() - new Date(a.created_at ?? '').getTime())
     .slice(0, 20)
 
   // Compute effective feature flags

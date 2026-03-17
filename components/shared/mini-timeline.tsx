@@ -173,7 +173,7 @@ export function MiniTimeline({
         title: formatAuditTitle(log.action, log.entity_type),
         description: changesDesc,
         userId: log.user_id,
-        createdAt: log.created_at,
+        createdAt: log.created_at ?? '',
         entityType: log.entity_type,
       })
     })
@@ -186,7 +186,7 @@ export function MiniTimeline({
         title: a.title,
         description: a.description,
         userId: a.user_id,
-        createdAt: a.created_at,
+        createdAt: a.created_at ?? '',
         entityType: 'activity',
       })
     })

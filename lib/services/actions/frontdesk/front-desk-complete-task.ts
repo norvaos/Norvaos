@@ -95,14 +95,14 @@ export const frontDeskCompleteTaskAction: ActionDefinition<FrontDeskCompleteTask
     if (input.spawnNextTaskTemplateId) {
       const { data: templateItem } = await supabase
         .from('task_template_items')
-        .select('title, description, priority, due_days_offset, assigned_role')
+        .select('title, description, priority, days_offset, assign_to_role')
         .eq('id', input.spawnNextTaskTemplateId)
-        .eq('tenant_id', tenantId)
+        .eq('template_id', input.spawnNextTaskTemplateId)
         .single()
 
       if (templateItem) {
         const dueDate = new Date()
-        dueDate.setDate(dueDate.getDate() + (templateItem.due_days_offset ?? 1))
+        dueDate.setDate(dueDate.getDate() + (templateItem.days_offset ?? 1))
 
         assertNoError(
           await supabase.from('tasks').insert({

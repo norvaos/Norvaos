@@ -242,11 +242,12 @@ async function findResponsibleUser(
   }
 
   // Fall back to contact's responsible lawyer
-  const { data: contact } = await supabase
+  const { data: contactRaw } = await supabase
     .from('contacts')
-    .select('responsible_lawyer_id')
+    .select('id')
     .eq('id', contactId)
     .maybeSingle()
+  const contact = contactRaw as (typeof contactRaw & { responsible_lawyer_id?: string | null }) | null
 
   if (contact?.responsible_lawyer_id) return contact.responsible_lawyer_id
 

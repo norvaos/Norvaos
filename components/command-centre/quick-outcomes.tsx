@@ -34,7 +34,7 @@ import { useCommandPermissions } from '@/lib/hooks/use-command-permissions'
 // ─── Stage discovery helpers ────────────────────────────────────────
 
 function findStageByPattern(
-  stages: { id: string; name: string; is_win_stage: boolean; is_lost_stage: boolean }[],
+  stages: { id: string; name: string; is_win_stage: boolean | null; is_lost_stage: boolean | null }[],
   pattern: RegExp
 ) {
   return stages.find((s) => pattern.test(s.name))

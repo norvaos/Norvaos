@@ -117,7 +117,7 @@ async function checkConflictCleared(
 
   // Check the derived conflict_status (which comes from the conflict engine)
   const clearedStatuses = ['cleared', 'cleared_by_lawyer', 'waiver_obtained']
-  const passed = clearedStatuses.includes(lead.conflict_status)
+  const passed = clearedStatuses.includes(lead.conflict_status ?? '')
 
   return {
     gate: 'conflict_cleared',

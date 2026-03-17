@@ -24,7 +24,8 @@ async function fetchTenantBranding(supabase: SupabaseClient<Database>, tenantId:
     .select('name, logo_url, primary_color')
     .eq('id', tenantId)
     .single()
-  return data ?? { name: 'Your Law Firm', logo_url: null, primary_color: '#3b82f6' }
+  if (!data) return { name: 'Your Law Firm', logo_url: null, primary_color: '#3b82f6' }
+  return { ...data, primary_color: data.primary_color ?? '#3b82f6' }
 }
 
 interface AppointmentDetails {

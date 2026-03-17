@@ -96,7 +96,7 @@ export async function rollbackBatch(
 
           const previousStatusMap: Record<string, string> = {}
           for (const m of currentMatters ?? []) {
-            previousStatusMap[m.id] = m.status
+            previousStatusMap[m.id] = m.status ?? ''
           }
 
           const { error: revertErr } = await admin

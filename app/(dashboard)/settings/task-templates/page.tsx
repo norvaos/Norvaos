@@ -328,7 +328,7 @@ function TemplateItemFormDialog({
     title: string
     description: string | null
     priority: string | null
-    due_days_offset: number | null
+    days_offset: number | null
   } | null
   existingItemCount: number
 }) {
@@ -342,7 +342,7 @@ function TemplateItemFormDialog({
       title: item?.title ?? '',
       description: item?.description ?? '',
       priority: item?.priority ?? 'medium',
-      due_days_offset: item?.due_days_offset ?? null,
+      due_days_offset: item?.days_offset ?? null,
     },
   })
 
@@ -352,7 +352,7 @@ function TemplateItemFormDialog({
         title: item?.title ?? '',
         description: item?.description ?? '',
         priority: item?.priority ?? 'medium',
-        due_days_offset: item?.due_days_offset ?? null,
+        due_days_offset: item?.days_offset ?? null,
       })
     }
   }, [open, item, form])
@@ -604,7 +604,7 @@ function TemplateDetailView({
     title: string
     description: string | null
     priority: string | null
-    due_days_offset: number | null
+    days_offset: number | null
   } | null>(null)
   const [deleteItemTarget, setDeleteItemTarget] = useState<{
     id: string
@@ -743,10 +743,10 @@ function TemplateDetailView({
                       <PriorityBadge priority={item.priority ?? 'medium'} />
                     </TableCell>
                     <TableCell>
-                      {item.due_days_offset != null ? (
+                      {item.days_offset != null ? (
                         <span className="text-sm text-slate-700">
-                          {item.due_days_offset}{' '}
-                          {item.due_days_offset === 1 ? 'day' : 'days'}
+                          {item.days_offset}{' '}
+                          {item.days_offset === 1 ? 'day' : 'days'}
                         </span>
                       ) : (
                         <span className="text-sm text-slate-400">--</span>
@@ -771,7 +771,7 @@ function TemplateDetailView({
                                 title: item.title,
                                 description: item.description,
                                 priority: item.priority,
-                                due_days_offset: item.due_days_offset,
+                                days_offset: item.days_offset,
                               })
                               setItemFormOpen(true)
                             }}

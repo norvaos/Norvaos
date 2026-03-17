@@ -165,7 +165,7 @@ export function ActivityTimeline({ tenantId, matterId, contactId, entityType, en
       title: a.title,
       description: a.description,
       userId: a.user_id,
-      createdAt: a.created_at,
+      createdAt: a.created_at ?? '',
       icon,
       iconColor,
     })
@@ -195,7 +195,7 @@ export function ActivityTimeline({ tenantId, matterId, contactId, entityType, en
       title: `${log.action.charAt(0).toUpperCase() + log.action.slice(1)} ${log.entity_type}`,
       description: changesDesc,
       userId: log.user_id,
-      createdAt: log.created_at,
+      createdAt: log.created_at ?? '',
       icon: getAuditIcon(log.action),
       iconColor: getAuditColor(log.action),
       metadata: changes,

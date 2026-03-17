@@ -139,7 +139,7 @@ export function OverviewTab({
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
-          <InfoRow label="Billing Type" value={getBillingLabel(matter.billing_type)} />
+          <InfoRow label="Billing Type" value={getBillingLabel(matter.billing_type ?? '')} />
           {matter.hourly_rate != null && (
             <InfoRow
               label="Hourly Rate"

@@ -405,7 +405,7 @@ export function TaskTable({
         cell: ({ row }) => (
           <div onClick={(e) => e.stopPropagation()}>
             <TaskStatusCell
-              status={row.original.status}
+              status={row.original.status ?? ''}
               onStatusChange={handleStatusUpdate(row.original.id)}
             />
           </div>
@@ -426,7 +426,7 @@ export function TaskTable({
         cell: ({ row }) => (
           <div onClick={(e) => e.stopPropagation()}>
             <TaskPriorityCell
-              priority={row.original.priority}
+              priority={row.original.priority ?? ''}
               onPriorityChange={handlePriorityUpdate(row.original.id)}
             />
           </div>
@@ -595,7 +595,7 @@ export function TaskTable({
           const task = row.original
           return (
             <Checkbox
-              checked={task.custom_checkbox}
+              checked={task.custom_checkbox ?? false}
               onCheckedChange={(checked) =>
                 handleCheckboxToggle(task.id, !!checked)
               }

@@ -228,7 +228,8 @@ async function fetchTenantBranding(supabase: SupabaseClient<Database>, tenantId:
     .select('name, logo_url, primary_color')
     .eq('id', tenantId)
     .single()
-  return data ?? { name: 'Your Law Firm', logo_url: null, primary_color: '#3b82f6' }
+  if (!data) return { name: 'Your Law Firm', logo_url: null, primary_color: '#3b82f6' }
+  return { ...data, primary_color: data.primary_color ?? '#3b82f6' }
 }
 
 // ─── Core: Freeze Document ───────────────────────────────────────────────────
@@ -708,7 +709,7 @@ export async function createAndSendSigningRequest(
         const { html, text, subject } = await renderSigningRequestEmail({
           firmName: tenant.name,
           firmLogoUrl: tenant.logo_url,
-          primaryColor: tenant.primary_color,
+          primaryColor: tenant.primary_color ?? "",
           signerFirstName,
           documentTitle: docRecord.title,
           matterReference: matterRef,
@@ -1255,7 +1256,7 @@ export async function executeSignature(
           const { html, text, subject } = await renderSigningCompletedEmail({
             firmName: tenant.name,
             firmLogoUrl: tenant.logo_url,
-            primaryColor: tenant.primary_color,
+            primaryColor: tenant.primary_color ?? "",
             signerName: req.signer_name as string,
             documentTitle: docRecord.title as string,
             matterReference: '',
@@ -1369,7 +1370,7 @@ export async function declineSignature(
           const { html, text, subject } = await renderSigningDeclinedEmail({
             firmName: tenant.name,
             firmLogoUrl: tenant.logo_url,
-            primaryColor: tenant.primary_color,
+            primaryColor: tenant.primary_color ?? "",
             signerName: req.signer_name as string,
             documentTitle: docTitle,
             matterReference: '',
@@ -1594,7 +1595,7 @@ export async function sendReminder(
         const { html, text, subject } = await renderSigningReminderEmail({
           firmName: tenant.name,
           firmLogoUrl: tenant.logo_url,
-          primaryColor: tenant.primary_color,
+          primaryColor: tenant.primary_color ?? "",
           signerFirstName,
           documentTitle: docTitle,
           matterReference: '',

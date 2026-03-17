@@ -59,7 +59,7 @@ export async function reviewDocumentSlot(params: ReviewParams): Promise<ReviewRe
     p_slot_id: slotId,
     p_user_id: userId,
     p_action: action,
-    p_reason: reason ?? null,
+    p_reason: reason ?? undefined,
   })
 
   if (error) {

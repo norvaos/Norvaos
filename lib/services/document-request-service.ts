@@ -144,7 +144,7 @@ export async function sendDocumentRequest(
     })
 
     // 5. Create document_requests audit record
-    const { data: requestRecord } = await supabase
+    const { data: requestRecord } = await (supabase as import('@supabase/supabase-js').SupabaseClient<any>)
       .from('document_requests')
       .insert({
         tenant_id: tenantId,

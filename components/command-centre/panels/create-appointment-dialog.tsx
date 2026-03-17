@@ -104,7 +104,7 @@ export function CreateAppointmentDialog({ open, onOpenChange }: CreateAppointmen
         answers: {
           type: appointmentType,
           format,
-        } as Record<string, unknown>,
+        } as import('@/lib/types/database').Json,
         status: 'confirmed',
       })
 

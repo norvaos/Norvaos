@@ -114,11 +114,11 @@ export const TaskKanbanCard = memo(function TaskKanbanCard({
               <TooltipTrigger asChild>
                 <span
                   className="mt-0.5 inline-block h-2.5 w-2.5 flex-shrink-0 rounded-full"
-                  style={{ backgroundColor: PRIORITY_COLORS[task.priority] ?? '#c3c6d4' }}
+                  style={{ backgroundColor: PRIORITY_COLORS[task.priority ?? ''] ?? '#c3c6d4' }}
                 />
               </TooltipTrigger>
               <TooltipContent>
-                {PRIORITY_LABELS[task.priority] ?? 'Normal'} priority
+                {PRIORITY_LABELS[task.priority ?? ''] ?? 'Normal'} priority
               </TooltipContent>
             </Tooltip>
 

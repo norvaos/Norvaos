@@ -16,7 +16,8 @@ import { withTiming } from '@/lib/middleware/request-timing'
  *
  * Handles the OAuth callback from Microsoft.
  * Exchanges the authorization code for tokens, fetches the user profile,
- * encrypts tokens, and upserts the microsoft_connections row.
+ * encrypts tokens, upserts the microsoft_connections row, and creates the
+ * email_accounts row to bridge into the email sync pipeline.
  */
 async function handleGet(request: NextRequest) {
   const appUrl = process.env.NEXT_PUBLIC_APP_URL!
@@ -95,6 +96,42 @@ async function handleGet(request: NextRequest) {
         calendar_sync_enabled: true,
       })
       .eq('id', state.userId)
+
+    // 6b. Create/update email_accounts row — bridges microsoft_connections to the
+    //     email sync pipeline (email-sync.ts reads email_accounts for delta state,
+    //     then resolves microsoft_connections for Graph API calls via graphFetch).
+    const emailAddress = profile.mail || profile.userPrincipalName
+    if (emailAddress) {
+      const { error: emailAcctError } = await admin
+        .from('email_accounts')
+        .upsert(
+          {
+            tenant_id: state.tenantId,
+            user_id: state.userId,
+            account_type: 'personal',
+            provider: 'microsoft',
+            email_address: emailAddress,
+            display_name: profile.displayName || null,
+            encrypted_access_token: accessTokenEncrypted,
+            encrypted_refresh_token: refreshTokenEncrypted,
+            token_expires_at: tokenExpiresAt,
+            authorized_user_ids: [state.userId],
+            sync_enabled: true,
+            is_active: true,
+            error_count: 0,
+            last_error: null,
+            updated_at: new Date().toISOString(),
+          },
+          { onConflict: 'tenant_id,email_address' }
+        )
+
+      if (emailAcctError) {
+        // Log but don't fail — the microsoft_connections row is already saved
+        console.error('[microsoft/callback] email_accounts upsert error:', emailAcctError)
+      } else {
+        console.log('[microsoft/callback] email_accounts row created/updated for:', emailAddress)
+      }
+    }
 
     // 7. Create the NorvaOS root folder in OneDrive (awaited — must complete before redirect)
     const { data: connRow } = await admin

@@ -323,7 +323,7 @@ export function useReportTaskStats(tenantId: string, range: DateRange, filters?:
 
       const statusCounts: Record<string, number> = {}
       for (const t of allTasksRes.data ?? []) {
-        statusCounts[t.status] = (statusCounts[t.status] || 0) + 1
+        statusCounts[t.status ?? ''] = (statusCounts[t.status ?? ''] || 0) + 1
       }
       const statusBreakdown = TASK_STATUSES.map((ts) => ({
         name: ts.label,

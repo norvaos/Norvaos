@@ -389,7 +389,7 @@ async function checkAndAutoClose(
     current_stage: string | null
     last_inbound_at: string | null
     last_outbound_at: string | null
-    created_at: string
+    created_at: string | null
   },
   params: {
     targetClosedStage: string
@@ -416,7 +416,7 @@ async function checkAndAutoClose(
   if ((attemptCount ?? 0) < params.cadence.length) return false
 
   // Check if idle period has been exceeded
-  const lastActivity = lead.last_inbound_at ?? lead.last_outbound_at ?? lead.created_at
+  const lastActivity = lead.last_inbound_at ?? lead.last_outbound_at ?? lead.created_at ?? ''
   const lastActivityDate = new Date(lastActivity)
   const businessDaysSinceActivity = businessDaysBetween(lastActivityDate, now, timezone)
 

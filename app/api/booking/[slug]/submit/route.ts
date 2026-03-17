@@ -237,7 +237,7 @@ async function handlePost(
         guest_email: email.toLowerCase(),
         guest_phone: phone ?? null,
         guest_notes: notes ?? null,
-        answers: answers ?? {},
+        answers: (answers ?? {}) as import('@/lib/types/database').Json,
         status: 'confirmed',
       })
       .select('id')

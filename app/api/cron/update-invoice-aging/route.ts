@@ -59,7 +59,7 @@ async function handlePost(request: Request) {
     const sevenDaysAgoStr = sevenDaysAgo.toISOString()
 
     for (const invoice of invoices) {
-      const dueDate = new Date(invoice.due_date)
+      const dueDate = new Date(invoice.due_date ?? '')
       const daysOverdue = Math.floor(
         (today.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24)
       )

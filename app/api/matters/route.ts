@@ -5,6 +5,7 @@ import { activateWorkflowKit, activateImmigrationKit } from '@/lib/services/kit-
 import { revalidateIntake } from '@/lib/services/intake-revalidate'
 import { invalidateMattersList } from '@/lib/services/cache-invalidation'
 import { withTiming } from '@/lib/middleware/request-timing'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { z } from 'zod'
 
 const createMatterSchema = z.object({
@@ -193,16 +194,35 @@ async function handlePost(request: Request) {
             .single()
 
           if (contact) {
-            await auth.supabase.from('matter_people').insert({
-              tenant_id: auth.tenantId,
-              matter_id: matter.id,
-              contact_id: contact_id,
-              person_role: 'principal_applicant',
-              first_name: contact.first_name || '',
-              last_name: contact.last_name || '',
-              email: contact.email_primary || null,
-              phone: contact.phone_primary || null,
-            })
+            const { data: newPerson } = await auth.supabase
+              .from('matter_people')
+              .insert({
+                tenant_id: auth.tenantId,
+                matter_id: matter.id,
+                contact_id: contact_id,
+                person_role: 'principal_applicant',
+                first_name: contact.first_name || '',
+                last_name: contact.last_name || '',
+                email: contact.email_primary || null,
+                phone: contact.phone_primary || null,
+              })
+              .select('id')
+              .single()
+
+            // Carry-forward: snapshot contacts.immigration_data → matter_people.profile_data
+            // Non-fatal — if contact has no immigration_data, profile_data starts as {}
+            // and staff can populate it in the workbench.
+            if (newPerson?.id) {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              await (auth.supabase as any).rpc('snapshot_contact_profile_to_matter', {
+                p_matter_person_id: newPerson.id,
+                p_contact_id:       contact_id,
+                p_tenant_id:        auth.tenantId,
+                p_synced_by:        auth.userId,
+              }).catch((snapshotErr: unknown) => {
+                console.error('Profile carry-forward error (non-fatal):', snapshotErr)
+              })
+            }
           }
         }
       }

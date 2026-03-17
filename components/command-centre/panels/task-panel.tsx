@@ -230,8 +230,8 @@ export function TaskPanel() {
 
       const today = new Date()
       const tasksToCreate = items.map((item) => {
-        const dueDate = item.due_days_offset
-          ? new Date(today.getTime() + item.due_days_offset * 86400000)
+        const dueDate = item.days_offset
+          ? new Date(today.getTime() + item.days_offset * 86400000)
               .toISOString()
               .split('T')[0]
           : null
@@ -493,7 +493,7 @@ export function TaskPanel() {
                     {/* Status dot */}
                     <span
                       className="h-2 w-2 rounded-full shrink-0"
-                      style={{ backgroundColor: STATUS_COLORS[task.status] ?? '#c3c6d4' }}
+                      style={{ backgroundColor: STATUS_COLORS[task.status ?? ''] ?? '#c3c6d4' }}
                     />
 
                     {/* Due date */}

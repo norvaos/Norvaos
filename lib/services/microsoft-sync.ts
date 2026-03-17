@@ -602,8 +602,8 @@ export async function syncTasksPush(
         const msTaskBody: Record<string, unknown> = {
           title: task.title,
           body: task.description ? { contentType: 'text', content: task.description } : undefined,
-          status: LOCAL_STATUS_TO_MS[task.status] || 'notStarted',
-          importance: LOCAL_PRIORITY_TO_MS[task.priority] || 'normal',
+          status: LOCAL_STATUS_TO_MS[task.status ?? ''] || 'notStarted',
+          importance: LOCAL_PRIORITY_TO_MS[task.priority ?? ''] || 'normal',
         }
 
         if (task.due_date) {

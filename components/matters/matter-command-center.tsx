@@ -163,10 +163,10 @@ export function MatterCommandCenter({
             matter_number: matter.matter_number,
             title: matter.title,
             opened_at: null,
-            created_at: matter.created_at,
+            created_at: matter.created_at ?? '',
             responsible_lawyer_id: matter.responsible_lawyer_id,
-            practice_area_id: matter.practice_area_id,
-            status: matter.status,
+            practice_area_id: matter.practice_area_id ?? '',
+            status: matter.status ?? '',
           }}
           users={users}
           practiceAreaName={practiceArea?.name ?? null}
@@ -256,7 +256,7 @@ export function MatterCommandCenter({
               </TabsContent>
 
               <TabsContent value="forms" className="space-y-4">
-                <FormsTab matterId={matterId} matterStatus={matter.status} />
+                <FormsTab matterId={matterId} matterStatus={matter.status ?? undefined} />
               </TabsContent>
 
               <TabsContent value="activity" className="space-y-4">

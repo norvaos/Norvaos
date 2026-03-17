@@ -736,7 +736,7 @@ export function ImmigrationDetailsPanel({ matterId, tenantId, fieldConfig }: Imm
             />
             <InlineBooleanField
               label="Letter of Acceptance"
-              value={immigration.letter_of_acceptance}
+              value={immigration.letter_of_acceptance ?? false}
               fieldKey="letter_of_acceptance"
               onSave={handleBooleanSave}
             />
@@ -903,7 +903,7 @@ export function ImmigrationDetailsPanel({ matterId, tenantId, fieldConfig }: Imm
             />
             <InlineBooleanField
               label="Spouse Included"
-              value={immigration.spouse_included}
+              value={immigration.spouse_included ?? false}
               fieldKey="spouse_included"
               onSave={handleBooleanSave}
             />
@@ -990,7 +990,7 @@ export function ImmigrationDetailsPanel({ matterId, tenantId, fieldConfig }: Imm
       <CollapsibleSection icon={Shield} title="Background" columns={2} defaultOpen={false}>
         <InlineBooleanField
           label="Prior Refusals"
-          value={immigration.prior_refusals}
+          value={immigration.prior_refusals ?? false}
           fieldKey="prior_refusals"
           onSave={handleBooleanSave}
           detailsFieldKey="prior_refusal_details"
@@ -999,7 +999,7 @@ export function ImmigrationDetailsPanel({ matterId, tenantId, fieldConfig }: Imm
         />
         <InlineBooleanField
           label="Criminal Record"
-          value={immigration.has_criminal_record}
+          value={immigration.has_criminal_record ?? false}
           fieldKey="has_criminal_record"
           onSave={handleBooleanSave}
           detailsFieldKey="criminal_record_details"
@@ -1008,7 +1008,7 @@ export function ImmigrationDetailsPanel({ matterId, tenantId, fieldConfig }: Imm
         />
         <InlineBooleanField
           label="Medical Issues"
-          value={immigration.has_medical_issues}
+          value={immigration.has_medical_issues ?? false}
           fieldKey="has_medical_issues"
           onSave={handleBooleanSave}
           detailsFieldKey="medical_issue_details"
@@ -1130,7 +1130,7 @@ export function ImmigrationDetailsPanel({ matterId, tenantId, fieldConfig }: Imm
           <CollapsibleSection icon={Heart} title="Family" columns={3} defaultOpen={false}>
             <InlineBooleanField
               label="Spouse Included"
-              value={immigration.spouse_included}
+              value={immigration.spouse_included ?? false}
               fieldKey="spouse_included"
               onSave={handleBooleanSave}
             />
@@ -1151,7 +1151,7 @@ export function ImmigrationDetailsPanel({ matterId, tenantId, fieldConfig }: Imm
       <CollapsibleSection icon={Wallet} title="Retainer & Fees" columns={3} defaultOpen={false}>
         <InlineBooleanField
           label="Retainer Signed"
-          value={immigration.retainer_signed}
+          value={immigration.retainer_signed ?? false}
           fieldKey="retainer_signed"
           onSave={handleBooleanSave}
         />

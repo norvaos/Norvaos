@@ -7,12 +7,12 @@
  *   A. Outstanding Balance Summary Card
  *   B. Invoice List (with status badges + actions)
  *   C. Generate Invoice Sheet
- *   D. Milestone Fees Panel (empty state — table not in schema)
+ *   D. Milestone Fees Panel
  *   E. Trust Account Widget
  */
 
 import { useState } from 'react'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
@@ -64,7 +64,7 @@ import {
   useSendReceipt,
   useDeleteInvoice,
 } from '@/lib/queries/invoicing'
-import type { Database } from '@/lib/types/database'
+import type { Database, MatterBillingMilestoneRow } from '@/lib/types/database'
 
 // ── Local types ───────────────────────────────────────────────────────────────
 
@@ -501,21 +501,273 @@ function RecordPaymentDialog({ invoiceId, tenantId, contactId, onClose }: Record
   )
 }
 
-// ── Milestone Empty State ─────────────────────────────────────────────────────
+// ── Milestones Panel ──────────────────────────────────────────────────────────
 
-function MilestoneEmptyState() {
+function milestoneBadgeClass(status: string): string {
+  switch (status) {
+    case 'complete':   return 'bg-green-100 text-green-700 border-green-200'
+    case 'billed':     return 'bg-blue-100 text-blue-700 border-blue-200'
+    case 'cancelled':  return 'bg-gray-100 text-gray-500 border-gray-200'
+    default:           return 'bg-amber-100 text-amber-700 border-amber-200'
+  }
+}
+
+interface MilestonesPanelProps {
+  matterId: string
+  tenantId: string
+}
+
+function MilestonesPanel({ matterId, tenantId }: MilestonesPanelProps) {
+  const supabase = createClient()
+  const queryClient = useQueryClient()
+
+  const [showAddForm, setShowAddForm] = useState(false)
+  const [newName, setNewName] = useState('')
+  const [newAmount, setNewAmount] = useState('')
+  const [newDueDate, setNewDueDate] = useState('')
+  const [newNotes, setNewNotes] = useState('')
+
+  const { data: milestones = [], isLoading } = useQuery({
+    queryKey: ['billing-milestones', matterId],
+    queryFn: async (): Promise<MatterBillingMilestoneRow[]> => {
+      const { data, error } = await supabase
+        .from('matter_billing_milestones')
+        .select('*')
+        .eq('matter_id', matterId)
+        .order('sort_order')
+      if (error) throw error
+      return (data ?? []) as MatterBillingMilestoneRow[]
+    },
+    enabled: !!matterId,
+  })
+
+  const markComplete = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from('matter_billing_milestones')
+        .update({ status: 'complete', completed_at: new Date().toISOString(), updated_at: new Date().toISOString() })
+        .eq('id', id)
+      if (error) throw error
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['billing-milestones', matterId] })
+      toast.success('Milestone marked complete')
+    },
+    onError: () => toast.error('Failed to update milestone'),
+  })
+
+  const billMilestone = useMutation({
+    mutationFn: async (milestone: MatterBillingMilestoneRow) => {
+      const now = new Date()
+      const dueDate = new Date(now.getTime() + 30 * 86400000)
+      const invoiceNumber = `INV-${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`
+
+      // Create invoice
+      const { data: invoice, error: invError } = await supabase
+        .from('invoices')
+        .insert({
+          tenant_id: tenantId,
+          matter_id: matterId,
+          invoice_number: invoiceNumber,
+          contact_id: '',
+          issue_date: now.toISOString().split('T')[0],
+          due_date: dueDate.toISOString().split('T')[0],
+          subtotal: milestone.amount_cents,
+          tax_amount: 0,
+          total_amount: milestone.amount_cents,
+          notes: `Milestone: ${milestone.name}`,
+        })
+        .select()
+        .single()
+      if (invError) throw invError
+
+      // Create line item
+      const { error: liError } = await supabase
+        .from('invoice_line_items')
+        .insert({
+          invoice_id: invoice.id,
+          description: `Milestone: ${milestone.name}`,
+          quantity: 1,
+          unit_price: milestone.amount_cents,
+          amount: milestone.amount_cents,
+          sort_order: 0,
+        })
+      if (liError) throw liError
+
+      // Update milestone
+      const { error: mbmError } = await supabase
+        .from('matter_billing_milestones')
+        .update({ status: 'billed', billed_at: now.toISOString(), invoice_id: invoice.id, updated_at: now.toISOString() })
+        .eq('id', milestone.id)
+      if (mbmError) throw mbmError
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['billing-milestones', matterId] })
+      queryClient.invalidateQueries({ queryKey: ['invoicing'] })
+      toast.success('Invoice created for milestone')
+    },
+    onError: () => toast.error('Failed to bill milestone'),
+  })
+
+  const addMilestone = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase
+        .from('matter_billing_milestones')
+        .insert({
+          tenant_id: tenantId,
+          matter_id: matterId,
+          name: newName.trim(),
+          amount_cents: Math.round(parseFloat(newAmount || '0') * 100),
+          due_date: newDueDate || null,
+          notes: newNotes.trim() || null,
+          sort_order: milestones.length,
+        })
+      if (error) throw error
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['billing-milestones', matterId] })
+      toast.success('Milestone added')
+      setNewName(''); setNewAmount(''); setNewDueDate(''); setNewNotes('')
+      setShowAddForm(false)
+    },
+    onError: () => toast.error('Failed to add milestone'),
+  })
+
   return (
     <Card>
       <CardHeader className="pb-2">
-        <div className="flex items-center gap-2">
-          <Milestone className="h-4 w-4 text-muted-foreground" />
-          <CardTitle className="text-sm font-semibold">Milestone Fees</CardTitle>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Milestone className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-semibold">Milestone Fees</CardTitle>
+          </div>
+          <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => setShowAddForm((v) => !v)}>
+            <Plus className="mr-1 h-3 w-3" />
+            Add Milestone
+          </Button>
         </div>
       </CardHeader>
-      <CardContent>
-        <p className="text-sm text-muted-foreground text-center py-4">
-          Milestones not configured for this matter type.
-        </p>
+      <CardContent className="pt-0 space-y-2">
+        {/* Add form */}
+        {showAddForm && (
+          <div className="rounded-md border border-dashed border-slate-300 bg-slate-50 p-3 space-y-2">
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <Label className="text-xs">Milestone Name</Label>
+                <Input
+                  value={newName}
+                  onChange={(e) => setNewName(e.target.value)}
+                  className="mt-1 h-7 text-xs"
+                  placeholder="e.g. Application Filed"
+                />
+              </div>
+              <div>
+                <Label className="text-xs">Amount ($)</Label>
+                <Input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={newAmount}
+                  onChange={(e) => setNewAmount(e.target.value)}
+                  className="mt-1 h-7 text-xs"
+                  placeholder="0.00"
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <Label className="text-xs">Due Date (optional)</Label>
+                <Input
+                  type="date"
+                  value={newDueDate}
+                  onChange={(e) => setNewDueDate(e.target.value)}
+                  className="mt-1 h-7 text-xs"
+                />
+              </div>
+              <div>
+                <Label className="text-xs">Notes (optional)</Label>
+                <Input
+                  value={newNotes}
+                  onChange={(e) => setNewNotes(e.target.value)}
+                  className="mt-1 h-7 text-xs"
+                  placeholder="Optional notes…"
+                />
+              </div>
+            </div>
+            <div className="flex justify-end gap-2 pt-1">
+              <Button variant="outline" size="sm" className="h-7 text-xs" onClick={() => setShowAddForm(false)}>
+                Cancel
+              </Button>
+              <Button
+                size="sm"
+                className="h-7 text-xs"
+                disabled={!newName.trim() || addMilestone.isPending}
+                onClick={() => addMilestone.mutate()}
+              >
+                {addMilestone.isPending && <Loader2 className="mr-1 h-3 w-3 animate-spin" />}
+                Save
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* List */}
+        {isLoading ? (
+          <div className="space-y-2">
+            {[0, 1].map((i) => <Skeleton key={i} className="h-10 w-full" />)}
+          </div>
+        ) : milestones.length === 0 && !showAddForm ? (
+          <p className="text-sm text-muted-foreground text-center py-4">
+            No milestones yet. Click &ldquo;Add Milestone&rdquo; to create one.
+          </p>
+        ) : (
+          <div className="space-y-1">
+            {milestones.map((m) => (
+              <div
+                key={m.id}
+                className="flex items-center gap-3 rounded-md border border-slate-100 bg-white px-3 py-2 text-sm"
+              >
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium truncate">{m.name}</p>
+                  {m.due_date && (
+                    <p className="text-xs text-muted-foreground">Due {formatDate(m.due_date)}</p>
+                  )}
+                </div>
+                <span className="text-sm font-semibold shrink-0">{fmtCents(m.amount_cents)}</span>
+                <Badge
+                  variant="outline"
+                  className={`text-[10px] py-0 px-1.5 shrink-0 border ${milestoneBadgeClass(m.status)}`}
+                >
+                  {m.status.charAt(0).toUpperCase() + m.status.slice(1)}
+                </Badge>
+                <div className="flex gap-1 shrink-0">
+                  {m.status === 'pending' && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-6 text-xs px-2"
+                      disabled={markComplete.isPending}
+                      onClick={() => markComplete.mutate(m.id)}
+                    >
+                      {markComplete.isPending ? <Loader2 className="h-3 w-3 animate-spin" /> : 'Mark Complete'}
+                    </Button>
+                  )}
+                  {m.status === 'complete' && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-6 text-xs px-2 text-blue-600"
+                      disabled={billMilestone.isPending}
+                      onClick={() => billMilestone.mutate(m)}
+                    >
+                      {billMilestone.isPending ? <Loader2 className="h-3 w-3 animate-spin" /> : 'Bill'}
+                    </Button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </CardContent>
     </Card>
   )
@@ -678,8 +930,8 @@ export function BillingTab({ matterId, tenantId, matter }: BillingTabProps) {
         </CardContent>
       </Card>
 
-      {/* ── D. Milestone Fees Panel (table absent — empty state) ──────────── */}
-      <MilestoneEmptyState />
+      {/* ── D. Milestone Fees Panel ─────────────────────────────────────────── */}
+      <MilestonesPanel matterId={matterId} tenantId={tenantId} />
 
       {/* ── E. Trust Account Widget ────────────────────────────────────────── */}
       <TrustWidget matterId={matterId} trustBalance={matter.trust_balance} />

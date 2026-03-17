@@ -84,7 +84,7 @@ export function NotificationBell() {
     id: string
     entity_type: string | null
     entity_id: string | null
-    is_read: boolean
+    is_read: boolean | null
   }) {
     // Mark as read if not already
     if (!notification.is_read) {
@@ -203,7 +203,7 @@ export function NotificationBell() {
                         </p>
                       )}
                       <p className="text-xs text-muted-foreground mt-1">
-                        {formatDistanceToNow(new Date(notification.created_at), {
+                        {formatDistanceToNow(new Date(notification.created_at ?? ''), {
                           addSuffix: true,
                         })}
                       </p>

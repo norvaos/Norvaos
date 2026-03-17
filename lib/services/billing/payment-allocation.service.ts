@@ -112,11 +112,12 @@ export async function recordPayment(
   const payload: PaymentInsert = {
     tenant_id: tenantId,
     invoice_id: invoiceId,
+    contact_id: (invoice as Record<string, unknown>).contact_id as string ?? '',
     amount: amountCents,
-    payment_date: paymentDate,
+    created_at: paymentDate,
     payment_method: paymentMethod,
     payment_source: paymentSource,
-    reference: reference ?? null,
+    external_payment_id: reference ?? null,
     notes: notes ?? null,
     trust_transaction_id: trustTransactionId ?? null,
     // recorded_by is stored in the audit log, not on the payment row

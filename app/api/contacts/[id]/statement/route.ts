@@ -58,7 +58,7 @@ async function handleGet(
     // --- Matter-scoped access control ---
     // Extract all matter IDs from invoices, then check access for each.
     // Only matters the requesting user is authorized to access are included.
-    const allMatterIds = [...new Set((invoices ?? []).map((inv) => inv.matter_id))]
+    const allMatterIds = [...new Set((invoices ?? []).map((inv) => inv.matter_id).filter((id): id is string => id !== null))]
 
     let authorizedMatterIds: string[] = []
     if (allMatterIds.length > 0) {
@@ -76,8 +76,8 @@ async function handleGet(
     // Filter invoices to authorized matters only, then exclude non-client-visible statuses
     const authorizedInvoices = (invoices ?? []).filter(
       (inv) =>
-        authorizedMatterIds.includes(inv.matter_id) &&
-        !NON_CLIENT_VISIBLE_STATUSES.includes(inv.status)
+        authorizedMatterIds.includes(inv.matter_id ?? '') &&
+        !NON_CLIENT_VISIBLE_STATUSES.includes(inv.status ?? '')
     )
 
     // Fetch all payments for authorized invoices only
@@ -131,10 +131,10 @@ async function handleGet(
 
     // Compute totals — exclude void/written_off/cancelled from outstanding calculation
     const outstandingEligible = authorizedInvoices.filter(
-      (inv) => !EXCLUDED_FROM_OUTSTANDING.includes(inv.status)
+      (inv) => !EXCLUDED_FROM_OUTSTANDING.includes(inv.status ?? '')
     )
-    const totalInvoiced = outstandingEligible.reduce((sum, inv) => sum + inv.total_amount, 0)
-    const totalPaid = outstandingEligible.reduce((sum, inv) => sum + inv.amount_paid, 0)
+    const totalInvoiced = outstandingEligible.reduce((sum, inv) => sum + (inv.total_amount ?? 0), 0)
+    const totalPaid = outstandingEligible.reduce((sum, inv) => sum + (inv.amount_paid ?? 0), 0)
     const totalOutstanding = totalInvoiced - totalPaid
 
     // Group invoices by authorized matter

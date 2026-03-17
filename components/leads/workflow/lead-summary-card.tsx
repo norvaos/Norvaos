@@ -38,8 +38,8 @@ export function LeadSummaryCard({ lead, contact, practiceArea, users }: LeadSumm
   const assignedUser = users?.find((u) => u.id === lead.assigned_to)
   const intakeStaff = users?.find((u) => u.id === lead.assigned_intake_staff_id)
   const responsibleLawyer = users?.find((u) => u.id === lead.responsible_lawyer_id)
-  const temperature = TEMPERATURE_CONFIG[lead.temperature] ?? TEMPERATURE_CONFIG.warm
-  const qualification = QUALIFICATION_STATUS_CONFIG[lead.qualification_status] ?? QUALIFICATION_STATUS_CONFIG.pending
+  const temperature = TEMPERATURE_CONFIG[lead.temperature ?? ''] ?? TEMPERATURE_CONFIG.warm
+  const qualification = QUALIFICATION_STATUS_CONFIG[lead.qualification_status ?? ''] ?? QUALIFICATION_STATUS_CONFIG.pending
   const stageAge = daysInStage(lead.stage_entered_at)
   const followUpOverdue = isOverdue(lead.next_follow_up)
 

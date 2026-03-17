@@ -56,7 +56,7 @@ export function StageHistory() {
 
     return auditLogs
       .filter((log) => log.action === 'stage_changed')
-      .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
+      .sort((a, b) => new Date(a.created_at ?? '').getTime() - new Date(b.created_at ?? '').getTime())
       .map((log, idx, arr) => {
         const changes = (log.changes ?? {}) as Record<string, unknown>
         const stageId = changes.stage_id as string
@@ -66,8 +66,8 @@ export function StageHistory() {
 
         // Days spent = diff between this event and the NEXT event (or now for the last one)
         const nextEvent = arr[idx + 1]
-        const exitTime = nextEvent ? nextEvent.created_at : new Date().toISOString()
-        const daysSpent = daysBetween(log.created_at, exitTime)
+        const exitTime = nextEvent ? (nextEvent.created_at ?? new Date().toISOString()) : new Date().toISOString()
+        const daysSpent = daysBetween(log.created_at ?? '', exitTime)
         const isCurrent = !nextEvent
 
         return {
@@ -86,7 +86,7 @@ export function StageHistory() {
   // Summary: total days in pipeline, current stage days
   const totalDays = useMemo(() => {
     if (!stageEvents.length) return 0
-    return daysBetween(stageEvents[0].movedAt, new Date().toISOString())
+    return daysBetween(stageEvents[0].movedAt ?? '', new Date().toISOString())
   }, [stageEvents])
 
   const currentStageDays = useMemo(() => {

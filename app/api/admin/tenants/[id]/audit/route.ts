@@ -78,7 +78,7 @@ const handleGet = withPlatformAdmin(async (request, { params }) => {
 
   // Merge, sort, and take the requested limit
   const merged = [...tenantEntries, ...paEntries]
-    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+    .sort((a, b) => new Date(b.created_at ?? '').getTime() - new Date(a.created_at ?? '').getTime())
     .slice(0, limit)
 
   const nextCursor = merged.length === limit ? merged[merged.length - 1].created_at : null

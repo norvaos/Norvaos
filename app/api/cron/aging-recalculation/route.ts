@@ -64,7 +64,7 @@ async function handlePost(request: Request) {
     stats.totalChecked = invoices.length
 
     for (const invoice of invoices) {
-      const newBucket = getAgingBucket(invoice.due_date)
+      const newBucket = getAgingBucket(invoice.due_date ?? '')
 
       // Track breakdown
       stats.bucketBreakdown[newBucket] = (stats.bucketBreakdown[newBucket] ?? 0) + 1

@@ -218,7 +218,7 @@ export function TaskGanttView({ tasks, onTaskClick }: TaskGanttViewProps) {
                 {/* Priority dot */}
                 <span
                   className="inline-block h-2 w-2 flex-shrink-0 rounded-full"
-                  style={{ backgroundColor: PRIORITY_COLORS[task.priority] ?? '#c3c6d4' }}
+                  style={{ backgroundColor: PRIORITY_COLORS[task.priority ?? ''] ?? '#c3c6d4' }}
                 />
                 {/* Title */}
                 <span className="min-w-0 flex-1 truncate text-xs font-medium text-slate-800">
@@ -334,7 +334,7 @@ export function TaskGanttView({ tasks, onTaskClick }: TaskGanttViewProps) {
                 const taskEnd = task.due_date
                   ? startOfDay(new Date(task.due_date))
                   : null
-                const statusColor = STATUS_COLOR_MAP[task.status] ?? '#6b7280'
+                const statusColor = STATUS_COLOR_MAP[task.status ?? ''] ?? '#6b7280'
 
                 // Case 1: Both start_date and due_date -- render a full bar
                 if (taskStart && taskEnd) {

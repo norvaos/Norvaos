@@ -70,7 +70,7 @@ async function handlePost(
         p_user_id: auth.userId,
         p_override_level: overrideLevel,
         p_override_reason: overrideReason,
-        p_previous_level: previousLevel,
+        p_previous_level: previousLevel ?? undefined,
       })
 
     if (rpcError) {
