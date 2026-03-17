@@ -1260,3 +1260,26 @@ export function useUpsertMatterCustomData() {
     },
   })
 }
+
+/**
+ * Fetch the document_naming_template for a single matter type.
+ * Used by DocumentsTab to auto-name uploaded files.
+ */
+export function useMatterTypeNamingTemplate(matterTypeId: string | null | undefined) {
+  return useQuery({
+    queryKey: ['matter_type_naming_template', matterTypeId],
+    queryFn: async () => {
+      if (!matterTypeId) return null
+      const supabase = createClient()
+      const { data, error } = await supabase
+        .from('matter_types')
+        .select('document_naming_template')
+        .eq('id', matterTypeId)
+        .single()
+      if (error) throw error
+      return data?.document_naming_template ?? null
+    },
+    enabled: !!matterTypeId,
+    staleTime: 5 * 60 * 1000,
+  })
+}

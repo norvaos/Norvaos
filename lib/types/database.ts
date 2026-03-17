@@ -19474,3 +19474,92 @@ export interface GateSnapshot {
 
 // ── Misc Aliases ───────────────────────────────────────────────────────────
 export type AgingBucket = string
+
+// ── Retainer Agreements (migration 116) ────────────────────────────────────
+// Manual types — not yet in the generated Database union.
+// Added here until next type-gen pass after migration 116 is applied.
+
+export interface RetainerAgreementRow {
+  id: string
+  tenant_id: string
+  matter_id: string
+  billing_type: string           // 'flat_fee' | 'hourly' | 'contingency' | 'hybrid'
+  flat_fee_amount: number | null
+  hourly_rate: number | null
+  estimated_hours: number | null
+  contingency_pct: number | null
+  scope_of_services: string | null
+  fee_schedule: Json             // { description: string; amount: number; quantity: number }[]
+  hst_applicable: boolean
+  hst_rate: number
+  subtotal_cents: number
+  tax_amount_cents: number
+  total_amount_cents: number
+  signing_method: string         // 'docusign' | 'manual' | 'in_person'
+  status: string                 // 'draft' | 'sent_for_signing' | 'signed' | 'voided'
+  signed_at: string | null
+  sent_at: string | null
+  voided_at: string | null
+  voided_reason: string | null
+  matter_auto_created: boolean
+  stage_advanced: boolean
+  created_by: string | null
+  updated_by: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface RetainerAgreementInsert {
+  id?: string
+  tenant_id: string
+  matter_id: string
+  billing_type?: string
+  flat_fee_amount?: number | null
+  hourly_rate?: number | null
+  estimated_hours?: number | null
+  contingency_pct?: number | null
+  scope_of_services?: string | null
+  fee_schedule?: Json
+  hst_applicable?: boolean
+  hst_rate?: number
+  subtotal_cents?: number
+  tax_amount_cents?: number
+  total_amount_cents?: number
+  signing_method?: string
+  status?: string
+  signed_at?: string | null
+  sent_at?: string | null
+  voided_at?: string | null
+  voided_reason?: string | null
+  matter_auto_created?: boolean
+  stage_advanced?: boolean
+  created_by?: string | null
+  updated_by?: string | null
+  created_at?: string
+  updated_at?: string
+}
+
+export interface RetainerAgreementUpdate {
+  billing_type?: string
+  flat_fee_amount?: number | null
+  hourly_rate?: number | null
+  estimated_hours?: number | null
+  contingency_pct?: number | null
+  scope_of_services?: string | null
+  fee_schedule?: Json
+  hst_applicable?: boolean
+  hst_rate?: number
+  subtotal_cents?: number
+  tax_amount_cents?: number
+  total_amount_cents?: number
+  signing_method?: string
+  status?: string
+  signed_at?: string | null
+  sent_at?: string | null
+  voided_at?: string | null
+  voided_reason?: string | null
+  matter_auto_created?: boolean
+  stage_advanced?: boolean
+  updated_by?: string | null
+  updated_at?: string
+}

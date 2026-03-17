@@ -26,6 +26,7 @@ import {
   useCreateCustomSlot,
   useDocumentSlotVersions,
 } from '@/lib/queries/document-slots'
+import { useMatterTypeNamingTemplate } from '@/lib/queries/matter-types'
 import { useDownloadDocument } from '@/lib/queries/documents'
 
 import { Progress } from '@/components/ui/progress'
@@ -102,6 +103,8 @@ export interface DocumentsTabProps {
   matterId: string
   tenantId: string
   enforcementEnabled: boolean
+  matterNumber?: string
+  matterTypeId?: string | null
 }
 
 type SlotRow = ReturnType<typeof useDocumentSlots>['data'] extends (infer T)[] | undefined ? T : never
@@ -122,6 +125,23 @@ function FileTypeIcon({ acceptedTypes }: { acceptedTypes: string[] | null }) {
     return <FileImage className="h-3.5 w-3.5 text-green-500 shrink-0" />
   }
   return <File className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+}
+
+// ─── Expiry badge helper ──────────────────────────────────────────────────────
+
+function getExpiryBadge(expiryDate: string | null) {
+  if (!expiryDate) return null
+  const today = new Date()
+  const expiry = new Date(expiryDate)
+  const daysUntilExpiry = Math.floor((expiry.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
+
+  if (daysUntilExpiry < 0) {
+    return <Badge variant="destructive" className="text-xs">Expired {Math.abs(daysUntilExpiry)}d ago</Badge>
+  }
+  if (daysUntilExpiry <= 30) {
+    return <Badge className="bg-amber-100 text-amber-800 border-amber-200 text-xs">Expires in {daysUntilExpiry}d</Badge>
+  }
+  return null // No badge needed if >30 days away
 }
 
 // ─── CategoryNode — collapsible folder in the sidebar ────────────────────────
@@ -215,12 +235,16 @@ function CategoryNode({
 function SlotCard({
   slot,
   matterId,
+  matterNumber,
+  namingTemplate,
   onViewHistory,
   highlighted,
   cardRef,
 }: {
   slot: SlotRow
   matterId: string
+  matterNumber: string
+  namingTemplate: string | null
   onViewHistory: (slotId: string) => void
   highlighted: boolean
   cardRef?: (el: HTMLDivElement | null) => void
@@ -271,12 +295,26 @@ function SlotCard({
 
   const handleFileSelect = useCallback(
     async (e: React.ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files?.[0]
-      if (!file) return
+      const raw = e.target.files?.[0]
+      if (!raw) return
+      // Auto-naming: if a template exists, rename the file before uploading
+      let file: globalThis.File = raw
+      if (namingTemplate) {
+        const ext = raw.name.includes('.') ? raw.name.split('.').pop() ?? '' : ''
+        const today = new Date()
+        const dateStr = today.toISOString().slice(0, 10) // YYYY-MM-DD
+        const generated = namingTemplate
+          .replace(/\{matter_number\}/g, matterNumber)
+          .replace(/\{slot_name\}/g, slot.slot_name.replace(/\s+/g, '_'))
+          .replace(/\{date\}/g, dateStr)
+          .replace(/\{ext\}/g, ext)
+        const named = ext ? `${generated}.${ext}` : generated
+        file = new globalThis.File([raw], named, { type: raw.type })
+      }
       await uploadMutation.mutateAsync({ file, slotId: slot.id, matterId })
       if (fileInputRef.current) fileInputRef.current.value = ''
     },
-    [slot.id, matterId, uploadMutation],
+    [slot.id, slot.slot_name, matterId, matterNumber, namingTemplate, uploadMutation],
   )
 
   return (
@@ -310,6 +348,7 @@ function SlotCard({
             </Badge>
           )}
           <StatusBadge status={status} />
+          {getExpiryBadge((slot as { expiry_date?: string | null }).expiry_date ?? null)}
         </div>
       </div>
 
@@ -826,8 +865,15 @@ function StatusSummaryBar({
 
 // ─── DocumentsTab (main export) ───────────────────────────────────────────────
 
-export function DocumentsTab({ matterId, tenantId, enforcementEnabled }: DocumentsTabProps) {
+export function DocumentsTab({
+  matterId,
+  tenantId,
+  enforcementEnabled,
+  matterNumber = '',
+  matterTypeId = null,
+}: DocumentsTabProps) {
   const { data: slotsRaw, isLoading, error } = useDocumentSlots(matterId)
+  const { data: namingTemplate = null } = useMatterTypeNamingTemplate(matterTypeId)
   const regenerateMutation = useRegenerateSlots()
   const createCustomSlot = useCreateCustomSlot()
 
@@ -1156,6 +1202,8 @@ export function DocumentsTab({ matterId, tenantId, enforcementEnabled }: Documen
                       key={slot.id}
                       slot={slot}
                       matterId={matterId}
+                      matterNumber={matterNumber}
+                      namingTemplate={namingTemplate}
                       onViewHistory={setHistorySlotId}
                       highlighted={slot.id === selectedSlotId}
                       cardRef={(el) => {
@@ -1175,6 +1223,8 @@ export function DocumentsTab({ matterId, tenantId, enforcementEnabled }: Documen
                 key={slot.id}
                 slot={slot}
                 matterId={matterId}
+                matterNumber={matterNumber}
+                namingTemplate={namingTemplate}
                 onViewHistory={setHistorySlotId}
                 highlighted={slot.id === selectedSlotId}
                 cardRef={(el) => {
