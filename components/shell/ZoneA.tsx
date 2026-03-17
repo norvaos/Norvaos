@@ -6,19 +6,22 @@
  * Fixed top bar. Always visible. ~80px height.
  * Shows: matter number, title, matter-type pill, status badge, priority
  * indicator, responsible lawyer, open risk-flag count, and quick-action
- * buttons (Flag, Notes, Share).
+ * buttons (Flag, Notes, Share, Retainer).
  *
  * Data fetched internally so the WorkplaceShell stays a thin layout shell.
  */
 
+import { useState } from 'react'
 import Link from 'next/link'
-import { ArrowLeft, Flag, StickyNote, Share2, AlertTriangle } from 'lucide-react'
+import { ArrowLeft, Flag, StickyNote, Share2, AlertTriangle, FileText } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { createClient } from '@/lib/supabase/client'
 import { useQuery } from '@tanstack/react-query'
 import { useMatterRiskFlagCount } from '@/lib/queries/stage-transitions'
+import { useLatestRetainerAgreement } from '@/lib/queries/retainer-agreements'
+import { RetainerGenerationModal } from '@/components/retainer/RetainerGenerationModal'
 import type { Database } from '@/lib/types/database'
 
 type Matter = Database['public']['Tables']['matters']['Row']
@@ -63,6 +66,10 @@ export interface ZoneAProps {
 
 export function ZoneA({ matter, tenantId, onFlagClick, onNotesClick }: ZoneAProps) {
   const supabase = createClient()
+  const [retainerModalOpen, setRetainerModalOpen] = useState(false)
+
+  // Determine if retainer is already signed — used to decide button label/style
+  const { data: latestRetainer } = useLatestRetainerAgreement(matter.id)
 
   // Matter-type name + colour
   const { data: matterType } = useQuery({
@@ -111,6 +118,7 @@ export function ZoneA({ matter, tenantId, onFlagClick, onNotesClick }: ZoneAProp
     : null
 
   return (
+    <>
     <div
       className="flex-none border-b bg-card px-4 py-2.5"
       style={{ minHeight: '72px' }}
@@ -217,9 +225,30 @@ export function ZoneA({ matter, tenantId, onFlagClick, onNotesClick }: ZoneAProp
             <Share2 className="h-3.5 w-3.5" />
             Share
           </Button>
+          {/* Retainer button — only shown when retainer is not yet signed */}
+          {latestRetainer?.status !== 'signed' && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-7 px-2 text-xs gap-1.5 border-primary/30 text-primary hover:bg-primary/5"
+              onClick={() => setRetainerModalOpen(true)}
+            >
+              <FileText className="h-3.5 w-3.5" />
+              Retainer
+            </Button>
+          )}
         </div>
 
       </div>
     </div>
+
+    {/* Retainer generation modal */}
+    <RetainerGenerationModal
+      open={retainerModalOpen}
+      onOpenChange={setRetainerModalOpen}
+      matter={matter}
+      tenantId={tenantId}
+    />
+    </>
   )
 }

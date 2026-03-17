@@ -32,6 +32,7 @@ import {
   Mail,
   Phone,
   Building2,
+  FileText,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
@@ -47,6 +48,8 @@ import {
 import { createClient } from '@/lib/supabase/client'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useMatterRiskFlagsAll } from '@/lib/queries/stage-transitions'
+import { useLatestRetainerAgreement } from '@/lib/queries/retainer-agreements'
+import { RetainerGenerationModal } from '@/components/retainer/RetainerGenerationModal'
 import { toast } from 'sonner'
 import type { Database } from '@/lib/types/database'
 
@@ -147,9 +150,13 @@ function initials(firstName: string | null, lastName: string | null): string {
 export function ZoneC({ matter, tenantId }: ZoneCProps) {
   const [collapsed, setCollapsed] = useState(false)
   const [selectedContact, setSelectedContact] = useState<MatterPersonWithContact | null>(null)
+  const [retainerModalOpen, setRetainerModalOpen] = useState(false)
 
   const supabase = createClient()
   const qc = useQueryClient()
+
+  // Retainer status — used to label the action button
+  const { data: latestRetainer } = useLatestRetainerAgreement(matter.id)
 
   // ── Responsible lawyer ──────────────────────────────────────────────────
   const { data: lawyer } = useQuery({
@@ -400,6 +407,31 @@ export function ZoneC({ matter, tenantId }: ZoneCProps) {
             />
           )}
 
+          {/* ── Retainer action ──────────────────────────────────────── */}
+          {latestRetainer?.status !== 'signed' && (
+            <div className="space-y-1.5">
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1">
+                <FileText className="h-3 w-3" />
+                Retainer
+              </p>
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full h-7 text-xs gap-1.5"
+                onClick={() => setRetainerModalOpen(true)}
+              >
+                <FileText className="h-3 w-3" />
+                {latestRetainer ? 'Continue Retainer' : 'Generate Retainer'}
+              </Button>
+            </div>
+          )}
+          {latestRetainer?.status === 'signed' && (
+            <div className="rounded-md border border-green-200 bg-green-50 px-2.5 py-1.5 flex items-center gap-1.5">
+              <CheckCircle2 className="h-3 w-3 text-green-600 shrink-0" />
+              <span className="text-[10px] text-green-800 font-medium">Retainer Signed</span>
+            </div>
+          )}
+
           {/* ── Billing snapshot ──────────────────────────────────────── */}
           <div className="space-y-1.5">
             <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1">
@@ -439,6 +471,14 @@ export function ZoneC({ matter, tenantId }: ZoneCProps) {
           )}
         </SheetContent>
       </Sheet>
+
+      {/* Retainer generation modal */}
+      <RetainerGenerationModal
+        open={retainerModalOpen}
+        onOpenChange={setRetainerModalOpen}
+        matter={matter}
+        tenantId={tenantId}
+      />
     </>
   )
 }
