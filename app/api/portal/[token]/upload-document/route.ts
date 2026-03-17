@@ -185,7 +185,7 @@ async function handlePost(
       slot_id: slotId,
       portal_link_id: link.id,
     },
-  }).then(() => {}).catch((err: unknown) => {
+  }).then(() => {}, (err: unknown) => {
     console.error('[upload-document] Activity log error:', err)
   })
 
