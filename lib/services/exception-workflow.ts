@@ -15,7 +15,6 @@
 
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/lib/types/database'
-import type { MatterDeficiencyRow } from '@/lib/types/database'
 
 type Json = Database['public']['Tables']['activities']['Insert']['metadata']
 
@@ -128,22 +127,12 @@ export async function returnMatterToStage(
   }
 
   // ── Step 6: Check for open critical deficiencies ──────────────────────────
-  // matter_deficiencies is registered as a standalone interface in database.ts but
-  // is not yet in the Database['public']['Tables'] map. We use a full unknown cast
-  // on the awaited result to remain type-safe at the calling site while bypassing
-  // the missing table registration. Flag: add matter_deficiencies to Database.Tables.
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const deficiencyQuery = (supabase as any)
+  const { data: openCritical, error: deficiencyErr } = await supabase
     .from('matter_deficiencies')
     .select('id')
     .eq('matter_id', matterId)
     .eq('severity', 'critical')
     .in('status', ['open', 'in_progress', 'reopened'])
-
-  const { data: openCritical, error: deficiencyErr } = await deficiencyQuery as {
-    data: Pick<MatterDeficiencyRow, 'id'>[] | null
-    error: { message: string } | null
-  }
 
   if (deficiencyErr) {
     throw new Error(`Failed to check for critical deficiencies: ${deficiencyErr.message}`)
