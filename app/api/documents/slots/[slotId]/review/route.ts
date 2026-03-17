@@ -6,6 +6,7 @@ import { checkTenantLimit, rateLimitResponse } from '@/lib/middleware/tenant-lim
 import { invalidateGating } from '@/lib/services/cache-invalidation'
 import { syncImmigrationIntakeStatus } from '@/lib/services/immigration-status-engine'
 import { withTiming } from '@/lib/middleware/request-timing'
+import { checkAndFlagRepeatedRejections } from '@/lib/services/document-rejection-handler'
 
 /**
  * POST /api/documents/slots/[slotId]/review
@@ -69,6 +70,14 @@ async function handlePost(
         await syncImmigrationIntakeStatus(auth.supabase, slot.matter_id, auth.userId)
       } catch (err) {
         console.error('[document-review] Status sync failed (non-fatal):', err)
+      }
+      // Check for repeated rejections (3+) and raise DOCUMENT_AUTHENTICITY risk flag
+      if (action === 'reject') {
+        try {
+          await checkAndFlagRepeatedRejections(auth.supabase, auth.tenantId, slot.matter_id, slotId)
+        } catch (err) {
+          console.error('[document-review] Rejection flag check failed (non-fatal):', err)
+        }
       }
     }
 

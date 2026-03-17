@@ -9,7 +9,7 @@
  *   2. Documents     — DocumentSlotPanel (file requirements + upload)
  *   3. Forms         — FormsTab (IRCC form instances)
  *   4. Questionnaire — ImmigrationReadiness → QuestionsWorkflowSection
- *   5. Review        — ImmigrationReadiness → ReviewBlockersWorkflowSection
+ *   5. Review        — ReviewTab (gate blockers + contradiction flags + lawyer sign-off)
  *   6. Billing       — BillingTab (time, invoices, retainer)
  *   7. Communications— stub (Sprint 7)
  *   8. Correspondence— stub (Sprint 4)
@@ -25,14 +25,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 import { UnifiedCaseDetailsTab } from '@/components/matters/unified-case-details-tab'
 import { DocumentsTab }           from '@/components/shell/tabs/DocumentsTab'
-import { FormsTab }               from '@/components/matters/tabs/forms-tab'
+import { FormsTab }               from '@/components/shell/tabs/FormsTab'
 import { BillingTab }             from '@/components/shell/tabs/BillingTab'
 import { TasksTab }               from '@/components/matters/tabs/tasks-tab'
 import { NotesEditor }            from '@/components/shared/notes-editor'
 import { ActivityTimeline }       from '@/components/shared/activity-timeline'
 import { QuestionsWorkflowSection }     from '@/components/matters/workflow/questions-section'
-import { ReviewBlockersWorkflowSection } from '@/components/matters/workflow/review-blockers-section'
 import { useImmigrationReadiness }      from '@/lib/queries/immigration-readiness'
+import { ReviewTab }              from '@/components/shell/tabs/ReviewTab'
 import { CommunicationsTab }      from '@/components/shell/tabs/CommunicationsTab'
 import { CorrespondenceTab }      from '@/components/shell/tabs/CorrespondenceTab'
 import type { Database } from '@/lib/types/database'
@@ -99,32 +99,6 @@ function QuestionnaireTabContent({
   )
 }
 
-/**
- * Review tab — same pattern. onNavigateToSection switches the parent tab.
- */
-function ReviewTabContent({
-  matterId,
-  onNavigateToSection,
-  onNavigateToField,
-}: {
-  matterId: string
-  onNavigateToSection: (section: 'questions' | 'documents' | 'formPacks') => void
-  onNavigateToField?: (profilePath: string) => void
-}) {
-  const { data: readinessData } = useImmigrationReadiness(matterId)
-  return (
-    <div className="p-4">
-      <ReviewBlockersWorkflowSection
-        readinessData={readinessData}
-        matterId={matterId}
-        defaultExpanded={true}
-        onNavigateToSection={onNavigateToSection}
-        onNavigateToField={onNavigateToField}
-      />
-    </div>
-  )
-}
-
 // ── Component ─────────────────────────────────────────────────────────────────
 
 // Valid tab IDs as a Set for fast O(1) validation
@@ -165,16 +139,10 @@ export function ZoneD({ matter, tenantId, initialTab = 'details' }: ZoneDProps) 
     window.history.replaceState(null, '', `#${tab}`)
   }, [])
 
-  // Map from readiness section names → tab IDs for ReviewBlockers navigation
-  const handleNavigateToSection = useCallback(
-    (section: 'questions' | 'documents' | 'formPacks') => {
-      const map: Record<string, TabId> = {
-        questions: 'questionnaire',
-        documents: 'documents',
-        formPacks: 'forms',
-      }
-      const target = map[section]
-      if (target) handleTabChange(target)
+  // Navigation handler for ReviewTab — maps section names to tab IDs
+  const handleReviewNavigate = useCallback(
+    (section: 'documents' | 'questionnaire' | 'forms') => {
+      handleTabChange(section)
     },
     [handleTabChange],
   )
@@ -244,9 +212,10 @@ export function ZoneD({ matter, tenantId, initialTab = 'details' }: ZoneDProps) 
 
         {/* 5 — Review */}
         <TabsContent value="review" className="flex-1 overflow-y-auto m-0 p-0">
-          <ReviewTabContent
+          <ReviewTab
             matterId={matter.id}
-            onNavigateToSection={handleNavigateToSection}
+            tenantId={tenantId}
+            onNavigateToSection={handleReviewNavigate}
           />
         </TabsContent>
 
