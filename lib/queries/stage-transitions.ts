@@ -136,6 +136,29 @@ export function useMatterRiskFlags(matterId: string | null | undefined) {
 }
 
 /**
+ * Fetch ALL risk flags for a matter regardless of status (open, acknowledged,
+ * overridden, resolved). Used by Zone C flag list which shows every flag and
+ * allows inline override of open/acknowledged flags.
+ */
+export function useMatterRiskFlagsAll(matterId: string | null | undefined) {
+  return useQuery({
+    queryKey: riskFlagKeys.byMatter(matterId ?? ''),
+    queryFn: async () => {
+      const supabase = createClient()
+      const { data, error } = await supabase
+        .from('matter_risk_flags')
+        .select('*')
+        .eq('matter_id', matterId!)
+        .order('detected_at', { ascending: false })
+      if (error) throw error
+      return (data ?? []) as MatterRiskFlagRow[]
+    },
+    enabled: !!matterId,
+    staleTime: 60 * 1000,
+  })
+}
+
+/**
  * Count of open risk flags — used by Zone A badge without loading full list.
  */
 export function useMatterRiskFlagCount(matterId: string | null | undefined) {
