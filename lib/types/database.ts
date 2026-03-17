@@ -18003,6 +18003,77 @@ export type Database = {
           },
         ]
       }
+      // ── matter_deficiencies — Migration 127, Sprint 6 Week 1 ─────────────
+      matter_deficiencies: {
+        Row: {
+          id: string
+          tenant_id: string
+          matter_id: string
+          stage_id: string | null
+          created_by: string
+          assigned_to_user_id: string | null
+          severity: 'minor' | 'major' | 'critical'
+          category: string
+          description: string
+          status: 'open' | 'in_progress' | 'resolved' | 'closed' | 'reopened'
+          reopen_count: number
+          chronic_flag: boolean
+          resolution_notes: string | null
+          resolution_evidence_path: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          reopened_at: string | null
+          reopened_by: string | null
+          chronic_escalated_at: string | null
+          chronic_escalated_to: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          tenant_id: string
+          matter_id: string
+          stage_id?: string | null
+          created_by: string
+          assigned_to_user_id?: string | null
+          severity: 'minor' | 'major' | 'critical'
+          category: string
+          description: string
+          status?: 'open' | 'in_progress' | 'resolved' | 'closed' | 'reopened'
+          reopen_count?: number
+          chronic_flag?: boolean
+          resolution_notes?: string | null
+          resolution_evidence_path?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          reopened_at?: string | null
+          reopened_by?: string | null
+          chronic_escalated_at?: string | null
+          chronic_escalated_to?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          stage_id?: string | null
+          assigned_to_user_id?: string | null
+          severity?: 'minor' | 'major' | 'critical'
+          category?: string
+          description?: string
+          status?: 'open' | 'in_progress' | 'resolved' | 'closed' | 'reopened'
+          reopen_count?: number
+          chronic_flag?: boolean
+          resolution_notes?: string | null
+          resolution_evidence_path?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          reopened_at?: string | null
+          reopened_by?: string | null
+          chronic_escalated_at?: string | null
+          chronic_escalated_to?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       mv_lead_metrics: {
@@ -20016,4 +20087,78 @@ export interface NextAction {
   due_at: string | null
   owner_role: string
   escalation_level: EscalationLevel
+}
+
+// ── matter_deficiencies ───────────────────────────────────────────────────────
+// Migration 127 — Sprint 6, Week 1 — 2026-03-17
+// Full deficiency workflow for legal review cycle.
+
+export interface MatterDeficiencyRow {
+  id: string
+  tenant_id: string
+  matter_id: string
+  stage_id: string | null
+  created_by: string
+  assigned_to_user_id: string | null
+  severity: 'minor' | 'major' | 'critical'
+  category: string
+  description: string
+  status: 'open' | 'in_progress' | 'resolved' | 'closed' | 'reopened'
+  reopen_count: number
+  chronic_flag: boolean
+  resolution_notes: string | null
+  resolution_evidence_path: string | null
+  resolved_at: string | null
+  resolved_by: string | null
+  reopened_at: string | null
+  reopened_by: string | null
+  chronic_escalated_at: string | null
+  chronic_escalated_to: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface MatterDeficiencyInsert {
+  id?: string
+  tenant_id: string
+  matter_id: string
+  stage_id?: string | null
+  created_by: string
+  assigned_to_user_id?: string | null
+  severity: 'minor' | 'major' | 'critical'
+  category: string
+  description: string
+  status?: 'open' | 'in_progress' | 'resolved' | 'closed' | 'reopened'
+  reopen_count?: number
+  chronic_flag?: boolean
+  resolution_notes?: string | null
+  resolution_evidence_path?: string | null
+  resolved_at?: string | null
+  resolved_by?: string | null
+  reopened_at?: string | null
+  reopened_by?: string | null
+  chronic_escalated_at?: string | null
+  chronic_escalated_to?: string | null
+  created_at?: string
+  updated_at?: string
+}
+
+export interface MatterDeficiencyUpdate {
+  stage_id?: string | null
+  assigned_to_user_id?: string | null
+  severity?: 'minor' | 'major' | 'critical'
+  category?: string
+  description?: string
+  status?: 'open' | 'in_progress' | 'resolved' | 'closed' | 'reopened'
+  reopen_count?: number
+  chronic_flag?: boolean
+  resolution_notes?: string | null
+  resolution_evidence_path?: string | null
+  resolved_at?: string | null
+  resolved_by?: string | null
+  reopened_at?: string | null
+  reopened_by?: string | null
+  chronic_escalated_at?: string | null
+  chronic_escalated_to?: string | null
+  updated_at?: string
 }

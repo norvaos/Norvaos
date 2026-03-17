@@ -49,6 +49,10 @@ interface GatingRuleRequireImmIntakeStatus {
   minimum_status: string
 }
 
+interface GatingRuleRequireNoOpenDeficiencies {
+  type: 'require_no_open_deficiencies'
+}
+
 export type GatingRule =
   | GatingRuleChecklistComplete
   | GatingRuleRequireDeadlines
@@ -58,6 +62,7 @@ export type GatingRule =
   | GatingRuleRequireDocumentSlotsComplete
   | GatingRuleRequireNoContradictions
   | GatingRuleRequireImmIntakeStatus
+  | GatingRuleRequireNoOpenDeficiencies
 
 // ─── Result Types ─────────────────────────────────────────────────────────────
 
@@ -726,6 +731,28 @@ export async function evaluateGatingRules(
           conditionName: `Immigration Intake Status ≥ ${requiredStatus}`,
           passed,
           details,
+        })
+        break
+      }
+
+      case 'require_no_open_deficiencies': {
+        const { data: openDefs } = await supabase
+          .from('matter_deficiencies')
+          .select('id, severity, category, description')
+          .eq('matter_id', matterId)
+          .in('status', ['open', 'in_progress', 'reopened'])
+
+        const defsPassed = !openDefs || openDefs.length === 0
+        const defDetails = defsPassed
+          ? undefined
+          : `${openDefs!.length} open deficiencie${openDefs!.length > 1 ? 's' : ''} must be resolved before advancing`
+
+        if (!defsPassed) failedRules.push(defDetails!)
+        conditions.push({
+          conditionId: 'require_no_open_deficiencies',
+          conditionName: 'No Open Deficiencies',
+          passed: defsPassed,
+          details: defDetails,
         })
         break
       }
