@@ -11,6 +11,7 @@
 import { NextResponse } from 'next/server'
 import { authenticateRequest, AuthError } from '@/lib/services/auth'
 import { validateDeficiencyCreate } from '@/lib/services/deficiency-engine'
+import { returnMatterToStage } from '@/lib/services/exception-workflow'
 import type { MatterDeficiencyInsert } from '@/lib/types/database'
 
 // ─── GET ──────────────────────────────────────────────────────────────────────
@@ -137,8 +138,10 @@ export async function POST(
       return NextResponse.json({ error: 'Failed to create deficiency' }, { status: 500 })
     }
 
-    // For critical severity: log to activities
+    // For critical severity: log to activities, then attempt auto-rollback.
+    // Both operations are fire-and-forget — they must not delay the 201 response.
     if (validationInput.severity === 'critical') {
+      // 1. Log deficiency creation activity
       auth.supabase
         .from('activities')
         .insert({
@@ -159,6 +162,88 @@ export async function POST(
             console.error('[deficiencies POST] Activity log error:', actErr.message)
           }
         })
+
+      // 2. Fire-and-forget auto-rollback: fetch stage state, then call returnMatterToStage
+      //    skipCriticalDeficiencyCheck = true to bypass the circular guard — the deficiency
+      //    we just created IS the open critical one, so we must skip that check.
+      Promise.resolve().then(async () => {
+        try {
+          const { data: stageState, error: stageStateErr } = await auth.supabase
+            .from('matter_stage_state')
+            .select('current_stage_id, previous_stage_id, pipeline_id')
+            .eq('matter_id', matterId)
+            .eq('tenant_id', auth.tenantId)
+            .maybeSingle()
+
+          if (stageStateErr || !stageState) {
+            console.warn('[deficiencies POST] Auto-rollback: could not fetch stage state', stageStateErr?.message)
+            return
+          }
+
+          const { current_stage_id, previous_stage_id } = stageState
+
+          if (!previous_stage_id || previous_stage_id === current_stage_id) {
+            // Matter is at first stage — no earlier stage to return to.
+            await auth.supabase
+              .from('activities')
+              .insert({
+                tenant_id: auth.tenantId,
+                matter_id: matterId,
+                user_id: auth.userId,
+                activity_type: 'auto_rollback_skipped',
+                title: 'Auto-rollback skipped — no previous stage',
+                metadata: { deficiency_id: created.id },
+              })
+            return
+          }
+
+          const returnReason = `Auto-rollback: critical deficiency created — ${validationInput.category}: ${validationInput.description.slice(0, 100)}`
+
+          await returnMatterToStage(auth.supabase, {
+            matterId,
+            tenantId: auth.tenantId,
+            targetStageId: previous_stage_id,
+            returnReason,
+            performedBy: auth.userId,
+            skipCriticalDeficiencyCheck: true,
+          })
+
+          await auth.supabase
+            .from('activities')
+            .insert({
+              tenant_id: auth.tenantId,
+              matter_id: matterId,
+              user_id: auth.userId,
+              activity_type: 'auto_rollback_triggered',
+              title: 'Stage auto-rollback triggered by critical deficiency',
+              metadata: {
+                deficiency_id: created.id,
+                severity: 'critical' as const,
+                target_stage_id: previous_stage_id,
+              },
+            })
+        } catch (rollbackErr) {
+          console.error('[deficiencies POST] Auto-rollback failed:', rollbackErr)
+          // Log failure to activities so it is auditable
+          auth.supabase
+            .from('activities')
+            .insert({
+              tenant_id: auth.tenantId,
+              matter_id: matterId,
+              user_id: auth.userId,
+              activity_type: 'auto_rollback_triggered',
+              title: 'Stage auto-rollback triggered by critical deficiency',
+              metadata: {
+                deficiency_id: created.id,
+                severity: 'critical' as const,
+                target_stage_id: null,
+              },
+            })
+            .then(() => { /* fire-and-forget */ })
+        }
+      }).catch((e: unknown) => {
+        console.error('[deficiencies POST] Auto-rollback promise chain error:', e)
+      })
     }
 
     return NextResponse.json(created, { status: 201 })

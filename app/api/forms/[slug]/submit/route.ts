@@ -3,12 +3,30 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { evaluateCondition } from '@/lib/utils/condition-evaluator'
 import type { IntakeField, IntakeFormSettings, FieldCondition } from '@/lib/types/intake-field'
 import { withTiming } from '@/lib/middleware/request-timing'
+import { createRateLimiter } from '@/lib/middleware/rate-limit'
+
+// In-process sliding-window rate limiter — suitable for single-instance deployments.
+// For multi-instance production, replace with a Redis-backed implementation.
+const submitLimiter = createRateLimiter({ maxRequests: 10, windowMs: 60_000 })
 
 async function handlePost(
   request: Request,
   { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
+    // Rate limit: 10 submissions per IP per minute
+    const ip =
+      request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ??
+      request.headers.get('x-real-ip') ??
+      'unknown'
+    const rateLimitResult = submitLimiter.check(ip)
+    if (!rateLimitResult.allowed) {
+      return NextResponse.json(
+        { error: 'Rate limit exceeded. Please wait before submitting again.' },
+        { status: 429 }
+      )
+    }
+
     const { slug } = await params
     const admin = createAdminClient()
 
@@ -326,8 +344,8 @@ async function handlePost(
       }
     }
 
-    // 9. Insert submission record
-    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? null
+    // 9. Insert submission record (reuse ip extracted above for rate limiting)
+    const submissionIp = ip !== 'unknown' ? ip : null
     const userAgent = request.headers.get('user-agent') ?? null
 
     const { error: subError } = await admin
@@ -338,7 +356,7 @@ async function handlePost(
         data: data as any,
         contact_id: contactId,
         lead_id: leadId,
-        source_ip: ip,
+        source_ip: submissionIp,
         user_agent: userAgent,
         utm_source: utm_source ?? null,
         utm_medium: utm_medium ?? null,

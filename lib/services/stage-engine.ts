@@ -53,6 +53,10 @@ interface GatingRuleRequireNoOpenDeficiencies {
   type: 'require_no_open_deficiencies'
 }
 
+interface GatingRuleRequireSubmissionConfirmation {
+  type: 'require_submission_confirmation'
+}
+
 export type GatingRule =
   | GatingRuleChecklistComplete
   | GatingRuleRequireDeadlines
@@ -63,6 +67,7 @@ export type GatingRule =
   | GatingRuleRequireNoContradictions
   | GatingRuleRequireImmIntakeStatus
   | GatingRuleRequireNoOpenDeficiencies
+  | GatingRuleRequireSubmissionConfirmation
 
 // ─── Result Types ─────────────────────────────────────────────────────────────
 
@@ -753,6 +758,34 @@ export async function evaluateGatingRules(
           conditionName: 'No Open Deficiencies',
           passed: defsPassed,
           details: defDetails,
+        })
+        break
+      }
+
+      case 'require_submission_confirmation': {
+        // Check matter_intake for a recorded submission confirmation.
+        // Either submission_confirmation_number OR submission_confirmation_doc_path
+        // must be present (non-null) to satisfy the gate.
+        const { data: submissionIntake } = await supabase
+          .from('matter_intake')
+          .select('submission_confirmation_number, submission_confirmation_doc_path')
+          .eq('matter_id', matterId)
+          .maybeSingle()
+
+        const hasNumber = !!(submissionIntake as any)?.submission_confirmation_number
+        const hasDocPath = !!(submissionIntake as any)?.submission_confirmation_doc_path
+        const submissionPassed = hasNumber || hasDocPath
+
+        const submissionDetails = submissionPassed
+          ? undefined
+          : 'Submission confirmation is required. Provide a confirmation number or attach a confirmation document.'
+
+        if (!submissionPassed) failedRules.push(submissionDetails!)
+        conditions.push({
+          conditionId: 'require_submission_confirmation',
+          conditionName: 'Submission Confirmation Recorded',
+          passed: submissionPassed,
+          details: submissionDetails,
         })
         break
       }

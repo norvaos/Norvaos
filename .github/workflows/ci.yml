@@ -57,10 +57,16 @@ jobs:
       - name: Run tests
         run: pnpm vitest run
 
-  # ─── Lint, Type-check, Build ─────────────────────────────────────
+  # ─── Lint, Type-check, Test, Build ────────────────────────────────
   build:
     name: Build & Verify
     runs-on: ubuntu-latest
+    env:
+      # Supabase placeholders — tests mock the Supabase client so real
+      # credentials are not needed. Values must be non-empty strings.
+      NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder_anon_key_for_ci
+      WORKER_SECRET: test-secret
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -86,7 +92,19 @@ jobs:
         run: pnpm audit --audit-level=high || echo "::warning::Security vulnerabilities found — review pnpm audit output above"
 
       - name: Type Check
-        run: pnpm type-check
+        run: pnpm exec tsc --noEmit
+
+      - name: Sprint 6 tests
+        # Runs all Sprint 6 test files in lib/services/__tests__/ with verbose
+        # output so failures are clearly visible in the CI log.
+        # Sprint 6 files covered:
+        #   - refusal-engine.test.ts    (JR deadline computation + input validation)
+        # Additional Sprint 6 test files added to lib/services/__tests__/ are
+        # automatically picked up by the glob pattern in vitest.config.ts.
+        run: pnpm exec vitest run --reporter=verbose lib/services/__tests__/
+
+      - name: Run all tests
+        run: pnpm exec vitest run --reporter=verbose
 
       - name: Schema drift check
         run: node scripts/check-schema-drift.mjs
@@ -220,7 +238,7 @@ jobs:
 
       - name: Production deployment placeholder
         run: |
-          echo "🚀 Deploy to production environment"
+          echo "Deploy to production environment"
           echo "Configure your deployment platform in this step"
           echo "Version: $(node -p "require('./package.json').version")"
 

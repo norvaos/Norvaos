@@ -28,6 +28,13 @@ export interface ReturnStageInput {
   returnReason: string
   /** The app user ID (users.id) performing the action. */
   performedBy: string
+  /**
+   * When true, step 6 (open critical deficiency check) is skipped.
+   * Used exclusively by the auto-rollback path triggered by critical deficiency creation,
+   * where the newly created deficiency IS the open one — checking would create a circular
+   * block. Manual return-stage calls must never set this (default: false).
+   */
+  skipCriticalDeficiencyCheck?: boolean
 }
 
 export interface ReturnStageResult {
@@ -68,7 +75,7 @@ export async function returnMatterToStage(
   supabase: SupabaseClient<Database>,
   input: ReturnStageInput
 ): Promise<ReturnStageResult> {
-  const { matterId, tenantId, targetStageId, returnReason, performedBy } = input
+  const { matterId, tenantId, targetStageId, returnReason, performedBy, skipCriticalDeficiencyCheck = false } = input
 
   // ── Step 1: Validate return reason length ────────────────────────────────
   if (returnReason.trim().length < 50) {
@@ -127,21 +134,26 @@ export async function returnMatterToStage(
   }
 
   // ── Step 6: Check for open critical deficiencies ──────────────────────────
-  const { data: openCritical, error: deficiencyErr } = await supabase
-    .from('matter_deficiencies')
-    .select('id')
-    .eq('matter_id', matterId)
-    .eq('severity', 'critical')
-    .in('status', ['open', 'in_progress', 'reopened'])
+  // Skipped when skipCriticalDeficiencyCheck = true (auto-rollback path only).
+  // At that point the caller has just created the critical deficiency and
+  // intentionally bypasses this guard to avoid a circular block.
+  if (!skipCriticalDeficiencyCheck) {
+    const { data: openCritical, error: deficiencyErr } = await supabase
+      .from('matter_deficiencies')
+      .select('id')
+      .eq('matter_id', matterId)
+      .eq('severity', 'critical')
+      .in('status', ['open', 'in_progress', 'reopened'])
 
-  if (deficiencyErr) {
-    throw new Error(`Failed to check for critical deficiencies: ${deficiencyErr.message}`)
-  }
+    if (deficiencyErr) {
+      throw new Error(`Failed to check for critical deficiencies: ${deficiencyErr.message}`)
+    }
 
-  if (openCritical && openCritical.length > 0) {
-    throw new Error(
-      'Cannot return stage while critical deficiencies are open. Resolve critical deficiencies first.'
-    )
+    if (openCritical && openCritical.length > 0) {
+      throw new Error(
+        'Cannot return stage while critical deficiencies are open. Resolve critical deficiencies first.'
+      )
+    }
   }
 
   // ── Step 7: Write to stage_transition_log ────────────────────────────────

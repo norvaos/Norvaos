@@ -9062,6 +9062,130 @@ export type Database = {
           },
         ]
       }
+      ircc_correspondence: {
+        Row: {
+          id: string
+          tenant_id: string
+          matter_id: string
+          item_type: string
+          item_date: string | null
+          status: string
+          decision_type: string | null
+          notes: string | null
+          document_path: string | null
+          created_by: string | null
+          created_at: string
+          updated_at: string
+          jr_deadline: string | null
+          jr_basis: string | null
+          jr_matter_id: string | null
+          reapplication_matter_id: string | null
+          client_notified_at: string | null
+          urgent_task_id: string | null
+        }
+        Insert: {
+          id?: string
+          tenant_id: string
+          matter_id: string
+          item_type: string
+          item_date?: string | null
+          status?: string
+          decision_type?: string | null
+          notes?: string | null
+          document_path?: string | null
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+          jr_deadline?: string | null
+          jr_basis?: string | null
+          jr_matter_id?: string | null
+          reapplication_matter_id?: string | null
+          client_notified_at?: string | null
+          urgent_task_id?: string | null
+        }
+        Update: {
+          item_type?: string
+          item_date?: string | null
+          status?: string
+          decision_type?: string | null
+          notes?: string | null
+          document_path?: string | null
+          updated_at?: string
+          jr_deadline?: string | null
+          jr_basis?: string | null
+          jr_matter_id?: string | null
+          reapplication_matter_id?: string | null
+          client_notified_at?: string | null
+          urgent_task_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ircc_correspondence_matter_id_fkey"
+            columns: ["matter_id"]
+            isOneToOne: false
+            referencedRelation: "matters"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ircc_correspondence_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      refusal_actions: {
+        Row: {
+          id: string
+          tenant_id: string
+          correspondence_id: string
+          matter_id: string
+          action_type: string
+          performed_at: string
+          performed_by: string | null
+          metadata: Json
+        }
+        Insert: {
+          id?: string
+          tenant_id: string
+          correspondence_id: string
+          matter_id: string
+          action_type: string
+          performed_at?: string
+          performed_by?: string | null
+          metadata?: Json
+        }
+        Update: {
+          action_type?: string
+          performed_at?: string
+          performed_by?: string | null
+          metadata?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "refusal_actions_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "refusal_actions_matter_id_fkey"
+            columns: ["matter_id"]
+            isOneToOne: false
+            referencedRelation: "matters"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "refusal_actions_correspondence_id_fkey"
+            columns: ["correspondence_id"]
+            isOneToOne: false
+            referencedRelation: "ircc_correspondence"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       job_run_logs: {
         Row: {
           created_at: string
@@ -20160,5 +20284,138 @@ export interface MatterDeficiencyUpdate {
   reopened_by?: string | null
   chronic_escalated_at?: string | null
   chronic_escalated_to?: string | null
+  updated_at?: string
+}
+
+// ── refusal_actions (migration 129) ──────────────────────────────────────────
+
+export type RefusalActionType =
+  | 'jr_deadline_set'
+  | 'urgent_task_created'
+  | 'client_notified'
+  | 'jr_matter_created'
+  | 'reapplication_matter_created'
+
+export interface RefusalActionRow {
+  id: string
+  tenant_id: string
+  correspondence_id: string
+  matter_id: string
+  action_type: RefusalActionType
+  performed_at: string
+  performed_by: string | null
+  metadata: Json
+}
+
+export interface RefusalActionInsert {
+  id?: string
+  tenant_id: string
+  correspondence_id: string
+  matter_id: string
+  action_type: RefusalActionType
+  performed_at?: string
+  performed_by?: string | null
+  metadata?: Json
+}
+
+export interface RefusalActionUpdate {
+  metadata?: Json
+}
+
+// ── ircc_correspondence: new refusal columns (migration 129) ─────────────────
+// Extends IrccCorrespondenceRow / Insert / Update above.
+// These are added as a separate augmentation interface because the base
+// IrccCorrespondenceRow above is maintained manually and reflects prior state.
+
+export interface IrccCorrespondenceRefusalFields {
+  jr_deadline: string | null           // DATE — computed JR deadline
+  jr_basis: 'inland' | 'outside_canada' | null
+  jr_matter_id: string | null          // UUID → matters.id
+  reapplication_matter_id: string | null // UUID → matters.id
+  client_notified_at: string | null    // TIMESTAMPTZ
+  urgent_task_id: string | null        // UUID → tasks.id
+}
+
+/** Full ircc_correspondence row including refusal workflow columns */
+export interface IrccCorrespondenceRowV2
+  extends IrccCorrespondenceRow,
+    IrccCorrespondenceRefusalFields {}
+
+/** Insert payload including optional refusal columns */
+export interface IrccCorrespondenceInsertV2
+  extends IrccCorrespondenceInsert,
+    Partial<IrccCorrespondenceRefusalFields> {}
+
+/** Update payload including refusal columns */
+export interface IrccCorrespondenceUpdateV2
+  extends IrccCorrespondenceUpdate,
+    Partial<IrccCorrespondenceRefusalFields> {}
+
+// ── matters: new closure columns (migration 129) ─────────────────────────────
+
+export interface MatterClosureFields {
+  closed_reason: string | null
+  closed_by: string | null      // UUID → users.id
+  closed_at: string | null      // TIMESTAMPTZ
+}
+
+// ── matter_intake: new submission confirmation columns (migration 129) ────────
+
+export interface MatterIntakeSubmissionFields {
+  submission_confirmation_number: string | null
+  submission_confirmation_doc_path: string | null
+  submission_confirmed_at: string | null      // TIMESTAMPTZ
+  submission_confirmed_by: string | null      // UUID → users.id
+}
+
+// ── form_generation_log (migration 130) ──────────────────────────────────────
+// Audit log for every PDF form generation job dispatched to the Python sidecar.
+
+export type FormGenerationStatus = 'pending' | 'processing' | 'completed' | 'failed'
+
+export interface FormGenerationLogRow {
+  id: string
+  tenant_id: string
+  matter_id: string
+  form_template_id: string
+  generation_key: string
+  status: FormGenerationStatus
+  output_path: string | null
+  error_message: string | null
+  page_count: number | null
+  processing_started_at: string | null
+  completed_at: string | null
+  requested_by: string | null
+  metadata: Json
+  created_at: string
+  updated_at: string
+}
+
+export interface FormGenerationLogInsert {
+  id?: string
+  tenant_id: string
+  matter_id: string
+  form_template_id: string
+  generation_key?: string
+  status?: FormGenerationStatus
+  output_path?: string | null
+  error_message?: string | null
+  page_count?: number | null
+  processing_started_at?: string | null
+  completed_at?: string | null
+  requested_by?: string | null
+  metadata?: Json
+  created_at?: string
+  updated_at?: string
+}
+
+export interface FormGenerationLogUpdate {
+  status?: FormGenerationStatus
+  output_path?: string | null
+  error_message?: string | null
+  page_count?: number | null
+  processing_started_at?: string | null
+  completed_at?: string | null
+  metadata?: Json
   updated_at?: string
 }

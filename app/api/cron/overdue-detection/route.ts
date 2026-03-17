@@ -14,13 +14,13 @@ import { dispatchNotification } from '@/lib/services/notification-engine'
  * Uses admin client (service role) to operate across all tenants.
  */
 async function handlePost(request: Request) {
-  // Auth check
-  const cronSecret = process.env.CRON_SECRET
-  if (cronSecret) {
-    const authHeader = request.headers.get('authorization')
-    if (authHeader !== `Bearer ${cronSecret}`) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+  // Auth check — fail-closed: reject if CRON_SECRET is unset
+  const cronSecret = process.env['CRON_SECRET']
+  if (!cronSecret) {
+    return NextResponse.json({ error: 'Server misconfigured: CRON_SECRET not set' }, { status: 500 })
+  }
+  if (request.headers.get('authorization') !== `Bearer ${cronSecret}`) {
+    return NextResponse.json({ error: 'Unauthorised' }, { status: 401 })
   }
 
   const supabase = createAdminClient()

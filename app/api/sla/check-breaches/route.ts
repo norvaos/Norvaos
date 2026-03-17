@@ -3,10 +3,12 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { checkBreaches } from '@/lib/services/sla-engine'
 import { computeNextAction } from '@/lib/services/next-action-engine'
 
-const CRON_SECRET = process.env.CRON_SECRET ?? ''
-
 export async function POST(request: Request) {
-  // Validate shared secret
+  // Auth check — fail-closed: reject if CRON_SECRET is unset
+  const CRON_SECRET = process.env['CRON_SECRET']
+  if (!CRON_SECRET) {
+    return NextResponse.json({ error: 'Server misconfigured: CRON_SECRET not set' }, { status: 500 })
+  }
   const authHeader = request.headers.get('x-cron-secret')
   if (!authHeader || authHeader !== CRON_SECRET) {
     return NextResponse.json({ error: 'Unauthorised' }, { status: 401 })

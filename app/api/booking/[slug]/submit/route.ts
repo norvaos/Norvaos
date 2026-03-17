@@ -1,6 +1,11 @@
 import { NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { withTiming } from '@/lib/middleware/request-timing'
+import { createRateLimiter } from '@/lib/middleware/rate-limit'
+
+// In-process sliding-window rate limiter — suitable for single-instance deployments.
+// For multi-instance production, replace with a Redis-backed implementation.
+const submitLimiter = createRateLimiter({ maxRequests: 10, windowMs: 60_000 })
 
 /**
  * POST /api/booking/[slug]/submit
@@ -13,6 +18,19 @@ async function handlePost(
   { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
+    // Rate limit: 10 submissions per IP per minute
+    const ip =
+      request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ??
+      request.headers.get('x-real-ip') ??
+      'unknown'
+    const rateLimitResult = submitLimiter.check(ip)
+    if (!rateLimitResult.allowed) {
+      return NextResponse.json(
+        { error: 'Rate limit exceeded. Please wait before submitting again.' },
+        { status: 429 }
+      )
+    }
+
     const { slug } = await params
     const admin = createAdminClient()
 

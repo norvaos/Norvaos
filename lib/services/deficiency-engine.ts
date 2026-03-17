@@ -139,6 +139,27 @@ export function computeReopenTransition(
   }
 }
 
+// ─── Role authorisation helpers ───────────────────────────────────────────────
+
+/**
+ * Returns true if the given role name is permitted to resolve a deficiency.
+ * Only Lawyers and Admins may resolve deficiencies.
+ * Exported so it can be called from both the route handler and unit tests.
+ */
+export function isAuthorisedToResolveDeficiency(roleName: string | null): boolean {
+  return roleName === 'Lawyer' || roleName === 'Admin'
+}
+
+/**
+ * Returns true if the given role name is permitted to manually return a matter
+ * to an earlier stage.
+ * Only Lawyers and Admins may trigger the return-stage workflow.
+ * Exported so it can be called from both the route handler and unit tests.
+ */
+export function isAuthorisedToReturnStage(roleName: string | null): boolean {
+  return roleName === 'Lawyer' || roleName === 'Admin'
+}
+
 // ─── hasBlockingDeficiencies ──────────────────────────────────────────────────
 
 /**
