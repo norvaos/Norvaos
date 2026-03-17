@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useMemo, useCallback, useRef, useEffect } from 'react'
+import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
 import { useTenant } from '@/lib/hooks/use-tenant'
 import { useUser } from '@/lib/hooks/use-user'
@@ -305,6 +306,15 @@ export default function MatterDetailPage() {
   const params = useParams()
   const router = useRouter()
   const matterId = params.id as string
+
+  // Redirect to the WorkplaceShell — this is the canonical matter view.
+  // The legacy content below is retained during migration but not rendered.
+  useEffect(() => {
+    if (matterId) {
+      router.replace(`/matters/${matterId}/shell`)
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [matterId])
   const { tenant } = useTenant()
   const { appUser } = useUser()
   const { role: userRole } = useUserRole()
@@ -596,8 +606,8 @@ export default function MatterDetailPage() {
     )
   }
 
-  const statusConfig = getStatusConfig(matter.status)
-  const priorityConfig = getPriorityConfig(matter.priority)
+  const statusConfig = getStatusConfig(matter.status ?? "")
+  const priorityConfig = getPriorityConfig(matter.priority ?? "")
 
   async function handleUpdatePrimaryContact(contactId: string | null | undefined) {
     const supabase = createClient()
@@ -893,6 +903,19 @@ export default function MatterDetailPage() {
         </div>
       )}
 
+      {/* ─── IRCC Filing Workspace link (immigration matters) ─── */}
+      {(matter?.case_type_id || matter?.matter_type) && (
+        <div className="flex items-center justify-end px-4 pt-1 pb-0 shrink-0">
+          <Link
+            href={`/matters/${matterId}/workspace`}
+            className="inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:text-primary/80 transition-colors"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+            Open IRCC Filing Workspace →
+          </Link>
+        </div>
+      )}
+
       {/* ─── Phase C: Workplace Shell (5-zone layout) ─── */}
       <WorkplaceShell
         matterId={matterId}
@@ -946,7 +969,7 @@ export default function MatterDetailPage() {
           tenantId,
           readinessData,
           intakeStatus,
-          matterStatus: matter.status,
+          matterStatus: matter.status ?? undefined,
           isImmigrationWorkspace,
           immigrationWorkspaceContent: immigrationContent,
           blockerCardProps: {
@@ -963,7 +986,7 @@ export default function MatterDetailPage() {
           },
           suggestedActionProps: {
             intakeStatus,
-            matterStatus: matter.status,
+            matterStatus: matter.status ?? undefined,
             readinessData,
             onSendDocRequest: () => setDocRequestDialogOpen(true),
             onOpenQuestionnaire: () => setExternalSheetKey('irccIntake'),
@@ -1019,7 +1042,7 @@ export default function MatterDetailPage() {
               onOpenContactsSheet={() => setExternalSheetKey('contacts')}
             />
           ) : (
-            <FormsTab matterId={matterId} matterStatus={matter.status} />
+            <FormsTab matterId={matterId} matterStatus={matter.status ?? undefined} />
           ),
           tasks: (
             <TasksTab
@@ -1044,7 +1067,7 @@ export default function MatterDetailPage() {
           ),
           trust: (
             <RequirePermission entity="trust_accounting" action="view" variant="inline">
-              <TrustTab matterId={matterId} tenantId={tenantId} matter={matter} />
+              <TrustTab matterId={matterId} tenantId={tenantId} matter={{ ...matter, trust_balance: matter.trust_balance ?? 0 }} />
             </RequirePermission>
           ),
           notes: <NotesEditor tenantId={tenantId} matterId={matterId} />,

@@ -28,6 +28,7 @@ import { ZoneC } from './ZoneC'
 import { ZoneD } from './ZoneD'
 import { ZoneE } from './ZoneE'
 import type { Database } from '@/lib/types/database'
+import type { ZoneDProps } from './ZoneD'
 
 type Matter = Database['public']['Tables']['matters']['Row']
 
@@ -36,11 +37,13 @@ type Matter = Database['public']['Tables']['matters']['Row']
 export interface WorkplaceShellProps {
   matter: Matter
   tenantId: string
+  /** Deep-link: open ZoneD at this tab on first render. */
+  initialTab?: ZoneDProps['initialTab']
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
-export function WorkplaceShell({ matter, tenantId }: WorkplaceShellProps) {
+export function WorkplaceShell({ matter, tenantId, initialTab }: WorkplaceShellProps) {
   return (
     <div className="flex flex-col h-full overflow-hidden bg-background">
 
@@ -57,7 +60,7 @@ export function WorkplaceShell({ matter, tenantId }: WorkplaceShellProps) {
         <ZoneC matter={matter} tenantId={tenantId} />
 
         {/* Zone D — Main Workspace */}
-        <ZoneD matter={matter} tenantId={tenantId} />
+        <ZoneD matter={matter} tenantId={tenantId} initialTab={initialTab} />
 
         {/* Zone E — Audit Rail */}
         <ZoneE matterId={matter.id} tenantId={tenantId} />

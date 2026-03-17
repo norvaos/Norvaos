@@ -6,22 +6,51 @@
  * Full-screen WorkplaceShell (5-zone layout) for a single matter.
  * Fetches the matter row and tenant context, then mounts the shell.
  *
+ * Supports deep-linking to a specific tab via the `?tab=` search param.
+ * Example: /matters/abc123/shell?tab=billing  → opens at the Billing tab.
+ * Hash routing (#billing) is still supported for back/forward navigation.
+ *
  * This is the new spec-aligned shell (Section 3) that replaces the legacy
  * IRCC-specific WorkspaceShell over time. Both can coexist during migration.
  */
 
-import { useParams, useRouter } from 'next/navigation'
+import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import { useEffect } from 'react'
 import { Loader2, AlertTriangle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { WorkplaceShell } from '@/components/shell/WorkplaceShell'
+import type { ZoneDProps } from '@/components/shell/ZoneD'
 import { useMatter } from '@/lib/queries/matters'
 import { useTenant } from '@/lib/hooks/use-tenant'
 
+// Valid ZoneD tab IDs — keep in sync with ZoneD's TabId union.
+const VALID_TABS = new Set<ZoneDProps['initialTab']>([
+  'details',
+  'documents',
+  'forms',
+  'questionnaire',
+  'review',
+  'billing',
+  'communications',
+  'correspondence',
+  'tasks',
+  'notes',
+])
+
+function parseTabParam(raw: string | null): ZoneDProps['initialTab'] | undefined {
+  if (!raw) return undefined
+  const candidate = raw as ZoneDProps['initialTab']
+  return VALID_TABS.has(candidate) ? candidate : undefined
+}
+
 export default function MatterShellPage() {
-  const params   = useParams()
-  const router   = useRouter()
-  const matterId = params.id as string
+  const params       = useParams()
+  const router       = useRouter()
+  const searchParams = useSearchParams()
+  const matterId     = params.id as string
+
+  // ?tab=billing → open ZoneD at the Billing tab on first render
+  const initialTab = parseTabParam(searchParams.get('tab'))
 
   const { tenant, isLoading: tenantLoading } = useTenant()
   const tenantId = tenant?.id ?? ''
@@ -72,7 +101,7 @@ export default function MatterShellPage() {
   // ── Shell ────────────────────────────────────────────────────────────────
   return (
     <div className="h-full overflow-hidden">
-      <WorkplaceShell matter={matter} tenantId={tenantId} />
+      <WorkplaceShell matter={matter} tenantId={tenantId} initialTab={initialTab} />
     </div>
   )
 }
