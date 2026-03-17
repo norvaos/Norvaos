@@ -8,15 +8,16 @@
  * Upcoming stages grey. Gated stages red with lock icon.
  *
  * Wired to:
- *   - matter_stage_state   (current_stage_id, stage_history)
- *   - matter_stages        (all stages for the pipeline)
- *   - check-gating API     (which stages have unmet gate conditions)
+ *   - matter_stage_state        (current_stage_id, stage_history)
+ *   - matter_stages             (all stages for the pipeline)
+ *   - check-gating API          (which stages have unmet gate conditions)
+ *   - useImmigrationReadiness   (blockers surfaced on next stage for imm. matters)
  *   - useAdvanceMatterStage mutation
  *
  * Read-only when matter is closed.
  */
 
-import { useCallback } from 'react'
+import { useCallback, useMemo } from 'react'
 import { Skeleton } from '@/components/ui/skeleton'
 import { StagePipelineBar } from '@/components/matters/stage-pipeline-bar'
 import {
@@ -25,6 +26,7 @@ import {
   useAdvanceMatterStage,
   useCheckGating,
 } from '@/lib/queries/matter-types'
+import { useImmigrationReadiness } from '@/lib/queries/immigration-readiness'
 import type { Database } from '@/lib/types/database'
 
 type Matter = Database['public']['Tables']['matters']['Row']
@@ -52,6 +54,10 @@ export function ZoneB({ matterId, matter }: ZoneBProps) {
   // Pre-evaluated gating errors for all stages
   const { data: gatingData } = useCheckGating(matterId, !!pipelineId)
 
+  // Immigration readiness blockers — only fetched for immigration matters
+  const isImmigrationMatter = !!matter.matter_type_id
+  const { data: readinessData } = useImmigrationReadiness(isImmigrationMatter ? matterId : null)
+
   const advanceStage = useAdvanceMatterStage()
 
   const isLoading = stateLoading || stagesLoading
@@ -67,6 +73,42 @@ export function ZoneB({ matterId, matter }: ZoneBProps) {
     },
     [matterId, stageState?.current_stage_id, isClosed, advanceStage, matter.matter_type_id],
   )
+
+  /**
+   * Merge check-gating API errors with immigration readiness blockers.
+   *
+   * For immigration matters: if there are known readiness blockers (docs
+   * missing, questionnaire incomplete, etc.), annotate the "next" stage
+   * (the stage immediately after the current one) with those reasons.
+   *
+   * The check-gating API evaluates matter_stages.gating_rules; the readiness
+   * hook provides granular immigration-specific blockers. Both are surfaced
+   * in the tooltip so the lawyer sees a single, complete blocked view.
+   */
+  const effectiveGatingErrors = useMemo((): Record<string, string[]> | undefined => {
+    const base: Record<string, string[]> = { ...(gatingData?.gatingErrors ?? {}) }
+
+    if (!readinessData || !stages || stages.length === 0) return base
+
+    const blockers = readinessData.blockedReasons
+    if (!blockers || blockers.length === 0) return base
+
+    // Find the next stage (immediately after current)
+    const sorted = [...stages].sort((a, b) => a.sort_order - b.sort_order)
+    const currentIndex = sorted.findIndex((s) => s.id === stageState?.current_stage_id)
+    const nextStage = currentIndex >= 0 ? sorted[currentIndex + 1] : null
+
+    if (!nextStage) return base
+
+    // Merge: deduplicate with any existing check-gating errors on this stage
+    const existing = base[nextStage.id] ?? []
+    const merged = Array.from(new Set([...existing, ...blockers]))
+    if (merged.length > 0) {
+      base[nextStage.id] = merged
+    }
+
+    return base
+  }, [gatingData?.gatingErrors, readinessData, stages, stageState?.current_stage_id])
 
   if (isLoading) {
     return (
@@ -97,7 +139,7 @@ export function ZoneB({ matterId, matter }: ZoneBProps) {
         stageHistory={stageHistory}
         onStageClick={isClosed ? undefined : handleStageClick}
         disabled={isClosed || advanceStage.isPending}
-        gatingErrors={gatingData?.gatingErrors}
+        gatingErrors={effectiveGatingErrors}
       />
     </div>
   )

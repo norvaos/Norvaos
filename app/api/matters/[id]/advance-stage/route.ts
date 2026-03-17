@@ -5,6 +5,7 @@ import { advanceGenericStage, advanceImmigrationStage } from '@/lib/services/sta
 import { invalidateGating, invalidateMatter } from '@/lib/services/cache-invalidation'
 import { dispatchNotification } from '@/lib/services/notification-engine'
 import { withTiming } from '@/lib/middleware/request-timing'
+import type { NorvaOSGateFailure } from '@/lib/types/errors'
 
 /**
  * POST /api/matters/[id]/advance-stage
@@ -124,6 +125,7 @@ async function handlePost(
 
       // 6b. Write to stage_transition_log — fire-and-forget, non-fatal.
       //     Zone E (audit rail) reads from this table.
+      //     gate_snapshot now carries the full per-condition evaluation result.
       auth.supabase
         .from('stage_transition_log')
         .insert({
@@ -134,7 +136,8 @@ async function handlePost(
           from_stage_name: fromStageName,
           to_stage_name:   toStageName,
           transition_type: 'advance',
-          gate_snapshot:   {},
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          gate_snapshot:   result.gateSnapshot as any,
           transitioned_by: auth.userId,
         })
         .then(({ error: logErr }) => {
@@ -170,6 +173,35 @@ async function handlePost(
 
       return NextResponse.json(result, { status: 200 })
     } else {
+      // Gate failure: return structured 422 with NorvaOSGateFailure payload.
+      // This lets the UI distinguish a gate block (422) from a bad request (400)
+      // and surface actionable messaging about which conditions failed.
+      const failedConditions = result.conditions ?? []
+      const hasGateConditions = failedConditions.length > 0
+
+      if (hasGateConditions) {
+        const gateFailure: NorvaOSGateFailure = {
+          code: 'GATE_CONDITIONS_NOT_MET',
+          title: 'Stage Advancement Blocked',
+          message: result.error,
+          action: 'Resolve the listed conditions before advancing to the next stage.',
+          owner: 'lawyer',
+          failedConditions: failedConditions.filter((c) => !c.passed),
+        }
+
+        return NextResponse.json(
+          {
+            success: false,
+            error: gateFailure.title,
+            code: gateFailure.code,
+            gateFailure,
+            failedRules: result.failedRules ?? [],
+          },
+          { status: 422 }
+        )
+      }
+
+      // Non-gate failure (e.g. missing pipeline, DB error) — keep 400
       return NextResponse.json(result, { status: 400 })
     }
   } catch (error) {

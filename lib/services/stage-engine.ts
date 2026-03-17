@@ -1,8 +1,11 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/lib/types/database'
+import type { GateConditionResult, GateSnapshot } from '@/lib/types/errors'
 import { calculateCompletionScore } from './checklist-engine'
 import { processAutomationTrigger } from './automation-engine'
 import { sendStageChangeEmail } from './email-service'
+
+export type { GateConditionResult, GateSnapshot }
 
 type Json = Database['public']['Tables']['activities']['Insert']['metadata']
 
@@ -61,12 +64,16 @@ export type GatingRule =
 interface AdvanceSuccess {
   success: true
   stageName: string
+  /** All gate conditions evaluated (all passed). Written to stage_transition_log.gate_snapshot. */
+  gateSnapshot: GateSnapshot
 }
 
 interface AdvanceFailure {
   success: false
   error: string
   failedRules?: string[]
+  /** Per-condition results (including passed conditions) — for structured 422 response. */
+  conditions?: GateConditionResult[]
 }
 
 type AdvanceResult = AdvanceSuccess | AdvanceFailure
@@ -125,8 +132,13 @@ export async function advanceGenericStage(params: StageEngineParams): Promise<Ad
   const rawGatingRules = (Array.isArray(targetStage.gating_rules) ? targetStage.gating_rules : []) as unknown as GatingRule[]
   const effectiveRules = await getEffectiveGatingRules(supabase, matterId, rawGatingRules, targetStage.sort_order)
 
+  const evaluatedAt = new Date().toISOString()
+  let gateSnapshot: GateSnapshot = { evaluatedAt, conditions: [], allPassed: true }
+
   if (effectiveRules.length > 0) {
     const gateResult = await evaluateGatingRules(supabase, matterId, tenantId, effectiveRules, currentState?.stage_history)
+    gateSnapshot = { evaluatedAt, conditions: gateResult.conditions, allPassed: gateResult.passed }
+
     if (!gateResult.passed) {
       // Log the blocked attempt
       await logActivity(supabase, {
@@ -137,7 +149,12 @@ export async function advanceGenericStage(params: StageEngineParams): Promise<Ad
         description: gateResult.failedRules.join('; '),
         userId,
       })
-      return { success: false, error: gateResult.failedRules.join('. '), failedRules: gateResult.failedRules }
+      return {
+        success: false,
+        error: gateResult.failedRules.join('. '),
+        failedRules: gateResult.failedRules,
+        conditions: gateResult.conditions,
+      }
     }
   }
 
@@ -263,7 +280,7 @@ export async function advanceGenericStage(params: StageEngineParams): Promise<Ad
     userId,
   })
 
-  return { success: true, stageName: targetStage.name }
+  return { success: true, stageName: targetStage.name, gateSnapshot }
 }
 
 // ─── Immigration Stage Advancement ────────────────────────────────────────────
@@ -289,6 +306,12 @@ export async function advanceImmigrationStage(params: StageEngineParams): Promis
   }
 
   // 2. If requires_checklist_complete, validate all required items
+  const immGateSnapshot: GateSnapshot = {
+    evaluatedAt: new Date().toISOString(),
+    conditions: [],
+    allPassed: true,
+  }
+
   if (newStage.requires_checklist_complete) {
     const { data: checklistItems, error: checklistError } = await supabase
       .from('matter_checklist_items')
@@ -301,19 +324,33 @@ export async function advanceImmigrationStage(params: StageEngineParams): Promis
     }
 
     const score = calculateCompletionScore(checklistItems ?? [])
-    if (!score.isComplete) {
+    const checklistPassed = score.isComplete
+    const checklistDetails = checklistPassed
+      ? undefined
+      : `Missing required checklist items: ${score.missingRequired.join(', ')}`
+
+    immGateSnapshot.conditions.push({
+      conditionId: 'require_checklist_complete',
+      conditionName: 'Checklist Complete',
+      passed: checklistPassed,
+      details: checklistDetails,
+    })
+
+    if (!checklistPassed) {
+      immGateSnapshot.allPassed = false
       await logActivity(supabase, {
         tenantId,
         matterId,
         activityType: 'stage_change_blocked',
         title: `Stage advancement to "${newStage.name}" blocked`,
-        description: `Missing required checklist items: ${score.missingRequired.join(', ')}`,
+        description: checklistDetails ?? '',
         userId,
       })
       return {
         success: false,
         error: `All required checklist items must be approved before advancing to "${newStage.name}". Missing: ${score.missingRequired.join(', ')}`,
         failedRules: score.missingRequired.map((name) => `Required: ${name}`),
+        conditions: immGateSnapshot.conditions,
       }
     }
   }
@@ -455,7 +492,7 @@ export async function advanceImmigrationStage(params: StageEngineParams): Promis
     userId,
   })
 
-  return { success: true, stageName: newStage.name }
+  return { success: true, stageName: newStage.name, gateSnapshot: immGateSnapshot }
 }
 
 // ─── Gating Rule Evaluator ────────────────────────────────────────────────────
@@ -466,8 +503,9 @@ export async function evaluateGatingRules(
   tenantId: string,
   rules: GatingRule[],
   stageHistory?: unknown
-): Promise<{ passed: boolean; failedRules: string[] }> {
+): Promise<{ passed: boolean; failedRules: string[]; conditions: GateConditionResult[] }> {
   const failedRules: string[] = []
+  const conditions: GateConditionResult[] = []
 
   for (const rule of rules) {
     switch (rule.type) {
@@ -478,14 +516,24 @@ export async function evaluateGatingRules(
           .eq('matter_id', matterId)
           .eq('is_required', true)
 
+        let conditionPassed = true
+        let details: string | undefined
+
         if (items && items.length > 0) {
           const score = calculateCompletionScore(items)
           if (!score.isComplete) {
-            failedRules.push(
-              `Required checklist items incomplete (${score.requiredApproved}/${score.required}): ${score.missingRequired.slice(0, 3).join(', ')}${score.missingRequired.length > 3 ? '...' : ''}`
-            )
+            conditionPassed = false
+            details = `Required checklist items incomplete (${score.requiredApproved}/${score.required}): ${score.missingRequired.slice(0, 3).join(', ')}${score.missingRequired.length > 3 ? '...' : ''}`
+            failedRules.push(details)
           }
         }
+
+        conditions.push({
+          conditionId: 'require_checklist_complete',
+          conditionName: 'Checklist Complete',
+          passed: conditionPassed,
+          details,
+        })
         break
       }
 
@@ -503,7 +551,20 @@ export async function evaluateGatingRules(
 
         for (const name of requiredNames) {
           if (!existingTypes.has(name)) {
-            failedRules.push(`Required deadline missing: "${name}"`)
+            const detail = `Required deadline missing: "${name}"`
+            failedRules.push(detail)
+            conditions.push({
+              conditionId: `require_deadline:${name}`,
+              conditionName: `Deadline Required: ${name}`,
+              passed: false,
+              details: detail,
+            })
+          } else {
+            conditions.push({
+              conditionId: `require_deadline:${name}`,
+              conditionName: `Deadline Required: ${name}`,
+              passed: true,
+            })
           }
         }
         break
@@ -512,9 +573,14 @@ export async function evaluateGatingRules(
       case 'require_previous_stage': {
         const history = (Array.isArray(stageHistory) ? stageHistory : []) as { stage_name?: string }[]
         const wasReached = history.some((entry) => entry.stage_name === rule.stage_name)
-        if (!wasReached) {
-          failedRules.push(`Stage "${rule.stage_name}" must be completed first`)
-        }
+        const details = wasReached ? undefined : `Stage "${rule.stage_name}" must be completed first`
+        if (!wasReached) failedRules.push(details!)
+        conditions.push({
+          conditionId: `require_previous_stage:${rule.stage_name}`,
+          conditionName: `Previous Stage: ${rule.stage_name}`,
+          passed: wasReached,
+          details,
+        })
         break
       }
 
@@ -530,11 +596,18 @@ export async function evaluateGatingRules(
         const currentIdx = statusOrder.indexOf(intake?.intake_status ?? 'incomplete')
         const requiredIdx = statusOrder.indexOf(minStatus)
 
-        if (currentIdx < requiredIdx) {
-          failedRules.push(
-            `Core Data Card must be ${minStatus} before advancing. Current status: ${intake?.intake_status ?? 'not started'}`
-          )
-        }
+        const passed = currentIdx >= requiredIdx
+        const details = passed
+          ? undefined
+          : `Core Data Card must be ${minStatus} before advancing. Current status: ${intake?.intake_status ?? 'not started'}`
+
+        if (!passed) failedRules.push(details!)
+        conditions.push({
+          conditionId: 'require_intake_complete',
+          conditionName: 'Core Data Card Complete',
+          passed,
+          details,
+        })
         break
       }
 
@@ -547,15 +620,19 @@ export async function evaluateGatingRules(
 
         const blockLevels = rule.block_levels ?? ['critical']
         const effectiveLevel = riskIntake?.risk_override_level ?? riskIntake?.risk_level
+        const isBlocked = !!(effectiveLevel && blockLevels.includes(effectiveLevel) && !riskIntake?.risk_override_at)
 
-        if (effectiveLevel && blockLevels.includes(effectiveLevel)) {
-          const hasOverride = !!riskIntake?.risk_override_at
-          if (!hasOverride) {
-            failedRules.push(
-              `Risk level is "${effectiveLevel}". Lawyer review and override required before advancing.`
-            )
-          }
-        }
+        const details = isBlocked
+          ? `Risk level is "${effectiveLevel}". Lawyer review and override required before advancing.`
+          : undefined
+
+        if (isBlocked) failedRules.push(details!)
+        conditions.push({
+          conditionId: 'require_risk_review',
+          conditionName: 'Risk Review Complete',
+          passed: !isBlocked,
+          details,
+        })
         break
       }
 
@@ -567,16 +644,26 @@ export async function evaluateGatingRules(
           .eq('is_active', true)
           .eq('is_required', true)
 
+        let passed = true
+        let details: string | undefined
+
         if (requiredSlots && requiredSlots.length > 0) {
           const unaccepted = requiredSlots.filter((s) => s.status !== 'accepted')
           if (unaccepted.length > 0) {
+            passed = false
             const missingNames = unaccepted.slice(0, 3).map((s) => s.slot_name).join(', ')
             const suffix = unaccepted.length > 3 ? '...' : ''
-            failedRules.push(
-              `Required documents not yet accepted (${requiredSlots.length - unaccepted.length}/${requiredSlots.length}): ${missingNames}${suffix}`
-            )
+            details = `Required documents not yet accepted (${requiredSlots.length - unaccepted.length}/${requiredSlots.length}): ${missingNames}${suffix}`
+            failedRules.push(details)
           }
         }
+
+        conditions.push({
+          conditionId: 'require_document_slots_complete',
+          conditionName: 'Required Documents Accepted',
+          passed,
+          details,
+        })
         break
       }
 
@@ -587,6 +674,9 @@ export async function evaluateGatingRules(
           .eq('matter_id', matterId)
           .maybeSingle()
 
+        let passed = true
+        let details: string | undefined
+
         if (intakeForContra) {
           const flags = Array.isArray(intakeForContra.contradiction_flags)
             ? intakeForContra.contradiction_flags
@@ -596,11 +686,18 @@ export async function evaluateGatingRules(
             (f: any) => typeof f === 'object' && f?.severity === blockingSeverity
           )
           if (blockingFlags.length > 0 && !intakeForContra.contradiction_override_at) {
-            failedRules.push(
-              `${blockingFlags.length} blocking contradiction(s) must be resolved or overridden before advancing.`
-            )
+            passed = false
+            details = `${blockingFlags.length} blocking contradiction(s) must be resolved or overridden before advancing.`
+            failedRules.push(details)
           }
         }
+
+        conditions.push({
+          conditionId: 'require_no_contradictions',
+          conditionName: 'No Blocking Contradictions',
+          passed,
+          details,
+        })
         break
       }
 
@@ -618,17 +715,24 @@ export async function evaluateGatingRules(
         const actualStatus = intakeForStatus?.immigration_intake_status ?? 'not_issued'
         const actualIdx = IMMIGRATION_INTAKE_STATUS_ORDER.indexOf(actualStatus as any)
 
-        if (requiredIdx >= 0 && actualIdx < requiredIdx) {
-          failedRules.push(
-            `Immigration intake status must be at least "${requiredStatus}". Current: "${actualStatus}".`
-          )
-        }
+        const passed = !(requiredIdx >= 0 && actualIdx < requiredIdx)
+        const details = passed
+          ? undefined
+          : `Immigration intake status must be at least "${requiredStatus}". Current: "${actualStatus}".`
+
+        if (!passed) failedRules.push(details!)
+        conditions.push({
+          conditionId: `require_imm_intake_status:${requiredStatus}`,
+          conditionName: `Immigration Intake Status ≥ ${requiredStatus}`,
+          passed,
+          details,
+        })
         break
       }
     }
   }
 
-  return { passed: failedRules.length === 0, failedRules }
+  return { passed: failedRules.length === 0, failedRules, conditions }
 }
 
 // ─── Default Baseline Gating Resolution ──────────────────────────────────────
@@ -916,8 +1020,8 @@ async function applyStageWorkflowTemplates(
           if (templateItems && templateItems.length > 0) {
             for (const item of templateItems) {
               const dueDate = new Date()
-              if (item.due_days_offset) {
-                dueDate.setDate(dueDate.getDate() + item.due_days_offset)
+              if (item.days_offset) {
+                dueDate.setDate(dueDate.getDate() + item.days_offset)
               }
 
               // Idempotent insert via source_template_item_id unique index
