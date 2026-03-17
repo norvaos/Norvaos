@@ -25,7 +25,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { MessageSquare, Mail } from 'lucide-react'
 
 import { UnifiedCaseDetailsTab } from '@/components/matters/unified-case-details-tab'
-import { DocumentSlotPanel }      from '@/components/matters/document-slot-panel'
+import { DocumentsTab }           from '@/components/shell/tabs/DocumentsTab'
 import { FormsTab }               from '@/components/matters/tabs/forms-tab'
 import { BillingTab }             from '@/components/matters/tabs/billing-tab'
 import { TasksTab }               from '@/components/matters/tabs/tasks-tab'
@@ -151,8 +151,10 @@ function hashToTab(hash: string): TabId | null {
 }
 
 export function ZoneD({ matter, tenantId, initialTab = 'details' }: ZoneDProps) {
-  // Initialise from URL hash if present, else fall back to prop
+  // Priority: initialTab prop (from ?tab= searchParam) > URL hash > 'details'
   const [activeTab, setActiveTab] = useState<TabId>(() => {
+    // initialTab is already validated upstream (only set when it's a known TabId)
+    if (initialTab !== 'details') return initialTab
     if (typeof window !== 'undefined') {
       const fromHash = hashToTab(window.location.hash)
       if (fromHash) return fromHash
@@ -226,14 +228,14 @@ export function ZoneD({ matter, tenantId, initialTab = 'details' }: ZoneDProps) 
             matterId={matter.id}
             tenantId={tenantId}
             matterTypeId={matter.matter_type_id ?? null}
-            contactId={(matter as any).contact_id ?? null}
+            contactId={null}
             caseTypeId={matter.case_type_id ?? null}
           />
         </TabsContent>
 
         {/* 2 — Documents */}
         <TabsContent value="documents" className="flex-1 overflow-y-auto m-0 p-0">
-          <DocumentSlotPanel
+          <DocumentsTab
             matterId={matter.id}
             tenantId={tenantId}
             enforcementEnabled={true}
@@ -266,7 +268,7 @@ export function ZoneD({ matter, tenantId, initialTab = 'details' }: ZoneDProps) 
           <BillingTab
             matterId={matter.id}
             tenantId={tenantId}
-            matter={matter as any}
+            matter={matter}
           />
         </TabsContent>
 
@@ -286,8 +288,8 @@ export function ZoneD({ matter, tenantId, initialTab = 'details' }: ZoneDProps) 
             matterId={matter.id}
             tenantId={tenantId}
             users={undefined}
-            practiceAreaId={(matter as any).practice_area_id ?? null}
-            contactId={(matter as any).contact_id ?? undefined}
+            practiceAreaId={matter.practice_area_id ?? null}
+            contactId={undefined}
           />
         </TabsContent>
 
