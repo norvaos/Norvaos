@@ -9784,6 +9784,63 @@ export type Database = {
           },
         ]
       }
+      lead_outcomes: {
+        Row: {
+          id: string
+          tenant_id: string
+          lead_id: string
+          outcome: string
+          outcome_at: string
+          notes: string | null
+          follow_up_date: string | null
+          referral_target: string | null
+          duplicate_of: string | null
+          actioned_by: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          tenant_id: string
+          lead_id: string
+          outcome: string
+          outcome_at?: string
+          notes?: string | null
+          follow_up_date?: string | null
+          referral_target?: string | null
+          duplicate_of?: string | null
+          actioned_by?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          tenant_id?: string
+          lead_id?: string
+          outcome?: string
+          outcome_at?: string
+          notes?: string | null
+          follow_up_date?: string | null
+          referral_target?: string | null
+          duplicate_of?: string | null
+          actioned_by?: string | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lead_outcomes_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lead_outcomes_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       lead_milestone_tasks: {
         Row: {
           completed_at: string | null
@@ -12320,6 +12377,70 @@ export type Database = {
             columns: ["tenant_id"]
             isOneToOne: false
             referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      matter_billing_milestones: {
+        Row: {
+          id: string
+          tenant_id: string
+          matter_id: string
+          name: string
+          amount_cents: number
+          due_date: string | null
+          status: string
+          completed_at: string | null
+          billed_at: string | null
+          invoice_id: string | null
+          sort_order: number
+          notes: string | null
+          created_by: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          tenant_id: string
+          matter_id: string
+          name: string
+          amount_cents?: number
+          due_date?: string | null
+          status?: string
+          completed_at?: string | null
+          billed_at?: string | null
+          invoice_id?: string | null
+          sort_order?: number
+          notes?: string | null
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          name?: string
+          amount_cents?: number
+          due_date?: string | null
+          status?: string
+          completed_at?: string | null
+          billed_at?: string | null
+          invoice_id?: string | null
+          sort_order?: number
+          notes?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "matter_billing_milestones_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matter_billing_milestones_matter_id_fkey"
+            columns: ["matter_id"]
+            isOneToOne: false
+            referencedRelation: "matters"
             referencedColumns: ["id"]
           },
         ]
@@ -19579,44 +19700,6 @@ export interface RetainerAgreementUpdate {
   stage_advanced?: boolean
   updated_by?: string | null
   updated_at?: string
-}
-
-// ── matter_sla_tracking ───────────────────────────────────────────────────────
-
-export interface MatterSLATrackingRow {
-  id: string
-  tenant_id: string
-  matter_id: string
-  sla_class: string
-  started_at: string
-  due_at: string
-  status: string
-  context_ref: string | null
-  created_by: string | null
-  completed_at: string | null
-  breached_at: string | null
-  created_at: string
-}
-
-export interface MatterSLATrackingInsert {
-  id?: string
-  tenant_id: string
-  matter_id: string
-  sla_class: string
-  started_at: string
-  due_at: string
-  status?: string
-  context_ref?: string | null
-  created_by?: string | null
-  completed_at?: string | null
-  breached_at?: string | null
-  created_at?: string
-}
-
-export interface MatterSLATrackingUpdate {
-  status?: string
-  completed_at?: string | null
-  breached_at?: string | null
 }
 
 // ── ircc_correspondence ────────────────────────────────────────────────────────

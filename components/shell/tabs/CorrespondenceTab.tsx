@@ -4,21 +4,14 @@
  * CorrespondenceTab — Zone D tab #8
  *
  * IRCC correspondence timeline for immigration matters.
- *
- * DB status (checked 2026-03-17): neither `ircc_correspondence` nor
- * `correspondence_items` exist in the database. This component renders
- * the full structured UI but operates on local state only — each field
- * is editable and shows a "No data" empty state until filled in.
- *
- * When migration 098-ircc-correspondence.sql is run (future sprint),
- * replace local state with a TanStack Query hook and persist to DB.
+ * Persisted to `ircc_correspondence` (migration 117).
  *
  * JR Deadline calculation:
  *   Inside Canada  → 15 days from decision date
  *   Outside Canada → 60 days from decision date
  */
 
-import { useState } from 'react'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { format, differenceInDays } from 'date-fns'
 import {
   CheckCircle2,
@@ -33,6 +26,7 @@ import {
   Clock,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { createClient } from '@/lib/supabase/client'
 
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -45,24 +39,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import type { IrccCorrespondenceRow } from '@/lib/types/database'
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
 type DecisionType = 'approved' | 'refused' | 'other' | ''
 type MilestoneStatus = 'pending' | 'received' | 'submitted' | 'n_a'
-
-interface CorrespondenceState {
-  aor_date:                 string   // Application Received (AOR)
-  biometrics_date:          string
-  biometrics_status:        MilestoneStatus
-  medical_date:             string
-  medical_status:           MilestoneStatus
-  additional_docs_date:     string
-  additional_docs_status:   MilestoneStatus
-  decision_date:            string
-  decision_type:            DecisionType
-  inside_canada:            boolean
-}
 
 // ── JR Deadline helper ────────────────────────────────────────────────────────
 
@@ -221,7 +203,6 @@ function MilestoneRow({
                 input.accept = '.pdf,.doc,.docx,.jpg,.png'
                 input.onchange = () => {
                   // TODO: wire to Supabase storage upload when bucket exists
-                  // For now, notify the user
                   if (input.files?.[0]) {
                     window.alert(
                       `File "${input.files[0].name}" selected.\n\nStorage upload will be wired when the correspondence-docs bucket is provisioned.`
@@ -250,36 +231,105 @@ interface CorrespondenceTabProps {
   tenantId: string
 }
 
-// ── Component ────────────────────────────────────────────────────────────────
+// ── Mutation hook ─────────────────────────────────────────────────────────────
+
+function useCreateCorrespondenceItem(matterId: string, tenantId: string) {
+  const qc = useQueryClient()
+  const supabase = createClient()
+
+  return useMutation({
+    mutationFn: async (payload: {
+      item_type: string
+      item_date?: string | null
+      status?: string
+      decision_type?: string | null
+    }) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error } = await (supabase as any)
+        .from('ircc_correspondence')
+        .upsert(
+          {
+            matter_id: matterId,
+            tenant_id: tenantId,
+            item_type: payload.item_type,
+            item_date: payload.item_date ?? null,
+            status: payload.status ?? 'pending',
+            decision_type: payload.decision_type ?? null,
+            updated_at: new Date().toISOString(),
+          },
+          { onConflict: 'matter_id,item_type' }
+        )
+      if (error) throw error
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['ircc-correspondence', matterId] })
+    },
+  })
+}
+
+// ── Component ─────────────────────────────────────────────────────────────────
 
 export function CorrespondenceTab({ matterId, tenantId }: CorrespondenceTabProps) {
-  // All state is local until migration 098 lands and wires to DB
-  const [state, setState] = useState<CorrespondenceState>({
-    aor_date:                '',
-    biometrics_date:         '',
-    biometrics_status:       'pending',
-    medical_date:            '',
-    medical_status:          'pending',
-    additional_docs_date:    '',
-    additional_docs_status:  'pending',
-    decision_date:           '',
-    decision_type:           '',
-    inside_canada:           false,
+  const supabase = createClient()
+
+  const { data: correspondence, isLoading } = useQuery({
+    queryKey: ['ircc-correspondence', matterId],
+    queryFn: async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data } = await (supabase as any)
+        .from('ircc_correspondence')
+        .select('*')
+        .eq('matter_id', matterId)
+        .order('item_date', { ascending: true })
+      return (data ?? []) as IrccCorrespondenceRow[]
+    },
+    enabled: !!matterId,
   })
 
-  function patch(updates: Partial<CorrespondenceState>) {
-    setState(prev => ({ ...prev, ...updates }))
+  const upsert = useCreateCorrespondenceItem(matterId, tenantId)
+
+  // Helper: find a record by item_type
+  function byType(type: string): IrccCorrespondenceRow | undefined {
+    return correspondence?.find(r => r.item_type === type)
   }
 
-  const showRefusal =
-    state.decision_date !== '' && state.decision_type === 'refused'
+  // Helper: get date string for a type
+  function dateFor(type: string): string {
+    return byType(type)?.item_date ?? ''
+  }
 
-  const hasAnyData =
-    state.aor_date ||
-    state.biometrics_date ||
-    state.medical_date ||
-    state.additional_docs_date ||
-    state.decision_date
+  // Helper: get status for a type
+  function statusFor(type: string): MilestoneStatus {
+    return (byType(type)?.status as MilestoneStatus) ?? 'pending'
+  }
+
+  // Decision notice record
+  const decisionRecord = byType('decision_notice')
+  const decisionDate = decisionRecord?.item_date ?? ''
+  const decisionType = (decisionRecord?.decision_type as DecisionType) ?? ''
+
+  // inside_canada is stored in notes field as a convention ("inside" | "outside")
+  // We store it as decision_type for the refusal record, but for location we use
+  // a separate item_type 'jr_location' with decision_type = 'inside' | 'outside'
+  const jrLocationRecord = byType('jr_location')
+  const insideCanada = jrLocationRecord?.decision_type === 'inside'
+
+  const showRefusal = decisionDate !== '' && decisionType === 'refused'
+
+  const hasAnyData = correspondence && correspondence.length > 0
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col h-full">
+        <div className="flex items-center justify-between px-4 py-3 border-b bg-card">
+          <div>
+            <h3 className="text-sm font-semibold">IRCC Correspondence</h3>
+            <p className="text-xs text-muted-foreground mt-0.5">Loading…</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="flex flex-col h-full">
@@ -300,57 +350,71 @@ export function CorrespondenceTab({ matterId, tenantId }: CorrespondenceTabProps
 
       {/* Timeline */}
       <div className="flex-1 overflow-y-auto px-4 py-2">
-
-        {/* Notice: DB not yet provisioned */}
-        <div className="mb-4 px-3 py-2.5 rounded-md bg-amber-50 border border-amber-200 flex items-start gap-2">
-          <AlertTriangle className="h-4 w-4 text-amber-500 shrink-0 mt-0.5" />
-          <p className="text-xs text-amber-700">
-            <strong>Local session only.</strong> The <code>ircc_correspondence</code> table has not been provisioned yet.
-            Dates entered here will reset on page refresh. Migration 098 will persist this data.
-          </p>
-        </div>
-
         <div className="divide-y">
 
           {/* 1 — Application Received (AOR) */}
           <MilestoneRow
             icon={<FileText className="h-4 w-4" />}
             label="Application Received (AOR)"
-            date={state.aor_date}
-            onDateChange={v => patch({ aor_date: v })}
+            date={dateFor('AOR')}
+            onDateChange={v => upsert.mutate({ item_type: 'AOR', item_date: v || null })}
           />
 
           {/* 2 — Biometrics Request */}
           <MilestoneRow
             icon={<ScanFace className="h-4 w-4" />}
             label="Biometrics Request"
-            date={state.biometrics_date}
-            onDateChange={v => patch({ biometrics_date: v })}
+            date={dateFor('biometrics_request')}
+            onDateChange={v => upsert.mutate({
+              item_type: 'biometrics_request',
+              item_date: v || null,
+              status: statusFor('biometrics_request'),
+            })}
             showStatus
-            status={state.biometrics_status}
-            onStatusChange={v => patch({ biometrics_status: v })}
+            status={statusFor('biometrics_request')}
+            onStatusChange={v => upsert.mutate({
+              item_type: 'biometrics_request',
+              item_date: dateFor('biometrics_request') || null,
+              status: v,
+            })}
           />
 
           {/* 3 — Medical Request */}
           <MilestoneRow
             icon={<Stethoscope className="h-4 w-4" />}
             label="Medical Request"
-            date={state.medical_date}
-            onDateChange={v => patch({ medical_date: v })}
+            date={dateFor('medical_request')}
+            onDateChange={v => upsert.mutate({
+              item_type: 'medical_request',
+              item_date: v || null,
+              status: statusFor('medical_request'),
+            })}
             showStatus
-            status={state.medical_status}
-            onStatusChange={v => patch({ medical_status: v })}
+            status={statusFor('medical_request')}
+            onStatusChange={v => upsert.mutate({
+              item_type: 'medical_request',
+              item_date: dateFor('medical_request') || null,
+              status: v,
+            })}
           />
 
           {/* 4 — Additional Documents Request */}
           <MilestoneRow
             icon={<FileText className="h-4 w-4" />}
             label="Additional Documents Request"
-            date={state.additional_docs_date}
-            onDateChange={v => patch({ additional_docs_date: v })}
+            date={dateFor('additional_docs_request')}
+            onDateChange={v => upsert.mutate({
+              item_type: 'additional_docs_request',
+              item_date: v || null,
+              status: statusFor('additional_docs_request'),
+            })}
             showStatus
-            status={state.additional_docs_status}
-            onStatusChange={v => patch({ additional_docs_status: v })}
+            status={statusFor('additional_docs_request')}
+            onStatusChange={v => upsert.mutate({
+              item_type: 'additional_docs_request',
+              item_date: dateFor('additional_docs_request') || null,
+              status: v,
+            })}
           />
 
           {/* 5 — Decision Notice */}
@@ -358,11 +422,11 @@ export function CorrespondenceTab({ matterId, tenantId }: CorrespondenceTabProps
             <div className="flex flex-col items-center">
               <div className={cn(
                 'h-8 w-8 rounded-full flex items-center justify-center shrink-0 border-2',
-                state.decision_date
+                decisionDate
                   ? 'bg-green-50 border-green-400 text-green-600'
                   : 'bg-muted border-border text-muted-foreground',
               )}>
-                {state.decision_date
+                {decisionDate
                   ? <CheckCircle2 className="h-4 w-4" />
                   : <Circle className="h-4 w-4 opacity-40" />
                 }
@@ -372,9 +436,9 @@ export function CorrespondenceTab({ matterId, tenantId }: CorrespondenceTabProps
               <div className="flex items-center gap-2 mb-2">
                 <Gavel className="h-4 w-4 text-muted-foreground" />
                 <span className="text-sm font-medium">Decision Notice</span>
-                {state.decision_date && (
+                {decisionDate && (
                   <span className="text-xs text-muted-foreground">
-                    {format(new Date(state.decision_date), 'MMM d, yyyy')}
+                    {format(new Date(decisionDate), 'MMM d, yyyy')}
                   </span>
                 )}
               </div>
@@ -385,8 +449,12 @@ export function CorrespondenceTab({ matterId, tenantId }: CorrespondenceTabProps
                   <Label className="text-xs text-muted-foreground">Date</Label>
                   <Input
                     type="date"
-                    value={state.decision_date}
-                    onChange={e => patch({ decision_date: e.target.value })}
+                    value={decisionDate}
+                    onChange={e => upsert.mutate({
+                      item_type: 'decision_notice',
+                      item_date: e.target.value || null,
+                      decision_type: decisionType || null,
+                    })}
                     className="h-7 text-xs w-36"
                   />
                 </div>
@@ -395,8 +463,12 @@ export function CorrespondenceTab({ matterId, tenantId }: CorrespondenceTabProps
                 <div className="flex flex-col gap-1">
                   <Label className="text-xs text-muted-foreground">Decision</Label>
                   <Select
-                    value={state.decision_type || 'other'}
-                    onValueChange={v => patch({ decision_type: v as DecisionType })}
+                    value={decisionType || 'other'}
+                    onValueChange={v => upsert.mutate({
+                      item_type: 'decision_notice',
+                      item_date: decisionDate || null,
+                      decision_type: v,
+                    })}
                   >
                     <SelectTrigger className="h-7 text-xs w-32">
                       <SelectValue placeholder="Select…" />
@@ -410,12 +482,15 @@ export function CorrespondenceTab({ matterId, tenantId }: CorrespondenceTabProps
                 </div>
 
                 {/* Location (for JR calculation) */}
-                {state.decision_date && (
+                {decisionDate && (
                   <div className="flex flex-col gap-1">
                     <Label className="text-xs text-muted-foreground">Location</Label>
                     <Select
-                      value={state.inside_canada ? 'inside' : 'outside'}
-                      onValueChange={v => patch({ inside_canada: v === 'inside' })}
+                      value={insideCanada ? 'inside' : 'outside'}
+                      onValueChange={v => upsert.mutate({
+                        item_type: 'jr_location',
+                        decision_type: v,
+                      })}
                     >
                       <SelectTrigger className="h-7 text-xs w-36">
                         <SelectValue />
@@ -459,10 +534,10 @@ export function CorrespondenceTab({ matterId, tenantId }: CorrespondenceTabProps
               </div>
 
               {/* JR Deadline badge — shown when decision date is set */}
-              {state.decision_date && (
+              {decisionDate && (
                 <JRDeadlineBadge
-                  decisionDate={state.decision_date}
-                  insideCanada={state.inside_canada}
+                  decisionDate={decisionDate}
+                  insideCanada={insideCanada}
                 />
               )}
             </div>
@@ -486,8 +561,8 @@ export function CorrespondenceTab({ matterId, tenantId }: CorrespondenceTabProps
                   Engage counsel immediately if considering a judicial review application.
                 </p>
                 <JRDeadlineBadge
-                  decisionDate={state.decision_date}
-                  insideCanada={state.inside_canada}
+                  decisionDate={decisionDate}
+                  insideCanada={insideCanada}
                 />
               </div>
             </div>
