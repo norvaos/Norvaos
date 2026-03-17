@@ -48,6 +48,10 @@ interface UIState {
   communicationPanelCollapsed: boolean
   setActiveDrawerPanel: (panel: DrawerPanel) => void
   toggleCommunicationPanel: () => void
+
+  // Zone E — Audit Rail collapse state (persisted)
+  zoneECollapsed: boolean
+  setZoneECollapsed: (v: boolean) => void
 }
 
 export const useUIStore = create<UIState>()(
@@ -105,6 +109,10 @@ export const useUIStore = create<UIState>()(
         set((state) => ({
           communicationPanelCollapsed: !state.communicationPanelCollapsed,
         })),
+
+      // Zone E — Audit Rail collapse state
+      zoneECollapsed: false,
+      setZoneECollapsed: (v) => set({ zoneECollapsed: v }),
     }),
     {
       name: 'norvaos-ui',
@@ -115,6 +123,7 @@ export const useUIStore = create<UIState>()(
         activePracticeColor: state.activePracticeColor,
         activePracticeName: state.activePracticeName,
         communicationPanelCollapsed: state.communicationPanelCollapsed,
+        zoneECollapsed: state.zoneECollapsed,
       }),
     }
   )

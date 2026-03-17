@@ -4819,6 +4819,7 @@ export type Database = {
           slot_name: string
           slot_slug: string
           slot_template_id: string | null
+          expiry_date: string | null
           sort_order: number
           status: string
           tenant_id: string
@@ -4832,6 +4833,7 @@ export type Database = {
           current_version?: number
           deactivated_at?: string | null
           description?: string | null
+          expiry_date?: string | null
           folder_id?: string | null
           id?: string
           is_active?: boolean
@@ -4856,6 +4858,7 @@ export type Database = {
           current_version?: number
           deactivated_at?: string | null
           description?: string | null
+          expiry_date?: string | null
           folder_id?: string | null
           id?: string
           is_active?: boolean
@@ -6733,6 +6736,7 @@ export type Database = {
           tenant_id: string
           validation_result: Json | null
           version_number: number
+          is_stale: boolean
         }
         Insert: {
           approved_at?: string | null
@@ -6753,6 +6757,7 @@ export type Database = {
           tenant_id: string
           validation_result?: Json | null
           version_number?: number
+          is_stale?: boolean
         }
         Update: {
           approved_at?: string | null
@@ -6773,6 +6778,7 @@ export type Database = {
           tenant_id?: string
           validation_result?: Json | null
           version_number?: number
+          is_stale?: boolean
         }
         Relationships: [
           {
@@ -11488,6 +11494,20 @@ export type Database = {
           uci_number: string | null
           updated_at: string
           work_experience_years: number | null
+          program_category: string | null
+          study_program: string | null
+          study_level: string | null
+          dli_number: string | null
+          study_duration_months: number | null
+          letter_of_acceptance: boolean | null
+          work_permit_type: string | null
+          job_title: string | null
+          sponsor_name: string | null
+          sponsor_relationship: string | null
+          sponsor_status: string | null
+          relationship_start_date: string | null
+          second_language_test_type: string | null
+          second_language_test_scores: Json | null
         }
         Insert: {
           application_number?: string | null
@@ -11538,6 +11558,20 @@ export type Database = {
           uci_number?: string | null
           updated_at?: string
           work_experience_years?: number | null
+          program_category?: string | null
+          study_program?: string | null
+          study_level?: string | null
+          dli_number?: string | null
+          study_duration_months?: number | null
+          letter_of_acceptance?: boolean | null
+          work_permit_type?: string | null
+          job_title?: string | null
+          sponsor_name?: string | null
+          sponsor_relationship?: string | null
+          sponsor_status?: string | null
+          relationship_start_date?: string | null
+          second_language_test_type?: string | null
+          second_language_test_scores?: Json | null
         }
         Update: {
           application_number?: string | null
@@ -11588,6 +11622,20 @@ export type Database = {
           uci_number?: string | null
           updated_at?: string
           work_experience_years?: number | null
+          program_category?: string | null
+          study_program?: string | null
+          study_level?: string | null
+          dli_number?: string | null
+          study_duration_months?: number | null
+          letter_of_acceptance?: boolean | null
+          work_permit_type?: string | null
+          job_title?: string | null
+          sponsor_name?: string | null
+          sponsor_relationship?: string | null
+          sponsor_status?: string | null
+          relationship_start_date?: string | null
+          second_language_test_type?: string | null
+          second_language_test_scores?: Json | null
         }
         Relationships: [
           {
@@ -11647,6 +11695,13 @@ export type Database = {
           risk_score: number | null
           tenant_id: string
           updated_at: string
+          contradiction_flags: Json
+          contradiction_override_at: string | null
+          contradiction_override_by: string | null
+          lawyer_review_status: string | null
+          lawyer_review_by: string | null
+          lawyer_review_at: string | null
+          lawyer_review_notes: string | null
         }
         Insert: {
           completion_pct?: number
@@ -11674,6 +11729,13 @@ export type Database = {
           risk_score?: number | null
           tenant_id: string
           updated_at?: string
+          contradiction_flags?: Json
+          contradiction_override_at?: string | null
+          contradiction_override_by?: string | null
+          lawyer_review_status?: string | null
+          lawyer_review_by?: string | null
+          lawyer_review_at?: string | null
+          lawyer_review_notes?: string | null
         }
         Update: {
           completion_pct?: number
@@ -11701,6 +11763,13 @@ export type Database = {
           risk_score?: number | null
           tenant_id?: string
           updated_at?: string
+          contradiction_flags?: Json
+          contradiction_override_at?: string | null
+          contradiction_override_by?: string | null
+          lawyer_review_status?: string | null
+          lawyer_review_by?: string | null
+          lawyer_review_at?: string | null
+          lawyer_review_notes?: string | null
         }
         Relationships: [
           {
@@ -12552,6 +12621,7 @@ export type Database = {
           color: string
           created_at: string
           description: string | null
+          document_naming_template: string | null
           enforcement_enabled: boolean
           has_ircc_forms: boolean
           icon: string | null
@@ -12572,6 +12642,7 @@ export type Database = {
           color?: string
           created_at?: string
           description?: string | null
+          document_naming_template?: string | null
           enforcement_enabled?: boolean
           has_ircc_forms?: boolean
           icon?: string | null
@@ -12592,6 +12663,7 @@ export type Database = {
           color?: string
           created_at?: string
           description?: string | null
+          document_naming_template?: string | null
           enforcement_enabled?: boolean
           has_ircc_forms?: boolean
           icon?: string | null
@@ -18923,6 +18995,11 @@ export type InvoiceTotalsResult = {
   balance_due: number
 }
 
+/** Payment plan record */
+export type PaymentPlanRow = Database['public']['Tables']['payment_plans']['Row']
+export type PaymentPlanInsert = Database['public']['Tables']['payment_plans']['Insert']
+export type PaymentPlanUpdate = Database['public']['Tables']['payment_plans']['Update']
+
 /** Individual instalment record within a payment plan */
 export type PaymentPlanInstalmentRow = {
   id: string
@@ -19217,7 +19294,7 @@ export type RiskFlagType =
   | 'DUPLICATE_APPLICANT_IDENTIFIER'
 
 export type RiskFlagSeverity = 'low' | 'advisory' | 'elevated' | 'critical'
-export type RiskFlagStatus = 'open' | 'resolved' | 'overridden'
+export type RiskFlagStatus = 'open' | 'acknowledged' | 'resolved' | 'overridden'
 
 export interface MatterRiskFlagRow {
   id: string
@@ -19256,3 +19333,144 @@ export interface MatterRiskFlagInsert {
 export type MatterRiskFlagUpdate = Partial<
   Pick<MatterRiskFlagRow, 'status' | 'resolution_note' | 'resolved_by' | 'resolved_at' | 'override_reason' | 'severity'>
 >
+
+// ── Document Engine Row Aliases ───────────────────────────────────────────────
+// Convenience aliases so document-engine.ts and consumers can import named types
+// instead of deeply nested Database['public']['Tables']['...']['Row'] paths.
+
+export type DocumentTemplateRow         = Database['public']['Tables']['document_templates']['Row']
+export type DocumentTemplateInsert      = Database['public']['Tables']['document_templates']['Insert']
+export type DocumentTemplateUpdate      = Database['public']['Tables']['document_templates']['Update']
+
+export type DocumentTemplateVersionRow    = Database['public']['Tables']['document_template_versions']['Row']
+export type DocumentTemplateVersionInsert = Database['public']['Tables']['document_template_versions']['Insert']
+export type DocumentTemplateVersionUpdate = Database['public']['Tables']['document_template_versions']['Update']
+
+export type DocumentTemplateMappingRow    = Database['public']['Tables']['document_template_mappings']['Row']
+export type DocumentTemplateMappingInsert = Database['public']['Tables']['document_template_mappings']['Insert']
+export type DocumentTemplateMappingUpdate = Database['public']['Tables']['document_template_mappings']['Update']
+
+export type DocumentTemplateConditionRow    = Database['public']['Tables']['document_template_conditions']['Row']
+export type DocumentTemplateConditionInsert = Database['public']['Tables']['document_template_conditions']['Insert']
+export type DocumentTemplateConditionUpdate = Database['public']['Tables']['document_template_conditions']['Update']
+
+export type DocumentClauseAssignmentRow    = Database['public']['Tables']['document_clause_assignments']['Row']
+export type DocumentClauseAssignmentInsert = Database['public']['Tables']['document_clause_assignments']['Insert']
+export type DocumentClauseAssignmentUpdate = Database['public']['Tables']['document_clause_assignments']['Update']
+
+export type DocumentClauseRow    = Database['public']['Tables']['document_clauses']['Row']
+export type DocumentClauseInsert = Database['public']['Tables']['document_clauses']['Insert']
+export type DocumentClauseUpdate = Database['public']['Tables']['document_clauses']['Update']
+
+export type DocumentInstanceRow    = Database['public']['Tables']['document_instances']['Row']
+export type DocumentInstanceInsert = Database['public']['Tables']['document_instances']['Insert']
+export type DocumentInstanceUpdate = Database['public']['Tables']['document_instances']['Update']
+
+export type DocumentArtifactRow    = Database['public']['Tables']['document_artifacts']['Row']
+export type DocumentArtifactInsert = Database['public']['Tables']['document_artifacts']['Insert']
+export type DocumentArtifactUpdate = Database['public']['Tables']['document_artifacts']['Update']
+
+export type DocumentInstanceFieldRow    = Database['public']['Tables']['document_instance_fields']['Row']
+export type DocumentInstanceFieldInsert = Database['public']['Tables']['document_instance_fields']['Insert']
+export type DocumentInstanceFieldUpdate = Database['public']['Tables']['document_instance_fields']['Update']
+
+export type DocumentStatusEventRow    = Database['public']['Tables']['document_status_events']['Row']
+export type DocumentStatusEventInsert = Database['public']['Tables']['document_status_events']['Insert']
+
+export type DocumentSignatureRequestRow    = Database['public']['Tables']['document_signature_requests']['Row']
+export type DocumentSignatureRequestInsert = Database['public']['Tables']['document_signature_requests']['Insert']
+export type DocumentSignatureRequestUpdate = Database['public']['Tables']['document_signature_requests']['Update']
+
+export type DocumentSignerRow    = Database['public']['Tables']['document_signers']['Row']
+export type DocumentSignerInsert = Database['public']['Tables']['document_signers']['Insert']
+export type DocumentSignerUpdate = Database['public']['Tables']['document_signers']['Update']
+
+export type DocumentWorkflowRuleRow    = Database['public']['Tables']['document_workflow_rules']['Row']
+export type DocumentWorkflowRuleInsert = Database['public']['Tables']['document_workflow_rules']['Insert']
+export type DocumentWorkflowRuleUpdate = Database['public']['Tables']['document_workflow_rules']['Update']
+
+// ── Trust Accounting Aliases ───────────────────────────────────────────────
+export type TrustBankAccountRow    = Database['public']['Tables']['trust_bank_accounts']['Row']
+export type TrustBankAccountInsert = Database['public']['Tables']['trust_bank_accounts']['Insert']
+export type TrustBankAccountUpdate = Database['public']['Tables']['trust_bank_accounts']['Update']
+
+export type TrustTransactionRow    = Database['public']['Tables']['trust_transactions']['Row']
+export type TrustTransactionInsert = Database['public']['Tables']['trust_transactions']['Insert']
+export type TrustTransactionUpdate = Database['public']['Tables']['trust_transactions']['Update']
+export type TrustTransactionType   = string
+export type TrustPaymentMethod     = string
+
+export type TrustHoldRow    = Database['public']['Tables']['trust_holds']['Row']
+export type TrustHoldInsert = Database['public']['Tables']['trust_holds']['Insert']
+export type TrustHoldUpdate = Database['public']['Tables']['trust_holds']['Update']
+
+export type TrustDisbursementRequestRow    = Database['public']['Tables']['trust_disbursement_requests']['Row']
+export type TrustDisbursementRequestInsert = Database['public']['Tables']['trust_disbursement_requests']['Insert']
+export type TrustDisbursementRequestUpdate = Database['public']['Tables']['trust_disbursement_requests']['Update']
+export type TrustDisbursementRequestStatus = string
+export type TrustDisbursementRequestType   = string
+
+export type TrustReconciliationRow    = Database['public']['Tables']['trust_reconciliations']['Row']
+export type TrustReconciliationInsert = Database['public']['Tables']['trust_reconciliations']['Insert']
+export type TrustReconciliationUpdate = Database['public']['Tables']['trust_reconciliations']['Update']
+
+export type TrustReconciliationItemRow    = Database['public']['Tables']['trust_reconciliation_items']['Row']
+export type TrustReconciliationItemInsert = Database['public']['Tables']['trust_reconciliation_items']['Insert']
+export type TrustReconciliationItemUpdate = Database['public']['Tables']['trust_reconciliation_items']['Update']
+export type TrustReconciliationItemType   = string
+
+export type TrustAuditLogRow    = Database['public']['Tables']['trust_audit_log']['Row']
+export type TrustAuditLogInsert = Database['public']['Tables']['trust_audit_log']['Insert']
+
+export type ChequeRow    = Database['public']['Tables']['cheques']['Row']
+export type ChequeInsert = Database['public']['Tables']['cheques']['Insert']
+export type ChequeUpdate = Database['public']['Tables']['cheques']['Update']
+export type ChequeAccountType = string
+export type ChequeStatus      = string
+
+export type OperatingBankAccountRow    = Database['public']['Tables']['operating_bank_accounts']['Row']
+export type OperatingBankAccountInsert = Database['public']['Tables']['operating_bank_accounts']['Insert']
+export type OperatingBankAccountUpdate = Database['public']['Tables']['operating_bank_accounts']['Update']
+
+// ── Canonical Profile Aliases ──────────────────────────────────────────────
+export type CanonicalProfileRow    = Database['public']['Tables']['canonical_profiles']['Row']
+export type CanonicalProfileInsert = Database['public']['Tables']['canonical_profiles']['Insert']
+
+export type CanonicalProfileFieldRow    = Database['public']['Tables']['canonical_profile_fields']['Row']
+export type CanonicalProfileFieldInsert = Database['public']['Tables']['canonical_profile_fields']['Insert']
+export type CanonicalProfileFieldUpdate = Database['public']['Tables']['canonical_profile_fields']['Update']
+
+export type CanonicalProfileSnapshotRow = Database['public']['Tables']['canonical_profile_snapshots']['Row']
+
+export type CanonicalProfileConflictRow = Database['public']['Tables']['canonical_profile_conflicts']['Row']
+
+// ── Activity Feed ────────────────────────────────────────────────────────────
+// Manual row type for the activities table used by Zone E activity feed.
+
+export interface ActivityRow {
+  id: string
+  activity_type: string
+  title: string
+  description: string | null
+  created_at: string | null
+  metadata: Json | null
+}
+
+// ── Gate Snapshot (stage_transition_log.gate_snapshot shape) ──────────────────
+// Typed overlay for the JSON gate evaluation snapshot stored per transition.
+
+export interface GateConditionResult {
+  conditionId: string
+  conditionName: string
+  passed: boolean
+  details?: string
+}
+
+export interface GateSnapshot {
+  evaluatedAt: string
+  conditions: GateConditionResult[]
+  allPassed: boolean
+}
+
+// ── Misc Aliases ───────────────────────────────────────────────────────────
+export type AgingBucket = string
