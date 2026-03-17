@@ -22,18 +22,19 @@
 import { useState, useEffect, useCallback } from 'react'
 import { cn } from '@/lib/utils'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { MessageSquare, Mail } from 'lucide-react'
 
 import { UnifiedCaseDetailsTab } from '@/components/matters/unified-case-details-tab'
 import { DocumentsTab }           from '@/components/shell/tabs/DocumentsTab'
 import { FormsTab }               from '@/components/matters/tabs/forms-tab'
-import { BillingTab }             from '@/components/matters/tabs/billing-tab'
+import { BillingTab }             from '@/components/shell/tabs/BillingTab'
 import { TasksTab }               from '@/components/matters/tabs/tasks-tab'
 import { NotesEditor }            from '@/components/shared/notes-editor'
 import { ActivityTimeline }       from '@/components/shared/activity-timeline'
 import { QuestionsWorkflowSection }     from '@/components/matters/workflow/questions-section'
 import { ReviewBlockersWorkflowSection } from '@/components/matters/workflow/review-blockers-section'
 import { useImmigrationReadiness }      from '@/lib/queries/immigration-readiness'
+import { CommunicationsTab }      from '@/components/shell/tabs/CommunicationsTab'
+import { CorrespondenceTab }      from '@/components/shell/tabs/CorrespondenceTab'
 import type { Database } from '@/lib/types/database'
 
 type Matter = Database['public']['Tables']['matters']['Row']
@@ -120,22 +121,6 @@ function ReviewTabContent({
         onNavigateToSection={onNavigateToSection}
         onNavigateToField={onNavigateToField}
       />
-    </div>
-  )
-}
-
-// ── Stub component for not-yet-built tabs ────────────────────────────────────
-
-function ComingSoonStub({ icon: Icon, label, sprint }: {
-  icon: React.ElementType
-  label: string
-  sprint: number
-}) {
-  return (
-    <div className="flex flex-col items-center justify-center h-64 gap-3 text-muted-foreground">
-      <Icon className="h-8 w-8 opacity-30" />
-      <p className="text-sm font-medium">{label}</p>
-      <p className="text-xs opacity-60">Planned for Sprint {sprint}</p>
     </div>
   )
 }
@@ -238,6 +223,8 @@ export function ZoneD({ matter, tenantId, initialTab = 'details' }: ZoneDProps) 
           <DocumentsTab
             matterId={matter.id}
             tenantId={tenantId}
+            matterNumber={matter.matter_number ?? ''}
+            matterTypeId={matter.matter_type_id ?? null}
             enforcementEnabled={true}
           />
         </TabsContent>
@@ -272,14 +259,14 @@ export function ZoneD({ matter, tenantId, initialTab = 'details' }: ZoneDProps) 
           />
         </TabsContent>
 
-        {/* 7 — Communications (Sprint 7) */}
+        {/* 7 — Communications */}
         <TabsContent value="communications" className="flex-1 overflow-y-auto m-0 p-0">
-          <ComingSoonStub icon={MessageSquare} label="Communications" sprint={7} />
+          <CommunicationsTab matterId={matter.id} tenantId={tenantId} />
         </TabsContent>
 
-        {/* 8 — Correspondence (Sprint 4) */}
+        {/* 8 — Correspondence */}
         <TabsContent value="correspondence" className="flex-1 overflow-y-auto m-0 p-0">
-          <ComingSoonStub icon={Mail} label="IRCC Correspondence" sprint={4} />
+          <CorrespondenceTab matterId={matter.id} tenantId={tenantId} />
         </TabsContent>
 
         {/* 9 — Tasks */}
