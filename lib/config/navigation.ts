@@ -23,6 +23,9 @@ import {
   Shield,
   Landmark,
   TrendingUp,
+  PhoneCall,
+  Scale,
+  User,
   type LucideIcon,
 } from 'lucide-react'
 
@@ -101,6 +104,24 @@ export const navigation: NavSection[] = [
     items: [
       { title: 'Front Desk', href: '/front-desk', icon: MonitorSmartphone, featureFlag: 'front_desk_mode' },
       { title: 'Command Centre', href: '/leads', icon: LayoutDashboard },
+    ],
+  },
+  {
+    title: 'Workspaces',
+    items: [
+      {
+        title: 'Role Workspaces',
+        href: '/workspace/front-desk',
+        icon: PhoneCall,
+        children: [
+          { title: 'Front Desk', href: '/workspace/front-desk', icon: PhoneCall },
+          { title: 'Legal Assistant', href: '/workspace/legal-assistant', icon: FileText },
+          { title: 'Lawyer', href: '/workspace/lawyer', icon: Scale },
+          { title: 'Billing', href: '/workspace/billing', icon: DollarSign },
+          { title: 'Admin', href: '/workspace/admin', icon: Settings },
+          { title: 'Client Portal', href: '/workspace/client', icon: User },
+        ],
+      },
     ],
   },
   {
