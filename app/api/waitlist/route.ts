@@ -1,10 +1,16 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+// Prevent Next.js from attempting static page-data collection at build time.
+// Supabase client requires real credentials; CI placeholder values would fail.
+export const dynamic = 'force-dynamic'
+
+function getSupabase() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
+}
 
 export async function POST(req: Request) {
   try {
@@ -13,6 +19,8 @@ export async function POST(req: Request) {
     if (!firmName || !firstName || !lastName || !email || !firmSize) {
       return NextResponse.json({ error: 'All fields are required.' }, { status: 400 })
     }
+
+    const supabase = getSupabase()
 
     // Check for duplicate email
     const { data: existing } = await supabase
