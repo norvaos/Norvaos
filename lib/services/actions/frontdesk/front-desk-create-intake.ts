@@ -108,7 +108,7 @@ export const frontDeskCreateIntakeAction: ActionDefinition<FrontDeskCreateIntake
         .select('id')
         .eq('contact_id', contactId)
         .eq('tenant_id', tenantId)
-        .eq('status', 'new')
+        .eq('status', 'open')
         .limit(1)
         .maybeSingle()
 
@@ -135,7 +135,7 @@ export const frontDeskCreateIntakeAction: ActionDefinition<FrontDeskCreateIntake
               stage_id: stageId,
               practice_area_id: input.practiceAreaId ?? null,
               temperature: temperatureMap[input.urgency] ?? 'warm',
-              status: 'new',
+              status: 'open',
               source: input.source ?? 'front_desk',
               notes: input.reason,
               created_by: userId,
