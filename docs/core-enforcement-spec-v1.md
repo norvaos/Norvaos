@@ -1,8 +1,8 @@
 # Core Enforcement Specification v1.0
 
 > **Status**: Active — FROZEN (see Section 10)
-> **Version**: `1.3.0`
-> **Last updated**: 2026-03-02
+> **Version**: `1.4.0`
+> **Last updated**: 2026-03-17
 > **Constant**: `CORE_ENFORCEMENT_SPEC_VERSION` in `lib/config/version.ts`
 > **Baseline commit**: `1249dd1338f3ff59f8e15eb7082c9669bc6447c5`
 > **Git tag**: `enforcement-v1.0.0`
@@ -376,6 +376,7 @@ checks:
 | 1.1.0 | 2026-03-01 | Added 5 billing surfaces: time-tracking page (self-gated), billing-stats-cards (self-gated), 3 time-tracking child components (parent-gated). Registry now 31 surfaces. |
 | 1.2.0 | 2026-03-02 | Added controlled workflow action surface: advance-stage-action.ts (stage_gating category, wraps stage engine). Registry now 32 surfaces. |
 | 1.3.0 | 2026-03-08 | Removed stale document-slot-templates/page.tsx. Added billing-tab.tsx (billing, parent-gated) and form-instance-engine.ts (documents, uses evaluateSlotCondition). Registry now 34 surfaces. |
+| 1.4.0 | 2026-03-17 | Registered 39 pre-existing Sprint 6 billing surfaces (built prior to Sprint 6 Week 3, never registered). Includes billing API routes (checkBillingPermission), cron routes (CRON_SECRET), portal routes (portal-token-auth), workspace pages (RequirePermission), shell components (parent-gate), and billing service-layer files (service-layer-only). Registry now 73 surfaces. |
 
 ---
 

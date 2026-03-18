@@ -13,7 +13,7 @@ export const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME || 'NorvaOS'
  * Must match the version in docs/core-enforcement-spec-v1.md.
  * Bump this when spec invariants change.
  */
-export const CORE_ENFORCEMENT_SPEC_VERSION = '1.3.0'
+export const CORE_ENFORCEMENT_SPEC_VERSION = '1.4.0'
 
 export function getVersionInfo() {
   return {

@@ -1,5 +1,5 @@
 {
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "Canonical registry of enforcement-sensitive surfaces. CI and tests read ONLY this file. No duplicate lists anywhere.",
   "surfaces": [
     {
@@ -219,6 +219,244 @@
       "category": "documents",
       "reason": "Form instance types (imports SlotConditions type from document-slot-engine)",
       "required_controls": ["evaluateSlotCondition"]
+    },
+    {
+      "path": "app/(dashboard)/billing/invoices/[id]/page.tsx",
+      "category": "billing",
+      "reason": "Invoice detail page (billing UI, RequirePermission-gated)",
+      "required_controls": ["RequirePermission"],
+      "gate_entity": "billing",
+      "gate_action": "view"
+    },
+    {
+      "path": "app/(dashboard)/billing/invoices/new/page.tsx",
+      "category": "billing",
+      "reason": "New invoice page (billing UI, RequirePermission-gated)",
+      "required_controls": ["RequirePermission"],
+      "gate_entity": "billing",
+      "gate_action": "view"
+    },
+    {
+      "path": "app/(dashboard)/workspace/billing/page.tsx",
+      "category": "billing",
+      "reason": "Workspace billing page (billing dashboard view)",
+      "required_controls": ["RequirePermission"]
+    },
+    {
+      "path": "app/(dashboard)/workspace/client/page.tsx",
+      "category": "billing",
+      "reason": "Workspace client page (contains billing queries for client financials)",
+      "required_controls": ["RequirePermission"]
+    },
+    {
+      "path": "app/(dashboard)/workspace/partner/page.tsx",
+      "category": "billing",
+      "reason": "Workspace partner page (contains billing queries for partner financials)",
+      "required_controls": ["RequirePermission"]
+    },
+    {
+      "path": "app/api/billing/invoices/[id]/adjustments/[adjId]/approve/route.ts",
+      "category": "billing",
+      "reason": "Invoice adjustment approval API (server-side billing permission check)",
+      "required_controls": ["checkBillingPermission", "server-403"]
+    },
+    {
+      "path": "app/api/billing/invoices/[id]/adjustments/route.ts",
+      "category": "billing",
+      "reason": "Invoice adjustments API (server-side billing permission check)",
+      "required_controls": ["checkBillingPermission", "server-403"]
+    },
+    {
+      "path": "app/api/billing/invoices/[id]/finalize/route.ts",
+      "category": "billing",
+      "reason": "Invoice finalization API (server-side billing permission check)",
+      "required_controls": ["checkBillingPermission", "server-403"]
+    },
+    {
+      "path": "app/api/billing/invoices/[id]/lines/[lineId]/route.ts",
+      "category": "billing",
+      "reason": "Invoice line item API (server-side billing permission check)",
+      "required_controls": ["checkBillingPermission", "server-403"]
+    },
+    {
+      "path": "app/api/billing/invoices/[id]/lines/route.ts",
+      "category": "billing",
+      "reason": "Invoice lines API (server-side billing permission check)",
+      "required_controls": ["checkBillingPermission", "server-403"]
+    },
+    {
+      "path": "app/api/billing/invoices/[id]/payments/route.ts",
+      "category": "billing",
+      "reason": "Invoice payments API (server-side billing permission check)",
+      "required_controls": ["checkBillingPermission", "server-403"]
+    },
+    {
+      "path": "app/api/billing/invoices/[id]/trust/route.ts",
+      "category": "billing",
+      "reason": "Invoice trust application API (server-side billing permission check)",
+      "required_controls": ["checkBillingPermission", "server-403"]
+    },
+    {
+      "path": "app/api/billing/invoices/[id]/void/route.ts",
+      "category": "billing",
+      "reason": "Invoice void API (server-side billing permission check)",
+      "required_controls": ["checkBillingPermission", "server-403"]
+    },
+    {
+      "path": "app/api/billing/payment-plans/[id]/instalments/[instalmentId]/pay/route.ts",
+      "category": "billing",
+      "reason": "Payment plan instalment payment API (server-side billing permission check)",
+      "required_controls": ["checkBillingPermission", "server-403"]
+    },
+    {
+      "path": "app/api/billing/payment-plans/[id]/route.ts",
+      "category": "billing",
+      "reason": "Payment plan detail API (server-side billing permission check)",
+      "required_controls": ["checkBillingPermission", "server-403"]
+    },
+    {
+      "path": "app/api/billing/payment-plans/route.ts",
+      "category": "billing",
+      "reason": "Payment plans list/create API (server-side billing permission check)",
+      "required_controls": ["checkBillingPermission", "server-403"]
+    },
+    {
+      "path": "app/api/billing/tax-profiles/route.ts",
+      "category": "billing",
+      "reason": "Tax profiles API (server-side billing permission check)",
+      "required_controls": ["checkBillingPermission", "server-403"]
+    },
+    {
+      "path": "app/api/command/convert-and-retain/route.ts",
+      "category": "billing",
+      "reason": "Lead conversion + retainer command API (requirePermission matters:create, billing queries via service layer)",
+      "required_controls": ["checkBillingPermission"]
+    },
+    {
+      "path": "app/api/contacts/[id]/statement/route.ts",
+      "category": "billing",
+      "reason": "Contact billing statement API (billing queries for client statement export)",
+      "required_controls": ["checkBillingPermission"]
+    },
+    {
+      "path": "app/api/cron/aging-recalculation/route.ts",
+      "category": "billing",
+      "reason": "Cron: recalculates invoice aging buckets (CRON_SECRET auth, operates across all tenants)",
+      "required_controls": ["cron-auth"]
+    },
+    {
+      "path": "app/api/cron/invoice-reminders/route.ts",
+      "category": "billing",
+      "reason": "Cron: sends invoice reminder emails (CRON_SECRET auth)",
+      "required_controls": ["cron-auth"]
+    },
+    {
+      "path": "app/api/cron/overdue-detection/route.ts",
+      "category": "billing",
+      "reason": "Cron: marks invoices overdue (CRON_SECRET auth)",
+      "required_controls": ["cron-auth"]
+    },
+    {
+      "path": "app/api/cron/snapshot-revenue/route.ts",
+      "category": "billing",
+      "reason": "Cron: snapshots daily revenue metrics (CRON_SECRET auth)",
+      "required_controls": ["cron-auth"]
+    },
+    {
+      "path": "app/api/cron/update-invoice-aging/route.ts",
+      "category": "billing",
+      "reason": "Cron: updates invoice aging fields (CRON_SECRET auth)",
+      "required_controls": ["cron-auth"]
+    },
+    {
+      "path": "app/api/portal/[token]/billing/mark-sent/route.ts",
+      "category": "billing",
+      "reason": "Portal billing mark-sent API (portal token auth via validatePortalToken)",
+      "required_controls": ["portal-token-auth"]
+    },
+    {
+      "path": "app/api/portal/[token]/billing/route.ts",
+      "category": "billing",
+      "reason": "Portal billing data API (portal token auth via validatePortalToken)",
+      "required_controls": ["portal-token-auth"]
+    },
+    {
+      "path": "app/api/portal/[token]/summary/route.ts",
+      "category": "billing",
+      "reason": "Portal summary API (portal token auth via validatePortalToken)",
+      "required_controls": ["portal-token-auth"]
+    },
+    {
+      "path": "app/portal/[token]/page.tsx",
+      "category": "billing",
+      "reason": "Client portal page (portal token auth, no internal RequirePermission needed)",
+      "required_controls": ["portal-token-auth"]
+    },
+    {
+      "path": "components/shell/tabs/BillingTab.tsx",
+      "category": "billing",
+      "reason": "Shell billing tab (imports invoicing hooks, parent-gated by workspace pages with RequirePermission)",
+      "required_controls": ["parent-gate"]
+    },
+    {
+      "path": "lib/services/analytics/analytics-service.ts",
+      "category": "billing",
+      "reason": "Analytics service (direct billing queries, consumed by cron snapshot-revenue and gated analytics UI)",
+      "required_controls": ["service-layer-only"]
+    },
+    {
+      "path": "lib/services/analytics/collections-service.ts",
+      "category": "billing",
+      "reason": "Collections analytics service (direct billing queries, consumed by gated analytics surfaces)",
+      "required_controls": ["service-layer-only"]
+    },
+    {
+      "path": "lib/services/billing/discount.service.ts",
+      "category": "billing",
+      "reason": "Discount calculation service (direct billing queries, consumed only by billing API routes with auth)",
+      "required_controls": ["service-layer-only"]
+    },
+    {
+      "path": "lib/services/billing/invoice-state.service.ts",
+      "category": "billing",
+      "reason": "Invoice state machine service (direct billing queries, consumed only by billing API routes with auth)",
+      "required_controls": ["service-layer-only"]
+    },
+    {
+      "path": "lib/services/billing/payment-allocation.service.ts",
+      "category": "billing",
+      "reason": "Payment allocation service (direct billing queries, consumed only by billing API routes with auth)",
+      "required_controls": ["service-layer-only"]
+    },
+    {
+      "path": "lib/services/billing/payment-plan.service.ts",
+      "category": "billing",
+      "reason": "Payment plan service (direct billing queries, consumed only by billing API routes with auth)",
+      "required_controls": ["service-layer-only"]
+    },
+    {
+      "path": "lib/services/billing/trust-application.service.ts",
+      "category": "billing",
+      "reason": "Trust application service (direct billing queries, consumed only by billing API routes with auth)",
+      "required_controls": ["service-layer-only"]
+    },
+    {
+      "path": "lib/services/esign-service.ts",
+      "category": "billing",
+      "reason": "E-sign service (billing queries for retainer/payment context, consumed only by gated command routes)",
+      "required_controls": ["service-layer-only"]
+    },
+    {
+      "path": "lib/services/invoice-email-service.ts",
+      "category": "billing",
+      "reason": "Invoice email service (billing queries for email generation, consumed only by billing API routes with auth)",
+      "required_controls": ["service-layer-only"]
+    },
+    {
+      "path": "lib/services/lead-conversion-executor.ts",
+      "category": "billing",
+      "reason": "Lead conversion executor (billing queries for retainer setup, consumed only by convert-and-retain command route)",
+      "required_controls": ["service-layer-only"]
     }
   ]
 }

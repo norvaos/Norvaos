@@ -144,22 +144,22 @@ describe('Enforcement Spec – Registry Consumption', () => {
     expect(categories.has('audit')).toBe(true)
   })
 
-  it('registry contains exactly 34 surfaces (frozen count — spec review required to change)', () => {
+  it('registry contains exactly 73 surfaces (frozen count — spec review required to change)', () => {
     const registry = loadRegistry()
-    if (registry.surfaces.length !== 34) {
-      const message = registry.surfaces.length < 34
-        ? `Registry has ${registry.surfaces.length} surfaces (expected 34). ` +
+    if (registry.surfaces.length !== 73) {
+      const message = registry.surfaces.length < 73
+        ? `Registry has ${registry.surfaces.length} surfaces (expected 73). ` +
           `A surface may have been removed without spec review. ` +
           `To fix: restore the missing surface or bump CORE_ENFORCEMENT_SPEC_VERSION ` +
           `and update docs/core-enforcement-spec-v1.md Section 10.`
-        : `Registry has ${registry.surfaces.length} surfaces (expected 34). ` +
+        : `Registry has ${registry.surfaces.length} surfaces (expected 73). ` +
           `A new surface was added without updating the frozen count. ` +
           `To fix: bump CORE_ENFORCEMENT_SPEC_VERSION, update the exact count ` +
           `in this test AND docs/core-enforcement-spec-v1.md Section 10, ` +
           `and get CODEOWNERS approval.`
       throw new Error(message)
     }
-    expect(registry.surfaces.length).toBe(34)
+    expect(registry.surfaces.length).toBe(73)
   })
 
   it('no duplicate paths in registry', () => {
