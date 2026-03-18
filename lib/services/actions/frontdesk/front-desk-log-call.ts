@@ -16,7 +16,34 @@ export const frontDeskLogCallAction: ActionDefinition<FrontDeskLogCallInput, Fro
   entityType: 'contact',
   getEntityId: (input) => input.contactId,
 
-  async execute({ input }) {
+  async execute({ input, supabase }) {
+    // Directly increment interaction_count and update last_contacted_at.
+    // The DB trigger (update_contact_engagement) only fires when engagement_points > 0
+    // which execute_action_atomic does not set for front-desk activities, so we
+    // must handle the contact stats update here instead of relying on the trigger.
+    const { data: current } = await supabase
+      .from('contacts')
+      .select('interaction_count')
+      .eq('id', input.contactId)
+      .single()
+
+    await supabase
+      .from('contacts')
+      .update({
+        interaction_count: (current?.interaction_count ?? 0) + 1,
+        last_contacted_at: new Date().toISOString(),
+        last_interaction_type: 'call',
+      })
+      .eq('id', input.contactId)
+
+    const outcomeLabel: Record<string, string> = {
+      connected:    'Connected',
+      no_answer:    'No Answer',
+      voicemail:    'Voicemail',
+      busy:         'Busy',
+      wrong_number: 'Wrong Number',
+    }
+
     return {
       data: {
         contactId: input.contactId,
@@ -30,11 +57,12 @@ export const frontDeskLogCallAction: ActionDefinition<FrontDeskLogCallInput, Fro
       },
       activity: {
         activityType: 'front_desk_call_logged',
-        title: `Phone call — ${input.direction} (${input.outcome})`,
-        description: input.notes,
+        title: `Call — ${outcomeLabel[input.outcome] ?? input.outcome}${input.notes ? ': ' + input.notes : ''}`,
+        description: input.notes || undefined,
         metadata: {
           direction: input.direction,
           outcome: input.outcome,
+          outcome_label: outcomeLabel[input.outcome] ?? input.outcome,
           duration_minutes: input.durationMinutes ?? null,
         },
         contactId: input.contactId,
