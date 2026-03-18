@@ -65,15 +65,15 @@ export default async function FrontDeskLayout({
     redirect('/')
   }
 
-  // Check feature flag
+  // Check feature flag — reads from the top-level feature_flags column,
+  // NOT settings.feature_flags (which is a different, nested key).
   const { data: tenant } = await admin
     .from('tenants')
-    .select('name, settings')
+    .select('name, feature_flags')
     .eq('id', userData.tenant_id)
     .single()
 
-  const settings = (tenant?.settings ?? {}) as Record<string, unknown>
-  const featureFlags = (settings.feature_flags ?? {}) as Record<string, boolean>
+  const featureFlags = (tenant?.feature_flags ?? {}) as Record<string, boolean>
 
   if (!featureFlags.front_desk_mode) {
     redirect('/')

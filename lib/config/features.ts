@@ -14,6 +14,8 @@ export const PLATFORM_FEATURE_DEFAULTS: Record<string, boolean> = {
   notifications_email: true,
   notifications_push: false,
   billing: false,
+  // Front Desk is on by default for all tenants — no per-tenant DB flag needed.
+  front_desk_mode: true,
 }
 
 /**
