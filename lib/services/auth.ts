@@ -5,6 +5,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { getJson, setJson, cacheKey } from '@/lib/services/cache'
 import { incrementDbCalls } from '@/lib/middleware/request-timing'
 import { AsyncLocalStorage } from 'node:async_hooks'
+import { cookies } from 'next/headers'
 
 /** Pre-resolved role data — populated once in authenticateRequest(). */
 export interface AuthRole {
@@ -87,12 +88,34 @@ export async function authenticateRequest(): Promise<AuthContext> {
     // Cache failures never break auth
   }
 
-  // 3. DB query (cache miss path) — now includes role_id + is_active for zero-cost permission checks
-  const { data: appUser, error: userError } = await supabase
+  // 3. DB query (cache miss path) — now includes role_id + is_active for zero-cost permission checks.
+  // A user may belong to multiple tenants (one users row per tenant). We resolve the
+  // active tenant via the norvaos-active-tenant cookie written by persistActiveTenant()
+  // on the client. When the cookie is present we add .eq('tenant_id', …) so the query
+  // always returns exactly one row. Without the cookie we fall back to the most recently
+  // created row (newest tenant wins). This avoids PGRST116 "more than one row" errors
+  // that break every action route for multi-tenant accounts.
+  let activeTenantId: string | null = null
+  try {
+    const cookieStore = await cookies()
+    activeTenantId = cookieStore.get('norvaos-active-tenant')?.value ?? null
+  } catch {
+    // cookies() may throw outside a request context (e.g. tests) — safe to ignore
+  }
+
+  let usersQuery = supabase
     .from('users')
     .select('id, tenant_id, role_id, is_active')
     .eq('auth_user_id', authUser.id)
-    .single()
+    .order('created_at', { ascending: false })
+    .limit(1)
+
+  if (activeTenantId) {
+    usersQuery = usersQuery.eq('tenant_id', activeTenantId) as typeof usersQuery
+  }
+
+  const { data: userRows, error: userError } = await usersQuery
+  const appUser = userRows?.[0] ?? null
 
   if (userError || !appUser) {
     throw new AuthError('User account not found', 403)
