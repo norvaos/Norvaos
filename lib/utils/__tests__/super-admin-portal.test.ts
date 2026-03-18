@@ -216,6 +216,9 @@ describe('Super Admin Portal — API routes use platform admin auth (auto-discov
     'app/api/admin/break-glass',
     'app/api/admin/delegations',
     'app/api/admin/supervision',
+    // Sprint 6 Week 3: tenant-scoped Admin-role routes (authenticateRequest + role check)
+    'app/api/admin/form-generation-jobs',
+    'app/api/admin/rule-snapshots',
   ]
 
   const discoveredRoutes = discoverAdminRoutes(resolve(ROOT, 'app/api/admin'))
