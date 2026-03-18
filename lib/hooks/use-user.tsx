@@ -6,6 +6,16 @@ import { useUIStore } from '@/lib/stores/ui-store'
 import type { User as AuthUser } from '@supabase/supabase-js'
 
 const ACTIVE_TENANT_KEY = 'norvaos-active-tenant'
+const ACTIVE_TENANT_COOKIE = 'norvaos-active-tenant'
+
+/** Write the active tenant ID to both localStorage and a cookie so server
+ *  components (Front Desk layout, auth guards) can resolve the right row when
+ *  a user belongs to multiple tenants. */
+function persistActiveTenant(tenantId: string) {
+  if (typeof window === 'undefined') return
+  localStorage.setItem(ACTIVE_TENANT_KEY, tenantId)
+  document.cookie = `${ACTIVE_TENANT_COOKIE}=${tenantId}; path=/; SameSite=Lax; max-age=31536000`
+}
 
 interface AppUser {
   id: string
@@ -85,14 +95,17 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
       setAllTenants(rows as AppUser[])
 
-      // Pick active tenant: prefer the one stored in localStorage, else newest
+      // Pick active tenant: prefer the one stored in localStorage, else newest.
+      // If the stored ID no longer matches any row (tenant deleted / wrong session),
+      // fall back to the newest row and update the persisted value so the cookie
+      // stays in sync for server-side layouts.
       const stored = typeof window !== 'undefined'
         ? localStorage.getItem(ACTIVE_TENANT_KEY)
         : null
-      const active =
-        (stored ? rows.find((r) => r.tenant_id === stored) : null) ?? rows[0]
-
-      const activeUser = active as AppUser
+      const activeRow = (stored ? rows.find((r) => r.tenant_id === stored) : null) ?? rows[0]
+      const activeUser = activeRow as AppUser
+      // Ensure cookie is always in sync with the resolved active tenant
+      persistActiveTenant(activeUser.tenant_id)
 
       // Update last_login_at for the active tenant row
       await supabase
@@ -124,9 +137,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const switchTenant = useCallback((tenantId: string) => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem(ACTIVE_TENANT_KEY, tenantId)
-    }
+    persistActiveTenant(tenantId)
     fetchUser()
   }, [fetchUser])
 
@@ -180,7 +191,5 @@ export function useUser() {
 
 /** Store the preferred active tenant (called from signup page after creating a new tenant) */
 export function setActiveTenant(tenantId: string) {
-  if (typeof window !== 'undefined') {
-    localStorage.setItem(ACTIVE_TENANT_KEY, tenantId)
-  }
+  persistActiveTenant(tenantId)
 }

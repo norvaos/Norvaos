@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation'
+import { cookies } from 'next/headers'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { FrontDeskHeader } from '@/components/front-desk/front-desk-header'
@@ -29,14 +30,27 @@ export default async function FrontDeskLayout({
     redirect('/login')
   }
 
-  // Get user's tenant and role
+  // Get user's tenant and role.
+  // A user may belong to multiple tenants (one row per tenant). We resolve the
+  // active tenant via the cookie written by persistActiveTenant() on the client.
+  // If no cookie, we fall back to the most recently created row.
   const admin = createAdminClient()
+  const cookieStore = await cookies()
+  const activeTenantId = cookieStore.get('norvaos-active-tenant')?.value
 
-  const { data: userData } = await admin
+  let usersQuery = admin
     .from('users')
     .select('id, first_name, last_name, avatar_url, tenant_id, role_id')
     .eq('auth_user_id', user.id)
-    .single()
+    .order('created_at', { ascending: false })
+    .limit(1)
+
+  if (activeTenantId) {
+    usersQuery = usersQuery.eq('tenant_id', activeTenantId) as typeof usersQuery
+  }
+
+  const { data: userRows } = await usersQuery
+  const userData = userRows?.[0] ?? null
 
   if (!userData) {
     redirect('/login')
