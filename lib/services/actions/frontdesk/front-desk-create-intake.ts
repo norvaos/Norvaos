@@ -59,6 +59,8 @@ export const frontDeskCreateIntakeAction: ActionDefinition<FrontDeskCreateIntake
     let contactId: string
     const isExisting = !!existingContactId
 
+    const dob = input.dateOfBirth?.trim() || null
+
     if (existingContactId) {
       // Use existing contact — update fields if provided
       contactId = existingContactId
@@ -68,6 +70,7 @@ export const frontDeskCreateIntakeAction: ActionDefinition<FrontDeskCreateIntake
           first_name: input.firstName,
           last_name: input.lastName,
           ...(email ? { email_primary: email } : {}),
+          ...(dob ? { date_of_birth: dob } : {}),
           custom_fields: {
             language: input.language ?? null,
             preferred_contact_method: input.preferredContactMethod ?? null,
@@ -82,6 +85,7 @@ export const frontDeskCreateIntakeAction: ActionDefinition<FrontDeskCreateIntake
             tenant_id: tenantId,
             first_name: input.firstName,
             last_name: input.lastName,
+            date_of_birth: dob,
             phone_primary: phone,
             email_primary: email,
             source: input.source ?? 'front_desk',

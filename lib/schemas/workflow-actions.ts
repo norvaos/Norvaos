@@ -92,14 +92,15 @@ export const frontDeskLogCallSchema = z.object({
   direction: z.enum(['inbound', 'outbound']),
   outcome: z.enum(['connected', 'no_answer', 'voicemail', 'busy', 'wrong_number']),
   durationMinutes: z.number().min(0).max(480).nullable().optional(),
-  notes: z.string().min(5, 'Notes must be at least 5 characters').max(1000),
+  // notes is optional — Quick Call buttons log outcomes in one click with no note
+  notes: z.string().max(1000).optional().or(z.literal('')),
 })
 
 export const frontDeskLogEmailSchema = z.object({
   contactId: z.string().uuid(),
   direction: z.enum(['inbound', 'outbound']),
   subject: z.string().min(1, 'Subject is required').max(200),
-  notes: z.string().min(5, 'Notes must be at least 5 characters').max(1000),
+  notes: z.string().max(1000).optional().or(z.literal('')),
 })
 
 export const frontDeskLogMeetingSchema = z.object({
@@ -107,7 +108,7 @@ export const frontDeskLogMeetingSchema = z.object({
   meetingType: z.enum(['in_person', 'video', 'phone']),
   durationMinutes: z.number().min(0).max(480).nullable().optional(),
   attendees: z.string().max(500).optional(),
-  notes: z.string().min(5, 'Notes must be at least 5 characters').max(1000),
+  notes: z.string().max(1000).optional().or(z.literal('')),
 })
 
 export const frontDeskCompleteTaskSchema = z.object({
@@ -120,6 +121,7 @@ export const frontDeskCompleteTaskSchema = z.object({
 export const frontDeskCreateIntakeSchema = z.object({
   firstName: z.string().min(1, 'First name is required'),
   lastName: z.string().min(1, 'Last name is required'),
+  dateOfBirth: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be YYYY-MM-DD').optional().or(z.literal('')),
   phone: z.string().min(7, 'Phone number is required'),
   email: z.string().email().optional().or(z.literal('')),
   preferredContactMethod: z.enum(['phone', 'email', 'text']).default('phone'),

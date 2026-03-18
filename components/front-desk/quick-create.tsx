@@ -30,6 +30,7 @@ interface QuickCreateProps {
 interface Step1Data {
   firstName: string
   lastName: string
+  dateOfBirth: string
   phone: string
   email: string
   preferredContactMethod: string
@@ -62,6 +63,7 @@ export function QuickCreate({ onCreated }: QuickCreateProps) {
   const [step1, setStep1] = useState<Step1Data>({
     firstName: '',
     lastName: '',
+    dateOfBirth: '',
     phone: '',
     email: '',
     preferredContactMethod: 'phone',
@@ -89,6 +91,7 @@ export function QuickCreate({ onCreated }: QuickCreateProps) {
           input: {
             firstName: step1.firstName.trim(),
             lastName: step1.lastName.trim(),
+            dateOfBirth: step1.dateOfBirth.trim() || undefined,
             phone: step1.phone.trim(),
             email: step1.email.trim() || undefined,
             preferredContactMethod: step1.preferredContactMethod,
@@ -182,6 +185,7 @@ export function QuickCreate({ onCreated }: QuickCreateProps) {
     setStep1({
       firstName: '',
       lastName: '',
+      dateOfBirth: '',
       phone: '',
       email: '',
       preferredContactMethod: 'phone',
@@ -272,6 +276,17 @@ export function QuickCreate({ onCreated }: QuickCreateProps) {
               {step1Errors.lastName && (
                 <p className="text-xs text-red-600">{step1Errors.lastName}</p>
               )}
+            </div>
+
+            {/* Date of Birth */}
+            <div className="space-y-1.5">
+              <Label htmlFor="qc-dob">Date of Birth</Label>
+              <Input
+                id="qc-dob"
+                type="date"
+                value={step1.dateOfBirth}
+                onChange={(e) => updateStep1('dateOfBirth', e.target.value)}
+              />
             </div>
 
             {/* Phone */}
