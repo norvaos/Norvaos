@@ -20,6 +20,9 @@ const schema = z.object({
   lawyerLastName:    z.string().optional(),
   lawyerEmail:       z.string().email().optional(),
   lawyerBarNumber:   z.string().optional(),
+  officeAddress:     z.string().optional(),
+  officePhone:       z.string().optional(),
+  officeEmail:       z.string().email().optional(),
 })
 
 type ApplySetupBody = z.infer<typeof schema>
@@ -93,6 +96,30 @@ async function handlePost(request: Request) {
     if (data.logoUrl)       tenantUpdate.logo_url      = data.logoUrl
     if (data.currency)      tenantUpdate.currency      = data.currency
     if (data.primaryColour) tenantUpdate.primary_color = data.primaryColour
+
+    // Ensure front_desk_mode is always enabled for tenants completing onboarding
+    const { data: currentFlags } = await admin
+      .from('tenants')
+      .select('feature_flags')
+      .eq('id', auth.tenantId)
+      .single()
+    const mergedFlags = {
+      ...((currentFlags?.feature_flags as Record<string, unknown>) ?? {}),
+      front_desk_mode: true,
+      portal_enabled: true,
+      billing_enabled: true,
+    }
+    tenantUpdate.feature_flags = j(mergedFlags)
+
+    // Store office contact details in settings if provided
+    if (data.officeAddress || data.officePhone || data.officeEmail) {
+      updatedSettings.office_contact = {
+        ...(currentSettings.office_contact as Record<string, unknown> ?? {}),
+        ...(data.officeAddress ? { address: data.officeAddress } : {}),
+        ...(data.officePhone   ? { phone: data.officePhone }     : {}),
+        ...(data.officeEmail   ? { email: data.officeEmail }     : {}),
+      }
+    }
 
     const { error: tenantErr } = await admin
       .from('tenants')

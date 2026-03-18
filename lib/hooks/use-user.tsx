@@ -5,6 +5,8 @@ import { createClient } from '@/lib/supabase/client'
 import { useUIStore } from '@/lib/stores/ui-store'
 import type { User as AuthUser } from '@supabase/supabase-js'
 
+const ACTIVE_TENANT_KEY = 'norvaos-active-tenant'
+
 interface AppUser {
   id: string
   tenant_id: string
@@ -27,6 +29,10 @@ interface UserContextType {
   isLoading: boolean
   error: string | null
   fullName: string
+  /** All tenants this auth user belongs to */
+  allTenants: AppUser[]
+  /** Switch the active tenant (persists to localStorage) */
+  switchTenant: (tenantId: string) => void
 }
 
 const UserContext = createContext<UserContextType>({
@@ -35,11 +41,14 @@ const UserContext = createContext<UserContextType>({
   isLoading: true,
   error: null,
   fullName: '',
+  allTenants: [],
+  switchTenant: () => {},
 })
 
 export function UserProvider({ children }: { children: ReactNode }) {
   const [authUser, setAuthUser] = useState<AuthUser | null>(null)
   const [appUser, setAppUser] = useState<AppUser | null>(null)
+  const [allTenants, setAllTenants] = useState<AppUser[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -53,40 +62,59 @@ export function UserProvider({ children }: { children: ReactNode }) {
       if (!user) {
         setAuthUser(null)
         setAppUser(null)
+        setAllTenants([])
         setIsLoading(false)
         return
       }
 
       setAuthUser(user)
 
-      const { data: userData, error: userError } = await supabase
+      // Fetch ALL user rows for this auth account (one per tenant they belong to)
+      const { data: rows, error: userError } = await supabase
         .from('users')
         .select('*')
         .eq('auth_user_id', user.id)
-        .single()
+        .eq('is_active', true)
+        .order('created_at', { ascending: false })
 
-      if (userError || !userData) {
+      if (userError || !rows || rows.length === 0) {
         setError('Failed to load user profile')
         setIsLoading(false)
         return
       }
 
-      // Client-side deactivation detection: sign out immediately if account disabled
-      if ((userData as AppUser).is_active === false) {
+      setAllTenants(rows as AppUser[])
+
+      // Pick active tenant: prefer the one stored in localStorage, else newest
+      const stored = typeof window !== 'undefined'
+        ? localStorage.getItem(ACTIVE_TENANT_KEY)
+        : null
+      const active =
+        (stored ? rows.find((r) => r.tenant_id === stored) : null) ?? rows[0]
+
+      const activeUser = active as AppUser
+
+      // Update last_login_at for the active tenant row
+      await supabase
+        .from('users')
+        .update({ last_login_at: new Date().toISOString() })
+        .eq('id', activeUser.id)
+
+      // Client-side deactivation detection
+      if (activeUser.is_active === false) {
         await supabase.auth.signOut()
         window.location.href = '/login?error=account_deactivated'
         return
       }
 
-      setAppUser(userData as AppUser)
+      setAppUser(activeUser)
 
       // Sync DB practice preference → Zustand on first load
-      // Only when localStorage has no saved state (fresh browser/device)
-      const stored = localStorage.getItem('norvaos-ui')
-      if (!stored && (userData as AppUser).practice_filter_preference) {
-        useUIStore.getState().setActivePracticeFilter(
-          (userData as AppUser).practice_filter_preference!
-        )
+      const uiStored = typeof window !== 'undefined'
+        ? localStorage.getItem('norvaos-ui')
+        : null
+      if (!uiStored && activeUser.practice_filter_preference) {
+        useUIStore.getState().setActivePracticeFilter(activeUser.practice_filter_preference!)
       }
     } catch {
       setError('An unexpected error occurred')
@@ -95,31 +123,31 @@ export function UserProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
-  // Initial fetch on mount
+  const switchTenant = useCallback((tenantId: string) => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(ACTIVE_TENANT_KEY, tenantId)
+    }
+    fetchUser()
+  }, [fetchUser])
+
   useEffect(() => {
     fetchUser()
   }, [fetchUser])
 
-  // Listen for auth state changes (login/logout) so the provider
-  // re-fetches automatically after sign-in without needing a hard refresh.
   useEffect(() => {
     const supabase = createClient()
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event) => {
-        if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-          fetchUser()
-        }
-        if (event === 'SIGNED_OUT') {
-          setAuthUser(null)
-          setAppUser(null)
-          setError(null)
-        }
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+        fetchUser()
       }
-    )
-
-    return () => {
-      subscription.unsubscribe()
-    }
+      if (event === 'SIGNED_OUT') {
+        setAuthUser(null)
+        setAppUser(null)
+        setAllTenants([])
+        setError(null)
+      }
+    })
+    return () => { subscription.unsubscribe() }
   }, [fetchUser])
 
   const fullName = useMemo(
@@ -131,8 +159,8 @@ export function UserProvider({ children }: { children: ReactNode }) {
   )
 
   const value = useMemo(
-    () => ({ authUser, appUser, isLoading, error, fullName }),
-    [authUser, appUser, isLoading, error, fullName]
+    () => ({ authUser, appUser, isLoading, error, fullName, allTenants, switchTenant }),
+    [authUser, appUser, isLoading, error, fullName, allTenants, switchTenant]
   )
 
   return (
@@ -148,4 +176,11 @@ export function useUser() {
     throw new Error('useUser must be used within a UserProvider')
   }
   return context
+}
+
+/** Store the preferred active tenant (called from signup page after creating a new tenant) */
+export function setActiveTenant(tenantId: string) {
+  if (typeof window !== 'undefined') {
+    localStorage.setItem(ACTIVE_TENANT_KEY, tenantId)
+  }
 }

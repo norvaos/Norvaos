@@ -52,7 +52,11 @@ async function handlePost(request: Request) {
 
     const supabase = createAdminClient()
 
-    // Step 1: Create the auth user
+    // Step 1: Resolve auth user — create fresh or reuse existing
+    // An email may already have an auth account (e.g. invited to another tenant).
+    // In that case we reuse the existing auth_user_id and update their password,
+    // then create a brand-new tenant for them. Each tenant is fully isolated by RLS.
+    let authUserId: string
     const { data: authData, error: authError } =
       await supabase.auth.admin.createUser({
         email,
@@ -66,22 +70,65 @@ async function handlePost(request: Request) {
       })
 
     if (authError) {
-      return NextResponse.json(
-        { data: null, error: authError.message },
-        { status: 400 }
-      )
-    }
+      const alreadyExists =
+        authError.message.toLowerCase().includes('already registered') ||
+        authError.message.toLowerCase().includes('already been registered') ||
+        authError.message.toLowerCase().includes('email address is already')
 
-    const authUserId = authData.user.id
+      if (!alreadyExists) {
+        return NextResponse.json(
+          { data: null, error: authError.message },
+          { status: 400 }
+        )
+      }
+
+      // Email already has an auth account — look it up and update password
+      const { data: listData, error: listError } =
+        await supabase.auth.admin.listUsers()
+      if (listError) {
+        return NextResponse.json(
+          { data: null, error: 'Failed to resolve existing account.' },
+          { status: 500 }
+        )
+      }
+      const existing = listData.users.find(
+        (u) => u.email?.toLowerCase() === email.toLowerCase()
+      )
+      if (!existing) {
+        return NextResponse.json(
+          { data: null, error: 'Account conflict — please try again or contact support.' },
+          { status: 400 }
+        )
+      }
+      // Update password so the user can sign in with the credentials they just provided
+      await supabase.auth.admin.updateUserById(existing.id, { password })
+      authUserId = existing.id
+    } else {
+      authUserId = authData.user.id
+    }
+    const authUserIsNew = !authError
 
     // Step 2: Create the tenant
     // Seat-limit exempt: signup creates a new tenant with 0 users, always passes.
     // max_users is set explicitly (non-null) because the DB trigger (enforce_max_users)
     // raises an exception when max_users IS NULL.
-    const slug = firmName
+    // Slug must be globally unique — append a short random suffix on collision.
+    const baseSlug = firmName
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-|-$/g, '')
+
+    // Try base slug first, then append random 4-char hex suffix until unique
+    let slug = baseSlug
+    {
+      const { count } = await supabase
+        .from('tenants')
+        .select('id', { count: 'exact', head: true })
+        .eq('slug', slug)
+      if ((count ?? 0) > 0) {
+        slug = `${baseSlug}-${Math.random().toString(16).slice(2, 6)}`
+      }
+    }
 
     const { data: tenant, error: tenantError } = await supabase
       .from('tenants')
@@ -93,12 +140,16 @@ async function handlePost(request: Request) {
         accent_color: '#3b82f6',
         timezone: 'America/Toronto',
         currency: 'CAD',
-        date_format: 'YYYY-MM-DD',
+        date_format: 'DD-MM-YYYY',
         subscription_tier: 'starter',
         subscription_status: 'trialing',
         max_users: 5,
         max_storage_gb: 5,
-        feature_flags: {},
+        feature_flags: {
+          front_desk_mode: true,
+          portal_enabled: true,
+          billing_enabled: true,
+        },
         settings: {},
         portal_branding: {},
         jurisdiction_code: jurisdiction,
@@ -107,8 +158,7 @@ async function handlePost(request: Request) {
       .single()
 
     if (tenantError) {
-      // Clean up: remove the auth user we just created
-      await supabase.auth.admin.deleteUser(authUserId)
+      if (authUserIsNew) await supabase.auth.admin.deleteUser(authUserId)
       return NextResponse.json(
         { data: null, error: `Failed to create firm: ${tenantError.message}` },
         { status: 500 }
@@ -138,9 +188,8 @@ async function handlePost(request: Request) {
       .single()
 
     if (roleError) {
-      // Clean up: remove tenant and auth user
       await supabase.from('tenants').delete().eq('id', tenant.id)
-      await supabase.auth.admin.deleteUser(authUserId)
+      if (authUserIsNew) await supabase.auth.admin.deleteUser(authUserId)
       return NextResponse.json(
         { data: null, error: `Failed to create role: ${roleError.message}` },
         { status: 500 }
@@ -171,10 +220,9 @@ async function handlePost(request: Request) {
       .single()
 
     if (userError) {
-      // Clean up: remove role, tenant, and auth user
       await supabase.from('roles').delete().eq('id', role.id)
       await supabase.from('tenants').delete().eq('id', tenant.id)
-      await supabase.auth.admin.deleteUser(authUserId)
+      if (authUserIsNew) await supabase.auth.admin.deleteUser(authUserId)
       return NextResponse.json(
         { data: null, error: `Failed to create user: ${userError.message}` },
         { status: 500 }

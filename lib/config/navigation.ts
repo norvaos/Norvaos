@@ -14,7 +14,6 @@ import {
   BarChart3,
   Settings,
   Phone,
-  Globe,
   Building2,
   MonitorSmartphone,
   Inbox,
@@ -53,15 +52,7 @@ export const navigation: NavSection[] = [
   {
     title: 'CRM',
     items: [
-      {
-        title: 'Dashboards',
-        href: '/',
-        icon: LayoutDashboard,
-        children: [
-          { title: 'Overview', href: '/', icon: LayoutDashboard },
-          { title: 'Immigration', href: '/dashboards/immigration', icon: Globe },
-        ],
-      },
+      { title: 'Dashboard', href: '/', icon: LayoutDashboard },
       { title: 'Contacts', href: '/contacts', icon: Users },
       { title: 'Matters', href: '/matters', icon: Briefcase },
       { title: 'Leads', href: '/leads', icon: Target },

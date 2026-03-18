@@ -15,9 +15,10 @@
  * State is held in useState — no cross-refresh persistence needed.
  */
 
-import React, { useState, useCallback, useRef } from 'react'
+import React, { useState, useCallback, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
+import { useTenant } from '@/lib/hooks/use-tenant'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -84,6 +85,9 @@ interface WizardState {
   logoUrl: string | null
   logoFile: File | null
   selectedPracticeAreas: PracticeAreaKey[]
+  officeAddress: string
+  officePhone: string
+  officeEmail: string
 
   // Step 2
   lawyerFirstName: string
@@ -111,7 +115,11 @@ const DEFAULT_STATE: WizardState = {
   firmName: '',
   logoUrl: null,
   logoFile: null,
-  selectedPracticeAreas: [],
+  // Immigration is the only active practice area — pre-selected and locked
+  selectedPracticeAreas: ['Immigration'],
+  officeAddress: '',
+  officePhone: '',
+  officeEmail: '',
   lawyerFirstName: '',
   lawyerLastName: '',
   lawyerEmail: '',
@@ -176,13 +184,6 @@ function StepFirmSetup({
 }) {
   const fileRef = useRef<HTMLInputElement>(null)
 
-  function togglePracticeArea(area: PracticeAreaKey) {
-    const next = state.selectedPracticeAreas.includes(area)
-      ? state.selectedPracticeAreas.filter((a) => a !== area)
-      : [...state.selectedPracticeAreas, area]
-    onChange({ selectedPracticeAreas: next })
-  }
-
   return (
     <div className="space-y-6">
       <div>
@@ -200,6 +201,44 @@ function StepFirmSetup({
           onChange={(e) => onChange({ firmName: e.target.value })}
         />
       </div>
+
+      {/* Office contact details */}
+      <div className="space-y-1.5">
+        <Label htmlFor="officeAddress">Office Address <span className="text-slate-400 font-normal">(optional)</span></Label>
+        <Input
+          id="officeAddress"
+          placeholder="e.g. 123 Main St, Toronto, ON M1A 1A1"
+          value={state.officeAddress}
+          onChange={(e) => onChange({ officeAddress: e.target.value })}
+        />
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-1.5">
+          <Label htmlFor="officePhone">Office Phone <span className="text-slate-400 font-normal">(optional)</span></Label>
+          <Input
+            id="officePhone"
+            type="tel"
+            placeholder="e.g. (416) 555-0100"
+            value={state.officePhone}
+            onChange={(e) => onChange({ officePhone: e.target.value })}
+          />
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="officeEmail">Office Email <span className="text-slate-400 font-normal">(optional)</span></Label>
+          <Input
+            id="officeEmail"
+            type="email"
+            placeholder="e.g. info@yourfirm.com"
+            value={state.officeEmail}
+            onChange={(e) => onChange({ officeEmail: e.target.value })}
+          />
+        </div>
+      </div>
+
+      <p className="text-xs text-slate-400 -mt-2">
+        These details will be used in letters, forms, and client communications across the platform.
+      </p>
 
       {/* Logo upload */}
       <div className="space-y-1.5">
@@ -240,30 +279,19 @@ function StepFirmSetup({
         <p className="text-xs text-slate-400">PNG, JPG or SVG — max 2 MB</p>
       </div>
 
-      {/* Practice areas */}
+      {/* Practice areas — Immigration is locked as the primary area */}
       <div className="space-y-2">
-        <Label>Practice Areas <span className="text-slate-400 font-normal">(select all that apply)</span></Label>
-        <div className="flex flex-wrap gap-2">
-          {PRACTICE_AREAS.map((area) => {
-            const selected = state.selectedPracticeAreas.includes(area)
-            return (
-              <button
-                key={area}
-                type="button"
-                onClick={() => togglePracticeArea(area)}
-                className={cn(
-                  'rounded-full border px-3 py-1 text-sm font-medium transition-colors',
-                  selected
-                    ? 'border-indigo-600 bg-indigo-50 text-indigo-700'
-                    : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50'
-                )}
-              >
-                {area}
-                {selected && <CheckCircle2 className="ml-1.5 inline h-3.5 w-3.5 text-indigo-600" />}
-              </button>
-            )
-          })}
+        <Label>Practice Areas</Label>
+        <div className="rounded-lg border border-indigo-200 bg-indigo-50 px-4 py-3 flex items-center justify-between">
+          <div>
+            <p className="text-sm font-semibold text-indigo-800">Immigration</p>
+            <p className="text-xs text-indigo-600 mt-0.5">Primary practice area — automation and workflows are fully configured for Immigration.</p>
+          </div>
+          <CheckCircle2 className="h-5 w-5 text-indigo-600 shrink-0" />
         </div>
+        <p className="text-xs text-slate-400">
+          Additional practice areas can be added later from <strong>Settings → Practice Areas</strong>. Automated workflows are currently available for Immigration only.
+        </p>
       </div>
     </div>
   )
@@ -649,11 +677,22 @@ function StepDone({ firmName }: { firmName: string }) {
 
 export default function SimpleOnboardingWizard() {
   const router = useRouter()
+  const { tenant } = useTenant()
   const [step, setStep]     = useState(0)
   const [state, setState]   = useState<WizardState>(DEFAULT_STATE)
   const [saving, setSaving] = useState(false)
   const [logoUploading, setLogoUploading] = useState(false)
   const [inviteResults, setInviteResults] = useState<{ email: string; ok: boolean; error?: string }[]>([])
+
+  // Pre-populate firm name from the already-created tenant (DEF-005)
+  // This ensures the name entered at signup is carried through to the wizard
+  // and prevents stale or incorrect values being written back via applyFirmSetup.
+  useEffect(() => {
+    if (tenant?.name && !state.firmName) {
+      setState((prev) => ({ ...prev, firmName: tenant.name }))
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tenant?.name])
 
   const isDoneStep  = step === TOTAL_STEPS - 1
   const canSkip     = step >= 2 && step < TOTAL_STEPS - 1
@@ -772,7 +811,7 @@ export default function SimpleOnboardingWizard() {
   // ── Apply firm setup directly to tenants table ──────────────────────────────
 
   async function applyFirmSetup() {
-    // Update firm name, logo, practice areas and billing via dedicated route
+    // Update firm name, logo, practice areas, office contact and billing via dedicated route
     await fetch('/api/onboarding/apply-setup', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -790,6 +829,9 @@ export default function SimpleOnboardingWizard() {
         lawyerLastName:     state.lawyerLastName.trim(),
         lawyerEmail:        state.lawyerEmail.trim(),
         lawyerBarNumber:    state.lawyerBarNumber.trim(),
+        officeAddress:      state.officeAddress.trim() || undefined,
+        officePhone:        state.officePhone.trim()   || undefined,
+        officeEmail:        state.officeEmail.trim()   || undefined,
       }),
     })
   }

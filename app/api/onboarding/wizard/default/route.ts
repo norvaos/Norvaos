@@ -325,6 +325,7 @@ async function handlePost() {
       flags.billing_enabled           = true
       flags.trust_accounting_enabled  = false
       flags.custom_fields_enabled     = false
+      flags.front_desk_mode           = true
 
       await admin.from('tenants').update({ settings: j(settings), feature_flags: j(flags), currency: 'CAD' } as never).eq('id', auth.tenantId)
     } catch { errors.push('tenant_settings_batch') }

@@ -77,15 +77,6 @@ function LoginForm() {
         return
       }
 
-      // Update last_login_at for the authenticated user
-      const { data: { user: authUser } } = await supabase.auth.getUser()
-      if (authUser) {
-        await supabase
-          .from('users')
-          .update({ last_login_at: new Date().toISOString() })
-          .eq('auth_user_id', authUser.id)
-      }
-
       router.push(redirectTo)
       router.refresh()
     } catch {

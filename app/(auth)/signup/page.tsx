@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
@@ -10,21 +11,25 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { CheckCircle, Lock } from 'lucide-react'
 import { NorvaLogo } from '@/components/landing/norva-logo'
+import { setActiveTenant } from '@/lib/hooks/use-user'
 
 const schema = z.object({
   firmName: z.string().min(2, 'Firm name is required'),
   firstName: z.string().min(1, 'First name is required'),
   lastName: z.string().min(1, 'Last name is required'),
   email: z.email('Please enter a valid email address'),
-  firmSize: z.string().min(1, 'Please select your firm size'),
+  password: z.string().min(8, 'Password must be at least 8 characters'),
+  confirmPassword: z.string().min(1, 'Please confirm your password'),
+}).refine((d) => d.password === d.confirmPassword, {
+  message: 'Passwords do not match',
+  path: ['confirmPassword'],
 })
 
 type FormValues = z.infer<typeof schema>
 
-export default function EarlyAccessPage() {
-  const [submitted, setSubmitted] = useState(false)
+export default function SignupPage() {
+  const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
 
   const { register, handleSubmit, formState: { errors } } = useForm<FormValues>({
@@ -34,47 +39,33 @@ export default function EarlyAccessPage() {
   async function onSubmit(data: FormValues) {
     setIsLoading(true)
     try {
-      const res = await fetch('/api/waitlist', {
+      const res = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+          firmName: data.firmName,
+          firstName: data.firstName,
+          lastName: data.lastName,
+          email: data.email,
+          password: data.password,
+        }),
       })
       const result = await res.json()
       if (!res.ok) {
         toast.error(result.error ?? 'Something went wrong. Please try again.')
         return
       }
-      setSubmitted(true)
+      // Pin the new tenant as active so login lands on the right firm
+      if (result.data?.tenant?.id) {
+        setActiveTenant(result.data.tenant.id)
+      }
+      toast.success('Account created! Please sign in.')
+      router.push('/login')
     } catch {
       toast.error('Something went wrong. Please try again.')
     } finally {
       setIsLoading(false)
     }
-  }
-
-  if (submitted) {
-    return (
-      <Card className="text-center">
-        <CardContent className="pt-10 pb-8 px-8">
-          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-100">
-            <CheckCircle className="h-7 w-7 text-emerald-600" />
-          </div>
-          <h2 className="text-xl font-bold text-gray-900">You&apos;re on the list</h2>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Thank you for your interest in NorvaOS. We&apos;ll reach out with your invitation when we&apos;re ready to onboard your firm.
-          </p>
-          <div className="mt-6 rounded-lg bg-indigo-50 border border-indigo-100 px-4 py-3 flex items-start gap-3 text-left">
-            <Lock className="h-4 w-4 text-indigo-500 mt-0.5 shrink-0" />
-            <p className="text-xs text-indigo-700">
-              NorvaOS is invitation-only during our launch phase. Each firm is onboarded personally to ensure a smooth start.
-            </p>
-          </div>
-          <Link href="/" className="mt-6 inline-block text-sm text-indigo-600 hover:underline">
-            ← Back to home
-          </Link>
-        </CardContent>
-      </Card>
-    )
   }
 
   return (
@@ -84,9 +75,9 @@ export default function EarlyAccessPage() {
           <NorvaLogo size={28} id="signup" />
           <span className="font-semibold text-gray-900">NorvaOS</span>
         </div>
-        <CardTitle>Request early access</CardTitle>
+        <CardTitle>Create your firm account</CardTitle>
         <CardDescription>
-          NorvaOS is invitation-only. Submit your details and we&apos;ll be in touch when we&apos;re ready to onboard your firm.
+          Set up NorvaOS for your firm. You&apos;ll be the account admin.
         </CardDescription>
       </CardHeader>
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -117,37 +108,24 @@ export default function EarlyAccessPage() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="firmSize">Firm size</Label>
-            <select
-              id="firmSize"
-              disabled={isLoading}
-              {...register('firmSize')}
-              className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-50"
-            >
-              <option value="">Select firm size</option>
-              <option value="solo">Solo practitioner</option>
-              <option value="2-5">2–5 lawyers</option>
-              <option value="6-15">6–15 lawyers</option>
-              <option value="16-50">16–50 lawyers</option>
-              <option value="50+">50+ lawyers</option>
-            </select>
-            {errors.firmSize && <p className="text-sm text-destructive">{errors.firmSize.message}</p>}
+            <Label htmlFor="password">Password</Label>
+            <Input id="password" type="password" placeholder="At least 8 characters" disabled={isLoading} {...register('password')} />
+            {errors.password && <p className="text-sm text-destructive">{errors.password.message}</p>}
           </div>
 
-          <div className="rounded-lg bg-amber-50 border border-amber-100 px-4 py-3 flex items-start gap-3">
-            <Lock className="h-4 w-4 text-amber-500 mt-0.5 shrink-0" />
-            <p className="text-xs text-amber-700">
-              Access is by invitation only. We personally onboard every firm to ensure a smooth setup.
-            </p>
+          <div className="space-y-2">
+            <Label htmlFor="confirmPassword">Confirm password</Label>
+            <Input id="confirmPassword" type="password" placeholder="Repeat your password" disabled={isLoading} {...register('confirmPassword')} />
+            {errors.confirmPassword && <p className="text-sm text-destructive">{errors.confirmPassword.message}</p>}
           </div>
         </CardContent>
 
         <CardFooter className="flex flex-col gap-4">
           <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? 'Submitting...' : 'Request early access'}
+            {isLoading ? 'Creating account...' : 'Create account'}
           </Button>
           <p className="text-center text-sm text-muted-foreground">
-            Already have an invitation?{' '}
+            Already have an account?{' '}
             <Link href="/login" className="text-primary hover:underline">Sign in</Link>
           </p>
         </CardFooter>
