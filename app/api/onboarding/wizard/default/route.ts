@@ -25,7 +25,10 @@ const DEFAULT_PRESET: WizardAnswers = {
   // Firm profile: leave existing name/colours; just set sensible defaults
   // (a specific firm name isn't assumed here)
   practiceModel: {
-    practiceAreas: [{ name: 'General', colour: '#6366f1' }],
+    // Immigration is the primary practice area — all automation, pipelines,
+    // and deadline types are built for it. Other practice areas can be added
+    // later from Settings → Practice Areas, but no automation is seeded for them.
+    practiceAreas: [{ name: 'Immigration', colour: '#6366f1' }],
   },
   matterNumbering: {
     prefix: 'M',

@@ -22,8 +22,8 @@ import { cn } from '@/lib/utils'
 // ─── What will be applied ─────────────────────────────────────────────────────
 
 const APPLYING_STEPS = [
-  { key: 'practice_areas',  label: 'Creating practice area (General)',                  icon: Layers       },
-  { key: 'matter_types',    label: 'Creating default matter type, pipeline & stages',   icon: Workflow     },
+  { key: 'practice_areas',  label: 'Setting up Immigration practice area',              icon: Layers       },
+  { key: 'matter_types',    label: 'Creating Immigration matter type, pipeline & stages', icon: Workflow   },
   { key: 'deadline_types',  label: 'Seeding standard deadline types',                  icon: Bell         },
   { key: 'matter_numbering',label: 'Configuring matter numbering (M-YYYY-NNN)',         icon: Hash         },
   { key: 'roles',           label: 'Seeding standard roles',                            icon: Shield       },
