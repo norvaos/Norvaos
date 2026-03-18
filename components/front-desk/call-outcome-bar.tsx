@@ -68,9 +68,11 @@ export function CallOutcomeBar({ contactId }: CallOutcomeBarProps) {
   })
 
   return (
-    <div className="flex items-center gap-1.5 px-3 py-2 bg-slate-50 border-b border-slate-200 rounded-t-md">
-      <Phone className="w-3.5 h-3.5 text-slate-400 mr-1" />
-      <span className="text-xs text-slate-500 font-medium mr-1">Quick Call:</span>
+    <div className="flex flex-wrap items-center gap-1.5 px-3 py-2 bg-slate-50 border border-slate-200 rounded-md">
+      <div className="flex items-center gap-1 shrink-0">
+        <Phone className="w-3.5 h-3.5 text-slate-400" />
+        <span className="text-xs text-slate-500 font-medium">Quick Call:</span>
+      </div>
       {CALL_OUTCOMES.map(({ outcome, label, icon: Icon, color }) => (
         <Button
           key={outcome}
@@ -91,3 +93,4 @@ export function CallOutcomeBar({ contactId }: CallOutcomeBarProps) {
     </div>
   )
 }
+

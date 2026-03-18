@@ -361,41 +361,10 @@ export function ContactWorkPanel({ contactId, onClose, onCreateIntake }: Contact
                 </dl>
               </div>
 
-              {/* ── Section 3: Timeline Summary ── */}
-              <div className="space-y-2">
-                <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
-                  Recent Activity
-                </h3>
-                {timelineLoading ? (
-                  <div className="space-y-3">
-                    {Array.from({ length: 3 }).map((_, i) => (
-                      <div key={i} className="flex items-start gap-3">
-                        <Skeleton className="size-8 rounded-full" />
-                        <div className="flex-1 space-y-1">
-                          <Skeleton className="h-4 w-3/4" />
-                          <Skeleton className="h-3 w-1/2" />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : timeline && timeline.length > 0 ? (
-                  <div className="divide-y divide-border">
-                    {timeline.map((event) => (
-                      <TimelineEventRow key={event.id} event={event} />
-                    ))}
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-2 py-4 text-sm text-muted-foreground">
-                    <Activity className="size-4" />
-                    <span>No recent activity</span>
-                  </div>
-                )}
-              </div>
-
               {/* ── Call Outcome Quick Bar ── */}
               <CallOutcomeBar contactId={contactId!} />
 
-              {/* ── Section 4: Action Bar ── */}
+              {/* ── Section 3: Action Bar ── */}
               <div className="border-t pt-4">
                 <ContactActionBar
                   contactId={contactId!}
@@ -423,6 +392,37 @@ export function ContactWorkPanel({ contactId, onClose, onCreateIntake }: Contact
                   }}
                   onCreateIntake={onCreateIntake}
                 />
+              </div>
+
+              {/* ── Section 4: Recent Activity (bottom) ── */}
+              <div className="space-y-2 border-t pt-4">
+                <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+                  Recent Activity
+                </h3>
+                {timelineLoading ? (
+                  <div className="space-y-3">
+                    {Array.from({ length: 3 }).map((_, i) => (
+                      <div key={i} className="flex items-start gap-3">
+                        <Skeleton className="size-8 rounded-full" />
+                        <div className="flex-1 space-y-1">
+                          <Skeleton className="h-4 w-3/4" />
+                          <Skeleton className="h-3 w-1/2" />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : timeline && timeline.length > 0 ? (
+                  <div className="divide-y divide-border">
+                    {timeline.map((event) => (
+                      <TimelineEventRow key={event.id} event={event} />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2 py-4 text-sm text-muted-foreground">
+                    <Activity className="size-4" />
+                    <span>No recent activity</span>
+                  </div>
+                )}
               </div>
 
             </div>
