@@ -231,6 +231,22 @@ export async function convertLeadToMatter(
 
   // ─── 5. Execute conversion (idempotent) ───────────────────────────────────
 
+  // ─── 4b. Clear any stale idempotency entry from a previously FAILED attempt ─
+  // The idempotency key `conversion:{leadId}` is a one-time key. If a previous
+  // attempt failed mid-way (matter INSERT threw, RLS blocked, etc.), the ledger
+  // still has the entry which permanently blocks all future retries, even though
+  // `lead.converted_matter_id` is still null (no matter was created).
+  //
+  // Since we confirmed above that converted_matter_id is null, any existing
+  // ledger entry for this key is from a failed conversion. Deleting it is safe:
+  // the DB unique constraint on `converted_matter_id` and the gate check above
+  // provide idempotency for successful conversions independently.
+  await supabase
+    .from('lead_workflow_executions')
+    .delete()
+    .eq('execution_key', idempotencyKeys.conversion(leadId))
+    .eq('tenant_id', tenantId)
+
   const idempotentResult = await executeIdempotent<{ matterId: string }>(supabase, {
     tenantId,
     leadId,

@@ -34,7 +34,8 @@ import { useAppointments } from '@/lib/queries/booking'
 import { ConflictReviewPanel, ConflictStatusBadge } from '@/components/contacts/conflict-review-panel'
 import { ContactTeamManager } from '@/components/contacts/contact-team-manager'
 import { useContactAssignments, getAssignmentRoleLabel } from '@/lib/queries/contact-assignments'
-import { PipelineProgress, PipelineStageBadge } from '@/components/contacts/pipeline-progress'
+import { PipelineStageBadge } from '@/components/contacts/pipeline-progress'
+import { ACTIVE_STAGES, STAGE_LABELS } from '@/lib/config/lead-workflow-definitions'
 import { InteractionsPanel } from '@/components/shared/interactions-panel'
 import { hasPermission } from '@/lib/utils/permissions'
 import { useUserRole } from '@/lib/hooks/use-user-role'
@@ -201,11 +202,14 @@ function useContactActiveLead(contactId: string) {
     queryKey: ['contact-active-lead', contactId],
     queryFn: async () => {
       const supabase = createClient()
+      // Fetch the most recent non-converted, non-closed lead for this contact.
+      // Include current_stage and pipeline_id so the pipeline widget shows the
+      // real lead stage (from LEAD_STAGES) rather than contacts.pipeline_stage.
       const { data, error } = await supabase
         .from('leads')
-        .select('id, status')
+        .select('id, status, current_stage, pipeline_id')
         .eq('contact_id', contactId)
-        .in('status', ['open', 'new', 'contacted', 'qualified', 'pitched'])
+        .not('status', 'in', '("converted","closed_lost","closed_won","closed")')
         .order('created_at', { ascending: false })
         .limit(1)
         .maybeSingle()
@@ -714,15 +718,29 @@ function OverviewTab({
   const { data: orgContacts } = useOrganizationContacts(contactId, tenantId, isOrganization)
   const { data: appointments } = useAppointments(tenantId, { contactId, upcoming: true })
   const updateContact = useUpdateContact()
+  const queryClient = useQueryClient()
 
-  // Pipeline stage change handler
-  const handlePipelineStageChange = (newStage: string) => {
-    updateContact.mutate({
-      id: contactId,
-      pipeline_stage: newStage,
-      milestone: newStage,
-      milestone_updated_at: new Date().toISOString(),
-    })
+  // Active lead — drives the pipeline widget so it mirrors the Leads page stage.
+  const { data: activeLead, isLoading: leadLoading } = useContactActiveLead(contactId)
+
+  // Lead stage advance — calls the lead stage API and invalidates the cache.
+  const [isAdvancingStage, setIsAdvancingStage] = useState(false)
+  const handleLeadStageAdvance = async (targetStage: string) => {
+    if (!activeLead?.id || isAdvancingStage) return
+    setIsAdvancingStage(true)
+    try {
+      const res = await fetch(`/api/leads/${activeLead.id}/stage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ targetStage, reason: 'Advanced from contact page' }),
+      })
+      if (res.ok) {
+        // Refresh active lead so the widget updates immediately
+        await queryClient.invalidateQueries({ queryKey: ['contact-active-lead', contactId] })
+      }
+    } finally {
+      setIsAdvancingStage(false)
+    }
   }
 
   const hasAddress =
@@ -990,21 +1008,77 @@ function OverviewTab({
 
       {/* Right column: Stats sidebar */}
       <div className="space-y-4">
-        {/* Pipeline Progress */}
+        {/* Pipeline Progress — reads from the active lead's current_stage */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center justify-between text-sm">
               Pipeline
-              <PipelineStageBadge stage={contact.pipeline_stage ?? 'new_lead'} />
+              {activeLead?.current_stage ? (
+                <span className="inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium bg-blue-50 text-blue-700 border-blue-200">
+                  {STAGE_LABELS[activeLead.current_stage as keyof typeof STAGE_LABELS] ?? activeLead.current_stage}
+                </span>
+              ) : (
+                <PipelineStageBadge stage={contact.pipeline_stage ?? 'new_lead'} />
+              )}
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <PipelineProgress
-              currentStage={contact.pipeline_stage ?? 'new_lead'}
-              compact
-              onStageChange={handlePipelineStageChange}
-              isUpdating={updateContact.isPending}
-            />
+            {leadLoading ? (
+              <div className="h-16 animate-pulse rounded bg-slate-100" />
+            ) : activeLead?.current_stage ? (
+              // ── Lead-driven pipeline widget ─────────────────────────────
+              // Shows the lead's actual stage from LEAD_STAGES, not the
+              // stale contacts.pipeline_stage field.
+              (() => {
+                const stageIndex = ACTIVE_STAGES.indexOf(activeLead.current_stage as typeof ACTIVE_STAGES[number])
+                const progress = stageIndex >= 0
+                  ? Math.round(((stageIndex + 1) / ACTIVE_STAGES.length) * 100)
+                  : 0
+                const nextStage = stageIndex >= 0 && stageIndex < ACTIVE_STAGES.length - 1
+                  ? ACTIVE_STAGES[stageIndex + 1]
+                  : null
+
+                return (
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-medium text-slate-700">
+                        {STAGE_LABELS[activeLead.current_stage as keyof typeof STAGE_LABELS] ?? activeLead.current_stage}
+                      </span>
+                      <span className="text-xs text-muted-foreground">{progress}%</span>
+                    </div>
+                    <div className="h-1.5 w-full rounded-full bg-slate-100">
+                      <div
+                        className="h-1.5 rounded-full bg-blue-500 transition-all duration-500"
+                        style={{ width: `${progress}%` }}
+                      />
+                    </div>
+                    <p className="text-[10px] text-muted-foreground">
+                      {stageIndex >= 0 ? `Step ${stageIndex + 1} of ${ACTIVE_STAGES.length}` : 'Stage unknown'}
+                    </p>
+                    {nextStage && (
+                      <div className="border-t border-slate-100 pt-2">
+                        <button
+                          type="button"
+                          disabled={isAdvancingStage}
+                          onClick={() => handleLeadStageAdvance(nextStage)}
+                          className="flex w-full items-center justify-center gap-1.5 rounded-md border border-blue-200 bg-blue-50 px-2.5 py-1.5 text-xs font-medium text-blue-700 transition-colors hover:bg-blue-100 hover:border-blue-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {isAdvancingStage ? (
+                            <span className="size-3 animate-spin rounded-full border border-blue-500 border-t-transparent" />
+                          ) : (
+                            <span>›</span>
+                          )}
+                          Advance to {STAGE_LABELS[nextStage as keyof typeof STAGE_LABELS] ?? nextStage}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )
+              })()
+            ) : (
+              // No active lead — show placeholder
+              <p className="text-xs text-muted-foreground">No active lead for this contact.</p>
+            )}
           </CardContent>
         </Card>
 
