@@ -9,3 +9,33 @@
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
+
+# ── Force HTTPS — redirect all HTTP traffic to HTTPS ──────────────────────────
+[[redirects]]
+  from   = "http://norvaos.ca/*"
+  to     = "https://norvaos.ca/:splat"
+  status = 301
+  force  = true
+
+[[redirects]]
+  from   = "http://www.norvaos.ca/*"
+  to     = "https://norvaos.ca/:splat"
+  status = 301
+  force  = true
+
+[[redirects]]
+  from   = "http://*.netlify.app/*"
+  to     = "https://:splat.netlify.app/:splat"
+  status = 301
+  force  = true
+
+# ── Security headers ──────────────────────────────────────────────────────────
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Strict-Transport-Security = "max-age=63072000; includeSubDomains; preload"
+    X-Frame-Options            = "DENY"
+    X-Content-Type-Options     = "nosniff"
+    Referrer-Policy            = "strict-origin-when-cross-origin"
+    Permissions-Policy         = "camera=(), microphone=(), geolocation=()"
+    X-XSS-Protection           = "1; mode=block"
