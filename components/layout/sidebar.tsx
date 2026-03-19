@@ -94,7 +94,7 @@ function NavItemButton({
       href={href}
       onClick={onClick}
       className={cn(
-        'group relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colours',
+        'group relative flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-sm font-medium transition-colours',
         isActive
           ? 'bg-primary/10 text-primary'
           : 'text-muted-foreground hover:bg-muted hover:text-foreground',
@@ -213,7 +213,7 @@ function NavDropdown({ item, pathname, isCollapsed, featureFlags }: NavDropdownP
         type="button"
         onClick={() => setOpen((o) => !o)}
         className={cn(
-          'group relative flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colours',
+          'group relative flex w-full items-center gap-2.5 rounded-md px-2.5 py-1.5 text-sm font-medium transition-colours',
           anyChildActive
             ? 'bg-primary/10 text-primary'
             : 'text-muted-foreground hover:bg-muted hover:text-foreground'
@@ -332,7 +332,7 @@ export function Sidebar() {
         <ScrollArea className="flex-1 overflow-y-auto">
           <nav
             className={cn(
-              'flex flex-col gap-6 py-4',
+              'flex flex-col gap-4 py-3',
               sidebarCollapsed ? 'px-2' : 'px-3'
             )}
           >
@@ -346,10 +346,10 @@ export function Sidebar() {
               if (visibleItems.length === 0) return null
 
               return (
-                <div key={section.title} className="flex flex-col gap-1">
+                <div key={section.title} className="flex flex-col gap-0.5">
                   {/* Section title -- hidden when collapsed */}
                   {!sidebarCollapsed && (
-                    <span className="mb-1 px-3 text-xs font-medium uppercase tracking-wider text-muted-foreground/70">
+                    <span className="mb-0.5 px-2.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/50">
                       {section.title}
                     </span>
                   )}

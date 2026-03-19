@@ -11,11 +11,9 @@ import {
   Clock,
   FileText,
   Mail,
-  MessageSquare,
   DollarSign,
   BarChart3,
   Settings,
-  Phone,
   Building2,
   MonitorSmartphone,
   Inbox,
@@ -24,9 +22,6 @@ import {
   Shield,
   Landmark,
   TrendingUp,
-  PhoneCall,
-  Scale,
-  User,
   Layers,
   AlertTriangle,
   type LucideIcon,
@@ -52,9 +47,15 @@ export interface NavSection {
 
 export const navigation: NavSection[] = [
   {
-    title: 'CRM',
+    title: 'Main',
     items: [
       { title: 'Dashboard', href: '/', icon: LayoutDashboard },
+      { title: 'Front Desk', href: '/front-desk', icon: MonitorSmartphone, featureFlag: 'front_desk_mode' },
+    ],
+  },
+  {
+    title: 'Practice',
+    items: [
       { title: 'Contacts', href: '/contacts', icon: Users },
       { title: 'Matters', href: '/matters', icon: Briefcase },
       { title: 'Leads', href: '/leads', icon: Target },
@@ -70,56 +71,11 @@ export const navigation: NavSection[] = [
     ],
   },
   {
-    title: 'Communicate',
-    items: [
-      { title: 'Email', href: '/communications', icon: Mail, deprecated: true },
-      { title: 'Phone', href: '/communications/phone', icon: Phone, comingSoon: true, featureFlag: 'phone' },
-      { title: 'Chat', href: '/chat', icon: MessageSquare, comingSoon: true },
-      { title: 'Clio', href: '/integrations/clio', icon: Globe, comingSoon: true },
-    ],
-  },
-  {
     title: 'Finance',
     items: [
-      { title: 'Time Tracking', href: '/time-tracking', icon: Clock },
       { title: 'Billing', href: '/billing', icon: DollarSign },
       { title: 'Trust Accounting', href: '/trust', icon: Landmark },
-      { title: 'Reports', href: '/reports', icon: BarChart3, featureFlag: 'advanced_reporting' },
-    ],
-  },
-  {
-    title: 'Analytics',
-    items: [
-      { title: 'KPI Scorecard', href: '/analytics/scorecard', icon: TrendingUp },
-      { title: 'Financial Analytics', href: '/analytics', icon: BarChart3 },
-      { title: 'Trust Compliance', href: '/analytics/trust-compliance', icon: Landmark },
-    ],
-  },
-  {
-    title: 'Operations',
-    items: [
-      { title: 'Front Desk', href: '/front-desk', icon: MonitorSmartphone, featureFlag: 'front_desk_mode' },
-      { title: 'Command Centre', href: '/leads', icon: LayoutDashboard },
-      { title: 'Critical Actions', href: '/admin/critical-actions', icon: AlertTriangle },
-    ],
-  },
-  {
-    title: 'Workspaces',
-    items: [
-      {
-        title: 'Role Workspaces',
-        href: '/workspace/front-desk',
-        icon: PhoneCall,
-        children: [
-          { title: 'Front Desk', href: '/workspace/front-desk', icon: PhoneCall },
-          { title: 'Legal Assistant', href: '/workspace/legal-assistant', icon: FileText },
-          { title: 'Lawyer', href: '/workspace/lawyer', icon: Scale },
-          { title: 'Billing', href: '/workspace/billing', icon: DollarSign },
-          { title: 'Admin', href: '/workspace/admin', icon: Settings },
-          { title: 'Client Portal', href: '/workspace/client', icon: User },
-          { title: 'Partner', href: '/workspace/partner', icon: BarChart3 },
-        ],
-      },
+      { title: 'Time Tracking', href: '/time-tracking', icon: Clock },
     ],
   },
   {
@@ -130,16 +86,23 @@ export const navigation: NavSection[] = [
         href: '/settings',
         icon: Settings,
         children: [
-          { title: 'All Settings', href: '/settings', icon: Settings },
+          { title: 'General', href: '/settings', icon: Settings },
+          { title: 'Users & Roles', href: '/settings/users', icon: Users },
+          { title: 'Matter Types', href: '/admin/matter-types', icon: Layers },
           { title: 'Email Accounts', href: '/settings/email-accounts', icon: Inbox },
           { title: 'Automation Rules', href: '/settings/automation-rules', icon: Zap },
           { title: 'Expiry Reminders', href: '/settings/expiry-reminders', icon: Bell },
           { title: 'Access Control', href: '/settings/access-control', icon: Shield },
           { title: 'Trust Accounts', href: '/settings/trust-accounts', icon: Landmark },
+          { title: 'Analytics', href: '/analytics', icon: BarChart3 },
+          { title: 'KPI Scorecard', href: '/analytics/scorecard', icon: TrendingUp },
+          { title: 'Reports', href: '/reports', icon: BarChart3, featureFlag: 'advanced_reporting' },
+          { title: 'Integrations', href: '/integrations/clio', icon: Globe, comingSoon: true },
+          { title: 'Tenants', href: '/admin/tenants', icon: Building2 },
+          { title: 'Critical Actions', href: '/admin/critical-actions', icon: AlertTriangle },
+          { title: 'Communications', href: '/communications', icon: Mail, deprecated: true },
         ],
       },
-      { title: 'Matter Types', href: '/admin/matter-types', icon: Layers },
-      { title: 'Tenants', href: '/admin/tenants', icon: Building2 },
     ],
   },
 ]
