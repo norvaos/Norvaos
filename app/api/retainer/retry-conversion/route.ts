@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { authenticateRequest, AuthError } from '@/lib/services/auth'
 import { requirePermission } from '@/lib/services/require-role'
 import { convertLeadToMatter } from '@/lib/services/lead-conversion-executor'
@@ -99,10 +100,11 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Execute conversion
+    // Execute conversion using admin client to bypass RLS on matters INSERT
+    const adminClient = createAdminClient()
     const billingType = retainerPkg.billing_type || 'flat_fee'
     const conversionResult = await convertLeadToMatter({
-      supabase,
+      supabase: adminClient,
       leadId,
       tenantId: auth.tenantId,
       userId: auth.userId,
@@ -121,7 +123,7 @@ export async function POST(request: NextRequest) {
 
     if (conversionResult.success && conversionResult.matterId) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data: matter } = await (supabase as any)
+      const { data: matter } = await (adminClient as any)
         .from('matters')
         .select('matter_number')
         .eq('id', conversionResult.matterId)
@@ -134,12 +136,19 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    // Conversion failed — return the error
+    // Conversion failed — return structured error with all blocked reasons
+    const blockedReasons: string[] = conversionResult.gateResults
+      ? conversionResult.gateResults.blockedReasons
+      : conversionResult.error
+        ? conversionResult.error.split('\n').filter(Boolean)
+        : ['Matter could not be created. Check that Practice Area, Matter Type, Responsible Lawyer, Retainer Signed, and Payment Received are all complete on this lead.']
+
     return NextResponse.json({
       success: true, // The API call succeeded, but conversion didn't
       matterId: null,
       matterNumber: null,
-      conversionError: conversionResult.error ?? 'Conversion blocked — check lead fields',
+      conversionError: blockedReasons.join('\n'),
+      blockedReasons,
     })
   } catch (err) {
     console.error('[retry-conversion] Error:', err)

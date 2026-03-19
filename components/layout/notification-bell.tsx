@@ -74,8 +74,8 @@ function showNotificationToast(title: string, message: string, _isFrontDesk: boo
   playChime()
   toast(title, {
     description: message || undefined,
-    duration: 5000,          // 5 s — auto-dismisses, not intrusive
-    position: 'top-right',  // corner, not centre-screen
+    duration: Infinity,      // stays until the user manually dismisses it
+    position: 'top-right',
   })
 }
 

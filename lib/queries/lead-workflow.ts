@@ -894,6 +894,7 @@ export function useRecordRetainerPayment() {
       matterId?: string | null
       matterNumber?: string | null
       conversionError?: string
+      blockedReasons?: string[]
       paymentStatus: 'paid' | 'partial'
       totalPaid: number
       totalOwed: number

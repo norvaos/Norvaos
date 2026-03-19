@@ -27,9 +27,11 @@ async function handlePost(
 
     // 2. Parse optional body
     let triggerType: TriggerType = 'manual'
+    let leadId: string | undefined
     try {
       const body = await request.json()
       if (body.triggerType) triggerType = body.triggerType
+      if (body.leadId) leadId = body.leadId
     } catch {
       // No body or invalid JSON — use defaults
     }
@@ -56,6 +58,25 @@ async function handlePost(
       triggeredBy: auth.userId,
       triggerType,
     })
+
+    // 5. If a leadId was provided, sync lead.conflict_status with the scan result
+    if (leadId) {
+      const newStatus = result.scan.status === 'completed'
+        ? (result.matches.length === 0
+            ? 'auto_scan_complete'
+            : (result.scan.score ?? 0) >= 50
+              ? 'review_required'
+              : 'review_suggested')
+        : undefined
+
+      if (newStatus) {
+        await auth.supabase
+          .from('leads')
+          .update({ conflict_status: newStatus })
+          .eq('id', leadId)
+          .eq('tenant_id', auth.tenantId)
+      }
+    }
 
     return NextResponse.json(
       {

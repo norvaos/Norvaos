@@ -242,6 +242,7 @@ export function ConsultationOutcomePanel() {
   // Shown when auto-conversion fails due to missing fields.
   const [conversionBlockedOpen, setConversionBlockedOpen] = useState(false)
   const [conversionBlockedMessage, setConversionBlockedMessage] = useState('')
+  const [conversionBlockedReasons, setConversionBlockedReasons] = useState<string[]>([])
   const [isRetryingConversion, setIsRetryingConversion] = useState(false)
 
   // ── Retry conversion ────────────────────────────────────────────
@@ -269,9 +270,12 @@ export function ConsultationOutcomePanel() {
         })
         setConversionBlockedOpen(false)
         setConversionBlockedMessage('')
+        setConversionBlockedReasons([])
         // Navigate to the matter page
         router.push(`/matters/${data.matterId}`)
       } else if (data.conversionError) {
+        const reasons: string[] = data.blockedReasons ?? data.conversionError.split('\n').filter(Boolean)
+        setConversionBlockedReasons(reasons)
         setConversionBlockedMessage(data.conversionError)
         setConversionBlockedOpen(true)
       }
@@ -839,7 +843,8 @@ export function ConsultationOutcomePanel() {
           toast.success('Matter created', { description: 'Payment recorded and lead converted to matter.', duration: 5000 })
           router.push(`/matters/${data.matterId}`)
         } else if (data.conversionError) {
-          // Show conversion blocked dialog if conversion failed
+          const reasons: string[] = data.blockedReasons ?? data.conversionError.split('\n').filter(Boolean)
+          setConversionBlockedReasons(reasons)
           setConversionBlockedMessage(data.conversionError)
           setConversionBlockedOpen(true)
         }
@@ -907,7 +912,8 @@ export function ConsultationOutcomePanel() {
         router.push(`/matters/${data.matterId}`)
       } else if (data.conversionError) {
         toast.success('Retainer marked as signed on paper')
-        // Show blocking dialog instead of a dismissible toast
+        const reasons: string[] = data.blockedReasons ?? data.conversionError.split('\n').filter(Boolean)
+        setConversionBlockedReasons(reasons)
         setConversionBlockedMessage(data.conversionError)
         setConversionBlockedOpen(true)
       } else {
@@ -1708,32 +1714,47 @@ export function ConsultationOutcomePanel() {
 
             {/* ── Conversion Blocked Dialog ── */}
             <AlertDialog open={conversionBlockedOpen} onOpenChange={setConversionBlockedOpen}>
-              <AlertDialogContent>
+              <AlertDialogContent className="max-w-lg">
                 <AlertDialogHeader>
                   <AlertDialogTitle className="flex items-center gap-2">
-                    <AlertTriangle className="h-5 w-5 text-amber-500" />
+                    <AlertTriangle className="h-5 w-5 text-amber-500 shrink-0" />
                     Matter Could Not Be Created
                   </AlertDialogTitle>
                   <AlertDialogDescription asChild>
                     <div className="space-y-3 text-sm text-slate-600">
                       <p>
-                        The following steps must be completed before this lead can be converted to a matter:
+                        Complete the following steps, then click <strong>Convert to Matter</strong> to try again:
                       </p>
-                      <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-amber-800 text-sm">
-                        <ul className="list-disc list-inside space-y-1">
-                          {conversionBlockedMessage.split('\n').map((reason, i) => (
-                            <li key={i} className="font-medium">{reason}</li>
-                          ))}
-                        </ul>
+                      <div className="space-y-2">
+                        {(conversionBlockedReasons.length > 0
+                          ? conversionBlockedReasons
+                          : conversionBlockedMessage.split('\n').filter(Boolean)
+                        ).map((reason, i) => (
+                          <div key={i} className="flex items-start gap-2.5 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2.5">
+                            <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-amber-200 text-amber-800 text-xs font-bold">
+                              {i + 1}
+                            </span>
+                            <p className="text-amber-800 text-xs leading-relaxed">{reason}</p>
+                          </div>
+                        ))}
                       </div>
-                      <p className="text-slate-500 text-xs">
-                        Complete the steps above, then click <strong>Convert to Matter</strong> to retry.
-                      </p>
+                      {isRetryingConversion ? (
+                        <p className="text-slate-400 text-xs text-center">Retrying conversion…</p>
+                      ) : null}
                     </div>
                   </AlertDialogDescription>
                 </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Got it</AlertDialogCancel>
+                <AlertDialogFooter className="gap-2">
+                  <AlertDialogCancel>Close</AlertDialogCancel>
+                  {latestRetainer?.id && (
+                    <AlertDialogAction
+                      onClick={(e) => { e.preventDefault(); retryConversion() }}
+                      disabled={isRetryingConversion}
+                      className="bg-amber-600 hover:bg-amber-700 text-white"
+                    >
+                      {isRetryingConversion ? 'Retrying…' : 'Convert to Matter'}
+                    </AlertDialogAction>
+                  )}
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>

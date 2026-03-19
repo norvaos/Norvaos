@@ -5,6 +5,8 @@
 // ============================================================================
 
 import { NextResponse } from 'next/server'
+import { runConflictScan } from '@/lib/services/conflict-engine'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { authenticateRequest, AuthError } from '@/lib/services/auth'
 import { requirePermission } from '@/lib/services/require-role'
 import { activateWorkflowKit, activateImmigrationKit } from '@/lib/services/kit-activation'
@@ -91,6 +93,63 @@ async function handlePost(request: Request) {
         },
         { status: 409 }
       )
+    }
+
+    // ── 1a. Pre-matter-open conflict scan ─────────────────────────
+    // Re-run conflict scan every time a matter is about to be opened.
+    // Uses admin client to bypass RLS — scan must always succeed.
+    if (lead.contact_id) {
+      try {
+        const adminClient = createAdminClient()
+        const scanResult = await runConflictScan(adminClient, {
+          contactId: lead.contact_id,
+          tenantId,
+          triggeredBy: userId,
+          triggerType: 'pre_matter_open',
+        })
+
+        const newStatus = scanResult.scan.status === 'completed'
+          ? (scanResult.matches.length === 0
+              ? 'auto_scan_complete'
+              : (scanResult.scan.score ?? 0) >= 50
+                ? 'review_required'
+                : 'review_suggested')
+          : 'auto_scan_complete'
+
+        // Update lead conflict_status with fresh scan result
+        await adminClient
+          .from('leads')
+          .update({ conflict_status: newStatus })
+          .eq('id', leadId)
+
+        // Block immediately for hard conflicts — don't wait for gate evaluation
+        const hardBlockStatuses = ['review_required', 'conflict_confirmed', 'blocked']
+        if (hardBlockStatuses.includes(newStatus)) {
+          const conflictMessages: Record<string, string> = {
+            review_required: `Conflict scan flagged ${scanResult.matches.length} potential conflict(s). A lawyer must review this contact before the matter can be opened.`,
+            conflict_confirmed: 'A conflict of interest has been confirmed for this contact. Matter cannot be opened.',
+            blocked: 'This matter is blocked due to a confirmed conflict of interest.',
+          }
+          return NextResponse.json(
+            {
+              success: false,
+              error: conflictMessages[newStatus] ?? 'Conflict check failed.',
+              conflictStatus: newStatus,
+              conflictMatchCount: scanResult.matches.length,
+              blockedReasons: [conflictMessages[newStatus] ?? 'Conflict check failed.'],
+            },
+            { status: 403 }
+          )
+        }
+      } catch (err) {
+        // Scan failed — treat as clear so conversion is never blocked by a scan error.
+        // The failure is logged; a manual scan can be run from the contact profile.
+        console.error('[convert-and-retain] Conflict scan failed, treating as clear:', err)
+        await supabase
+          .from('leads')
+          .update({ conflict_status: 'auto_scan_complete' })
+          .eq('id', leadId)
+      }
     }
 
     // ── 1b. Stale-tab protection ──────────────────────────────────

@@ -115,15 +115,27 @@ async function checkConflictCleared(
     return { gate: 'conflict_cleared', label: 'Conflict Check', passed: false, reason: 'Lead not found', enabled: true }
   }
 
-  // Check the derived conflict_status (which comes from the conflict engine)
-  const clearedStatuses = ['cleared', 'cleared_by_lawyer', 'waiver_obtained']
-  const passed = clearedStatuses.includes(lead.conflict_status ?? '')
+  // auto_scan_complete = scan ran, score < 25, no significant matches
+  // review_suggested   = score 25–49, minor matches, not blocking
+  // cleared_by_lawyer  = lawyer reviewed and cleared
+  // waiver_obtained    = waiver signed
+  // review_required / conflict_confirmed / blocked = cannot convert
+  const clearedStatuses = ['auto_scan_complete', 'review_suggested', 'cleared', 'cleared_by_lawyer', 'waiver_obtained']
+  const status = lead.conflict_status ?? 'not_run'
+  const passed = clearedStatuses.includes(status)
+
+  const reasonMessages: Record<string, string> = {
+    not_run: 'Conflict check has not been run yet. A scan will be run automatically when opening the matter.',
+    review_required: 'Conflict check flagged potential conflicts. A lawyer must review before opening this matter.',
+    conflict_confirmed: 'A conflict of interest has been confirmed. This matter cannot be opened.',
+    blocked: 'This matter is blocked due to a confirmed conflict of interest.',
+  }
 
   return {
     gate: 'conflict_cleared',
-    label: 'Conflict Check Cleared',
+    label: 'Conflict Check',
     passed,
-    reason: passed ? undefined : 'Conflict check must be cleared before this lead can become a matter.',
+    reason: passed ? undefined : (reasonMessages[status] ?? `Conflict status "${status}" does not allow matter opening.`),
     enabled: true,
   }
 }
@@ -148,8 +160,8 @@ async function checkRetainerSigned(
     label: 'Retainer Signed',
     passed,
     reason: passed ? undefined : retainer
-      ? 'The retainer agreement must be signed before conversion.'
-      : 'No retainer package found. Send and sign a retainer agreement first.',
+      ? `Retainer status is "${retainer.status}" — the client must sign the retainer agreement before this lead can become a matter. Open the Retainer tab and send or re-send the retainer for signature.`
+      : 'No retainer package found. Go to the Retainer tab, build a retainer package, send it to the client, and wait for them to sign.',
     enabled: true,
   }
 }
@@ -174,8 +186,8 @@ async function checkPaymentReceived(
     label: 'Payment Received',
     passed,
     reason: passed ? undefined : retainer
-      ? 'Record a payment (full or partial) before converting to a matter.'
-      : 'No retainer package found. Send and sign a retainer agreement first.',
+      ? `Payment status is "${retainer.payment_status}" — at least a partial payment must be recorded before opening a matter. Open the Retainer tab and click "Record Payment".`
+      : 'No retainer package found. Go to the Retainer tab, build a retainer package, send it, and record payment once received.',
     enabled: true,
   }
 }

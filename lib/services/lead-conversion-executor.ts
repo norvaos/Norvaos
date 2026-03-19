@@ -143,9 +143,14 @@ export async function convertLeadToMatter(
   if (!effectiveResponsibleLawyerId) missingFields.push('Assigned Lawyer')
 
   if (missingFields.length > 0) {
+    const fieldInstructions: Record<string, string> = {
+      'Practice Area': 'Practice Area is not set — open the lead details and select a Practice Area (e.g. Immigration, Family Law).',
+      'Matter Type': 'Matter Type is not set — open the lead details and select the specific matter type (e.g. Visitor Visa, Study Permit).',
+      'Assigned Lawyer': 'No lawyer is assigned to this lead — open the lead details and assign a Responsible Lawyer.',
+    }
     return {
       success: false,
-      error: missingFields.map((f) => `${f} is required`).join('\n'),
+      error: missingFields.map((f) => fieldInstructions[f] ?? `${f} is required`).join('\n'),
       auditEvents,
     }
   }

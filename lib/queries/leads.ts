@@ -120,6 +120,16 @@ export function useCreateLead() {
         action: 'created',
         changes: { contact_id: lead.contact_id, temperature: lead.temperature, status: lead.status },
       })
+
+      // Fire conflict scan in the background — updates contact.conflict_status
+      // and lead.conflict_status automatically
+      if (lead.contact_id) {
+        fetch(`/api/contacts/${lead.contact_id}/conflict-scan`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ triggerType: 'auto_create', leadId: lead.id }),
+        }).catch(() => {})
+      }
     },
     onError: () => {
       toast.error('Failed to create lead')

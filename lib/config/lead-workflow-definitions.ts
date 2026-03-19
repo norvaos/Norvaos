@@ -909,7 +909,7 @@ export const DEFAULT_WORKSPACE_CONFIG = {
     conflict_cleared: true,
     retainer_signed: true,
     payment_received: true,
-    intake_complete: true,
+    intake_complete: false,
     id_verification: false,
     required_documents: false,
   },
