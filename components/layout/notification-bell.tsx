@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { formatDistanceToNow } from 'date-fns'
 import {
@@ -26,6 +26,7 @@ import { useRealtime } from '@/lib/hooks/use-realtime'
 import { useQueryClient } from '@tanstack/react-query'
 import { cn } from '@/lib/utils'
 
+import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import {
@@ -51,6 +52,33 @@ function getNotificationIcon(type: string | null) {
   }
 }
 
+function playChime() {
+  try {
+    const ctx = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)()
+    const osc = ctx.createOscillator()
+    const gain = ctx.createGain()
+    osc.connect(gain)
+    gain.connect(ctx.destination)
+    osc.type = 'sine'
+    osc.frequency.setValueAtTime(880, ctx.currentTime)
+    gain.gain.setValueAtTime(0.18, ctx.currentTime)
+    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.6)
+    osc.start(ctx.currentTime)
+    osc.stop(ctx.currentTime + 0.6)
+  } catch {
+    // Audio context unavailable — skip silently
+  }
+}
+
+function showNotificationToast(title: string, message: string, _isFrontDesk: boolean) {
+  playChime()
+  toast(title, {
+    description: message || undefined,
+    duration: 5000,          // 5 s — auto-dismisses, not intrusive
+    position: 'top-right',  // corner, not centre-screen
+  })
+}
+
 export function NotificationBell() {
   const { appUser } = useUser()
   const userId = appUser?.id ?? ''
@@ -59,8 +87,12 @@ export function NotificationBell() {
   const router = useRouter()
   const queryClient = useQueryClient()
 
-  // Prevent hydration mismatch — Radix Popover generates different
-  // aria-controls IDs between SSR and client. Defer rendering until mounted.
+  // Track the latest notification ID we've already shown a popup for
+  const seenLatestIdRef = useRef<string | null>(null)
+  // Track whether this is the initial load (don't popup for pre-existing notifications)
+  const initialLoadDoneRef = useRef(false)
+
+  // Prevent hydration mismatch
   useEffect(() => { setMounted(true) }, [])
 
   const { data: notifications, isLoading } = useNotifications(userId)
@@ -68,15 +100,53 @@ export function NotificationBell() {
   const markAsRead = useMarkNotificationAsRead()
   const markAllAsRead = useMarkAllNotificationsAsRead()
 
-  // Realtime: subscribe to new notifications for this user
+  // ── Polling-based new notification detector ──────────────────────────────
+  // Watches the notification list (polled every 6s). On the first load, records
+  // the latest ID as "already seen". On subsequent polls, if a new unread
+  // notification appears at the top, shows a popup immediately.
+  useEffect(() => {
+    if (!notifications || notifications.length === 0) return
+
+    const latest = notifications[0]
+
+    if (!initialLoadDoneRef.current) {
+      // First load — record the current latest ID and suppress popup
+      seenLatestIdRef.current = latest.id
+      initialLoadDoneRef.current = true
+      return
+    }
+
+    // If the latest notification is new and unread, show popup
+    if (latest.id !== seenLatestIdRef.current && !latest.is_read) {
+      seenLatestIdRef.current = latest.id
+      const title   = latest.title ?? 'New Notification'
+      const message = latest.message ?? ''
+      const isFrontDesk = latest.notification_type?.startsWith('front_desk') ?? false
+      showNotificationToast(title, message, isFrontDesk)
+    }
+  }, [notifications])
+
+  // ── Realtime as a faster secondary path ──────────────────────────────────
+  // Even if the polling catches it within 6s, Realtime can fire immediately.
+  // The seenLatestIdRef guard prevents double-popups.
   useRealtime<Record<string, unknown>>({
     table: 'notifications',
     filter: `user_id=eq.${userId}`,
     event: 'INSERT',
-    enabled: !!userId,
-    onInsert: () => {
+    enabled: !!userId && initialLoadDoneRef.current,
+    onInsert: (payload) => {
       queryClient.invalidateQueries({ queryKey: notificationKeys.list(userId) })
       queryClient.invalidateQueries({ queryKey: notificationKeys.unreadCount(userId) })
+      // Popup will fire via the useEffect above when the query updates,
+      // OR fire immediately here if the query hasn't updated yet
+      const id = payload.id as string | undefined
+      if (id && id !== seenLatestIdRef.current) {
+        seenLatestIdRef.current = id
+        const title   = (payload.title   as string | undefined) ?? 'New Notification'
+        const message = (payload.message as string | undefined) ?? ''
+        const isFrontDesk = (payload.notification_type as string | undefined)?.startsWith('front_desk') ?? false
+        showNotificationToast(title, message, isFrontDesk)
+      }
     },
   })
 
@@ -126,7 +196,16 @@ export function NotificationBell() {
   }
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover
+      open={open}
+      onOpenChange={(next) => {
+        setOpen(next)
+        // Auto-mark all as read when the panel is closed after being opened
+        if (!next && (unreadCount ?? 0) > 0) {
+          markAllAsRead.mutate(userId)
+        }
+      }}
+    >
       <PopoverTrigger asChild>
         <Button variant="ghost" size="icon" className="relative h-9 w-9">
           <Bell className="h-5 w-5" />

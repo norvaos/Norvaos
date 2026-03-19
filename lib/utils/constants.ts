@@ -24,10 +24,10 @@ export const MATTER_STATUSES = [
 ] as const
 
 export const PRIORITIES = [
-  { value: 'low', label: 'Low', color: '#6b7280' },
-  { value: 'medium', label: 'Medium', color: '#3b82f6' },
-  { value: 'high', label: 'High', color: '#f59e0b' },
-  { value: 'urgent', label: 'Urgent', color: '#ef4444' },
+  { value: 'low', label: 'Routine', color: '#6b7280' },
+  { value: 'medium', label: 'Moderate', color: '#3b82f6' },
+  { value: 'high', label: 'Elevated', color: '#f59e0b' },
+  { value: 'urgent', label: 'Critical', color: '#ef4444' },
 ] as const
 
 export const BILLING_TYPES = [
@@ -44,9 +44,9 @@ export const CONTACT_TYPES = [
 ] as const
 
 export const LEAD_TEMPERATURES = [
-  { value: 'cold', label: 'Cold', color: '#3b82f6' },
-  { value: 'warm', label: 'Warm', color: '#f59e0b' },
-  { value: 'hot', label: 'Hot', color: '#ef4444' },
+  { value: 'cold', label: 'Standard', color: '#6b7280' },
+  { value: 'warm', label: 'Elevated', color: '#f59e0b' },
+  { value: 'hot', label: 'Critical', color: '#ef4444' },
 ] as const
 
 export const TASK_STATUSES = [

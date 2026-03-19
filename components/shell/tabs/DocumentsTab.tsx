@@ -267,6 +267,8 @@ function SlotCard({
         file_size: number | null
         storage_path: string
         storage_bucket: string | null
+        onedrive_web_url?: string | null
+        external_provider?: string | null
         is_shared_with_client?: boolean | null
         created_at: string
       } | null
@@ -496,6 +498,7 @@ function SlotCard({
           fileName={currentDoc.file_name}
           fileType={currentDoc.file_type ?? ''}
           storageBucket={currentDoc.storage_bucket ?? undefined}
+          externalUrl={currentDoc.onedrive_web_url}
           open={showViewer}
           onOpenChange={setShowViewer}
         />

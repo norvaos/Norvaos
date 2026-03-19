@@ -38,6 +38,7 @@ import { PipelineProgress, PipelineStageBadge } from '@/components/contacts/pipe
 import { InteractionsPanel } from '@/components/shared/interactions-panel'
 import { hasPermission } from '@/lib/utils/permissions'
 import { useUserRole } from '@/lib/hooks/use-user-role'
+import { ScreeningAnswersPanel } from '@/components/shared/screening-answers-panel'
 
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -516,7 +517,6 @@ export default function ContactDetailPage() {
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         <TabsList>
           <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="immigration">Immigration</TabsTrigger>
           <TabsTrigger value="matters">Matters</TabsTrigger>
           <TabsTrigger value="tasks">Tasks</TabsTrigger>
           <TabsTrigger value="documents">Documents</TabsTrigger>
@@ -533,11 +533,6 @@ export default function ContactDetailPage() {
         {/* Overview Tab */}
         <TabsContent value="overview" className="space-y-4">
           <OverviewTab contact={contact} tenantId={tenantId} contactId={contactId} stats={stats} onTabChange={setActiveTab} />
-        </TabsContent>
-
-        {/* Immigration History Tab */}
-        <TabsContent value="immigration" className="space-y-4">
-          <ImmigrationTab contact={contact} contactId={contactId} tenantId={tenantId} />
         </TabsContent>
 
         {/* Matters Tab */}
@@ -578,7 +573,7 @@ export default function ContactDetailPage() {
 
         {/* Intake Tab */}
         <TabsContent value="intake" className="space-y-4">
-          <IntakeTab contactId={contactId} tenantSettings={tenant?.settings as Record<string, unknown> | undefined} />
+          <IntakeTab contactId={contactId} tenantId={tenantId} tenantSettings={tenant?.settings as Record<string, unknown> | undefined} />
         </TabsContent>
 
         {/* Appointments Tab */}
@@ -1121,19 +1116,24 @@ function OverviewTab({
                   </div>
                   <div className="space-y-2">
                     {appointments.slice(0, 3).map((appt) => {
-                      const d = new Date(appt.appointment_date + 'T00:00:00')
-                      const [h, m] = appt.start_time.split(':').map(Number)
+                      const d = appt.appointment_date
+                        ? new Date(appt.appointment_date + 'T00:00:00')
+                        : null
+                      const startTime = appt.start_time ?? ''
+                      const [h = 0, m = 0] = startTime ? startTime.split(':').map(Number) : [0, 0]
                       const ampm = h >= 12 ? 'PM' : 'AM'
                       const hour12 = h === 0 ? 12 : h > 12 ? h - 12 : h
-                      const timeStr = `${hour12}:${m.toString().padStart(2, '0')} ${ampm}`
+                      const timeStr = startTime
+                        ? `${hour12}:${m.toString().padStart(2, '0')} ${ampm}`
+                        : 'Time TBD'
                       const lawyerName = [appt.user_first_name, appt.user_last_name].filter(Boolean).join(' ')
                       return (
                         <div key={appt.id} className="flex items-center gap-2">
                           <div className="flex h-8 w-8 shrink-0 flex-col items-center justify-center rounded bg-primary/10 text-primary">
                             <span className="text-[9px] font-medium leading-none">
-                              {d.toLocaleDateString('en-US', { month: 'short' })}
+                              {d ? d.toLocaleDateString('en-US', { month: 'short' }) : '---'}
                             </span>
-                            <span className="text-xs font-bold leading-none">{d.getDate()}</span>
+                            <span className="text-xs font-bold leading-none">{d ? d.getDate() : '-'}</span>
                           </div>
                           <div className="min-w-0 flex-1">
                             <p className="text-xs font-medium text-slate-900">{timeStr}</p>
@@ -1635,9 +1635,31 @@ interface IntakeField {
   allow_other?: boolean
 }
 
-function IntakeTab({ contactId, tenantSettings }: { contactId: string; tenantSettings?: Record<string, unknown> }) {
+function IntakeTab({ contactId, tenantSettings, tenantId }: { contactId: string; tenantSettings?: Record<string, unknown>; tenantId: string }) {
   const { data: submissions, isLoading } = useContactIntakeSubmissions(contactId)
   const { data: checkIns, isLoading: checkInsLoading } = useContactCheckIns(contactId)
+
+  // Fetch screening answers from the contact's most recent lead (front desk intake)
+  const { data: screeningLead } = useQuery({
+    queryKey: ['contact-screening-lead', contactId, tenantId],
+    queryFn: async () => {
+      const supabase = createClient()
+      const { data } = await supabase
+        .from('leads')
+        .select('id, custom_intake_data, created_at')
+        .eq('contact_id', contactId)
+        .eq('tenant_id', tenantId)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle()
+      return data
+    },
+    enabled: !!contactId && !!tenantId,
+    staleTime: 60_000,
+  })
+
+  const hasScreeningData = !!(screeningLead?.custom_intake_data &&
+    Object.keys(screeningLead.custom_intake_data as Record<string, unknown>).length > 0)
 
   // Build a map of kiosk question IDs → question objects for label resolution
   const kioskConfig = (tenantSettings?.kiosk_config ?? {}) as Record<string, unknown>
@@ -1661,19 +1683,25 @@ function IntakeTab({ contactId, tenantSettings }: { contactId: string; tenantSet
   const hasSubmissions = submissions && submissions.length > 0
   const hasCheckIns = checkIns && checkIns.length > 0
 
-  if (!hasSubmissions && !hasCheckIns) {
+  if (!hasSubmissions && !hasCheckIns && !hasScreeningData) {
     return (
-      <Card>
-        <CardContent className="py-12 text-center">
-          <ClipboardList className="mx-auto mb-3 size-10 text-muted-foreground/50" />
-          <p className="text-sm font-medium text-slate-900">
-            No intake submissions or check-in records
-          </p>
-          <p className="mt-1 text-sm text-muted-foreground">
-            This contact has not submitted any intake forms or checked in via the kiosk.
-          </p>
-        </CardContent>
-      </Card>
+      <div className="space-y-4">
+        <ScreeningAnswersPanel
+          customIntakeData={screeningLead?.custom_intake_data as Record<string, unknown> | null | undefined}
+          defaultCollapsed={false}
+        />
+        <Card>
+          <CardContent className="py-12 text-center">
+            <ClipboardList className="mx-auto mb-3 size-10 text-muted-foreground/50" />
+            <p className="text-sm font-medium text-slate-900">
+              No intake submissions or check-in records
+            </p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              This contact has not submitted any intake forms or checked in via the kiosk.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
     )
   }
 
@@ -1703,6 +1731,12 @@ function IntakeTab({ contactId, tenantSettings }: { contactId: string; tenantSet
 
   return (
     <div className="space-y-4">
+      {/* Screening answers from front desk intake */}
+      <ScreeningAnswersPanel
+        customIntakeData={screeningLead?.custom_intake_data as Record<string, unknown> | null | undefined}
+        defaultCollapsed={false}
+      />
+
       {/* Check-in sessions (kiosk) */}
       {hasCheckIns && (
         <>

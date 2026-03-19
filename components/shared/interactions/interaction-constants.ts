@@ -29,7 +29,8 @@ export const INTERACTION_GROUPS: InteractionGroup[] = [
     key: 'phone_calls',
     label: 'Phone Calls',
     icon: Phone,
-    activityTypes: ['phone_inbound', 'phone_outbound', 'phone_call'],
+    // front_desk_call_logged = call logged via the Front Desk console
+    activityTypes: ['phone_inbound', 'phone_outbound', 'phone_call', 'front_desk_call_logged'],
     color: 'blue',
     bgClass: 'bg-blue-50 text-blue-600',
   },
@@ -37,7 +38,8 @@ export const INTERACTION_GROUPS: InteractionGroup[] = [
     key: 'emails',
     label: 'Emails',
     icon: Mail,
-    activityTypes: ['email_sent', 'email_received'],
+    // front_desk_email_logged = email logged via the Front Desk console
+    activityTypes: ['email_sent', 'email_received', 'front_desk_email_logged'],
     color: 'purple',
     bgClass: 'bg-purple-50 text-purple-600',
   },
@@ -45,9 +47,11 @@ export const INTERACTION_GROUPS: InteractionGroup[] = [
     key: 'meetings',
     label: 'Meetings',
     icon: Calendar,
+    // front_desk_meeting_logged = meeting logged via the Front Desk console
     activityTypes: [
       'meeting', 'consultation', 'booking_created', 'booking_rescheduled',
       'appointment_started', 'appointment_checked_in', 'appointment_completed',
+      'front_desk_meeting_logged',
     ],
     color: 'green',
     bgClass: 'bg-green-50 text-green-600',
@@ -139,8 +143,11 @@ const ACTIVITY_TYPE_LABELS: Record<string, string> = {
   phone_inbound: 'Inbound Call',
   phone_outbound: 'Outbound Call',
   phone_call: 'Phone Call',
+  front_desk_call_logged: 'Call (Front Desk)',
   email_sent: 'Email Sent',
   email_received: 'Email Received',
+  front_desk_email_logged: 'Email (Front Desk)',
+  front_desk_meeting_logged: 'Meeting (Front Desk)',
   sms_sent: 'SMS Sent',
   sms_received: 'SMS Received',
   meeting: 'Meeting',

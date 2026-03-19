@@ -230,6 +230,7 @@ const stageFormSchema = z.object({
   is_terminal: z.boolean(),
   auto_close_matter: z.boolean(),
   sla_days: z.number().int().positive().nullable().optional(),
+  completion_pct: z.number().int().min(0).max(100).nullable().optional(),
 })
 type StageFormValues = z.infer<typeof stageFormSchema>
 
@@ -301,12 +302,20 @@ function SortableStageRow({
             </Badge>
           )}
         </div>
-        {stage.sla_days && (
-          <div className="flex items-center gap-1 mt-0.5">
-            <Clock className="h-3 w-3 text-slate-400" />
-            <span className="text-xs text-slate-500">
-              {stage.sla_days}d SLA
-            </span>
+        {(stage.sla_days || stage.completion_pct != null) && (
+          <div className="flex items-center gap-3 mt-0.5">
+            {stage.sla_days && (
+              <span className="flex items-center gap-1 text-xs text-slate-500">
+                <Clock className="h-3 w-3 text-slate-400" />
+                {stage.sla_days}d SLA
+              </span>
+            )}
+            {stage.completion_pct != null && (
+              <span className="flex items-center gap-1 text-xs font-semibold tabular-nums"
+                style={{ color: stage.color ?? '#6366f1' }}>
+                {stage.completion_pct}%
+              </span>
+            )}
           </div>
         )}
       </div>
@@ -775,6 +784,7 @@ function MatterStageDialog({
       is_terminal: false,
       auto_close_matter: false,
       sla_days: null,
+      completion_pct: null,
     },
   })
 
@@ -790,6 +800,7 @@ function MatterStageDialog({
             is_terminal: stage.is_terminal,
             auto_close_matter: stage.auto_close_matter,
             sla_days: stage.sla_days ?? null,
+            completion_pct: stage.completion_pct ?? null,
           }
         : {
             name: '',
@@ -798,6 +809,7 @@ function MatterStageDialog({
             is_terminal: false,
             auto_close_matter: false,
             sla_days: null,
+            completion_pct: null,
           }
     )
   }, [open, stage?.id]) // eslint-disable-line react-hooks/exhaustive-deps
@@ -815,6 +827,7 @@ function MatterStageDialog({
             is_terminal: values.is_terminal,
             auto_close_matter: values.auto_close_matter,
             sla_days: values.sla_days ?? null,
+            completion_pct: values.completion_pct ?? undefined,
           },
         },
         { onSuccess: () => onOpenChange(false) }
@@ -831,6 +844,7 @@ function MatterStageDialog({
           isTerminal: values.is_terminal,
           autoCloseMatter: values.auto_close_matter,
           slaDays: values.sla_days ?? null,
+          completionPct: values.completion_pct ?? undefined,
         },
         {
           onSuccess: () => {
@@ -897,27 +911,56 @@ function MatterStageDialog({
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="sla_days"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>SLA Days (optional)</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      min={1}
-                      placeholder="Target days in this stage"
-                      value={field.value ?? ''}
-                      onChange={(e) =>
-                        field.onChange(e.target.value ? Number(e.target.value) : null)
-                      }
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {/* SLA Days + Completion % side by side */}
+            <div className="grid grid-cols-2 gap-3">
+              <FormField
+                control={form.control}
+                name="sla_days"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>SLA Days</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        min={1}
+                        placeholder="e.g. 14"
+                        value={field.value ?? ''}
+                        onChange={(e) =>
+                          field.onChange(e.target.value ? Number(e.target.value) : null)
+                        }
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="completion_pct"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Completion %</FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <Input
+                          type="number"
+                          min={0}
+                          max={100}
+                          placeholder="0–100"
+                          value={field.value ?? ''}
+                          onChange={(e) =>
+                            field.onChange(e.target.value ? Math.min(100, Math.max(0, Number(e.target.value))) : null)
+                          }
+                          className="pr-7"
+                        />
+                        <span className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-slate-400">%</span>
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
             <div className="flex gap-4">
               <FormField

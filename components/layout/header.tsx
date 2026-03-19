@@ -116,9 +116,8 @@ export function Header() {
   const { data: practiceAreas } = useEnabledPracticeAreas(tenant?.id)
 
   async function handleSignOut() {
-    const supabase = createClient()
-    await supabase.auth.signOut()
-    router.push('/')
+    await fetch('/auth/signout', { method: 'POST' })
+    window.location.href = '/'
   }
 
   /**

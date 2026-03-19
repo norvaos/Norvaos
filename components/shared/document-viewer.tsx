@@ -10,13 +10,17 @@ import {
   DialogDescription,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { Download, FileQuestion } from 'lucide-react'
+import { Download, ExternalLink, FileQuestion } from 'lucide-react'
 
 interface DocumentViewerProps {
   storagePath: string
   fileName: string
   fileType: string | null
   storageBucket?: string
+  /** External URL for documents stored outside Supabase (e.g. OneDrive). When
+   *  provided and storagePath is empty, the viewer shows an "Open" button
+   *  instead of the broken download fallback. */
+  externalUrl?: string | null
   open: boolean
   onOpenChange: (open: boolean) => void
 }
@@ -25,12 +29,16 @@ interface DocumentViewerProps {
  * Document viewer that streams files through the server-side API endpoint.
  * Uses /api/documents/view which bypasses storage RLS via admin client
  * and serves files from the same origin — no X-Frame-Options blocking.
+ *
+ * For externally-stored documents (OneDrive etc.) with no local storage_path,
+ * pass externalUrl to show an "Open in browser" button instead of a dead fallback.
  */
 export function DocumentViewer({
   storagePath,
   fileName,
   fileType,
   storageBucket,
+  externalUrl,
   open,
   onOpenChange,
 }: DocumentViewerProps) {
@@ -46,12 +54,18 @@ export function DocumentViewer({
     return `/api/documents/view?${params.toString()}`
   }, [storagePath, storageBucket])
 
+  const isExternal = !viewUrl && !!externalUrl
+
   const handleDownload = () => {
     if (!viewUrl) return
     const a = document.createElement('a')
     a.href = viewUrl
     a.download = fileName
     a.click()
+  }
+
+  const handleOpenExternal = () => {
+    if (externalUrl) window.open(externalUrl, '_blank', 'noopener,noreferrer')
   }
 
   return (
@@ -79,6 +93,23 @@ export function DocumentViewer({
                 alt={fileName}
                 className="max-w-full max-h-full object-contain"
               />
+            </div>
+          ) : isExternal ? (
+            /* OneDrive / external storage — can't embed, offer open-in-browser */
+            <div className="flex flex-col items-center justify-center h-full gap-4">
+              <ExternalLink className="h-16 w-16 text-slate-300" />
+              <div className="text-center">
+                <p className="text-sm font-medium text-slate-600">
+                  This document is stored externally
+                </p>
+                <p className="text-xs text-slate-400 mt-1">
+                  Click below to open it in a new tab
+                </p>
+              </div>
+              <Button onClick={handleOpenExternal}>
+                <ExternalLink className="mr-2 h-4 w-4" />
+                Open in Browser
+              </Button>
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center h-full gap-4">

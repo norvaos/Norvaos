@@ -293,6 +293,7 @@ export function ContextHeader({
             onStageClick={(stageId) => onStageClick?.(stageId)}
             disabled={stageAdvancing}
             users={users}
+            completionPercent={completionPercent ?? undefined}
           />
         </div>
       )}

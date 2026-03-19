@@ -108,7 +108,8 @@ export const frontDeskLogMeetingSchema = z.object({
   meetingType: z.enum(['in_person', 'video', 'phone']),
   durationMinutes: z.number().min(0).max(480).nullable().optional(),
   attendees: z.string().max(500).optional(),
-  notes: z.string().max(1000).optional().or(z.literal('')),
+  matterId: z.string().uuid().optional(),
+  notes: z.string().min(1, 'Notes are required').max(1000),
 })
 
 export const frontDeskCompleteTaskSchema = z.object({
@@ -131,7 +132,8 @@ export const frontDeskCreateIntakeSchema = z.object({
   entityType: z.enum(['lead', 'contact']),
   practiceAreaId: z.string().uuid().optional(),
   urgency: z.enum(['low', 'medium', 'high']).default('medium'),
-  reason: z.string().min(10, 'Reason must be at least 10 characters'),
+  reason: z.string().optional().default(''),
+  screeningAnswers: z.record(z.string(), z.union([z.string(), z.array(z.string())])).optional(),
 })
 
 export const frontDeskBookAppointmentSchema = z.object({
@@ -165,6 +167,7 @@ export const frontDeskUploadDocumentSchema = z.object({
   documentType: z.string().min(1, 'Document type is required'),
   fileName: z.string().min(1, 'File name is required'),
   storagePath: z.string().min(1, 'Storage path is required'),
+  storageBucket: z.string().optional(),
   fileSize: z.number().min(0).optional(),
   matterId: z.string().uuid().optional(),
 })

@@ -264,10 +264,9 @@ export function Sidebar() {
   const featureFlags = useFeatureFlags()
 
   const handleLogout = useCallback(async () => {
-    const supabase = createClient()
-    await supabase.auth.signOut()
-    router.push('/')
-  }, [router])
+    await fetch('/auth/signout', { method: 'POST' })
+    window.location.href = '/'
+  }, [])
 
   return (
     <TooltipProvider delayDuration={100}>

@@ -26,6 +26,8 @@ interface BasePayload {
   consultationId: string
   outcome: OutcomeType
   consultationNotes?: string
+  /** When true, all outcome side-effects still fire but the lead's stage_id is NOT updated. */
+  skipStageAdvance?: boolean
 }
 
 interface SendRetainerPayload extends BasePayload {
@@ -355,9 +357,10 @@ async function handlePost(request: Request) {
           commandSummary.push('No fee template applied (manual entry)')
         }
 
-        // 4. Move to "Retained Pending Retainer" stage
+        // 4. Move to "Retainer Sent" stage
         const retainedStage = stages.find((s) =>
-          /retain.*pend|pend.*retainer/i.test(s.name)
+          /^retainer\s+sent$/i.test(s.name) ||
+          /retainer.*sent|sent.*retainer/i.test(s.name)
         )
 
         // Build update payload — set conflict as cleared (lawyer chose to engage)
@@ -371,7 +374,7 @@ async function handlePost(request: Request) {
           person_scope: p.personScope,
           responsible_lawyer_id: p.responsibleLawyerId,
         }
-        if (retainedStage) {
+        if (!body.skipStageAdvance && retainedStage) {
           sendRetainerUpdate.stage_id = retainedStage.id
           sendRetainerUpdate.stage_entered_at = new Date().toISOString()
         }
@@ -381,7 +384,7 @@ async function handlePost(request: Request) {
           .update(sendRetainerUpdate)
           .eq('id', leadId)
 
-        if (retainedStage) {
+        if (!body.skipStageAdvance && retainedStage) {
           newStage = { id: retainedStage.id, name: retainedStage.name }
         }
 
@@ -474,11 +477,13 @@ async function handlePost(request: Request) {
 
         commandSummary.push('Consultation outcome recorded (follow_up_later)')
 
-        // 2. Move to "Consultation Completed" stage
+        // 2. Move to "Follow-Up Active" stage (client thinking after consultation)
         const completedStage = stages.find((s) =>
-          /consult.*complet|complet.*consult/i.test(s.name)
+          /follow.?up.?active|active.*follow.?up/i.test(s.name)
+        ) ?? stages.find((s) =>
+          /consult.*complet|complet.*consult|appointment.*complet/i.test(s.name)
         )
-        if (completedStage) {
+        if (!body.skipStageAdvance && completedStage) {
           await supabase
             .from('leads')
             .update({
@@ -549,8 +554,9 @@ async function handlePost(request: Request) {
 
         commandSummary.push('Consultation outcome recorded (client_declined)')
 
-        // 2. Create closure record
-        const lostStage = stages.find((s) => s.is_lost_stage)
+        // 2. Create closure record — target "Closed – Client Declined" stage
+        const lostStage = stages.find((s) => /client.?declin/i.test(s.name))
+          ?? stages.find((s) => s.is_lost_stage)
         const { data: closure } = await supabase
           .from('lead_closure_records')
           .insert({
@@ -577,13 +583,13 @@ async function handlePost(request: Request) {
             is_closed: true,
             consultation_status: 'completed',
             closure_record_id: closureRecordId,
-            ...(lostStage
+            ...(!body.skipStageAdvance && lostStage
               ? { stage_id: lostStage.id, stage_entered_at: new Date().toISOString() }
               : {}),
           })
           .eq('id', leadId)
 
-        if (lostStage) {
+        if (!body.skipStageAdvance && lostStage) {
           newStage = { id: lostStage.id, name: lostStage.name }
         }
 
@@ -612,7 +618,8 @@ async function handlePost(request: Request) {
 
         commandSummary.push('Consultation outcome recorded (not_a_fit)')
 
-        const lostStage = stages.find((s) => s.is_lost_stage)
+        const lostStage = stages.find((s) => /not.?a?.?fit/i.test(s.name))
+          ?? stages.find((s) => s.is_lost_stage)
         const { data: closure } = await supabase
           .from('lead_closure_records')
           .insert({
@@ -638,13 +645,13 @@ async function handlePost(request: Request) {
             is_closed: true,
             consultation_status: 'completed',
             closure_record_id: closureRecordId,
-            ...(lostStage
+            ...(!body.skipStageAdvance && lostStage
               ? { stage_id: lostStage.id, stage_entered_at: new Date().toISOString() }
               : {}),
           })
           .eq('id', leadId)
 
-        if (lostStage) {
+        if (!body.skipStageAdvance && lostStage) {
           newStage = { id: lostStage.id, name: lostStage.name }
         }
 
@@ -671,7 +678,8 @@ async function handlePost(request: Request) {
 
         commandSummary.push('Consultation outcome recorded (referred_out)')
 
-        const lostStage = stages.find((s) => s.is_lost_stage)
+        const lostStage = stages.find((s) => /not.?a?.?fit|referred/i.test(s.name))
+          ?? stages.find((s) => s.is_lost_stage)
         const { data: closure } = await supabase
           .from('lead_closure_records')
           .insert({
@@ -697,13 +705,13 @@ async function handlePost(request: Request) {
             is_closed: true,
             consultation_status: 'completed',
             closure_record_id: closureRecordId,
-            ...(lostStage
+            ...(!body.skipStageAdvance && lostStage
               ? { stage_id: lostStage.id, stage_entered_at: new Date().toISOString() }
               : {}),
           })
           .eq('id', leadId)
 
-        if (lostStage) {
+        if (!body.skipStageAdvance && lostStage) {
           newStage = { id: lostStage.id, name: lostStage.name }
         }
 
@@ -727,13 +735,20 @@ async function handlePost(request: Request) {
 
         commandSummary.push('Consultation marked as No Show')
 
-        // 2. Update lead
+        // 2. Move to "No-Show" stage + update lead
+        const noShowStage = stages.find((s) => /no.?show/i.test(s.name))
         await supabase
           .from('leads')
           .update({
             consultation_status: 'no_show',
+            ...(!body.skipStageAdvance && noShowStage
+              ? { stage_id: noShowStage.id, stage_entered_at: new Date().toISOString() }
+              : {}),
           })
           .eq('id', leadId)
+        if (!body.skipStageAdvance && noShowStage) {
+          newStage = { id: noShowStage.id, name: noShowStage.name }
+        }
 
         // 3. Create high-priority follow-up task (due: tomorrow)
         const followUpDate = new Date()

@@ -179,7 +179,7 @@ export function useUpdateTask() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async ({ id, ...updates }: TaskUpdate & { id: string }) => {
+    mutationFn: async ({ id, _prevAssignedTo, ...updates }: TaskUpdate & { id: string; _prevAssignedTo?: string | null }) => {
       const supabase = createClient()
       const { data, error } = await supabase
         .from('tasks')
@@ -189,9 +189,9 @@ export function useUpdateTask() {
         .single()
 
       if (error) throw error
-      return data as Task
+      return { task: data as Task, prevAssignedTo: _prevAssignedTo }
     },
-    onSuccess: (data) => {
+    onSuccess: ({ task: data, prevAssignedTo }) => {
       queryClient.invalidateQueries({ queryKey: taskKeys.lists() })
       queryClient.setQueryData(taskKeys.detail(data.id), data)
       toast.success('Task updated')
@@ -204,6 +204,22 @@ export function useUpdateTask() {
         action: 'updated',
         changes: { title: data.title, status: data.status, priority: data.priority },
       })
+
+      // Fire assignment notification if the assignee changed
+      if (
+        data.assigned_to &&
+        data.assigned_to !== data.created_by &&
+        data.assigned_to !== prevAssignedTo
+      ) {
+        createTaskNotification({
+          tenantId: data.tenant_id,
+          recipientId: data.assigned_to,
+          title: `Task assigned to you: ${data.title}`,
+          message: data.description?.slice(0, 100) ?? undefined,
+          taskId: data.id,
+          type: 'task_assigned',
+        }).catch(() => {})
+      }
     },
     onError: () => {
       toast.error('Failed to update task')

@@ -12,6 +12,7 @@ import { RetainerCard } from './retainer-card'
 import { QualificationCard } from './qualification-card'
 import { isStageAtOrPast } from './lead-workflow-helpers'
 import { LEAD_STAGES } from '@/lib/config/lead-workflow-definitions'
+import { ScreeningAnswersPanel } from '@/components/shared/screening-answers-panel'
 import type {
   Lead,
   Contact,
@@ -119,6 +120,12 @@ export function CentrePanel({
         contact={contact}
         practiceArea={practiceArea}
         users={users}
+      />
+
+      {/* Screening Answers (from front desk intake) */}
+      <ScreeningAnswersPanel
+        customIntakeData={lead.custom_intake_data as Record<string, unknown> | null}
+        defaultCollapsed={false}
       />
 
       {/* Qualification */}

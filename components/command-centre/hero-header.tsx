@@ -15,6 +15,7 @@ import {
   formatInitials,
   formatPhoneNumber,
   formatDate,
+  formatElapsed,
   isOverdue,
   daysInStage,
 } from '@/lib/utils/formatters'
@@ -40,6 +41,7 @@ import {
   Eye,
   Play,
   Timer,
+  Square,
   ClipboardList,
 } from 'lucide-react'
 
@@ -64,7 +66,9 @@ export function HeroHeader({ onToggleActivity, activityOpen, onToggleScreening, 
     users,
     isConverted,
     timerRunning,
+    timerElapsed,
     startMeetingTimer,
+    stopMeetingTimer,
   } = useCommandCentre()
 
   const updateLeadStage = useUpdateLeadStage()
@@ -141,7 +145,7 @@ export function HeroHeader({ onToggleActivity, activityOpen, onToggleScreening, 
           {entityType === 'matter' ? 'Matters' : 'Leads'}
         </Button>
         <div className="flex items-center gap-2">
-          {!timerRunning && (
+          {!timerRunning ? (
             <Button
               variant="outline"
               size="sm"
@@ -152,6 +156,22 @@ export function HeroHeader({ onToggleActivity, activityOpen, onToggleScreening, 
               <Timer className="h-3.5 w-3.5" />
               <span className="hidden sm:inline">Start Meeting</span>
             </Button>
+          ) : (
+            <div className="flex items-center gap-1 h-8 px-2 rounded-md bg-red-50 border border-red-200 text-red-600">
+              <Timer className="h-3.5 w-3.5 animate-pulse shrink-0" />
+              <span className="font-mono text-xs font-bold tabular-nums min-w-[42px]">
+                {formatElapsed(timerElapsed)}
+              </span>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-6 w-6 p-0 text-red-500 hover:text-red-700 hover:bg-red-100"
+                onClick={stopMeetingTimer}
+                title="Stop meeting"
+              >
+                <Square className="h-3 w-3 fill-current" />
+              </Button>
+            </div>
           )}
           {entityType === 'lead' && onToggleScreening && (
             <Button
@@ -297,53 +317,121 @@ export function HeroHeader({ onToggleActivity, activityOpen, onToggleScreening, 
       </div>
 
       {/* Pipeline stage stepper */}
-      {entityType === 'lead' && stages.length > 0 && (
-        <div className="px-4 pb-3">
-          <TooltipProvider delayDuration={200}>
-            <div className="flex items-center gap-1">
-              {stages.map((stage, idx) => {
-                const isCurrent = stage.id === lead?.stage_id
-                const isPast = idx < currentStageIndex
-                const isWin = stage.is_win_stage
-                const isLost = stage.is_lost_stage
+      {entityType === 'lead' && stages.length > 0 && (() => {
+        const activeStages = stages.filter((s) => !s.is_lost_stage)
+        const lostStages  = stages.filter((s) => s.is_lost_stage)
+        const currentIdx  = stages.findIndex((s) => s.id === lead?.stage_id)
+        const currentActiveIdx = activeStages.findIndex((s) => s.id === lead?.stage_id)
 
-                return (
-                  <Tooltip key={stage.id}>
-                    <TooltipTrigger asChild>
-                      <button
-                        type="button"
-                        onClick={() => handleStageClick(stage.id)}
-                        disabled={isConverted || updateLeadStage.isPending}
-                        className={cn(
-                          'flex-1 h-2 rounded-full transition-all duration-200 cursor-pointer hover:opacity-80',
-                          'disabled:cursor-not-allowed disabled:opacity-50',
-                          isCurrent && 'h-3 ring-2 ring-offset-1',
-                          isLost && 'opacity-40'
+        return (
+          <div className="px-4 pb-3 space-y-1.5">
+            <TooltipProvider delayDuration={150}>
+              {/* ── Active / win stages bar ── */}
+              <div className="flex items-center gap-0.5">
+                {activeStages.map((stage, idx) => {
+                  const isCurrent = stage.id === lead?.stage_id
+                  const isPast    = currentActiveIdx >= 0 && idx < currentActiveIdx
+
+                  return (
+                    <Tooltip key={stage.id}>
+                      <TooltipTrigger asChild>
+                        <button
+                          type="button"
+                          onClick={() => handleStageClick(stage.id)}
+                          disabled={isConverted || updateLeadStage.isPending || isCurrent || isPast}
+                          className={cn(
+                            'flex-1 rounded-full transition-all duration-200',
+                            isCurrent ? 'h-3 ring-2 ring-offset-1 cursor-default' : 'h-2',
+                            !isCurrent && !isPast && !isConverted ? 'cursor-pointer hover:opacity-75' : '',
+                            isPast ? 'cursor-default' : ''
+                          )}
+                          style={{
+                            backgroundColor: isPast || isCurrent ? (stage.color ?? '#6b7280') : '#e2e8f0',
+                            ...(isCurrent ? { ['--tw-ring-color' as string]: `${stage.color ?? '#6b7280'}60` } : {}),
+                          }}
+                        />
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom" className="text-xs max-w-xs">
+                        <p className="font-medium">{stage.name}</p>
+                        {stage.win_probability != null && (
+                          <p className="text-slate-400">{stage.win_probability}% retention probability</p>
                         )}
-                        style={{
-                          backgroundColor: isPast || isCurrent
-                            ? (stage.color ?? '#6b7280')
-                            : '#e2e8f0',
-                          ...(isCurrent ? { ringColor: stage.color ?? '#6b7280' } : {}),
-                        }}
-                      />
-                    </TooltipTrigger>
-                    <TooltipContent side="bottom" className="text-xs max-w-xs">
-                      <p className="font-medium">{stage.name}</p>
-                      {isWin && <p className="text-green-600">Win stage</p>}
-                      {isLost && <p className="text-red-600">Lost stage</p>}
-                      {stage.win_probability != null && (
-                        <p className="text-slate-500">{stage.win_probability}% probability</p>
-                      )}
-                      <StageAutomationHint stageId={stage.id} stageName={stage.name} />
-                    </TooltipContent>
-                  </Tooltip>
-                )
-              })}
-            </div>
-          </TooltipProvider>
-        </div>
-      )}
+                        {stage.description && (
+                          <p className="text-slate-500 mt-0.5 max-w-[220px] leading-snug">{stage.description}</p>
+                        )}
+                        <StageAutomationHint stageId={stage.id} stageName={stage.name} />
+                      </TooltipContent>
+                    </Tooltip>
+                  )
+                })}
+
+                {/* ── Separator before closed stages ── */}
+                {lostStages.length > 0 && (
+                  <div className="w-px h-4 bg-slate-200 mx-0.5 shrink-0" />
+                )}
+
+                {/* ── Lost / closed stages (always visible, clickable) ── */}
+                {lostStages.map((stage) => {
+                  const isCurrent = stage.id === lead?.stage_id
+
+                  return (
+                    <Tooltip key={stage.id}>
+                      <TooltipTrigger asChild>
+                        <button
+                          type="button"
+                          onClick={() => handleStageClick(stage.id)}
+                          disabled={isConverted || updateLeadStage.isPending || isCurrent}
+                          className={cn(
+                            'flex-1 rounded-full transition-all duration-200',
+                            isCurrent ? 'h-3 ring-2 ring-offset-1 cursor-default' : 'h-2 opacity-40 hover:opacity-70',
+                            !isCurrent && !isConverted ? 'cursor-pointer' : ''
+                          )}
+                          style={{
+                            backgroundColor: stage.color ?? '#6b7280',
+                            ...(isCurrent ? { ['--tw-ring-color' as string]: `${stage.color ?? '#6b7280'}60` } : {}),
+                          }}
+                        />
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom" className="text-xs max-w-xs">
+                        <p className="font-medium text-red-600">{stage.name}</p>
+                        <p className="text-slate-400">Closed stage — moves lead to lost</p>
+                        {stage.description && (
+                          <p className="text-slate-500 mt-0.5 max-w-[220px] leading-snug">{stage.description}</p>
+                        )}
+                        <StageAutomationHint stageId={stage.id} stageName={stage.name} />
+                      </TooltipContent>
+                    </Tooltip>
+                  )
+                })}
+              </div>
+
+              {/* Current stage label + probability */}
+              {currentStage && (
+                <div className="flex items-center gap-2">
+                  <span
+                    className="h-1.5 w-1.5 rounded-full shrink-0"
+                    style={{ backgroundColor: currentStage.color ?? '#6b7280' }}
+                  />
+                  <span
+                    className="text-xs font-semibold"
+                    style={{ color: currentStage.color ?? '#6b7280' }}
+                  >
+                    {currentStage.name}
+                  </span>
+                  {currentStage.win_probability != null && (
+                    <span className="text-[10px] text-slate-400">
+                      · {currentStage.win_probability}% retention
+                    </span>
+                  )}
+                  <span className="text-[10px] text-slate-300 ml-auto">
+                    {currentIdx + 1} / {stages.length}
+                  </span>
+                </div>
+              )}
+            </TooltipProvider>
+          </div>
+        )
+      })()}
 
       {/* Stage history metrics */}
       {entityType === 'lead' && <StageHistory />}

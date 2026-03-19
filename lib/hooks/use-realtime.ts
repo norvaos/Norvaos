@@ -16,6 +16,20 @@ interface UseRealtimeOptions<T extends Record<string, unknown>> {
   enabled?: boolean
 }
 
+/**
+ * useRealtime — Supabase Realtime subscription hook.
+ *
+ * Key design choices:
+ *  1. Callbacks (onInsert/onUpdate/onDelete/onChange) are stored in refs so
+ *     they NEVER appear in the useEffect deps array. This prevents the
+ *     subscription from tearing down and recreating every render (which was
+ *     causing notifications to be missed because the channel was killed before
+ *     the INSERT event arrived).
+ *  2. The channel name includes the filter string to avoid collisions when
+ *     multiple components subscribe to the same table with different filters.
+ *  3. Only `table`, `schema`, `event`, `filter`, and `enabled` control
+ *     whether the channel is recreated.
+ */
 export function useRealtime<T extends Record<string, unknown>>({
   table,
   schema = 'public',
@@ -29,6 +43,20 @@ export function useRealtime<T extends Record<string, unknown>>({
 }: UseRealtimeOptions<T>) {
   const channelRef = useRef<RealtimeChannel | null>(null)
 
+  // Store callbacks in refs so the subscription never restarts due to a new
+  // function reference being passed from the parent component.
+  const onInsertRef  = useRef(onInsert)
+  const onUpdateRef  = useRef(onUpdate)
+  const onDeleteRef  = useRef(onDelete)
+  const onChangeRef  = useRef(onChange)
+
+  // Keep refs up-to-date on every render — this is safe because the effect
+  // only reads from them inside the callback (not during subscription setup).
+  onInsertRef.current  = onInsert
+  onUpdateRef.current  = onUpdate
+  onDeleteRef.current  = onDelete
+  onChangeRef.current  = onChange
+
   useEffect(() => {
     if (!enabled) return
 
@@ -39,49 +67,61 @@ export function useRealtime<T extends Record<string, unknown>>({
       schema,
       table,
     }
-
     if (filter) {
       channelConfig.filter = filter
     }
+
+    // Unique channel name: include filter so multiple subscribers on the same
+    // table with different filters don't collide.
+    const channelName = `${schema}:${table}:${event}:${filter ?? 'all'}`
 
     let channel: RealtimeChannel | null = null
 
     try {
       channel = supabase
-        .channel(`${table}-changes`)
+        .channel(channelName)
         .on(
           'postgres_changes' as never,
           channelConfig,
           (payload: RealtimePostgresChangesPayload<T>) => {
-            onChange?.(payload)
+            // Read from refs — always latest callback, no stale closures
+            onChangeRef.current?.(payload)
 
-            if (payload.eventType === 'INSERT' && onInsert) {
-              onInsert(payload.new as T)
+            if (payload.eventType === 'INSERT' && onInsertRef.current) {
+              onInsertRef.current(payload.new as T)
             }
-            if (payload.eventType === 'UPDATE' && onUpdate) {
-              onUpdate({ old: payload.old as T, new: payload.new as T })
+            if (payload.eventType === 'UPDATE' && onUpdateRef.current) {
+              onUpdateRef.current({ old: payload.old as T, new: payload.new as T })
             }
-            if (payload.eventType === 'DELETE' && onDelete) {
-              onDelete(payload.old as T)
+            if (payload.eventType === 'DELETE' && onDeleteRef.current) {
+              onDeleteRef.current(payload.old as T)
             }
           }
         )
-        .subscribe()
+        .subscribe((status) => {
+          if (status === 'SUBSCRIBED') {
+            // Channel is live — any INSERT events will now fire
+          } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+            console.warn(`[useRealtime] Channel ${channelName} error: ${status}`)
+          }
+        })
 
       channelRef.current = channel
     } catch (err) {
-      // WebSocket may fail in insecure contexts (e.g. HTTP in dev) or when
-      // the browser blocks the connection. Degrade gracefully — data still
-      // loads via React Query; only real-time push is lost.
+      // WebSocket may fail in insecure contexts or when the browser blocks
+      // the connection. Degrade gracefully.
       console.warn('[useRealtime] Subscription failed, real-time disabled:', err)
     }
 
     return () => {
       if (channel) {
         supabase.removeChannel(channel)
+        channelRef.current = null
       }
     }
-  }, [table, schema, event, filter, enabled, onChange, onInsert, onUpdate, onDelete])
+    // Callbacks intentionally excluded — stored in refs above.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [table, schema, event, filter, enabled])
 
   return channelRef.current
 }

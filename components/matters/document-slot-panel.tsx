@@ -176,7 +176,7 @@ export function SlotCard({
 
   const status = (slot.status as SlotStatus) ?? 'empty'
   const hasDocument = !!slot.current_document_id && slot.current_version > 0
-  const currentDoc = (slot as { current_document?: { id: string; file_name: string; file_type: string | null; file_size: number | null; storage_path: string; storage_bucket: string | null; is_shared_with_client?: boolean | null; created_at: string } | null }).current_document
+  const currentDoc = (slot as { current_document?: { id: string; file_name: string; file_type: string | null; file_size: number | null; storage_path: string; storage_bucket: string | null; onedrive_web_url?: string | null; external_provider?: string | null; is_shared_with_client?: boolean | null; created_at: string } | null }).current_document
   const [sharedState, setSharedState] = useState<boolean>(currentDoc?.is_shared_with_client ?? false)
 
   const handleShareToggle = useCallback(async () => {
@@ -370,6 +370,7 @@ export function SlotCard({
           fileName={currentDoc.file_name}
           fileType={currentDoc.file_type ?? ''}
           storageBucket={currentDoc.storage_bucket ?? undefined}
+          externalUrl={currentDoc.onedrive_web_url}
           open={showViewer}
           onOpenChange={setShowViewer}
         />

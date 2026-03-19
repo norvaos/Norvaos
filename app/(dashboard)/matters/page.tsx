@@ -40,6 +40,7 @@ import { useMatterTypes } from '@/lib/queries/matter-types'
 import { createClient } from '@/lib/supabase/client'
 import { MATTER_STATUSES, PRIORITIES, RISK_LEVELS } from '@/lib/utils/constants'
 import { formatDate } from '@/lib/utils/formatters'
+import { cn } from '@/lib/utils'
 import type { Database } from '@/lib/types/database'
 
 import { Button } from '@/components/ui/button'
@@ -179,6 +180,7 @@ const MATTER_COLUMNS: MatterColumn[] = [
   { id: 'title', label: 'Title', sortable: 'title', alwaysVisible: true },
   { id: 'practice_area', label: 'Practice Area' },
   { id: 'matter_type', label: 'Matter Type' },
+  { id: 'stage', label: 'Stage / Progress' },
   { id: 'status', label: 'Status', sortable: 'status' },
   { id: 'priority', label: 'Priority', sortable: 'priority' },
   { id: 'risk', label: 'Risk' },
@@ -188,7 +190,7 @@ const MATTER_COLUMNS: MatterColumn[] = [
   { id: 'created_at', label: 'Created', sortable: 'created_at' },
 ]
 
-const DEFAULT_VISIBLE = ['matter_number', 'title', 'status', 'priority', 'lawyer', 'next_deadline', 'created_at']
+const DEFAULT_VISIBLE = ['matter_number', 'title', 'stage', 'status', 'priority', 'lawyer', 'next_deadline', 'created_at']
 
 function loadVisibleColumns(): string[] {
   if (typeof window === 'undefined') return DEFAULT_VISIBLE
@@ -349,6 +351,39 @@ export default function MattersPage() {
   function getLawyerName(id: string | null): string {
     if (!id) return '--'
     return formatUserName(lawyers?.find((u) => u.id === id))
+  }
+
+  // Bulk stage state for current page
+  const matterIds = useMemo(() => matters.map((m) => m.id), [matters])
+  const { data: stageStates } = useQuery({
+    queryKey: ['matter_stage_states_bulk', matterIds.join(',')],
+    queryFn: async () => {
+      if (!matterIds.length) return []
+      const supabase = createClient()
+      const { data: states, error: statesError } = await supabase
+        .from('matter_stage_state')
+        .select('matter_id, current_stage_id')
+        .in('matter_id', matterIds)
+      if (statesError) throw statesError
+      const stageIds = [...new Set(states.map((s) => s.current_stage_id).filter(Boolean))] as string[]
+      if (!stageIds.length) return states.map((s) => ({ matter_id: s.matter_id, stage: null }))
+      const { data: stages, error: stagesError } = await supabase
+        .from('matter_stages')
+        .select('id, name, color, completion_pct')
+        .in('id', stageIds)
+      if (stagesError) throw stagesError
+      const stageMap = new Map(stages.map((s) => [s.id, s]))
+      return states.map((s) => ({
+        matter_id: s.matter_id,
+        stage: s.current_stage_id ? (stageMap.get(s.current_stage_id) ?? null) : null,
+      }))
+    },
+    enabled: matterIds.length > 0,
+    staleTime: 1000 * 60 * 2,
+  })
+
+  function getMatterStageInfo(matterId: string) {
+    return stageStates?.find((s) => s.matter_id === matterId) ?? null
   }
 
   // Sort handler
@@ -669,6 +704,40 @@ export default function MattersPage() {
                               })() : <span className="text-slate-400 text-xs">--</span>}
                             </TableCell>
                           )
+                        case 'stage': {
+                          const stageInfo = getMatterStageInfo(matter.id)
+                          const pct = stageInfo?.stage?.completion_pct ?? null
+                          const stageName = stageInfo?.stage?.name ?? null
+                          const stageColor = stageInfo?.stage?.color ?? '#94a3b8'
+                          if (!stageName) return <TableCell key={col.id} className="text-slate-400 text-xs">--</TableCell>
+                          return (
+                            <TableCell key={col.id} className="min-w-[160px]">
+                              <div className="space-y-1">
+                                <div className="flex items-center gap-1.5">
+                                  <span className="h-2 w-2 rounded-full shrink-0" style={{ backgroundColor: stageColor }} />
+                                  <span className="text-xs font-medium text-slate-700 truncate max-w-[120px]">{stageName}</span>
+                                  {pct !== null && (
+                                    <span className={cn(
+                                      'text-[10px] font-semibold tabular-nums shrink-0',
+                                      pct >= 100 ? 'text-emerald-600' : pct >= 70 ? 'text-violet-600' : pct >= 40 ? 'text-blue-600' : 'text-amber-600'
+                                    )}>{pct}%</span>
+                                  )}
+                                </div>
+                                {pct !== null && (
+                                  <div className="h-1 bg-slate-100 rounded-full overflow-hidden">
+                                    <div
+                                      className={cn(
+                                        'h-full rounded-full transition-all duration-500',
+                                        pct >= 100 ? 'bg-emerald-500' : pct >= 70 ? 'bg-violet-500' : pct >= 40 ? 'bg-blue-500' : 'bg-amber-500'
+                                      )}
+                                      style={{ width: `${Math.min(pct, 100)}%` }}
+                                    />
+                                  </div>
+                                )}
+                              </div>
+                            </TableCell>
+                          )
+                        }
                         case 'status':
                           return <TableCell key={col.id}>{getStatusBadge(matter.status ?? '')}</TableCell>
                         case 'priority':

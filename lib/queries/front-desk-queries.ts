@@ -161,7 +161,38 @@ const DEFAULT_CONFIG: FrontDeskConfig = {
   free_text_follow_up: false,
   override_booking_permission: false,
   new_leads_require_id_scan: false,
-  languages: ['English', 'French'],
+  languages: [
+    'English',
+    'French',
+    'Arabic',
+    'Punjabi',
+    'Urdu',
+    'Hindi',
+    'Mandarin',
+    'Cantonese',
+    'Tagalog',
+    'Portuguese',
+    'Spanish',
+    'Italian',
+    'Polish',
+    'Romanian',
+    'Tamil',
+    'Bengali',
+    'Gujarati',
+    'Korean',
+    'Vietnamese',
+    'Persian (Farsi)',
+    'Turkish',
+    'Somali',
+    'Amharic',
+    'Russian',
+    'Ukrainian',
+    'Greek',
+    'Tigrinya',
+    'Swahili',
+    'Pashto',
+    'Other',
+  ],
   sources: ['Walk-in', 'Phone', 'Website', 'Referral', 'Other'],
   default_task_bundle: [],
   task_chains: {},
@@ -315,7 +346,7 @@ export function useFrontDeskTimeline(contactId: string | null) {
         .select('id, activity_type, title, description, created_at, metadata')
         .eq('contact_id', contactId)
         .order('created_at', { ascending: false })
-        .limit(10)
+        .limit(25)
 
       if (error) throw error
       return (data ?? []) as FrontDeskTimelineEvent[]
@@ -452,6 +483,7 @@ export function useFrontDeskTasks(tenantId: string, currentUserId: string, staff
         const { data, error } = await supabase
           .from('tasks')
           .select(selectCols)
+          .eq('tenant_id', tenantId)
           .eq('assigned_to', staffFilter)
           .in('status', ['not_started', 'working_on_it', 'stuck'])
           .eq('is_deleted', false)
@@ -465,6 +497,7 @@ export function useFrontDeskTasks(tenantId: string, currentUserId: string, staff
           supabase
             .from('tasks')
             .select(selectCols)
+            .eq('tenant_id', tenantId)
             .eq('assigned_to', currentUserId)
             .in('status', ['not_started', 'working_on_it', 'stuck'])
             .eq('is_deleted', false)
@@ -473,6 +506,7 @@ export function useFrontDeskTasks(tenantId: string, currentUserId: string, staff
           supabase
             .from('tasks')
             .select(selectCols)
+            .eq('tenant_id', tenantId)
             .eq('created_by', currentUserId)
             .neq('assigned_to', currentUserId)
             .in('status', ['not_started', 'working_on_it', 'stuck'])
@@ -550,7 +584,8 @@ export function useFrontDeskTasks(tenantId: string, currentUserId: string, staff
         }))
     },
     enabled: !!tenantId && !!currentUserId,
-    refetchInterval: 30_000,
+    refetchInterval: 8_000,   // Poll every 8s — realtime handles instant updates
+    staleTime: 5_000,
   })
 }
 
@@ -747,12 +782,99 @@ export function useFrontDeskStats(tenantId: string) {
   })
 }
 
+// ─── Interaction Breakdown ───────────────────────────────────────────────────
+
+export interface InteractionBreakdown {
+  inbound_calls: number
+  outbound_calls: number
+  no_answer: number
+  voicemail: number
+  busy: number
+  wrong_number: number
+  emails: number
+  meetings: number
+  meetings_in_person: number
+  meetings_video: number
+  meetings_phone: number
+  total: number
+}
+
+export function useFrontDeskInteractionBreakdown(contactId: string | null) {
+  return useQuery({
+    queryKey: [...frontDeskKeys.all, 'interaction-breakdown', contactId ?? ''] as const,
+    queryFn: async (): Promise<InteractionBreakdown> => {
+      const blank: InteractionBreakdown = {
+        inbound_calls: 0, outbound_calls: 0, no_answer: 0, voicemail: 0,
+        busy: 0, wrong_number: 0, emails: 0, meetings: 0,
+        meetings_in_person: 0, meetings_video: 0, meetings_phone: 0, total: 0,
+      }
+      if (!contactId) return blank
+
+      const supabase = createClient()
+      const { data, error } = await supabase
+        .from('activities')
+        .select('activity_type, metadata')
+        .eq('contact_id', contactId)
+        .in('activity_type', ['front_desk_call_logged', 'front_desk_email_logged', 'front_desk_meeting_logged'])
+        .order('created_at', { ascending: false })
+        .limit(500)
+
+      if (error) throw error
+
+      const result: InteractionBreakdown = { ...blank }
+
+      for (const row of data ?? []) {
+        const meta = (row.metadata ?? {}) as Record<string, unknown>
+        if (row.activity_type === 'front_desk_call_logged') {
+          const outcome = meta.outcome as string | undefined
+          const direction = meta.direction as string | undefined
+          if (outcome === 'connected') {
+            if (direction === 'inbound') result.inbound_calls++
+            else result.outbound_calls++
+          } else if (outcome === 'no_answer') {
+            result.no_answer++
+          } else if (outcome === 'voicemail') {
+            result.voicemail++
+          } else if (outcome === 'busy') {
+            result.busy++
+          } else if (outcome === 'wrong_number') {
+            result.wrong_number++
+          } else {
+            // Any other call outcome counts toward outbound/inbound
+            if (direction === 'inbound') result.inbound_calls++
+            else result.outbound_calls++
+          }
+        } else if (row.activity_type === 'front_desk_email_logged') {
+          result.emails++
+        } else if (row.activity_type === 'front_desk_meeting_logged') {
+          result.meetings++
+          const meetingType = meta.meeting_type as string | undefined
+          if (meetingType === 'in_person') result.meetings_in_person++
+          else if (meetingType === 'video') result.meetings_video++
+          else if (meetingType === 'phone') result.meetings_phone++
+        }
+      }
+
+      result.total =
+        result.inbound_calls + result.outbound_calls +
+        result.no_answer + result.voicemail + result.busy + result.wrong_number +
+        result.emails + result.meetings
+
+      return result
+    },
+    enabled: !!contactId,
+    staleTime: 30_000,
+  })
+}
+
 // ─── Active Shift Hook ───────────────────────────────────────────────────────
 
 export interface FrontDeskActiveShift {
   id: string
   started_at: string
   shift_date: string
+  onBreak: boolean
+  breakStartedAt: string | null
 }
 
 export function useFrontDeskActiveShift(userId: string) {
@@ -770,7 +892,24 @@ export function useFrontDeskActiveShift(userId: string) {
         .maybeSingle()
 
       if (error) throw error
-      return data as FrontDeskActiveShift | null
+      if (!data) return null
+
+      const shift = data as { id: string; started_at: string; shift_date: string }
+
+      // Check if currently on lunch break by looking at last break event
+      const { data: lastBreakEvent } = await (supabase
+        .from('front_desk_events' as any)
+        .select('event_type, created_at') as any)
+        .eq('shift_id', shift.id)
+        .in('event_type', ['lunch_break_start', 'lunch_break_end'])
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle()
+
+      const onBreak = lastBreakEvent?.event_type === 'lunch_break_start'
+      const breakStartedAt = onBreak ? (lastBreakEvent?.created_at ?? null) : null
+
+      return { ...shift, onBreak, breakStartedAt }
     },
     enabled: !!userId,
     refetchInterval: 30_000,
@@ -844,5 +983,99 @@ export function useFrontDeskDayKpis(userId: string | null, date: string | null) 
     enabled: !!userId && !!date,
     refetchInterval: 60_000,
     staleTime: 30_000,
+  })
+}
+
+// ─── Kiosk Questions ─────────────────────────────────────────────────────────
+
+export interface TenantKioskQuestionOption {
+  label: string
+  value: string
+}
+
+export interface TenantKioskQuestion {
+  id: string
+  field_type: 'select' | 'multi_select' | 'text' | 'textarea' | 'boolean' | 'date' | 'country'
+  label: string
+  description?: string
+  is_required: boolean
+  options?: TenantKioskQuestionOption[]
+  sort_order: number
+  condition?: {
+    field_id: string
+    operator: 'equals' | 'not_equals' | 'in' | 'not_in' | 'is_truthy' | 'is_falsy'
+    value?: string | string[]
+  }
+}
+
+/**
+ * Fetches kiosk screening questions from tenant settings.
+ * Stored at: tenants.settings.kiosk_config.kiosk_questions (JSONB array)
+ */
+export function useTenantKioskQuestions(tenantId: string) {
+  return useQuery({
+    queryKey: [...frontDeskKeys.all, 'kiosk-questions', tenantId] as const,
+    queryFn: async (): Promise<TenantKioskQuestion[]> => {
+      const supabase = createClient()
+      const { data, error } = await supabase
+        .from('tenants')
+        .select('settings')
+        .eq('id', tenantId)
+        .single()
+
+      if (error) throw error
+
+      const settings = (data?.settings ?? {}) as Record<string, unknown>
+      const kioskConfig = (settings.kiosk_config ?? {}) as Record<string, unknown>
+      const questions = (kioskConfig.kiosk_questions ?? []) as TenantKioskQuestion[]
+      return questions.sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
+    },
+    enabled: !!tenantId,
+    staleTime: 120_000,
+  })
+}
+
+/**
+ * Fetches the kiosk self-check-in URL for the tenant.
+ * Tries portal_links table first (link_type='kiosk'), then falls back to
+ * tenants.settings.kiosk_token.
+ */
+export function useTenantKioskUrl(tenantId: string) {
+  return useQuery({
+    queryKey: [...frontDeskKeys.all, 'kiosk-url', tenantId] as const,
+    queryFn: async (): Promise<string | null> => {
+      const supabase = createClient()
+
+      // Try portal_links table first
+      try {
+        const { data } = await (supabase as any)
+          .from('portal_links')
+          .select('kiosk_token')
+          .is('matter_id', null)
+          .limit(1)
+          .maybeSingle()
+
+        if (data?.kiosk_token) {
+          return `/kiosk/${data.kiosk_token}`
+        }
+      } catch {
+        // table may not exist yet — fall through
+      }
+
+      // Fallback: read from tenant settings
+      const { data: tenantData } = await supabase
+        .from('tenants')
+        .select('settings')
+        .eq('id', tenantId)
+        .single()
+
+      const settings = ((tenantData?.settings ?? {}) as Record<string, unknown>)
+      const kioskToken = settings.kiosk_token as string | undefined
+      if (kioskToken) return `/kiosk/${kioskToken}`
+
+      return null
+    },
+    enabled: !!tenantId,
+    staleTime: 300_000,
   })
 }

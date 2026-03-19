@@ -433,7 +433,11 @@ export default function FrontDeskDashboard() {
       <ContactWorkPanel
         contactId={selectedContactId}
         onClose={() => setSelectedContactId(null)}
-        onCreateIntake={handleCreateWalkIn}
+        onCreateIntake={() => {
+          // Close the contact panel first, then open quick create
+          setSelectedContactId(null)
+          handleCreateWalkIn()
+        }}
       />
 
       {/* Action Dialog (shared by all quick actions from Schedule/Tasks/Check-ins) */}

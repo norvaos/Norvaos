@@ -4,8 +4,9 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { Bell, LogOut, LayoutDashboard, Monitor, Copy, ExternalLink, Loader2, Clock, Play, Square } from 'lucide-react'
+import { LogOut, LayoutDashboard, Monitor, Copy, ExternalLink, Loader2, Clock, Play, Square } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { NotificationBell } from '@/components/layout/notification-bell'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { toast } from 'sonner'
 import { useFrontDeskActiveShift, frontDeskKeys } from '@/lib/queries/front-desk-queries'
@@ -239,9 +240,7 @@ export function FrontDeskHeader({ userId, userName, avatarUrl, firmName }: Front
             </Button>
           )}
 
-          <Button variant="ghost" size="sm" className="relative">
-            <Bell className="w-4 h-4" />
-          </Button>
+          <NotificationBell />
 
           <div className="flex items-center gap-2 pl-2 border-l border-slate-200">
             <Avatar className="h-8 w-8">

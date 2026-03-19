@@ -18,6 +18,7 @@ import { MatterStatusPanel } from './panels/matter-status-panel'
 import { CommunicationsPanel } from './panels/communications-panel'
 import { DocumentStatusPanel } from './panels/document-status-panel'
 import { RiskPanel } from './panels/risk-panel'
+import { IntakeWizardPanel } from './panels/intake-wizard-panel'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -29,14 +30,19 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import {
-  Thermometer,
+  AlertCircle,
   Briefcase,
-  ExternalLink,
+  Radio,
   Calendar,
   UserCheck,
   Eye,
   FileText,
   Users,
+  MapPin,
+  ShieldAlert,
+  History,
+  BadgeInfo,
+  Globe,
 } from 'lucide-react'
 
 // ─── Types ──────────────────────────────────────────────────────────
@@ -50,6 +56,12 @@ interface CoreDataForm {
   next_follow_up: string
   assigned_to: string
   reviewer_id: string
+  // Immigration intelligence fields (stored in custom_fields)
+  client_location: string       // 'inland' | 'outside' | ''
+  immigration_status: string    // visitor, student, worker, pr, citizen, refugee, no_status, etc.
+  has_refusals: string          // 'yes' | 'no' | ''
+  has_criminality: string       // 'yes' | 'no' | ''
+  has_misrepresentation: string // 'yes' | 'no' | ''
 }
 
 // ─── Debounce hook ──────────────────────────────────────────────────
@@ -144,6 +156,9 @@ export function Workspace() {
         isConverted={isConverted}
       />
 
+      {/* Interactive Intake Wizard */}
+      <IntakeWizardPanel />
+
       {/* CRS Calculator — only for point-based programs (Express Entry, PNP) */}
       {showCrsCalculator && <CrsCalculatorPanel />}
 
@@ -217,6 +232,11 @@ function CoreDataCard({ lead, entityId, tenantId, users, practiceAreas, isConver
       next_follow_up: lead?.next_follow_up?.split('T')[0] ?? '',
       assigned_to: lead?.assigned_to ?? '',
       reviewer_id: (customFields.reviewer_id as string) ?? '',
+      client_location: (customFields.client_location as string) ?? '',
+      immigration_status: (customFields.immigration_status as string) ?? '',
+      has_refusals: (customFields.has_refusals as string) ?? '',
+      has_criminality: (customFields.has_criminality as string) ?? '',
+      has_misrepresentation: (customFields.has_misrepresentation as string) ?? '',
     },
   })
 
@@ -233,6 +253,11 @@ function CoreDataCard({ lead, entityId, tenantId, users, practiceAreas, isConver
         next_follow_up: lead.next_follow_up?.split('T')[0] ?? '',
         assigned_to: lead.assigned_to ?? '',
         reviewer_id: (cf.reviewer_id as string) ?? '',
+        client_location: (cf.client_location as string) ?? '',
+        immigration_status: (cf.immigration_status as string) ?? '',
+        has_refusals: (cf.has_refusals as string) ?? '',
+        has_criminality: (cf.has_criminality as string) ?? '',
+        has_misrepresentation: (cf.has_misrepresentation as string) ?? '',
       })
     }
   }, [lead, reset])
@@ -245,7 +270,7 @@ function CoreDataCard({ lead, entityId, tenantId, users, practiceAreas, isConver
 
         const updates: Record<string, unknown> = {}
 
-        if (field === 'reviewer_id') {
+        if (['reviewer_id', 'client_location', 'immigration_status', 'has_refusals', 'has_criminality', 'has_misrepresentation'].includes(field)) {
           // Store in custom_fields JSON
           const cf = (lead.custom_fields ?? {}) as Record<string, unknown>
           const cleanValue = value && value !== 'none' ? value : null
@@ -392,11 +417,11 @@ function CoreDataCard({ lead, entityId, tenantId, users, practiceAreas, isConver
             </Select>
           </div>
 
-          {/* Temperature */}
+          {/* Case Priority (formerly Temperature) */}
           <div className="space-y-1.5">
             <Label className="text-xs text-slate-500 flex items-center gap-1">
-              <Thermometer className="h-3 w-3" />
-              Temperature
+              <AlertCircle className="h-3 w-3" />
+              Case Priority
             </Label>
             <Select
               value={watch('temperature')}
@@ -422,10 +447,10 @@ function CoreDataCard({ lead, entityId, tenantId, users, practiceAreas, isConver
             </Select>
           </div>
 
-          {/* Source */}
+          {/* Source — read from lead (set at front desk intake); editable if needed */}
           <div className="space-y-1.5">
             <Label className="text-xs text-slate-500 flex items-center gap-1">
-              <ExternalLink className="h-3 w-3" />
+              <Radio className="h-3 w-3" />
               Source
             </Label>
             <Select
@@ -437,6 +462,10 @@ function CoreDataCard({ lead, entityId, tenantId, users, practiceAreas, isConver
                 <SelectValue placeholder="Select..." />
               </SelectTrigger>
               <SelectContent>
+                {/* Always include the current value even if it came from front desk */}
+                {watch('source') && !CONTACT_SOURCES.includes(watch('source') as typeof CONTACT_SOURCES[number]) && (
+                  <SelectItem value={watch('source')}>{watch('source')}</SelectItem>
+                )}
                 {CONTACT_SOURCES.map((s) => (
                   <SelectItem key={s} value={s}>
                     {s}
@@ -507,6 +536,156 @@ function CoreDataCard({ lead, entityId, tenantId, users, practiceAreas, isConver
                 ))}
               </SelectContent>
             </Select>
+          </div>
+        </div>
+
+        {/* ── Immigration Intelligence ──────────────────────────────────── */}
+        <div className="mt-4 pt-4 border-t border-slate-100">
+          <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wide mb-3 flex items-center gap-1.5">
+            <Globe className="h-3 w-3" />
+            Immigration Intelligence
+          </p>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+
+            {/* Client Location — drives JR deadlines (15d inland / 60d outside) */}
+            <div className="space-y-1.5">
+              <Label className="text-xs text-slate-500 flex items-center gap-1">
+                <MapPin className="h-3 w-3" />
+                Client Location
+              </Label>
+              <Select
+                value={watch('client_location')}
+                onValueChange={(val) => setValue('client_location', val)}
+                disabled={isConverted}
+              >
+                <SelectTrigger className="h-9 text-sm">
+                  <SelectValue placeholder="Select..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="inland">
+                    <span className="flex items-center gap-2">
+                      <span className="h-2 w-2 rounded-full bg-blue-500 shrink-0" />
+                      Inland — Inside Canada
+                    </span>
+                  </SelectItem>
+                  <SelectItem value="outside">
+                    <span className="flex items-center gap-2">
+                      <span className="h-2 w-2 rounded-full bg-amber-500 shrink-0" />
+                      Outside Canada
+                    </span>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+              {watch('client_location') === 'inland' && (
+                <p className="text-[10px] text-blue-600 font-medium">JR deadline: 15 days from refusal</p>
+              )}
+              {watch('client_location') === 'outside' && (
+                <p className="text-[10px] text-amber-600 font-medium">JR deadline: 60 days from refusal</p>
+              )}
+            </div>
+
+            {/* Immigration Status in Canada */}
+            <div className="space-y-1.5">
+              <Label className="text-xs text-slate-500 flex items-center gap-1">
+                <BadgeInfo className="h-3 w-3" />
+                Current Status
+              </Label>
+              <Select
+                value={watch('immigration_status')}
+                onValueChange={(val) => setValue('immigration_status', val)}
+                disabled={isConverted}
+              >
+                <SelectTrigger className="h-9 text-sm">
+                  <SelectValue placeholder="Select..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="visitor">Visitor / Tourist</SelectItem>
+                  <SelectItem value="student">Study Permit Holder</SelectItem>
+                  <SelectItem value="worker">Work Permit Holder</SelectItem>
+                  <SelectItem value="pgwp">PGWP Holder</SelectItem>
+                  <SelectItem value="pr">Permanent Resident</SelectItem>
+                  <SelectItem value="citizen">Canadian Citizen</SelectItem>
+                  <SelectItem value="refugee_claimant">Refugee Claimant</SelectItem>
+                  <SelectItem value="protected_person">Protected Person</SelectItem>
+                  <SelectItem value="no_status">No Status / Undocumented</SelectItem>
+                  <SelectItem value="implied_status">Implied Status</SelectItem>
+                  <SelectItem value="abrod">Abroad — Never Entered</SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Previous Refusals */}
+            <div className="space-y-1.5">
+              <Label className="text-xs text-slate-500 flex items-center gap-1">
+                <History className="h-3 w-3" />
+                Previous Refusals?
+              </Label>
+              <Select
+                value={watch('has_refusals')}
+                onValueChange={(val) => setValue('has_refusals', val)}
+                disabled={isConverted}
+              >
+                <SelectTrigger className={`h-9 text-sm ${watch('has_refusals') === 'yes' ? 'border-amber-400 bg-amber-50' : ''}`}>
+                  <SelectValue placeholder="Unknown" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="no">No</SelectItem>
+                  <SelectItem value="yes">Yes — has refusal history</SelectItem>
+                  <SelectItem value="unknown">Unknown / Not Asked</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Criminality / Inadmissibility */}
+            <div className="space-y-1.5">
+              <Label className="text-xs text-slate-500 flex items-center gap-1">
+                <ShieldAlert className="h-3 w-3" />
+                Criminality / Inadmissibility?
+              </Label>
+              <Select
+                value={watch('has_criminality')}
+                onValueChange={(val) => setValue('has_criminality', val)}
+                disabled={isConverted}
+              >
+                <SelectTrigger className={`h-9 text-sm ${watch('has_criminality') === 'yes' ? 'border-red-400 bg-red-50' : ''}`}>
+                  <SelectValue placeholder="Unknown" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="no">No</SelectItem>
+                  <SelectItem value="yes">Yes — criminal/security record</SelectItem>
+                  <SelectItem value="possible">Possible — needs review</SelectItem>
+                  <SelectItem value="unknown">Unknown / Not Asked</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Misrepresentation */}
+            <div className="space-y-1.5">
+              <Label className="text-xs text-slate-500 flex items-center gap-1">
+                <ShieldAlert className="h-3 w-3" />
+                Misrepresentation Finding?
+              </Label>
+              <Select
+                value={watch('has_misrepresentation')}
+                onValueChange={(val) => setValue('has_misrepresentation', val)}
+                disabled={isConverted}
+              >
+                <SelectTrigger className={`h-9 text-sm ${watch('has_misrepresentation') === 'yes' ? 'border-red-400 bg-red-50' : ''}`}>
+                  <SelectValue placeholder="Unknown" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="no">No</SelectItem>
+                  <SelectItem value="yes">Yes — s.40 finding / ban active</SelectItem>
+                  <SelectItem value="possible">Possible — needs review</SelectItem>
+                  <SelectItem value="unknown">Unknown / Not Asked</SelectItem>
+                </SelectContent>
+              </Select>
+              {watch('has_misrepresentation') === 'yes' && (
+                <p className="text-[10px] text-red-600 font-medium">⚠ 5-year ban applies — verify expiry</p>
+              )}
+            </div>
+
           </div>
         </div>
       </CardContent>

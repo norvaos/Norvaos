@@ -171,11 +171,16 @@ export const StagePipelineBar = memo(function StagePipelineBar({
                       <Check className="h-3 w-3 shrink-0" />
                     )}
 
-                    {/* Current: name prominently */}
+                    {/* Current: name + % prominently */}
                     {isCurrent && (
                       <span className="flex items-center gap-1.5 min-w-0 overflow-hidden">
                         <span className="h-1.5 w-1.5 rounded-full bg-white shrink-0 animate-pulse" />
                         <span className="truncate font-semibold">{stage.name}</span>
+                        {stage.completion_pct !== null && stage.completion_pct !== undefined && (
+                          <span className="shrink-0 text-[9px] font-bold bg-white/25 rounded px-1 py-0.5 tabular-nums">
+                            {stage.completion_pct}%
+                          </span>
+                        )}
                       </span>
                     )}
 
@@ -188,62 +193,77 @@ export const StagePipelineBar = memo(function StagePipelineBar({
                     )}
                   </button>
                 </TooltipTrigger>
-                <TooltipContent side="top" className="max-w-[260px]">
-                  <div className="space-y-1.5">
-                    <div>
-                      <p className="font-semibold text-xs">{stage.name}</p>
-                      <p className="text-[10px] opacity-80">
-                        {isCompleted
-                          ? '✓ Completed'
-                          : isCurrent
-                            ? '● Current Stage'
-                            : isGated
-                              ? '🔒 Blocked'
-                              : '○ Upcoming'}
-                      </p>
+                <TooltipContent side="top" className="max-w-[300px] p-3">
+                  <div className="space-y-2">
+                    {/* Stage name + status badge */}
+                    <div className="flex items-start justify-between gap-2">
+                      <p className="font-semibold text-xs leading-snug">{stage.name}</p>
+                      <span className={cn(
+                        'shrink-0 text-[9px] font-medium px-1.5 py-0.5 rounded-full',
+                        isCompleted && 'bg-emerald-500/20 text-emerald-300',
+                        isCurrent && 'bg-white/20 text-white',
+                        isGated && 'bg-red-500/20 text-red-300',
+                        isUpcoming && !isGated && 'bg-white/10 text-white/60',
+                      )}>
+                        {isCompleted ? '✓ Done' : isCurrent ? '● Active' : isGated ? '🔒 Blocked' : '○ Upcoming'}
+                      </span>
                     </div>
 
-                    {/* Gating errors */}
-                    {isGated && stageErrors.map((err, i) => (
-                      <p key={i} className="text-[10px] text-red-400">{err}</p>
-                    ))}
-
-                    {/* SLA info */}
-                    {stage.sla_days && (
-                      <p className="text-[10px] opacity-60">SLA: {stage.sla_days}d</p>
+                    {/* Completion % */}
+                    {stage.completion_pct !== null && stage.completion_pct !== undefined && (
+                      <div className="flex items-center gap-2">
+                        <div className="flex-1 h-1 bg-white/20 rounded-full overflow-hidden">
+                          <div
+                            className="h-full rounded-full bg-white/70"
+                            style={{ width: `${stage.completion_pct}%` }}
+                          />
+                        </div>
+                        <span className="text-[10px] font-semibold tabular-nums text-white/90">{stage.completion_pct}%</span>
+                      </div>
                     )}
 
-                    {/* Duration info */}
-                    {(isCompleted || isCurrent) && stageDuration && (
-                      <div className="pt-1 border-t border-white/20 space-y-0.5">
-                        <div className="flex items-center gap-1 text-[10px]">
+                    {/* Description */}
+                    {stage.description && (
+                      <p className="text-[10px] leading-relaxed opacity-80 border-t border-white/15 pt-2">
+                        {stage.description}
+                      </p>
+                    )}
+
+                    {/* Gating errors */}
+                    {isGated && (
+                      <div className="space-y-0.5 border-t border-white/15 pt-1">
+                        {stageErrors.map((err, i) => (
+                          <p key={i} className="text-[10px] text-red-300">• {err}</p>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* SLA + timing */}
+                    <div className="flex items-center gap-3 text-[10px] opacity-60">
+                      {stage.sla_days && (
+                        <span>SLA: {stage.sla_days}d</span>
+                      )}
+                      {(isCompleted || isCurrent) && stageDuration && (
+                        <div className="flex items-center gap-1">
                           <Clock className="h-2.5 w-2.5 shrink-0" />
-                          <span>
-                            {isCurrent
-                              ? `${stageDuration} (ongoing)`
-                              : stageDuration}
-                          </span>
+                          <span>{isCurrent ? `${stageDuration} (ongoing)` : stageDuration}</span>
                         </div>
-                        {stageEnteredDate && (
-                          <p className="text-[10px] opacity-70">
-                            Entered: {stageEnteredDate}
-                          </p>
-                        )}
-                        {isCompleted && stageExitedDate && (
-                          <p className="text-[10px] opacity-70">
-                            Exited: {stageExitedDate}
-                          </p>
-                        )}
+                      )}
+                    </div>
+
+                    {/* Entered / exited dates */}
+                    {(isCompleted || isCurrent) && stageEnteredDate && (
+                      <div className="text-[10px] opacity-60 space-y-0.5">
+                        <p>Entered: {stageEnteredDate}</p>
+                        {isCompleted && stageExitedDate && <p>Exited: {stageExitedDate}</p>}
                       </div>
                     )}
 
                     {/* Moved by */}
                     {movedBy && (
-                      <div className="pt-1 border-t border-white/20">
-                        <div className="flex items-center gap-1 text-[10px]">
-                          <User className="h-2.5 w-2.5 shrink-0" />
-                          <span>Moved by {movedBy}</span>
-                        </div>
+                      <div className="flex items-center gap-1 text-[10px] opacity-60 border-t border-white/15 pt-1">
+                        <User className="h-2.5 w-2.5 shrink-0" />
+                        <span>Moved by {movedBy}</span>
                       </div>
                     )}
                   </div>
@@ -253,23 +273,34 @@ export const StagePipelineBar = memo(function StagePipelineBar({
           })}
         </div>
 
-        {/* Optional completion progress bar below */}
+        {/* Completion progress bar */}
         {completionPercent !== undefined && completionPercent !== null && (
-          <div className="flex items-center gap-2">
-            <div className="flex-1 h-1 bg-gray-100 rounded-full overflow-hidden">
+          <div className="flex items-center gap-2 pt-0.5">
+            <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
               <div
                 className={cn(
                   'h-full rounded-full transition-all duration-500',
                   completionPercent >= 100
-                    ? 'bg-green-500'
-                    : completionPercent >= 60
-                      ? 'bg-blue-500'
-                      : 'bg-amber-500'
+                    ? 'bg-emerald-500'
+                    : completionPercent >= 70
+                      ? 'bg-violet-500'
+                      : completionPercent >= 40
+                        ? 'bg-blue-500'
+                        : 'bg-amber-500'
                 )}
                 style={{ width: `${Math.min(completionPercent, 100)}%` }}
               />
             </div>
-            <span className="text-[10px] font-medium text-muted-foreground tabular-nums shrink-0">
+            <span className={cn(
+              'text-[11px] font-semibold tabular-nums shrink-0',
+              completionPercent >= 100
+                ? 'text-emerald-600'
+                : completionPercent >= 70
+                  ? 'text-violet-600'
+                  : completionPercent >= 40
+                    ? 'text-blue-600'
+                    : 'text-amber-600'
+            )}>
               {completionPercent}%
             </span>
           </div>

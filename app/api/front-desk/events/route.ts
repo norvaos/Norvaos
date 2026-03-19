@@ -26,6 +26,8 @@ const eventBodySchema = z.object({
     'panel_opened',
     'panel_closed',
     'heartbeat',
+    'lunch_break_start',
+    'lunch_break_end',
   ]),
   eventData: z.record(z.string(), z.unknown()).default({}),
 })

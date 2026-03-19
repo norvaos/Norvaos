@@ -1,5 +1,7 @@
+// Navigation configuration
 import {
   LayoutDashboard,
+  Globe,
   Users,
   Briefcase,
   Target,
@@ -73,6 +75,7 @@ export const navigation: NavSection[] = [
       { title: 'Email', href: '/communications', icon: Mail, deprecated: true },
       { title: 'Phone', href: '/communications/phone', icon: Phone, comingSoon: true, featureFlag: 'phone' },
       { title: 'Chat', href: '/chat', icon: MessageSquare, comingSoon: true },
+      { title: 'Clio', href: '/integrations/clio', icon: Globe, comingSoon: true },
     ],
   },
   {

@@ -28,6 +28,10 @@ export function useNotifications(userId: string) {
       return data as Notification[]
     },
     enabled: !!userId,
+    // Poll every 6 seconds so new notifications are detected even if Realtime
+    // events are delayed or blocked by browser/network.
+    refetchInterval: 6_000,
+    staleTime: 4_000,
   })
 }
 

@@ -1,11 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   StickyNote,
   Bell,
-  Phone,
   Mail,
   Video,
   CalendarPlus,
@@ -13,7 +12,6 @@ import {
   CalendarX,
   ClipboardCheck,
   ListPlus,
-  CheckSquare,
   PenSquare,
   Upload,
   UserPlus,
@@ -22,7 +20,12 @@ import {
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { ActionDialog, type ActionField } from '@/components/front-desk/action-dialog'
+import { LogMeetingDialog } from '@/components/front-desk/log-meeting-dialog'
+import { UploadDocumentDialog } from '@/components/front-desk/upload-document-dialog'
+import { CreateTaskDialog } from '@/components/front-desk/create-task-dialog'
+import { NotifyStaffDialog } from '@/components/front-desk/notify-staff-dialog'
 import type { FrontDeskConfig } from '@/lib/queries/front-desk-queries'
+import { frontDeskKeys } from '@/lib/queries/front-desk-queries'
 import { useTenant } from '@/lib/hooks/use-tenant'
 import { createClient } from '@/lib/supabase/client'
 
@@ -71,7 +74,12 @@ export function ContactActionBar({
 }: ContactActionBarProps) {
   const [activeAction, setActiveAction] = useState<ActionConfig | null>(null)
   const [recentSuccess, setRecentSuccess] = useState<string | null>(null)
+  const [logMeetingOpen, setLogMeetingOpen]   = useState(false)
+  const [uploadDocOpen, setUploadDocOpen]     = useState(false)
+  const [createTaskOpen, setCreateTaskOpen]   = useState(false)
+  const [notifyStaffOpen, setNotifyStaffOpen] = useState(false)
   const { tenant } = useTenant()
+  const queryClient = useQueryClient()
 
   // ─── Fetch contact's matters for linking ──────────────────────────────
 
@@ -93,12 +101,32 @@ export function ContactActionBar({
   })
 
   const matterOptions = [
-    { value: '', label: 'No related matter' },
+    { value: '__none', label: 'No related matter' },
     ...(contactMatters ?? []).map((m) => ({
       value: m.id,
       label: `${m.matter_number ?? ''} — ${m.title ?? 'Untitled'}`.trim(),
     })),
   ]
+
+  // ─── Fetch contact name (for meeting attendee pre-fill) ────────────────
+
+  const { data: contactDetail } = useQuery({
+    queryKey: ['front-desk', 'contact-name', contactId],
+    queryFn: async () => {
+      const supabase = createClient()
+      const { data } = await supabase
+        .from('contacts')
+        .select('first_name, last_name, preferred_name')
+        .eq('id', contactId)
+        .single()
+      if (!data) return ''
+      return data.preferred_name || [data.first_name, data.last_name].filter(Boolean).join(' ') || ''
+    },
+    enabled: !!contactId,
+    staleTime: 60_000,
+  })
+
+  const contactName = contactDetail ?? ''
 
   // ─── Fetch contact's open tasks for dropdown ────────────────────────────
 
@@ -198,6 +226,7 @@ export function ContactActionBar({
   // ─── Action Definitions ─────────────────────────────────────────────────
 
   // Row 1: Communication
+  // Note: Notify Staff uses dedicated NotifyStaffDialog (not listed here)
   const communicationActions: ActionConfig[] = [
     {
       type: 'front_desk_note',
@@ -218,81 +247,6 @@ export function ContactActionBar({
         entityType: 'contact',
         entityId: contactId,
         ...formData,
-      }),
-    },
-    {
-      type: 'front_desk_notify_staff',
-      label: 'Notify Staff',
-      icon: <Bell className="w-4 h-4" />,
-      color: 'bg-purple-600 hover:bg-purple-700 text-white',
-      fields: [
-        {
-          name: 'recipientUserId',
-          label: 'Recipient',
-          type: 'select',
-          required: true,
-          options: staffOptions,
-        },
-        {
-          name: 'message',
-          label: 'Message',
-          type: 'textarea',
-          placeholder: 'Message to staff (min 5 characters)...',
-          required: true,
-          minLength: 5,
-        },
-      ],
-      buildInput: (formData) => ({ ...formData }),
-    },
-    {
-      type: 'front_desk_log_call',
-      label: 'Log Call',
-      icon: <Phone className="w-4 h-4" />,
-      color: 'bg-green-600 hover:bg-green-700 text-white',
-      fields: [
-        {
-          name: 'direction',
-          label: 'Direction',
-          type: 'select',
-          required: true,
-          options: [
-            { value: 'inbound', label: 'Inbound' },
-            { value: 'outbound', label: 'Outbound' },
-          ],
-        },
-        {
-          name: 'outcome',
-          label: 'Outcome',
-          type: 'select',
-          required: true,
-          options: [
-            { value: 'connected', label: 'Connected' },
-            { value: 'no_answer', label: 'No Answer' },
-            { value: 'voicemail', label: 'Voicemail' },
-            { value: 'busy', label: 'Busy' },
-            { value: 'wrong_number', label: 'Wrong Number' },
-          ],
-        },
-        {
-          name: 'durationMinutes',
-          label: 'Duration (minutes)',
-          type: 'text',
-          placeholder: 'e.g. 15',
-          required: false,
-        },
-        {
-          name: 'notes',
-          label: 'Notes',
-          type: 'textarea',
-          placeholder: 'Call notes (min 5 characters)...',
-          required: true,
-          minLength: 5,
-        },
-      ],
-      buildInput: (formData) => ({
-        contactId,
-        ...formData,
-        durationMinutes: formData.durationMinutes ? Number(formData.durationMinutes) : null,
       }),
     },
     {
@@ -332,52 +286,8 @@ export function ContactActionBar({
         ...formData,
       }),
     },
-    {
-      type: 'front_desk_log_meeting',
-      label: 'Log Meeting',
-      icon: <Video className="w-4 h-4" />,
-      color: 'bg-violet-600 hover:bg-violet-700 text-white',
-      fields: [
-        {
-          name: 'meetingType',
-          label: 'Meeting Type',
-          type: 'select',
-          required: true,
-          options: [
-            { value: 'in_person', label: 'In-Person' },
-            { value: 'video', label: 'Video Call' },
-            { value: 'phone', label: 'Phone Call' },
-          ],
-        },
-        {
-          name: 'durationMinutes',
-          label: 'Duration (minutes)',
-          type: 'text',
-          placeholder: 'e.g. 30',
-          required: false,
-        },
-        {
-          name: 'attendees',
-          label: 'Attendees (optional)',
-          type: 'text',
-          placeholder: 'e.g. John Smith, Jane Doe',
-          required: false,
-        },
-        {
-          name: 'notes',
-          label: 'Notes',
-          type: 'textarea',
-          placeholder: 'Meeting notes (min 5 characters)...',
-          required: true,
-          minLength: 5,
-        },
-      ],
-      buildInput: (formData) => ({
-        contactId,
-        ...formData,
-        durationMinutes: formData.durationMinutes ? Number(formData.durationMinutes) : null,
-      }),
-    },
+    // Log Meeting uses its own dedicated dialog (LogMeetingDialog)
+    // — it is NOT in the communicationActions array; the button is rendered separately below.
   ]
 
   // Time slot options for appointment booking
@@ -400,7 +310,7 @@ export function ContactActionBar({
 
   // Room / boardroom options from config
   const roomOptions = [
-    { value: '', label: 'No room assigned' },
+    { value: '__none', label: 'No room assigned' },
     ...(config.rooms ?? []).map((r) => ({ value: r, label: r })),
   ]
 
@@ -475,8 +385,8 @@ export function ContactActionBar({
         contactId,
         ...formData,
         durationMinutes: Number(formData.durationMinutes) || 60,
-        matterId: formData.matterId || undefined,
-        room: formData.room || undefined,
+        matterId: (formData.matterId && formData.matterId !== '__none') ? formData.matterId : undefined,
+        room: (formData.room && formData.room !== '__none') ? formData.room : undefined,
       }),
     },
     // Only show Reschedule, Cancel/No-Show, Check In when contact has appointments
@@ -588,96 +498,24 @@ export function ContactActionBar({
     ] as ActionConfig[] : []),
   ]
 
-  // Row 3: Tasks
-  const taskActions: ActionConfig[] = [
-    {
-      type: 'front_desk_create_task',
-      label: 'Create Task',
-      icon: <ListPlus className="w-4 h-4" />,
-      color: 'bg-indigo-600 hover:bg-indigo-700 text-white',
-      fields: [
-        {
-          name: 'title',
-          label: 'Title',
-          type: 'text',
-          placeholder: 'Task title (min 5 characters)',
-          required: true,
-          minLength: 5,
-        },
-        {
-          name: 'assignToUserId',
-          label: 'Assign To',
-          type: 'select',
-          required: true,
-          options: staffOptions,
-        },
-        {
-          name: 'dueDate',
-          label: 'Due Date',
-          type: 'date',
-          required: true,
-        },
-        {
-          name: 'priority',
-          label: 'Priority',
-          type: 'select',
-          required: true,
-          options: [
-            { value: 'low', label: 'Low' },
-            { value: 'medium', label: 'Medium' },
-            { value: 'high', label: 'High' },
-            { value: 'urgent', label: 'Urgent' },
-          ],
-        },
-        {
-          name: 'reason',
-          label: 'Reason / Description',
-          type: 'textarea',
-          placeholder: 'Why is this task needed? (min 10 characters)...',
-          required: true,
-          minLength: 10,
-        },
-      ],
-      buildInput: (formData) => ({ ...formData }),
+  // Row 3: Tasks — handled via dedicated CreateTaskDialog (see below)
+  const taskActions: ActionConfig[] = []
+
+  // Build "current value" hints for Request Edit
+  const { data: contactFull } = useQuery({
+    queryKey: ['front-desk', 'contact-full', contactId],
+    queryFn: async () => {
+      const supabase = createClient()
+      const { data } = await supabase
+        .from('contacts')
+        .select('first_name, last_name, preferred_name, phone_primary, phone_secondary, email_primary, email_secondary')
+        .eq('id', contactId)
+        .single()
+      return data
     },
-    {
-      type: 'front_desk_complete_task',
-      label: 'Complete Task',
-      icon: <CheckSquare className="w-4 h-4" />,
-      color: 'bg-teal-600 hover:bg-teal-700 text-white',
-      fields: [
-        {
-          name: 'taskId',
-          label: 'Select Task',
-          type: 'select',
-          required: true,
-          options: taskOptions.length > 0
-            ? taskOptions
-            : [{ value: '', label: 'No open tasks' }],
-        },
-        {
-          name: 'outcomeCode',
-          label: 'Outcome',
-          type: 'select',
-          required: true,
-          options: [
-            { value: 'completed', label: 'Completed' },
-            { value: 'left_voicemail', label: 'Left Voicemail' },
-            { value: 'client_will_call_back', label: 'Client Will Call Back' },
-            { value: 'escalated', label: 'Escalated' },
-          ],
-        },
-        {
-          name: 'notes',
-          label: 'Notes (optional)',
-          type: 'textarea',
-          placeholder: 'Any additional notes...',
-          required: false,
-        },
-      ],
-      buildInput: (formData) => ({ ...formData }),
-    },
-  ]
+    enabled: !!contactId,
+    staleTime: 60_000,
+  })
 
   // Row 4: Other
   const otherActions: ActionConfig[] = [
@@ -689,22 +527,31 @@ export function ContactActionBar({
       fields: [
         {
           name: 'fieldToEdit',
-          label: 'Field to Edit',
+          label: 'Field to Update',
           type: 'select',
           required: true,
           options: [
-            { value: 'phone', label: 'Phone' },
-            { value: 'email', label: 'Email' },
-            { value: 'name', label: 'Name' },
+            {
+              value: 'phone',
+              label: `Phone${contactFull?.phone_primary ? ` (current: ${contactFull.phone_primary})` : ''}`,
+            },
+            {
+              value: 'email',
+              label: `Email${contactFull?.email_primary ? ` (current: ${contactFull.email_primary})` : ''}`,
+            },
+            {
+              value: 'name',
+              label: `Name (current: ${[contactFull?.first_name, contactFull?.last_name].filter(Boolean).join(' ') || '—'})`,
+            },
             { value: 'address', label: 'Address' },
-            { value: 'other', label: 'Other' },
+            { value: 'other',   label: 'Other field' },
           ],
         },
         {
           name: 'requestedChanges',
-          label: 'Requested Changes',
+          label: 'New Value / Description of Change',
           type: 'textarea',
-          placeholder: 'Describe the changes needed (min 10 characters)...',
+          placeholder: 'Enter the corrected value or describe the change needed (min 10 characters)...',
           required: true,
           minLength: 10,
         },
@@ -714,37 +561,132 @@ export function ContactActionBar({
         ...formData,
       }),
     },
-    {
-      type: 'front_desk_upload_document',
-      label: 'Upload Document',
-      icon: <Upload className="w-4 h-4" />,
-      color: 'bg-cyan-600 hover:bg-cyan-700 text-white',
-      fields: [
-        {
-          name: 'documentType',
-          label: 'Document Type',
-          type: 'text',
-          placeholder: 'e.g. ID, passport, contract',
-          required: true,
-        },
-        {
-          name: 'fileName',
-          label: 'File Name',
-          type: 'text',
-          placeholder: 'e.g. passport-scan.pdf',
-          required: true,
-        },
-        {
-          name: 'storagePath',
-          label: 'Storage Path',
-          type: 'text',
-          placeholder: 'e.g. /uploads/contacts/...',
-          required: true,
-        },
-      ],
-      buildInput: (formData) => ({ ...formData }),
-    },
+    // Upload Document uses its own dedicated dialog (UploadDocumentDialog)
   ]
+
+  // ─── Upload Document Mutation ─────────────────────────────────────────────
+
+  const uploadDocMutation = useMutation({
+    mutationFn: async (input: Record<string, unknown>) => {
+      const res = await fetch('/api/actions/front_desk_upload_document', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          input,
+          source: 'front_desk',
+          idempotencyKey: `front_desk_upload_document:${contactId}:${Math.floor(Date.now() / 5000)}`,
+        }),
+      })
+      if (!res.ok) {
+        const data = await res.json()
+        throw new Error(data.error ?? 'Action failed')
+      }
+      return res.json()
+    },
+    onSuccess: () => {
+      setUploadDocOpen(false)
+      setRecentSuccess('front_desk_upload_document')
+      toast.success('Document saved')
+      queryClient.invalidateQueries({ queryKey: frontDeskKeys.all })
+      setTimeout(() => setRecentSuccess(null), 3000)
+    },
+    onError: (err: Error) => {
+      toast.error(err.message)
+    },
+  })
+
+  // ─── Log Meeting Mutation ─────────────────────────────────────────────────
+
+  const logMeetingMutation = useMutation({
+    mutationFn: async (input: Record<string, unknown>) => {
+      const res = await fetch('/api/actions/front_desk_log_meeting', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          input,
+          source: 'front_desk',
+          idempotencyKey: `front_desk_log_meeting:${contactId}:${Math.floor(Date.now() / 5000)}`,
+        }),
+      })
+      if (!res.ok) {
+        const data = await res.json()
+        throw new Error(data.error ?? 'Action failed')
+      }
+      return res.json()
+    },
+    onSuccess: () => {
+      setLogMeetingOpen(false)
+      setRecentSuccess('front_desk_log_meeting')
+      toast.success('Meeting logged successfully')
+      queryClient.invalidateQueries({ queryKey: frontDeskKeys.all })
+      setTimeout(() => setRecentSuccess(null), 3000)
+    },
+    onError: (err: Error) => {
+      toast.error(err.message)
+    },
+  })
+
+  // ─── Create Task Mutation ─────────────────────────────────────────────────
+
+  const createTaskMutation = useMutation({
+    mutationFn: async (input: Record<string, unknown>) => {
+      const res = await fetch('/api/actions/front_desk_create_task', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          input,
+          source: 'front_desk',
+          idempotencyKey: `front_desk_create_task:${contactId}:${Math.floor(Date.now() / 5000)}`,
+        }),
+      })
+      if (!res.ok) {
+        const data = await res.json()
+        throw new Error(data.error ?? 'Action failed')
+      }
+      return res.json()
+    },
+    onSuccess: () => {
+      setCreateTaskOpen(false)
+      setRecentSuccess('front_desk_create_task')
+      toast.success('Task created successfully')
+      queryClient.invalidateQueries({ queryKey: frontDeskKeys.all })
+      setTimeout(() => setRecentSuccess(null), 3000)
+    },
+    onError: (err: Error) => {
+      toast.error(err.message)
+    },
+  })
+
+  // ─── Notify Staff Mutation ────────────────────────────────────────────────
+
+  const notifyStaffMutation = useMutation({
+    mutationFn: async (input: Record<string, unknown>) => {
+      const res = await fetch('/api/actions/front_desk_notify_staff', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          input,
+          source: 'front_desk',
+          idempotencyKey: `front_desk_notify_staff:${contactId}:${Math.floor(Date.now() / 5000)}`,
+        }),
+      })
+      if (!res.ok) {
+        const data = await res.json()
+        throw new Error(data.error ?? 'Action failed')
+      }
+      return res.json()
+    },
+    onSuccess: () => {
+      setNotifyStaffOpen(false)
+      setRecentSuccess('front_desk_notify_staff')
+      toast.success('Staff notified')
+      queryClient.invalidateQueries({ queryKey: frontDeskKeys.all })
+      setTimeout(() => setRecentSuccess(null), 3000)
+    },
+    onError: (err: Error) => {
+      toast.error(err.message)
+    },
+  })
 
   // ─── Submit Handler ─────────────────────────────────────────────────────
 
@@ -795,24 +737,95 @@ export function ContactActionBar({
 
   // ─── Filter groups by config ────────────────────────────────────────────
 
-  const filteredOtherActions = otherActions.filter((a) => {
-    if (a.type === 'front_desk_upload_document' && config.show_action_documents === false) return false
-    return true
-  })
+  // otherActions now only contains Request Edit (Upload Document has its own dialog)
+  const filteredOtherActions = otherActions
 
   return (
     <div className="space-y-3">
-      {renderGroup('Communication', communicationActions)}
-      {config.show_action_appointments !== false && renderGroup('Appointments', appointmentActions)}
-      {config.show_action_tasks !== false && renderGroup('Tasks', taskActions)}
+      {/* Communication group — Log Meeting button is rendered here outside the generic list */}
+      <div className="space-y-1.5">
+        <span className="text-[11px] font-medium uppercase tracking-wider text-slate-400">
+          Communication
+        </span>
+        <div className="flex flex-wrap gap-2">
+          {communicationActions.map(renderActionButton)}
+          {/* Notify Staff — dedicated dialog */}
+          <Button
+            onClick={() => setNotifyStaffOpen(true)}
+            className="bg-purple-600 hover:bg-purple-700 text-white"
+            size="sm"
+          >
+            {recentSuccess === 'front_desk_notify_staff' ? (
+              <CheckCircle2 className="w-4 h-4 mr-1.5" />
+            ) : (
+              <span className="mr-1.5"><Bell className="w-4 h-4" /></span>
+            )}
+            Notify Staff
+          </Button>
+          {/* Log Meeting — dedicated dialog */}
+          <Button
+            onClick={() => setLogMeetingOpen(true)}
+            className="bg-violet-600 hover:bg-violet-700 text-white"
+            size="sm"
+          >
+            {recentSuccess === 'front_desk_log_meeting' ? (
+              <CheckCircle2 className="w-4 h-4 mr-1.5" />
+            ) : (
+              <span className="mr-1.5"><Video className="w-4 h-4" /></span>
+            )}
+            Log Meeting
+          </Button>
+        </div>
+      </div>
 
-      {/* Other group — includes the New Walk-In button */}
+      {config.show_action_appointments !== false && renderGroup('Appointments', appointmentActions)}
+
+      {/* Tasks group — uses dedicated CreateTaskDialog */}
+      {config.show_action_tasks !== false && (
+        <div className="space-y-1.5">
+          <span className="text-[11px] font-medium uppercase tracking-wider text-slate-400">
+            Tasks
+          </span>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              onClick={() => setCreateTaskOpen(true)}
+              className="bg-indigo-600 hover:bg-indigo-700 text-white"
+              size="sm"
+            >
+              {recentSuccess === 'front_desk_create_task' ? (
+                <CheckCircle2 className="w-4 h-4 mr-1.5" />
+              ) : (
+                <span className="mr-1.5"><ListPlus className="w-4 h-4" /></span>
+              )}
+              Create Task
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* Other group — includes Upload Document, Request Edit, and New Walk-In */}
       <div className="space-y-1.5">
         <span className="text-[11px] font-medium uppercase tracking-wider text-slate-400">
           Other
         </span>
         <div className="flex flex-wrap gap-2">
           {filteredOtherActions.map(renderActionButton)}
+
+          {/* Upload Document — dedicated dialog */}
+          {config.show_action_documents !== false && (
+            <Button
+              onClick={() => setUploadDocOpen(true)}
+              className="bg-cyan-600 hover:bg-cyan-700 text-white"
+              size="sm"
+            >
+              {recentSuccess === 'front_desk_upload_document' ? (
+                <CheckCircle2 className="w-4 h-4 mr-1.5" />
+              ) : (
+                <span className="mr-1.5"><Upload className="w-4 h-4" /></span>
+              )}
+              Upload Document
+            </Button>
+          )}
 
           {/* New Walk-In — fires callback instead of opening a dialog */}
           {config.show_action_walk_in !== false && (
@@ -845,6 +858,50 @@ export function ContactActionBar({
           onSubmit={handleSubmit}
         />
       )}
+
+      {/* Notify Staff Dialog */}
+      <NotifyStaffDialog
+        isOpen={notifyStaffOpen}
+        isSubmitting={notifyStaffMutation.isPending}
+        staffOptions={staffOptions}
+        onClose={() => setNotifyStaffOpen(false)}
+        onSubmit={(data) => notifyStaffMutation.mutate(data as unknown as Record<string, unknown>)}
+      />
+
+      {/* Create Task Dialog */}
+      <CreateTaskDialog
+        isOpen={createTaskOpen}
+        isSubmitting={createTaskMutation.isPending}
+        staffOptions={staffOptions}
+        matterOptions={matterOptions}
+        onClose={() => setCreateTaskOpen(false)}
+        onSubmit={(data) => createTaskMutation.mutate({
+          ...data,
+          contactId,
+        })}
+      />
+
+      {/* Log Meeting Dialog */}
+      <LogMeetingDialog
+        isOpen={logMeetingOpen}
+        isSubmitting={logMeetingMutation.isPending}
+        contactName={contactName}
+        contactId={contactId}
+        matterOptions={matterOptions}
+        onClose={() => setLogMeetingOpen(false)}
+        onSubmit={(data) => logMeetingMutation.mutate(data as unknown as Record<string, unknown>)}
+      />
+
+      {/* Upload Document Dialog */}
+      <UploadDocumentDialog
+        isOpen={uploadDocOpen}
+        isSubmitting={uploadDocMutation.isPending}
+        contactId={contactId}
+        contactName={contactName}
+        matterOptions={matterOptions}
+        onClose={() => setUploadDocOpen(false)}
+        onSubmit={(data) => uploadDocMutation.mutate(data as unknown as Record<string, unknown>)}
+      />
     </div>
   )
 }

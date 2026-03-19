@@ -1,11 +1,21 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { useMutation } from '@tanstack/react-query'
-import { UserPlus, ArrowRight, ArrowLeft, Loader2 } from 'lucide-react'
+import { UserPlus, ArrowRight, ArrowLeft, Loader2, CheckCircle2, QrCode } from 'lucide-react'
 import { toast } from 'sonner'
 import { useTenant } from '@/lib/hooks/use-tenant'
-import { useFrontDeskPracticeAreas, useFrontDeskConfig } from '@/lib/queries/front-desk-queries'
+import {
+  useFrontDeskPracticeAreas,
+  useFrontDeskConfig,
+  useTenantKioskQuestions,
+  useTenantKioskUrl,
+  type TenantKioskQuestion,
+} from '@/lib/queries/front-desk-queries'
+import {
+  DEFAULT_SCREENING_QUESTIONS as SHARED_SCREENING_QUESTIONS,
+  evaluateScreeningCondition,
+} from '@/lib/utils/screening-questions'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -44,9 +54,358 @@ interface Step2Data {
   practiceAreaId: string
   urgency: string
   reason: string
+  retaining: boolean // contacts only: will they be retaining for services?
 }
 
-// ─── Component ──────────────────────────────────────────────────────────────
+type FieldCondition = NonNullable<TenantKioskQuestion['condition']>
+
+// ─── Country List ─────────────────────────────────────────────────────────────
+
+const ALL_COUNTRIES = [
+  'Afghanistan','Albania','Algeria','Andorra','Angola','Antigua and Barbuda','Argentina','Armenia',
+  'Australia','Austria','Azerbaijan','Bahamas','Bahrain','Bangladesh','Barbados','Belarus','Belgium',
+  'Belize','Benin','Bhutan','Bolivia','Bosnia and Herzegovina','Botswana','Brazil','Brunei',
+  'Bulgaria','Burkina Faso','Burundi','Cabo Verde','Cambodia','Cameroon','Canada',
+  'Central African Republic','Chad','Chile','China','Colombia','Comoros','Congo (Brazzaville)',
+  'Congo (Kinshasa)','Costa Rica','Croatia','Cuba','Cyprus','Czech Republic','Denmark','Djibouti',
+  'Dominica','Dominican Republic','Ecuador','Egypt','El Salvador','Equatorial Guinea','Eritrea',
+  'Estonia','Eswatini','Ethiopia','Fiji','Finland','France','Gabon','Gambia','Georgia','Germany',
+  'Ghana','Greece','Grenada','Guatemala','Guinea','Guinea-Bissau','Guyana','Haiti','Honduras',
+  'Hungary','Iceland','India','Indonesia','Iran','Iraq','Ireland','Israel','Italy','Jamaica',
+  'Japan','Jordan','Kazakhstan','Kenya','Kiribati','Kosovo','Kuwait','Kyrgyzstan','Laos','Latvia',
+  'Lebanon','Lesotho','Liberia','Libya','Liechtenstein','Lithuania','Luxembourg','Madagascar',
+  'Malawi','Malaysia','Maldives','Mali','Malta','Marshall Islands','Mauritania','Mauritius',
+  'Mexico','Micronesia','Moldova','Monaco','Mongolia','Montenegro','Morocco','Mozambique',
+  'Myanmar','Namibia','Nauru','Nepal','Netherlands','New Zealand','Nicaragua','Niger','Nigeria',
+  'North Korea','North Macedonia','Norway','Oman','Pakistan','Palau','Palestine','Panama',
+  'Papua New Guinea','Paraguay','Peru','Philippines','Poland','Portugal','Qatar','Romania',
+  'Russia','Rwanda','Saint Kitts and Nevis','Saint Lucia','Saint Vincent and the Grenadines',
+  'Samoa','San Marino','Sao Tome and Principe','Saudi Arabia','Senegal','Serbia','Seychelles',
+  'Sierra Leone','Singapore','Slovakia','Slovenia','Solomon Islands','Somalia','South Africa',
+  'South Korea','South Sudan','Spain','Sri Lanka','Sudan','Suriname','Sweden','Switzerland',
+  'Syria','Taiwan','Tajikistan','Tanzania','Thailand','Timor-Leste','Togo','Tonga',
+  'Trinidad and Tobago','Tunisia','Turkey','Turkmenistan','Tuvalu','Uganda','Ukraine',
+  'United Arab Emirates','United Kingdom','United States','Uruguay','Uzbekistan','Vanuatu',
+  'Vatican City','Venezuela','Vietnam','Yemen','Zambia','Zimbabwe',
+]
+
+// ─── Default Screening Questions ─────────────────────────────────────────────
+// Imported from shared utils — single source of truth for the full question set.
+// Cast to TenantKioskQuestion[] so the ScreeningQuestions renderer accepts them.
+
+const DEFAULT_SCREENING_QUESTIONS = SHARED_SCREENING_QUESTIONS as unknown as TenantKioskQuestion[]
+
+// ─── Condition Evaluator ─────────────────────────────────────────────────────
+// Delegates to the shared utility so logic is consistent with the display panel.
+
+function evaluateCondition(
+  condition: FieldCondition,
+  answers: Record<string, string | string[]>,
+): boolean {
+  return evaluateScreeningCondition(
+    condition as Parameters<typeof evaluateScreeningCondition>[0],
+    answers,
+  )
+}
+
+// ─── Country Picker ───────────────────────────────────────────────────────────
+
+function CountryPicker({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const [search, setSearch] = useState('')
+  const filtered = ALL_COUNTRIES.filter((c) =>
+    c.toLowerCase().includes(search.toLowerCase())
+  )
+  return (
+    <div className="space-y-1.5">
+      <Input
+        value={search || value}
+        onChange={(e) => { setSearch(e.target.value); if (!e.target.value) onChange('') }}
+        placeholder="Search country…"
+        className="h-9 text-sm"
+      />
+      {search && (
+        <div className="border rounded-md max-h-36 overflow-y-auto bg-white shadow-sm">
+          {filtered.length === 0 && (
+            <p className="px-3 py-2 text-xs text-muted-foreground">No matches</p>
+          )}
+          {filtered.map((c) => (
+            <button
+              key={c}
+              type="button"
+              onClick={() => { onChange(c); setSearch('') }}
+              className="w-full text-left px-3 py-1.5 text-sm hover:bg-accent transition-colors"
+            >
+              {c}
+            </button>
+          ))}
+        </div>
+      )}
+      {value && !search && (
+        <p className="text-xs text-green-700 font-medium">✓ {value}</p>
+      )}
+    </div>
+  )
+}
+
+// ─── Screening Questions Renderer ────────────────────────────────────────────
+// One question at a time — compact stepper with progress bar.
+
+function ScreeningQuestions({
+  questions,
+  answers,
+  onAnswer,
+  onReady,       // called when all visible required questions are answered
+  submitError,
+}: {
+  questions: TenantKioskQuestion[]
+  answers: Record<string, string | string[]>
+  onAnswer: (id: string, value: string | string[]) => void
+  onReady?: (ready: boolean) => void
+  submitError?: string | null
+}) {
+  const [qIndex, setQIndex] = useState(0)
+
+  const visibleQuestions = questions.filter((q) => {
+    if (!q.condition) return true
+    return evaluateCondition(q.condition, answers)
+  })
+
+  // Keep index in bounds if visible questions shrink (conditional removal)
+  const safeIndex = Math.min(qIndex, Math.max(visibleQuestions.length - 1, 0))
+  const q = visibleQuestions[safeIndex]
+  const total = visibleQuestions.length
+  const isFirst = safeIndex === 0
+  const isLast = safeIndex === total - 1
+
+  const hasAnswer = (id: string) => {
+    const a = answers[id]
+    if (Array.isArray(a)) return a.length > 0
+    return !!a
+  }
+
+  const currentAnswered = q ? hasAnswer(q.id) : false
+  const allRequiredDone = visibleQuestions
+    .filter((vq) => vq.is_required)
+    .every((vq) => hasAnswer(vq.id))
+
+  // Notify parent whenever readiness changes
+  useEffect(() => {
+    onReady?.(allRequiredDone)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [allRequiredDone])
+
+  if (visibleQuestions.length === 0) {
+    return (
+      <div className="py-6 text-center">
+        <p className="text-sm text-muted-foreground italic">No screening questions configured.</p>
+      </div>
+    )
+  }
+
+  const goNext = () => { if (!isLast) setQIndex(safeIndex + 1) }
+  const goPrev = () => { if (!isFirst) setQIndex(safeIndex - 1) }
+
+  return (
+    <div className="space-y-3">
+      {/* Progress bar + counter */}
+      <div className="flex items-center gap-2">
+        <div className="flex-1 h-1.5 rounded-full bg-slate-100 overflow-hidden">
+          <div
+            className="h-full rounded-full bg-blue-500 transition-all duration-300"
+            style={{ width: `${((safeIndex + 1) / total) * 100}%` }}
+          />
+        </div>
+        <span className="text-xs text-muted-foreground tabular-nums shrink-0">
+          {safeIndex + 1} / {total}
+        </span>
+      </div>
+
+      {/* Question card */}
+      {q && (
+        <div className="rounded-lg border border-slate-200 bg-slate-50/60 p-4 space-y-3">
+          {/* Label */}
+          <div>
+            <p className="text-sm font-medium text-foreground leading-snug">
+              {q.label}
+              {q.is_required && <span className="text-red-500 ml-1">*</span>}
+            </p>
+            {q.description && (
+              <p className="text-xs text-muted-foreground mt-0.5">{q.description}</p>
+            )}
+          </div>
+
+          {/* Boolean */}
+          {q.field_type === 'boolean' && (
+            <div className="grid grid-cols-2 gap-2">
+              {(['yes', 'no'] as const).map((val) => {
+                const sel = answers[q.id] === val
+                return (
+                  <button
+                    key={val}
+                    type="button"
+                    onClick={() => { onAnswer(q.id, val); if (!isLast) setTimeout(goNext, 180) }}
+                    className={`rounded-lg border-2 py-2.5 text-sm font-semibold transition-all ${
+                      sel
+                        ? val === 'yes'
+                          ? 'border-green-500 bg-green-50 text-green-700'
+                          : 'border-red-400 bg-red-50 text-red-700'
+                        : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'
+                    }`}
+                  >
+                    {val === 'yes' ? 'Yes' : 'No'}
+                  </button>
+                )
+              })}
+            </div>
+          )}
+
+          {/* Select */}
+          {q.field_type === 'select' && q.options && (
+            <div className="flex flex-col gap-1">
+              {q.options.map((opt) => {
+                const sel = answers[q.id] === opt.value
+                return (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => { onAnswer(q.id, opt.value); if (!isLast) setTimeout(goNext, 180) }}
+                    className={`w-full text-left rounded-md border px-3 py-2 text-sm transition-all ${
+                      sel
+                        ? 'border-blue-500 bg-blue-50 text-blue-700 font-medium'
+                        : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50'
+                    }`}
+                  >
+                    {sel && <span className="mr-2 text-blue-500">✓</span>}
+                    {opt.label}
+                  </button>
+                )
+              })}
+            </div>
+          )}
+
+          {/* Multi-select */}
+          {q.field_type === 'multi_select' && q.options && (
+            <div className="flex flex-col gap-1">
+              {q.options.map((opt) => {
+                const current = (answers[q.id] as string[] | undefined) ?? []
+                const sel = current.includes(opt.value)
+                return (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => {
+                      onAnswer(q.id, sel ? current.filter((v) => v !== opt.value) : [...current, opt.value])
+                    }}
+                    className={`w-full text-left rounded-md border px-3 py-2 text-sm transition-all ${
+                      sel
+                        ? 'border-blue-500 bg-blue-50 text-blue-700 font-medium'
+                        : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300'
+                    }`}
+                  >
+                    {sel && <span className="mr-2 text-blue-500">✓</span>}
+                    {opt.label}
+                  </button>
+                )
+              })}
+            </div>
+          )}
+
+          {/* Text */}
+          {q.field_type === 'text' && (
+            <Input
+              value={(answers[q.id] as string) ?? ''}
+              onChange={(e) => onAnswer(q.id, e.target.value)}
+              className="h-9 text-sm"
+              placeholder="Type your answer…"
+            />
+          )}
+
+          {/* Textarea */}
+          {q.field_type === 'textarea' && (
+            <Textarea
+              value={(answers[q.id] as string) ?? ''}
+              onChange={(e) => onAnswer(q.id, e.target.value)}
+              rows={2}
+              className="text-sm resize-none"
+              placeholder="Type your answer…"
+            />
+          )}
+
+          {/* Date */}
+          {q.field_type === 'date' && (
+            <Input
+              type="date"
+              value={(answers[q.id] as string) ?? ''}
+              onChange={(e) => onAnswer(q.id, e.target.value)}
+              className="h-9 text-sm"
+            />
+          )}
+
+          {/* Country */}
+          {q.field_type === 'country' && (
+            <CountryPicker
+              value={(answers[q.id] as string) ?? ''}
+              onChange={(v) => onAnswer(q.id, v)}
+            />
+          )}
+        </div>
+      )}
+
+      {/* Prev / Next navigation */}
+      <div className="flex items-center justify-between gap-2">
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={goPrev}
+          disabled={isFirst}
+          className="text-xs"
+        >
+          <ArrowLeft className="w-3.5 h-3.5 mr-1" />
+          Prev
+        </Button>
+
+        {/* Answered dots */}
+        <div className="flex gap-1 flex-wrap justify-center">
+          {visibleQuestions.map((vq, i) => (
+            <button
+              key={vq.id}
+              type="button"
+              onClick={() => setQIndex(i)}
+              className={`w-2 h-2 rounded-full transition-all ${
+                i === safeIndex
+                  ? 'bg-blue-500 scale-125'
+                  : hasAnswer(vq.id)
+                    ? 'bg-green-400'
+                    : 'bg-slate-200'
+              }`}
+              title={vq.label}
+            />
+          ))}
+        </div>
+
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={goNext}
+          disabled={isLast}
+          className="text-xs"
+        >
+          Next
+          <ArrowRight className="w-3.5 h-3.5 ml-1" />
+        </Button>
+      </div>
+
+      {/* Required unanswered reminder */}
+      {submitError && (
+        <p className="text-xs text-red-600 font-medium text-center">{submitError}</p>
+      )}
+    </div>
+  )
+}
+
+// ─── Main Component ──────────────────────────────────────────────────────────
 
 export function QuickCreate({ onCreated }: QuickCreateProps) {
   const { tenant } = useTenant()
@@ -54,10 +413,14 @@ export function QuickCreate({ onCreated }: QuickCreateProps) {
 
   const { data: practiceAreas } = useFrontDeskPracticeAreas(tenantId)
   const { data: config } = useFrontDeskConfig(tenantId)
+  const { data: kioskQuestions } = useTenantKioskQuestions(tenantId)
+  const { data: kioskUrl } = useTenantKioskUrl(tenantId)
 
-  const [step, setStep] = useState<1 | 2>(1)
+  const [step, setStep] = useState<1 | 2 | 3 | 4>(1)
   const [step1Errors, setStep1Errors] = useState<Record<string, string>>({})
   const [step2Errors, setStep2Errors] = useState<Record<string, string>>({})
+  const [screeningErrors, setScreeningErrors] = useState<string | null>(null)
+  const [screeningAnswers, setScreeningAnswers] = useState<Record<string, string | string[]>>({})
 
   // Step 1 fields
   const [step1, setStep1] = useState<Step1Data>({
@@ -78,7 +441,55 @@ export function QuickCreate({ onCreated }: QuickCreateProps) {
     practiceAreaId: '',
     urgency: 'medium',
     reason: '',
+    retaining: false,
   })
+
+  // ─── Derived ────────────────────────────────────────────────────────────
+
+  const languages = config?.languages ?? [
+    'English',
+    'French',
+    'Arabic',
+    'Punjabi',
+    'Urdu',
+    'Hindi',
+    'Mandarin',
+    'Cantonese',
+    'Tagalog',
+    'Portuguese',
+    'Spanish',
+    'Italian',
+    'Polish',
+    'Romanian',
+    'Tamil',
+    'Bengali',
+    'Gujarati',
+    'Korean',
+    'Vietnamese',
+    'Persian (Farsi)',
+    'Turkish',
+    'Somali',
+    'Amharic',
+    'Russian',
+    'Ukrainian',
+    'Greek',
+    'Tigrinya',
+    'Swahili',
+    'Pashto',
+    'Other',
+  ]
+  const sources = config?.sources ?? ['Walk-in', 'Phone', 'Website', 'Referral', 'Other']
+
+  // Show screening if: lead (always) or contact who is retaining
+  const showScreening = step2.entityType === 'lead' || step2.retaining
+
+  // Total step count for badge
+  const totalSteps =
+    step2.entityType === 'lead'
+      ? 4
+      : step2.retaining
+        ? 3
+        : 2
 
   // ─── Mutation ───────────────────────────────────────────────────────────
 
@@ -102,6 +513,7 @@ export function QuickCreate({ onCreated }: QuickCreateProps) {
             practiceAreaId: step2.practiceAreaId,
             urgency: step2.urgency,
             reason: step2.reason.trim(),
+            screeningAnswers: Object.keys(screeningAnswers).length > 0 ? screeningAnswers : undefined,
           },
           source: 'front_desk',
           idempotencyKey: `front_desk_create_intake:${Date.now()}`,
@@ -114,14 +526,6 @@ export function QuickCreate({ onCreated }: QuickCreateProps) {
       }
 
       return res.json()
-    },
-    onSuccess: () => {
-      toast.success('Intake created successfully')
-      resetForm()
-      onCreated?.()
-    },
-    onError: (err: Error) => {
-      toast.error(err.message)
     },
   })
 
@@ -141,43 +545,94 @@ export function QuickCreate({ onCreated }: QuickCreateProps) {
     } else if (step1.phone.trim().length < 7) {
       errors.phone = 'Phone must be at least 7 characters'
     }
+    if (!step1.email.trim()) {
+      errors.email = 'Email is required'
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(step1.email.trim())) {
+      errors.email = 'Enter a valid email address'
+    }
 
     setStep1Errors(errors)
     return Object.keys(errors).length === 0
   }
 
   function validateStep2(): boolean {
-    const errors: Record<string, string> = {}
+    // practiceAreaId is optional — no required fields remain on this step
+    setStep2Errors({})
+    return true
+  }
 
-    if (!step2.practiceAreaId) {
-      errors.practiceAreaId = 'Practice area is required'
-    }
-    if (!step2.reason.trim()) {
-      errors.reason = 'Reason is required'
-    } else if (step2.reason.trim().length < 10) {
-      errors.reason = 'Reason must be at least 10 characters'
-    }
+  function validateScreening(): boolean {
+    const questions = (kioskQuestions && kioskQuestions.length > 0) ? kioskQuestions : DEFAULT_SCREENING_QUESTIONS
+    const visibleQs = questions.filter((q) => {
+      if (!q.condition) return true
+      return evaluateCondition(q.condition, screeningAnswers)
+    })
+    const unanswered = visibleQs.filter((q) => {
+      if (!q.is_required) return false
+      const answer = screeningAnswers[q.id]
+      if (Array.isArray(answer)) return answer.length === 0
+      return !answer
+    })
 
-    setStep2Errors(errors)
-    return Object.keys(errors).length === 0
+    if (unanswered.length > 0) {
+      setScreeningErrors(`Please answer all required questions (${unanswered.length} remaining)`)
+      return false
+    }
+    setScreeningErrors(null)
+    return true
   }
 
   // ─── Handlers ───────────────────────────────────────────────────────────
 
   function handleNext() {
-    if (validateStep1()) {
-      setStep(2)
-    }
+    if (validateStep1()) setStep(2)
   }
 
-  function handleBack() {
+  function handleBackToStep1() {
     setStep(1)
     setStep2Errors({})
   }
 
-  function handleSubmit() {
+  function handleBackToStep2() {
+    setStep(2)
+    setScreeningErrors(null)
+  }
+
+  async function handleStep2Continue() {
     if (!validateStep2()) return
-    createMutation.mutate()
+
+    if (showScreening) {
+      // Go to screening step
+      setStep(3)
+    } else {
+      // No screening — submit now
+      try {
+        await createMutation.mutateAsync()
+        toast.success('Intake created successfully')
+        resetForm()
+        onCreated?.()
+      } catch (err) {
+        toast.error((err as Error).message)
+      }
+    }
+  }
+
+  async function handleScreeningSubmit() {
+    if (!validateScreening()) return
+
+    try {
+      await createMutation.mutateAsync()
+      toast.success('Intake created successfully')
+      if (step2.entityType === 'lead') {
+        // Show QR code step for leads
+        setStep(4)
+      } else {
+        resetForm()
+        onCreated?.()
+      }
+    } catch (err) {
+      toast.error((err as Error).message)
+    }
   }
 
   function resetForm() {
@@ -198,9 +653,17 @@ export function QuickCreate({ onCreated }: QuickCreateProps) {
       practiceAreaId: '',
       urgency: 'medium',
       reason: '',
+      retaining: false,
     })
+    setScreeningAnswers({})
     setStep1Errors({})
     setStep2Errors({})
+    setScreeningErrors(null)
+  }
+
+  function handleDone() {
+    resetForm()
+    onCreated?.()
   }
 
   function updateStep1<K extends keyof Step1Data>(field: K, value: Step1Data[K]) {
@@ -221,10 +684,17 @@ export function QuickCreate({ onCreated }: QuickCreateProps) {
     })
   }
 
-  // ─── Derived ────────────────────────────────────────────────────────────
+  const handleAnswer = useCallback((id: string, value: string | string[]) => {
+    setScreeningAnswers((prev) => ({ ...prev, [id]: value }))
+    setScreeningErrors(null)
+  }, [])
 
-  const languages = config?.languages ?? ['English', 'French']
-  const sources = config?.sources ?? ['Walk-in', 'Phone', 'Website', 'Referral', 'Other']
+  // ─── Step badge label ────────────────────────────────────────────────────
+
+  const stepBadgeLabel =
+    step === 1
+      ? 'Step 1'
+      : `Step ${step} of ${totalSteps}`
 
   // ─── Render ─────────────────────────────────────────────────────────────
 
@@ -236,17 +706,19 @@ export function QuickCreate({ onCreated }: QuickCreateProps) {
             <UserPlus className="w-5 h-5" />
             Quick Create
           </div>
-          <Badge variant="secondary" className="text-xs">
-            Step {step} of 2
-          </Badge>
+          {step < 4 && (
+            <Badge variant="secondary" className="text-xs">
+              {stepBadgeLabel}
+            </Badge>
+          )}
         </CardTitle>
       </CardHeader>
 
       <CardContent>
-        {step === 1 ? (
-          /* ────────────────── Step 1: Minimal Intake ────────────────── */
+
+        {/* ────────────────── Step 1: Personal Info ────────────────── */}
+        {step === 1 && (
           <div className="space-y-4">
-            {/* First Name */}
             <div className="space-y-1.5">
               <Label htmlFor="qc-firstName">
                 First Name <span className="text-red-500">*</span>
@@ -262,7 +734,6 @@ export function QuickCreate({ onCreated }: QuickCreateProps) {
               )}
             </div>
 
-            {/* Last Name */}
             <div className="space-y-1.5">
               <Label htmlFor="qc-lastName">
                 Last Name <span className="text-red-500">*</span>
@@ -278,7 +749,6 @@ export function QuickCreate({ onCreated }: QuickCreateProps) {
               )}
             </div>
 
-            {/* Date of Birth */}
             <div className="space-y-1.5">
               <Label htmlFor="qc-dob">Date of Birth</Label>
               <Input
@@ -289,7 +759,6 @@ export function QuickCreate({ onCreated }: QuickCreateProps) {
               />
             </div>
 
-            {/* Phone */}
             <div className="space-y-1.5">
               <Label htmlFor="qc-phone">
                 Phone <span className="text-red-500">*</span>
@@ -305,19 +774,22 @@ export function QuickCreate({ onCreated }: QuickCreateProps) {
               )}
             </div>
 
-            {/* Email */}
             <div className="space-y-1.5">
-              <Label htmlFor="qc-email">Email</Label>
+              <Label htmlFor="qc-email">
+                Email <span className="text-red-500">*</span>
+              </Label>
               <Input
                 id="qc-email"
                 type="email"
                 value={step1.email}
                 onChange={(e) => updateStep1('email', e.target.value)}
-                placeholder="Email (optional)"
+                placeholder="Email address"
               />
+              {step1Errors.email && (
+                <p className="text-xs text-red-600">{step1Errors.email}</p>
+              )}
             </div>
 
-            {/* Preferred Contact Method */}
             <div className="space-y-1.5">
               <Label>Preferred Contact Method</Label>
               <Select
@@ -335,7 +807,6 @@ export function QuickCreate({ onCreated }: QuickCreateProps) {
               </Select>
             </div>
 
-            {/* Language */}
             <div className="space-y-1.5">
               <Label>Language</Label>
               <Select
@@ -346,7 +817,7 @@ export function QuickCreate({ onCreated }: QuickCreateProps) {
                   <SelectValue placeholder="Select language" />
                 </SelectTrigger>
                 <SelectContent>
-                  {languages.map((lang) => (
+                  {languages.filter(Boolean).map((lang) => (
                     <SelectItem key={lang} value={lang}>
                       {lang}
                     </SelectItem>
@@ -355,7 +826,6 @@ export function QuickCreate({ onCreated }: QuickCreateProps) {
               </Select>
             </div>
 
-            {/* Source */}
             <div className="space-y-1.5">
               <Label>Source / How They Heard About Us</Label>
               <Select
@@ -366,7 +836,7 @@ export function QuickCreate({ onCreated }: QuickCreateProps) {
                   <SelectValue placeholder="Select source" />
                 </SelectTrigger>
                 <SelectContent>
-                  {sources.map((src) => (
+                  {sources.filter(Boolean).map((src) => (
                     <SelectItem key={src} value={src}>
                       {src}
                     </SelectItem>
@@ -375,7 +845,6 @@ export function QuickCreate({ onCreated }: QuickCreateProps) {
               </Select>
             </div>
 
-            {/* Appointment Requested */}
             <div className="flex items-center justify-between rounded-lg border border-slate-200 p-3">
               <Label htmlFor="qc-appointment" className="cursor-pointer">
                 Appointment Requested?
@@ -383,20 +852,19 @@ export function QuickCreate({ onCreated }: QuickCreateProps) {
               <Switch
                 id="qc-appointment"
                 checked={step1.appointmentRequested}
-                onCheckedChange={(checked) =>
-                  updateStep1('appointmentRequested', checked === true)
-                }
+                onCheckedChange={(checked) => updateStep1('appointmentRequested', checked === true)}
               />
             </div>
 
-            {/* Next Button */}
             <Button onClick={handleNext} className="w-full">
               Next
               <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
           </div>
-        ) : (
-          /* ────────────────── Step 2: Classification ────────────────── */
+        )}
+
+        {/* ────────────────── Step 2: Classification ────────────────── */}
+        {step === 2 && (
           <div className="space-y-4">
             {/* Lead vs Contact */}
             <div className="space-y-1.5">
@@ -428,6 +896,25 @@ export function QuickCreate({ onCreated }: QuickCreateProps) {
                 </button>
               </div>
             </div>
+
+            {/* Contact-only: retaining toggle */}
+            {step2.entityType === 'contact' && (
+              <div className="flex items-center justify-between rounded-lg border border-amber-200 bg-amber-50 p-3">
+                <div>
+                  <Label htmlFor="qc-retaining" className="cursor-pointer text-amber-800 font-medium">
+                    Retaining for services?
+                  </Label>
+                  <p className="text-xs text-amber-600 mt-0.5">
+                    Enable to collect screening information
+                  </p>
+                </div>
+                <Switch
+                  id="qc-retaining"
+                  checked={step2.retaining}
+                  onCheckedChange={(checked) => updateStep2('retaining', checked === true)}
+                />
+              </div>
+            )}
 
             {/* Practice Area */}
             <div className="space-y-1.5">
@@ -472,28 +959,11 @@ export function QuickCreate({ onCreated }: QuickCreateProps) {
               </Select>
             </div>
 
-            {/* Brief Reason */}
-            <div className="space-y-1.5">
-              <Label htmlFor="qc-reason">
-                Brief Reason <span className="text-red-500">*</span>
-              </Label>
-              <Textarea
-                id="qc-reason"
-                value={step2.reason}
-                onChange={(e) => updateStep2('reason', e.target.value)}
-                placeholder="Brief description of their enquiry (min 10 characters)..."
-                rows={3}
-              />
-              {step2Errors.reason && (
-                <p className="text-xs text-red-600">{step2Errors.reason}</p>
-              )}
-            </div>
-
-            {/* Back + Submit Buttons */}
+            {/* Back + Continue */}
             <div className="flex gap-3">
               <Button
                 variant="outline"
-                onClick={handleBack}
+                onClick={handleBackToStep1}
                 disabled={createMutation.isPending}
                 className="flex-1"
               >
@@ -501,7 +971,51 @@ export function QuickCreate({ onCreated }: QuickCreateProps) {
                 Back
               </Button>
               <Button
-                onClick={handleSubmit}
+                onClick={handleStep2Continue}
+                disabled={createMutation.isPending}
+                className="flex-1"
+              >
+                {createMutation.isPending ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Submitting...
+                  </>
+                ) : showScreening ? (
+                  <>
+                    Next
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </>
+                ) : (
+                  'Submit'
+                )}
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* ────────────────── Step 3: Screening Questions ──────────────── */}
+        {step === 3 && (
+          <div className="space-y-4">
+            <ScreeningQuestions
+              questions={(kioskQuestions && kioskQuestions.length > 0) ? kioskQuestions : DEFAULT_SCREENING_QUESTIONS}
+              answers={screeningAnswers}
+              onAnswer={handleAnswer}
+              onReady={(ready) => ready && setScreeningErrors(null)}
+              submitError={screeningErrors}
+            />
+
+            <div className="flex gap-3">
+              <Button
+                variant="outline"
+                onClick={handleBackToStep2}
+                disabled={createMutation.isPending}
+                className="flex-1"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back
+              </Button>
+              <Button
+                onClick={handleScreeningSubmit}
                 disabled={createMutation.isPending}
                 className="flex-1"
               >
@@ -517,6 +1031,63 @@ export function QuickCreate({ onCreated }: QuickCreateProps) {
             </div>
           </div>
         )}
+
+        {/* ────────────────── Step 4: QR Code (Leads only) ─────────────── */}
+        {step === 4 && (
+          <div className="space-y-5 text-center py-2">
+            <div className="flex flex-col items-center gap-2">
+              <CheckCircle2 className="w-10 h-10 text-green-500" />
+              <h3 className="text-base font-semibold text-foreground">
+                Lead Created Successfully
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                {step1.firstName} {step1.lastName} has been added as a lead.
+              </p>
+            </div>
+
+            {kioskUrl ? (
+              <div className="space-y-3">
+                <div className="flex items-center justify-center gap-1.5 text-sm font-medium text-slate-700">
+                  <QrCode className="w-4 h-4" />
+                  Self Check-in QR Code
+                </div>
+                <div className="flex justify-center">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(
+                      typeof window !== 'undefined'
+                        ? `${window.location.origin}${kioskUrl}`
+                        : kioskUrl
+                    )}`}
+                    alt="Self check-in QR code"
+                    width={200}
+                    height={200}
+                    className="rounded-lg border border-slate-200 shadow-sm"
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Show this QR code to the lead so they can complete their own self check-in.
+                </p>
+              </div>
+            ) : (
+              <div className="rounded-md border border-slate-200 bg-slate-50 px-4 py-3">
+                <p className="text-sm text-muted-foreground">
+                  No kiosk configured. Set up a self check-in kiosk in Settings to enable QR codes.
+                </p>
+              </div>
+            )}
+
+            <div className="flex gap-3 pt-2">
+              <Button variant="outline" onClick={handleDone} className="flex-1">
+                Done
+              </Button>
+              <Button onClick={resetForm} className="flex-1">
+                Create Another
+              </Button>
+            </div>
+          </div>
+        )}
+
       </CardContent>
     </Card>
   )

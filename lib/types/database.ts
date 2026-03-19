@@ -10532,6 +10532,7 @@ export type Database = {
           created_by: string | null
           current_stage: string | null
           custom_fields: Json | null
+          custom_intake_data: Json | null
           engagement_score: number | null
           estimated_value: number | null
           follow_up_count: number | null
@@ -10587,6 +10588,7 @@ export type Database = {
           created_by?: string | null
           current_stage?: string | null
           custom_fields?: Json | null
+          custom_intake_data?: Json | null
           engagement_score?: number | null
           estimated_value?: number | null
           follow_up_count?: number | null
@@ -10642,6 +10644,7 @@ export type Database = {
           created_by?: string | null
           current_stage?: string | null
           custom_fields?: Json | null
+          custom_intake_data?: Json | null
           engagement_score?: number | null
           estimated_value?: number | null
           follow_up_count?: number | null
@@ -12700,6 +12703,7 @@ export type Database = {
           auto_close_matter: boolean
           client_label: string | null
           color: string
+          completion_pct: number
           created_at: string
           description: string | null
           gating_rules: Json
@@ -12717,6 +12721,7 @@ export type Database = {
           auto_close_matter?: boolean
           client_label?: string | null
           color?: string
+          completion_pct?: number
           created_at?: string
           description?: string | null
           gating_rules?: Json
@@ -12734,6 +12739,7 @@ export type Database = {
           auto_close_matter?: boolean
           client_label?: string | null
           color?: string
+          completion_pct?: number
           created_at?: string
           description?: string | null
           gating_rules?: Json

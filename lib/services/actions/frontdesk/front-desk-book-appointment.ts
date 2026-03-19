@@ -33,7 +33,7 @@ export const frontDeskBookAppointmentAction: ActionDefinition<FrontDeskBookAppoi
         .select('id')
         .eq('is_active', true)
         .limit(1)
-        .single()
+        .maybeSingle()
       bookingPageId = pages?.id ?? null
     }
 
@@ -51,7 +51,7 @@ export const frontDeskBookAppointmentAction: ActionDefinition<FrontDeskBookAppoi
           is_active: true,
         })
         .select('id')
-        .single()
+        .maybeSingle()
 
       bookingPageId = newPage?.id ?? null
     }

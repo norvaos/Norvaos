@@ -835,6 +835,7 @@ export function useCreateMatterStage() {
       autoCloseMatter?: boolean
       slaDays?: number | null
       description?: string | null
+      completionPct?: number | null
     }) => {
       const supabase = createClient()
       const { data, error } = await supabase
@@ -849,6 +850,7 @@ export function useCreateMatterStage() {
           auto_close_matter: input.autoCloseMatter ?? false,
           sla_days: input.slaDays,
           description: input.description,
+          completion_pct: input.completionPct ?? undefined,
         })
         .select()
         .single()
@@ -871,7 +873,7 @@ export function useUpdateMatterStage() {
     mutationFn: async (input: {
       id: string
       pipelineId: string
-      updates: Partial<Pick<MatterStage, 'name' | 'color' | 'sort_order' | 'is_terminal' | 'auto_close_matter' | 'sla_days' | 'description'>>
+      updates: Partial<Pick<MatterStage, 'name' | 'color' | 'sort_order' | 'is_terminal' | 'auto_close_matter' | 'sla_days' | 'description' | 'completion_pct'>>
     }) => {
       const supabase = createClient()
       const { error } = await supabase

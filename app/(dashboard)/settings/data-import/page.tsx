@@ -1,6 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
+import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Upload } from 'lucide-react'
 import { ImportWizard } from '@/components/import/import-wizard'
@@ -17,6 +19,23 @@ import {
 export default function DataImportPage() {
   const { tenant } = useTenant()
   const [showWizard, setShowWizard] = useState(false)
+  const searchParams = useSearchParams()
+
+  useEffect(() => {
+    const connected = searchParams.get('connected')
+    const error = searchParams.get('error')
+    if (connected === 'clio') {
+      toast.success('Clio account connected successfully')
+      window.history.replaceState({}, '', '/settings/data-import')
+    } else if (connected === 'ghl') {
+      toast.success('Go High Level account connected successfully')
+      window.history.replaceState({}, '', '/settings/data-import')
+    }
+    if (error) {
+      toast.error(`Connection failed: ${error}`)
+      window.history.replaceState({}, '', '/settings/data-import')
+    }
+  }, [searchParams])
 
   const { data: ghlConn, isLoading: ghlLoading } = useGhlConnection(tenant?.id ?? '')
   const { data: clioConn, isLoading: clioLoading } = useClioConnection(tenant?.id ?? '')

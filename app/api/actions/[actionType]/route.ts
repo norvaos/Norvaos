@@ -40,7 +40,10 @@ async function handlePost(
 
     // 2. Authenticate & authorize
     const auth = await authenticateRequest()
-    requirePermission(auth, 'matters', 'edit')
+    if (definition.permission) {
+      const { entity, action } = definition.permission
+      requirePermission(auth, entity, action)
+    }
 
     // 3. Parse request body
     const body = await request.json()

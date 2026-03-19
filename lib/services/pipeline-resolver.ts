@@ -49,13 +49,13 @@ export async function resolveDefaultPipelineAndStage(
     }
   }
 
-  // 3. Auto-create if none exists
+  // 3. Auto-create if none exists — full 14-stage Core Intake & Retainer Pipeline
   if (!pipelineId) {
     const { data: newPipeline } = await supabase
       .from('pipelines')
       .insert({
         tenant_id: tenantId,
-        name: 'Default Pipeline',
+        name: 'Core Intake & Retainer Pipeline',
         is_default: true,
       })
       .select('id')
@@ -63,20 +63,30 @@ export async function resolveDefaultPipelineAndStage(
 
     if (newPipeline) {
       pipelineId = newPipeline.id
-      const defaultStages = ['New Lead', 'Contacted', 'Consultation', 'Retained', 'Closed']
-      for (let i = 0; i < defaultStages.length; i++) {
+      const defaultStages = [
+        { name: 'New Inquiry',                         sort_order: 1,  win_probability: 5,   color: '#94a3b8', rotting_days: 1,    is_win_stage: false, is_lost_stage: false },
+        { name: 'Contacted',                           sort_order: 2,  win_probability: 15,  color: '#60a5fa', rotting_days: 3,    is_win_stage: false, is_lost_stage: false },
+        { name: 'Appointment Booked',                  sort_order: 3,  win_probability: 32,  color: '#818cf8', rotting_days: 5,    is_win_stage: false, is_lost_stage: false },
+        { name: 'No-Show',                             sort_order: 4,  win_probability: 10,  color: '#fb923c', rotting_days: 2,    is_win_stage: false, is_lost_stage: false },
+        { name: 'Appointment Completed',               sort_order: 5,  win_probability: 52,  color: '#3b82f6', rotting_days: 5,    is_win_stage: false, is_lost_stage: false },
+        { name: 'Retainer Sent',                       sort_order: 6,  win_probability: 70,  color: '#f59e0b', rotting_days: 4,    is_win_stage: false, is_lost_stage: false },
+        { name: 'Follow-Up Active',                    sort_order: 7,  win_probability: 42,  color: '#eab308', rotting_days: 7,    is_win_stage: false, is_lost_stage: false },
+        { name: 'Retainer Signed – Payment Pending',   sort_order: 8,  win_probability: 88,  color: '#7c3aed', rotting_days: 3,    is_win_stage: false, is_lost_stage: false },
+        { name: 'Retained – Active Matter',            sort_order: 9,  win_probability: 100, color: '#22c55e', rotting_days: null, is_win_stage: true,  is_lost_stage: false },
+        { name: 'Closed – No Response',                sort_order: 10, win_probability: 0,   color: '#9ca3af', rotting_days: null, is_win_stage: false, is_lost_stage: true  },
+        { name: 'Closed – Retainer Not Signed',        sort_order: 11, win_probability: 0,   color: '#f87171', rotting_days: null, is_win_stage: false, is_lost_stage: true  },
+        { name: 'Closed – Client Declined',            sort_order: 12, win_probability: 0,   color: '#ef4444', rotting_days: null, is_win_stage: false, is_lost_stage: true  },
+        { name: 'Closed – Not a Fit',                  sort_order: 13, win_probability: 0,   color: '#dc2626', rotting_days: null, is_win_stage: false, is_lost_stage: true  },
+        { name: 'Closed – Matter Completed – Small',   sort_order: 14, win_probability: 100, color: '#10b981', rotting_days: null, is_win_stage: true,  is_lost_stage: false },
+      ]
+      for (const stage of defaultStages) {
         const { data: createdStage } = await supabase
           .from('pipeline_stages')
-          .insert({
-            pipeline_id: pipelineId,
-            name: defaultStages[i],
-            sort_order: i,
-            tenant_id: tenantId,
-          })
+          .insert({ ...stage, pipeline_id: pipelineId, tenant_id: tenantId })
           .select('id')
           .single()
 
-        if (i === 0 && createdStage) {
+        if (stage.sort_order === 1 && createdStage) {
           stageId = createdStage.id
         }
       }

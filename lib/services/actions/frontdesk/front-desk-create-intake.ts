@@ -2,6 +2,7 @@ import type { ActionDefinition } from '../types'
 import { assertOk } from '../db-assert'
 import { frontDeskCreateIntakeSchema, type FrontDeskCreateIntakeInput } from '@/lib/schemas/workflow-actions'
 import { resolveDefaultPipelineAndStage } from '@/lib/services/pipeline-resolver'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 interface FrontDeskCreateIntakeResult {
   contactId: string
@@ -141,7 +142,7 @@ export const frontDeskCreateIntakeAction: ActionDefinition<FrontDeskCreateIntake
               temperature: temperatureMap[input.urgency] ?? 'warm',
               status: 'open',
               source: input.source ?? 'front_desk',
-              notes: input.reason,
+              notes: input.reason || null,
               created_by: userId,
             })
             .select('id')
@@ -149,6 +150,29 @@ export const frontDeskCreateIntakeAction: ActionDefinition<FrontDeskCreateIntake
           'front_desk_create_intake:create_lead'
         )
         leadId = lead!.id
+
+        // Save screening answers using admin client to bypass RLS.
+        if (input.screeningAnswers && Object.keys(input.screeningAnswers).length > 0 && leadId) {
+          try {
+            const adminSupabase = createAdminClient()
+            const { error: screeningError } = await adminSupabase
+              .from('leads')
+              .update({
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                custom_intake_data: input.screeningAnswers as any,
+              })
+              .eq('id', leadId)
+            if (screeningError) {
+              console.error('[front_desk_create_intake] Failed to save screening answers:', screeningError.message, screeningError.code)
+            } else {
+              console.log('[front_desk_create_intake] Screening answers saved for lead', leadId, '— keys:', Object.keys(input.screeningAnswers))
+            }
+          } catch (err) {
+            console.error('[front_desk_create_intake] Unexpected error saving screening answers:', err)
+          }
+        } else {
+          console.log('[front_desk_create_intake] No screening answers to save (empty or undefined)')
+        }
       }
     }
 

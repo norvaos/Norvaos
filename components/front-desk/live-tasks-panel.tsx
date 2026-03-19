@@ -1,7 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { useFrontDeskTasks, useFrontDeskStaffList } from '@/lib/queries/front-desk-queries'
+import { useQueryClient } from '@tanstack/react-query'
+import { useFrontDeskTasks, useFrontDeskStaffList, frontDeskKeys } from '@/lib/queries/front-desk-queries'
+import { useRealtime } from '@/lib/hooks/use-realtime'
 import { useTenant } from '@/lib/hooks/use-tenant'
 import { useUser } from '@/lib/hooks/use-user'
 import { ListTodo, Clock, User, Users, AlertCircle, CheckCircle2, Briefcase } from 'lucide-react'
@@ -120,9 +122,31 @@ export function LiveTasksQueue({ onCompleteTask, onSelectContact }: LiveTasksQue
   const tenantId = tenant?.id ?? ''
   const currentUserId = appUser?.id ?? ''
   const [staffFilter, setStaffFilter] = useState<string>('__mine')
+  const queryClient = useQueryClient()
 
   const { data: tasks, isLoading } = useFrontDeskTasks(tenantId, currentUserId, staffFilter)
   const { data: staffList } = useFrontDeskStaffList(tenantId)
+
+  // ── Realtime: instantly refresh when any task changes in this tenant ──────
+  // Covers: new task assigned to me (INSERT), task updated (UPDATE status etc.)
+  // Invalidate ALL task variants (my tasks, all tasks, staff-filtered) at once
+  function invalidateTasks() {
+    // Partial key match: any query starting with ['front-desk', 'tasks', tenantId, ...]
+    queryClient.invalidateQueries({
+      queryKey: [...frontDeskKeys.all, 'tasks', tenantId],
+      exact: false,
+    })
+  }
+
+  useRealtime<Record<string, unknown>>({
+    table: 'tasks',
+    event: '*',
+    filter: tenantId ? `tenant_id=eq.${tenantId}` : undefined,
+    enabled: !!tenantId,
+    onInsert: invalidateTasks,
+    onUpdate: invalidateTasks,
+    onDelete: invalidateTasks,
+  })
 
   const filteredTasks = tasks ?? []
 

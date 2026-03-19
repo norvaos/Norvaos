@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo, useCallback, useRef } from 'react'
+import { useState, useMemo, useCallback, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useCommandCentre } from './command-centre-context'
 import { useCommandPermissions } from '@/lib/hooks/use-command-permissions'
@@ -84,6 +84,7 @@ import {
 } from '@/components/ui/alert-dialog'
 import { toast } from 'sonner'
 import { createClient } from '@/lib/supabase/client'
+import { StageAdvanceDialog } from './stage-advance-dialog'
 
 // ─── Icon map ───────────────────────────────────────────────────────────
 
@@ -112,6 +113,7 @@ export function ConsultationOutcomePanel() {
     lead,
     contact,
     stages,
+    currentStage,
     tenantId,
     userId,
     entityId,
@@ -139,6 +141,7 @@ export function ConsultationOutcomePanel() {
     lead?.responsible_lawyer_id ?? userId
   )
   const [billingType, setBillingType] = useState('flat_fee')
+  const [flatFeeAmount, setFlatFeeAmount] = useState('')
   // follow_up_later / book_follow_up
   const [followUpDate, setFollowUpDate] = useState('')
   const [followUpOwner, setFollowUpOwner] = useState(userId)
@@ -212,6 +215,9 @@ export function ConsultationOutcomePanel() {
     if (latestRetainer.status === 'sent') return 'sent'
     return 'saved'
   }, [latestRetainer, activeSigningReq])
+
+  // ── Stage-advance confirmation dialog state ─────────────────
+  const [stageDialogOpen, setStageDialogOpen] = useState(false)
 
   // ── E-sign dialog state ─────────────────────────────────────
   const [esignDialogOpen, setEsignDialogOpen] = useState(false)
@@ -330,6 +336,51 @@ export function ConsultationOutcomePanel() {
     [canMarkRetained, canCloseLost]
   )
 
+  // ── Auto-select matter type from intake answers ──────────────
+  // Runs once when send_retainer is selected and no matter type is yet chosen
+  useEffect(() => {
+    if (selectedOutcome !== 'send_retainer') return
+    if (matterTypeId) return   // already set — don't overwrite
+    if (!matterTypes?.length) return
+
+    const cf = (lead?.custom_fields ?? {}) as Record<string, string>
+    const goal         = cf.immigration_goal
+    const pathway      = cf.pr_pathway
+    const studyGoal    = cf.study_permit_goal
+    const currentStatus = cf.current_status
+
+    // Infer matter type name from intake answers
+    let inferredName: string | null = null
+    if (goal === 'permanent_residence') {
+      if (pathway === 'express_entry' || pathway === 'pnp' || pathway === 'atlantic' ||
+          pathway === 'rural_northern' || pathway === 'agri_food' || pathway === 'caregiver_pr') {
+        inferredName = 'Express Entry'
+      } else if (pathway === 'family_class') {
+        inferredName = currentStatus && currentStatus !== 'no_status'
+          ? 'Spousal Sponsorship — Inside Canada'
+          : 'Spousal Sponsorship — Outside Canada'
+      } else {
+        inferredName = 'PR Application'
+      }
+    } else if (goal === 'work_permit') {
+      inferredName = 'Work Permit'
+    } else if (goal === 'study_permit') {
+      inferredName = studyGoal === 'pgwp' ? 'Post-Graduate Work Permit (PGWP)' : 'Study Permit'
+    } else if (goal === 'visitor_visa') {
+      inferredName = currentStatus === 'no_status'
+        ? 'Visitor Visa — Outside Canada'
+        : 'Visitor Visa — Inside Canada'
+    } else if (goal === 'family_sponsorship') {
+      inferredName = currentStatus && currentStatus !== 'no_status'
+        ? 'Spousal Sponsorship — Inside Canada'
+        : 'Spousal Sponsorship — Outside Canada'
+    }
+
+    if (!inferredName) return
+    const match = matterTypes.find((mt) => mt.name === inferredName)
+    if (match) setMatterTypeId(match.id)
+  }, [selectedOutcome, matterTypeId, matterTypes, lead?.custom_fields])
+
   // ── Reset form (re-reads from lead to preserve Core Data) ────
   const resetForm = useCallback(() => {
     setSelectedOutcome(null)
@@ -337,6 +388,7 @@ export function ConsultationOutcomePanel() {
     setPersonScope((lead?.person_scope as 'single' | 'joint') ?? 'single')
     setResponsibleLawyerId(lead?.responsible_lawyer_id ?? userId)
     setBillingType('flat_fee')
+    setFlatFeeAmount('')
     setFollowUpDate('')
     setFollowUpOwner(userId)
     setFollowUpType('phone')
@@ -356,7 +408,14 @@ export function ConsultationOutcomePanel() {
 
     switch (selectedOutcome) {
       case 'send_retainer':
-        return !!(lead?.practice_area_id && matterTypeId && responsibleLawyerId && billingType && consultationNotes.trim())
+        return !!(
+          lead?.practice_area_id &&
+          matterTypeId &&
+          responsibleLawyerId &&
+          billingType &&
+          consultationNotes.trim() &&
+          (billingType !== 'flat_fee' || (flatFeeAmount.trim() && !isNaN(parseFloat(flatFeeAmount)) && parseFloat(flatFeeAmount) > 0))
+        )
       case 'follow_up_later':
         return !!(followUpDate && followUpOwner && consultationNotes.trim())
       case 'client_declined':
@@ -382,13 +441,94 @@ export function ConsultationOutcomePanel() {
     }
   }, [
     selectedOutcome, lead?.practice_area_id, matterTypeId, responsibleLawyerId, billingType,
-    consultationNotes, followUpDate, followUpOwner, followUpType,
+    flatFeeAmount, consultationNotes, followUpDate, followUpOwner, followUpType,
     declineReason, declineDetails, notFitReason, notFitDetails,
     referredToName, referralReason,
   ])
 
+  // ── Proposed stage for stage-advance dialog ───────────────────
+  // Mirrors the regex logic in /api/command/record-consultation-outcome
+  const proposedStage = useMemo(() => {
+    if (!selectedOutcome || !stages.length) return null
+    switch (selectedOutcome) {
+      case 'send_retainer':
+        return stages.find(
+          (s) =>
+            /^retainer\s+sent$/i.test(s.name) ||
+            /retainer.*sent|sent.*retainer/i.test(s.name)
+        ) ?? null
+      case 'follow_up_later':
+        return (
+          stages.find((s) => /follow.?up.?active|active.*follow.?up/i.test(s.name)) ??
+          stages.find((s) =>
+            /consult.*complet|complet.*consult|appointment.*complet/i.test(s.name)
+          ) ??
+          null
+        )
+      case 'client_declined':
+        return (
+          stages.find((s) => /client.?declin/i.test(s.name)) ??
+          stages.find((s) => !!s.is_lost_stage) ??
+          null
+        )
+      case 'not_a_fit':
+        return (
+          stages.find((s) => /not.?a?.?fit/i.test(s.name)) ??
+          stages.find((s) => !!s.is_lost_stage) ??
+          null
+        )
+      case 'referred_out':
+        return (
+          stages.find((s) => /not.?a?.?fit|referred/i.test(s.name)) ??
+          stages.find((s) => !!s.is_lost_stage) ??
+          null
+        )
+      case 'no_show':
+        return stages.find((s) => /no.?show/i.test(s.name)) ?? null
+      default:
+        return null // book_follow_up — no stage advance
+    }
+  }, [selectedOutcome, stages])
+
+  // ── Automations list for stage-advance dialog ─────────────────
+  const proposedAutomations = useMemo((): string[] => {
+    switch (selectedOutcome) {
+      case 'send_retainer':
+        return [
+          'Retainer package created and saved to this lead',
+          'Task: Prepare and send retainer agreement (due in 2 days)',
+          'Intake profile marked as complete',
+          'Conflict status cleared',
+        ]
+      case 'follow_up_later':
+        return [
+          `Follow-up task created${followUpDate ? ` for ${followUpDate}` : ''}`,
+          ...(leadTemperature ? ['Lead temperature updated'] : []),
+        ]
+      case 'client_declined':
+        return [
+          'Lead closed as Lost — Client Declined',
+          'Closure record created with decline reason',
+        ]
+      case 'not_a_fit':
+        return [
+          'Lead closed as Lost — Not a Fit',
+          'Closure record created with reason',
+        ]
+      case 'referred_out':
+        return [
+          'Lead closed as Lost — Referred Out',
+          `Closure record created (referred to: ${referredToName || '…'})`,
+        ]
+      case 'no_show':
+        return ['High-priority follow-up task created (due tomorrow)']
+      default:
+        return []
+    }
+  }, [selectedOutcome, followUpDate, leadTemperature, referredToName])
+
   // ── Submit handler ────────────────────────────────────────────
-  const handleSubmit = useCallback(async () => {
+  const handleSubmit = useCallback(async (skipStageAdvance = false) => {
     if (!selectedOutcome || !lead || isSubmitting) return
 
     setIsSubmitting(true)
@@ -405,6 +545,7 @@ export function ConsultationOutcomePanel() {
         leadId: lead.id,
         consultationId,
         outcome: selectedOutcome,
+        skipStageAdvance,
       }
 
       switch (selectedOutcome) {
@@ -414,6 +555,9 @@ export function ConsultationOutcomePanel() {
           payload.responsibleLawyerId = responsibleLawyerId
           payload.billingType = billingType
           payload.consultationNotes = consultationNotes
+          if (billingType === 'flat_fee' && flatFeeAmount) {
+            payload.flatFeeAmountCents = Math.round(parseFloat(flatFeeAmount) * 100)
+          }
           if (defaultTemplate) {
             payload.retainerFeeTemplateId = defaultTemplate.id
           }
@@ -488,6 +632,17 @@ export function ConsultationOutcomePanel() {
     notFitDetails, referredToName, referralReason, defaultTemplate,
     queryClient,
   ])
+
+  // ── Initiate submit — show stage-advance dialog (or submit directly) ──
+  const handleInitiateSubmit = useCallback(() => {
+    if (!isFormValid || isSubmitting) return
+    // book_follow_up never advances a stage — bypass the dialog
+    if (selectedOutcome === 'book_follow_up' || !proposedStage) {
+      void handleSubmit(false)
+      return
+    }
+    setStageDialogOpen(true)
+  }, [isFormValid, isSubmitting, selectedOutcome, proposedStage, handleSubmit])
 
   // ── Helper: scroll to retainer builder ──────────────────────────
   const scrollToRetainerBuilder = useCallback(() => {
@@ -1758,6 +1913,28 @@ export function ConsultationOutcomePanel() {
                   </SelectContent>
                 </Select>
               </div>
+
+              {/* Flat fee amount — shown only when billing type is flat_fee */}
+              {billingType === 'flat_fee' && (
+                <div className="space-y-1.5">
+                  <Label className="text-xs">Flat Fee Amount (CAD) *</Label>
+                  <div className="relative">
+                    <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-sm text-slate-400">$</span>
+                    <Input
+                      type="number"
+                      min="0"
+                      step="50"
+                      value={flatFeeAmount}
+                      onChange={(e) => setFlatFeeAmount(e.target.value)}
+                      placeholder="e.g. 2500"
+                      className="h-9 text-sm pl-6"
+                    />
+                  </div>
+                  <p className="text-[10px] text-slate-400">
+                    This amount was quoted and agreed with the client during the consultation.
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* Default template indicator */}
@@ -2063,6 +2240,43 @@ export function ConsultationOutcomePanel() {
         )}
       </div>
 
+      {/* ── Consultation summary (send_retainer only) ───────── */}
+      {selectedOutcome === 'send_retainer' && isFormValid && (() => {
+        const matterTypeName = matterTypes?.find((mt) => mt.id === matterTypeId)?.name ?? 'General Matter'
+        const lawyerUser = lawyers.find((u) => u.id === responsibleLawyerId)
+        const lawyerName = lawyerUser
+          ? `${lawyerUser.first_name ?? ''} ${lawyerUser.last_name ?? ''}`.trim()
+          : 'the responsible lawyer'
+        const clientName = contact
+          ? `${contact.first_name ?? ''} ${contact.last_name ?? ''}`.trim() || 'the client'
+          : 'the client'
+        const feeText = billingType === 'flat_fee' && flatFeeAmount
+          ? `$${parseFloat(flatFeeAmount).toLocaleString('en-CA', { minimumFractionDigits: 0 })} CAD flat fee`
+          : billingType === 'hourly' ? 'hourly billing' : billingType === 'contingency' ? 'contingency basis' : 'retainer-based billing'
+
+        return (
+          <div className="rounded-lg border border-emerald-200 bg-emerald-50/70 p-3 space-y-2">
+            <p className="text-[11px] font-semibold text-emerald-800 uppercase tracking-wide">
+              ✓ Consultation Summary — Ready to Send
+            </p>
+            <ul className="space-y-1">
+              {[
+                `${lawyerName} has reviewed ${clientName}'s immigration goals and assessed eligibility`,
+                `Recommended matter type: ${matterTypeName}`,
+                `Agreed fee arrangement: ${feeText}`,
+                'Client has been informed of the process, timeline, and next steps',
+                'Retainer agreement will be sent for review and signature',
+              ].map((line, i) => (
+                <li key={i} className="flex items-start gap-1.5 text-[11px] text-emerald-800">
+                  <span className="text-emerald-500 mt-0.5 shrink-0">✓</span>
+                  {line}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )
+      })()}
+
       {/* ── Submit buttons ──────────────────────────────────── */}
       <div className="flex items-center justify-end gap-2 pt-1">
         <Button
@@ -2076,7 +2290,7 @@ export function ConsultationOutcomePanel() {
         </Button>
         <Button
           size="sm"
-          onClick={handleSubmit}
+          onClick={handleInitiateSubmit}
           disabled={!isFormValid || isSubmitting}
           className="text-xs gap-1.5"
           style={{
@@ -2088,6 +2302,39 @@ export function ConsultationOutcomePanel() {
           Confirm {outcomeInfo.label}
         </Button>
       </div>
+
+      {/* ── Stage-advance confirmation dialog ───────────────── */}
+      {proposedStage && (
+        <StageAdvanceDialog
+          open={stageDialogOpen}
+          onCancel={() => setStageDialogOpen(false)}
+          onConfirm={() => {
+            setStageDialogOpen(false)
+            void handleSubmit(false)   // advance stage
+          }}
+          onSkip={() => {
+            setStageDialogOpen(false)
+            void handleSubmit(true)    // record outcome, keep stage
+          }}
+          isSubmitting={isSubmitting}
+          contactName={
+            contact
+              ? `${contact.first_name ?? ''} ${contact.last_name ?? ''}`.trim() || undefined
+              : undefined
+          }
+          currentStageName={currentStage?.name}
+          currentStageColor={currentStage?.color}
+          proposedStageName={proposedStage.name}
+          proposedStageColor={proposedStage.color}
+          proposedWinProbability={proposedStage.win_probability}
+          proposedStageDescription={proposedStage.description}
+          automations={proposedAutomations}
+          isLostMove={['client_declined', 'not_a_fit', 'referred_out'].includes(
+            selectedOutcome ?? ''
+          )}
+          isWinMove={false}
+        />
+      )}
     </div>
   )
 }

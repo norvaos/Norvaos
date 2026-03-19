@@ -89,6 +89,8 @@ export async function updateSession(request: NextRequest) {
       !pathname.startsWith('/login') &&
       !pathname.startsWith('/signup') &&
       !pathname.startsWith('/forgot-password') &&
+      !pathname.startsWith('/change-password') &&
+      !pathname.startsWith('/onboarding') &&
       !pathname.startsWith('/portal') &&
       !pathname.startsWith('/kiosk') &&
       !pathname.startsWith('/booking') &&
@@ -162,6 +164,59 @@ export async function updateSession(request: NextRequest) {
     }
   }
 
+  // ── Must-Change-Password Gate ────────────────────────────────────────────────
+  // If an admin created the user with a temp password, force them to set their
+  // own password before accessing any page. Uses cookie __chpw to cache result.
+  if (user) {
+    const pathname = request.nextUrl.pathname
+    // Page lives at /change-password (app/(auth)/change-password/page.tsx)
+    const isChangePwRoute = pathname.startsWith('/change-password')
+    const isApiRoute      = pathname.startsWith('/api')
+    const isSystemRoute   = (
+      pathname.startsWith('/front-desk') ||
+      pathname.startsWith('/auth') ||
+      pathname.startsWith('/portal') ||
+      pathname.startsWith('/kiosk') ||
+      pathname.startsWith('/booking') ||
+      pathname.startsWith('/forms') ||
+      pathname.startsWith('/invite') ||
+      pathname.startsWith('/signing') ||
+      pathname.startsWith('/_next')
+    )
+
+    if (!isChangePwRoute && !isApiRoute && !isSystemRoute) {
+      const chpwDone = request.cookies.get('__chpw')?.value
+
+      if (chpwDone !== '0') {
+        try {
+          const { data: userData } = await supabase
+            .from('users')
+            .select('must_change_password')
+            .eq('auth_user_id', user.id)
+            .limit(1)
+            .maybeSingle()
+
+          if ((userData as any)?.must_change_password === true) {
+            const url = request.nextUrl.clone()
+            url.pathname = '/change-password'
+            return NextResponse.redirect(url)
+          } else {
+            // Cache: no need to change password (5 min)
+            supabaseResponse.cookies.set('__chpw', '0', {
+              httpOnly: true,
+              secure: process.env.NODE_ENV === 'production',
+              sameSite: 'lax',
+              maxAge: 300,
+              path: '/',
+            })
+          }
+        } catch {
+          // Fail-open: let user through rather than blocking
+        }
+      }
+    }
+  }
+
   // ── Onboarding Gate ─────────────────────────────────────────────────────────
   // If a logged-in user's tenant hasn't completed onboarding, redirect them to
   // /onboarding unless they're already on an /onboarding* or /api* route.
@@ -175,6 +230,7 @@ export async function updateSession(request: NextRequest) {
     const isSystemRoute     = (
       pathname.startsWith('/front-desk') ||
       pathname.startsWith('/auth') ||
+      pathname.startsWith('/change-password') ||
       pathname.startsWith('/portal') ||
       pathname.startsWith('/kiosk') ||
       pathname.startsWith('/booking') ||

@@ -40,32 +40,46 @@ interface NoteTemplate {
 
 const NOTE_TEMPLATES: NoteTemplate[] = [
   {
+    id: 'immigration_intake',
+    label: 'Immigration Intake Assessment',
+    icon: '🛂',
+    generate: (name, date) =>
+      `## Immigration Intake Assessment — ${date}\n\n**Client:** ${name}\n**Attending Lawyer:** \n**Duration:** \n\n---\n\n### 1. Personal Identity\n- **Full Legal Name:** \n- **Date of Birth:** \n- **Country of Birth:** \n- **Citizenship(s):** \n- **Passport Country / Expiry:** \n- **Languages Spoken:** \n\n---\n\n### 2. Current Location & Status\n- **Currently in Canada?** ☐ Yes (Inland) ☐ No (Outside Canada)\n- **Current Status in Canada:** ☐ Visitor ☐ Student ☐ Worker ☐ PGWP ☐ PR ☐ No Status ☐ Refugee Claimant ☐ Other: \n- **Date of Last Entry to Canada:** \n- **Authorized Stay Expiry (if applicable):** \n- **Port of Entry (last entry):** \n\n---\n\n### 3. Immigration History\n- **Previous Applications to Canada?** ☐ Yes ☐ No\n  - If yes, list: (type / year / result)\n  1. \n  2. \n  3. \n- **Previous Refusals?** ☐ Yes ☐ No\n  - If yes — application type, date refused, stated reason:\n  1. \n  2. \n- **Has client ever been removed / deported?** ☐ Yes ☐ No\n- **Has client ever left Canada under a removal order?** ☐ Yes ☐ No\n- **Any outstanding removal orders?** ☐ Yes ☐ No\n\n---\n\n### 4. Admissibility Review (IRPA s.34–42)\n- **Criminal Record (Canada or abroad)?** ☐ Yes ☐ No ☐ Unknown\n  - Offence(s), country, date, sentence:\n- **Section 8 / Misrepresentation finding (IRPA s.40)?** ☐ Yes ☐ No\n  - If yes — date of finding, expiry of 5-year ban: \n- **Health Inadmissibility concern?** ☐ Yes ☐ No\n- **Financial Inadmissibility concern?** ☐ Yes ☐ No\n- **Security / Organized Crime concern?** ☐ Yes ☐ No\n- **⚠ Notes on admissibility:** \n\n---\n\n### 5. Family Situation\n- **Marital Status:** ☐ Single ☐ Married ☐ Common-Law ☐ Separated ☐ Divorced ☐ Widowed\n  - If married/CL — how long together: ; how long cohabiting: \n- **Spouse / Partner citizenship & immigration status:** \n- **Dependent children (names, DOB, citizenship):**\n  1. \n  2. \n  3. \n- **Other dependants abroad?** \n- **Family members already in Canada?** \n\n---\n\n### 6. Education & Credentials\n- **Highest level of education:** \n- **Field of study:** \n- **Institution name & country:** \n- **Canadian ECA completed?** ☐ Yes ☐ No ☐ In Progress — Body: \n- **Language tests (IELTS / CELPIP / TEF)?** ☐ Yes ☐ No\n  - CLB / NCLC scores: R: ; W: ; L: ; S: ; Date: \n\n---\n\n### 7. Employment & Work History\n- **Current occupation / NOC code:** \n- **Employer in Canada (if any):** \n- **Job offer?** ☐ Yes ☐ No — LMIA? ☐ Yes ☐ No ☐ Exempt\n- **Canadian work experience (months):** \n- **Foreign work experience (years, NOC):** \n- **Provincial nomination?** ☐ Yes ☐ No — Province: \n\n---\n\n### 8. Financial Position\n- **Sufficient settlement funds?** ☐ Yes ☐ No ☐ Unknown\n- **Approximate liquid funds (CAD):** \n- **Property / significant ties in home country?** ☐ Yes ☐ No\n\n---\n\n### 9. Client Goals & Urgency\n- **What does the client want to achieve?**\n  - ☐ Maintain current status ☐ Restore status ☐ Get work permit ☐ Get study permit\n  - ☐ PR (Express Entry / PNP) ☐ Spousal/family sponsorship ☐ Appeal refusal\n  - ☐ Judicial Review ☐ Refugee protection ☐ Citizenship ☐ Other: \n- **Timeline / urgency:** \n- **Any upcoming deadlines?** \n\n---\n\n### 10. Lawyer's Assessment\n- **Recommended application / strategy:** \n- **Available streams / programs:** \n- **Estimated CRS score (if Express Entry):** \n- **Red flags / risk factors:** \n- **Opinion on success probability:** ☐ Strong ☐ Reasonable ☐ Borderline ☐ Not advisable\n- **Advice given:** \n\n---\n\n### 11. Next Steps\n- [ ] Confirm identity documents (passport, existing permits)\n- [ ] Request supporting documents: \n- [ ] Follow-up date: \n- [ ] Retainer / scope of work agreed? ☐ Yes ☐ Pending\n`,
+  },
+  {
+    id: 'refusal_appeal',
+    label: 'Refusal & Appeal Assessment',
+    icon: '⚖️',
+    generate: (name, date) =>
+      `## Refusal & Appeal Assessment — ${date}\n\n**Client:** ${name}\n**Attending Lawyer:** \n\n---\n\n### 1. Refusal Details\n- **Application Type Refused:** \n- **Date of Refusal Letter:** \n- **IRCC / CBSA / IRB File No.:** \n- **Decision Maker (office / visa post):** \n- **Reason(s) Stated in Refusal Letter:**\n  1. \n  2. \n  3. \n\n---\n\n### 2. Deadline Calculation (CRITICAL)\n- **Client currently:** ☐ Inland (Inside Canada) — 15-day JR deadline ☐ Outside Canada — 60-day JR deadline\n- **Refusal date:** \n- **JR filing deadline (Federal Court):** \n- **IAD / RAD appeal deadline (if applicable):** \n- **⚠ Days remaining as of today:** \n\n---\n\n### 3. Procedural History\n- **Previous appeals / JR applications?** ☐ Yes ☐ No\n  - Outcomes: \n- **Was an H&C submitted?** ☐ Yes ☐ No ☐ N/A\n- **PRRA triggered?** ☐ Yes ☐ No ☐ N/A\n- **Stage reached:** ☐ IRCC ☐ IAD ☐ RAD ☐ Federal Court ☐ SCC ☐ PRRA ☐ H&C\n\n---\n\n### 4. Grounds for Challenge\n- **Breach of procedural fairness?** ☐ Yes ☐ No — Details: \n- **Reviewable error of law?** ☐ Yes ☐ No — Details: \n- **Unreasonable factual findings?** ☐ Yes ☐ No — Details: \n- **New evidence / changed circumstances?** ☐ Yes ☐ No\n  - If yes: \n- **Humanitarian & Compassionate grounds?** ☐ Yes ☐ No\n  - Establishment: ; Best interests of child: ; Other H&C: \n\n---\n\n### 5. Legal Options Available\n- [ ] Judicial Review — Federal Court (certiorari / mandamus)\n- [ ] IAD Appeal (if PR / family sponsorship / removal order)\n- [ ] RAD Appeal (if refugee claim)\n- [ ] Re-application with stronger package\n- [ ] H&C application (IRPA s.25)\n- [ ] PRRA (if removal imminent)\n- [ ] Ministerial Relief (s.34–35 inadmissibility)\n- [ ] Other: \n\n---\n\n### 6. Lawyer's Recommendation\n- **Recommended course of action:** \n- **Success probability:** ☐ Strong ☐ Reasonable ☐ Borderline ☐ Not advisable\n- **Reasons:** \n- **Estimated legal fees:** \n- **Client instructed:** ☐ Proceed with JR ☐ Proceed with Appeal ☐ Re-apply ☐ No action ☐ Reviewing\n\n---\n\n### 7. Urgent Action Items\n- [ ] File Notice of Application (JR) by: \n- [ ] Obtain certified tribunal record\n- [ ] Obtain refusal letter certified copy\n- [ ] Brief client on risks / options\n- [ ] Retainer signed for appeal / JR work\n`,
+  },
+  {
     id: 'consultation',
-    label: 'Consultation Notes',
-    icon: '\u{1F4CB}',
+    label: 'General Consultation Notes',
+    icon: '📋',
     generate: (name, date) =>
       `## Consultation — ${date}\n\n**Client:** ${name}\n**Attendees:** \n**Duration:** \n\n### Key Facts\n- \n\n### Client Goals\n- \n\n### Recommended Path\n- \n\n### Red Flags / Concerns\n- \n\n### Next Steps\n- [ ] \n`,
   },
   {
     id: 'follow_up',
     label: 'Follow-up Notes',
-    icon: '\u{1F4DE}',
+    icon: '📞',
     generate: (name, date) =>
-      `## Follow-up — ${date}\n\n**Client:** ${name}\n**Method:** Phone / Email / In-person\n\n### Discussion\n- \n\n### Updates / Changes\n- \n\n### Action Items\n- [ ] \n`,
+      `## Follow-up — ${date}\n\n**Client:** ${name}\n**Method:** ☐ Phone ☐ Email ☐ In-person ☐ Video\n\n### Discussion\n- \n\n### Updates / Changes Since Last Contact\n- \n\n### Client's Outstanding Questions\n- \n\n### Action Items\n- [ ] \n`,
   },
   {
     id: 'retainer_discussion',
     label: 'Retainer Discussion',
-    icon: '\u{1F4DD}',
+    icon: '📝',
     generate: (name, date) =>
-      `## Retainer Discussion — ${date}\n\n**Client:** ${name}\n\n### Scope of Work\n- \n\n### Fee Structure\n- **Type:** Flat Fee / Hourly / Retainer\n- **Amount:** $\n- **Payment Terms:** \n\n### Client Questions\n- \n\n### Agreed Terms\n- \n\n### Next Steps\n- [ ] Send retainer agreement\n- [ ] \n`,
+      `## Retainer Discussion — ${date}\n\n**Client:** ${name}\n\n### Scope of Work\n- **Application type(s):** \n- **Inclusions:** \n- **Exclusions / Out-of-scope:** \n\n### Fee Structure\n- **Type:** ☐ Flat Fee ☐ Hourly ☐ Retainer ☐ Hybrid\n- **Amount:** $\n- **Payment schedule:** \n- **Disbursements / Government fees:** $\n\n### Client Questions\n- \n\n### Agreed Terms\n- \n\n### Next Steps\n- [ ] Send retainer agreement\n- [ ] Collect retainer payment\n- [ ] Open matter file\n`,
   },
   {
     id: 'red_flags',
-    label: 'Red Flags',
-    icon: '\u{1F6A9}',
+    label: 'Red Flags / Risk Note',
+    icon: '🚩',
     generate: (name, date) =>
-      `## Red Flags — ${date}\n\n**Client:** ${name}\n\n### Concern\n- \n\n### Evidence / Context\n- \n\n### Risk Level\n- \u2610 Low \u2610 Medium \u2610 High \u2610 Critical\n\n### Recommended Action\n- \n\n### Discussed With\n- \n`,
+      `## Risk / Red Flag Note — ${date}\n\n**Client:** ${name}\n**Recorded by:** \n\n### Nature of Concern\n- ☐ Misrepresentation risk ☐ Criminality ☐ Fraud indicators ☐ Conflict of interest\n- ☐ Unreliable instructions ☐ Document authenticity ☐ Other: \n\n### Evidence / Context\n- \n\n### Risk Level\n- ☐ Low ☐ Moderate ☐ High ☐ Critical — Do not proceed\n\n### Recommended Action\n- \n\n### Discussed With (supervising lawyer / partner)\n- \n\n### Resolution / Status\n- \n`,
   },
 ]
 

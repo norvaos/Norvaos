@@ -503,7 +503,7 @@ export default function DocumentsPage() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [showUpload, setShowUpload] = useState(false)
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; storagePath: string; name: string } | null>(null)
-  const [viewerDoc, setViewerDoc] = useState<{ storagePath: string; fileName: string; fileType: string | null } | null>(null)
+  const [viewerDoc, setViewerDoc] = useState<{ storagePath: string; fileName: string; fileType: string | null; externalUrl?: string | null } | null>(null)
 
   // ── Debounce search ──
   useEffect(() => {
@@ -693,7 +693,7 @@ export default function DocumentsPage() {
             <DocumentCard
               key={doc.id}
               doc={doc}
-              onView={() => setViewerDoc({ storagePath: doc.storage_path, fileName: doc.file_name, fileType: doc.file_type })}
+              onView={() => setViewerDoc({ storagePath: doc.storage_path, fileName: doc.file_name, fileType: doc.file_type, externalUrl: doc.onedrive_web_url })}
               onDownload={() => handleDownload(doc.storage_path, doc.file_name)}
               onDelete={() => setDeleteTarget({ id: doc.id, storagePath: doc.storage_path, name: doc.file_name })}
               isDownloading={downloadMutation.isPending}
@@ -706,7 +706,7 @@ export default function DocumentsPage() {
             <DocumentRow
               key={doc.id}
               doc={doc}
-              onView={() => setViewerDoc({ storagePath: doc.storage_path, fileName: doc.file_name, fileType: doc.file_type })}
+              onView={() => setViewerDoc({ storagePath: doc.storage_path, fileName: doc.file_name, fileType: doc.file_type, externalUrl: doc.onedrive_web_url })}
               onDownload={() => handleDownload(doc.storage_path, doc.file_name)}
               onDelete={() => setDeleteTarget({ id: doc.id, storagePath: doc.storage_path, name: doc.file_name })}
               isDownloading={downloadMutation.isPending}
@@ -752,6 +752,7 @@ export default function DocumentsPage() {
           storagePath={viewerDoc.storagePath}
           fileName={viewerDoc.fileName}
           fileType={viewerDoc.fileType}
+          externalUrl={viewerDoc.externalUrl}
           open={!!viewerDoc}
           onOpenChange={(open) => {
             if (!open) setViewerDoc(null)

@@ -962,7 +962,9 @@ export default function MatterDetailPage() {
           onRegenerateSlots: () => regenerateSlots.mutate({ matterId }),
           regeneratingSlots: regenerateSlots.isPending,
           enforcementEnabled,
-          completionPercent: intake?.completion_pct ?? null,
+          // Derive completion % from the current pipeline stage (matter_stages.completion_pct)
+          // NOT from matter_intake.completion_pct which is the IRCC intake form readiness score
+          completionPercent: pipelineStages?.find(s => s.id === stageState?.current_stage_id)?.completion_pct ?? null,
         }}
         centralSurfaceProps={{
           matterId,

@@ -162,7 +162,7 @@ export function MiniTimeline({
     }> = []
 
     auditLogs?.forEach((log) => {
-      const changes = log.changes as Record<string, unknown>
+      const changes = (log.changes != null ? log.changes : {}) as Record<string, unknown>
       const changesDesc = Object.keys(changes).length > 0
         ? `Changed: ${Object.keys(changes).join(', ')}`
         : null

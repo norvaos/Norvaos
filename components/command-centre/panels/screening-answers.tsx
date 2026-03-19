@@ -5,6 +5,7 @@ import { useCommandCentre } from '../command-centre-context'
 import { useLeadIntakeSubmission, useIntakeForms } from '@/lib/queries/intake-forms'
 import { useContactCheckIns } from '@/lib/queries/check-ins'
 import { useTenant } from '@/lib/hooks/use-tenant'
+import { ScreeningAnswersPanel } from '@/components/shared/screening-answers-panel'
 import type { KioskQuestion } from '@/lib/types/kiosk-question'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -81,8 +82,11 @@ function getSourceLabel(submission: { user_agent?: string | null; source_ip?: st
 // ─── Component ──────────────────────────────────────────────────────
 
 export function ScreeningAnswers() {
-  const { entityId, tenantId, contact } = useCommandCentre()
+  const { entityId, tenantId, contact, lead } = useCommandCentre()
   const { tenant } = useTenant()
+
+  // ── Front desk screening answers (custom_intake_data on lead) ─
+  const frontDeskIntakeData = (lead?.custom_intake_data ?? null) as Record<string, unknown> | null
 
   // ── Intake form submission (web/portal) ───────────────────────
   const { data: submission, isLoading: intakeLoading } = useLeadIntakeSubmission(entityId)
@@ -102,8 +106,15 @@ export function ScreeningAnswers() {
 
   const isLoading = intakeLoading || checkInsLoading
 
-  const [intakeExpanded, setIntakeExpanded] = useState(true)
-  const [kioskExpanded, setKioskExpanded] = useState(true)
+  // Does the lead have front desk intake answers?
+  const hasFrontDeskAnswers = !!(
+    frontDeskIntakeData &&
+    Object.keys(frontDeskIntakeData).length > 0
+  )
+
+  const [frontDeskExpanded, setFrontDeskExpanded] = useState(false)
+  const [intakeExpanded, setIntakeExpanded] = useState(false)
+  const [kioskExpanded, setKioskExpanded] = useState(false)
   const [copied, setCopied] = useState(false)
 
   // Parse fields from the intake form
@@ -139,8 +150,9 @@ export function ScreeningAnswers() {
   const hasKioskAnswers = checkInsWithAnswers.length > 0
   const hasIntakeSubmission = !!submission
 
-  // Total question count for badge
-  const totalQuestions = (hasIntakeSubmission ? fields.length : 0) + kioskAnswers.length
+  // Total question count for badge (front desk + kiosk + intake form)
+  const frontDeskAnswerCount = hasFrontDeskAnswers ? Object.keys(frontDeskIntakeData!).length : 0
+  const totalQuestions = frontDeskAnswerCount + (hasIntakeSubmission ? fields.length : 0) + kioskAnswers.length
 
   // Generate screening link
   const screeningLink = useMemo(() => {
@@ -199,8 +211,43 @@ export function ScreeningAnswers() {
           </div>
         )}
 
+        {/* ── Front Desk Intake Answers (custom_intake_data) ─────── */}
+        {!isLoading && hasFrontDeskAnswers && (
+          <div className="space-y-2">
+            <button
+              type="button"
+              className="flex items-center gap-1 text-xs font-medium text-slate-500 hover:text-slate-700 w-full"
+              onClick={() => setFrontDeskExpanded(!frontDeskExpanded)}
+            >
+              {frontDeskExpanded ? (
+                <ChevronDown className="h-3 w-3 shrink-0" />
+              ) : (
+                <ChevronRight className="h-3 w-3 shrink-0" />
+              )}
+              <Badge variant="outline" className="text-[10px] gap-1 bg-blue-50 text-blue-700 border-blue-200 ml-0.5">
+                Front Desk Intake
+              </Badge>
+              <span className="text-[10px] text-slate-400 ml-auto">{frontDeskAnswerCount} answers</span>
+            </button>
+
+            {frontDeskExpanded && (
+              <div className="-mx-1">
+                <ScreeningAnswersPanel
+                  customIntakeData={frontDeskIntakeData}
+                  defaultCollapsed={false}
+                />
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Separator between front desk and other sources */}
+        {!isLoading && hasFrontDeskAnswers && (hasKioskAnswers || hasIntakeSubmission) && (
+          <Separator className="my-3" />
+        )}
+
         {/* No data at all */}
-        {!isLoading && !hasIntakeSubmission && !hasKioskAnswers && (
+        {!isLoading && !hasFrontDeskAnswers && !hasIntakeSubmission && !hasKioskAnswers && (
           <div className="text-center py-6">
             <ClipboardList className="h-8 w-8 text-slate-300 mx-auto mb-2" />
             <p className="text-sm text-slate-500">No screening form submitted</p>

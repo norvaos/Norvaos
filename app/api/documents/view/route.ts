@@ -46,11 +46,16 @@ async function handleGet(request: NextRequest) {
       )
     }
 
-    // Download via admin client (bypasses storage RLS)
+    // Download via admin client (bypasses storage RLS).
+    // Strip bucket prefix from path if it was stored with it (e.g. "documents/a/b.pdf" → "a/b.pdf")
+    const downloadPath = storagePath.startsWith(`${bucket}/`)
+      ? storagePath.slice(bucket.length + 1)
+      : storagePath
+
     const adminSupabase = createAdminClient()
     const { data, error: downloadError } = await adminSupabase.storage
       .from(bucket)
-      .download(storagePath)
+      .download(downloadPath)
 
     if (downloadError || !data) {
       console.error('Storage download error:', downloadError)

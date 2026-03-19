@@ -145,10 +145,9 @@ export function MobileNav() {
 
   const handleLogout = useCallback(async () => {
     closeSheet()
-    const supabase = createClient()
-    await supabase.auth.signOut()
-    router.push('/login')
-  }, [closeSheet, router])
+    await fetch('/auth/signout', { method: 'POST' })
+    window.location.href = '/'
+  }, [closeSheet])
 
   return (
     <Sheet open={sidebarMobileOpen} onOpenChange={setSidebarMobileOpen}>

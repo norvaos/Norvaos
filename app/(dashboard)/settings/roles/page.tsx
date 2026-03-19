@@ -7,6 +7,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   Loader2,
   Lock,
+  Monitor,
   Plus,
   Shield,
   ShieldCheck,
@@ -123,6 +124,20 @@ function buildDefaultPermissions(): Record<string, Record<string, boolean>> {
     }
   }
   return perms
+}
+
+/**
+ * Returns true if this role will be routed to the Front Desk console on login.
+ * Mirrors the middleware logic: front_desk.view = true AND matters.view ≠ true AND name ≠ 'Admin'
+ */
+function isFrontDeskOnlyRole(
+  name: string,
+  permissions: Record<string, Record<string, boolean>>,
+): boolean {
+  if (name === 'Admin') return false
+  const hasFrontDesk = permissions.front_desk?.view === true
+  const hasMatters = permissions.matters?.view === true
+  return hasFrontDesk && !hasMatters
 }
 
 function countEnabledPermissions(permissions: Record<string, Record<string, boolean>>): number {
@@ -312,6 +327,12 @@ export default function SettingsRolesPage() {
 
                 <div>
                   <h4 className="mb-3 text-sm font-medium">Permissions</h4>
+                  <p className="mb-3 text-xs text-indigo-700 bg-indigo-50 border border-indigo-200 rounded-md px-3 py-2 flex items-start gap-1.5">
+                    <Monitor className="h-3.5 w-3.5 mt-0.5 shrink-0" />
+                    <span>
+                      <strong>Front Desk routing:</strong> If you enable <em>Front Desk → View</em> and leave <em>Matters → View</em> off, users with this role will be sent directly to the Front Desk console when they log in.
+                    </span>
+                  </p>
                   <div className="space-y-4">
                     {PERMISSION_MODULES.map((mod) => (
                       <div key={mod.key} className="rounded-md border p-4">
@@ -379,6 +400,7 @@ export default function SettingsRolesPage() {
             const enabledCount = countEnabledPermissions(role.permissions)
             const total = totalPermissionsCount()
             const isDefault = role.is_system || DEFAULT_ROLE_NAMES.includes(role.name)
+            const frontDeskOnly = isFrontDeskOnlyRole(role.name, role.permissions)
             const permLabel = isAdmin ? 'Full Access (all permissions)' : `Permissions (${enabledCount}/${total})`
 
             return (
@@ -389,12 +411,20 @@ export default function SettingsRolesPage() {
                       <ShieldCheck className="h-5 w-5 text-muted-foreground" />
                       <CardTitle className="text-base">{role.name}</CardTitle>
                     </div>
-                    {isDefault && (
-                      <Badge variant="secondary">
-                        <Lock className="mr-1 h-3 w-3" />
-                        Default
-                      </Badge>
-                    )}
+                    <div className="flex items-center gap-1.5">
+                      {frontDeskOnly && (
+                        <Badge className="bg-indigo-100 text-indigo-700 border-indigo-200 hover:bg-indigo-100">
+                          <Monitor className="mr-1 h-3 w-3" />
+                          Front Desk
+                        </Badge>
+                      )}
+                      {isDefault && (
+                        <Badge variant="secondary">
+                          <Lock className="mr-1 h-3 w-3" />
+                          Default
+                        </Badge>
+                      )}
+                    </div>
                   </div>
                   <CardDescription>
                     {role.description || 'No description provided.'}

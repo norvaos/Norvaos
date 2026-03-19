@@ -17,9 +17,17 @@ export const frontDeskNoteAction: ActionDefinition<FrontDeskNoteInput, FrontDesk
   entityType: 'contact', // dynamic based on input, but default for registry
   getEntityId: (input) => input.entityId,
 
-  async execute({ input }) {
-    // No direct DB write needed — the note IS the activity.
-    // The action executor writes the activity atomically via execute_action_atomic().
+  async execute({ input, supabase, tenantId, userId }) {
+    // Also insert into the notes table so the note appears in the main
+    // platform's Notes tab (which queries the notes table, not activities).
+    await supabase.from('notes').insert({
+      tenant_id: tenantId,
+      contact_id: input.entityType === 'contact' ? input.entityId : null,
+      user_id: userId ?? null,
+      content: input.note,
+      note_type: 'front_desk',
+    })
+
     return {
       data: {
         noteCreated: true,
@@ -39,6 +47,8 @@ export const frontDeskNoteAction: ActionDefinition<FrontDeskNoteInput, FrontDesk
           entity_type: input.entityType,
           entity_id: input.entityId,
         },
+        // Link activity to the contact so it appears in the contact timeline
+        contactId: input.entityType === 'contact' ? input.entityId : undefined,
       },
     }
   },

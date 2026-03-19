@@ -21,9 +21,19 @@ export const frontDeskLogCallAction: ActionDefinition<FrontDeskLogCallInput, Fro
     // The DB trigger (update_contact_engagement) only fires when engagement_points > 0
     // which execute_action_atomic does not set for front-desk activities, so we
     // must handle the contact stats update here instead of relying on the trigger.
+    // Engagement scoring: connected=5, voicemail=2, no_answer/busy/wrong=1
+    const engagementDelta: Record<string, number> = {
+      connected:    5,
+      voicemail:    2,
+      no_answer:    1,
+      busy:         1,
+      wrong_number: 1,
+    }
+    const points = engagementDelta[input.outcome] ?? 1
+
     const { data: current } = await supabase
       .from('contacts')
-      .select('interaction_count')
+      .select('interaction_count, engagement_score')
       .eq('id', input.contactId)
       .single()
 
@@ -31,6 +41,7 @@ export const frontDeskLogCallAction: ActionDefinition<FrontDeskLogCallInput, Fro
       .from('contacts')
       .update({
         interaction_count: (current?.interaction_count ?? 0) + 1,
+        engagement_score:  (current?.engagement_score  ?? 0) + points,
         last_contacted_at: new Date().toISOString(),
         last_interaction_type: 'call',
       })

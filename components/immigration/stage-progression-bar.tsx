@@ -9,6 +9,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
+import { useMemo } from 'react'
 
 interface StageHistoryEntry {
   stage_id: string
@@ -40,6 +41,8 @@ interface StageProgressionBarProps {
   onStageClick?: (stageId: string) => void
   disabled?: boolean
   users?: StageUser[]
+  /** Optional override. If omitted, derived from stage position. */
+  completionPercent?: number | null
 }
 
 function formatDuration(enteredAt: string, exitedAt?: string): string {
@@ -88,9 +91,19 @@ export function StageProgressionBar({
   onStageClick,
   disabled = false,
   users,
+  completionPercent: completionPercentProp,
 }: StageProgressionBarProps) {
   const sortedStages = [...stages].sort((a, b) => a.sort_order - b.sort_order)
   const currentIndex = sortedStages.findIndex((s) => s.id === currentStageId)
+
+  // Derive % from position if no explicit value given
+  const completionPercent = useMemo(() => {
+    if (completionPercentProp !== undefined && completionPercentProp !== null) return completionPercentProp
+    if (!currentStageId || currentIndex < 0 || sortedStages.length === 0) return null
+    const isTerminal = sortedStages[currentIndex]?.is_terminal
+    if (isTerminal) return 100
+    return Math.round(((currentIndex + 1) / sortedStages.length) * 100)
+  }, [completionPercentProp, currentStageId, currentIndex, sortedStages])
 
   // Build a map of stage_id -> history entry for duration lookups
   const historyByStage = new Map<string, StageHistoryEntry>()
@@ -102,6 +115,7 @@ export function StageProgressionBar({
 
   return (
     <TooltipProvider>
+      <div className="w-full space-y-1">
       <div className="flex w-full gap-[2px]">
         {sortedStages.map((stage, index) => {
           const isCompleted = currentIndex > -1 && index < currentIndex
@@ -216,6 +230,40 @@ export function StageProgressionBar({
             </Tooltip>
           )
         })}
+      </div>
+
+      {/* Completion progress bar */}
+      {completionPercent !== null && completionPercent !== undefined && (
+        <div className="flex items-center gap-2 pt-0.5">
+          <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+            <div
+              className={cn(
+                'h-full rounded-full transition-all duration-500',
+                completionPercent >= 100
+                  ? 'bg-emerald-500'
+                  : completionPercent >= 70
+                    ? 'bg-violet-500'
+                    : completionPercent >= 40
+                      ? 'bg-blue-500'
+                      : 'bg-amber-500'
+              )}
+              style={{ width: `${Math.min(completionPercent, 100)}%` }}
+            />
+          </div>
+          <span className={cn(
+            'text-[11px] font-semibold tabular-nums shrink-0',
+            completionPercent >= 100
+              ? 'text-emerald-600'
+              : completionPercent >= 70
+                ? 'text-violet-600'
+                : completionPercent >= 40
+                  ? 'text-blue-600'
+                  : 'text-amber-600'
+          )}>
+            {completionPercent}%
+          </span>
+        </div>
+      )}
       </div>
     </TooltipProvider>
   )
