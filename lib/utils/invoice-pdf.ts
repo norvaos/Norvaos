@@ -24,6 +24,7 @@ import {
   rgb,
 } from 'pdf-lib'
 import fontkit from '@pdf-lib/fontkit'
+import { formatDateWithFormat } from '@/lib/utils/formatters'
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -79,6 +80,8 @@ export interface InvoicePdfData {
 
   // Currency
   currency?: string // default: 'CAD'
+  /** Tenant's preferred date format token, e.g. "DD/MM/YYYY". Passed from API route. */
+  dateFormat?: string | null
 }
 
 // ── Constants ────────────────────────────────────────────────────────────────
@@ -154,25 +157,11 @@ function formatCurrency(cents: number, currency = 'CAD'): string {
 
 /**
  * Format ISO date string (YYYY-MM-DD) to readable string.
- * Parses date parts manually to avoid UTC/local timezone shift
- * that causes off-by-one errors with `new Date('2026-03-01')`.
+ * Delegates to formatDateWithFormat which handles timezone-safe manual parsing
+ * and converts tenant moment-style tokens to date-fns tokens.
  */
-function formatDate(isoDate: string): string {
-  try {
-    const parts = isoDate.split('T')[0].split('-')
-    if (parts.length < 3) return isoDate
-    const year = parseInt(parts[0], 10)
-    const month = parseInt(parts[1], 10) - 1 // 0-indexed
-    const day = parseInt(parts[2], 10)
-    const d = new Date(year, month, day) // local date, no timezone shift
-    return d.toLocaleDateString('en-CA', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    })
-  } catch {
-    return isoDate
-  }
+function formatDate(isoDate: string, dateFormat?: string | null): string {
+  return formatDateWithFormat(isoDate, dateFormat)
 }
 
 /** Capitalize first letter */
@@ -469,8 +458,8 @@ export async function generateInvoicePdf(data: InvoicePdfData): Promise<Uint8Arr
   pm.y = metaStartY
 
   const metaRows: [string, string][] = [
-    ['Issue Date', formatDate(data.issueDate)],
-    ['Due Date', formatDate(data.dueDate)],
+    ['Issue Date', formatDate(data.issueDate, data.dateFormat)],
+    ['Due Date', formatDate(data.dueDate, data.dateFormat)],
     ['Status', capitalize(sanitize(data.status))],
     ['Matter', sanitize(data.matterTitle)],
   ]
@@ -591,7 +580,7 @@ export async function generateInvoicePdf(data: InvoicePdfData): Promise<Uint8Arr
 
     for (const pmt of data.payments) {
       pm.ensureSpace(LINE_HEIGHT + 6)
-      const dateStr = formatDate(pmt.payment_date)
+      const dateStr = formatDate(pmt.payment_date, data.dateFormat)
       const methodStr = paymentMethodLabel(pmt.payment_method)
       const refStr = pmt.reference ? ` (Ref: ${sanitize(pmt.reference)})` : ''
       pm.drawText(`${dateStr} \u2014 ${methodStr}${refStr}`, {

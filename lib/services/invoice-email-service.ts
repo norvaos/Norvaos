@@ -75,7 +75,7 @@ export async function sendInvoiceEmail(
 
     // Fetch tenant, matter, contact, line items, payments in parallel
     const [tenantRes, matterRes, lineItemsRes, paymentsRes] = await Promise.all([
-      supabase.from('tenants').select('id, name, currency, settings').eq('id', tenantId).single(),
+      supabase.from('tenants').select('id, name, currency, date_format, settings').eq('id', tenantId).single(),
       supabase.from('matters').select('id, title, matter_number').eq('id', invoice.matter_id ?? '').eq('tenant_id', tenantId).single(),
       supabase.from('invoice_line_items').select('*').eq('invoice_id', invoiceId).eq('tenant_id', tenantId).order('sort_order'),
       supabase.from('payments').select('*').eq('invoice_id', invoiceId).eq('tenant_id', tenantId).order('created_at', { ascending: false }),
@@ -250,7 +250,7 @@ export async function sendReceiptEmail(
     const [invoiceRes, paymentsRes, tenantRes] = await Promise.all([
       supabase.from('invoices').select('*').eq('id', invoiceId).eq('tenant_id', tenantId).single(),
       supabase.from('payments').select('*').eq('invoice_id', invoiceId).eq('tenant_id', tenantId).order('created_at', { ascending: false }),
-      supabase.from('tenants').select('id, name, currency, settings').eq('id', tenantId).single(),
+      supabase.from('tenants').select('id, name, currency, date_format, settings').eq('id', tenantId).single(),
     ])
 
     if (!invoiceRes.data) return { success: false, error: 'Invoice not found' }
@@ -305,6 +305,7 @@ export async function sendReceiptEmail(
       totalPaid: invoice.amount_paid ?? 0,
       invoiceTotal: invoice.total_amount,
       currency,
+      dateFormat: (tenant as { date_format?: string | null }).date_format ?? null,
     })
 
     const totalFormatted = new Intl.NumberFormat('en-CA', { style: 'currency', currency }).format((invoice.amount_paid ?? 0) / 100)
@@ -368,7 +369,7 @@ export async function sendReminderEmail(
 
     const [invoiceRes, tenantRes] = await Promise.all([
       supabase.from('invoices').select('*').eq('id', invoiceId).eq('tenant_id', tenantId).single(),
-      supabase.from('tenants').select('id, name, currency, settings').eq('id', tenantId).single(),
+      supabase.from('tenants').select('id, name, currency, date_format, settings').eq('id', tenantId).single(),
     ])
 
     if (!invoiceRes.data || !tenantRes.data) return { success: false, error: 'Invoice or tenant not found' }

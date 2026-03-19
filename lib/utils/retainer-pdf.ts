@@ -25,6 +25,7 @@ import {
   rgb,
 } from 'pdf-lib'
 import fontkit from '@pdf-lib/fontkit'
+import { formatDateWithFormat } from '@/lib/utils/formatters'
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -47,6 +48,8 @@ export interface RetainerPdfData {
   currency?: string // default 'CAD'
   /** Unique verification code for paper-sign authentication. Printed on PDF footer. */
   verificationCode?: string | null
+  /** Tenant's preferred date format token, e.g. "DD/MM/YYYY". Passed from API route. */
+  dateFormat?: string | null
 }
 
 // ── Constants (exported for template renderer) ──────────────────────────────
@@ -130,26 +133,11 @@ export function formatDollars(dollars: number, currency = 'CAD'): string {
 }
 
 /**
- * Format ISO date string (YYYY-MM-DD) to readable string.
- * Parses date parts manually to avoid UTC/local timezone shift
- * that causes off-by-one errors with `new Date('2026-03-01')`.
+ * Format ISO date string using the tenant's preferred format.
+ * Delegates to formatDateWithFormat (timezone-safe manual parsing).
  */
-function formatDate(isoDate: string): string {
-  try {
-    const parts = isoDate.split('T')[0].split('-')
-    if (parts.length < 3) return isoDate
-    const year = parseInt(parts[0], 10)
-    const month = parseInt(parts[1], 10) - 1 // 0-indexed
-    const day = parseInt(parts[2], 10)
-    const d = new Date(year, month, day) // local date, no timezone shift
-    return d.toLocaleDateString('en-CA', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    })
-  } catch {
-    return isoDate
-  }
+function formatDate(isoDate: string, dateFormat?: string | null): string {
+  return formatDateWithFormat(isoDate, dateFormat)
 }
 
 /** Capitalize first letter */
@@ -732,7 +720,7 @@ export async function generateRetainerPdf(data: RetainerPdfData): Promise<Uint8A
       pm.drawText(fmtDollars(installment.amount), { size: FONT_BODY, x: planColAmount })
 
       if (installment.dueDate) {
-        pm.drawText(formatDate(installment.dueDate), { size: FONT_BODY, x: planColDue })
+        pm.drawText(formatDate(installment.dueDate, data.dateFormat), { size: FONT_BODY, x: planColDue })
       } else {
         pm.drawText('\u2014', { size: FONT_BODY, color: COLOR_LIGHT, x: planColDue })
       }

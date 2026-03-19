@@ -24,6 +24,36 @@ export function setTenantDateFormat(tenantFormat: string): void {
   _tenantDateFnsFormat = toDateFnsTokens(tenantFormat)
 }
 
+/**
+ * Format an ISO date string using a caller-supplied moment-style format token
+ * (e.g. "DD/MM/YYYY"). Safe to call from server-side code (API routes, PDFs)
+ * where the client singleton is unavailable.
+ *
+ * Parses date parts manually to avoid the UTC/local timezone shift that
+ * causes off-by-one errors with `new Date('2026-03-01')`.
+ *
+ * Falls back to "MMMM d, yyyy" (e.g. "March 19, 2026") when no format is given.
+ */
+export function formatDateWithFormat(
+  isoDate: string | null | undefined,
+  tenantFormat?: string | null,
+): string {
+  if (!isoDate) return ''
+  try {
+    const parts = isoDate.split('T')[0].split('-')
+    if (parts.length < 3) return isoDate
+    const d = new Date(
+      parseInt(parts[0], 10),
+      parseInt(parts[1], 10) - 1,
+      parseInt(parts[2], 10),
+    )
+    const fmt = tenantFormat ? toDateFnsTokens(tenantFormat) : 'MMMM d, yyyy'
+    return format(d, fmt)
+  } catch {
+    return isoDate
+  }
+}
+
 // ── Formatting helpers ───────────────────────────────────────────────────────
 
 export function formatDate(date: string | Date | null | undefined, dateFormat?: string): string {

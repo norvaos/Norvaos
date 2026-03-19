@@ -8,6 +8,7 @@ import { readFileSync } from 'fs'
 import { join } from 'path'
 import { PDFDocument, rgb } from 'pdf-lib'
 import fontkit from '@pdf-lib/fontkit'
+import { formatDateWithFormat } from '@/lib/utils/formatters'
 
 // Types
 export interface ReceiptPdfPayment {
@@ -26,6 +27,8 @@ export interface ReceiptPdfData {
   totalPaid: number // cents
   invoiceTotal: number // cents
   currency?: string
+  /** Tenant's preferred date format token, e.g. "DD/MM/YYYY". Passed from API route. */
+  dateFormat?: string | null
 }
 
 // Constants
@@ -66,15 +69,8 @@ function formatCurrency(cents: number, currency = 'CAD'): string {
   return new Intl.NumberFormat('en-CA', { style: 'currency', currency, minimumFractionDigits: 2 }).format(cents / 100)
 }
 
-function formatDate(isoDate: string): string {
-  try {
-    const parts = isoDate.split('T')[0].split('-')
-    if (parts.length < 3) return isoDate
-    const d = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10))
-    return d.toLocaleDateString('en-CA', { year: 'numeric', month: 'long', day: 'numeric' })
-  } catch {
-    return isoDate
-  }
+function formatDate(isoDate: string, dateFormat?: string | null): string {
+  return formatDateWithFormat(isoDate, dateFormat)
 }
 
 function paymentMethodLabel(method: string): string {
@@ -124,7 +120,7 @@ export async function generateReceiptPdf(data: ReceiptPdfData): Promise<Uint8Arr
   const details: [string, string][] = [
     ['Invoice Number', sanitize(data.invoiceNumber)],
     ['Client', sanitize(data.billToName)],
-    ['Date', formatDate(new Date().toISOString().split('T')[0])],
+    ['Date', formatDate(new Date().toISOString().split('T')[0], data.dateFormat)],
   ]
 
   for (const [label, value] of details) {
@@ -148,7 +144,7 @@ export async function generateReceiptPdf(data: ReceiptPdfData): Promise<Uint8Arr
 
   // Payment rows
   for (const pmt of data.payments) {
-    page.drawText(formatDate(pmt.payment_date), { x: MARGIN_LEFT + 4, y, size: 9, font, color: COLOR_DARK })
+    page.drawText(formatDate(pmt.payment_date, data.dateFormat), { x: MARGIN_LEFT + 4, y, size: 9, font, color: COLOR_DARK })
     page.drawText(paymentMethodLabel(pmt.payment_method), { x: MARGIN_LEFT + 130, y, size: 9, font, color: COLOR_DARK })
     page.drawText(sanitize(pmt.reference) || '—', { x: MARGIN_LEFT + 260, y, size: 9, font, color: COLOR_DARK })
     const amtStr = fmt(pmt.amount)

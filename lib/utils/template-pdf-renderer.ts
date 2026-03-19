@@ -21,6 +21,7 @@ import {
   rgb,
 } from 'pdf-lib'
 import fontkit from '@pdf-lib/fontkit'
+import { formatDateWithFormat } from '@/lib/utils/formatters'
 import type {
   TemplateBody,
   TemplateSection,
@@ -577,7 +578,7 @@ function renderPaymentScheduleTable(
     pm.drawText(fmtDollars(inst.amount), { size: FONT_BODY, x: planColAmount })
 
     if (inst.dueDate) {
-      pm.drawText(formatDateSafe(inst.dueDate), { size: FONT_BODY, x: planColDue })
+      pm.drawText(formatDateSafe(inst.dueDate, data.dateFormat), { size: FONT_BODY, x: planColDue })
     } else {
       pm.drawText('\u2014', { size: FONT_BODY, color: COLOR_LIGHT, x: planColDue })
     }
@@ -686,16 +687,6 @@ function resolveFields(text: string, fields: Record<string, string>): string {
 
 // ── Date Helper ──────────────────────────────────────────────────────────────
 
-function formatDateSafe(isoDate: string): string {
-  try {
-    const parts = isoDate.split('T')[0].split('-')
-    if (parts.length < 3) return isoDate
-    const year = parseInt(parts[0], 10)
-    const month = parseInt(parts[1], 10) - 1
-    const day = parseInt(parts[2], 10)
-    const d = new Date(year, month, day)
-    return d.toLocaleDateString('en-CA', { year: 'numeric', month: 'long', day: 'numeric' })
-  } catch {
-    return isoDate
-  }
+function formatDateSafe(isoDate: string, dateFormat?: string | null): string {
+  return formatDateWithFormat(isoDate, dateFormat)
 }

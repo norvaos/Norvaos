@@ -102,7 +102,7 @@ async function handleGet(
       .single(),
     supabase
       .from('tenants')
-      .select('id, name, currency, settings')
+      .select('id, name, currency, date_format, settings')
       .eq('id', tenantId)
       .single(),
   ])
@@ -228,6 +228,7 @@ async function handleGet(
     })),
     notes: invoice.notes ?? null,
     currency,
+    dateFormat: (tenant as { date_format?: string | null }).date_format ?? null,
   }
 
   const pdfBytes = await generateInvoicePdf(pdfData)

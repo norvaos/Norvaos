@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
 
     const { data: tenant } = await supabase
       .from('tenants')
-      .select('name, settings')
+      .select('name, date_format, settings')
       .eq('id', auth.tenantId)
       .single()
 
@@ -145,6 +145,7 @@ export async function POST(request: NextRequest) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       paymentPlan: retainerPkg.payment_plan as any,
       verificationCode,
+      dateFormat: tenantData?.date_format ?? null,
     }
 
     // ── 6. Try template-driven PDF first ──────────────────────────────

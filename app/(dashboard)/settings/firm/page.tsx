@@ -200,9 +200,9 @@ export default function SettingsFirmPage() {
         throw new Error((body as { error?: string }).error ?? 'Failed to save')
       }
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       toast.success('Firm settings updated successfully.')
-      refreshTenant()
+      await refreshTenant()   // await so singleton is updated before the UI re-renders
       router.refresh()
     },
     onError: (error) => {
