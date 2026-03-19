@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { useUser } from './use-user'
+import { setTenantDateFormat } from '@/lib/utils/formatters'
 
 interface Tenant {
   id: string
@@ -62,6 +63,9 @@ export function TenantProvider({ children }: { children: ReactNode }) {
       const { data: tenantData } = await res.json()
       if (!tenantData) { setError('Failed to load firm data'); setIsLoading(false); return }
       setTenant(tenantData as Tenant)
+      // Push the tenant's date format into the formatters singleton so that
+      // every formatDate() / formatDateTime() call across the app reflects it.
+      if (tenantData.date_format) setTenantDateFormat(tenantData.date_format)
     } catch {
       setError('An unexpected error occurred')
     } finally {

@@ -1,13 +1,39 @@
 import { format, formatDistanceToNow, isToday, isYesterday, isPast, differenceInDays } from 'date-fns'
 
-export function formatDate(date: string | Date | null | undefined, dateFormat = 'dd-MMM-yyyy'): string {
+// ── Tenant date-format singleton ─────────────────────────────────────────────
+// The TenantProvider calls setTenantDateFormat() once the tenant loads.
+// All formatDate / formatDateTime calls automatically pick up the tenant's
+// preference without needing any changes in the 80+ files that use them.
+
+let _tenantDateFnsFormat = 'dd-MMM-yyyy' // safe fallback
+
+/**
+ * Convert the moment-style token string stored in the DB (e.g. "DD/MM/YYYY")
+ * into a date-fns compatible token string (e.g. "dd/MM/yyyy").
+ */
+function toDateFnsTokens(fmt: string): string {
+  // Process longer tokens first to avoid partial replacement collisions.
+  return fmt
+    .replace(/YYYY/g, 'yyyy') // 4-digit year
+    .replace(/DD/g,   'dd')   // day of month (2-digit)
+  // MM (month) and MMM (month abbrev) are identical in date-fns — no change needed.
+}
+
+/** Called by TenantProvider after the tenant data loads. */
+export function setTenantDateFormat(tenantFormat: string): void {
+  _tenantDateFnsFormat = toDateFnsTokens(tenantFormat)
+}
+
+// ── Formatting helpers ───────────────────────────────────────────────────────
+
+export function formatDate(date: string | Date | null | undefined, dateFormat?: string): string {
   if (!date) return ''
-  return format(new Date(date), dateFormat)
+  return format(new Date(date), dateFormat ?? _tenantDateFnsFormat)
 }
 
 export function formatDateTime(date: string | Date | null | undefined): string {
   if (!date) return ''
-  return format(new Date(date), 'dd-MMM-yyyy h:mm a')
+  return format(new Date(date), `${_tenantDateFnsFormat} h:mm a`)
 }
 
 export function formatRelativeDate(date: string | Date | null | undefined): string {
