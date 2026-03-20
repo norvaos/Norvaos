@@ -15,7 +15,8 @@
  *   - Version records created via SECURITY DEFINER RPC for atomic numbering
  *
  * Flow (draft):
- *   1. Fetch profile from contacts.immigration_data
+ *   1. Resolve profile — prefer matter_form_instances.answers via resolveForGeneration(),
+ *      fall back to contacts.immigration_data for legacy instances
  *   2. Compute readiness — hard fail if can_generate === false
  *   3. Validate template checksum — hard fail on mismatch
  *   4. Snapshot profile + resolve XFA fields
@@ -51,6 +52,7 @@ import {
   buildXfaFieldDataFromDB,
   computePackReadinessFromDB,
 } from './xfa-filler-db'
+import { resolveForGeneration } from './generation-resolver'
 import {
   computeFileChecksum,
   validateTemplateBytesChecksum,
@@ -87,9 +89,43 @@ export async function generateFormPack(
 
   const { formId, formCode, expectedChecksum, storagePath: templateStoragePath } = await resolveFormId(supabase, tenantId, packType)
 
-  // ── 2. Fetch the primary contact's immigration profile ──────────────────
+  // ── 2. Resolve profile — prefer instance answers, fall back to contact ──
 
-  const profile = await fetchImmigrationProfile(supabase, tenantId, matterId)
+  // Try to find a form instance for this matter + form (new engine path)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: formInstance } = await (supabase as any)
+    .from('matter_form_instances')
+    .select('id, answers')
+    .eq('matter_id', matterId)
+    .eq('form_id', formId)
+    .eq('is_active', true)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+
+  let profile: Record<string, unknown>
+  let resolvedFields: Record<string, string>
+  let useInstanceResolver = false
+
+  if (formInstance?.id && formInstance.answers && Object.keys(formInstance.answers as object).length > 0) {
+    // ── NEW ENGINE PATH: Resolve from per-instance answers ──────────────
+    const resolverResult = await resolveForGeneration(formInstance.id, formId, supabase)
+
+    if (!resolverResult.readinessCheck.canGenerate) {
+      throw new ReadinessError(
+        resolverResult.readinessCheck.errors.map((e) => e),
+        resolverResult.readinessCheck.errors,
+      )
+    }
+
+    profile = resolverResult.inputSnapshot
+    resolvedFields = resolverResult.resolvedFields
+    useInstanceResolver = true
+  } else {
+    // ── LEGACY FALLBACK: Resolve from contacts.immigration_data ─────────
+    profile = await fetchImmigrationProfile(supabase, tenantId, matterId)
+    resolvedFields = {} // Will be computed later via resolveXFAFieldsFromDB
+  }
 
   // ── 2b. Fetch matter metadata for representative name + PDF filename ────
 
@@ -124,13 +160,15 @@ export async function generateFormPack(
   // ── 2c. Playbook-level generation guard ────────────────────────────────
   await enforcePlaybookGenerationRules(supabase, matterId, packType)
 
-  // ── 3. Compute readiness from DB — hard fail if not ready ───────────────
-  const readiness = await computePackReadinessFromDB(profile, [formId], supabase)
-  if (!readiness.isReady) {
-    throw new ReadinessError(
-      readiness.missingFields.map((f) => f.profile_path),
-      readiness.missingFields.map((f) => `Required field missing: ${f.label}`),
-    )
+  // ── 3. Compute readiness — skip for instance path (already checked) ────
+  if (!useInstanceResolver) {
+    const readiness = await computePackReadinessFromDB(profile, [formId], supabase)
+    if (!readiness.isReady) {
+      throw new ReadinessError(
+        readiness.missingFields.map((f) => f.profile_path),
+        readiness.missingFields.map((f) => `Required field missing: ${f.label}`),
+      )
+    }
   }
 
   // ── 4. Download template + validate checksum ────────────────────────────
@@ -148,7 +186,10 @@ export async function generateFormPack(
     // ── 5. Create frozen snapshot ─────────────────────────────────────────
 
     const inputSnapshot = structuredClone(profile)
-    const resolvedFields = await resolveXFAFieldsFromDB(formId, profile, supabase)
+    // If instance resolver was used, resolvedFields is already populated
+    if (!useInstanceResolver) {
+      resolvedFields = await resolveXFAFieldsFromDB(formId, profile, supabase)
+    }
     const mappingVersion = await getMappingVersionFromDB(formId, supabase)
 
     // ── 6. Validate form data (draft = non-blocking, collected for record) ─
@@ -240,10 +281,13 @@ export async function generateFormPack(
       idempotent_hit: boolean
     }
 
-    // Tag version with DB generation source + form_id
+    // Tag version with generation source + form_id
     await supabase
       .from('form_pack_versions')
-      .update({ generation_source: 'db', form_id: formId })
+      .update({
+        generation_source: useInstanceResolver ? 'instance_engine' : 'db',
+        form_id: formId,
+      })
       .eq('id', result.version_id)
 
     // Check for idempotent hit — return early without re-uploading

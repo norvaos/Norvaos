@@ -98,6 +98,7 @@ export const navigation: NavSection[] = [
           { title: 'KPI Scorecard', href: '/analytics/scorecard', icon: TrendingUp },
           { title: 'Reports', href: '/reports', icon: BarChart3, featureFlag: 'advanced_reporting' },
           { title: 'Integrations', href: '/integrations/clio', icon: Globe, comingSoon: true },
+          { title: 'IRCC Forms', href: '/admin/ircc-forms', icon: FileText },
           { title: 'Tenants', href: '/admin/tenants', icon: Building2 },
           { title: 'Critical Actions', href: '/admin/critical-actions', icon: AlertTriangle },
           { title: 'Communications', href: '/communications', icon: Mail, deprecated: true },

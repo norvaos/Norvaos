@@ -5,15 +5,16 @@ import { Clock, Users, Calendar, AlertTriangle, Timer, Play, Square, Coffee, Rot
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { useTenant } from '@/lib/hooks/use-tenant'
-import { useFrontDeskCheckIns, useTodaySchedule, useFrontDeskTasks, frontDeskKeys } from '@/lib/queries/front-desk-queries'
-import type { FrontDeskActiveShift } from '@/lib/queries/front-desk-queries'
+import { useFrontDeskCheckIns, useTodaySchedule, useFrontDeskTasks, useFrontDeskActiveShift, frontDeskKeys } from '@/lib/queries/front-desk-queries'
 
 interface NowStripProps {
   userId: string
-  activeShift: FrontDeskActiveShift | null | undefined
 }
 
-export function NowStrip({ userId, activeShift }: NowStripProps) {
+export function NowStrip({ userId }: NowStripProps) {
+  // Own the active shift query here — don't rely on parent prop drilling.
+  // This ensures invalidation immediately re-renders this component.
+  const { data: activeShift } = useFrontDeskActiveShift(userId)
   const { tenant } = useTenant()
   const tenantId = tenant?.id ?? ''
   const today = new Date().toISOString().split('T')[0]
@@ -41,7 +42,18 @@ export function NowStrip({ userId, activeShift }: NowStripProps) {
       if (!res.ok) throw new Error(data.error ?? 'Failed to start shift')
       return data
     },
-    onSuccess: () => {
+    onSuccess: (result) => {
+      // Optimistic update — flip the UI immediately before the refetch completes
+      const shiftData = result?.data
+      if (shiftData?.shiftId) {
+        queryClient.setQueryData(frontDeskKeys.activeShift(userId), {
+          id: shiftData.shiftId,
+          started_at: shiftData.startedAt ?? new Date().toISOString(),
+          shift_date: new Date().toISOString().split('T')[0],
+          onBreak: false,
+          breakStartedAt: null,
+        })
+      }
       toast.success('Shift started')
       queryClient.invalidateQueries({ queryKey: frontDeskKeys.all })
     },
@@ -60,6 +72,8 @@ export function NowStrip({ userId, activeShift }: NowStripProps) {
       return data
     },
     onSuccess: () => {
+      // Optimistic clear — remove shift from cache immediately
+      queryClient.setQueryData(frontDeskKeys.activeShift(userId), null)
       toast.success('Shift ended')
       setShowEndDialog(false)
       queryClient.invalidateQueries({ queryKey: frontDeskKeys.all })

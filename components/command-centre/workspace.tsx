@@ -19,6 +19,7 @@ import { CommunicationsPanel } from './panels/communications-panel'
 import { DocumentStatusPanel } from './panels/document-status-panel'
 import { RiskPanel } from './panels/risk-panel'
 import { IntakeWizardPanel } from './panels/intake-wizard-panel'
+import { ClientProfilePanel } from './panels/client-profile-panel'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -59,6 +60,7 @@ interface CoreDataForm {
   // Immigration intelligence fields (stored in custom_fields)
   client_location: string       // 'inland' | 'outside' | ''
   immigration_status: string    // visitor, student, worker, pr, citizen, refugee, no_status, etc.
+  processing_stream: string     // 'inland' | 'outland' | 'hybrid' | ''
   has_refusals: string          // 'yes' | 'no' | ''
   has_criminality: string       // 'yes' | 'no' | ''
   has_misrepresentation: string // 'yes' | 'no' | ''
@@ -117,6 +119,9 @@ export function Workspace() {
   if (entityType === 'matter') {
     return (
       <div className="max-w-5xl mx-auto px-4 py-6 space-y-6">
+        {/* Client Profile — demographics collected at intake */}
+        <ClientProfilePanel />
+
         {/* Matter Status + Risk (side by side) */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <MatterStatusPanel />
@@ -158,6 +163,9 @@ export function Workspace() {
 
       {/* Interactive Intake Wizard */}
       <IntakeWizardPanel />
+
+      {/* Client Profile — demographics collected at lead/intake stage */}
+      <ClientProfilePanel />
 
       {/* CRS Calculator — only for point-based programs (Express Entry, PNP) */}
       {showCrsCalculator && <CrsCalculatorPanel />}
@@ -234,6 +242,7 @@ function CoreDataCard({ lead, entityId, tenantId, users, practiceAreas, isConver
       reviewer_id: (customFields.reviewer_id as string) ?? '',
       client_location: (customFields.client_location as string) ?? '',
       immigration_status: (customFields.immigration_status as string) ?? '',
+      processing_stream: (customFields.processing_stream as string) ?? '',
       has_refusals: (customFields.has_refusals as string) ?? '',
       has_criminality: (customFields.has_criminality as string) ?? '',
       has_misrepresentation: (customFields.has_misrepresentation as string) ?? '',
@@ -255,6 +264,7 @@ function CoreDataCard({ lead, entityId, tenantId, users, practiceAreas, isConver
         reviewer_id: (cf.reviewer_id as string) ?? '',
         client_location: (cf.client_location as string) ?? '',
         immigration_status: (cf.immigration_status as string) ?? '',
+        processing_stream: (cf.processing_stream as string) ?? '',
         has_refusals: (cf.has_refusals as string) ?? '',
         has_criminality: (cf.has_criminality as string) ?? '',
         has_misrepresentation: (cf.has_misrepresentation as string) ?? '',
@@ -270,7 +280,7 @@ function CoreDataCard({ lead, entityId, tenantId, users, practiceAreas, isConver
 
         const updates: Record<string, unknown> = {}
 
-        if (['reviewer_id', 'client_location', 'immigration_status', 'has_refusals', 'has_criminality', 'has_misrepresentation'].includes(field)) {
+        if (['reviewer_id', 'client_location', 'immigration_status', 'processing_stream', 'has_refusals', 'has_criminality', 'has_misrepresentation'].includes(field)) {
           // Store in custom_fields JSON
           const cf = (lead.custom_fields ?? {}) as Record<string, unknown>
           const cleanValue = value && value !== 'none' ? value : null
@@ -582,6 +592,28 @@ function CoreDataCard({ lead, entityId, tenantId, users, practiceAreas, isConver
               {watch('client_location') === 'outside' && (
                 <p className="text-[10px] text-amber-600 font-medium">JR deadline: 60 days from refusal</p>
               )}
+            </div>
+
+            {/* Processing Stream */}
+            <div className="space-y-1.5">
+              <Label className="text-xs text-slate-500 flex items-center gap-1">
+                <Globe className="h-3 w-3" />
+                Processing Stream
+              </Label>
+              <Select
+                value={watch('processing_stream')}
+                onValueChange={(val) => setValue('processing_stream', val)}
+                disabled={isConverted}
+              >
+                <SelectTrigger className="h-9 text-sm">
+                  <SelectValue placeholder="Select..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="inland">Inland</SelectItem>
+                  <SelectItem value="outland">Outland</SelectItem>
+                  <SelectItem value="hybrid">Hybrid</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             {/* Immigration Status in Canada */}

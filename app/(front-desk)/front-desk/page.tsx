@@ -49,6 +49,7 @@ export default function FrontDeskDashboard() {
   const userId = appUser?.id ?? ''
   const { data: staffList } = useFrontDeskStaffList(tenantId)
   const { data: fdConfig } = useFrontDeskConfig(tenantId)
+  // Shared with NowStrip — TanStack Query deduplicates, one network request
   const { data: activeShift } = useFrontDeskActiveShift(userId)
 
   const staffOptions = (staffList ?? []).map((s) => ({ value: s.id, label: s.name }))
@@ -376,7 +377,7 @@ export default function FrontDeskDashboard() {
       />
 
       {/* Now Strip — live context bar */}
-      {userId && <NowStrip userId={userId} activeShift={activeShift} />}
+      {userId && <NowStrip userId={userId} />}
 
       {/* Stats Bar */}
       {fdConfig?.show_stats_bar !== false && <StatsBar />}

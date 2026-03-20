@@ -3099,8 +3099,12 @@ export type Database = {
           conflict_status: string
           contact_type: string
           country: string | null
+          country_of_birth: string | null
+          country_of_residence: string | null
           created_at: string | null
           created_by: string | null
+          criminal_charges: boolean | null
+          currently_in_canada: boolean | null
           custom_fields: Json | null
           date_of_birth: string | null
           email_notifications_enabled: boolean | null
@@ -3109,9 +3113,13 @@ export type Database = {
           email_secondary: string | null
           engagement_score: number | null
           first_name: string | null
+          gender: string | null
           has_portal_access: boolean | null
           id: string
           immigration_data: Json | null
+          immigration_status: string | null
+          immigration_status_expiry: string | null
+          inadmissibility_flag: boolean | null
           interaction_count: number | null
           is_active: boolean | null
           is_archived: boolean | null
@@ -3119,10 +3127,12 @@ export type Database = {
           last_contacted_at: string | null
           last_interaction_type: string | null
           last_name: string | null
+          marital_status: string | null
           matter_type_id: string | null
           middle_name: string | null
           milestone: string
           milestone_updated_at: string | null
+          nationality: string | null
           notes: string | null
           opt_in_date: string | null
           opt_in_source: string | null
@@ -3143,6 +3153,7 @@ export type Database = {
           source: string | null
           source_detail: string | null
           tenant_id: string
+          travel_history_flag: boolean | null
           updated_at: string | null
           website: string | null
         }
@@ -3154,8 +3165,12 @@ export type Database = {
           conflict_status?: string
           contact_type?: string
           country?: string | null
+          country_of_birth?: string | null
+          country_of_residence?: string | null
           created_at?: string | null
           created_by?: string | null
+          criminal_charges?: boolean | null
+          currently_in_canada?: boolean | null
           custom_fields?: Json | null
           date_of_birth?: string | null
           email_notifications_enabled?: boolean | null
@@ -3164,9 +3179,13 @@ export type Database = {
           email_secondary?: string | null
           engagement_score?: number | null
           first_name?: string | null
+          gender?: string | null
           has_portal_access?: boolean | null
           id?: string
           immigration_data?: Json | null
+          immigration_status?: string | null
+          immigration_status_expiry?: string | null
+          inadmissibility_flag?: boolean | null
           interaction_count?: number | null
           is_active?: boolean | null
           is_archived?: boolean | null
@@ -3174,10 +3193,12 @@ export type Database = {
           last_contacted_at?: string | null
           last_interaction_type?: string | null
           last_name?: string | null
+          marital_status?: string | null
           matter_type_id?: string | null
           middle_name?: string | null
           milestone?: string
           milestone_updated_at?: string | null
+          nationality?: string | null
           notes?: string | null
           opt_in_date?: string | null
           opt_in_source?: string | null
@@ -3198,6 +3219,7 @@ export type Database = {
           source?: string | null
           source_detail?: string | null
           tenant_id: string
+          travel_history_flag?: boolean | null
           updated_at?: string | null
           website?: string | null
         }
@@ -3209,8 +3231,12 @@ export type Database = {
           conflict_status?: string
           contact_type?: string
           country?: string | null
+          country_of_birth?: string | null
+          country_of_residence?: string | null
           created_at?: string | null
           created_by?: string | null
+          criminal_charges?: boolean | null
+          currently_in_canada?: boolean | null
           custom_fields?: Json | null
           date_of_birth?: string | null
           email_notifications_enabled?: boolean | null
@@ -3219,9 +3245,13 @@ export type Database = {
           email_secondary?: string | null
           engagement_score?: number | null
           first_name?: string | null
+          gender?: string | null
           has_portal_access?: boolean | null
           id?: string
           immigration_data?: Json | null
+          immigration_status?: string | null
+          immigration_status_expiry?: string | null
+          inadmissibility_flag?: boolean | null
           interaction_count?: number | null
           is_active?: boolean | null
           is_archived?: boolean | null
@@ -3229,10 +3259,12 @@ export type Database = {
           last_contacted_at?: string | null
           last_interaction_type?: string | null
           last_name?: string | null
+          marital_status?: string | null
           matter_type_id?: string | null
           middle_name?: string | null
           milestone?: string
           milestone_updated_at?: string | null
+          nationality?: string | null
           notes?: string | null
           opt_in_date?: string | null
           opt_in_source?: string | null
@@ -3253,6 +3285,7 @@ export type Database = {
           source?: string | null
           source_detail?: string | null
           tenant_id?: string
+          travel_history_flag?: boolean | null
           updated_at?: string | null
           website?: string | null
         }
@@ -8572,6 +8605,14 @@ export type Database = {
           value_format: Json | null
           xfa_field_type: string | null
           xfa_path: string
+          // migration 145: forms-engine columns
+          on_parent_change: string
+          propagation_mode: string
+          min_length: number | null
+          validation_pattern: string | null
+          validation_message: string | null
+          is_blocking: boolean
+          canonical_domain: string | null
         }
         Insert: {
           array_config?: Json | null
@@ -8605,6 +8646,14 @@ export type Database = {
           value_format?: Json | null
           xfa_field_type?: string | null
           xfa_path: string
+          // migration 145: forms-engine columns
+          on_parent_change?: string
+          propagation_mode?: string
+          min_length?: number | null
+          validation_pattern?: string | null
+          validation_message?: string | null
+          is_blocking?: boolean
+          canonical_domain?: string | null
         }
         Update: {
           array_config?: Json | null
@@ -8638,6 +8687,14 @@ export type Database = {
           value_format?: Json | null
           xfa_field_type?: string | null
           xfa_path?: string
+          // migration 145: forms-engine columns
+          on_parent_change?: string
+          propagation_mode?: string
+          min_length?: number | null
+          validation_pattern?: string | null
+          validation_message?: string | null
+          is_blocking?: boolean
+          canonical_domain?: string | null
         }
         Relationships: [
           {
@@ -8674,6 +8731,9 @@ export type Database = {
           sort_order: number
           tenant_id: string
           title: string
+          // migration 145: forms-engine columns
+          completion_condition: Json | null
+          is_repeatable: boolean
         }
         Insert: {
           created_at?: string
@@ -8685,6 +8745,9 @@ export type Database = {
           sort_order?: number
           tenant_id: string
           title: string
+          // migration 145: forms-engine columns
+          completion_condition?: Json | null
+          is_repeatable?: boolean
         }
         Update: {
           created_at?: string
@@ -8696,6 +8759,9 @@ export type Database = {
           sort_order?: number
           tenant_id?: string
           title?: string
+          // migration 145: forms-engine columns
+          completion_condition?: Json | null
+          is_repeatable?: boolean
         }
         Relationships: [
           {
@@ -20423,5 +20489,174 @@ export interface FormGenerationLogUpdate {
   processing_started_at?: string | null
   completed_at?: string | null
   metadata?: Json
+  updated_at?: string
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// Migration 145: IRCC Forms Engine — Core Infrastructure
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// ── matter_form_instances: new forms-engine columns ─────────────────────────
+
+export interface MatterFormInstanceEngineFields {
+  answers: Json                        // JSONB, per-instance answer storage
+  completion_state: Json               // JSONB, section-level completion tracking
+  blocker_count: number                // blocking validation failures
+  stale_count: number                  // stale dependency count
+  missing_required_count: number       // required fields still empty
+  last_prefill_at: string | null       // TIMESTAMPTZ
+  prefill_source: string | null        // e.g. 'canonical_prefill', 'cross_form_reuse'
+}
+
+// ── ircc_form_fields: new forms-engine columns ──────────────────────────────
+
+export interface IrccFormFieldEngineFields {
+  on_parent_change: 'mark_stale' | 'auto_clear'
+  propagation_mode: 'auto' | 'no_propagate'
+  min_length: number | null
+  validation_pattern: string | null
+  validation_message: string | null
+  is_blocking: boolean
+  canonical_domain: string | null
+}
+
+// ── ircc_form_sections: new forms-engine columns ────────────────────────────
+
+export interface IrccFormSectionEngineFields {
+  completion_condition: Json | null    // JSONB rule for section completion
+  is_repeatable: boolean
+}
+
+// ── form_instance_answer_history (append-only audit) ────────────────────────
+
+export type AnswerHistorySource =
+  | 'client_portal'
+  | 'staff_entry'
+  | 'canonical_prefill'
+  | 'cross_form_reuse'
+  | 'cross_matter_import'
+  | 'extraction'
+  | 'migration'
+
+export interface FormInstanceAnswerHistoryRow {
+  id: string
+  tenant_id: string
+  form_instance_id: string
+  profile_path: string
+  old_value: Json | null
+  new_value: Json | null
+  source: AnswerHistorySource
+  source_origin: string | null
+  changed_by: string | null            // UUID → users.id
+  changed_at: string                   // TIMESTAMPTZ
+  stale_triggered: boolean
+}
+
+export interface FormInstanceAnswerHistoryInsert {
+  id?: string
+  tenant_id: string
+  form_instance_id: string
+  profile_path: string
+  old_value?: Json | null
+  new_value?: Json | null
+  source: AnswerHistorySource
+  source_origin?: string | null
+  changed_by?: string | null
+  changed_at?: string
+  stale_triggered?: boolean
+}
+
+// No Update type — table is append-only (no UPDATE/DELETE allowed by RLS)
+
+// ── reuse_log ───────────────────────────────────────────────────────────────
+
+export type ReuseType = 'cross_form' | 'cross_matter' | 'canonical_prefill'
+
+export interface ReuseLogRow {
+  id: string
+  tenant_id: string
+  reuse_type: ReuseType
+  target_instance_id: string
+  target_profile_path: string
+  source_instance_id: string | null
+  source_matter_id: string | null
+  source_canonical_field_id: string | null
+  value: Json
+  accepted: boolean | null
+  accepted_by: string | null           // UUID → users.id
+  accepted_at: string | null           // TIMESTAMPTZ
+  created_at: string
+}
+
+export interface ReuseLogInsert {
+  id?: string
+  tenant_id: string
+  reuse_type: ReuseType
+  target_instance_id: string
+  target_profile_path: string
+  source_instance_id?: string | null
+  source_matter_id?: string | null
+  source_canonical_field_id?: string | null
+  value: Json
+  accepted?: boolean | null
+  accepted_by?: string | null
+  accepted_at?: string | null
+  created_at?: string
+}
+
+// No Update type — table is append-only (no UPDATE/DELETE allowed by RLS)
+
+// ── composite_validation_rules ──────────────────────────────────────────────
+
+export type CompositeRuleSeverity = 'blocking' | 'warning'
+export type CompositeRuleScope = 'form' | 'matter' | 'entity'
+
+export interface CompositeValidationRuleRow {
+  id: string
+  tenant_id: string
+  form_id: string | null               // UUID → ircc_forms.id (null = global rule)
+  rule_key: string
+  description: string
+  severity: CompositeRuleSeverity
+  scope: CompositeRuleScope
+  condition: Json                      // JSONB rule definition
+  field_paths: string[]
+  error_message: string
+  error_message_staff: string | null
+  is_active: boolean
+  sort_order: number
+  created_at: string
+  updated_at: string
+}
+
+export interface CompositeValidationRuleInsert {
+  id?: string
+  tenant_id: string
+  form_id?: string | null
+  rule_key: string
+  description: string
+  severity?: CompositeRuleSeverity
+  scope?: CompositeRuleScope
+  condition: Json
+  field_paths: string[]
+  error_message: string
+  error_message_staff?: string | null
+  is_active?: boolean
+  sort_order?: number
+  created_at?: string
+  updated_at?: string
+}
+
+export interface CompositeValidationRuleUpdate {
+  rule_key?: string
+  description?: string
+  severity?: CompositeRuleSeverity
+  scope?: CompositeRuleScope
+  condition?: Json
+  field_paths?: string[]
+  error_message?: string
+  error_message_staff?: string | null
+  is_active?: boolean
+  sort_order?: number
   updated_at?: string
 }

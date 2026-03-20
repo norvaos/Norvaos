@@ -21,7 +21,10 @@ export async function POST(request: NextRequest) {
   try {
     const auth = await authenticateRequest()
     requirePermission(auth, 'leads', 'edit')
+    // All reads and writes use adminClient — user-scoped RLS must never block
+    // a legitimate conversion triggered by an authenticated, authorised user.
     const supabase = await createServerSupabaseClient()
+    const adminForReads = createAdminClient()
 
     const body = await request.json()
     const { leadId, retainerPackageId } = body
@@ -33,9 +36,9 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Verify access
+    // Verify lead belongs to this tenant (use adminClient so RLS never hides it)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: lead, error: leadErr } = await (supabase as any)
+    const { data: lead, error: leadErr } = await (adminForReads as any)
       .from('leads')
       .select('id, contact_id, matter_type_id, practice_area_id, responsible_lawyer_id, assigned_to, person_scope, status, converted_matter_id, pipeline_id')
       .eq('id', leadId)
@@ -49,7 +52,7 @@ export async function POST(request: NextRequest) {
     if (lead.converted_matter_id) {
       // Already converted — return success
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data: matter } = await (supabase as any)
+      const { data: matter } = await (adminForReads as any)
         .from('matters')
         .select('matter_number')
         .eq('id', lead.converted_matter_id)
@@ -61,9 +64,10 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    // Verify retainer package exists and is in a convertible state
+    // Verify retainer package — use adminClient so RLS on lead_retainer_packages
+    // never causes a false 404 that silently aborts the conversion.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: retainerPkg } = await (supabase as any)
+    const { data: retainerPkg } = await (adminForReads as any)
       .from('lead_retainer_packages')
       .select('id, status, payment_status, billing_type')
       .eq('id', retainerPackageId)
@@ -123,7 +127,7 @@ export async function POST(request: NextRequest) {
 
     if (conversionResult.success && conversionResult.matterId) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data: matter } = await (adminClient as any)
+      const { data: matter } = await (adminForReads as any)
         .from('matters')
         .select('matter_number')
         .eq('id', conversionResult.matterId)

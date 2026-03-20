@@ -107,12 +107,15 @@ export function ContactsTab({
     setIsLinking(true)
     try {
       const supabase = createClient()
+      // If no primary contact exists yet, the first one added is always primary
+      const hasPrimary = contacts?.some((c) => c.is_primary) ?? false
+      const effectiveIsPrimary = hasPrimary ? isPrimary : true
       const { error } = await supabase.from('matter_contacts').insert({
         tenant_id: tenantId,
         matter_id: matterId,
         contact_id: selectedContactId,
         role: selectedRole,
-        is_primary: isPrimary,
+        is_primary: effectiveIsPrimary,
       })
       if (error) throw error
       queryClient.invalidateQueries({ queryKey: ['matter-contacts', matterId] })

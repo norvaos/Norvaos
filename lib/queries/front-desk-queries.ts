@@ -912,7 +912,9 @@ export function useFrontDeskActiveShift(userId: string) {
       return { ...shift, onBreak, breakStartedAt }
     },
     enabled: !!userId,
-    refetchInterval: 30_000,
+    staleTime: 0,            // Always stale — refetch immediately on focus/invalidation
+    refetchInterval: 10_000, // Poll every 10s as fallback
+    refetchOnMount: 'always',// Always hit DB on mount, never serve stale cache
   })
 }
 

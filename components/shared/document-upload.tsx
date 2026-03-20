@@ -43,7 +43,9 @@ import {
   Cloud,
   HardDrive,
   ExternalLink,
+  ScanSearch,
 } from 'lucide-react'
+import { DocumentScanButton } from '@/components/shared/document-scan-button'
 
 const DOCUMENT_CATEGORIES = [
   { value: 'general', label: 'General' },
@@ -125,6 +127,7 @@ export function DocumentUpload({ entityType, entityId, tenantId, entityName, hid
   const [deleteId, setDeleteId] = useState<{ id: string; storagePath: string; name: string } | null>(null)
   const [isDragging, setIsDragging] = useState(false)
   const [viewerDoc, setViewerDoc] = useState<{ storagePath: string; fileName: string; fileType: string | null } | null>(null)
+  const [scanExtracted, setScanExtracted] = useState<Record<string, string | number | null> | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Check if OneDrive is connected and enabled
@@ -264,6 +267,7 @@ export function DocumentUpload({ entityType, entityId, tenantId, entityName, hid
     setCategory('general')
     setDescription('')
     setStorageLocation('local')
+    setScanExtracted(null)
   }
 
   const handleDownload = async (storagePath: string, fileName: string) => {
@@ -470,6 +474,61 @@ export function DocumentUpload({ entityType, entityId, tenantId, entityName, hid
                 )
               })}
             </div>
+            {/* Scan Document */}
+            {selectedFiles.length === 1 && (
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <DocumentScanButton
+                    file={selectedFiles[0]}
+                    documentTypeHint={category}
+                    onFieldsExtracted={(fields, detectedType) => {
+                      setScanExtracted(fields)
+                      // Auto-set category based on detected type
+                      const typeMap: Record<string, string> = {
+                        passport: 'identification',
+                        drivers_licence: 'identification',
+                        birth_certificate: 'identification',
+                        government_id: 'identification',
+                        marriage_certificate: 'identification',
+                        bank_statement: 'financial',
+                        tax_document: 'financial',
+                        employment_letter: 'financial',
+                        court_order: 'court_filing',
+                        police_clearance: 'general',
+                      }
+                      const detectedKey = detectedType.toLowerCase().replace(/[\s/]+/g, '_')
+                      const mapped = typeMap[detectedKey]
+                      if (mapped) setCategory(mapped)
+                      if (detectedKey.startsWith('ircc')) setCategory('immigration')
+                    }}
+                    disabled={uploadMutation.isPending}
+                  />
+                  <span className="text-xs text-muted-foreground">AI-powered extraction</span>
+                </div>
+                {scanExtracted && (
+                  <div className="border rounded-lg bg-green-50/50 border-green-200 divide-y divide-green-100">
+                    <div className="px-3 py-1.5 text-xs font-medium text-green-700 flex items-center gap-1.5">
+                      <ScanSearch className="h-3.5 w-3.5" />
+                      Extracted Information
+                    </div>
+                    {Object.entries(scanExtracted)
+                      .filter(([, v]) => v !== null)
+                      .map(([key, value]) => (
+                        <div
+                          key={key}
+                          className="flex items-center justify-between px-3 py-1.5 text-xs"
+                        >
+                          <span className="text-muted-foreground">
+                            {key.split('_').map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
+                          </span>
+                          <span className="font-medium">{String(value)}</span>
+                        </div>
+                      ))}
+                  </div>
+                )}
+              </div>
+            )}
+
             <div>
               <label className="text-sm font-medium">Category</label>
               <Select

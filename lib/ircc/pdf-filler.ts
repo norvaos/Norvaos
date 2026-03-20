@@ -1,12 +1,15 @@
 /**
+ * @deprecated — LEGACY PDF Filler.
+ *
+ * Replaced by xfa-filler-db-server.ts which reads field mappings from the DB
+ * (ircc_form_fields) instead of the hardcoded form-field-registry.
+ *
+ * This file still imports from the deprecated form-field-registry.ts.
+ * Do not add new call-sites — migrate existing consumers to the DB path.
+ *
+ * Original description:
  * IRCC PDF Filler — fills IRCC form PDFs with client profile data.
- *
- * Two modes:
- * 1. **Template mode** — loads a blank fillable PDF and populates form fields
- *    by name using the field registry mappings.
- * 2. **Summary mode** — generates a clean data-summary PDF from scratch when
- *    no official IRCC template is available.
- *
+ * Two modes: Template mode (fillable PDF) and Summary mode (data-summary PDF).
  * Uses `pdf-lib` for all PDF operations.
  */
 

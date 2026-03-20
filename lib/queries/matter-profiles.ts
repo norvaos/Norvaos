@@ -288,11 +288,85 @@ export function useSyncMatterProfileToCanonical() {
         },
       ) as { error: Error | null }
       if (error) throw error
+
+      // ── Dual-write: propagate synced-back fields to active form instances ──
+      // After the canonical contact blob is updated, propagate the changed
+      // fields to all active matter_form_instances for this matter so the
+      // new engine stays in sync.
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { data: person } = await (supabase as any)
+          .from('matter_people')
+          .select('profile_data')
+          .eq('id', matterPersonId)
+          .single()
+
+        if (person?.profile_data) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const { data: instances } = await (supabase as any)
+            .from('matter_form_instances')
+            .select('id, answers')
+            .eq('matter_id', matterId)
+            .eq('is_active', true)
+
+          if (instances && instances.length > 0) {
+            const now = new Date().toISOString()
+            const profileData = person.profile_data as Record<string, unknown>
+            // Flatten dot-notation keys from profile_data
+            const flatKeys: Record<string, unknown> = {}
+            function flatten(obj: Record<string, unknown>, prefix = '') {
+              for (const [k, v] of Object.entries(obj)) {
+                const path = prefix ? `${prefix}.${k}` : k
+                if (v && typeof v === 'object' && !Array.isArray(v)) {
+                  flatten(v as Record<string, unknown>, path)
+                } else {
+                  flatKeys[path] = v
+                }
+              }
+            }
+            flatten(profileData)
+
+            // Only sync the requested fields (or all if fieldsToSync is null)
+            const keysToSync = fieldsToSync
+              ? Object.entries(flatKeys).filter(([k]) => fieldsToSync.some((f) => k.startsWith(f)))
+              : Object.entries(flatKeys)
+
+            for (const inst of instances) {
+              const curAnswers = (inst.answers as Record<string, unknown>) ?? {}
+              const updAnswers = { ...curAnswers }
+              let changed = false
+
+              for (const [path, val] of keysToSync) {
+                if (val === undefined) continue
+                updAnswers[path] = {
+                  value: val,
+                  source: 'system',
+                  updated_at: now,
+                  stale: false,
+                }
+                changed = true
+              }
+
+              if (changed) {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                void (supabase as any)
+                  .from('matter_form_instances')
+                  .update({ answers: updAnswers, updated_at: now })
+                  .eq('id', inst.id)
+              }
+            }
+          }
+        }
+      } catch {
+        // Non-fatal — the canonical sync already succeeded
+      }
+
       return { matterId, matterPersonId, contactId }
     },
     onSuccess: ({ matterId, matterPersonId }) => {
       qc.invalidateQueries({ queryKey: matterProfileKeys.syncLog(matterId) })
       qc.invalidateQueries({ queryKey: matterProfileKeys.person(matterId, matterPersonId) })
+      qc.invalidateQueries({ queryKey: ['answer-engine'] })
     },
   })
 }

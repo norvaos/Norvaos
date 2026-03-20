@@ -42,8 +42,13 @@ async function handlePost(request: Request) {
 
     const { supabase, tenantId, userId } = auth
 
+    // All server-side DB operations use the admin client so that RLS can never
+    // silently block matter creation, gate checks, or any linked-record writes.
+    // The user-scoped `supabase` client is kept only for the auth handshake above.
+    const adminClient = createAdminClient()
+
     // ── 0. Server-side permission check ─────────────────────────
-    const { data: user } = await supabase
+    const { data: user } = await adminClient
       .from('users')
       .select('role_id')
       .eq('id', userId)
@@ -51,7 +56,7 @@ async function handlePost(request: Request) {
       .single()
 
     if (user?.role_id) {
-      const { data: role } = await supabase
+      const { data: role } = await adminClient
         .from('roles')
         .select('name, permissions')
         .eq('id', user.role_id)
@@ -69,7 +74,7 @@ async function handlePost(request: Request) {
     }
 
     // ── 1. Verify lead exists, is open, not already converted ─────
-    const { data: lead, error: leadErr } = await supabase
+    const { data: lead, error: leadErr } = await adminClient
       .from('leads')
       .select('*')
       .eq('id', leadId)
@@ -83,15 +88,16 @@ async function handlePost(request: Request) {
       )
     }
 
-    if (lead.status === 'converted') {
-      // Idempotency: return existing matter if already converted
+    // Idempotency: check both status and converted_matter_id so a partial
+    // failure (matter created but lead update failed) still returns the matter.
+    if (lead.status === 'converted' || lead.converted_matter_id) {
       return NextResponse.json(
         {
-          success: false,
-          error: 'Lead is already converted',
+          success: true,
           matterId: lead.converted_matter_id,
+          matterNumber: null,
         },
-        { status: 409 }
+        { status: 200 }
       )
     }
 
@@ -100,7 +106,6 @@ async function handlePost(request: Request) {
     // Uses admin client to bypass RLS — scan must always succeed.
     if (lead.contact_id) {
       try {
-        const adminClient = createAdminClient()
         const scanResult = await runConflictScan(adminClient, {
           contactId: lead.contact_id,
           tenantId,
@@ -145,7 +150,7 @@ async function handlePost(request: Request) {
         // Scan failed — treat as clear so conversion is never blocked by a scan error.
         // The failure is logged; a manual scan can be run from the contact profile.
         console.error('[convert-and-retain] Conflict scan failed, treating as clear:', err)
-        await supabase
+        await adminClient
           .from('leads')
           .update({ conflict_status: 'auto_scan_complete' })
           .eq('id', leadId)
@@ -168,9 +173,10 @@ async function handlePost(request: Request) {
     }
 
     // ── 1c. Conversion gate enforcement ───────────────────────────
-    const workflowConfig = await getWorkspaceWorkflowConfig(supabase, tenantId)
+    // Use adminClient so RLS can never falsely block a gate check.
+    const workflowConfig = await getWorkspaceWorkflowConfig(adminClient, tenantId)
     const gateResult = await evaluateConversionGates(
-      supabase,
+      adminClient,
       leadId,
       tenantId,
       workflowConfig
@@ -197,7 +203,7 @@ async function handlePost(request: Request) {
     // Try practice-area-specific pipeline first
     const resolvedPracticeAreaId = practiceAreaId || lead.practice_area_id
     if (resolvedPracticeAreaId) {
-      const { data: pa } = await supabase
+      const { data: pa } = await adminClient
         .from('practice_areas')
         .select('name')
         .eq('id', resolvedPracticeAreaId)
@@ -206,7 +212,7 @@ async function handlePost(request: Request) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const paData = pa as any
       if (paData?.name) {
-        const { data: paPipeline } = await supabase
+        const { data: paPipeline } = await adminClient
           .from('pipelines')
           .select('id')
           .eq('tenant_id', tenantId)
@@ -220,7 +226,7 @@ async function handlePost(request: Request) {
         const paPipelineData = paPipeline as any
         if (paPipelineData?.id) {
           targetPipelineId = paPipelineData.id
-          const { data: winStage } = await supabase
+          const { data: winStage } = await adminClient
             .from('pipeline_stages')
             .select('id')
             .eq('pipeline_id', targetPipelineId!)
@@ -235,7 +241,7 @@ async function handlePost(request: Request) {
     // Fallback: use current pipeline's win stage
     if (!targetPipelineId && lead.pipeline_id) {
       targetPipelineId = lead.pipeline_id
-      const { data: winStage } = await supabase
+      const { data: winStage } = await adminClient
         .from('pipeline_stages')
         .select('id')
         .eq('pipeline_id', lead.pipeline_id)
@@ -248,7 +254,7 @@ async function handlePost(request: Request) {
     // ── 3. Resolve matter type + case type ────────────────────────
     const caseTypeId: string | null = null
     if (matterTypeId) {
-      const { data: mt } = await supabase
+      const { data: mt } = await adminClient
         .from('matter_types')
         .select('id')
         .eq('id', matterTypeId)
@@ -264,7 +270,7 @@ async function handlePost(request: Request) {
     }
 
     // ── 4. Create matter record ───────────────────────────────────
-    const { data: matter, error: matterErr } = await supabase
+    const { data: matter, error: matterErr } = await adminClient
       .from('matters')
       .insert({
         tenant_id: tenantId,
@@ -294,46 +300,85 @@ async function handlePost(request: Request) {
 
     // ── 5. Link contact as 'client' in matter_contacts ────────────
     if (lead.contact_id) {
-      await supabase.from('matter_contacts').insert({
+      await adminClient.from('matter_contacts').insert({
         tenant_id: tenantId,
         matter_id: matter.id,
         contact_id: lead.contact_id,
         role: 'client',
+        is_primary: true,
       })
     }
 
     // ── 6. Create matter_intake record ────────────────────────────
-    const { data: tenantRow } = await supabase
+    const { data: tenantRow } = await adminClient
       .from('tenants')
       .select('jurisdiction_code')
       .eq('id', tenantId)
       .single()
 
-    await supabase.from('matter_intake').insert({
+    // Auto-derive program_category from the matter type's program_category_key
+    let programCategoryKey: string | null = null
+    if (matterTypeId) {
+      const { data: mtRow } = await adminClient
+        .from('matter_types')
+        .select('program_category_key')
+        .eq('id', matterTypeId)
+        .single()
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      programCategoryKey = (mtRow as any)?.program_category_key ?? null
+    }
+
+    // Carry processing_stream set by the lawyer in the command centre
+    const leadCustomFields = (lead.custom_fields ?? {}) as Record<string, unknown>
+    const processingStream = (leadCustomFields.processing_stream as string) || null
+
+    await adminClient.from('matter_intake').insert({
       tenant_id: tenantId,
       matter_id: matter.id,
       intake_status: 'incomplete',
       jurisdiction: tenantRow?.jurisdiction_code ?? 'CA',
+      program_category: programCategoryKey,
+      processing_stream: processingStream,
     }).then(() => {}) // ignore conflict
 
     // ── 7. Seed principal applicant from contact ──────────────────
     if (lead.contact_id) {
-      const { data: contact } = await supabase
+      const { data: contact } = await adminClient
         .from('contacts')
-        .select('first_name, last_name, email_primary, phone_primary')
+        .select('first_name, last_name, middle_name, email_primary, phone_primary, date_of_birth, nationality, gender, marital_status, immigration_status, immigration_status_expiry, country_of_residence, country_of_birth, currently_in_canada, criminal_charges, inadmissibility_flag, travel_history_flag, address_line1, address_line2, city, province_state, postal_code, country')
         .eq('id', lead.contact_id)
         .single()
 
       if (contact) {
-        await supabase.from('matter_people').insert({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const c = contact as any
+        await adminClient.from('matter_people').insert({
           tenant_id: tenantId,
           matter_id: matter.id,
           contact_id: lead.contact_id,
           person_role: 'principal_applicant',
-          first_name: contact.first_name || '',
-          last_name: contact.last_name || '',
-          email: contact.email_primary || null,
-          phone: contact.phone_primary || null,
+          first_name: c.first_name || '',
+          last_name: c.last_name || '',
+          middle_name: c.middle_name ?? null,
+          email: c.email_primary || null,
+          phone: c.phone_primary || null,
+          date_of_birth: c.date_of_birth ?? null,
+          nationality: c.nationality ?? null,
+          gender: c.gender ?? null,
+          marital_status: c.marital_status ?? null,
+          immigration_status: c.immigration_status ?? null,
+          status_expiry_date: c.immigration_status_expiry ?? null,
+          country_of_residence: c.country_of_residence ?? c.country ?? null,
+          country_of_birth: c.country_of_birth ?? null,
+          currently_in_canada: c.currently_in_canada ?? false,
+          criminal_charges: c.criminal_charges ?? false,
+          inadmissibility_flag: c.inadmissibility_flag ?? false,
+          travel_history_flag: c.travel_history_flag ?? false,
+          address_line1: c.address_line1 ?? null,
+          address_line2: c.address_line2 ?? null,
+          city: c.city ?? null,
+          province_state: c.province_state ?? null,
+          postal_code: c.postal_code ?? null,
         })
       }
     }
@@ -345,7 +390,7 @@ async function handlePost(request: Request) {
       const expiresAt = new Date()
       expiresAt.setDate(expiresAt.getDate() + 30)
 
-      const { data: portalLink } = await supabase
+      const { data: portalLink } = await adminClient
         .from('portal_links')
         .insert({
           tenant_id: tenantId,
@@ -367,7 +412,7 @@ async function handlePost(request: Request) {
     try {
       if (matterTypeId && !caseTypeId) {
         await activateWorkflowKit({
-          supabase,
+          supabase: adminClient,
           tenantId,
           matterId: matter.id,
           matterTypeId,
@@ -377,7 +422,7 @@ async function handlePost(request: Request) {
 
       if (caseTypeId) {
         await activateImmigrationKit({
-          supabase,
+          supabase: adminClient,
           tenantId,
           matterId: matter.id,
           caseTypeId,
@@ -390,7 +435,7 @@ async function handlePost(request: Request) {
 
     // ── 10. Send document request if slots were generated ─────────
     try {
-      const { data: slots } = await supabase
+      const { data: slots } = await adminClient
         .from('document_slots')
         .select('id')
         .eq('matter_id', matter.id)
@@ -400,7 +445,7 @@ async function handlePost(request: Request) {
 
       if (slots && slots.length > 0) {
         await sendDocumentRequest({
-          supabase,
+          supabase: adminClient,
           tenantId,
           matterId: matter.id,
           slotIds: slots.map((s) => s.id),
@@ -414,7 +459,7 @@ async function handlePost(request: Request) {
 
     // ── 10b. Create invoice from retainer package ─────────────────
     const contactId = lead.contact_id
-    const { data: retainerPkgForInvoice } = await supabase
+    const { data: retainerPkgForInvoice } = await adminClient
       .from('lead_retainer_packages')
       .select('*')
       .eq('lead_id', leadId)
@@ -428,7 +473,7 @@ async function handlePost(request: Request) {
       const disbursementItems = (retainerPkgForInvoice.disbursements as any[]) ?? []
 
       // Create invoice
-      const { data: invoice } = await supabase
+      const { data: invoice } = await adminClient
         .from('invoices')
         .insert({
           tenant_id: tenantId,
@@ -480,7 +525,7 @@ async function handlePost(request: Request) {
         ]
 
         if (allItems.length > 0) {
-          await supabase.from('invoice_line_items').insert(allItems)
+          await adminClient.from('invoice_line_items').insert(allItems)
         }
       }
     }
@@ -488,7 +533,7 @@ async function handlePost(request: Request) {
     // ── 10c. Link signing documents/requests to the new matter ───
     // Link signing documents to the new matter
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (supabase as any)
+    await (adminClient as any)
       .from('signing_documents')
       .update({ matter_id: matter.id })
       .eq('lead_id', leadId)
@@ -496,14 +541,14 @@ async function handlePost(request: Request) {
 
     // Link signing requests to the new matter
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (supabase as any)
+    await (adminClient as any)
       .from('signing_requests')
       .update({ matter_id: matter.id })
       .eq('lead_id', leadId)
       .is('matter_id', null)
 
     // ── 11. Mark lead as converted + move to practice area pipeline ─
-    await supabase
+    await adminClient
       .from('leads')
       .update({
         status: 'converted',
@@ -516,7 +561,7 @@ async function handlePost(request: Request) {
 
     // ── 12. Log audit trail ───────────────────────────────────────
     // Fetch retainer package info for audit metadata
-    const { data: retainerPkg } = await supabase
+    const { data: retainerPkg } = await adminClient
       .from('lead_retainer_packages')
       .select('id, status, payment_status')
       .eq('lead_id', leadId)
@@ -524,7 +569,7 @@ async function handlePost(request: Request) {
       .limit(1)
       .maybeSingle()
 
-    await supabase.from('activities').insert({
+    await adminClient.from('activities').insert({
       tenant_id: tenantId,
       matter_id: matter.id,
       activity_type: 'file_opened',

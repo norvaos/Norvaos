@@ -405,6 +405,56 @@ async function handlePost(
       )
     }
 
+    // ── Dual-write to matter_form_instances.answers (new engine) ──────────
+    // This legacy route doesn't know which form the answers belong to, so we
+    // write to ALL active instances for this matter. Each instance merges only
+    // the profile_paths its form actually maps.
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: instances } = await (admin as any)
+        .from('matter_form_instances')
+        .select('id, form_id, answers')
+        .eq('matter_id', matterId)
+        .eq('is_active', true)
+
+      if (instances && instances.length > 0) {
+        const now = new Date().toISOString()
+        const flatProfile = flattenObject(profile)
+
+        for (const inst of instances) {
+          const currentAnswers = (inst.answers as Record<string, unknown>) ?? {}
+          const updatedAnswers = { ...currentAnswers }
+          let changed = false
+
+          for (const [profilePath, value] of Object.entries(flatProfile)) {
+            if (value === null || value === undefined) continue
+            updatedAnswers[profilePath] = {
+              value,
+              source: 'client_portal',
+              updated_at: now,
+              stale: false,
+            }
+            changed = true
+          }
+
+          if (changed) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            await (admin as any)
+              .from('matter_form_instances')
+              .update({
+                answers: updatedAnswers,
+                status: complete ? 'ready_for_review' : 'in_progress',
+                updated_at: now,
+              })
+              .eq('id', inst.id)
+          }
+        }
+      }
+    } catch (instanceErr) {
+      // Non-fatal — contacts.immigration_data write already succeeded
+      console.error('[portal-ircc-questionnaire] Instance dual-write error (non-fatal):', instanceErr)
+    }
+
     // Mark session as having portal saves — prevents stale contact immigration_data
     // from pre-filling this session on subsequent GET requests.
     if (session && !complete) {

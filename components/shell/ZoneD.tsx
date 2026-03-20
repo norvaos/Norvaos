@@ -20,6 +20,8 @@
  */
 
 import { useState, useEffect, useCallback } from 'react'
+import { useQuery } from '@tanstack/react-query'
+import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
@@ -111,6 +113,25 @@ function hashToTab(hash: string): TabId | null {
 }
 
 export function ZoneD({ matter, tenantId, initialTab = 'details' }: ZoneDProps) {
+  // Fetch primary contact ID so the IRCC questionnaire and other contact-aware
+  // sections in the Details tab can resolve the client correctly.
+  const { data: primaryContactId } = useQuery({
+    queryKey: ['matter-primary-contact', matter.id],
+    queryFn: async () => {
+      const supabase = createClient()
+      const { data } = await supabase
+        .from('matter_contacts')
+        .select('contact_id')
+        .eq('matter_id', matter.id)
+        .eq('tenant_id', tenantId)
+        .eq('is_primary', true)
+        .maybeSingle()
+      return data?.contact_id ?? null
+    },
+    enabled: !!matter.id && !!tenantId,
+    staleTime: 60_000,
+  })
+
   // Priority: initialTab prop (from ?tab= searchParam) > URL hash > 'details'
   const [activeTab, setActiveTab] = useState<TabId>(() => {
     // initialTab is already validated upstream (only set when it's a known TabId)
@@ -183,7 +204,7 @@ export function ZoneD({ matter, tenantId, initialTab = 'details' }: ZoneDProps) 
               matterId={matter.id}
               tenantId={tenantId}
               matterTypeId={matter.matter_type_id ?? null}
-              contactId={null}
+              contactId={primaryContactId ?? null}
               caseTypeId={matter.case_type_id ?? null}
             />
             {/* Rules at Opening — bottom of details tab */}

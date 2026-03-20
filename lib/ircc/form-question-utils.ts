@@ -1,7 +1,18 @@
+/**
+ * @deprecated — LEGACY Form Question Utilities.
+ *
+ * This file reads from the deprecated FORM_REGISTRY (form-field-registry.ts),
+ * which now returns empty data. All form metadata should be fetched from the
+ * DB (ircc_forms / ircc_form_sections / ircc_form_fields) instead.
+ *
+ * Do not add new call-sites — migrate existing consumers to the DB path.
+ */
+
 import { FORM_REGISTRY } from '@/lib/ircc/form-field-registry'
 import type { IRCCFormSection } from '@/lib/types/ircc-profile'
 
 /**
+ * @deprecated Use DB-driven form data instead.
  * Check if a form code has question definitions in FORM_REGISTRY.
  */
 export function hasQuestionDefinitions(formCode: string): boolean {

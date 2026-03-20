@@ -47,6 +47,31 @@ function deepMerge(
   return result
 }
 
+/**
+ * Flatten a nested profile object into dot-notation keys for answer records.
+ * e.g. { personal: { family_name: 'Smith' } } → { 'personal.family_name': 'Smith' }
+ */
+function flattenForAnswers(
+  obj: Record<string, unknown>,
+  prefix = '',
+): Record<string, unknown> {
+  const result: Record<string, unknown> = {}
+  for (const [key, value] of Object.entries(obj)) {
+    const path = prefix ? `${prefix}.${key}` : key
+    if (
+      value !== null &&
+      value !== undefined &&
+      typeof value === 'object' &&
+      !Array.isArray(value)
+    ) {
+      Object.assign(result, flattenForAnswers(value as Record<string, unknown>, path))
+    } else {
+      result[path] = value
+    }
+  }
+  return result
+}
+
 // ── POST /api/portal/[token]/ircc-forms/[formId]/save ───────────────────────
 
 /**
@@ -205,6 +230,57 @@ async function handlePost(
     if (updateError) {
       console.error('[portal-ircc-form-save] Update contact error:', updateError)
       return NextResponse.json({ error: 'Failed to save profile data' }, { status: 500 })
+    }
+
+    // ── 4b. Dual-write to matter_form_instances.answers (new engine) ─────
+    // Finds or creates the form instance for this matter + form, then merges
+    // the submitted profile fields into the instance's per-field answer map.
+    // This is the PRIMARY write path for the new engine; contacts.immigration_data
+    // above is kept as a transitional cache until all consumers are migrated.
+    try {
+      const { data: existingInstance } = await admin
+        .from('matter_form_instances')
+        .select('id, answers')
+        .eq('matter_id', matterId)
+        .eq('form_id', formId)
+        .eq('is_active', true)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle()
+
+      if (existingInstance) {
+        const now = new Date().toISOString()
+        const currentAnswers = (existingInstance.answers as Record<string, unknown>) ?? {}
+
+        // Flatten the nested profile object into dot-notation answer records
+        const flatProfile = flattenForAnswers(profile)
+        const updatedAnswers = { ...currentAnswers }
+
+        for (const [profilePath, value] of Object.entries(flatProfile)) {
+          if (value === null || value === undefined) continue
+          updatedAnswers[profilePath] = {
+            value,
+            source: 'client_portal',
+            updated_at: now,
+            stale: false,
+          }
+        }
+
+        const instanceStatus = complete ? 'ready_for_review' : 'in_progress'
+
+        await admin
+          .from('matter_form_instances')
+          .update({
+            answers: updatedAnswers,
+            status: instanceStatus,
+            updated_at: now,
+          })
+          .eq('id', existingInstance.id)
+      }
+    } catch (instanceErr) {
+      // Non-fatal — the contacts.immigration_data write already succeeded.
+      // Log for debugging but don't fail the portal save.
+      console.error('[portal-ircc-form-save] Instance dual-write error (non-fatal):', instanceErr)
     }
 
     // ── 5. Recompute per-form progress with updated profile ───────────────

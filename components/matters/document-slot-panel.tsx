@@ -61,8 +61,10 @@ import {
   FileDown,
   Plus,
   Share2,
+  ScanSearch,
 } from 'lucide-react'
 import { Input } from '@/components/ui/input'
+import { DocumentScanButton } from '@/components/shared/document-scan-button'
 
 // ─── Types ──────────────────────────────────────────────────────────────────────
 
@@ -170,6 +172,8 @@ export function SlotCard({
   const [showReview, setShowReview] = useState(false)
   const [showViewer, setShowViewer] = useState(false)
   const [isSharing, setIsSharing] = useState(false)
+  const [pendingFile, setPendingFile] = useState<File | null>(null)
+  const [slotScanExtracted, setSlotScanExtracted] = useState<Record<string, string | number | null> | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const uploadMutation = useUploadToSlot()
   const downloadMutation = useDownloadDocument()
@@ -196,21 +200,28 @@ export function SlotCard({
   }, [currentDoc?.id, sharedState])
 
   const handleFileSelect = useCallback(
-    async (e: React.ChangeEvent<HTMLInputElement>) => {
+    (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0]
       if (!file) return
-
-      await uploadMutation.mutateAsync({
-        file,
-        slotId: slot.id,
-        matterId,
-      })
-
-      setShowUpload(false)
+      setPendingFile(file)
+      setSlotScanExtracted(null)
+      setShowUpload(true)
       if (fileInputRef.current) fileInputRef.current.value = ''
     },
-    [slot.id, matterId, uploadMutation]
+    []
   )
+
+  const handleConfirmUpload = useCallback(async () => {
+    if (!pendingFile) return
+    await uploadMutation.mutateAsync({
+      file: pendingFile,
+      slotId: slot.id,
+      matterId,
+    })
+    setPendingFile(null)
+    setSlotScanExtracted(null)
+    setShowUpload(false)
+  }, [pendingFile, slot.id, matterId, uploadMutation])
 
   return (
     <div className="border rounded-lg p-4 space-y-3">
@@ -351,6 +362,77 @@ export function SlotCard({
         accept={slot.accepted_file_types?.join(',') ?? undefined}
         onChange={handleFileSelect}
       />
+
+      {/* Upload Confirmation Dialog (with Scan option) */}
+      <Dialog open={showUpload} onOpenChange={(open) => {
+        if (!open) { setShowUpload(false); setPendingFile(null); setSlotScanExtracted(null) }
+      }}>
+        <DialogContent className="sm:max-w-md max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Upload to: {slot.slot_name}</DialogTitle>
+            <DialogDescription>
+              {pendingFile ? pendingFile.name : 'Select a file to upload'}
+            </DialogDescription>
+          </DialogHeader>
+          {pendingFile && (
+            <div className="space-y-3">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <FileText className="h-4 w-4" />
+                <span className="truncate">{pendingFile.name}</span>
+                <span className="text-xs">({formatFileSize(pendingFile.size)})</span>
+              </div>
+
+              {/* Scan Button */}
+              <div className="flex items-center gap-2">
+                <DocumentScanButton
+                  file={pendingFile}
+                  documentTypeHint={slot.slot_slug}
+                  onFieldsExtracted={(fields) => {
+                    setSlotScanExtracted(fields)
+                  }}
+                  disabled={uploadMutation.isPending}
+                />
+                <span className="text-xs text-muted-foreground">Optional — extract data before uploading</span>
+              </div>
+
+              {/* Scan Results */}
+              {slotScanExtracted && (
+                <div className="border rounded-lg bg-green-50/50 border-green-200 divide-y divide-green-100">
+                  <div className="px-3 py-1.5 text-xs font-medium text-green-700 flex items-center gap-1.5">
+                    <ScanSearch className="h-3.5 w-3.5" />
+                    Extracted Information
+                  </div>
+                  {Object.entries(slotScanExtracted)
+                    .filter(([, v]) => v !== null)
+                    .map(([key, value]) => (
+                      <div
+                        key={key}
+                        className="flex items-center justify-between px-3 py-1.5 text-xs"
+                      >
+                        <span className="text-muted-foreground">
+                          {key.split('_').map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
+                        </span>
+                        <span className="font-medium">{String(value)}</span>
+                      </div>
+                    ))}
+                </div>
+              )}
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => { setShowUpload(false); setPendingFile(null); setSlotScanExtracted(null) }}>
+              Cancel
+            </Button>
+            <Button onClick={handleConfirmUpload} disabled={uploadMutation.isPending || !pendingFile}>
+              {uploadMutation.isPending ? (
+                <><Loader2 className="mr-1 h-4 w-4 animate-spin" />Uploading...</>
+              ) : (
+                <><Upload className="mr-1 h-4 w-4" />Upload</>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Review Dialog */}
       {showReview && (

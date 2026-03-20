@@ -164,7 +164,7 @@ export function CoreDataCardTab({ matterId, tenantId, fieldConfig }: CoreDataCar
     resolver: zodResolver(matterIntakeSchema),
     values: {
       processing_stream: (intake?.processing_stream as any) ?? null,
-      program_category: intake?.program_category ?? null, // auto-derived from matter type server-side
+      program_category: intake?.program_category ?? matterTypeProgramCategoryKey ?? null,
       jurisdiction: intake?.jurisdiction ?? 'CA',
       intake_delegation: (intake?.intake_delegation as any) ?? 'pa_only',
     },
@@ -264,46 +264,30 @@ export function CoreDataCardTab({ matterId, tenantId, fieldConfig }: CoreDataCar
                 </div>
               )}
 
-              {/* Program Category — fixed from Matter Type OR user-selectable for generic types */}
+              {/* Program Category — editable, pre-filled from matter type */}
               {isFieldVisible('program_category') && (
                 <div className="space-y-2">
                   <Label className="flex items-center gap-1">
                     Programme Category
-                    {!matterTypeProgramCategoryKey && (
-                      <span className="text-[10px] text-orange-600 font-normal">(required for workflow)</span>
-                    )}
                   </Label>
-                  {matterTypeProgramCategoryKey ? (
-                    // Read-only: matter type has a fixed playbook key
-                    <>
-                      <div className="flex items-center h-10 px-3 rounded-md border bg-muted/50 text-sm text-slate-700">
-                        {matterTypeName || matter?.matter_type || 'Not set'}
-                      </div>
-                      <p className="text-xs text-muted-foreground">Derived from matter type</p>
-                    </>
-                  ) : (
-                    // Editable: generic matter type — user selects the specific immigration stream
-                    <>
-                      <Select
-                        disabled={isLocked}
-                        value={intakeForm.watch('program_category') ?? ''}
-                        onValueChange={(v) => intakeForm.setValue('program_category', v)}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select immigration stream…" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {PROGRAM_CATEGORIES.map((c) => (
-                            <SelectItem key={c.value} value={c.value}>
-                              {c.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <p className="text-xs text-muted-foreground">
-                        Select the immigration programme for this matter — determines the readiness playbook.
-                      </p>
-                    </>
+                  <Select
+                    disabled={isLocked}
+                    value={intakeForm.watch('program_category') ?? ''}
+                    onValueChange={(v) => intakeForm.setValue('program_category', v)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select immigration stream…" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {PROGRAM_CATEGORIES.map((c) => (
+                        <SelectItem key={c.value} value={c.value}>
+                          {c.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {matterTypeProgramCategoryKey && (
+                    <p className="text-xs text-muted-foreground">Auto-set from matter type — change if needed.</p>
                   )}
                 </div>
               )}

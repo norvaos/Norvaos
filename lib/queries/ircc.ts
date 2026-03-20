@@ -228,6 +228,7 @@ export function useUpdateIRCCProfile() {
       contactId,
       profile,
       changedBy,
+      matterId,
     }: {
       contactId: string
       profile: Partial<IRCCProfile>
@@ -293,6 +294,53 @@ export function useUpdateIRCCProfile() {
         }
       }
 
+      // ── Dual-write to matter_form_instances.answers (new engine) ─────
+      // When matterId is provided, also write to all active form instances
+      // for this matter so the new engine stays in sync.
+      if (matterId) {
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const { data: instances } = await (supabase as any)
+            .from('matter_form_instances')
+            .select('id, answers')
+            .eq('matter_id', matterId)
+            .eq('is_active', true)
+
+          if (instances && instances.length > 0) {
+            const now = new Date().toISOString()
+            const flatUpdates = flattenObject(profile as unknown as Record<string, unknown>)
+
+            for (const inst of instances) {
+              const curAnswers = (inst.answers as Record<string, unknown>) ?? {}
+              const updAnswers = { ...curAnswers }
+              let changed = false
+
+              for (const [pp, val] of Object.entries(flatUpdates)) {
+                if (val === null || val === undefined) continue
+                updAnswers[pp] = {
+                  value: val,
+                  source: 'staff_entry',
+                  updated_at: now,
+                  updated_by: changedBy,
+                  stale: false,
+                }
+                changed = true
+              }
+
+              if (changed) {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                void (supabase as any)
+                  .from('matter_form_instances')
+                  .update({ answers: updAnswers, updated_at: now })
+                  .eq('id', inst.id)
+              }
+            }
+          }
+        } catch {
+          // Non-fatal — contacts.immigration_data is the primary during transition
+        }
+      }
+
       return data?.immigration_data as Partial<IRCCProfile>
     },
     onSuccess: (_, variables) => {
@@ -300,6 +348,8 @@ export function useUpdateIRCCProfile() {
       // Invalidate readiness cache so header, action panel, sections update immediately
       if (variables.matterId) {
         queryClient.invalidateQueries({ queryKey: readinessKeys.detail(variables.matterId) })
+        // Invalidate instance answer caches
+        queryClient.invalidateQueries({ queryKey: ['answer-engine'] })
       }
     },
     onError: () => {

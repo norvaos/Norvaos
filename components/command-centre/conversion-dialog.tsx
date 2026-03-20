@@ -142,13 +142,14 @@ export function ConversionDialog({ open, onOpenChange }: ConversionDialogProps) 
         return
       }
 
+      if (!result.matterId) {
+        setError('Matter was not created. Please try again or contact support.')
+        return
+      }
+
       toast.success('Lead converted to active matter!')
       onOpenChange(false)
-
-      // Navigate to the new matter page
-      if (result.matterId) {
-        router.push(`/matters/${result.matterId}`)
-      }
+      router.push(`/matters/${result.matterId}`)
     } catch {
       setError('Network error. Please try again.')
     } finally {

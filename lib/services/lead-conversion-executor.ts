@@ -99,7 +99,7 @@ export async function convertLeadToMatter(
 
   const { data: lead, error: leadError } = await supabase
     .from('leads')
-    .select('id, tenant_id, status, current_stage, is_closed, converted_matter_id, contact_id, practice_area_id, responsible_lawyer_id, assigned_to, pipeline_id')
+    .select('id, tenant_id, status, current_stage, is_closed, converted_matter_id, contact_id, practice_area_id, responsible_lawyer_id, assigned_to, pipeline_id, custom_fields')
     .eq('id', leadId)
     .eq('tenant_id', tenantId)
     .single()
@@ -393,7 +393,7 @@ export async function convertLeadToMatter(
       if (lead.contact_id) {
         const { data: contact } = await supabase
           .from('contacts')
-          .select('first_name, last_name, email_primary, phone_primary')
+          .select('first_name, last_name, middle_name, email_primary, phone_primary, date_of_birth, nationality, gender, marital_status, immigration_status, immigration_status_expiry, country_of_residence, country_of_birth, currently_in_canada, criminal_charges, inadmissibility_flag, travel_history_flag, address_line1, address_line2, city, province_state, postal_code, country')
           .eq('id', lead.contact_id)
           .single()
 
@@ -408,15 +408,35 @@ export async function convertLeadToMatter(
             .maybeSingle()
 
           if (!existingPA) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const c = contact as any
             await supabase.from('matter_people').insert({
               tenant_id: tenantId,
               matter_id: matter.id,
               contact_id: lead.contact_id,
               person_role: 'principal_applicant',
-              first_name: contact.first_name || '',
-              last_name: contact.last_name || '',
-              email: contact.email_primary || null,
-              phone: contact.phone_primary || null,
+              first_name: c.first_name || '',
+              last_name: c.last_name || '',
+              middle_name: c.middle_name ?? null,
+              email: c.email_primary || null,
+              phone: c.phone_primary || null,
+              date_of_birth: c.date_of_birth ?? null,
+              nationality: c.nationality ?? null,
+              gender: c.gender ?? null,
+              marital_status: c.marital_status ?? null,
+              immigration_status: c.immigration_status ?? null,
+              status_expiry_date: c.immigration_status_expiry ?? null,
+              country_of_residence: c.country_of_residence ?? c.country ?? null,
+              country_of_birth: c.country_of_birth ?? null,
+              currently_in_canada: c.currently_in_canada ?? false,
+              criminal_charges: c.criminal_charges ?? false,
+              inadmissibility_flag: c.inadmissibility_flag ?? false,
+              travel_history_flag: c.travel_history_flag ?? false,
+              address_line1: c.address_line1 ?? null,
+              address_line2: c.address_line2 ?? null,
+              city: c.city ?? null,
+              province_state: c.province_state ?? null,
+              postal_code: c.postal_code ?? null,
             })
           }
         }
@@ -437,6 +457,7 @@ export async function convertLeadToMatter(
             matter_id: matter.id,
             contact_id: lead.contact_id,
             role: 'client',
+            is_primary: true,
           })
         }
       }
@@ -449,11 +470,30 @@ export async function convertLeadToMatter(
           .eq('id', tenantId)
           .single()
 
+        // Auto-derive program_category from the matter type's program_category_key
+        let programCategoryKey: string | null = null
+        if (matterData.matterTypeId) {
+          const { data: mtRow } = await supabase
+            .from('matter_types')
+            .select('program_category_key')
+            .eq('id', matterData.matterTypeId)
+            .single()
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          programCategoryKey = (mtRow as any)?.program_category_key ?? null
+        }
+
+        // Carry processing_stream set by the lawyer in the command centre
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const leadCF = (lead.custom_fields ?? {}) as Record<string, unknown>
+        const processingStream = (leadCF.processing_stream as string) || null
+
         await supabase.from('matter_intake').insert({
           tenant_id: tenantId,
           matter_id: matter.id,
           intake_status: 'incomplete',
           jurisdiction: tenantRow?.jurisdiction_code ?? 'CA',
+          program_category: programCategoryKey,
+          processing_stream: processingStream,
         })
       } catch {
         // Non-fatal: ignore if matter_intake insert conflicts

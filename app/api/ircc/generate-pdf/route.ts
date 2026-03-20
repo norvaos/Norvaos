@@ -108,7 +108,29 @@ async function handlePost(request: Request) {
       : ''
 
     if (matterId) {
-      // Path A: matter-scoped profile
+      // Path A0: Try instance-based resolution first (new engine)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: formInstance } = await (auth.supabase as any)
+        .from('matter_form_instances')
+        .select('id, answers')
+        .eq('matter_id', matterId)
+        .eq('form_id', dbForm.id)
+        .eq('is_active', true)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle()
+
+      if (formInstance?.id && formInstance.answers && Object.keys(formInstance.answers as object).length > 0) {
+        // Use instance answers — flatten AnswerMap to profile shape
+        const instanceAnswers = formInstance.answers as Record<string, { value: unknown }>
+        for (const [path, record] of Object.entries(instanceAnswers)) {
+          if (record?.value !== null && record?.value !== undefined) {
+            profile[path] = record.value
+          }
+        }
+      }
+
+      // Path A1: matter-scoped profile (person.profile_data)
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { data: person, error: personError } = await (auth.supabase as any)
         .from('matter_people')
@@ -131,12 +153,16 @@ async function handlePost(request: Request) {
         )
       }
 
-      profile = (person.profile_data as Record<string, unknown>) ?? {}
       contactFirstName = person.first_name
       contactLastName  = person.last_name
 
-      // If profile_data is empty but a contact_id exists, fall back to
-      // contacts.immigration_data as a one-time convenience. Staff should
+      // If instance answers didn't populate profile, try person.profile_data
+      if (Object.keys(profile).length === 0) {
+        profile = (person.profile_data as Record<string, unknown>) ?? {}
+      }
+
+      // If profile_data is also empty but a contact_id exists, fall back to
+      // contacts.immigration_data as a last resort. Staff should
       // run snapshot_contact_profile_to_matter to populate properly.
       if (Object.keys(profile).length === 0 && person.contact_id) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any

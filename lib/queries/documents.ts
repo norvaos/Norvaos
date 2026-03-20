@@ -294,6 +294,45 @@ export function useAllDocuments(params: AllDocumentsParams) {
   })
 }
 
+// ── Document Scanning (AI Extraction) ────────────────────────────────────────
+
+export interface DocumentScanResult {
+  detected_document_type: string
+  confidence: number
+  extracted_fields: Record<string, string | number | null>
+  raw_text_summary: string
+}
+
+export function useScanDocument() {
+  return useMutation({
+    mutationFn: async ({
+      file,
+      documentTypeHint,
+    }: {
+      file: File
+      documentTypeHint?: string
+    }): Promise<DocumentScanResult> => {
+      const formData = new FormData()
+      formData.append('file', file)
+      if (documentTypeHint) formData.append('document_type_hint', documentTypeHint)
+
+      const response = await fetch('/api/documents/scan', {
+        method: 'POST',
+        body: formData,
+      })
+
+      const result = await response.json()
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || 'Scan failed')
+      }
+      return result.data as DocumentScanResult
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Failed to scan document')
+    },
+  })
+}
+
 // ── Document Stats ──────────────────────────────────────────────────────────
 
 export interface DocumentStats {

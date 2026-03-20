@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { Loader2, Paperclip, X } from 'lucide-react'
+import { Loader2, Paperclip, X, ScanSearch } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -20,6 +20,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { createClient } from '@/lib/supabase/client'
+import { DocumentScanButton } from '@/components/shared/document-scan-button'
 
 /**
  * Upload Document Dialog (Front Desk)
@@ -90,6 +91,7 @@ export function UploadDocumentDialog({
   const [selectedFile, setSelectedFile]     = useState<File | null>(null)
   const [uploading, setUploading]           = useState(false)
   const [uploadError, setUploadError]       = useState<string | null>(null)
+  const [scanExtracted, setScanExtracted]   = useState<Record<string, string | number | null> | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const effectiveDocType = docTypePreset === 'Other' ? customDocType.trim() : docTypePreset
@@ -117,6 +119,7 @@ export function UploadDocumentDialog({
       setSubmitted(false)
       setSelectedFile(null)
       setUploadError(null)
+      setScanExtracted(null)
     }
   }, [isOpen])
 
@@ -284,6 +287,57 @@ export function UploadDocumentDialog({
               )}
             </button>
           </div>
+
+          {/* Scan Document Button */}
+          {selectedFile && (
+            <div className="space-y-1.5">
+              <div className="flex items-center gap-2">
+                <DocumentScanButton
+                  file={selectedFile}
+                  documentTypeHint={
+                    effectiveDocType
+                      ? effectiveDocType.toLowerCase().replace(/[\s/]+/g, '_')
+                      : undefined
+                  }
+                  onFieldsExtracted={(fields, detectedType) => {
+                    setScanExtracted(fields)
+                    // Auto-select document type if not already chosen
+                    if (!docTypePreset && detectedType) {
+                      const match = DOCUMENT_TYPES.find(
+                        (dt) => dt.toLowerCase().replace(/[\s/]+/g, '_') === detectedType.toLowerCase().replace(/[\s/]+/g, '_')
+                      )
+                      if (match) setDocTypePreset(match)
+                    }
+                  }}
+                  disabled={isBusy}
+                />
+                <span className="text-xs text-muted-foreground">
+                  AI-powered extraction
+                </span>
+              </div>
+              {scanExtracted && (
+                <div className="border rounded-lg bg-green-50/50 border-green-200 divide-y divide-green-100">
+                  <div className="px-3 py-1.5 text-xs font-medium text-green-700 flex items-center gap-1.5">
+                    <ScanSearch className="h-3.5 w-3.5" />
+                    Extracted Information
+                  </div>
+                  {Object.entries(scanExtracted)
+                    .filter(([, v]) => v !== null)
+                    .map(([key, value]) => (
+                      <div
+                        key={key}
+                        className="flex items-center justify-between px-3 py-1.5 text-xs"
+                      >
+                        <span className="text-muted-foreground">
+                          {key.split('_').map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
+                        </span>
+                        <span className="font-medium">{String(value)}</span>
+                      </div>
+                    ))}
+                </div>
+              )}
+            </div>
+          )}
 
           {/* File Name — auto-generated, editable */}
           <div className="space-y-1.5">

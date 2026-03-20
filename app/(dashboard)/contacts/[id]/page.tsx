@@ -1338,12 +1338,19 @@ function MattersTab({
     setLinking(true)
     try {
       const supabase = createClient()
+      // Check if the target matter already has a primary contact
+      const { data: existingPrimary } = await supabase
+        .from('matter_contacts')
+        .select('id')
+        .eq('matter_id', selectedMatterId)
+        .eq('is_primary', true)
+        .maybeSingle()
       const { error } = await supabase.from('matter_contacts').insert({
         tenant_id: tenantId,
         matter_id: selectedMatterId,
         contact_id: contactId,
         role: linkRole,
-        is_primary: false,
+        is_primary: !existingPrimary, // first contact is always primary
       })
       if (error) throw error
       toast.success('Contact linked to matter')
@@ -1975,7 +1982,64 @@ function ImmigrationTab({
         id: contactId,
         immigration_data: merged,
       })
+
+      // ── Dual-write to matter_form_instances.answers (new engine) ────────
+      // When contact-level immigration data is edited by staff, propagate
+      // the changed fields to all active form instances across all matters
+      // for this contact. This ensures the new engine stays in sync.
+      try {
+        const supabase = createClient()
+        // Find all active instances linked to this contact via matter_people
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { data: matterPeople } = await (supabase as any)
+          .from('matter_people')
+          .select('matter_id')
+          .eq('contact_id', contactId)
+          .eq('is_active', true)
+
+        if (matterPeople && matterPeople.length > 0) {
+          const matterIds = matterPeople.map((mp: { matter_id: string }) => mp.matter_id)
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const { data: instances } = await (supabase as any)
+            .from('matter_form_instances')
+            .select('id, answers')
+            .in('matter_id', matterIds)
+            .eq('is_active', true)
+
+          if (instances && instances.length > 0) {
+            const now = new Date().toISOString()
+            for (const inst of instances) {
+              const curAnswers = (inst.answers as Record<string, unknown>) ?? {}
+              const updAnswers = { ...curAnswers }
+              let changed = false
+
+              for (const [key, val] of Object.entries(editing)) {
+                if (val === undefined) continue
+                updAnswers[key] = {
+                  value: val,
+                  source: 'staff_entry',
+                  updated_at: now,
+                  stale: false,
+                }
+                changed = true
+              }
+
+              if (changed) {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                void (supabase as any)
+                  .from('matter_form_instances')
+                  .update({ answers: updAnswers, updated_at: now })
+                  .eq('id', inst.id)
+              }
+            }
+          }
+        }
+      } catch {
+        // Non-fatal — contact blob was already saved
+      }
+
       queryClient.invalidateQueries({ queryKey: ['contact', contactId] })
+      queryClient.invalidateQueries({ queryKey: ['answer-engine'] })
       setEditing({})
       toast.success('Immigration data saved')
     } catch {
