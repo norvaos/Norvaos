@@ -4,7 +4,19 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { Resend } from 'resend'
 import { renderWelcomeEmail } from '@/lib/email-templates/welcome-email'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+// Lazy-init Resend to avoid build-time crash when env var is missing
+let _resend: Resend | null = null
+function getResend() {
+  if (!_resend) {
+    const key = process.env.RESEND_API_KEY
+    if (!key) {
+      console.error('[auth/callback] RESEND_API_KEY is not set')
+      return null
+    }
+    _resend = new Resend(key)
+  }
+  return _resend
+}
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url)
@@ -41,7 +53,9 @@ export async function GET(request: Request) {
                 dashboardUrl,
               })
 
-              await resend.emails.send({
+              const resendClient = getResend()
+              if (!resendClient) throw new Error('Resend not configured')
+              await resendClient.emails.send({
                 from: process.env.RESEND_FROM_DOMAIN === 'resend.dev'
                   ? 'NorvaOS <onboarding@resend.dev>'
                   : (process.env.RESEND_FROM_EMAIL ?? `NorvaOS <notifications@${process.env.RESEND_FROM_DOMAIN || 'norvaos.com'}>`),
