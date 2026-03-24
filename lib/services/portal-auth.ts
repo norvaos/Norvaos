@@ -86,7 +86,7 @@ export async function validatePortalToken(token: string): Promise<PortalLink> {
     throw new PortalAuthError('Invalid or expired portal link', 404)
   }
 
-  if (link.expires_at && new Date(link.expires_at) < new Date()) {
+  if (link.expires_at && typeof link.expires_at === 'string' && new Date(link.expires_at) < new Date()) {
     throw new PortalAuthError('This portal link has expired', 410)
   }
 
@@ -94,12 +94,12 @@ export async function validatePortalToken(token: string): Promise<PortalLink> {
   ;(admin as any)
     .from('portal_links')
     .update({
-      access_count: (link.access_count ?? 0) + 1,
+      access_count: (Number(link.access_count) || 0) + 1,
       last_accessed_at: new Date().toISOString(),
     })
     .eq('id', link.id)
     .then(() => {})
     .catch(() => {})
 
-  return link as PortalLink
+  return link as unknown as PortalLink
 }
