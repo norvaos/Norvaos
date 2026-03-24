@@ -81,6 +81,7 @@ export const TASK_VISIBILITIES = [
 
 export const MATTER_CONTACT_ROLES = [
   { value: 'client', label: 'Client' },
+  { value: 'lead', label: 'Lead' },
   { value: 'opposing_party', label: 'Opposing Party' },
   { value: 'opposing_counsel', label: 'Opposing Counsel' },
   { value: 'witness', label: 'Witness' },

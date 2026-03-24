@@ -12,6 +12,7 @@ import { withTiming } from '@/lib/middleware/request-timing'
 async function handlePost(request: NextRequest) {
   try {
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'documents', 'create')
 
     const limit = await checkTenantLimit(auth.tenantId, 'documents/upload')
@@ -41,7 +42,7 @@ async function handlePost(request: NextRequest) {
 
     // Document gating for enforcement-enabled matters
     if (matterId) {
-      const { data: matter, error: matterError } = await auth.supabase
+      const { data: matter, error: matterError } = await admin
         .from('matters')
         .select('id, tenant_id, matter_type_id, intake_status')
         .eq('id', matterId)
@@ -56,7 +57,7 @@ async function handlePost(request: NextRequest) {
       }
 
       if (matter.matter_type_id) {
-        const { data: matterType } = await auth.supabase
+        const { data: matterType } = await admin
           .from('matter_types')
           .select('enforcement_enabled')
           .eq('id', matter.matter_type_id)
@@ -106,7 +107,7 @@ async function handlePost(request: NextRequest) {
     let matterNumber: string | null = null
 
     if (slotId) {
-      const { data: slot, error: slotError } = await auth.supabase
+      const { data: slot, error: slotError } = await admin
         .from('document_slots')
         .select('id, slot_slug, person_role, accepted_file_types, max_file_size_bytes, matter_id, is_active')
         .eq('id', slotId)
@@ -161,7 +162,7 @@ async function handlePost(request: NextRequest) {
       slotData = { ...slot, accepted_file_types: slot.accepted_file_types ?? [], max_file_size_bytes: slot.max_file_size_bytes ?? 0 }
 
       // Fetch matter number for auto-rename
-      const { data: matterRow } = await auth.supabase
+      const { data: matterRow } = await admin
         .from('matters')
         .select('matter_number')
         .eq('id', slot.matter_id)
@@ -204,7 +205,7 @@ async function handlePost(request: NextRequest) {
 
       if (effectiveMatterId) {
         // Matter documents → NorvaOS/Matters/{MatterNumber} - {Title}/
-        const { data: matterInfo } = await auth.supabase
+        const { data: matterInfo } = await admin
           .from('matters')
           .select('matter_number, title')
           .eq('id', effectiveMatterId)
@@ -220,7 +221,7 @@ async function handlePost(request: NextRequest) {
         }
       } else if (contactId) {
         // Contact documents → NorvaOS/Contacts/{First Last}/
-        const { data: contactInfo } = await auth.supabase
+        const { data: contactInfo } = await admin
           .from('contacts')
           .select('first_name, last_name')
           .eq('id', contactId)
@@ -236,7 +237,7 @@ async function handlePost(request: NextRequest) {
         }
       } else if (leadId) {
         // Lead documents → NorvaOS/Leads/{Lead Name}/
-        const { data: leadInfo } = await auth.supabase
+        const { data: leadInfo } = await admin
           .from('leads')
           .select('id, contacts(first_name, last_name)')
           .eq('id', leadId)
@@ -253,7 +254,7 @@ async function handlePost(request: NextRequest) {
         }
       } else if (taskId) {
         // Task documents → NorvaOS/Tasks/{Task Title}/
-        const { data: taskInfo } = await auth.supabase
+        const { data: taskInfo } = await admin
           .from('tasks')
           .select('title')
           .eq('id', taskId)
@@ -280,7 +281,7 @@ async function handlePost(request: NextRequest) {
 
       // Create document record (no Supabase Storage path)
       const effectiveCategory = slotData ? slotData.slot_slug : (category || 'general')
-      const { data: doc, error: docError } = await auth.supabase
+      const { data: doc, error: docError } = await admin
         .from('documents')
         .insert({
           tenant_id: auth.tenantId,
@@ -314,7 +315,7 @@ async function handlePost(request: NextRequest) {
       let versionNumber: number | null = null
       if (slotData && doc) {
         const fileExt = file.name.split('.').pop() ?? 'bin'
-        const { data: rpcResult, error: rpcError } = await auth.supabase.rpc(
+        const { data: rpcResult, error: rpcError } = await admin.rpc(
           'upload_document_version',
           {
             p_tenant_id: auth.tenantId,
@@ -339,7 +340,7 @@ async function handlePost(request: NextRequest) {
 
       // Notify responsible lawyer
       if (effectiveMatterId) {
-        const { data: matterDetail } = await auth.supabase
+        const { data: matterDetail } = await admin
           .from('matters')
           .select('responsible_lawyer_id')
           .eq('id', effectiveMatterId)
@@ -347,7 +348,7 @@ async function handlePost(request: NextRequest) {
 
         const recipientId = matterDetail?.responsible_lawyer_id
         if (recipientId && recipientId !== auth.userId) {
-          dispatchNotification(auth.supabase, {
+          dispatchNotification(admin, {
             tenantId: auth.tenantId,
             eventType: 'document_uploaded',
             recipientUserIds: [recipientId],
@@ -410,7 +411,7 @@ async function handlePost(request: NextRequest) {
 
     // Create document record
     const effectiveCategory = slotData ? slotData.slot_slug : (category || 'general')
-    const { data: doc, error: docError } = await auth.supabase
+    const { data: doc, error: docError } = await admin
       .from('documents')
       .insert({
         tenant_id: auth.tenantId,
@@ -440,7 +441,7 @@ async function handlePost(request: NextRequest) {
     let versionNumber: number | null = null
 
     if (slotData && doc) {
-      const { data: rpcResult, error: rpcError } = await auth.supabase.rpc(
+      const { data: rpcResult, error: rpcError } = await admin.rpc(
         'upload_document_version',
         {
           p_tenant_id: auth.tenantId,
@@ -473,7 +474,7 @@ async function handlePost(request: NextRequest) {
             originalExtension: fileExt,
           })
 
-          await auth.supabase
+          await admin
             .from('documents')
             .update({ file_name: correctedName.fileName })
             .eq('id', doc.id)
@@ -487,7 +488,7 @@ async function handlePost(request: NextRequest) {
       // Auto-sync immigration intake status so upload advances the matter
       // (e.g. client_in_progress → review_required when all mandatory docs uploaded)
       try {
-        await syncImmigrationIntakeStatus(auth.supabase, effectiveMatterId, auth.userId)
+        await syncImmigrationIntakeStatus(admin, effectiveMatterId, auth.userId)
       } catch (err) {
         console.error('[document-upload] Status sync failed (non-fatal):', err)
       }
@@ -496,7 +497,7 @@ async function handlePost(request: NextRequest) {
     // Notify responsible lawyer about new document upload
     const effectiveMatterIdForNotify = matterId || (slotData?.matter_id ?? null)
     if (effectiveMatterIdForNotify) {
-      const { data: matterDetail } = await auth.supabase
+      const { data: matterDetail } = await admin
         .from('matters')
         .select('responsible_lawyer_id')
         .eq('id', effectiveMatterIdForNotify)
@@ -504,7 +505,7 @@ async function handlePost(request: NextRequest) {
 
       const recipientId = matterDetail?.responsible_lawyer_id
       if (recipientId && recipientId !== auth.userId) {
-        dispatchNotification(auth.supabase, {
+        dispatchNotification(admin, {
           tenantId: auth.tenantId,
           eventType: 'document_uploaded',
           recipientUserIds: [recipientId],
@@ -540,3 +541,5 @@ async function handlePost(request: NextRequest) {
 }
 
 export const POST = withTiming(handlePost, 'POST /api/documents/upload')
+
+const admin = createAdminClient()

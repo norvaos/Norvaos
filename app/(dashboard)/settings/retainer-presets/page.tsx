@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Textarea } from '@/components/ui/textarea'
 import {
   Dialog,
   DialogContent,
@@ -69,6 +70,7 @@ export default function RetainerPresetsPage() {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [dialogCategory, setDialogCategory] = useState<UICategory>('services')
   const [editingItem, setEditingItem] = useState<RetainerPreset | null>(null)
+  const [formName, setFormName] = useState('')
   const [formDesc, setFormDesc] = useState('')
   const [formAmount, setFormAmount] = useState('')
   const [loadingDefaults, setLoadingDefaults] = useState(false)
@@ -83,6 +85,7 @@ export default function RetainerPresetsPage() {
   const openAdd = (category: UICategory) => {
     setDialogCategory(category)
     setEditingItem(null)
+    setFormName('')
     setFormDesc('')
     setFormAmount('')
     setDialogOpen(true)
@@ -91,15 +94,16 @@ export default function RetainerPresetsPage() {
   const openEdit = (category: UICategory, item: RetainerPreset) => {
     setDialogCategory(category)
     setEditingItem(item)
-    setFormDesc(item.description)
+    setFormName(item.name)
+    setFormDesc(item.description ?? '')
     // Convert cents to dollars for display
     setFormAmount((item.amount / 100).toFixed(2))
     setDialogOpen(true)
   }
 
   const handleSave = async () => {
-    if (!formDesc.trim()) {
-      toast.error('Description is required')
+    if (!formName.trim()) {
+      toast.error('Name is required')
       return
     }
     const dollars = parseFloat(formAmount) || 0
@@ -112,7 +116,8 @@ export default function RetainerPresetsPage() {
           id: editingItem.id,
           tenant_id: tenantId,
           user_id: userId,
-          description: formDesc.trim(),
+          name: formName.trim(),
+          description: formDesc.trim() || null,
           amount: cents,
         })
       } else {
@@ -120,7 +125,8 @@ export default function RetainerPresetsPage() {
           tenant_id: tenantId,
           user_id: userId,
           category: dbCategory,
-          description: formDesc.trim(),
+          name: formName.trim(),
+          description: formDesc.trim() || undefined,
           amount: cents,
         })
       }
@@ -136,7 +142,7 @@ export default function RetainerPresetsPage() {
         id: preset.id,
         tenant_id: tenantId,
         user_id: userId,
-        description: preset.description,
+        name: preset.name,
       })
     } catch {
       // Error handled by mutation hooks
@@ -252,19 +258,31 @@ export default function RetainerPresetsPage() {
             </DialogTitle>
             <DialogDescription>
               {editingItem
-                ? 'Update the description and default amount.'
+                ? 'Update the name, description, and default amount.'
                 : `Add a new ${categoryLabel(dialogCategory).toLowerCase()} preset.`}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-2">
             <div className="space-y-1.5">
-              <Label>Description</Label>
+              <Label>Name</Label>
               <Input
-                value={formDesc}
-                onChange={(e) => setFormDesc(e.target.value)}
+                value={formName}
+                onChange={(e) => setFormName(e.target.value)}
                 placeholder="e.g. Work Permit Application"
                 autoFocus
               />
+              <p className="text-[11px] text-slate-400">Short label shown in the retainer builder and invoices</p>
+            </div>
+            <div className="space-y-1.5">
+              <Label>Description <span className="text-slate-400 font-normal">(optional)</span></Label>
+              <Textarea
+                value={formDesc}
+                onChange={(e) => setFormDesc(e.target.value)}
+                placeholder="e.g. Includes preparation, submission, and follow-up with IRCC..."
+                rows={2}
+                className="resize-none"
+              />
+              <p className="text-[11px] text-slate-400">Detailed explanation shown as secondary text</p>
             </div>
             <div className="space-y-1.5">
               <Label>Default Amount ($)</Label>
@@ -369,8 +387,11 @@ function PresetSection({
         <div className="divide-y divide-slate-100 rounded-lg border border-slate-200 bg-white">
           {items.map((item) => (
             <div key={item.id} className="flex items-center justify-between px-4 py-2.5">
-              <div className="flex items-center gap-3 min-w-0">
-                <span className="text-sm text-slate-700 truncate">{item.description}</span>
+              <div className="flex flex-col gap-0.5 min-w-0">
+                <span className="text-sm text-slate-700 truncate">{item.name}</span>
+                {item.description && (
+                  <span className="text-[11px] text-slate-400 leading-tight truncate">{item.description}</span>
+                )}
               </div>
               <div className="flex items-center gap-2 shrink-0 ml-3">
                 <Badge variant="secondary" className="text-xs font-medium">

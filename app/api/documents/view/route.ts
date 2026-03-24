@@ -17,6 +17,7 @@ import { withTiming } from '@/lib/middleware/request-timing'
 async function handleGet(request: NextRequest) {
   try {
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'documents', 'view')
 
     const { searchParams } = new URL(request.url)
@@ -31,7 +32,7 @@ async function handleGet(request: NextRequest) {
     }
 
     // Verify the document belongs to the caller's tenant
-    const { data: doc, error: docError } = await auth.supabase
+    const { data: doc, error: docError } = await admin
       .from('documents')
       .select('id, file_type, file_name')
       .eq('storage_path', storagePath)

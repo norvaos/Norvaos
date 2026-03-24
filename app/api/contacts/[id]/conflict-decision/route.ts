@@ -4,6 +4,7 @@ import { requirePermission } from '@/lib/services/require-role'
 import { recordConflictDecision } from '@/lib/services/conflict-engine'
 import { withTiming } from '@/lib/middleware/request-timing'
 import type { DecisionType } from '@/lib/services/conflict-engine'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 const VALID_DECISIONS: DecisionType[] = [
   'no_conflict',
@@ -39,6 +40,7 @@ async function handlePost(
 
     // 1. Authenticate & authorize
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'conflicts', 'approve')
 
     // 2. Parse and validate body
@@ -63,7 +65,7 @@ async function handlePost(
     }
 
     // 3. Verify the contact belongs to this tenant
-    const { data: contact, error: contactErr } = await auth.supabase
+    const { data: contact, error: contactErr } = await admin
       .from('contacts')
       .select('id, tenant_id')
       .eq('id', contactId)
@@ -78,7 +80,7 @@ async function handlePost(
     }
 
     // 4. Record the decision
-    await recordConflictDecision(auth.supabase, {
+    await recordConflictDecision(admin, {
       tenantId: auth.tenantId,
       contactId,
       scanId,
@@ -91,7 +93,7 @@ async function handlePost(
     })
 
     // 5. Fetch updated contact status
-    const { data: updated } = await auth.supabase
+    const { data: updated } = await admin
       .from('contacts')
       .select('conflict_status, conflict_score')
       .eq('id', contactId)

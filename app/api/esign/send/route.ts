@@ -53,10 +53,12 @@ async function handlePost(request: Request) {
       )
     }
 
+    // Admin client for all write operations
+    const admin = createAdminClient()
+
     // 0. Fetch lawyer's saved signature (if any) for pre-signing
     let lawyerSignature: { imageBuffer: Buffer; lawyerName: string; credentials?: string | null } | null = null
     try {
-      const admin = createAdminClient()
       const { data: lawyerUser } = await admin
         .from('users')
         .select('first_name, last_name, settings')
@@ -109,7 +111,7 @@ async function handlePost(request: Request) {
     }
 
     // 1. Freeze the source document (with optional lawyer pre-signature)
-    const freezeResult = await freezeDocument(supabase as never, {
+    const freezeResult = await freezeDocument(admin as never, {
       tenantId,
       sourceEntityType: 'invoice',
       sourceEntityId: invoiceId,
@@ -128,7 +130,7 @@ async function handlePost(request: Request) {
     }
 
     // 2. Create and send the signing request
-    const sendResult = await createAndSendSigningRequest(supabase as never, {
+    const sendResult = await createAndSendSigningRequest(admin as never, {
       tenantId,
       signingDocumentId: freezeResult.data.signingDocumentId,
       matterId,

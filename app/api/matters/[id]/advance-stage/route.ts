@@ -7,6 +7,7 @@ import { dispatchNotification } from '@/lib/services/notification-engine'
 import { withTiming } from '@/lib/middleware/request-timing'
 import { evaluateRiskFlags } from '@/lib/services/risk-flag-engine'
 import type { NorvaOSGateFailure } from '@/lib/types/errors'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 /**
  * POST /api/matters/[id]/advance-stage
@@ -29,6 +30,7 @@ async function handlePost(
 
     // 1. Authenticate, authorise, and get tenant context
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'matters', 'edit')
 
     // 2. Parse request body
@@ -53,7 +55,7 @@ async function handlePost(
     }
 
     // 3. Verify the matter belongs to the authenticated user's tenant
-    const { data: matter, error: matterErr } = await auth.supabase
+    const { data: matter, error: matterErr } = await admin
       .from('matters')
       .select('id, tenant_id')
       .eq('id', matterId)
@@ -70,12 +72,12 @@ async function handlePost(
     // 4. Capture the current stage BEFORE advancing so the log has from/to names.
     //    Run in parallel with the stage-names lookup for targetStageId.
     const [stageStateResult, stageNamesResult] = await Promise.all([
-      auth.supabase
+      admin
         .from('matter_stage_state')
         .select('current_stage_id')
         .eq('matter_id', matterId)
         .maybeSingle(),
-      auth.supabase
+      admin
         .from('matter_stages')
         .select('id, name')
         .in('id', [targetStageId]),          // will be augmented with fromStageId below
@@ -91,7 +93,7 @@ async function handlePost(
 
     // Fetch from-stage name if we have an ID and it wasn't already fetched
     if (fromStageId && !stageNameMap[fromStageId]) {
-      const { data: fromStageRow } = await auth.supabase
+      const { data: fromStageRow } = await admin
         .from('matter_stages')
         .select('id, name')
         .eq('id', fromStageId)
@@ -103,7 +105,7 @@ async function handlePost(
 
     // 5. Dispatch to appropriate stage engine
     const engineParams = {
-      supabase: auth.supabase,
+      supabase: admin,
       matterId,
       tenantId: auth.tenantId,
       targetStageId,
@@ -125,7 +127,7 @@ async function handlePost(
       ])
 
       // 6b. Fire-and-forget risk flag evaluation on every successful stage advance.
-      evaluateRiskFlags(auth.supabase, auth.tenantId, matterId)
+      evaluateRiskFlags(admin, auth.tenantId, matterId)
         .catch((e) => console.error('[advance-stage] Risk flag evaluation failed:', e))
 
       // 6b-ii. Fire-and-forget readiness recompute — forward auth cookie.
@@ -143,7 +145,7 @@ async function handlePost(
       // 6c. Write to stage_transition_log — fire-and-forget, non-fatal.
       //     Zone E (audit rail) reads from this table.
       //     gate_snapshot now carries the full per-condition evaluation result.
-      auth.supabase
+      admin
         .from('stage_transition_log')
         .insert({
           tenant_id:       auth.tenantId,
@@ -164,7 +166,7 @@ async function handlePost(
         })
 
       // 6d. Notify responsible lawyer
-      const { data: matterDetail } = await auth.supabase
+      const { data: matterDetail } = await admin
         .from('matters')
         .select('responsible_lawyer_id')
         .eq('id', matterId)
@@ -176,7 +178,7 @@ async function handlePost(
         : []
 
       if (recipientIds.length > 0) {
-        dispatchNotification(auth.supabase, {
+        dispatchNotification(admin, {
           tenantId:        auth.tenantId,
           eventType:       'stage_change',
           recipientUserIds: recipientIds,
@@ -238,3 +240,5 @@ async function handlePost(
 }
 
 export const POST = withTiming(handlePost, 'POST /api/matters/[id]/advance-stage')
+
+const admin = createAdminClient()

@@ -4,6 +4,7 @@ import { requirePermission } from '@/lib/services/require-role'
 import { runConflictScan } from '@/lib/services/conflict-engine'
 import { withTiming } from '@/lib/middleware/request-timing'
 import type { TriggerType } from '@/lib/services/conflict-engine'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 /**
  * POST /api/contacts/[id]/conflict-scan
@@ -23,6 +24,7 @@ async function handlePost(
 
     // 1. Authenticate & authorize
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'conflicts', 'create')
 
     // 2. Parse optional body
@@ -37,7 +39,7 @@ async function handlePost(
     }
 
     // 3. Verify the contact belongs to this tenant
-    const { data: contact, error: contactErr } = await auth.supabase
+    const { data: contact, error: contactErr } = await admin
       .from('contacts')
       .select('id, tenant_id')
       .eq('id', contactId)
@@ -52,7 +54,7 @@ async function handlePost(
     }
 
     // 4. Run the scan
-    const result = await runConflictScan(auth.supabase, {
+    const result = await runConflictScan(admin, {
       contactId,
       tenantId: auth.tenantId,
       triggeredBy: auth.userId,
@@ -70,7 +72,7 @@ async function handlePost(
         : undefined
 
       if (newStatus) {
-        await auth.supabase
+        await admin
           .from('leads')
           .update({ conflict_status: newStatus })
           .eq('id', leadId)
@@ -103,3 +105,5 @@ async function handlePost(
 }
 
 export const POST = withTiming(handlePost, 'POST /api/contacts/[id]/conflict-scan')
+
+const admin = createAdminClient()

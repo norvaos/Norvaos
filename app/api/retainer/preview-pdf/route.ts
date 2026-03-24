@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from 'next/server'
-import { createServerSupabaseClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { authenticateRequest, AuthError } from '@/lib/services/auth'
 import { requirePermission } from '@/lib/services/require-role'
 import type { TemplateBody } from '@/lib/types/document-engine'
@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
   try {
     const auth = await authenticateRequest()
     requirePermission(auth, 'leads', 'view')
-    const supabase = await createServerSupabaseClient()
+    const supabase = createAdminClient()
 
     const { leadId, markAsSent } = await request.json()
 

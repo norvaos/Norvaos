@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { authenticateRequest, AuthError } from '@/lib/services/auth'
 import { requirePermission } from '@/lib/services/require-role'
 import { withTiming } from '@/lib/middleware/request-timing'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 /**
  * GET /api/contacts/[id]/status-records
@@ -15,11 +16,12 @@ async function handleGet(
 ) {
   try {
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'contacts', 'view')
     const { id: contactId } = await params
 
     // Verify contact belongs to tenant
-    const { data: contact, error: contactError } = await auth.supabase
+    const { data: contact, error: contactError } = await admin
       .from('contacts')
       .select('id, tenant_id')
       .eq('id', contactId)
@@ -33,7 +35,7 @@ async function handleGet(
       )
     }
 
-    const { data: records, error: recordsError } = await auth.supabase
+    const { data: records, error: recordsError } = await admin
       .from('contact_status_records')
       .select('*')
       .eq('contact_id', contactId)

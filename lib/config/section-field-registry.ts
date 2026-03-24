@@ -18,10 +18,10 @@ export interface FieldDefinition {
 export const SECTION_FIELD_REGISTRY: Record<string, FieldDefinition[]> = {
   // ── Core Data: Processing Info ──────────────────────────────────────────
   processing_info: [
-    { key: 'processing_stream', label: 'Processing Stream' },
+    { key: 'processing_stream', label: 'Processing Mode' },
     { key: 'jurisdiction', label: 'Jurisdiction' },
     { key: 'intake_delegation', label: 'Intake Delegation Mode' },
-    { key: 'program_category', label: 'Program Category' },
+    { key: 'program_category', label: 'Processing Stream' },
   ],
 
   // ── Core Data: People & Dependents ─────────────────────────────────────

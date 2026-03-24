@@ -37,6 +37,7 @@ const officeSettingsSchema = z.object({
 async function handlePatch(request: Request) {
   try {
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'settings', 'edit')
 
     const body = await request.json()
@@ -54,7 +55,6 @@ async function handlePatch(request: Request) {
       return NextResponse.json({ error: 'Nothing to update' }, { status: 400 })
     }
 
-    const admin = createAdminClient()
 
     // Read current tenant for audit delta + settings merge
     const { data: current, error: readErr } = await admin
@@ -117,7 +117,7 @@ async function handlePatch(request: Request) {
       }
 
     logAuditServer({
-      supabase: auth.supabase,
+      supabase: admin,
       tenantId: auth.tenantId,
       userId: auth.userId,
       entityType: 'tenant',

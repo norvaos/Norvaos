@@ -65,7 +65,7 @@ async function handlePost(
 
     // Fire-and-forget audit — do not block response
     logAuditServer({
-      supabase: auth.supabase,
+      supabase: admin,
       tenantId: auth.tenantId,
       userId: auth.userId,
       entityType: 'onboarding_checklist',

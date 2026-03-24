@@ -7,6 +7,7 @@ import {
 import { regenerateFormInstances } from '@/lib/services/form-instance-engine'
 import { invalidateGating } from '@/lib/services/cache-invalidation'
 import { withTiming } from '@/lib/middleware/request-timing'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 /**
  * GET /api/matters/[id]/document-slots
@@ -21,10 +22,11 @@ async function handleGet(
   try {
     const { id: matterId } = await params
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'documents', 'view')
 
     // Verify matter belongs to tenant
-    const { data: matter, error: matterErr } = await auth.supabase
+    const { data: matter, error: matterErr } = await admin
       .from('matters')
       .select('id, tenant_id')
       .eq('id', matterId)
@@ -39,7 +41,7 @@ async function handleGet(
     }
 
     // Fetch active document slots with current document info
-    const { data: slots, error: slotsErr } = await auth.supabase
+    const { data: slots, error: slotsErr } = await admin
       .from('document_slots')
       .select(`
         *,
@@ -95,10 +97,11 @@ async function handlePost(
   try {
     const { id: matterId } = await params
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'matters', 'edit')
 
     // Fetch matter with type info
-    const { data: matter, error: matterErr } = await auth.supabase
+    const { data: matter, error: matterErr } = await admin
       .from('matters')
       .select('id, tenant_id, matter_type_id')
       .eq('id', matterId)
@@ -115,7 +118,7 @@ async function handlePost(
     // Determine scope — check for case_type_id from matter_immigration
     let caseTypeId: string | null = null
     if (!matter.matter_type_id) {
-      const { data: immData } = await auth.supabase
+      const { data: immData } = await admin
         .from('matter_immigration')
         .select('case_type_id')
         .eq('matter_id', matterId)
@@ -125,7 +128,7 @@ async function handlePost(
     }
 
     const result = await regenerateDocumentSlots({
-      supabase: auth.supabase,
+      supabase: admin,
       tenantId: auth.tenantId,
       matterId,
       matterTypeId: matter.matter_type_id,
@@ -134,7 +137,7 @@ async function handlePost(
 
     // Also regenerate form instances
     const formResult = await regenerateFormInstances({
-      supabase: auth.supabase,
+      supabase: admin,
       tenantId: auth.tenantId,
       matterId,
       matterTypeId: matter.matter_type_id,
@@ -182,6 +185,7 @@ async function handlePut(
   try {
     const { id: matterId } = await params
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'documents', 'edit')
 
     // Parse and validate body
@@ -197,7 +201,7 @@ async function handlePut(
     }
 
     // Verify matter belongs to tenant
-    const { data: matter, error: matterErr } = await auth.supabase
+    const { data: matter, error: matterErr } = await admin
       .from('matters')
       .select('id, tenant_id')
       .eq('id', matterId)
@@ -222,7 +226,7 @@ async function handlePut(
         .replace(/^_|_$/g, '')
         || 'custom'
 
-      const { data: existingSlugs } = await auth.supabase
+      const { data: existingSlugs } = await admin
         .from('document_slots')
         .select('slot_slug')
         .eq('matter_id', matterId)
@@ -238,7 +242,7 @@ async function handlePut(
     }
 
     // Determine next sort_order
-    const { data: maxSort } = await auth.supabase
+    const { data: maxSort } = await admin
       .from('document_slots')
       .select('sort_order')
       .eq('matter_id', matterId)
@@ -250,7 +254,7 @@ async function handlePut(
     const nextSortOrder = (maxSort?.sort_order ?? 0) + 1
 
     // Insert custom slot
-    const { data: newSlot, error: insertErr } = await auth.supabase
+    const { data: newSlot, error: insertErr } = await admin
       .from('document_slots')
       .insert({
         tenant_id: auth.tenantId,
@@ -310,6 +314,7 @@ async function handlePatch(
   try {
     const { id: matterId } = await params
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'documents', 'edit')
 
     const body = await request.json()
@@ -324,7 +329,7 @@ async function handlePatch(
     }
 
     // Verify matter belongs to tenant
-    const { data: matter, error: matterErr } = await auth.supabase
+    const { data: matter, error: matterErr } = await admin
       .from('matters')
       .select('id, tenant_id')
       .eq('id', matterId)
@@ -339,7 +344,7 @@ async function handlePatch(
     }
 
     // Fetch the template (must belong to same tenant)
-    const { data: template, error: tplErr } = await auth.supabase
+    const { data: template, error: tplErr } = await admin
       .from('document_slot_templates')
       .select('*')
       .eq('id', slotTemplateId)
@@ -355,7 +360,7 @@ async function handlePatch(
     }
 
     // Check if already instantiated for this (matter, template, person) combination
-    const existingQuery = auth.supabase
+    const existingQuery = admin
       .from('document_slots')
       .select('id, is_active')
       .eq('matter_id', matterId)
@@ -375,7 +380,7 @@ async function handlePatch(
         )
       }
       // Reactivate a previously soft-deleted slot
-      const { data: reactivated, error: reactErr } = await auth.supabase
+      const { data: reactivated, error: reactErr } = await admin
         .from('document_slots')
         .update({ is_active: true, deactivated_at: null, status: 'empty' })
         .eq('id', existing.id)
@@ -389,7 +394,7 @@ async function handlePatch(
     }
 
     // Determine next sort_order
-    const { data: maxSort } = await auth.supabase
+    const { data: maxSort } = await admin
       .from('document_slots')
       .select('sort_order')
       .eq('matter_id', matterId)
@@ -401,7 +406,7 @@ async function handlePatch(
     const nextSortOrder = (maxSort?.sort_order ?? 0) + 1
 
     // Insert the new slot from template data
-    const { data: newSlot, error: insertErr } = await auth.supabase
+    const { data: newSlot, error: insertErr } = await admin
       .from('document_slots')
       .insert({
         tenant_id: auth.tenantId,
@@ -453,6 +458,7 @@ async function handleDelete(
   try {
     const { id: matterId } = await params
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'documents', 'edit')
 
     const slotId = new URL(request.url).searchParams.get('slot_id')
@@ -460,7 +466,7 @@ async function handleDelete(
       return NextResponse.json({ error: 'slot_id is required' }, { status: 400 })
     }
 
-    const { error } = await auth.supabase
+    const { error } = await admin
       .from('document_slots')
       .update({ is_active: false })
       .eq('id', slotId)

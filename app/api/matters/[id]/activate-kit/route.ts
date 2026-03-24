@@ -4,6 +4,7 @@ import { requirePermission } from '@/lib/services/require-role'
 import { activateWorkflowKit, activateImmigrationKit } from '@/lib/services/kit-activation'
 import { invalidateMatter } from '@/lib/services/cache-invalidation'
 import { withTiming } from '@/lib/middleware/request-timing'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 /**
  * POST /api/matters/[id]/activate-kit
@@ -21,6 +22,7 @@ async function handlePost(
   try {
     const { id: matterId } = await params
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'matters', 'edit')
 
     const body = await request.json()
@@ -30,7 +32,7 @@ async function handlePost(
     }
 
     // Verify matter belongs to tenant
-    const { data: matter, error: matterErr } = await auth.supabase
+    const { data: matter, error: matterErr } = await admin
       .from('matters')
       .select('id, tenant_id')
       .eq('id', matterId)
@@ -47,7 +49,7 @@ async function handlePost(
     // Activate appropriate kit
     if (matterTypeId && !caseTypeId) {
       await activateWorkflowKit({
-        supabase: auth.supabase,
+        supabase: admin,
         tenantId: auth.tenantId,
         matterId,
         matterTypeId,
@@ -57,7 +59,7 @@ async function handlePost(
 
     if (caseTypeId) {
       await activateImmigrationKit({
-        supabase: auth.supabase,
+        supabase: admin,
         tenantId: auth.tenantId,
         matterId,
         caseTypeId,

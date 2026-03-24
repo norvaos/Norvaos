@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
-import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { authenticateRequest, AuthError } from '@/lib/services/auth'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { requirePermission } from '@/lib/services/require-role'
 import { withTiming } from '@/lib/middleware/request-timing'
 import {
@@ -23,14 +23,14 @@ async function handlePost() {
     const auth = await authenticateRequest()
     requirePermission(auth, 'settings', 'edit')
 
-    const supabase = await createServerSupabaseClient()
+    const admin = createAdminClient()
     const tenantId = auth.tenantId
 
     // Build insert rows from all three preset categories
     const rows: {
       tenant_id: string
       category: string
-      description: string
+      name: string
       amount: number
       currency: string
       sort_order: number
@@ -41,7 +41,7 @@ async function handlePost() {
       rows.push({
         tenant_id: tenantId,
         category: 'professional_services',
-        description: p.description,
+        name: p.description,
         amount: p.unitPrice * 100, // dollars → cents
         currency: 'CAD',
         sort_order: i,
@@ -53,7 +53,7 @@ async function handlePost() {
       rows.push({
         tenant_id: tenantId,
         category: 'government_fees',
-        description: p.description,
+        name: p.description,
         amount: p.amount * 100, // dollars → cents
         currency: 'CAD',
         sort_order: i,
@@ -65,7 +65,7 @@ async function handlePost() {
       rows.push({
         tenant_id: tenantId,
         category: 'disbursements',
-        description: p.description,
+        name: p.description,
         amount: p.amount * 100, // dollars → cents
         currency: 'CAD',
         sort_order: i,
@@ -73,12 +73,12 @@ async function handlePost() {
     })
 
     // Use upsert with ignoreDuplicates to make this idempotent.
-    // The unique index on (tenant_id, category, lower(description)) WHERE is_active = TRUE
+    // The unique index on (tenant_id, category, lower(name)) WHERE is_active = TRUE
     // prevents duplicates. Supabase upsert with ignoreDuplicates skips conflicts.
-    const { data, error } = await supabase
+    const { data, error } = await admin
       .from('retainer_presets')
       .upsert(rows, {
-        onConflict: 'tenant_id,category,lower(description)',
+        onConflict: 'tenant_id,category,lower(name)',
         ignoreDuplicates: true,
       })
       .select('id')
@@ -87,7 +87,7 @@ async function handlePost() {
       // If the upsert approach fails due to partial index, fall back to individual inserts
       let inserted = 0
       for (const row of rows) {
-        const { error: insertError } = await supabase
+        const { error: insertError } = await admin
           .from('retainer_presets')
           .insert(row)
 
@@ -98,7 +98,7 @@ async function handlePost() {
       }
 
       // Audit log
-      await supabase.from('activities').insert({
+      await admin.from('activities').insert({
         tenant_id: tenantId,
         activity_type: 'retainer_defaults_loaded',
         title: 'Default retainer presets loaded',
@@ -115,7 +115,7 @@ async function handlePost() {
     const countInserted = data?.length ?? 0
 
     // Audit log
-    await supabase.from('activities').insert({
+    await admin.from('activities').insert({
       tenant_id: tenantId,
       activity_type: 'retainer_defaults_loaded',
       title: 'Default retainer presets loaded',

@@ -12,6 +12,7 @@ import { evaluateConditionsDetailed } from '@/lib/services/document-engine/condi
 export async function POST(request: NextRequest) {
   try {
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'document_generation', 'view')
 
     const body = await request.json()
@@ -24,7 +25,7 @@ export async function POST(request: NextRequest) {
     const adminClient = createAdminClient()
 
     // Get template
-    const templateResult = await getTemplateWithVersion(auth.supabase, {
+    const templateResult = await getTemplateWithVersion(admin, {
       tenantId: auth.tenantId,
       templateId,
     })

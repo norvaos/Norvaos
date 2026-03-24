@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { authenticateRequest, AuthError } from '@/lib/services/auth'
 import { requirePermission } from '@/lib/services/require-role'
 import { withTiming } from '@/lib/middleware/request-timing'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 // ── Shared: resolve retainer package for a matter ─────────────────────────────
 
@@ -48,9 +49,10 @@ async function handleGet(
   try {
     const { id: matterId } = await params
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'billing', 'view')
 
-    const result = await resolveRetainerPackage(auth.supabase, auth.tenantId, matterId)
+    const result = await resolveRetainerPackage(admin, auth.tenantId, matterId)
 
     if ('error' in result && result.error === 'no_retainer') {
       return NextResponse.json({ retainerSummary: null })
@@ -110,6 +112,7 @@ async function handlePost(
   try {
     const { id: matterId } = await params
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'billing', 'edit')
 
     const body = await request.json()
@@ -126,7 +129,7 @@ async function handlePost(
       return NextResponse.json({ error: 'paymentMethod is required' }, { status: 400 })
     }
 
-    const result = await resolveRetainerPackage(auth.supabase, auth.tenantId, matterId)
+    const result = await resolveRetainerPackage(admin, auth.tenantId, matterId)
 
     if ('error' in result && result.error === 'no_retainer') {
       return NextResponse.json({ error: 'No retainer package found for this matter' }, { status: 404 })
@@ -146,7 +149,7 @@ async function handlePost(
     const now = new Date().toISOString()
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (auth.supabase.from('lead_retainer_packages') as any)
+    await (admin.from('lead_retainer_packages') as any)
       .update({
         payment_status: isFullyPaid ? 'paid' : 'partial',
         payment_amount: totalPaid,
@@ -161,7 +164,7 @@ async function handlePost(
     const amountFmt = `$${(amount / 100).toFixed(2)}`
     const balanceFmt = `$${(balance / 100).toFixed(2)}`
 
-    await auth.supabase.from('activities').insert({
+    await admin.from('activities').insert({
       tenant_id: auth.tenantId,
       activity_type: 'retainer_payment_recorded',
       title: `Payment recorded: ${amountFmt}${!isFullyPaid ? ` (balance: ${balanceFmt})` : ' — paid in full'}`,
@@ -206,3 +209,5 @@ async function handlePost(
 
 export const GET = withTiming(handleGet, 'GET /api/matters/[id]/retainer-summary')
 export const POST = withTiming(handlePost, 'POST /api/matters/[id]/retainer-summary')
+
+const admin = createAdminClient()

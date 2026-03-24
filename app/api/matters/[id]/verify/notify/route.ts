@@ -3,6 +3,7 @@ import { authenticateRequest, AuthError } from '@/lib/services/auth'
 import { requirePermission } from '@/lib/services/require-role'
 import { withTiming } from '@/lib/middleware/request-timing'
 import { sendClientEmail } from '@/lib/services/email-service'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 type RouteContext = { params: Promise<{ id: string }> }
 
@@ -34,6 +35,7 @@ async function handlePost(
   try {
     const { id: matterId } = await params
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'form_packs', 'create')
 
     const body = (await request.json()) as NotifyBody
@@ -46,7 +48,7 @@ async function handlePost(
     }
 
     // Fetch matter reference
-    const { data: matter, error: matterErr } = await auth.supabase
+    const { data: matter, error: matterErr } = await admin
       .from('matters')
       .select('id, reference_number')
       .eq('id', matterId)
@@ -58,7 +60,7 @@ async function handlePost(
     }
 
     // Find the primary contact via matter_contacts junction
-    const { data: primaryMc } = await auth.supabase
+    const { data: primaryMc } = await admin
       .from('matter_contacts')
       .select('contact_id')
       .eq('matter_id', matterId)
@@ -87,7 +89,7 @@ async function handlePost(
         itemNames.push(readable)
       } else if (target.type === 'document' && target.slot_id) {
         // Fetch slot name
-        const { data: slot } = await auth.supabase
+        const { data: slot } = await admin
           .from('document_slots')
           .select('slot_name')
           .eq('id', target.slot_id)
@@ -99,7 +101,7 @@ async function handlePost(
     // Send the notification email using the 'general' type
     // (the email service handles template rendering + Resend dispatch)
     await sendClientEmail({
-      supabase: auth.supabase,
+      supabase: admin,
       tenantId: auth.tenantId,
       matterId,
       contactId,

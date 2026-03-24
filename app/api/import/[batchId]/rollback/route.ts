@@ -46,7 +46,7 @@ async function handlePost(
 
     // Audit log — batch-level rollback event (per-matter events written by rollback-engine)
     logAuditServer({
-      supabase: auth.supabase,
+      supabase: admin,
       tenantId: auth.tenantId,
       userId: auth.userId,
       entityType: 'import_batch',

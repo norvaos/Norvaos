@@ -22,6 +22,10 @@ const createMatterSchema = z.object({
   hourly_rate: z.number().min(0).optional().nullable(),
   estimated_value: z.number().min(0).optional().nullable(),
   fee_template_id: z.string().uuid().optional().nullable(),
+  applicant_location: z.enum(['inside_canada', 'outside_canada']).optional().nullable(),
+  client_province: z.string().max(2).optional().nullable(),
+  tax_rate: z.number().min(0).max(1).optional().nullable(),
+  tax_label: z.string().max(20).optional().nullable(),
   priority: z.enum(['low', 'medium', 'high', 'urgent']).default('medium'),
   description: z.string().optional().nullable(),
   pipeline_id: z.string().uuid().optional().nullable(),
@@ -86,6 +90,10 @@ async function handlePost(request: Request) {
       hourly_rate,
       estimated_value,
       fee_template_id,
+      applicant_location,
+      client_province,
+      tax_rate: bodyTaxRate,
+      tax_label: bodyTaxLabel,
       priority,
       description,
       pipeline_id,
@@ -94,8 +102,9 @@ async function handlePost(request: Request) {
       initial_matter_stage_id,
     } = parsed.data
 
-    // 3. Insert the matter
-    const { data: matter, error: insertError } = await auth.supabase
+    // 3. Insert the matter (use admin client to bypass RLS — auth already verified above)
+    const admin = createAdminClient()
+    const { data: matter, error: insertError } = await admin
       .from('matters')
       .insert({
         tenant_id: auth.tenantId,
@@ -111,6 +120,10 @@ async function handlePost(request: Request) {
         hourly_rate: hourly_rate ?? null,
         estimated_value: estimated_value ?? null,
         fee_template_id: fee_template_id || null,
+        applicant_location: applicant_location || null,
+        client_province: client_province || null,
+        tax_rate: bodyTaxRate ?? null,
+        tax_label: bodyTaxLabel || null,
         priority: priority || 'medium',
         status: 'active',
         date_opened: new Date().toISOString().split('T')[0],
@@ -129,12 +142,63 @@ async function handlePost(request: Request) {
       )
     }
 
+    // 3b. Snapshot the fee template (non-fatal)
+    if (fee_template_id) {
+      try {
+        const { data: template } = await admin
+          .from('retainer_fee_templates')
+          .select('*')
+          .eq('id', fee_template_id)
+          .single()
+
+        if (template) {
+          const professionalFees = template.professional_fees as any[] || []
+          const governmentFees = template.government_fees as any[] || []
+          const disbursements = template.disbursements as any[] || []
+
+          const profTotal = professionalFees.reduce((sum: number, f: any) => sum + (f.amount_cents || (f.quantity || 1) * (f.unitPrice || 0)), 0)
+          const govtTotal = governmentFees.reduce((sum: number, f: any) => sum + (f.amount_cents || 0), 0)
+          const disbTotal = disbursements.reduce((sum: number, f: any) => sum + (f.amount_cents || 0), 0)
+
+          const taxableAmount = profTotal + disbTotal // govt fees are exempt
+          const taxRate = bodyTaxRate || 0
+          const taxAmount = Math.round(taxableAmount * taxRate)
+          const subtotal = profTotal + govtTotal + disbTotal
+          const total = subtotal + taxAmount
+
+          const feeSnapshot = {
+            template_id: template.id,
+            template_name: template.name,
+            professional_fees: professionalFees,
+            government_fees: governmentFees,
+            disbursements: disbursements,
+            hst_applicable: template.hst_applicable,
+            billing_type: template.billing_type,
+            snapshotted_at: new Date().toISOString(),
+          }
+
+          await admin
+            .from('matters')
+            .update({
+              fee_snapshot: feeSnapshot,
+              subtotal_cents: subtotal,
+              tax_amount_cents: taxAmount,
+              total_amount_cents: total,
+              estimated_value: total / 100,
+            })
+            .eq('id', matter.id)
+        }
+      } catch (snapshotError) {
+        console.error('Fee snapshot error (non-fatal):', snapshotError)
+      }
+    }
+
     // 4. Activate kit based on matter type
     try {
       if (matter_type_id && !case_type_id) {
         // Generic workflow kit (Real Estate, etc.)
         await activateWorkflowKit({
-          supabase: auth.supabase,
+          supabase: admin,
           tenantId: auth.tenantId,
           matterId: matter.id,
           matterTypeId: matter_type_id,
@@ -147,7 +211,7 @@ async function handlePost(request: Request) {
       if (case_type_id) {
         // Immigration kit
         await activateImmigrationKit({
-          supabase: auth.supabase,
+          supabase: admin,
           tenantId: auth.tenantId,
           matterId: matter.id,
           caseTypeId: case_type_id,
@@ -162,14 +226,14 @@ async function handlePost(request: Request) {
     // 5. Initialize UEE intake + seed principal applicant
     try {
       // Fetch tenant jurisdiction
-      const { data: tenantRow } = await auth.supabase
+      const { data: tenantRow } = await admin
         .from('tenants')
         .select('jurisdiction_code')
         .eq('id', auth.tenantId)
         .single()
 
       // Always create matter_intake record
-      await auth.supabase.from('matter_intake').insert({
+      await admin.from('matter_intake').insert({
         tenant_id: auth.tenantId,
         matter_id: matter.id,
         intake_status: 'incomplete',
@@ -179,7 +243,7 @@ async function handlePost(request: Request) {
       // If a primary contact was selected, seed them as principal applicant (idempotent)
       if (contact_id) {
         // Guard: check if a PA already exists for this matter (prevents duplicates on retry)
-        const { data: existingPA } = await auth.supabase
+        const { data: existingPA } = await admin
           .from('matter_people')
           .select('id')
           .eq('matter_id', matter.id)
@@ -188,14 +252,14 @@ async function handlePost(request: Request) {
           .maybeSingle()
 
         if (!existingPA) {
-          const { data: contact } = await auth.supabase
+          const { data: contact } = await admin
             .from('contacts')
             .select('first_name, last_name, email_primary, phone_primary')
             .eq('id', contact_id)
             .single()
 
           if (contact) {
-            const { data: newPerson } = await auth.supabase
+            const { data: newPerson } = await admin
               .from('matter_people')
               .insert({
                 tenant_id: auth.tenantId,
@@ -215,7 +279,7 @@ async function handlePost(request: Request) {
             // and staff can populate it in the workbench.
             if (newPerson?.id) {
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              await (auth.supabase as any).rpc('snapshot_contact_profile_to_matter', {
+              await (admin as any).rpc('snapshot_contact_profile_to_matter', {
                 p_matter_person_id: newPerson.id,
                 p_contact_id:       contact_id,
                 p_tenant_id:        auth.tenantId,
@@ -229,14 +293,14 @@ async function handlePost(request: Request) {
       }
 
       // Revalidate intake to compute initial completion %, risk, and status
-      await revalidateIntake(auth.supabase, matter.id)
+      await revalidateIntake(admin, matter.id)
     } catch (intakeError) {
       // Intake initialization failure is non-fatal — matter already created
       console.error('Intake initialization error (non-fatal):', intakeError)
     }
 
     // 6. Log activity
-    await auth.supabase.from('activities').insert({
+    await admin.from('activities').insert({
       tenant_id: auth.tenantId,
       matter_id: matter.id,
       activity_type: 'matter_created',
@@ -255,7 +319,7 @@ async function handlePost(request: Request) {
     await invalidateMattersList(auth.tenantId)
 
     // 7. Fire-and-forget rule snapshot capture — non-blocking
-    captureRuleSnapshots(matter.id, auth.tenantId, auth.supabase).catch(
+    captureRuleSnapshots(matter.id, auth.tenantId, admin).catch(
       (e) => console.error('[matters] Rule snapshot capture failed (non-fatal):', e)
     )
 
@@ -298,7 +362,8 @@ async function handleDelete(req: Request) {
       return NextResponse.json({ success: false, error: 'Cannot delete more than 200 matters at once' }, { status: 400 })
     }
 
-    const { error } = await auth.supabase
+    const admin = createAdminClient()
+    const { error } = await admin
       .from('matters')
       .update({ status: 'archived' })
       .in('id', ids)

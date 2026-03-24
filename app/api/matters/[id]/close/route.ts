@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { authenticateRequest, AuthError } from '@/lib/services/auth'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { withTiming } from '@/lib/middleware/request-timing'
 
 /**
@@ -55,8 +56,11 @@ async function handlePost(
       trust_override_reason?: string
     }
 
+    // Use admin client to bypass RLS — auth already verified above
+    const admin = createAdminClient()
+
     // 3. Verify matter belongs to tenant
-    const { data: matter, error: matterErr } = await auth.supabase
+    const { data: matter, error: matterErr } = await admin
       .from('matters')
       .select('id, tenant_id, status, title')
       .eq('id', matterId)
@@ -73,20 +77,20 @@ async function handlePost(
     // 4. Run all guards in parallel
     const [deficienciesResult, trustResult, riskFlagsResult] = await Promise.all([
       // Guard 2: Open deficiencies
-      auth.supabase
+      admin
         .from('matter_deficiencies')
         .select('id', { count: 'exact', head: true })
         .eq('matter_id', matterId)
         .in('status', ['open', 'in_progress', 'reopened']),
 
       // Guard 3: Trust balance (debits vs credits)
-      auth.supabase
+      admin
         .from('trust_transactions')
         .select('transaction_type, amount_cents')
         .eq('matter_id', matterId),
 
       // Guard 4: Critical/high open risk flags
-      auth.supabase
+      admin
         .from('matter_risk_flags')
         .select('id', { count: 'exact', head: true })
         .eq('matter_id', matterId)
@@ -187,7 +191,7 @@ async function handlePost(
     const resolvedStatus = closureStatus ?? 'closed_won'
     const closedAt = new Date().toISOString()
 
-    const { error: closeErr } = await auth.supabase
+    const { error: closeErr } = await admin
       .from('matters')
       .update({
         status: resolvedStatus,
@@ -208,7 +212,7 @@ async function handlePost(
     }
 
     // 8. Log activity
-    await auth.supabase.from('activities').insert({
+    await admin.from('activities').insert({
       tenant_id: auth.tenantId,
       matter_id: matterId,
       activity_type: 'matter_closed',

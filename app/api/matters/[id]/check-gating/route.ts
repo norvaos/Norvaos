@@ -7,6 +7,7 @@ import {
   type GatingRule,
 } from '@/lib/services/stage-engine'
 import { withTiming } from '@/lib/middleware/request-timing'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 /**
  * GET /api/matters/[id]/check-gating
@@ -30,10 +31,11 @@ async function handleGet(
 
     // 1. Authenticate, authorize, and get tenant context
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'matters', 'view')
 
     // 2. Verify the matter belongs to the authenticated user's tenant
-    const { data: matter, error: matterErr } = await auth.supabase
+    const { data: matter, error: matterErr } = await admin
       .from('matters')
       .select('id, tenant_id')
       .eq('id', matterId)
@@ -48,7 +50,7 @@ async function handleGet(
     }
 
     // 3. Fetch matter_stage_state to get pipeline_id + stage_history
-    const { data: stageState } = await auth.supabase
+    const { data: stageState } = await admin
       .from('matter_stage_state')
       .select('pipeline_id, current_stage_id, stage_history')
       .eq('matter_id', matterId)
@@ -60,7 +62,7 @@ async function handleGet(
     }
 
     // 4. Fetch all stages in the pipeline (ordered by sort_order)
-    const { data: stages } = await auth.supabase
+    const { data: stages } = await admin
       .from('matter_stages')
       .select('id, name, sort_order, gating_rules')
       .eq('pipeline_id', stageState.pipeline_id)
@@ -82,7 +84,7 @@ async function handleGet(
       // Resolve effective rules — applies default baseline for enforcement-enabled types
       // Passes sort_order so early stages (0–1) are not blocked by default baseline
       const effectiveRules = await getEffectiveGatingRules(
-        auth.supabase,
+        admin,
         matterId,
         rawRules,
         stage.sort_order
@@ -90,7 +92,7 @@ async function handleGet(
 
       if (effectiveRules.length > 0) {
         const result = await evaluateGatingRules(
-          auth.supabase,
+          admin,
           matterId,
           auth.tenantId,
           effectiveRules,

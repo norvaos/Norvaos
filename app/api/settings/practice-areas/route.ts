@@ -5,6 +5,7 @@ import { withTiming } from '@/lib/middleware/request-timing'
 import { logAuditServer } from '@/lib/queries/audit-logs'
 import { z } from 'zod'
 import type { Database } from '@/lib/types/database'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 type PracticeAreaRow = Database['public']['Tables']['practice_areas']['Row']
 
@@ -26,6 +27,7 @@ const createPracticeAreaSchema = z.object({
 async function handlePost(request: Request) {
   try {
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'settings', 'edit')
 
     const body = await request.json()
@@ -40,7 +42,7 @@ async function handlePost(request: Request) {
 
     const { name, color } = parsed.data
 
-    const { data, error } = await auth.supabase
+    const { data, error } = await admin
       .from('practice_areas')
       .insert({
         tenant_id: auth.tenantId,
@@ -66,7 +68,7 @@ async function handlePost(request: Request) {
     }
 
     await logAuditServer({
-      supabase: auth.supabase,
+      supabase: admin,
       tenantId: auth.tenantId,
       userId: auth.userId,
       entityType: 'practice_area',

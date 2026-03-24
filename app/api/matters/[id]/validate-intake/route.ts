@@ -3,6 +3,7 @@ import { authenticateRequest, AuthError } from '@/lib/services/auth'
 import { requirePermission } from '@/lib/services/require-role'
 import { revalidateIntake } from '@/lib/services/intake-revalidate'
 import { withTiming } from '@/lib/middleware/request-timing'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 /**
  * POST /api/matters/[id]/validate-intake
@@ -26,10 +27,11 @@ async function handlePost(
 
     // 1. Authenticate and get tenant context
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'matters', 'edit')
 
     // 2. Verify the matter belongs to this tenant
-    const { data: matter, error: matterErr } = await auth.supabase
+    const { data: matter, error: matterErr } = await admin
       .from('matters')
       .select('id, tenant_id')
       .eq('id', matterId)
@@ -44,7 +46,7 @@ async function handlePost(
     }
 
     // 3. Delegate to shared revalidation service
-    const result = await revalidateIntake(auth.supabase, matterId)
+    const result = await revalidateIntake(admin, matterId)
 
     if (!result.success) {
       return NextResponse.json(

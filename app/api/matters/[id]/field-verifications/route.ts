@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { authenticateRequest } from '@/lib/services/auth'
 import { requirePermission } from '@/lib/services/require-role'
 import { withTiming } from '@/lib/middleware/request-timing'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 type RouteContext = { params: Promise<{ id: string }> }
 
@@ -18,9 +19,10 @@ async function handleGet(
   try {
     const { id: matterId } = await params
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'matters', 'view')
 
-    const { data, error } = await auth.supabase
+    const { data, error } = await admin
       .from('field_verifications')
       .select('id, profile_path, verified_value, verified_by, verified_at, notes, verification_status, rejection_reason')
       .eq('matter_id', matterId)
@@ -49,6 +51,7 @@ async function handlePost(
   try {
     const { id: matterId } = await params
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'form_packs', 'create') // Lawyer-level gate
 
     const body = await request.json()
@@ -75,7 +78,7 @@ async function handlePost(
     }))
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await (auth.supabase as any)
+    const { error } = await (admin as any)
       .from('field_verifications')
       .upsert(inserts, { onConflict: 'tenant_id,matter_id,profile_path' })
 
@@ -100,6 +103,7 @@ async function handleDelete(
   try {
     const { id: matterId } = await params
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'form_packs', 'create')
 
     const { profile_path } = await request.json()
@@ -107,7 +111,7 @@ async function handleDelete(
       return NextResponse.json({ error: 'Missing profile_path' }, { status: 400 })
     }
 
-    const { error } = await auth.supabase
+    const { error } = await admin
       .from('field_verifications')
       .delete()
       .eq('tenant_id', auth.tenantId)
@@ -125,3 +129,5 @@ async function handleDelete(
 export const GET = withTiming(handleGet, 'GET /api/matters/[id]/field-verifications')
 export const POST = withTiming(handlePost, 'POST /api/matters/[id]/field-verifications')
 export const DELETE = withTiming(handleDelete, 'DELETE /api/matters/[id]/field-verifications')
+
+const admin = createAdminClient()

@@ -12,13 +12,14 @@ import { listTemplates, createTemplate } from '@/lib/services/document-engine'
 export async function GET(request: NextRequest) {
   try {
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'document_templates', 'view')
 
     const { searchParams } = new URL(request.url)
     const documentFamily = searchParams.get('documentFamily') ?? undefined
     const status = searchParams.get('status') ?? undefined
 
-    const result = await listTemplates(auth.supabase, {
+    const result = await listTemplates(admin, {
       tenantId: auth.tenantId,
       documentFamily,
       status,
@@ -40,6 +41,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'document_templates', 'create')
 
     const body = await request.json()

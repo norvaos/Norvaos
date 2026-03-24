@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { authenticateRequest, AuthError } from '@/lib/services/auth'
 import { requirePermission } from '@/lib/services/require-role'
 import type { Database } from '@/lib/types/database'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 /**
  * PUT /api/leads/[id]/milestones
@@ -18,6 +19,7 @@ export async function PUT(
   try {
     const { id: leadId } = await params
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'leads', 'update')
 
     const body = await request.json()
@@ -35,7 +37,7 @@ export async function PUT(
     }
 
     // Verify lead belongs to tenant
-    const { data: lead, error: leadError } = await auth.supabase
+    const { data: lead, error: leadError } = await admin
       .from('leads')
       .select('id, tenant_id, is_closed, current_stage')
       .eq('id', leadId)
@@ -50,7 +52,7 @@ export async function PUT(
     }
 
     // Verify task belongs to this lead
-    const { data: task, error: taskError } = await auth.supabase
+    const { data: task, error: taskError } = await admin
       .from('lead_milestone_tasks')
       .select('id, lead_id, status, milestone_group_id')
       .eq('id', taskId)
@@ -84,7 +86,7 @@ export async function PUT(
           skip_reason: skipReason || null,
         }
 
-    const { error: updateError } = await auth.supabase
+    const { error: updateError } = await admin
       .from('lead_milestone_tasks')
       .update(updateData)
       .eq('id', taskId)
@@ -97,7 +99,7 @@ export async function PUT(
     }
 
     // Recalculate group completion percentage
-    const { data: groupTasks } = await auth.supabase
+    const { data: groupTasks } = await admin
       .from('lead_milestone_tasks')
       .select('id, status')
       .eq('milestone_group_id', task.milestone_group_id)
@@ -108,7 +110,7 @@ export async function PUT(
       const percent = Math.round((completed / total) * 100)
       const allDone = groupTasks.every((t) => t.status === 'completed' || t.status === 'skipped')
 
-      await auth.supabase
+      await admin
         .from('lead_milestone_groups')
         .update({
           completion_percent: percent,
@@ -118,7 +120,7 @@ export async function PUT(
     }
 
     // Log activity
-    await auth.supabase.from('activities').insert({
+    await admin.from('activities').insert({
       tenant_id: auth.tenantId,
       activity_type: action === 'complete' ? 'task_completed' : 'task_skipped',
       title: action === 'complete' ? 'Milestone task completed' : 'Milestone task skipped',
@@ -151,3 +153,5 @@ export async function PUT(
     )
   }
 }
+
+const admin = createAdminClient()

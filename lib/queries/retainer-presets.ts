@@ -11,7 +11,8 @@ export interface RetainerPreset {
   id: string
   tenant_id: string
   category: string
-  description: string
+  name: string
+  description: string | null
   amount: number // cents
   currency: string
   sort_order: number
@@ -69,11 +70,11 @@ export function useRetainerPresets(tenantId: string, category?: string) {
       const supabase = createClient()
       let query = supabase
         .from('retainer_presets')
-        .select('*')
+        .select('id, tenant_id, category, name, description, amount, currency, sort_order, is_active, created_at, updated_at')
         .eq('tenant_id', tenantId)
         .eq('is_active', true)
         .order('sort_order')
-        .order('description')
+        .order('name')
 
       if (category) {
         query = query.eq('category', category)
@@ -98,7 +99,8 @@ export function useCreateRetainerPreset() {
       tenant_id: string
       user_id: string
       category: string
-      description: string
+      name: string
+      description?: string
       amount: number // cents
       currency?: string
       sort_order?: number
@@ -109,7 +111,8 @@ export function useCreateRetainerPreset() {
         .insert({
           tenant_id: input.tenant_id,
           category: input.category,
-          description: input.description,
+          name: input.name,
+          description: input.description ?? null,
           amount: input.amount,
           currency: input.currency ?? 'CAD',
           sort_order: input.sort_order ?? 0,
@@ -119,7 +122,7 @@ export function useCreateRetainerPreset() {
 
       if (error) {
         if (error.code === '23505') {
-          throw new Error('A preset with this description already exists in this category')
+          throw new Error('A preset with this name already exists in this category')
         }
         throw error
       }
@@ -129,16 +132,16 @@ export function useCreateRetainerPreset() {
         input.tenant_id,
         input.user_id,
         'retainer_preset_created',
-        `Retainer preset created: ${input.description}`,
-        `Added "${input.description}" to ${input.category} ($${(input.amount / 100).toFixed(2)} ${input.currency ?? 'CAD'})`,
-        { preset_id: data.id, category: input.category, description: input.description, amount: input.amount, currency: input.currency ?? 'CAD' }
+        `Retainer preset created: ${input.name}`,
+        `Added "${input.name}" to ${input.category} ($${(input.amount / 100).toFixed(2)} ${input.currency ?? 'CAD'})`,
+        { preset_id: data.id, category: input.category, name: input.name, amount: input.amount, currency: input.currency ?? 'CAD' }
       )
 
       return data as RetainerPreset
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: retainerPresetKeys.all })
-      toast.success(`Preset "${data.description}" created`)
+      toast.success(`Preset "${data.name}" created`)
     },
     onError: (error: Error) => {
       toast.error(error.message || 'Failed to create preset')
@@ -156,13 +159,15 @@ export function useUpdateRetainerPreset() {
       id: string
       tenant_id: string
       user_id: string
-      description?: string
+      name?: string
+      description?: string | null
       amount?: number
       currency?: string
       sort_order?: number
     }) => {
       const supabase = createClient()
       const updates: Record<string, unknown> = {}
+      if (input.name !== undefined) updates.name = input.name
       if (input.description !== undefined) updates.description = input.description
       if (input.amount !== undefined) updates.amount = input.amount
       if (input.currency !== undefined) updates.currency = input.currency
@@ -177,7 +182,7 @@ export function useUpdateRetainerPreset() {
 
       if (error) {
         if (error.code === '23505') {
-          throw new Error('A preset with this description already exists in this category')
+          throw new Error('A preset with this name already exists in this category')
         }
         throw error
       }
@@ -186,7 +191,7 @@ export function useUpdateRetainerPreset() {
         input.tenant_id,
         input.user_id,
         'retainer_preset_updated',
-        `Retainer preset updated: ${data.description}`,
+        `Retainer preset updated: ${data.name}`,
         `Updated preset in ${data.category}`,
         { preset_id: data.id, changes: updates }
       )
@@ -213,7 +218,7 @@ export function useDeleteRetainerPreset() {
       id: string
       tenant_id: string
       user_id: string
-      description: string
+      name: string
     }) => {
       const supabase = createClient()
       const { error } = await supabase
@@ -227,9 +232,9 @@ export function useDeleteRetainerPreset() {
         input.tenant_id,
         input.user_id,
         'retainer_preset_deleted',
-        `Retainer preset removed: ${input.description}`,
-        `Deactivated preset "${input.description}"`,
-        { preset_id: input.id, description: input.description }
+        `Retainer preset removed: ${input.name}`,
+        `Deactivated preset "${input.name}"`,
+        { preset_id: input.id, name: input.name }
       )
     },
     onSuccess: () => {

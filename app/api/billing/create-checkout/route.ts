@@ -3,6 +3,7 @@ import { authenticateRequest, AuthError } from '@/lib/services/auth'
 import { requirePermission } from '@/lib/services/require-role'
 import { stripe, getStripePriceId } from '@/lib/stripe/config'
 import { withTiming } from '@/lib/middleware/request-timing'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 /**
  * POST /api/billing/create-checkout
@@ -13,9 +14,10 @@ import { withTiming } from '@/lib/middleware/request-timing'
 async function handlePost(request: NextRequest) {
   try {
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'billing', 'create')
 
-    const { data: tenant } = await auth.supabase
+    const { data: tenant } = await admin
       .from('tenants')
       .select('id, name, stripe_customer_id')
       .eq('id', auth.tenantId)
@@ -45,7 +47,7 @@ async function handlePost(request: NextRequest) {
 
     if (!customerId) {
       // Get user email for Stripe customer
-      const { data: userRecord } = await auth.supabase
+      const { data: userRecord } = await admin
         .from('users')
         .select('email')
         .eq('id', auth.userId)
@@ -61,7 +63,7 @@ async function handlePost(request: NextRequest) {
       customerId = customer.id
 
       // Store customer ID
-      await auth.supabase
+      await admin
         .from('tenants')
         .update({ stripe_customer_id: customerId })
         .eq('id', tenant.id)

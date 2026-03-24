@@ -4,6 +4,7 @@ import { requirePermission } from '@/lib/services/require-role'
 import { closeLead } from '@/lib/services/lead-closure-engine'
 import { withTiming } from '@/lib/middleware/request-timing'
 import type { LeadStage } from '@/lib/config/lead-workflow-definitions'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 /**
  * POST /api/leads/[id]/close
@@ -29,6 +30,7 @@ async function handlePost(
   try {
     const { id: leadId } = await params
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'leads', 'edit')
 
     const body = await request.json()
@@ -53,7 +55,7 @@ async function handlePost(
     }
 
     // Verify lead belongs to tenant
-    const { data: lead, error: leadErr } = await auth.supabase
+    const { data: lead, error: leadErr } = await admin
       .from('leads')
       .select('id, tenant_id')
       .eq('id', leadId)
@@ -68,7 +70,7 @@ async function handlePost(
     }
 
     const result = await closeLead({
-      supabase: auth.supabase,
+      supabase: admin,
       leadId,
       tenantId: auth.tenantId,
       closedStage: closedStage as LeadStage,

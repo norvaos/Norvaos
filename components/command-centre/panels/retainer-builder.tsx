@@ -188,7 +188,7 @@ function RetainerTimeline({
 
 // ─── Preset Picker Sub-Component ────────────────────────────────────
 
-function PresetPicker<T extends { description: string }>({
+function PresetPicker<T extends { name: string; description?: string | null }>({
   presets,
   isAdded,
   onToggle,
@@ -197,7 +197,7 @@ function PresetPicker<T extends { description: string }>({
   disabled,
 }: {
   presets: readonly T[]
-  isAdded: (desc: string) => boolean
+  isAdded: (name: string) => boolean
   onToggle: (preset: T) => void
   triggerLabel: string
   triggerColor: string
@@ -209,10 +209,10 @@ function PresetPicker<T extends { description: string }>({
   const filtered = useMemo(() => {
     if (!search.trim()) return presets
     const q = search.toLowerCase()
-    return presets.filter((p) => p.description.toLowerCase().includes(q))
+    return presets.filter((p) => p.name.toLowerCase().includes(q) || (p.description && p.description.toLowerCase().includes(q)))
   }, [presets, search])
 
-  const addedCount = presets.filter((p) => isAdded(p.description)).length
+  const addedCount = presets.filter((p) => isAdded(p.name)).length
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -262,14 +262,14 @@ function PresetPicker<T extends { description: string }>({
             <p className="text-xs text-slate-400 text-center py-4">No matching presets</p>
           )}
           {filtered.map((preset) => {
-            const added = isAdded(preset.description)
+            const added = isAdded(preset.name)
             const amount =
               'unitPrice' in preset
                 ? (preset as unknown as { unitPrice: number }).unitPrice
                 : (preset as unknown as { amount: number }).amount
             return (
               <button
-                key={preset.description}
+                key={preset.name}
                 type="button"
                 onClick={() => onToggle(preset)}
                 className={cn(
@@ -285,7 +285,12 @@ function PresetPicker<T extends { description: string }>({
                 >
                   {added && <Check className="h-3 w-3" />}
                 </div>
-                <span className="text-xs text-slate-700 flex-1 truncate">{preset.description}</span>
+                <div className="flex-1 min-w-0">
+                  <span className="text-xs text-slate-700 truncate block">{preset.name}</span>
+                  {preset.description && (
+                    <span className="text-[10px] text-slate-400 leading-tight truncate block">{preset.description}</span>
+                  )}
+                </div>
                 <span className="text-xs text-slate-400 shrink-0 font-medium">
                   ${amount.toLocaleString()}
                 </span>
@@ -319,17 +324,17 @@ function RetainerBuilderContent() {
   // Split by category, convert cents → dollars for UI compatibility
   const servicePresets = useMemo(() =>
     dbPresets.filter(p => p.category === 'professional_services')
-      .map(p => ({ description: p.description, unitPrice: p.amount / 100 })),
+      .map(p => ({ name: p.name, description: p.description, unitPrice: p.amount / 100 })),
     [dbPresets]
   )
   const govFeePresets = useMemo(() =>
     dbPresets.filter(p => p.category === 'government_fees')
-      .map(p => ({ description: p.description, amount: p.amount / 100 })),
+      .map(p => ({ name: p.name, description: p.description, amount: p.amount / 100 })),
     [dbPresets]
   )
   const disbursementPresets = useMemo(() =>
     dbPresets.filter(p => p.category === 'disbursements')
-      .map(p => ({ description: p.description, amount: p.amount / 100 })),
+      .map(p => ({ name: p.name, description: p.description, amount: p.amount / 100 })),
     [dbPresets]
   )
 
@@ -531,39 +536,39 @@ function RetainerBuilderContent() {
     setDisbursements((prev) => prev.map((d) => (d.id === id ? { ...d, [field]: value } : d)))
 
   // ── Preset toggle helpers ───────────────────────────────────────
-  const isServiceAdded = (desc: string) => lineItems.some((li) => li.description === desc)
-  const isGovFeeAdded = (desc: string) => govFees.some((g) => g.description === desc)
-  const isDisbursementAdded = (desc: string) => disbursements.some((d) => d.description === desc)
+  const isServiceAdded = (name: string) => lineItems.some((li) => li.description === name)
+  const isGovFeeAdded = (name: string) => govFees.some((g) => g.description === name)
+  const isDisbursementAdded = (name: string) => disbursements.some((d) => d.description === name)
 
-  const toggleServicePreset = (preset: { description: string; unitPrice: number }) => {
-    if (isServiceAdded(preset.description)) {
-      setLineItems((prev) => prev.filter((li) => li.description !== preset.description))
+  const toggleServicePreset = (preset: { name: string; description?: string | null; unitPrice: number }) => {
+    if (isServiceAdded(preset.name)) {
+      setLineItems((prev) => prev.filter((li) => li.description !== preset.name))
     } else {
       setLineItems((prev) => [
         ...prev,
-        { id: crypto.randomUUID(), description: preset.description, quantity: 1, unitPrice: preset.unitPrice },
+        { id: crypto.randomUUID(), description: preset.name, quantity: 1, unitPrice: preset.unitPrice },
       ])
     }
   }
 
-  const toggleGovFeePreset = (preset: { description: string; amount: number }) => {
-    if (isGovFeeAdded(preset.description)) {
-      setGovFees((prev) => prev.filter((g) => g.description !== preset.description))
+  const toggleGovFeePreset = (preset: { name: string; description?: string | null; amount: number }) => {
+    if (isGovFeeAdded(preset.name)) {
+      setGovFees((prev) => prev.filter((g) => g.description !== preset.name))
     } else {
       setGovFees((prev) => [
         ...prev,
-        { id: crypto.randomUUID(), description: preset.description, amount: preset.amount },
+        { id: crypto.randomUUID(), description: preset.name, amount: preset.amount },
       ])
     }
   }
 
-  const toggleDisbursementPreset = (preset: { description: string; amount: number }) => {
-    if (isDisbursementAdded(preset.description)) {
-      setDisbursements((prev) => prev.filter((d) => d.description !== preset.description))
+  const toggleDisbursementPreset = (preset: { name: string; description?: string | null; amount: number }) => {
+    if (isDisbursementAdded(preset.name)) {
+      setDisbursements((prev) => prev.filter((d) => d.description !== preset.name))
     } else {
       setDisbursements((prev) => [
         ...prev,
-        { id: crypto.randomUUID(), description: preset.description, amount: preset.amount },
+        { id: crypto.randomUUID(), description: preset.name, amount: preset.amount },
       ])
     }
   }
@@ -821,7 +826,7 @@ function RetainerBuilderContent() {
                   </span>
                   {!isReadOnly && (
                     <>
-                      {item.description && item.unitPrice > 0 && !servicePresets.some(p => p.description === item.description) && (
+                      {item.description && item.unitPrice > 0 && !servicePresets.some(p => p.name === item.description) && (
                         <TooltipProvider>
                           <Tooltip>
                             <TooltipTrigger asChild>
@@ -833,7 +838,7 @@ function RetainerBuilderContent() {
                                   tenant_id: tenantId,
                                   user_id: '', // audit only
                                   category: 'professional_services',
-                                  description: item.description,
+                                  name: item.description,
                                   amount: Math.round(item.unitPrice * 100),
                                 })}
                               >
@@ -927,7 +932,7 @@ function RetainerBuilderContent() {
                   </div>
                   {!isReadOnly && (
                     <>
-                      {g.description && g.amount > 0 && !govFeePresets.some(p => p.description === g.description) && (
+                      {g.description && g.amount > 0 && !govFeePresets.some(p => p.name === g.description) && (
                         <TooltipProvider>
                           <Tooltip>
                             <TooltipTrigger asChild>
@@ -939,7 +944,7 @@ function RetainerBuilderContent() {
                                   tenant_id: tenantId,
                                   user_id: '',
                                   category: 'government_fees',
-                                  description: g.description,
+                                  name: g.description,
                                   amount: Math.round(g.amount * 100),
                                 })}
                               >
@@ -1031,7 +1036,7 @@ function RetainerBuilderContent() {
                       disabled={isReadOnly}
                     />
                   </div>
-                  {!isReadOnly && d.description && d.amount > 0 && !disbursementPresets.some(p => p.description === d.description) && (
+                  {!isReadOnly && d.description && d.amount > 0 && !disbursementPresets.some(p => p.name === d.description) && (
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger asChild>
@@ -1043,7 +1048,7 @@ function RetainerBuilderContent() {
                               tenant_id: tenantId,
                               user_id: '',
                               category: 'disbursements',
-                              description: d.description,
+                              name: d.description,
                               amount: Math.round(d.amount * 100),
                             })}
                           >

@@ -34,6 +34,9 @@ export const matterSchema = z.object({
   next_deadline: z.string().optional().nullable(),
   case_type_id: z.string().uuid().optional().nullable(),
   matter_type_id: z.string().uuid().optional().nullable(),
+  // Tax / location fields (not persisted to DB — used for matter-level tax calculation)
+  applicant_location: z.enum(['inside_canada', 'outside_canada']).default('inside_canada'),
+  client_province: z.string().optional().nullable(),
 })
 
 export type MatterFormValues = z.infer<typeof matterSchema>

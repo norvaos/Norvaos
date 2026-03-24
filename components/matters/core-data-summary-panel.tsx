@@ -43,7 +43,7 @@ export function CoreDataSummaryPanel({ matterId }: CoreDataSummaryPanelProps) {
 
   const pa = people?.find((p) => p.person_role === 'principal_applicant')
   const intakeStatusConfig = INTAKE_STATUSES.find((s) => s.value === intake.intake_status)
-  const programLabel = matter?.matter_type ?? PROGRAM_CATEGORIES.find((c) => c.value === intake.program_category)?.label
+  const programLabel = PROGRAM_CATEGORIES.find((c) => c.value === intake.program_category)?.label ?? matter?.matter_type
   const streamLabel = PROCESSING_STREAMS.find((s) => s.value === intake.processing_stream)?.label
   const effectiveRiskLevel = intake.risk_override_level ?? intake.risk_level
   const redFlagCount = Array.isArray(intake.red_flags) ? intake.red_flags.length : 0

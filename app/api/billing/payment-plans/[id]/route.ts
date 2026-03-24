@@ -3,6 +3,7 @@ import { authenticateRequest, AuthError } from '@/lib/services/auth'
 import { checkBillingPermission } from '@/lib/services/billing-permission'
 import { withTiming } from '@/lib/middleware/request-timing'
 import { approvePaymentPlan, cancelPaymentPlan } from '@/lib/services/billing/payment-plan.service'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 // ── GET /api/billing/payment-plans/[id] ──────────────────────────────────────
 
@@ -23,9 +24,10 @@ async function handleGet(
   }
 
   const { supabase, tenantId, userId } = auth
+  const admin = createAdminClient()
 
   const { allowed } = await checkBillingPermission(
-    supabase,
+    admin,
     userId,
     tenantId,
     'GET /api/billing/payment-plans/[id]',
@@ -92,10 +94,11 @@ async function handlePatch(
     return NextResponse.json({ error: 'Authentication failed' }, { status: 401 })
   }
 
-  const { supabase, tenantId, userId } = auth
+  const { tenantId, userId } = auth
+  const admin = createAdminClient()
 
   const { allowed } = await checkBillingPermission(
-    supabase,
+    admin,
     userId,
     tenantId,
     'PATCH /api/billing/payment-plans/[id]',
@@ -117,7 +120,7 @@ async function handlePatch(
   const { action, reason } = body
 
   if (action === 'approve') {
-    const result = await approvePaymentPlan({ supabase, tenantId, userId, planId })
+    const result = await approvePaymentPlan({ supabase: admin, tenantId, userId, planId })
     if (!result.success) {
       return NextResponse.json({ error: result.error }, { status: 422 })
     }
@@ -126,7 +129,7 @@ async function handlePatch(
 
   if (action === 'cancel') {
     const result = await cancelPaymentPlan({
-      supabase,
+      supabase: admin,
       tenantId,
       userId,
       planId,

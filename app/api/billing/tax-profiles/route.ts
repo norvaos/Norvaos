@@ -3,6 +3,7 @@ import { authenticateRequest, AuthError } from '@/lib/services/auth'
 import { checkBillingPermission } from '@/lib/services/billing-permission'
 import { withTiming } from '@/lib/middleware/request-timing'
 import { getTaxProfilesWithCodes } from '@/lib/services/billing/tax-calculation.service'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 // ── GET /api/billing/tax-profiles ────────────────────────────────────────────
 

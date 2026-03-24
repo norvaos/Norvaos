@@ -149,6 +149,13 @@ const settingsCards: { section: string; items: SettingsCard[] }[] = [
         icon: Receipt,
         color: 'text-lime-600 bg-lime-50',
       },
+      {
+        title: 'Fee Templates',
+        description: 'Create and manage standardised fee structures for each matter type',
+        href: '/settings/fee-templates',
+        icon: CreditCard,
+        color: 'text-green-600 bg-green-50',
+      },
     ],
   },
   {

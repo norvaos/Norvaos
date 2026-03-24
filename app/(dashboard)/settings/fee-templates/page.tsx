@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react'
 import { useTenant } from '@/lib/hooks/use-tenant'
+import { useUser } from '@/lib/hooks/use-user'
 import { useMatterTypes } from '@/lib/queries/matter-types'
 import {
   useRetainerFeeTemplates,
@@ -11,6 +12,11 @@ import {
   type GovernmentFeeItem,
   type DisbursementItem,
 } from '@/lib/queries/retainer-fee-templates'
+import {
+  useRetainerPresets,
+  useCreateRetainerPreset,
+  type RetainerPresetCategory,
+} from '@/lib/queries/retainer-presets'
 import { PERSON_SCOPES } from '@/lib/utils/constants'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -47,6 +53,7 @@ import {
   Receipt,
   Users,
   StarOff,
+  Check,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import type { Database } from '@/lib/types/database'
@@ -56,6 +63,7 @@ type RetainerFeeTemplate = Database['public']['Tables']['retainer_fee_templates'
 // ─── Fee Line Item Editor ─────────────────────────────────────────────
 
 interface FeeLineItem {
+  name: string
   description: string
   amount: number
   quantity?: number
@@ -66,14 +74,26 @@ function FeeLineEditor({
   onChange,
   showQuantity,
   placeholder,
+  presetCategory,
+  tenantId,
+  userId,
 }: {
   items: FeeLineItem[]
   onChange: (items: FeeLineItem[]) => void
   showQuantity?: boolean
   placeholder: string
+  presetCategory: RetainerPresetCategory
+  tenantId: string
+  userId: string
 }) {
+  const { data: presets } = useRetainerPresets(tenantId, presetCategory)
+  const createPreset = useCreateRetainerPreset()
+  const [showNewPresetForm, setShowNewPresetForm] = useState(false)
+  const [newPresetDesc, setNewPresetDesc] = useState('')
+  const [newPresetAmount, setNewPresetAmount] = useState('')
+
   const addItem = () => {
-    onChange([...items, { description: '', amount: 0, ...(showQuantity ? { quantity: 1 } : {}) }])
+    onChange([...items, { name: '', description: '', amount: 0, ...(showQuantity ? { quantity: 1 } : {}) }])
   }
 
   const updateItem = (index: number, field: string, value: string | number) => {
@@ -85,46 +105,189 @@ function FeeLineEditor({
     onChange(items.filter((_, i) => i !== index))
   }
 
+  const handlePickPreset = (presetId: string) => {
+    const preset = presets?.find((p) => p.id === presetId)
+    if (!preset) return
+    // Add a new line item pre-filled from the preset (amount stored in cents)
+    const newItem: FeeLineItem = {
+      name: preset.name,
+      description: preset.description ?? '',
+      amount: preset.amount / 100,
+      ...(showQuantity ? { quantity: 1 } : {}),
+    }
+    onChange([...items, newItem])
+  }
+
+  const handleCreateAndAdd = async () => {
+    if (!newPresetDesc.trim()) {
+      toast.error('Name is required')
+      return
+    }
+    const dollars = parseFloat(newPresetAmount) || 0
+    const cents = Math.round(dollars * 100)
+
+    try {
+      const created = await createPreset.mutateAsync({
+        tenant_id: tenantId,
+        user_id: userId,
+        category: presetCategory,
+        name: newPresetDesc.trim(),
+        amount: cents,
+      })
+      // Add the newly created preset as a line item
+      const newItem: FeeLineItem = {
+        name: created.name,
+        description: created.description ?? '',
+        amount: created.amount / 100,
+        ...(showQuantity ? { quantity: 1 } : {}),
+      }
+      onChange([...items, newItem])
+      setNewPresetDesc('')
+      setNewPresetAmount('')
+      setShowNewPresetForm(false)
+    } catch {
+      // Error handled by mutation hook
+    }
+  }
+
   return (
     <div className="space-y-2">
+      {/* Preset picker */}
+      {presets && presets.length > 0 && (
+        <div className="flex items-center gap-2">
+          <Select onValueChange={handlePickPreset} value="">
+            <SelectTrigger className="h-8 text-xs text-slate-500 flex-1">
+              <SelectValue placeholder="Pick from presets..." />
+            </SelectTrigger>
+            <SelectContent>
+              {presets.map((p) => (
+                <SelectItem key={p.id} value={p.id} className="text-sm">
+                  <span className="flex items-center justify-between gap-3 w-full">
+                    <span className="flex flex-col">
+                      <span className="font-medium">{p.name}</span>
+                      {p.description && (
+                        <span className="text-[11px] text-slate-400 leading-tight">{p.description}</span>
+                      )}
+                    </span>
+                    <span className="text-slate-400 text-xs ml-2 shrink-0">
+                      ${(p.amount / 100).toFixed(2)}
+                    </span>
+                  </span>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      )}
+
+      {/* Inline new preset form */}
+      {showNewPresetForm ? (
+        <div className="rounded-md border border-dashed border-slate-300 bg-slate-50 p-2 space-y-2">
+          <p className="text-[10px] font-medium text-slate-500 uppercase tracking-wide">
+            Create new preset
+          </p>
+          <div className="flex items-center gap-2">
+            <Input
+              value={newPresetDesc}
+              onChange={(e) => setNewPresetDesc(e.target.value)}
+              placeholder="Description"
+              className="flex-1 h-7 text-xs"
+              autoFocus
+            />
+            <div className="relative w-24">
+              <DollarSign className="absolute left-2 top-1/2 -translate-y-1/2 h-3 w-3 text-slate-400" />
+              <Input
+                type="number"
+                step="0.01"
+                min={0}
+                value={newPresetAmount}
+                onChange={(e) => setNewPresetAmount(e.target.value)}
+                placeholder="0.00"
+                className="pl-6 h-7 text-xs"
+              />
+            </div>
+            <Button
+              size="sm"
+              className="h-7 text-xs gap-1 px-2"
+              onClick={handleCreateAndAdd}
+              disabled={createPreset.isPending}
+            >
+              {createPreset.isPending ? (
+                <Loader2 className="h-3 w-3 animate-spin" />
+              ) : (
+                <Check className="h-3 w-3" />
+              )}
+              Save & Add
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 text-xs px-2"
+              onClick={() => { setShowNewPresetForm(false); setNewPresetDesc(''); setNewPresetAmount('') }}
+            >
+              Cancel
+            </Button>
+          </div>
+        </div>
+      ) : (
+        <button
+          type="button"
+          onClick={() => setShowNewPresetForm(true)}
+          className="text-[11px] text-blue-600 hover:text-blue-700 hover:underline flex items-center gap-1"
+        >
+          <Plus className="h-3 w-3" />
+          Add new fee to presets
+        </button>
+      )}
+
+      {/* Existing line items (manual entry) */}
       {items.map((item, i) => (
-        <div key={i} className="flex items-center gap-2">
-          <Input
+        <div key={i} className="rounded-md border border-slate-200 bg-white p-2 space-y-1.5">
+          <div className="flex items-center gap-2">
+            <Input
+              value={item.name}
+              onChange={(e) => updateItem(i, 'name', e.target.value)}
+              placeholder="Fee name (e.g. Study Permit Processing Fee)"
+              className="flex-1 h-8 text-sm font-medium"
+            />
+            {showQuantity && (
+              <Input
+                type="number"
+                min={1}
+                value={item.quantity ?? 1}
+                onChange={(e) => updateItem(i, 'quantity', parseInt(e.target.value) || 1)}
+                className="w-16 h-8 text-sm text-center"
+                placeholder="Qty"
+              />
+            )}
+            <div className="relative w-28">
+              <DollarSign className="absolute left-2 top-1/2 -translate-y-1/2 h-3 w-3 text-slate-400" />
+              <Input
+                type="number"
+                step="0.01"
+                min={0}
+                value={item.amount || ''}
+                onChange={(e) => updateItem(i, 'amount', parseFloat(e.target.value) || 0)}
+                className="pl-6 h-8 text-sm"
+                placeholder="0.00"
+              />
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 w-8 p-0 text-slate-400 hover:text-red-500"
+              onClick={() => removeItem(i)}
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+            </Button>
+          </div>
+          <Textarea
             value={item.description}
             onChange={(e) => updateItem(i, 'description', e.target.value)}
-            placeholder={placeholder}
-            className="flex-1 h-8 text-sm"
+            placeholder="Description (optional) — detailed explanation of this fee..."
+            rows={1}
+            className="text-xs text-slate-600 resize-none min-h-[28px]"
           />
-          {showQuantity && (
-            <Input
-              type="number"
-              min={1}
-              value={item.quantity ?? 1}
-              onChange={(e) => updateItem(i, 'quantity', parseInt(e.target.value) || 1)}
-              className="w-16 h-8 text-sm text-center"
-              placeholder="Qty"
-            />
-          )}
-          <div className="relative w-28">
-            <DollarSign className="absolute left-2 top-1/2 -translate-y-1/2 h-3 w-3 text-slate-400" />
-            <Input
-              type="number"
-              step="0.01"
-              min={0}
-              value={item.amount || ''}
-              onChange={(e) => updateItem(i, 'amount', parseFloat(e.target.value) || 0)}
-              className="pl-6 h-8 text-sm"
-              placeholder="0.00"
-            />
-          </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-8 w-8 p-0 text-slate-400 hover:text-red-500"
-            onClick={() => removeItem(i)}
-          >
-            <Trash2 className="h-3.5 w-3.5" />
-          </Button>
         </div>
       ))}
       <Button variant="outline" size="sm" onClick={addItem} className="text-xs h-7 gap-1">
@@ -139,7 +302,9 @@ function FeeLineEditor({
 
 export default function FeeTemplatesPage() {
   const { tenant } = useTenant()
+  const { appUser } = useUser()
   const tenantId = tenant?.id ?? ''
+  const userId = appUser?.id ?? ''
 
   // All matter types for filter
   const { data: matterTypes } = useMatterTypes(tenantId)
@@ -186,13 +351,14 @@ export default function FeeTemplatesPage() {
   const hst = formHstApplicable ? profTotal * 0.13 : 0
   const grandTotal = subtotal + hst
 
-  const fmtDollars = (n: number) =>
+  // Format cents to dollars (e.g. 250000 → $2,500.00)
+  const fmtDollars = (cents: number) =>
     new Intl.NumberFormat('en-CA', {
       style: 'currency',
       currency: 'CAD',
-      minimumFractionDigits: 0,
+      minimumFractionDigits: 2,
       maximumFractionDigits: 2,
-    }).format(n)
+    }).format(cents / 100)
 
   // Reset form
   const resetForm = () => {
@@ -226,19 +392,20 @@ export default function FeeTemplatesPage() {
     setFormHstApplicable(template.hst_applicable ?? false)
     setFormIsDefault(template.is_default ?? false)
 
-    // Parse JSONB fee arrays
+    // Parse JSONB fee arrays — convert cents to dollars for the form inputs
     const pf: ProfessionalFeeItem[] = Array.isArray(template.professional_fees) ? template.professional_fees as unknown as ProfessionalFeeItem[] : []
     setFormProfFees(
       pf.map((f) => ({
-        description: f.description,
-        amount: f.unitPrice,
-        quantity: f.quantity,
+        name: f.name ?? f.description,
+        description: f.description ?? '',
+        amount: (f.amount_cents ?? ((f.unitPrice ?? 0) * (f.quantity ?? 1))) / 100,
+        quantity: f.quantity ?? 1,
       }))
     )
     const gf: GovernmentFeeItem[] = Array.isArray(template.government_fees) ? template.government_fees as unknown as GovernmentFeeItem[] : []
-    setFormGovFees(gf.map((f) => ({ description: f.description, amount: f.amount })))
+    setFormGovFees(gf.map((f) => ({ name: f.name ?? f.description, description: f.description ?? '', amount: (f.amount_cents ?? f.amount ?? 0) / 100 })))
     const db: DisbursementItem[] = Array.isArray(template.disbursements) ? template.disbursements as unknown as DisbursementItem[] : []
-    setFormDisbursements(db.map((f) => ({ description: f.description, amount: f.amount })))
+    setFormDisbursements(db.map((f) => ({ name: f.name ?? f.description, description: f.description ?? '', amount: (f.amount_cents ?? f.amount ?? 0) / 100 })))
 
     setDialogOpen(true)
   }
@@ -280,27 +447,29 @@ export default function FeeTemplatesPage() {
       return
     }
 
-    // Build JSONB arrays
+    // Build JSONB arrays — convert dollars (form input) to cents for storage
     const professionalFees = formProfFees
-      .filter((f) => f.description.trim())
+      .filter((f) => f.name.trim() || f.description.trim())
       .map((f) => ({
-        description: f.description.trim(),
-        quantity: f.quantity ?? 1,
-        unitPrice: f.amount,
+        name: f.name?.trim() || f.description?.trim() || '',
+        description: f.description?.trim() || '',
+        amount_cents: Math.round((f.amount ?? 0) * 100),
       }))
 
     const governmentFees = formGovFees
-      .filter((f) => f.description.trim())
+      .filter((f) => f.name.trim() || f.description.trim())
       .map((f) => ({
-        description: f.description.trim(),
-        amount: f.amount,
+        name: f.name?.trim() || f.description?.trim() || '',
+        description: f.description?.trim() || '',
+        amount_cents: Math.round((f.amount ?? 0) * 100),
       }))
 
     const disbursements = formDisbursements
-      .filter((f) => f.description.trim())
+      .filter((f) => f.name.trim() || f.description.trim())
       .map((f) => ({
-        description: f.description.trim(),
-        amount: f.amount,
+        name: f.name?.trim() || f.description?.trim() || '',
+        description: f.description?.trim() || '',
+        amount_cents: Math.round((f.amount ?? 0) * 100),
       }))
 
     try {
@@ -445,15 +614,16 @@ export default function FeeTemplatesPage() {
                   const pf: ProfessionalFeeItem[] = Array.isArray(t.professional_fees) ? t.professional_fees as unknown as ProfessionalFeeItem[] : []
                   const gf: GovernmentFeeItem[] = Array.isArray(t.government_fees) ? t.government_fees as unknown as GovernmentFeeItem[] : []
                   const db: DisbursementItem[] = Array.isArray(t.disbursements) ? t.disbursements as unknown as DisbursementItem[] : []
-                  const total =
-                    pf.reduce((s, f) => s + (f.unitPrice ?? 0) * (f.quantity ?? 0), 0) +
-                    gf.reduce((s, f) => s + (f.amount ?? 0), 0) +
-                    db.reduce((s, f) => s + (f.amount ?? 0), 0)
-                  const hstAmt = t.hst_applicable ? pf.reduce((s, f) => s + (f.unitPrice ?? 0) * (f.quantity ?? 0), 0) * 0.13 : 0
+                  // Support both amount_cents (seeded) and unitPrice*quantity (legacy)
+                  const pfTotal = pf.reduce((s, f) => s + (f.amount_cents ?? ((f.unitPrice ?? 0) * (f.quantity ?? 0))), 0)
+                  const gfTotal = gf.reduce((s, f) => s + (f.amount_cents ?? f.amount ?? 0), 0)
+                  const dbTotal = db.reduce((s, f) => s + (f.amount_cents ?? f.amount ?? 0), 0)
+                  const total = pfTotal + gfTotal + dbTotal
+                  const hstAmt = t.hst_applicable ? Math.round(pfTotal * 0.13) : 0
 
                   return (
-                    <div key={t.id} className="flex items-center justify-between px-4 py-3">
-                      <div className="flex items-center gap-3 min-w-0">
+                    <div key={t.id} className="px-4 py-3 space-y-2">
+                      <div className="flex items-center justify-between">
                         <div className="min-w-0">
                           <div className="flex items-center gap-2">
                             <span className="text-sm font-medium text-slate-800 truncate">
@@ -470,18 +640,14 @@ export default function FeeTemplatesPage() {
                               {t.person_scope === 'joint' ? 'Joint' : 'Single'}
                             </Badge>
                           </div>
-                          <p className="text-xs text-slate-400 mt-0.5">
-                            {pf.length} service{pf.length !== 1 ? 's' : ''}
-                            {gf.length > 0 ? ` · ${gf.length} gov fee${gf.length !== 1 ? 's' : ''}` : ''}
-                            {db.length > 0 ? ` · ${db.length} disbursement${db.length !== 1 ? 's' : ''}` : ''}
-                            {t.hst_applicable ? ' · +HST' : ''}
-                          </p>
+                          {t.description && (
+                            <p className="text-xs text-slate-500 mt-0.5">{t.description}</p>
+                          )}
                         </div>
-                      </div>
-                      <div className="flex items-center gap-2 shrink-0 ml-3">
-                        <Badge variant="secondary" className="text-xs font-semibold">
-                          {fmtDollars(total + hstAmt)}
-                        </Badge>
+                        <div className="flex items-center gap-2 shrink-0 ml-3">
+                          <Badge variant="secondary" className="text-xs font-semibold">
+                            {fmtDollars(total + hstAmt)}
+                          </Badge>
                         <Button
                           variant="ghost"
                           size="sm"
@@ -511,6 +677,85 @@ export default function FeeTemplatesPage() {
                         >
                           <Trash2 className="h-3.5 w-3.5" />
                         </Button>
+                        </div>
+                      </div>
+
+                      {/* Fee line item descriptions */}
+                      <div className="grid grid-cols-3 gap-3 text-xs">
+                        {pf.length > 0 && (
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-1 text-[10px] font-semibold text-slate-500 uppercase tracking-wide">
+                              <Briefcase className="h-3 w-3" />
+                              Professional Fees
+                            </div>
+                            {pf.map((f, i) => (
+                              <div key={`pf-${i}`} className="flex justify-between text-slate-600">
+                                <span className="truncate mr-2">
+                                  <span className="font-medium">{f.name || f.description || 'Untitled'}</span>
+                                  {f.name && f.description && f.name !== f.description && (
+                                    <span className="block text-[10px] text-slate-400 leading-tight truncate">{f.description}</span>
+                                  )}
+                                </span>
+                                <span className="tabular-nums shrink-0 text-slate-800 font-medium">
+                                  {fmtDollars(f.amount_cents ?? ((f.unitPrice ?? 0) * (f.quantity ?? 0)))}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                        {gf.length > 0 && (
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-1 text-[10px] font-semibold text-slate-500 uppercase tracking-wide">
+                              <Landmark className="h-3 w-3" />
+                              Government Fees
+                            </div>
+                            {gf.map((f, i) => (
+                              <div key={`gf-${i}`} className="flex justify-between text-slate-600">
+                                <span className="truncate mr-2">
+                                  <span className="font-medium">{f.name || f.description || 'Untitled'}</span>
+                                  {f.name && f.description && f.name !== f.description && (
+                                    <span className="block text-[10px] text-slate-400 leading-tight truncate">{f.description}</span>
+                                  )}
+                                </span>
+                                <span className="tabular-nums shrink-0 text-slate-800 font-medium">
+                                  {fmtDollars(f.amount_cents ?? f.amount ?? 0)}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                        {db.length > 0 && (
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-1 text-[10px] font-semibold text-slate-500 uppercase tracking-wide">
+                              <Receipt className="h-3 w-3" />
+                              Disbursements
+                            </div>
+                            {db.map((f, i) => (
+                              <div key={`db-${i}`} className="flex justify-between text-slate-600">
+                                <span className="truncate mr-2">
+                                  <span className="font-medium">{f.name || f.description || 'Untitled'}</span>
+                                  {f.name && f.description && f.name !== f.description && (
+                                    <span className="block text-[10px] text-slate-400 leading-tight truncate">{f.description}</span>
+                                  )}
+                                </span>
+                                <span className="tabular-nums shrink-0 text-slate-800 font-medium">
+                                  {fmtDollars(f.amount_cents ?? f.amount ?? 0)}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Totals row */}
+                      <div className="flex items-center justify-between text-xs border-t border-slate-100 pt-2">
+                        <span className="text-slate-500">
+                          Legal: {fmtDollars(pfTotal)} · Govt: {fmtDollars(gfTotal)} · Admin: {fmtDollars(dbTotal)}
+                          {t.hst_applicable ? ` · HST: ${fmtDollars(hstAmt)}` : ''}
+                        </span>
+                        <span className="font-semibold text-slate-800">
+                          Total: {fmtDollars(total + hstAmt)}
+                        </span>
                       </div>
                     </div>
                   )
@@ -649,6 +894,9 @@ export default function FeeTemplatesPage() {
                 onChange={setFormProfFees}
                 showQuantity
                 placeholder="e.g. Legal representation"
+                presetCategory="professional_services"
+                tenantId={tenantId}
+                userId={userId}
               />
             </div>
 
@@ -669,6 +917,9 @@ export default function FeeTemplatesPage() {
                 items={formGovFees}
                 onChange={setFormGovFees}
                 placeholder="e.g. Sponsorship application fee"
+                presetCategory="government_fees"
+                tenantId={tenantId}
+                userId={userId}
               />
             </div>
 
@@ -689,6 +940,9 @@ export default function FeeTemplatesPage() {
                 items={formDisbursements}
                 onChange={setFormDisbursements}
                 placeholder="e.g. Courier / translation"
+                presetCategory="disbursements"
+                tenantId={tenantId}
+                userId={userId}
               />
             </div>
 

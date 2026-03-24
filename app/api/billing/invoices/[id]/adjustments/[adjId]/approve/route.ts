@@ -3,6 +3,7 @@ import { authenticateRequest, AuthError } from '@/lib/services/auth'
 import { checkBillingPermission } from '@/lib/services/billing-permission'
 import { withTiming } from '@/lib/middleware/request-timing'
 import { approveAdjustment } from '@/lib/services/billing/discount.service'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 // ── POST /api/billing/invoices/[id]/adjustments/[adjId]/approve ───────────────
 
@@ -22,10 +23,11 @@ async function handlePost(
     return NextResponse.json({ error: 'Authentication failed' }, { status: 401 })
   }
 
-  const { supabase, tenantId, userId } = auth
+  const { tenantId, userId } = auth
+  const admin = createAdminClient()
 
   const { allowed } = await checkBillingPermission(
-    supabase,
+    admin,
     userId,
     tenantId,
     'POST /api/billing/invoices/[id]/adjustments/[adjId]/approve',
@@ -34,7 +36,7 @@ async function handlePost(
     return NextResponse.json({ error: 'Insufficient permissions: billing:view required' }, { status: 403 })
   }
 
-  const result = await approveAdjustment(supabase, tenantId, invoiceId, adjustmentId, userId)
+  const result = await approveAdjustment(admin, tenantId, invoiceId, adjustmentId, userId)
 
   if (!result.success) {
     return NextResponse.json({ error: result.error }, { status: 422 })

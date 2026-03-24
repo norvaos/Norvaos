@@ -22,6 +22,7 @@ type RouteParams = { params: Promise<{ id: string }> }
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'document_generation', 'view')
     const { id } = await params
 
@@ -29,7 +30,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
     // Download URL endpoint
     if (searchParams.get('download') === 'true') {
-      const result = await getDownloadUrl(auth.supabase, {
+      const result = await getDownloadUrl(admin, {
         tenantId: auth.tenantId,
         instanceId: id,
       })
@@ -39,7 +40,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ success: true, ...result.data })
     }
 
-    const result = await getInstanceWithDetails(auth.supabase, {
+    const result = await getInstanceWithDetails(admin, {
       tenantId: auth.tenantId,
       instanceId: id,
     })
@@ -60,6 +61,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 export async function PATCH(request: NextRequest, { params }: RouteParams) {
   try {
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     const { id } = await params
     const body = await request.json()
     const adminClient = createAdminClient()

@@ -4,6 +4,7 @@ import { requirePermission } from '@/lib/services/require-role'
 import { withTiming } from '@/lib/middleware/request-timing'
 import { updateCanonicalField } from '@/lib/services/canonical-profile'
 import type { CanonicalDomain, FieldSource } from '@/lib/services/canonical-profile'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 /**
  * GET /api/contacts/[id]/canonical-profile/fields
@@ -19,13 +20,14 @@ async function handleGet(
   try {
     const { id: contactId } = await params
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'contacts', 'read')
 
     const url = new URL(request.url)
     const domain = url.searchParams.get('domain')
 
     // Get profile for this contact
-    const { data: profile, error: profileErr } = await auth.supabase
+    const { data: profile, error: profileErr } = await admin
       .from('canonical_profiles')
       .select('id')
       .eq('contact_id', contactId)
@@ -37,7 +39,7 @@ async function handleGet(
       return NextResponse.json({ success: true, fields: [] })
     }
 
-    let query = auth.supabase
+    let query = admin
       .from('canonical_profile_fields')
       .select('*')
       .eq('profile_id', profile.id)
@@ -82,10 +84,11 @@ async function handlePut(
   try {
     const { id: contactId } = await params
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'contacts', 'update')
 
     // Verify contact belongs to this tenant
-    const { data: contact, error: contactErr } = await auth.supabase
+    const { data: contact, error: contactErr } = await admin
       .from('contacts')
       .select('id')
       .eq('id', contactId)
@@ -110,7 +113,7 @@ async function handlePut(
     }
 
     const result = await updateCanonicalField(
-      auth.supabase,
+      admin,
       profileId,
       domain as CanonicalDomain,
       fieldKey,

@@ -5,6 +5,7 @@ import { revalidateIntake } from '@/lib/services/intake-revalidate'
 import { logAuditServer } from '@/lib/queries/audit-logs'
 import { invalidateGating } from '@/lib/services/cache-invalidation'
 import { withTiming } from '@/lib/middleware/request-timing'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 /**
  * PUT /api/matters/[id]/people/[personId]
@@ -23,10 +24,11 @@ async function handlePut(
 
     // 1. Authenticate and get tenant context
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'contacts', 'edit')
 
     // 2. Verify the matter belongs to this tenant
-    const { data: matter, error: matterErr } = await auth.supabase
+    const { data: matter, error: matterErr } = await admin
       .from('matters')
       .select('id, tenant_id')
       .eq('id', matterId)
@@ -41,7 +43,7 @@ async function handlePut(
     }
 
     // 3. Verify person belongs to this matter
-    const { data: existing, error: personErr } = await auth.supabase
+    const { data: existing, error: personErr } = await admin
       .from('matter_people')
       .select('*')
       .eq('id', personId)
@@ -62,7 +64,7 @@ async function handlePut(
     const body = await request.json()
 
     // 6. Update the person record
-    const { data: updated, error: updateErr } = await auth.supabase
+    const { data: updated, error: updateErr } = await admin
       .from('matter_people')
       .update(body)
       .eq('id', personId)
@@ -78,7 +80,7 @@ async function handlePut(
     }
 
     // 7. Auto-revalidate
-    const revalidation = await revalidateIntake(auth.supabase, matterId)
+    const revalidation = await revalidateIntake(admin, matterId)
     const { success: _revalSuccess, ...revalidationData } = revalidation
 
     // 8. Build audit diff (only fields that actually changed)
@@ -93,7 +95,7 @@ async function handlePut(
 
     // 9. Audit log (fire-and-forget)
     logAuditServer({
-      supabase: auth.supabase,
+      supabase: admin,
       tenantId: auth.tenantId,
       userId: auth.userId,
       entityType: 'matter_people',
@@ -144,10 +146,11 @@ async function handleDelete(
 
     // 1. Authenticate and get tenant context
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'matters', 'delete')
 
     // 2. Verify the matter belongs to this tenant
-    const { data: matter, error: matterErr } = await auth.supabase
+    const { data: matter, error: matterErr } = await admin
       .from('matters')
       .select('id, tenant_id')
       .eq('id', matterId)
@@ -162,7 +165,7 @@ async function handleDelete(
     }
 
     // 3. Verify person belongs to this matter and fetch name for audit
-    const { data: person, error: personErr } = await auth.supabase
+    const { data: person, error: personErr } = await admin
       .from('matter_people')
       .select('id, first_name, last_name, person_role')
       .eq('id', personId)
@@ -177,7 +180,7 @@ async function handleDelete(
     }
 
     // 4. Soft-delete (set is_active = false)
-    const { error: deleteErr } = await auth.supabase
+    const { error: deleteErr } = await admin
       .from('matter_people')
       .update({ is_active: false })
       .eq('id', personId)
@@ -191,12 +194,12 @@ async function handleDelete(
     }
 
     // 5. Auto-revalidate
-    const revalidation = await revalidateIntake(auth.supabase, matterId)
+    const revalidation = await revalidateIntake(admin, matterId)
     const { success: _revalSuccess, ...revalidationData } = revalidation
 
     // 6. Audit log (fire-and-forget)
     logAuditServer({
-      supabase: auth.supabase,
+      supabase: admin,
       tenantId: auth.tenantId,
       userId: auth.userId,
       entityType: 'matter_people',
@@ -236,3 +239,5 @@ async function handleDelete(
 
 export const PUT = withTiming(handlePut, 'PUT /api/matters/[id]/people/[personId]')
 export const DELETE = withTiming(handleDelete, 'DELETE /api/matters/[id]/people/[personId]')
+
+const admin = createAdminClient()

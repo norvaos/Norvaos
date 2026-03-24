@@ -6,6 +6,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { createClient } from '@/lib/supabase/client'
 import { useTenant } from '@/lib/hooks/use-tenant'
 import { useUser } from '@/lib/hooks/use-user'
+import { useUserRole } from '@/lib/hooks/use-user-role'
 import { useLead, useDeleteLead } from '@/lib/queries/leads'
 import {
   useLeadStageTransitions,
@@ -47,7 +48,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet'
-import { ArrowLeft, Loader2, MessageSquare } from 'lucide-react'
+import { ArrowLeft, Loader2, MessageSquare, Brain } from 'lucide-react'
 
 // Workflow components
 import { LeadDetailHeader } from '@/components/leads/workflow/lead-detail-header'
@@ -59,6 +60,10 @@ import { AdvanceStageDialog } from '@/components/leads/workflow/advance-stage-di
 import { CloseLeadDialog } from '@/components/leads/workflow/close-lead-dialog'
 import { ReopenLeadDialog } from '@/components/leads/workflow/reopen-lead-dialog'
 import { ConvertLeadDialog } from '@/components/leads/workflow/convert-lead-dialog'
+// Command Centre components
+import { LiveIntakeSidebar } from '@/components/leads/workflow/live-intake-sidebar'
+import { ComplianceGateModal } from '@/components/leads/workflow/compliance-gate-modal'
+import { useRunOnboarding } from '@/lib/queries/command-centre'
 import type { CommunicationFormData } from '@/components/leads/workflow/communication-log-form'
 import type { TransitionWithStatus, Lead, Contact, PracticeArea, UserRow } from '@/components/leads/workflow/lead-workflow-types'
 import { isStageAtOrPast } from '@/components/leads/workflow/lead-workflow-helpers'
@@ -144,6 +149,7 @@ export default function LeadDetailPage() {
   const { tenant } = useTenant()
   const tenantId = tenant?.id ?? ''
   const { appUser } = useUser()
+  const { role: userRole } = useUserRole()
   const userId = appUser?.id ?? ''
 
   // ─── Dialog States ──────────────────────────────────────────────────────────
@@ -154,6 +160,8 @@ export default function LeadDetailPage() {
   const [showConvertDialog, setShowConvertDialog] = useState(false)
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const [showCommSheet, setShowCommSheet] = useState(false)
+  const [showIntakeSheet, setShowIntakeSheet] = useState(false)
+  const [showComplianceGate, setShowComplianceGate] = useState(false)
   const [updatingTaskId, setUpdatingTaskId] = useState<string | null>(null)
 
   // ─── Primary Data ───────────────────────────────────────────────────────────
@@ -219,6 +227,7 @@ export default function LeadDetailPage() {
   const generateInsightsMutation = useGenerateInsights()
   const acceptInsightMutation = useAcceptInsight()
   const deleteLeadMutation = useDeleteLead()
+  const runOnboarding = useRunOnboarding()
 
   // ─── Handlers ───────────────────────────────────────────────────────────────
 
@@ -243,6 +252,26 @@ export default function LeadDetailPage() {
     )
   }
 
+  /**
+   * handleConvertAttempt — Intercepts the "Convert to Matter" action.
+   * Checks the retainer_signed gate FIRST. If no signed retainer is found,
+   * opens the Compliance Gate modal instead of proceeding directly.
+   */
+  function handleConvertAttempt() {
+    // Check if retainer gate passes
+    const retainerGate = conversionGatesData?.gateResults?.find(
+      (g) => g.gate === 'retainer_signed'
+    )
+
+    if (retainerGate && !retainerGate.passed && retainerGate.enabled) {
+      // Open compliance gate modal instead
+      setShowComplianceGate(true)
+    } else {
+      // Retainer gate passes — open normal convert dialog
+      setShowConvertDialog(true)
+    }
+  }
+
   function handleConvertLead(data: {
     title: string
     description?: string
@@ -253,8 +282,35 @@ export default function LeadDetailPage() {
   }) {
     convertLeadMutation.mutate(
       { leadId, tenantId, userId, ...data },
-      { onSuccess: () => setShowConvertDialog(false) }
+      {
+        onSuccess: (result) => {
+          setShowConvertDialog(false)
+
+          // Trigger One-Click Onboarding after successful conversion
+          // This runs the 3-step sequence: Fee Snapshot → Portal Birth → Blueprint Injection
+          if (result?.converted_matter_id) {
+            runOnboarding.mutate({
+              matterId: result.converted_matter_id,
+              leadId,
+            })
+          }
+        },
+      }
     )
+  }
+
+  /** Handle compliance gate bypass — proceed to convert dialog */
+  function handleComplianceBypassConfirmed() {
+    setShowComplianceGate(false)
+    setShowConvertDialog(true)
+  }
+
+  /** Handle "Generate Retainer" from compliance gate modal */
+  function handleGenerateRetainer() {
+    setShowComplianceGate(false)
+    // Navigate to the retainer tab/section of this lead
+    // The retainer builder is in the right panel
+    router.push(`/leads/${leadId}#retainer`)
   }
 
   function handleLogCommunication(data: CommunicationFormData) {
@@ -316,10 +372,11 @@ export default function LeadDetailPage() {
         onReopen={isClosed ? () => setShowReopenDialog(true) : undefined}
         onConvert={
           currentStage === LEAD_STAGES.RETAINED_ACTIVE_MATTER
-            ? () => setShowConvertDialog(true)
+            ? handleConvertAttempt
             : undefined
         }
         onDelete={() => setShowDeleteDialog(true)}
+        onStartIntake={!isReadOnly ? () => setShowIntakeSheet(true) : undefined}
       />
 
       {/* Stage Pipeline Bar */}
@@ -330,8 +387,8 @@ export default function LeadDetailPage() {
         convertedMatterId={lead.converted_matter_id}
       />
 
-      {/* Communication Sheet toggle (tablet) */}
-      <div className="flex items-center lg:hidden px-4 py-2 border-b">
+      {/* Toolbar: Communication Sheet toggle (tablet) + Start Intake */}
+      <div className="flex items-center gap-2 lg:hidden px-4 py-2 border-b">
         <Button
           variant="outline"
           size="sm"
@@ -344,6 +401,17 @@ export default function LeadDetailPage() {
             <span className="ml-1 text-muted-foreground">({communicationEvents.length})</span>
           )}
         </Button>
+        {!isReadOnly && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setShowIntakeSheet(true)}
+            className="text-xs border-violet-200 text-violet-700 hover:bg-violet-50"
+          >
+            <Brain className="mr-1 h-3 w-3" />
+            Live Intake
+          </Button>
+        )}
       </div>
 
       {/* 3-Panel Grid */}
@@ -400,7 +468,7 @@ export default function LeadDetailPage() {
             gateResults={conversionGatesData?.gateResults}
             blockedReasons={conversionGatesData?.blockedReasons}
             isGatesLoading={isGatesLoading}
-            onConvert={() => setShowConvertDialog(true)}
+            onConvert={handleConvertAttempt}
             closureRecords={closureRecords}
             onReopen={() => setShowReopenDialog(true)}
           />
@@ -423,6 +491,32 @@ export default function LeadDetailPage() {
           />
         </SheetContent>
       </Sheet>
+
+      {/* Live Intake Sheet (mobile/tablet) */}
+      <Sheet open={showIntakeSheet} onOpenChange={setShowIntakeSheet}>
+        <SheetContent side="right" className="w-[360px] p-0">
+          <SheetHeader className="sr-only">
+            <SheetTitle>Live Intake</SheetTitle>
+          </SheetHeader>
+          <LiveIntakeSidebar
+            leadId={leadId}
+            tenantId={tenantId}
+            userId={userId}
+          />
+        </SheetContent>
+      </Sheet>
+
+      {/* Compliance Gate Modal */}
+      <ComplianceGateModal
+        open={showComplianceGate}
+        onOpenChange={setShowComplianceGate}
+        leadId={leadId}
+        tenantId={tenantId}
+        userId={userId}
+        userRole={userRole?.name ?? 'member'}
+        onGenerateRetainer={handleGenerateRetainer}
+        onBypassConfirmed={handleComplianceBypassConfirmed}
+      />
 
       {/* ─── Dialogs ──────────────────────────────────────────────────── */}
 

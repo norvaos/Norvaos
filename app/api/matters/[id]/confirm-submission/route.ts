@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { authenticateRequest, AuthError } from '@/lib/services/auth'
 import { withTiming } from '@/lib/middleware/request-timing'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 /**
  * POST /api/matters/[id]/confirm-submission
@@ -26,6 +27,7 @@ async function handlePost(
 
     // 1. Authenticate + role check
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     const role = auth.role?.name
     if (!role || !['Lawyer', 'Admin', 'Paralegal'].includes(role)) {
       return NextResponse.json(
@@ -56,7 +58,7 @@ async function handlePost(
     }
 
     // 4. Verify matter belongs to tenant
-    const { data: matter, error: matterErr } = await auth.supabase
+    const { data: matter, error: matterErr } = await admin
       .from('matters')
       .select('id, tenant_id')
       .eq('id', matterId)
@@ -71,7 +73,7 @@ async function handlePost(
     }
 
     // 5. Fetch the intake record
-    const { data: intake, error: intakeErr } = await auth.supabase
+    const { data: intake, error: intakeErr } = await admin
       .from('matter_intake')
       .select('id')
       .eq('matter_id', matterId)
@@ -86,7 +88,7 @@ async function handlePost(
 
     // 6. Update matter_intake
     const confirmedAt = new Date().toISOString()
-    const { data: updatedIntake, error: updateErr } = await auth.supabase
+    const { data: updatedIntake, error: updateErr } = await admin
       .from('matter_intake')
       .update({
         submission_confirmation_number: hasConfirmationNumber
@@ -116,7 +118,7 @@ async function handlePost(
     if (hasConfirmationNumber) descriptionParts.push(`Confirmation number: ${confirmation_number!.trim()}`)
     if (hasDocPath) descriptionParts.push(`Document path attached`)
 
-    await auth.supabase.from('activities').insert({
+    await admin.from('activities').insert({
       tenant_id: auth.tenantId,
       matter_id: matterId,
       activity_type: 'submission_confirmed',
@@ -152,3 +154,5 @@ async function handlePost(
 }
 
 export const POST = withTiming(handlePost, 'POST /api/matters/[id]/confirm-submission')
+
+const admin = createAdminClient()

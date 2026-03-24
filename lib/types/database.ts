@@ -10788,6 +10788,7 @@ export type Database = {
           id: string
           intake_profile_id: string | null
           is_closed: boolean | null
+          lead_metadata: Json | null
           last_automated_action_at: string | null
           last_inbound_at: string | null
           last_outbound_at: string | null
@@ -10844,6 +10845,7 @@ export type Database = {
           id?: string
           intake_profile_id?: string | null
           is_closed?: boolean | null
+          lead_metadata?: Json | null
           last_automated_action_at?: string | null
           last_inbound_at?: string | null
           last_outbound_at?: string | null
@@ -10900,6 +10902,7 @@ export type Database = {
           id?: string
           intake_profile_id?: string | null
           is_closed?: boolean | null
+          lead_metadata?: Json | null
           last_automated_action_at?: string | null
           last_inbound_at?: string | null
           last_outbound_at?: string | null
@@ -15082,9 +15085,10 @@ export type Database = {
           category: string
           created_at: string
           currency: string
-          description: string
+          description: string | null
           id: string
           is_active: boolean
+          name: string
           sort_order: number
           tenant_id: string
           updated_at: string
@@ -15094,9 +15098,10 @@ export type Database = {
           category: string
           created_at?: string
           currency?: string
-          description: string
+          description?: string | null
           id?: string
           is_active?: boolean
+          name: string
           sort_order?: number
           tenant_id: string
           updated_at?: string
@@ -15106,9 +15111,10 @@ export type Database = {
           category?: string
           created_at?: string
           currency?: string
-          description?: string
+          description?: string | null
           id?: string
           is_active?: boolean
+          name?: string
           sort_order?: number
           tenant_id?: string
           updated_at?: string
@@ -18473,6 +18479,224 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      // ─── Command Centre Tables (Migration 156) ──────────────────────────
+      intake_sessions: {
+        Row: {
+          id: string
+          tenant_id: string
+          lead_id: string
+          user_id: string | null
+          status: string
+          transcript: string | null
+          summary: string | null
+          extracted_entities: Json | null
+          suggested_stream: string | null
+          suggested_matter_type_id: string | null
+          recommendation_confidence: number | null
+          started_at: string
+          finalised_at: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          tenant_id: string
+          lead_id: string
+          user_id?: string | null
+          status?: string
+          transcript?: string | null
+          summary?: string | null
+          extracted_entities?: Json | null
+          suggested_stream?: string | null
+          suggested_matter_type_id?: string | null
+          recommendation_confidence?: number | null
+          started_at?: string
+          finalised_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          tenant_id?: string
+          lead_id?: string
+          user_id?: string | null
+          status?: string
+          transcript?: string | null
+          summary?: string | null
+          extracted_entities?: Json | null
+          suggested_stream?: string | null
+          suggested_matter_type_id?: string | null
+          recommendation_confidence?: number | null
+          started_at?: string
+          finalised_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "intake_sessions_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "intake_sessions_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "intake_sessions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      compliance_bypass_log: {
+        Row: {
+          id: string
+          tenant_id: string
+          lead_id: string
+          matter_id: string | null
+          user_id: string
+          gate_name: string
+          bypass_reason: string
+          user_role: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          tenant_id: string
+          lead_id: string
+          matter_id?: string | null
+          user_id: string
+          gate_name: string
+          bypass_reason: string
+          user_role: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          tenant_id?: string
+          lead_id?: string
+          matter_id?: string | null
+          user_id?: string
+          gate_name?: string
+          bypass_reason?: string
+          user_role?: string
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "compliance_bypass_log_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "compliance_bypass_log_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "compliance_bypass_log_matter_id_fkey"
+            columns: ["matter_id"]
+            isOneToOne: false
+            referencedRelation: "matters"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "compliance_bypass_log_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      onboarding_runs: {
+        Row: {
+          id: string
+          tenant_id: string
+          matter_id: string
+          lead_id: string | null
+          user_id: string | null
+          fee_snapshot_status: string
+          portal_creation_status: string
+          blueprint_injection_status: string
+          portal_link_id: string | null
+          document_slots_created: number | null
+          fee_snapshot_data: Json | null
+          error_log: Json | null
+          started_at: string
+          completed_at: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          tenant_id: string
+          matter_id: string
+          lead_id?: string | null
+          user_id?: string | null
+          fee_snapshot_status?: string
+          portal_creation_status?: string
+          blueprint_injection_status?: string
+          portal_link_id?: string | null
+          document_slots_created?: number | null
+          fee_snapshot_data?: Json | null
+          error_log?: Json | null
+          started_at?: string
+          completed_at?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          tenant_id?: string
+          matter_id?: string
+          lead_id?: string | null
+          user_id?: string | null
+          fee_snapshot_status?: string
+          portal_creation_status?: string
+          blueprint_injection_status?: string
+          portal_link_id?: string | null
+          document_slots_created?: number | null
+          fee_snapshot_data?: Json | null
+          error_log?: Json | null
+          started_at?: string
+          completed_at?: string | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "onboarding_runs_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "onboarding_runs_matter_id_fkey"
+            columns: ["matter_id"]
+            isOneToOne: false
+            referencedRelation: "matters"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "onboarding_runs_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

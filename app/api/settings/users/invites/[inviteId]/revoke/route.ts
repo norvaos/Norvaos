@@ -54,7 +54,7 @@ async function handlePost(
     }
 
     await logAuditServer({
-      supabase: auth.supabase,
+      supabase: admin,
       tenantId: auth.tenantId,
       userId: auth.userId,
       entityType: 'user_invite',

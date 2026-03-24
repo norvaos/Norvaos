@@ -96,6 +96,9 @@ async function handlePost(request: Request) {
       )
     }
 
+    // Admin client for all write operations
+    const admin = createAdminClient()
+
     // ── Fetch lawyer's saved signature (if any) for pre-signing ──
     let lawyerSignature: {
       imageBuffer: Buffer
@@ -104,7 +107,6 @@ async function handlePost(request: Request) {
     } | null = null
 
     try {
-      const admin = createAdminClient()
       const { data: lawyerUser } = await admin
         .from('users')
         .select('first_name, last_name, settings')
@@ -157,7 +159,7 @@ async function handlePost(request: Request) {
     }
 
     // ── Freeze the source document (with optional lawyer pre-signature)
-    const freezeResult = await freezeDocument(supabase as never, {
+    const freezeResult = await freezeDocument(admin as never, {
       tenantId,
       sourceEntityType: 'retainer_package',
       sourceEntityId: retainerPackageId,
@@ -177,7 +179,7 @@ async function handlePost(request: Request) {
     }
 
     // ── Create and send the signing request ───────────────────────
-    const sendResult = await createAndSendSigningRequest(supabase as never, {
+    const sendResult = await createAndSendSigningRequest(admin as never, {
       tenantId,
       signingDocumentId: freezeResult.data.signingDocumentId,
       leadId,
@@ -195,7 +197,7 @@ async function handlePost(request: Request) {
     }
 
     // ── Update retainer package status ────────────────────────────
-    await supabase
+    await admin
       .from('lead_retainer_packages')
       .update({
         status: 'sent',
@@ -207,12 +209,12 @@ async function handlePost(request: Request) {
       .eq('tenant_id', tenantId)
 
     // ── Recalculate lead summary ──────────────────────────────────
-    await recalculateLeadSummary(supabase, leadId, tenantId)
+    await recalculateLeadSummary(admin, leadId, tenantId)
 
     // ── Best-effort stage advance to retainer_sent ────────────────
     try {
       await advanceLeadStage({
-        supabase,
+        supabase: admin,
         leadId,
         tenantId,
         targetStage: 'retainer_sent',

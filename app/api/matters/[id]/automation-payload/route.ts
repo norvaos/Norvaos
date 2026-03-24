@@ -4,6 +4,7 @@ import { requirePermission } from '@/lib/services/require-role'
 import { logAuditServer } from '@/lib/queries/audit-logs'
 import { withTiming } from '@/lib/middleware/request-timing'
 import { assembleAutomationPayload } from '@/lib/services/automation-payload'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 /**
  * GET /api/matters/[id]/automation-payload
@@ -39,10 +40,11 @@ async function handleGet(
   try {
     const { id: matterId } = await params
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'matters', 'read')
 
     const result = await assembleAutomationPayload(
-      auth.supabase,
+      admin,
       matterId,
       auth.tenantId,
     )
@@ -56,7 +58,7 @@ async function handleGet(
 
     // Audit log
     await logAuditServer({
-      supabase: auth.supabase,
+      supabase: admin,
       tenantId: auth.tenantId,
       userId: auth.userId,
       entityType: 'matter',

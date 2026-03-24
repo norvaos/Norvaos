@@ -106,6 +106,9 @@ export const KanbanColumn = memo(function KanbanColumn({
               <KanbanCard
                 key={lead.id}
                 lead={lead}
+                stageName={stage.name}
+                stageRottingDays={stage.rotting_days}
+                stageSortOrder={stage.sort_order}
                 contact={lead.contact_id ? contactsMap[lead.contact_id] : undefined}
                 assignedUser={lead.assigned_to ? usersMap[lead.assigned_to] : undefined}
                 practiceAreaName={lead.practice_area_id && practiceAreasMap ? practiceAreasMap[lead.practice_area_id]?.name : null}

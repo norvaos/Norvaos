@@ -21,6 +21,7 @@ import {
   Landmark,
   Layers,
   AlertTriangle,
+  Receipt,
   type LucideIcon,
 } from 'lucide-react'
 
@@ -89,6 +90,7 @@ export const navigation: NavSection[] = [
           { title: 'Expiry Reminders', href: '/settings/expiry-reminders', icon: Bell },
           { title: 'Access Control', href: '/settings/access-control', icon: Shield },
           { title: 'Trust Accounts', href: '/settings/trust-accounts', icon: Landmark },
+          { title: 'Fee Templates', href: '/settings/fee-templates', icon: Receipt },
           { title: 'Reports', href: '/reports', icon: BarChart3, featureFlag: 'advanced_reporting' },
           { title: 'Integrations', href: '/integrations/clio', icon: Globe, comingSoon: true },
           { title: 'IRCC Forms', href: '/admin/ircc-forms', icon: FileText },

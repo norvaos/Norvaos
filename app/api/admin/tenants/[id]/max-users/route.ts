@@ -57,7 +57,8 @@ async function handlePatch(
       actorId = auth.userId
 
       // Permission gate: must be Admin with settings:edit
-      const { data: callerUser } = await auth.supabase
+      const adminCheck = createAdminClient()
+      const { data: callerUser } = await adminCheck
         .from('users')
         .select('role_id')
         .eq('id', auth.userId)
@@ -68,7 +69,7 @@ async function handlePatch(
         return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
       }
 
-      const { data: callerRole } = await auth.supabase
+      const { data: callerRole } = await adminCheck
         .from('roles')
         .select('name, permissions')
         .eq('id', callerUser.role_id)

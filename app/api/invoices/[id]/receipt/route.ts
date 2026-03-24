@@ -4,6 +4,7 @@ import { requirePermission } from '@/lib/services/require-role'
 import { logAuditServer } from '@/lib/queries/audit-logs'
 import { sendReceiptEmail } from '@/lib/services/invoice-email-service'
 import { withTiming } from '@/lib/middleware/request-timing'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { reportError } from '@/lib/monitoring/error-reporter'
 
 async function handlePost(
@@ -17,17 +18,18 @@ async function handlePost(
     await requirePermission(auth, 'billing', 'edit')
 
     const { supabase, tenantId, userId } = auth
+    const admin = createAdminClient()
     const body = await request.json().catch(() => ({}))
     const emailOverride = body.email_override as string | undefined
 
-    const result = await sendReceiptEmail(supabase, invoiceId, tenantId, emailOverride)
+    const result = await sendReceiptEmail(admin, invoiceId, tenantId, emailOverride)
 
     if (!result.success) {
       return NextResponse.json({ error: result.error }, { status: 400 })
     }
 
     await logAuditServer({
-      supabase,
+      supabase: admin,
       tenantId,
       userId,
       entityType: 'invoice',

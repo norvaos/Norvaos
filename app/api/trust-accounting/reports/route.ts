@@ -10,10 +10,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { authenticateRequest, AuthError } from '@/lib/services/auth'
 import { requirePermission } from '@/lib/services/require-role'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 export async function GET(request: NextRequest) {
   try {
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'trust_accounting', 'view')
 
     const { searchParams } = new URL(request.url)
@@ -27,7 +29,7 @@ export async function GET(request: NextRequest) {
         }
 
         // Get latest running balance per matter for this trust account
-        const { data: txns } = await (auth.supabase as any)
+        const { data: txns } = await (admin as any)
           .from('trust_transactions')
           .select('matter_id, running_balance_cents, created_at, matters!inner(id, title)')
           .eq('tenant_id', auth.tenantId)
@@ -62,7 +64,7 @@ export async function GET(request: NextRequest) {
           return NextResponse.json({ success: false, error: 'trustAccountId is required' }, { status: 400 })
         }
 
-        const { data: account } = await (auth.supabase as any)
+        const { data: account } = await (admin as any)
           .from('trust_bank_accounts')
           .select('*')
           .eq('id', trustAccountId)
@@ -74,7 +76,7 @@ export async function GET(request: NextRequest) {
         }
 
         // Total balance (sum latest per matter)
-        const { data: txns } = await (auth.supabase as any)
+        const { data: txns } = await (admin as any)
           .from('trust_transactions')
           .select('matter_id, running_balance_cents, created_at')
           .eq('tenant_id', auth.tenantId)
@@ -92,7 +94,7 @@ export async function GET(request: NextRequest) {
         const activeMatters = Array.from(latestByMatter.values()).filter(b => b !== 0).length
 
         // Active holds
-        const { data: holds } = await (auth.supabase as any)
+        const { data: holds } = await (admin as any)
           .from('trust_holds')
           .select('amount_cents')
           .eq('tenant_id', auth.tenantId)
@@ -102,7 +104,7 @@ export async function GET(request: NextRequest) {
         const holdsTotal = (holds ?? []).reduce((sum: number, h: any) => sum + Number(h.amount_cents), 0)
 
         // Last reconciliation
-        const { data: lastRecon } = await (auth.supabase as any)
+        const { data: lastRecon } = await (admin as any)
           .from('trust_reconciliations')
           .select('id, period_end, status, is_balanced')
           .eq('trust_account_id', trustAccountId)
@@ -132,7 +134,7 @@ export async function GET(request: NextRequest) {
         const from = (page - 1) * pageSize
         const to = from + pageSize - 1
 
-        let query = (auth.supabase as any)
+        let query = (admin as any)
           .from('cheques')
           .select('*, matters(id, title)', { count: 'exact' })
           .eq('tenant_id', auth.tenantId)
@@ -157,7 +159,7 @@ export async function GET(request: NextRequest) {
       }
 
       case 'holds': {
-        const { data: holds } = await (auth.supabase as any)
+        const { data: holds } = await (admin as any)
           .from('trust_holds')
           .select('*, matters!inner(id, title), trust_transactions!inner(trust_account_id, description)')
           .eq('tenant_id', auth.tenantId)
@@ -180,7 +182,7 @@ export async function GET(request: NextRequest) {
         const from = (page - 1) * pageSize
         const to = from + pageSize - 1
 
-        let query = (auth.supabase as any)
+        let query = (admin as any)
           .from('trust_audit_log')
           .select('*, users!inner(id, first_name, last_name, email)', { count: 'exact' })
           .eq('tenant_id', auth.tenantId)

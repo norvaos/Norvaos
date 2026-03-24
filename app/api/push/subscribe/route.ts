@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { authenticateRequest, AuthError } from '@/lib/services/auth'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { withTiming } from '@/lib/middleware/request-timing'
 import type { Json } from '@/lib/types/database'
 
@@ -27,7 +28,7 @@ async function handlePost(request: Request) {
       return NextResponse.json({ error: 'Invalid subscription' }, { status: 400 })
     }
 
-    // Fetch current device_tokens
+    // Fetch current device_tokens (read via auth-scoped client)
     const { data: user } = await supabase
       .from('users')
       .select('device_tokens')
@@ -52,7 +53,9 @@ async function handlePost(request: Request) {
       },
     ]
 
-    await supabase
+    // Write via admin client to bypass RLS
+    const admin = createAdminClient()
+    await admin
       .from('users')
       .update({ device_tokens: updated as unknown as Json })
       .eq('id', userId)

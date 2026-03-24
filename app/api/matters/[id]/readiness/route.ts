@@ -3,6 +3,7 @@ import { authenticateRequest, AuthError } from '@/lib/services/auth'
 import { computeReadiness } from '@/lib/services/readiness-engine'
 import { withTiming } from '@/lib/middleware/request-timing'
 import type { Json } from '@/lib/types/database'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 /**
  * POST /api/matters/[id]/readiness
@@ -21,9 +22,10 @@ async function handlePost(
     const { id: matterId } = await params
 
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
 
     // Verify matter belongs to this tenant
-    const { data: matter, error: matterErr } = await auth.supabase
+    const { data: matter, error: matterErr } = await admin
       .from('matters')
       .select('id, tenant_id')
       .eq('id', matterId)
@@ -38,11 +40,11 @@ async function handlePost(
     }
 
     // Compute readiness
-    const result = await computeReadiness(matterId, auth.supabase)
+    const result = await computeReadiness(matterId, admin)
 
     // Persist to matters table — fire-and-forget is intentional; the
     // computed result is the source of truth returned to the caller.
-    auth.supabase
+    admin
       .from('matters')
       .update({
         readiness_score: result.total,

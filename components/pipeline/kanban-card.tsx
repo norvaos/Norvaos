@@ -8,6 +8,7 @@ import {
   CircleDollarSign,
   Clock,
   GripVertical,
+  RotateCcw,
   User,
 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
@@ -18,7 +19,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip'
 import { cn } from '@/lib/utils'
-import { formatCurrency, formatRelativeDate, isOverdue } from '@/lib/utils/formatters'
+import { formatCurrency, formatDate, formatRelativeDate, isOverdue } from '@/lib/utils/formatters'
 import { LEAD_TEMPERATURES } from '@/lib/utils/constants'
 import type { Database } from '@/lib/types/database'
 
@@ -50,6 +51,9 @@ export interface KanbanCardDisplayOptions {
 
 interface KanbanCardProps extends KanbanCardDisplayOptions {
   lead: Lead
+  stageName?: string | null
+  stageRottingDays?: number | null
+  stageSortOrder?: number | null
   contact?: ContactInfo
   assignedUser?: UserInfo
   practiceAreaName?: string | null
@@ -103,6 +107,9 @@ function calculateDaysInStage(lead: Lead): number {
 
 export const KanbanCard = memo(function KanbanCard({
   lead,
+  stageName,
+  stageRottingDays,
+  stageSortOrder,
   contact,
   assignedUser,
   practiceAreaName,
@@ -134,6 +141,12 @@ export const KanbanCard = memo(function KanbanCard({
   const daysInStage = calculateDaysInStage(lead)
   const contactName = getContactDisplayName(contact)
   const followUpOverdue = lead.next_follow_up ? isOverdue(lead.next_follow_up) : false
+  const isDeferred = stageName ? /deferred/i.test(stageName) : false
+
+  // SLA stale detection: rotting_days from stage config, or default 2 for Track 1 stages (sort_order 1-4)
+  const isTrack1 = (stageSortOrder ?? 0) >= 1 && (stageSortOrder ?? 0) <= 4
+  const rottingThreshold = stageRottingDays ?? (isTrack1 ? 2 : null)
+  const isStale = rottingThreshold != null && daysInStage > rottingThreshold
 
   return (
     <div
@@ -141,7 +154,8 @@ export const KanbanCard = memo(function KanbanCard({
       style={style}
       className={cn(
         'group cursor-pointer rounded-lg border bg-white p-3 shadow-sm transition-shadow hover:shadow-md',
-        isDragging && 'shadow-lg ring-2 ring-primary/20'
+        isDragging && 'shadow-lg ring-2 ring-primary/20',
+        isStale && !isDragging && 'border-red-400 ring-1 ring-red-300'
       )}
       onClick={() => onClick?.(lead.id)}
     >
@@ -242,8 +256,8 @@ export const KanbanCard = memo(function KanbanCard({
           </Tooltip>
         )}
 
-        {/* Next follow-up */}
-        {showFollowUp && lead.next_follow_up && (
+        {/* Next follow-up (hidden when deferred — show reactivation badge instead) */}
+        {showFollowUp && lead.next_follow_up && !isDeferred && (
           <Tooltip>
             <TooltipTrigger asChild>
               <div
@@ -259,6 +273,19 @@ export const KanbanCard = memo(function KanbanCard({
             <TooltipContent>
               {followUpOverdue ? 'Follow-up overdue' : 'Next follow-up'}
             </TooltipContent>
+          </Tooltip>
+        )}
+
+        {/* Deferred reactivation date */}
+        {isDeferred && lead.next_follow_up && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="flex items-center gap-1 text-indigo-600">
+                <RotateCcw className="h-3 w-3" />
+                <span className="font-medium">{formatDate(lead.next_follow_up)}</span>
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>Reactivates on this date</TooltipContent>
           </Tooltip>
         )}
       </div>

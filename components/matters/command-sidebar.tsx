@@ -33,7 +33,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Separator } from '@/components/ui/separator'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { cn } from '@/lib/utils'
+import { cn, formatCents } from '@/lib/utils'
 import { formatDate } from '@/lib/utils/formatters'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
@@ -115,13 +115,6 @@ function usePrimaryContact(matterId: string) {
     enabled: !!matterId,
     staleTime: 60_000,
   })
-}
-
-// ── Currency formatter ────────────────────────────────────────────────────────
-
-function formatCents(cents: number | null | undefined): string {
-  if (!cents && cents !== 0) return '—'
-  return new Intl.NumberFormat('en-CA', { style: 'currency', currency: 'CAD' }).format(cents / 100)
 }
 
 // ── Section header ────────────────────────────────────────────────────────────

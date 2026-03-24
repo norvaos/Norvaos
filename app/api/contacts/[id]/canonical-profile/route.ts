@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { authenticateRequest, AuthError } from '@/lib/services/auth'
 import { requirePermission } from '@/lib/services/require-role'
 import { withTiming } from '@/lib/middleware/request-timing'
+import { createAdminClient } from '@/lib/supabase/admin'
 import {
   createCanonicalProfile,
   getCanonicalProfile,
@@ -20,10 +21,11 @@ async function handleGet(
   try {
     const { id: contactId } = await params
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'contacts', 'read')
 
     // Verify contact belongs to this tenant
-    const { data: contact, error: contactErr } = await auth.supabase
+    const { data: contact, error: contactErr } = await admin
       .from('contacts')
       .select('id')
       .eq('id', contactId)
@@ -37,7 +39,7 @@ async function handleGet(
       )
     }
 
-    const profile = await getCanonicalProfile(auth.supabase, contactId)
+    const profile = await getCanonicalProfile(admin, contactId)
 
     return NextResponse.json({ success: true, profile })
   } catch (error) {
@@ -68,10 +70,11 @@ async function handlePost(
   try {
     const { id: contactId } = await params
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'contacts', 'update')
 
     // Verify contact belongs to this tenant
-    const { data: contact, error: contactErr } = await auth.supabase
+    const { data: contact, error: contactErr } = await admin
       .from('contacts')
       .select('id')
       .eq('id', contactId)
@@ -86,7 +89,7 @@ async function handlePost(
     }
 
     const profileId = await createCanonicalProfile(
-      auth.supabase,
+      admin,
       auth.tenantId,
       contactId,
     )

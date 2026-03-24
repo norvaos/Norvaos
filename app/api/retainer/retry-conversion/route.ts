@@ -1,5 +1,4 @@
 import { NextResponse, type NextRequest } from 'next/server'
-import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { authenticateRequest, AuthError } from '@/lib/services/auth'
 import { requirePermission } from '@/lib/services/require-role'
@@ -23,7 +22,6 @@ export async function POST(request: NextRequest) {
     requirePermission(auth, 'leads', 'edit')
     // All reads and writes use adminClient — user-scoped RLS must never block
     // a legitimate conversion triggered by an authenticated, authorised user.
-    const supabase = await createServerSupabaseClient()
     const adminForReads = createAdminClient()
 
     const body = await request.json()
@@ -82,7 +80,7 @@ export async function POST(request: NextRequest) {
     let matterTitle = 'New Matter'
     if (lead.contact_id) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data: contact } = await (supabase as any)
+      const { data: contact } = await (adminForReads as any)
         .from('contacts')
         .select('first_name, last_name')
         .eq('id', lead.contact_id)
@@ -94,7 +92,7 @@ export async function POST(request: NextRequest) {
     }
     if (lead.matter_type_id) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data: mt } = await (supabase as any)
+      const { data: mt } = await (adminForReads as any)
         .from('matter_types')
         .select('name')
         .eq('id', lead.matter_type_id)

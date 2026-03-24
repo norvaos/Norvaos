@@ -4,6 +4,7 @@ import { requirePermission } from '@/lib/services/require-role'
 import { logAuditServer } from '@/lib/queries/audit-logs'
 import { invalidateGating } from '@/lib/services/cache-invalidation'
 import { withTiming } from '@/lib/middleware/request-timing'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 async function handlePost(
   request: NextRequest,
@@ -11,11 +12,12 @@ async function handlePost(
 ) {
   try {
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'matters', 'edit')
     const { id: matterId } = await params
 
     // Verify matter belongs to tenant
-    const { data: matter, error: matterError } = await auth.supabase
+    const { data: matter, error: matterError } = await admin
       .from('matters')
       .select('id, tenant_id')
       .eq('id', matterId)
@@ -44,7 +46,7 @@ async function handlePost(
     }
 
     // Fetch intake record
-    const { data: intake, error: intakeError } = await auth.supabase
+    const { data: intake, error: intakeError } = await admin
       .from('matter_intake')
       .select('id, intake_status')
       .eq('matter_id', matterId)
@@ -65,7 +67,7 @@ async function handlePost(
         )
       }
 
-      const { error: updateError } = await auth.supabase
+      const { error: updateError } = await admin
         .from('matter_intake')
         .update({
           intake_status: 'locked',
@@ -90,7 +92,7 @@ async function handlePost(
         )
       }
 
-      const { error: updateError } = await auth.supabase
+      const { error: updateError } = await admin
         .from('matter_intake')
         .update({
           intake_status: 'validated',
@@ -110,7 +112,7 @@ async function handlePost(
 
     // Audit log
     await logAuditServer({
-      supabase: auth.supabase,
+      supabase: admin,
       tenantId: auth.tenantId,
       userId: auth.userId,
       entityType: 'matter_intake',

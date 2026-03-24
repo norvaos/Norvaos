@@ -4,6 +4,7 @@ import { requirePermission } from '@/lib/services/require-role'
 import { withTiming } from '@/lib/middleware/request-timing'
 import { resolveConflict } from '@/lib/services/canonical-profile'
 import type { ConflictResolution } from '@/lib/services/canonical-profile'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 /**
  * GET /api/contacts/[id]/canonical-profile/conflicts
@@ -19,13 +20,14 @@ async function handleGet(
   try {
     const { id: contactId } = await params
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'contacts', 'read')
 
     const url = new URL(request.url)
     const status = url.searchParams.get('status') ?? 'pending'
 
     // Get profile for this contact
-    const { data: profile, error: profileErr } = await auth.supabase
+    const { data: profile, error: profileErr } = await admin
       .from('canonical_profiles')
       .select('id')
       .eq('contact_id', contactId)
@@ -37,7 +39,7 @@ async function handleGet(
       return NextResponse.json({ success: true, conflicts: [] })
     }
 
-    const { data: conflicts, error: conflictsErr } = await auth.supabase
+    const { data: conflicts, error: conflictsErr } = await admin
       .from('canonical_profile_conflicts')
       .select('*')
       .eq('profile_id', profile.id)
@@ -76,10 +78,11 @@ async function handlePost(
   try {
     const { id: contactId } = await params
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'contacts', 'update')
 
     // Verify contact belongs to this tenant
-    const { data: contact, error: contactErr } = await auth.supabase
+    const { data: contact, error: contactErr } = await admin
       .from('contacts')
       .select('id')
       .eq('id', contactId)
@@ -112,7 +115,7 @@ async function handlePost(
     }
 
     await resolveConflict(
-      auth.supabase,
+      admin,
       conflictId,
       resolution as ConflictResolution,
       auth.userId,

@@ -9,6 +9,7 @@ import { fillIRCCForm } from '@/lib/ircc/pdf-filler'
 import { fillXFAFormFromDB } from '@/lib/ircc/xfa-filler-db-server'
 import { checkTenantLimit, rateLimitResponse } from '@/lib/middleware/tenant-limiter'
 import { withTiming } from '@/lib/middleware/request-timing'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 /**
  * POST /api/ircc/generate-pdf
@@ -35,6 +36,7 @@ async function handlePost(request: Request) {
   try {
     // 1. Authenticate
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'form_packs', 'create')
 
     const limit = await checkTenantLimit(auth.tenantId, 'ircc/generate-pdf')
@@ -65,7 +67,7 @@ async function handlePost(request: Request) {
 
     // 3. Validate form code against DB — any active form for this tenant is valid
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: dbForm, error: dbFormError } = await (auth.supabase as any)
+    const { data: dbForm, error: dbFormError } = await (admin as any)
       .from('ircc_forms')
       .select('id, form_code, storage_path, is_xfa')
       .eq('form_code', formCode)
@@ -98,7 +100,7 @@ async function handlePost(request: Request) {
 
     // Fetch current user's name for the "Use of Representative" signature
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: currentUser } = await (auth.supabase as any)
+    const { data: currentUser } = await (admin as any)
       .from('users')
       .select('first_name, last_name')
       .eq('auth_user_id', auth.userId)
@@ -110,7 +112,7 @@ async function handlePost(request: Request) {
     if (matterId) {
       // Path A0: Try instance-based resolution first (new engine)
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data: formInstance } = await (auth.supabase as any)
+      const { data: formInstance } = await (admin as any)
         .from('matter_form_instances')
         .select('id, answers')
         .eq('matter_id', matterId)
@@ -132,7 +134,7 @@ async function handlePost(request: Request) {
 
       // Path A1: matter-scoped profile (person.profile_data)
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data: person, error: personError } = await (auth.supabase as any)
+      const { data: person, error: personError } = await (admin as any)
         .from('matter_people')
         .select('id, first_name, last_name, profile_data, is_locked, contact_id')
         .eq('matter_id', matterId)
@@ -166,7 +168,7 @@ async function handlePost(request: Request) {
       // run snapshot_contact_profile_to_matter to populate properly.
       if (Object.keys(profile).length === 0 && person.contact_id) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { data: fallback } = await (auth.supabase as any)
+        const { data: fallback } = await (admin as any)
           .from('contacts')
           .select('immigration_data')
           .eq('id', person.contact_id)
@@ -178,7 +180,7 @@ async function handlePost(request: Request) {
     } else {
       // Path B: legacy — contact-level canonical profile
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data: contact, error: contactError } = await (auth.supabase as any)
+      const { data: contact, error: contactError } = await (admin as any)
         .from('contacts')
         .select('id, first_name, last_name, immigration_data')
         .eq('id', contactId as string)
@@ -220,7 +222,7 @@ async function handlePost(request: Request) {
       resolvedTemplatePath = localTemplatePath
     } catch {
       // Local file missing — download from Supabase Storage
-      const { data: storageBlob, error: storageErr } = await auth.supabase.storage
+      const { data: storageBlob, error: storageErr } = await admin.storage
         .from('documents')
         .download(dbForm.storage_path)
 
@@ -258,7 +260,7 @@ async function handlePost(request: Request) {
         )
 
         const xfaResult = await fillXFAFormFromDB(
-          resolvedTemplatePath, dbForm.id, profile, auth.supabase, representativeName,
+          resolvedTemplatePath, dbForm.id, profile, admin, representativeName,
         )
         if (xfaResult) {
           pdfBytes = xfaResult.bytes

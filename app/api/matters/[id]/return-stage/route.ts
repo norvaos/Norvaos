@@ -3,6 +3,7 @@ import { authenticateRequest, AuthError } from '@/lib/services/auth'
 import { withTiming } from '@/lib/middleware/request-timing'
 import { returnMatterToStage } from '@/lib/services/exception-workflow'
 import type { ReturnStageResult } from '@/lib/services/exception-workflow'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 /**
  * POST /api/matters/[id]/return-stage
@@ -32,6 +33,7 @@ async function handlePost(
 
     // ── 1. Authenticate ────────────────────────────────────────────────────
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
 
     // ── 2. Role check: Lawyer or Admin only ───────────────────────────────
     const roleName = auth.role?.name ?? ''
@@ -81,7 +83,7 @@ async function handlePost(
     }
 
     // ── 4. Confirm matter belongs to this tenant ──────────────────────────
-    const { data: matter, error: matterErr } = await auth.supabase
+    const { data: matter, error: matterErr } = await admin
       .from('matters')
       .select('id, tenant_id')
       .eq('id', matterId)
@@ -96,7 +98,7 @@ async function handlePost(
     }
 
     // ── 5. Delegate to service ────────────────────────────────────────────
-    const transition: ReturnStageResult = await returnMatterToStage(auth.supabase, {
+    const transition: ReturnStageResult = await returnMatterToStage(admin, {
       matterId,
       tenantId: auth.tenantId,
       targetStageId,

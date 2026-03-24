@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation'
 import {
   ArrowLeft, MoreHorizontal, Pencil, XCircle, RotateCcw, ArrowRightLeft,
-  ExternalLink, Trash2, Thermometer,
+  ExternalLink, Trash2, Thermometer, Brain,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -38,6 +38,7 @@ interface LeadDetailHeaderProps {
   onReopen?: () => void
   onConvert?: () => void
   onDelete?: () => void
+  onStartIntake?: () => void
 }
 
 export function LeadDetailHeader({
@@ -48,6 +49,7 @@ export function LeadDetailHeader({
   onReopen,
   onConvert,
   onDelete,
+  onStartIntake,
 }: LeadDetailHeaderProps) {
   const router = useRouter()
   const currentStage = lead.current_stage ?? ''
@@ -98,6 +100,19 @@ export function LeadDetailHeader({
           )}
         </div>
       </div>
+
+      {/* Start Intake button (desktop) */}
+      {!isTerminal && onStartIntake && (
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={onStartIntake}
+          className="shrink-0 hidden lg:flex border-violet-200 text-violet-700 hover:bg-violet-50"
+        >
+          <Brain className="mr-1.5 h-3.5 w-3.5" />
+          Start Intake
+        </Button>
+      )}
 
       {/* Converted → View Matter link */}
       {isConverted && lead.converted_matter_id && (

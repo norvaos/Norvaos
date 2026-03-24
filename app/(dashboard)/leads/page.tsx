@@ -41,7 +41,7 @@ import { useTenant } from '@/lib/hooks/use-tenant'
 import { usePracticeAreaContext } from '@/lib/hooks/use-practice-area-context'
 import { createClient } from '@/lib/supabase/client'
 import { usePipelines, usePipelineStages } from '@/lib/queries/pipelines'
-import { useLeads, useUpdateLeadStage, leadKeys } from '@/lib/queries/leads'
+import { useLeads, useUpdateLeadStage, useUpdateLead, leadKeys } from '@/lib/queries/leads'
 import { formatCurrency, formatDate, isOverdue } from '@/lib/utils/formatters'
 import { cn } from '@/lib/utils'
 import { LEAD_TEMPERATURES, CONTACT_SOURCES } from '@/lib/utils/constants'
@@ -50,6 +50,9 @@ import { KanbanColumn, KanbanColumnSkeleton } from '@/components/pipeline/kanban
 import { KanbanCard } from '@/components/pipeline/kanban-card'
 import type { ContactInfo, UserInfo } from '@/components/pipeline/kanban-card'
 import { LeadCreateSheet } from '@/components/leads/lead-create-sheet'
+import { DeferredDateDialog } from '@/components/leads/deferred-date-dialog'
+import { LostReasonDialog } from '@/components/leads/lost-reason-dialog'
+import type { LostReason } from '@/components/leads/lost-reason-dialog'
 import { EmptyState } from '@/components/shared/empty-state'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -77,6 +80,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 
+import { toast } from 'sonner'
 import type { Database } from '@/lib/types/database'
 
 type Lead = Database['public']['Tables']['leads']['Row']
@@ -396,6 +400,19 @@ export default function LeadsPage() {
   // ---- Drag-and-drop -------------------------------------------------------
   const [activeLeadId, setActiveLeadId] = useState<string | null>(null)
   const updateLeadStage = useUpdateLeadStage()
+  const updateLead = useUpdateLead()
+
+  // ---- Deferred stage: pending move + date picker dialog -------------------
+  const [pendingDeferredMove, setPendingDeferredMove] = useState<{
+    leadId: string
+    stageId: string
+  } | null>(null)
+
+  // ---- Lost stage: pending move + lost reason dialog ----------------------
+  const [pendingLostMove, setPendingLostMove] = useState<{
+    leadId: string
+    stageId: string
+  } | null>(null)
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -414,22 +431,8 @@ export default function LeadsPage() {
     setActiveLeadId(event.active.id as string)
   }, [])
 
-  const handleDragEnd = useCallback(
-    (event: DragEndEvent) => {
-      setActiveLeadId(null)
-
-      const { active, over } = event
-      if (!over) return
-
-      const leadId = active.id as string
-      const lead = leads.find((l) => l.id === leadId)
-      if (!lead) return
-
-      // The droppable id is the stage id
-      const targetStageId = over.id as string
-      if (lead.stage_id === targetStageId) return
-
-      // Optimistic update: immediately move the lead in the cache
+  const applyOptimisticStageMove = useCallback(
+    (leadId: string, targetStageId: string) => {
       queryClient.setQueryData(
         leadKeys.list({
           tenantId,
@@ -447,6 +450,44 @@ export default function LeadsPage() {
           }
         }
       )
+    },
+    [queryClient, tenantId, selectedPipelineId]
+  )
+
+  const handleDragEnd = useCallback(
+    (event: DragEndEvent) => {
+      setActiveLeadId(null)
+
+      const { active, over } = event
+      if (!over) return
+
+      const leadId = active.id as string
+      const lead = leads.find((l) => l.id === leadId)
+      if (!lead) return
+
+      // The droppable id is the stage id
+      const targetStageId = over.id as string
+      if (lead.stage_id === targetStageId) return
+
+      const targetStage = stages?.find((s) => s.id === targetStageId)
+
+      // Check if target stage is a lost stage — requires a lost reason
+      if (targetStage?.is_lost_stage) {
+        // Do NOT apply optimistic move yet — wait for confirmation
+        setPendingLostMove({ leadId, stageId: targetStageId })
+        return
+      }
+
+      // Check if target stage is "Deferred" — requires a reactivation date
+      if (targetStage && /deferred/i.test(targetStage.name)) {
+        // Optimistic move, then open date picker
+        applyOptimisticStageMove(leadId, targetStageId)
+        setPendingDeferredMove({ leadId, stageId: targetStageId })
+        return
+      }
+
+      // All other stages (including On Hold): move normally
+      applyOptimisticStageMove(leadId, targetStageId)
 
       updateLeadStage.mutate(
         { id: leadId, stageId: targetStageId },
@@ -458,8 +499,80 @@ export default function LeadsPage() {
         }
       )
     },
-    [leads, queryClient, tenantId, selectedPipelineId, updateLeadStage]
+    [leads, stages, queryClient, applyOptimisticStageMove, updateLeadStage]
   )
+
+  // Deferred dialog: confirm with date
+  const handleDeferredConfirm = useCallback(
+    (date: Date) => {
+      if (!pendingDeferredMove) return
+      const { leadId, stageId } = pendingDeferredMove
+      setPendingDeferredMove(null)
+
+      // 1. Move the lead to the deferred stage
+      updateLeadStage.mutate(
+        { id: leadId, stageId },
+        {
+          onError: () => {
+            queryClient.invalidateQueries({ queryKey: leadKeys.lists() })
+          },
+        }
+      )
+
+      // 2. Set next_follow_up as the reactivation date
+      updateLead.mutate(
+        { id: leadId, next_follow_up: date.toISOString() },
+        {
+          onError: () => {
+            queryClient.invalidateQueries({ queryKey: leadKeys.lists() })
+          },
+        }
+      )
+    },
+    [pendingDeferredMove, updateLeadStage, updateLead, queryClient]
+  )
+
+  // Deferred dialog: cancel — revert the optimistic move
+  const handleDeferredCancel = useCallback(() => {
+    setPendingDeferredMove(null)
+    queryClient.invalidateQueries({ queryKey: leadKeys.lists() })
+  }, [queryClient])
+
+  // Lost dialog: confirm with reason
+  const handleLostConfirm = useCallback(
+    async (reason: LostReason, detail: string) => {
+      if (!pendingLostMove) return
+      const { leadId, stageId } = pendingLostMove
+      setPendingLostMove(null)
+
+      // Apply optimistic move now
+      applyOptimisticStageMove(leadId, stageId)
+
+      try {
+        // 1. Move to the lost stage
+        await updateLeadStage.mutateAsync({ id: leadId, stageId })
+
+        // 2. Update lead with lost reason, detail, and status
+        await updateLead.mutateAsync({
+          id: leadId,
+          lost_reason: reason,
+          lost_detail: detail || null,
+          status: 'lost',
+        })
+
+        toast.success('Lead closed as lost')
+      } catch {
+        toast.error('Failed to close lead as lost')
+        queryClient.invalidateQueries({ queryKey: leadKeys.lists() })
+      }
+    },
+    [pendingLostMove, applyOptimisticStageMove, updateLeadStage, updateLead, queryClient]
+  )
+
+  // Lost dialog: cancel — no optimistic update was applied, just clear
+  const handleLostCancel = useCallback(() => {
+    setPendingLostMove(null)
+  }, [])
 
   const handleDragCancel = useCallback(() => {
     setActiveLeadId(null)
@@ -907,6 +1020,23 @@ export default function LeadsPage() {
           stages={stages}
         />
       )}
+
+      {/* Deferred stage date picker dialog */}
+      <DeferredDateDialog
+        open={!!pendingDeferredMove}
+        onConfirm={handleDeferredConfirm}
+        onCancel={handleDeferredCancel}
+      />
+
+      {/* Lost reason dialog */}
+      <LostReasonDialog
+        open={!!pendingLostMove}
+        onOpenChange={(open) => {
+          if (!open) handleLostCancel()
+        }}
+        onConfirm={handleLostConfirm}
+        onCancel={handleLostCancel}
+      />
     </div>
   )
 }

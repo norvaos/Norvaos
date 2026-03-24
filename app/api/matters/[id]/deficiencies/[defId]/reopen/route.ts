@@ -12,6 +12,7 @@ import { NextResponse } from 'next/server'
 import { authenticateRequest, AuthError } from '@/lib/services/auth'
 import { computeReopenTransition } from '@/lib/services/deficiency-engine'
 import type { MatterDeficiencyRow } from '@/lib/types/database'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 export async function PUT(
   _request: Request,
@@ -20,9 +21,10 @@ export async function PUT(
   try {
     const { id: matterId, defId } = await params
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
 
     // Verify matter belongs to this tenant
-    const { data: matter, error: matterErr } = await auth.supabase
+    const { data: matter, error: matterErr } = await admin
       .from('matters')
       .select('id, tenant_id')
       .eq('id', matterId)
@@ -37,7 +39,7 @@ export async function PUT(
     }
 
     // Fetch the deficiency
-    const { data: deficiency, error: defErr } = await auth.supabase
+    const { data: deficiency, error: defErr } = await admin
       .from('matter_deficiencies')
       .select('*')
       .eq('id', defId)
@@ -86,7 +88,7 @@ export async function PUT(
       updatePayload.chronic_escalated_at = new Date().toISOString()
     }
 
-    const { data: updated, error: updateErr } = await auth.supabase
+    const { data: updated, error: updateErr } = await admin
       .from('matter_deficiencies')
       .update(updatePayload)
       .eq('id', defId)
@@ -100,7 +102,7 @@ export async function PUT(
 
     // Log to activities
     const isChronic = transition.chronicFlag && !current.chronic_flag
-    auth.supabase
+    admin
       .from('activities')
       .insert({
         tenant_id: auth.tenantId,

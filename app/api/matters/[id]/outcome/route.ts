@@ -3,6 +3,7 @@ import { authenticateRequest, AuthError } from '@/lib/services/auth'
 import { requirePermission } from '@/lib/services/require-role'
 import { recordOutcomeEvent } from '@/lib/services/outcome-event-engine'
 import { withTiming } from '@/lib/middleware/request-timing'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 /**
  * POST /api/matters/[id]/outcome
@@ -17,11 +18,12 @@ async function handlePost(
 ) {
   try {
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'matters', 'edit')
     const { id: matterId } = await params
 
     // Verify matter belongs to tenant
-    const { data: matter, error: matterError } = await auth.supabase
+    const { data: matter, error: matterError } = await admin
       .from('matters')
       .select('id, tenant_id')
       .eq('id', matterId)
@@ -57,7 +59,7 @@ async function handlePost(
     }
 
     const result = await recordOutcomeEvent(
-      auth.supabase,
+      admin,
       matterId,
       event_type,
       outcome_data ?? {},
@@ -102,11 +104,12 @@ async function handleGet(
 ) {
   try {
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'matters', 'view')
     const { id: matterId } = await params
 
     // Verify matter belongs to tenant
-    const { data: matter, error: matterError } = await auth.supabase
+    const { data: matter, error: matterError } = await admin
       .from('matters')
       .select('id, tenant_id')
       .eq('id', matterId)
@@ -120,7 +123,7 @@ async function handleGet(
       )
     }
 
-    const { data: outcomes, error: outcomesError } = await auth.supabase
+    const { data: outcomes, error: outcomesError } = await admin
       .from('matter_outcome_events')
       .select('*')
       .eq('matter_id', matterId)

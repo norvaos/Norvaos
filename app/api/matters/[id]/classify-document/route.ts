@@ -3,6 +3,7 @@ import { authenticateRequest, AuthError } from '@/lib/services/auth'
 import { requirePermission } from '@/lib/services/require-role'
 import { classifyPostSubmissionDocument } from '@/lib/services/post-submission-engine'
 import { withTiming } from '@/lib/middleware/request-timing'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 /**
  * POST /api/matters/[id]/classify-document
@@ -18,11 +19,12 @@ async function handlePost(
 ) {
   try {
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'matters', 'edit')
     const { id: matterId } = await params
 
     // Verify matter belongs to tenant
-    const { data: matter, error: matterError } = await auth.supabase
+    const { data: matter, error: matterError } = await admin
       .from('matters')
       .select('id, tenant_id')
       .eq('id', matterId)
@@ -47,7 +49,7 @@ async function handlePost(
     }
 
     const result = await classifyPostSubmissionDocument(
-      auth.supabase,
+      admin,
       matterId,
       document_id ?? null,
       type_key,

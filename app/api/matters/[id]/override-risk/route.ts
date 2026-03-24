@@ -3,6 +3,7 @@ import { authenticateRequest, AuthError } from '@/lib/services/auth'
 import { requirePermission } from '@/lib/services/require-role'
 import { invalidateGating } from '@/lib/services/cache-invalidation'
 import { withTiming } from '@/lib/middleware/request-timing'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 async function handlePost(
   request: NextRequest,
@@ -10,11 +11,12 @@ async function handlePost(
 ) {
   try {
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'matters', 'edit')
     const { id: matterId } = await params
 
     // Verify matter belongs to tenant
-    const { data: matter, error: matterError } = await auth.supabase
+    const { data: matter, error: matterError } = await admin
       .from('matters')
       .select('id, tenant_id')
       .eq('id', matterId)
@@ -29,7 +31,7 @@ async function handlePost(
     }
 
     // Fetch intake record
-    const { data: intake, error: intakeError } = await auth.supabase
+    const { data: intake, error: intakeError } = await admin
       .from('matter_intake')
       .select('id, risk_level, intake_status')
       .eq('matter_id', matterId)
@@ -62,7 +64,7 @@ async function handlePost(
     // 2. Inserts into risk_override_history (mandatory)
     // 3. Inserts audit log (mandatory)
     // If any step fails, the entire transaction rolls back.
-    const { data: result, error: rpcError } = await auth.supabase
+    const { data: result, error: rpcError } = await admin
       .rpc('apply_risk_override', {
         p_intake_id: intake.id,
         p_tenant_id: auth.tenantId,

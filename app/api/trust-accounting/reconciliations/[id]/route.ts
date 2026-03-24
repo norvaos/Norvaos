@@ -14,10 +14,11 @@ export async function GET(
 ) {
   try {
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'trust_accounting', 'view')
     const { id } = await params
 
-    const { data: recon, error } = await (auth.supabase as any)
+    const { data: recon, error } = await (admin as any)
       .from('trust_reconciliations')
       .select('*, trust_bank_accounts!inner(id, account_name, bank_name)')
       .eq('id', id)
@@ -29,7 +30,7 @@ export async function GET(
     }
 
     // Get reconciliation items
-    const { data: items } = await (auth.supabase as any)
+    const { data: items } = await (admin as any)
       .from('trust_reconciliation_items')
       .select('*')
       .eq('reconciliation_id', id)
@@ -54,6 +55,7 @@ export async function PATCH(
 ) {
   try {
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'trust_accounting', 'edit')
     const { id } = await params
     const body = await request.json()
@@ -368,3 +370,5 @@ export async function PATCH(
     return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 })
   }
 }
+
+const admin = createAdminClient()

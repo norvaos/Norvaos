@@ -6,6 +6,7 @@ import { logAuditServer } from '@/lib/queries/audit-logs'
 import { generateInvoicePdf, type InvoicePdfData } from '@/lib/utils/invoice-pdf'
 import { checkTenantLimit, rateLimitResponse } from '@/lib/middleware/tenant-limiter'
 import { withTiming } from '@/lib/middleware/request-timing'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 // ── GET /api/invoices/[id]/pdf ───────────────────────────────────────────────
 
@@ -33,6 +34,7 @@ async function handleGet(
   }
 
   const { supabase, tenantId, userId } = auth
+  const admin = createAdminClient()
 
   const limit = await checkTenantLimit(tenantId, 'invoices/pdf')
   if (!limit.allowed) return rateLimitResponse(limit)
@@ -44,7 +46,7 @@ async function handleGet(
   if (!allowed) {
     // Audit the denied attempt (without financial data to prevent leakage)
     await logAuditServer({
-      supabase,
+      supabase: admin,
       tenantId,
       userId,
       entityType: 'invoice',

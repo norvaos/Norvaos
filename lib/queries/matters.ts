@@ -116,6 +116,11 @@ export function useCreateMatter() {
       // initial_matter_stage_id is a creation-time param: seeds matter_stage_state
       // but is NOT stored on matters itself. The API reads it from the body.
       initial_matter_stage_id?: string | null
+      // Fee snapshot fields — handled by the API route, not stored via MatterInsert type yet
+      applicant_location?: string | null
+      client_province?: string | null
+      tax_rate?: number | null
+      tax_label?: string | null
     }) => {
       const response = await fetch('/api/matters', {
         method: 'POST',

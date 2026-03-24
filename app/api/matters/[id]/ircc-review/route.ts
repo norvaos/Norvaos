@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { authenticateRequest } from '@/lib/services/auth'
 import { requirePermission } from '@/lib/services/require-role'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 type RouteContext = { params: Promise<{ id: string }> }
 
@@ -16,10 +17,11 @@ async function handleGet(
   try {
     const { id: matterId } = await params
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'matters', 'view')
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data, error } = await (auth.supabase as any)
+    const { data, error } = await (admin as any)
       .from('ircc_client_reviews')
       .select('*')
       .eq('matter_id', matterId)
@@ -52,6 +54,7 @@ async function handlePost(
   try {
     const { id: matterId } = await params
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'matters', 'view')
 
     const body = await request.json() as {
@@ -65,7 +68,7 @@ async function handlePost(
     if (action === 'create') {
       // Create a new review record
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data, error } = await (auth.supabase as any)
+      const { data, error } = await (admin as any)
         .from('ircc_client_reviews')
         .insert({
           matter_id: matterId,
@@ -85,7 +88,7 @@ async function handlePost(
 
     if (action === 'mark_sent') {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data, error } = await (auth.supabase as any)
+      const { data, error } = await (admin as any)
         .from('ircc_client_reviews')
         .update({
           status: 'sent',
@@ -105,7 +108,7 @@ async function handlePost(
 
     if (action === 'mark_signed') {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data, error } = await (auth.supabase as any)
+      const { data, error } = await (admin as any)
         .from('ircc_client_reviews')
         .update({
           status: 'signed',
@@ -123,7 +126,7 @@ async function handlePost(
 
     if (action === 'mark_declined') {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data, error } = await (auth.supabase as any)
+      const { data, error } = await (admin as any)
         .from('ircc_client_reviews')
         .update({
           status: 'declined',
@@ -148,3 +151,5 @@ async function handlePost(
 
 export const GET = handleGet
 export const POST = handlePost
+
+const admin = createAdminClient()

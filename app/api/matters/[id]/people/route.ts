@@ -6,6 +6,7 @@ import { revalidateIntake } from '@/lib/services/intake-revalidate'
 import { logAuditServer } from '@/lib/queries/audit-logs'
 import { invalidateGating } from '@/lib/services/cache-invalidation'
 import { withTiming } from '@/lib/middleware/request-timing'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 /**
  * POST /api/matters/[id]/people
@@ -24,10 +25,11 @@ async function handlePost(
 
     // 1. Authenticate and get tenant context
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'contacts', 'create')
 
     // 2. Verify the matter belongs to this tenant
-    const { data: matter, error: matterErr } = await auth.supabase
+    const { data: matter, error: matterErr } = await admin
       .from('matters')
       .select('id, tenant_id')
       .eq('id', matterId)
@@ -53,7 +55,7 @@ async function handlePost(
     }
 
     // 4. Insert new person
-    const { data: person, error: insertErr } = await auth.supabase
+    const { data: person, error: insertErr } = await admin
       .from('matter_people')
       .insert({
         tenant_id: auth.tenantId,
@@ -72,12 +74,12 @@ async function handlePost(
     }
 
     // 5. Auto-revalidate
-    const revalidation = await revalidateIntake(auth.supabase, matterId)
+    const revalidation = await revalidateIntake(admin, matterId)
     const { success: _revalSuccess, ...revalidationData } = revalidation
 
     // 6. Audit log (fire-and-forget)
     logAuditServer({
-      supabase: auth.supabase,
+      supabase: admin,
       tenantId: auth.tenantId,
       userId: auth.userId,
       entityType: 'matter_people',
@@ -117,3 +119,5 @@ async function handlePost(
 }
 
 export const POST = withTiming(handlePost, 'POST /api/matters/[id]/people')
+
+const admin = createAdminClient()

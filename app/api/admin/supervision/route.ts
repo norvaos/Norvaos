@@ -3,6 +3,7 @@ import { authenticateRequest, AuthError } from '@/lib/services/auth'
 import { requirePermission } from '@/lib/services/require-role'
 import { addSupervision, removeSupervision, getSupervisees } from '@/lib/services/supervision'
 import { withTiming } from '@/lib/middleware/request-timing'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 /**
  * GET /api/admin/supervision
@@ -15,6 +16,7 @@ import { withTiming } from '@/lib/middleware/request-timing'
 async function handleGet(request: Request) {
   try {
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
 
     const { searchParams } = new URL(request.url)
     const targetUserId = searchParams.get('userId')
@@ -25,7 +27,7 @@ async function handleGet(request: Request) {
     }
 
     const userId = targetUserId || auth.userId
-    const supervision = await getSupervisees(auth.supabase, userId)
+    const supervision = await getSupervisees(admin, userId)
 
     return NextResponse.json({ success: true, supervision })
   } catch (error) {
@@ -48,6 +50,7 @@ async function handleGet(request: Request) {
 async function handlePost(request: Request) {
   try {
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'settings', 'edit')
 
     const body = await request.json()
@@ -61,7 +64,7 @@ async function handlePost(request: Request) {
     }
 
     const supervision = await addSupervision(
-      auth.supabase,
+      admin,
       supervisorId,
       superviseeId,
       auth.userId,
@@ -86,6 +89,7 @@ async function handlePost(request: Request) {
 async function handleDelete(request: Request) {
   try {
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'settings', 'edit')
 
     const { searchParams } = new URL(request.url)
@@ -95,7 +99,7 @@ async function handleDelete(request: Request) {
       return NextResponse.json({ error: 'id parameter is required' }, { status: 400 })
     }
 
-    await removeSupervision(auth.supabase, supervisionId, auth.userId)
+    await removeSupervision(admin, supervisionId, auth.userId)
 
     return NextResponse.json({ success: true })
   } catch (error) {

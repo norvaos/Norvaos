@@ -25,7 +25,8 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
     requirePermission(auth, 'document_templates', 'view')
     const { id } = await params
 
-    const result = await getTemplateWithVersion(auth.supabase, {
+    const adminRead = createAdminClient()
+    const result = await getTemplateWithVersion(adminRead, {
       tenantId: auth.tenantId,
       templateId: id,
     })

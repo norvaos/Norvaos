@@ -20,19 +20,26 @@ export const retainerFeeTemplateKeys = {
 // ─── Fee Template Types (JSONB shapes) ──────────────────────────────────────
 
 export interface ProfessionalFeeItem {
+  name?: string
   description: string
-  quantity: number
-  unitPrice: number // dollars
+  // DB stores amount_cents (seeded migration). Frontend may also use quantity+unitPrice.
+  amount_cents?: number
+  quantity?: number
+  unitPrice?: number // cents
 }
 
 export interface GovernmentFeeItem {
+  name?: string
   description: string
-  amount: number // dollars
+  amount?: number   // cents (legacy)
+  amount_cents?: number // cents (seeded migration)
 }
 
 export interface DisbursementItem {
+  name?: string
   description: string
-  amount: number // dollars
+  amount?: number   // cents (legacy)
+  amount_cents?: number // cents (seeded migration)
 }
 
 // ─── Hooks ──────────────────────────────────────────────────────────────────

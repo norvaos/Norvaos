@@ -3,6 +3,7 @@ import { authenticateRequest, AuthError } from '@/lib/services/auth'
 import { checkBillingPermission } from '@/lib/services/billing-permission'
 import { withTiming } from '@/lib/middleware/request-timing'
 import { createPaymentPlan } from '@/lib/services/billing/payment-plan.service'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 // ── POST /api/billing/payment-plans ──────────────────────────────────────────
 
@@ -17,10 +18,11 @@ async function handlePost(request: Request) {
     return NextResponse.json({ error: 'Authentication failed' }, { status: 401 })
   }
 
-  const { supabase, tenantId, userId } = auth
+  const { tenantId, userId } = auth
+  const admin = createAdminClient()
 
   const { allowed } = await checkBillingPermission(
-    supabase,
+    admin,
     userId,
     tenantId,
     'POST /api/billing/payment-plans',
@@ -73,7 +75,7 @@ async function handlePost(request: Request) {
   }
 
   const result = await createPaymentPlan({
-    supabase,
+    supabase: admin,
     tenantId,
     userId,
     invoiceId: invoice_id,

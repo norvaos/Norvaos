@@ -11,6 +11,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 export async function GET(request: NextRequest) {
   try {
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'trust_accounting', 'view')
 
     const { searchParams } = new URL(request.url)
@@ -23,7 +24,7 @@ export async function GET(request: NextRequest) {
     const from = (page - 1) * pageSize
     const to = from + pageSize - 1
 
-    let query = (auth.supabase as any)
+    let query = (admin as any)
       .from('cheques')
       .select('*, matters(id, title)', { count: 'exact' })
       .eq('tenant_id', auth.tenantId)
@@ -57,6 +58,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'trust_accounting', 'create')
 
     const body = await request.json()
@@ -145,3 +147,5 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 })
   }
 }
+
+const admin = createAdminClient()

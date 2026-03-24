@@ -3,6 +3,7 @@ import { authenticateRequest, AuthError } from '@/lib/services/auth'
 import { requirePermission } from '@/lib/services/require-role'
 import { grantBreakGlass, revokeBreakGlass, getActiveBreakGlassGrants } from '@/lib/services/break-glass'
 import { withTiming } from '@/lib/middleware/request-timing'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 /**
  * GET /api/admin/break-glass
@@ -14,9 +15,10 @@ import { withTiming } from '@/lib/middleware/request-timing'
 async function handleGet() {
   try {
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'settings', 'view')
 
-    const grants = await getActiveBreakGlassGrants(auth.supabase, auth.tenantId)
+    const grants = await getActiveBreakGlassGrants(admin, auth.tenantId)
 
     return NextResponse.json({ success: true, grants })
   } catch (error) {
@@ -39,6 +41,7 @@ async function handleGet() {
 async function handlePost(request: Request) {
   try {
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'settings', 'edit')
 
     const body = await request.json()
@@ -52,7 +55,7 @@ async function handlePost(request: Request) {
     }
 
     const grant = await grantBreakGlass(
-      auth.supabase,
+      admin,
       grantedTo,
       auth.userId,
       matterId ?? null,
@@ -79,6 +82,7 @@ async function handlePost(request: Request) {
 async function handleDelete(request: Request) {
   try {
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'settings', 'edit')
 
     const { searchParams } = new URL(request.url)
@@ -88,7 +92,7 @@ async function handleDelete(request: Request) {
       return NextResponse.json({ error: 'id parameter is required' }, { status: 400 })
     }
 
-    await revokeBreakGlass(auth.supabase, grantId, auth.userId)
+    await revokeBreakGlass(admin, grantId, auth.userId)
 
     return NextResponse.json({ success: true })
   } catch (error) {

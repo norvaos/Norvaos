@@ -3,6 +3,7 @@ import { authenticateRequest, AuthError } from '@/lib/services/auth'
 import { requirePermission } from '@/lib/services/require-role'
 import { computeNextAction } from '@/lib/services/next-action-engine'
 import { withTiming } from '@/lib/middleware/request-timing'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 /**
  * POST /api/matters/[id]/next-action
@@ -23,10 +24,11 @@ async function handlePost(
 
     // 1. Authenticate and authorise
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'matters', 'view')
 
     // 2. Verify the matter belongs to the authenticated user's tenant
-    const { data: matter, error: matterErr } = await auth.supabase
+    const { data: matter, error: matterErr } = await admin
       .from('matters')
       .select('id, tenant_id')
       .eq('id', matterId)
@@ -41,7 +43,7 @@ async function handlePost(
     }
 
     // 3. Compute and persist next action
-    const nextAction = await computeNextAction(matterId, auth.tenantId, auth.supabase)
+    const nextAction = await computeNextAction(matterId, auth.tenantId, admin)
 
     return NextResponse.json({ success: true, nextAction }, { status: 200 })
   } catch (error) {

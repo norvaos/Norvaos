@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { authenticateRequest, AuthError } from '@/lib/services/auth'
 import { requirePermission } from '@/lib/services/require-role'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { withTiming } from '@/lib/middleware/request-timing'
 import { z } from 'zod'
 
@@ -17,6 +18,7 @@ async function handlePost(request: Request) {
     const auth = await authenticateRequest()
     requirePermission(auth, 'communications', 'create')
     const { userId, tenantId, supabase } = auth
+    const admin = createAdminClient()
 
     const body = await request.json()
     const parsed = directMessageSchema.safeParse(body)
@@ -89,8 +91,8 @@ async function handlePost(request: Request) {
       }
     }
 
-    // No existing DM found — create one
-    const { data: channel, error: chError } = await supabase
+    // No existing DM found — create one (write — admin client)
+    const { data: channel, error: chError } = await admin
       .from('chat_channels')
       .insert({
         tenant_id: tenantId,
@@ -104,8 +106,8 @@ async function handlePost(request: Request) {
       return NextResponse.json({ error: 'Failed to create channel' }, { status: 500 })
     }
 
-    // Add both users as members
-    const { error: memError } = await supabase
+    // Add both users as members (write — admin client)
+    const { error: memError } = await admin
       .from('chat_channel_members')
       .insert([
         { channel_id: channel.id, user_id: userId },
@@ -113,7 +115,7 @@ async function handlePost(request: Request) {
       ])
 
     if (memError) {
-      await supabase.from('chat_channels').delete().eq('id', channel.id)
+      await admin.from('chat_channels').delete().eq('id', channel.id).eq('tenant_id', tenantId)
       return NextResponse.json({ error: 'Failed to add members' }, { status: 500 })
     }
 

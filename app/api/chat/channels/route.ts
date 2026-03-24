@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { authenticateRequest, AuthError } from '@/lib/services/auth'
 import { requirePermission } from '@/lib/services/require-role'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { withTiming } from '@/lib/middleware/request-timing'
 import { z } from 'zod'
 
@@ -22,10 +23,11 @@ async function handleGet() {
   try {
     const auth = await authenticateRequest()
     requirePermission(auth, 'communications', 'view')
-    const { userId, tenantId, supabase } = auth
+    const { userId, tenantId } = auth
+    const admin = createAdminClient()
 
     // Get all channels the user is a member of
-    const { data: memberships, error: memError } = await supabase
+    const { data: memberships, error: memError } = await admin
       .from('chat_channel_members')
       .select('channel_id, last_read_at')
       .eq('user_id', userId)
@@ -44,7 +46,7 @@ async function handleGet() {
     )
 
     // Fetch channel details
-    const { data: channels, error: chError } = await supabase
+    const { data: channels, error: chError } = await admin
       .from('chat_channels')
       .select('id, tenant_id, name, channel_type, matter_id, created_at')
       .in('id', channelIds)
@@ -61,14 +63,14 @@ async function handleGet() {
 
         // Build unread count query based on lastRead presence
         const unreadQuery = lastRead
-          ? supabase
+          ? admin
               .from('chat_messages')
               .select('*', { count: 'exact', head: true })
               .eq('channel_id', channel.id)
               .eq('is_deleted', false)
               .neq('sender_id', userId)
               .gt('created_at', lastRead)
-          : supabase
+          : admin
               .from('chat_messages')
               .select('*', { count: 'exact', head: true })
               .eq('channel_id', channel.id)
@@ -77,7 +79,7 @@ async function handleGet() {
 
         // Fire all 3 queries in parallel (was sequential)
         const [lastMsgResult, unreadResult, membersResult] = await Promise.all([
-          supabase
+          admin
             .from('chat_messages')
             .select('id, content, sender_id, created_at')
             .eq('channel_id', channel.id)
@@ -85,7 +87,7 @@ async function handleGet() {
             .order('created_at', { ascending: false })
             .limit(1),
           unreadQuery,
-          supabase
+          admin
             .from('chat_channel_members')
             .select('user_id')
             .eq('channel_id', channel.id),
@@ -100,7 +102,7 @@ async function handleGet() {
         if (channel.channel_type === 'direct' && members) {
           const otherMemberId = members.find((m) => m.user_id !== userId)?.user_id
           if (otherMemberId) {
-            const { data: otherUser } = await supabase
+            const { data: otherUser } = await admin
               .from('users')
               .select('first_name, last_name')
               .eq('id', otherMemberId)
@@ -148,7 +150,8 @@ async function handlePost(request: Request) {
   try {
     const auth = await authenticateRequest()
     requirePermission(auth, 'communications', 'create')
-    const { userId, tenantId, supabase } = auth
+    const { userId, tenantId } = auth
+    const admin = createAdminClient()
 
     const body = await request.json()
     const parsed = createChannelSchema.safeParse(body)
@@ -163,7 +166,7 @@ async function handlePost(request: Request) {
     const { name, channel_type, member_ids, matter_id } = parsed.data
 
     // Create channel
-    const { data: channel, error: chError } = await supabase
+    const { data: channel, error: chError } = await admin
       .from('chat_channels')
       .insert({
         tenant_id: tenantId,
@@ -185,13 +188,13 @@ async function handlePost(request: Request) {
       user_id: uid,
     }))
 
-    const { error: memError } = await supabase
+    const { error: memError } = await admin
       .from('chat_channel_members')
       .insert(memberInserts)
 
     if (memError) {
       // Cleanup channel on member insert failure
-      await supabase.from('chat_channels').delete().eq('id', channel.id)
+      await admin.from('chat_channels').delete().eq('id', channel.id)
       return NextResponse.json({ error: 'Failed to add members' }, { status: 500 })
     }
 

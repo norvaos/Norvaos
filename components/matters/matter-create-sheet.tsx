@@ -8,8 +8,7 @@ import { useUIStore } from '@/lib/stores/ui-store'
 import { useCreateMatter } from '@/lib/queries/matters'
 import { createClient } from '@/lib/supabase/client'
 import type { MatterFormValues } from '@/lib/schemas/matter'
-import { ScrollArea } from '@/components/ui/scroll-area'
-
+import { CANADIAN_TAX_RATES } from '@/lib/config/tax-rates'
 import {
   Sheet,
   SheetContent,
@@ -37,6 +36,13 @@ export function MatterCreateSheet({ open, onOpenChange, defaultContactId }: Matt
 
     const { contact_id, additional_contacts, ...matterValues } = values
 
+    // Resolve tax rate and label from province config
+    const provinceCode = matterValues.client_province
+    const provinceTax = provinceCode ? CANADIAN_TAX_RATES[provinceCode] : undefined
+    const isOutsideCanada = matterValues.applicant_location === 'outside_canada'
+    const taxRate = isOutsideCanada ? 0 : (provinceTax?.rate ?? 0)
+    const taxLabel = isOutsideCanada ? 'N/A' : (provinceTax?.label ?? 'HST')
+
     const result = await createMatter.mutateAsync({
       tenant_id: tenant.id,
       title: matterValues.title,
@@ -56,6 +62,10 @@ export function MatterCreateSheet({ open, onOpenChange, defaultContactId }: Matt
       hourly_rate: matterValues.hourly_rate ?? null,
       estimated_value: matterValues.estimated_value ?? null,
       fee_template_id: matterValues.fee_template_id || null,
+      applicant_location: matterValues.applicant_location || 'inside_canada',
+      client_province: provinceCode || null,
+      tax_rate: taxRate,
+      tax_label: taxLabel,
       priority: matterValues.priority,
       status: matterValues.status,
       visibility: matterValues.visibility || 'all',
@@ -115,7 +125,7 @@ export function MatterCreateSheet({ open, onOpenChange, defaultContactId }: Matt
             Create a new matter. Fields marked with * are required.
           </SheetDescription>
         </SheetHeader>
-        <ScrollArea className="flex-1 overflow-y-auto px-4 pb-4">
+        <div className="flex-1 overflow-y-auto px-4 pb-4">
           <MatterForm
             mode="create"
             defaultValues={{
@@ -125,7 +135,7 @@ export function MatterCreateSheet({ open, onOpenChange, defaultContactId }: Matt
             onSubmit={handleSubmit}
             isLoading={createMatter.isPending}
           />
-        </ScrollArea>
+        </div>
       </SheetContent>
     </Sheet>
   )

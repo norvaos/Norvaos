@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { authenticateRequest, AuthError } from '@/lib/services/auth'
 import { withTiming } from '@/lib/middleware/request-timing'
 import type { FormGenerationLogInsert } from '@/lib/types/database'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 /**
  * POST /api/matters/[id]/generate-form
@@ -37,6 +38,7 @@ async function handlePost(
 
     // 1. Authenticate + role check
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     const role = auth.role?.name
     if (!role || !['Lawyer', 'Admin', 'Paralegal'].includes(role)) {
       return NextResponse.json(
@@ -46,7 +48,7 @@ async function handlePost(
     }
 
     // 2. Verify matter belongs to tenant
-    const { data: matter, error: matterErr } = await auth.supabase
+    const { data: matter, error: matterErr } = await admin
       .from('matters')
       .select('id, tenant_id, matter_type_id')
       .eq('id', matterId)
@@ -93,7 +95,7 @@ async function handlePost(
 
     // 4. Idempotency check
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: existing } = await (auth.supabase as any)
+    const { data: existing } = await (admin as any)
       .from('form_generation_log')
       .select('id, status, output_path')
       .eq('matter_id', matterId)
@@ -131,7 +133,7 @@ async function handlePost(
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: logRow, error: logErr } = await (auth.supabase as any)
+    const { data: logRow, error: logErr } = await (admin as any)
       .from('form_generation_log')
       .insert(logInsert)
       .select('id')
@@ -182,7 +184,7 @@ async function handlePost(
           // Only update if still 'pending' — the sidecar may have already
           // called back with 'completed' before this fire-and-forget resumes.
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          await (auth.supabase as any)
+          await (admin as any)
             .from('form_generation_log')
             .update({
               status:                'processing',
@@ -220,3 +222,5 @@ async function handlePost(
 }
 
 export const POST = withTiming(handlePost, 'POST /api/matters/[id]/generate-form')
+
+const admin = createAdminClient()

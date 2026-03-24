@@ -108,7 +108,7 @@ async function handlePost(request: Request) {
 
     // Audit log
     logAuditServer({
-      supabase: auth.supabase,
+      supabase: admin,
       tenantId: auth.tenantId,
       userId: auth.userId,
       entityType: 'import_batch',

@@ -4,6 +4,7 @@ import { requirePermission } from '@/lib/services/require-role'
 import { evaluateConversionGates } from '@/lib/services/lead-conversion-gate'
 import { getWorkspaceWorkflowConfig } from '@/lib/services/workspace-config-service'
 import { withTiming } from '@/lib/middleware/request-timing'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 /**
  * GET /api/leads/[id]/conversion-gates
@@ -19,10 +20,11 @@ async function handleGet(
   try {
     const { id: leadId } = await params
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'leads', 'view')
 
     // Verify lead belongs to tenant
-    const { data: lead, error: leadErr } = await auth.supabase
+    const { data: lead, error: leadErr } = await admin
       .from('leads')
       .select('id, tenant_id')
       .eq('id', leadId)
@@ -36,9 +38,9 @@ async function handleGet(
       )
     }
 
-    const config = await getWorkspaceWorkflowConfig(auth.supabase, auth.tenantId)
+    const config = await getWorkspaceWorkflowConfig(admin, auth.tenantId)
     const result = await evaluateConversionGates(
-      auth.supabase,
+      admin,
       leadId,
       auth.tenantId,
       config

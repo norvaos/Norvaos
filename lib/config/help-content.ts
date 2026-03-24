@@ -5,6 +5,8 @@
  */
 export const HELP_CONTENT = {
   // ─── Matter Fields ───
+  'matter.estimated_value': 'The total estimated cost for this matter including legal fees, government fees, and disbursements. When a fee template is applied, this is auto-calculated. To edit the default amounts, go to Settings → Fee Templates and modify the template for this matter type.',
+  'matter.fee_template': 'Fee templates define the standard pricing for each case type. The default template is auto-selected when you choose a matter type. To create or edit templates, go to Settings → Fee Templates.',
   'matter.billing_type': 'Controls how this matter is billed. Flat fee charges a single amount; hourly tracks time entries against a rate.',
   'matter.practice_area': 'The practice area determines which matter types, stage pipelines, and deadline catalogues are available.',
   'matter.matter_type': 'The matter type defines the workflow stages, deadline types, and custom fields for this file.',
@@ -14,6 +16,8 @@ export const HELP_CONTENT = {
   'matter.responsible_lawyer': 'The lawyer with primary carriage of this matter. Receives all deadline alerts and billing notifications.',
   'matter.status': 'Current lifecycle state. Active matters can be worked on; closed matters are read-only.',
   'matter.readiness_score': 'This score represents the overall completion of mandatory IRCC data fields for this matter type.',
+  'matter.applicant_location': 'If the applicant is outside Canada, legal services are zero-rated (0% tax) under Section 23, Part V, Schedule VI of the Excise Tax Act. Government fees (IRCC) are always tax-exempt.',
+  'matter.client_province': 'Tax is calculated based on where your client is located, not your firm\'s location. This follows CRA place-of-supply rules for professional services.',
 
   // ─── Trust & Financial ───
   'trust.deposit': 'Funds held in trust on behalf of the client. Must match the bank wire or cheque amount exactly. Subject to Law Society By-Law 9 requirements.',

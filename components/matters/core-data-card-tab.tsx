@@ -25,6 +25,7 @@ import {
   Check,
   X,
   ExternalLink,
+  Pencil,
 } from 'lucide-react'
 import { useTenant } from '@/lib/hooks/use-tenant'
 import { useMatter } from '@/lib/queries/matters'
@@ -153,6 +154,8 @@ export function CoreDataCardTab({ matterId, tenantId, fieldConfig }: CoreDataCar
   const [overrideOpen, setOverrideOpen] = useState(false)
   const [personEditId, setPersonEditId] = useState<string | null>(null)
   const [personAddOpen, setPersonAddOpen] = useState(false)
+  // Controls whether the "Processing Stream" (program_category) dropdown is unlocked for manual override
+  const [streamEditUnlocked, setStreamEditUnlocked] = useState(false)
 
   const isLocked = intake?.intake_status === 'locked'
   const isLoading = intakeLoading || peopleLoading
@@ -241,17 +244,17 @@ export function CoreDataCardTab({ matterId, tenantId, fieldConfig }: CoreDataCar
         <CardContent>
           <form onSubmit={intakeForm.handleSubmit(onSaveIntake)} className="space-y-4">
             <div className="grid gap-4 sm:grid-cols-2">
-              {/* Processing Stream */}
+              {/* Processing Mode (Inland / Outland / Hybrid) */}
               {isFieldVisible('processing_stream') && (
                 <div className="space-y-2">
-                  <Label>Processing Stream</Label>
+                  <Label>Processing Mode</Label>
                   <Select
                     disabled={isLocked}
                     value={intakeForm.watch('processing_stream') ?? ''}
                     onValueChange={(v) => intakeForm.setValue('processing_stream', v as any)}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Select stream..." />
+                      <SelectValue placeholder="Select mode..." />
                     </SelectTrigger>
                     <SelectContent>
                       {PROCESSING_STREAMS.map((s) => (
@@ -264,31 +267,103 @@ export function CoreDataCardTab({ matterId, tenantId, fieldConfig }: CoreDataCar
                 </div>
               )}
 
-              {/* Program Category — editable, pre-filled from matter type */}
+              {/* Processing Stream (Programme Category) — locked by default, inherits from matter type */}
               {isFieldVisible('program_category') && (
                 <div className="space-y-2">
                   <Label className="flex items-center gap-1">
-                    Programme Category
+                    Processing Stream
                   </Label>
-                  <Select
-                    disabled={isLocked}
-                    value={intakeForm.watch('program_category') ?? ''}
-                    onValueChange={(v) => intakeForm.setValue('program_category', v)}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select immigration stream…" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {PROGRAM_CATEGORIES.map((c) => (
-                        <SelectItem key={c.value} value={c.value}>
-                          {c.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {matterTypeProgramCategoryKey && (
-                    <p className="text-xs text-muted-foreground">Auto-set from matter type — change if needed.</p>
-                  )}
+                  {(() => {
+                    const currentValue = intakeForm.watch('program_category') ?? ''
+                    const currentLabel = PROGRAM_CATEGORIES.find((c) => c.value === currentValue)?.label
+                    const isInherited = !!matterTypeProgramCategoryKey && currentValue === matterTypeProgramCategoryKey
+                    const showLocked = !streamEditUnlocked && !!currentValue && !isLocked
+
+                    if (isLocked) {
+                      // Full lockdown — show read-only badge
+                      return (
+                        <div className="flex items-center gap-2 rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-sm">
+                          <Badge variant="secondary" className="text-xs font-medium">
+                            {currentLabel ?? 'Not set'}
+                          </Badge>
+                          {isInherited && (
+                            <span className="text-[10px] text-muted-foreground">(from matter type)</span>
+                          )}
+                        </div>
+                      )
+                    }
+
+                    if (showLocked) {
+                      // Default locked state — badge + Change link
+                      return (
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2 rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-sm">
+                            <Badge variant="secondary" className="text-xs font-medium">
+                              {currentLabel ?? 'Not set'}
+                            </Badge>
+                            {isInherited && (
+                              <span className="text-[10px] text-muted-foreground">(from matter type)</span>
+                            )}
+                            <button
+                              type="button"
+                              className="ml-auto flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 hover:underline"
+                              onClick={() => setStreamEditUnlocked(true)}
+                            >
+                              <Pencil className="size-3" />
+                              Change
+                            </button>
+                          </div>
+                        </div>
+                      )
+                    }
+
+                    // Unlocked state — full dropdown (new matter with no value, or user clicked Change)
+                    return (
+                      <div className="space-y-1">
+                        {streamEditUnlocked && (
+                          <div className="flex items-center gap-1.5 rounded-md border border-amber-200 bg-amber-50 px-2.5 py-1.5 text-[11px] text-amber-700">
+                            <AlertTriangle className="size-3 shrink-0" />
+                            Changing the processing stream will update document slots and questionnaire sections.
+                          </div>
+                        )}
+                        <div className="flex items-center gap-2">
+                          <Select
+                            value={currentValue}
+                            onValueChange={(v) => intakeForm.setValue('program_category', v)}
+                          >
+                            <SelectTrigger className="flex-1">
+                              <SelectValue placeholder="Select processing stream…" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {PROGRAM_CATEGORIES.map((c) => (
+                                <SelectItem key={c.value} value={c.value}>
+                                  {c.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          {streamEditUnlocked && (
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              className="h-8 px-2 text-xs text-muted-foreground"
+                              onClick={() => {
+                                // Revert to inherited value if available, then re-lock
+                                if (matterTypeProgramCategoryKey) {
+                                  intakeForm.setValue('program_category', matterTypeProgramCategoryKey)
+                                }
+                                setStreamEditUnlocked(false)
+                              }}
+                            >
+                              <X className="mr-1 size-3" />
+                              Cancel
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    )
+                  })()}
                 </div>
               )}
 

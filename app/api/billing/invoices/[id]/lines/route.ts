@@ -3,6 +3,7 @@ import { authenticateRequest, AuthError } from '@/lib/services/auth'
 import { checkBillingPermission } from '@/lib/services/billing-permission'
 import { withTiming } from '@/lib/middleware/request-timing'
 import { recalculateInvoice } from '@/lib/services/billing/invoice-calculation.service'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { z } from 'zod'
 
 // ── POST /api/billing/invoices/[id]/lines ─────────────────────────────────────
@@ -39,10 +40,11 @@ async function handlePost(
     return NextResponse.json({ error: 'Authentication failed' }, { status: 401 })
   }
 
-  const { supabase, tenantId, userId } = auth
+  const { tenantId, userId } = auth
+  const admin = createAdminClient()
 
   const { allowed } = await checkBillingPermission(
-    supabase,
+    admin,
     userId,
     tenantId,
     'POST /api/billing/invoices/[id]/lines',
@@ -67,7 +69,7 @@ async function handlePost(
   const amount = Math.round(li.quantity * li.unit_price)
 
   /* eslint-disable @typescript-eslint/no-explicit-any */
-  const { data: newLine, error: insertErr } = await (supabase as any)
+  const { data: newLine, error: insertErr } = await (admin as any)
     .from('invoice_line_items')
     .insert({
       tenant_id: tenantId,
@@ -95,7 +97,7 @@ async function handlePost(
   }
 
   // Recalculate invoice totals via the authorised DB function
-  await recalculateInvoice(supabase, invoiceId)
+  await recalculateInvoice(admin, invoiceId)
 
   return NextResponse.json({ success: true, lineItemId: newLine.id }, { status: 201 })
 }

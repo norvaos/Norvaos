@@ -8,6 +8,7 @@ import { withTiming } from '@/lib/middleware/request-timing'
 async function handleDelete(request: NextRequest) {
   try {
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'documents', 'delete')
 
     const body = await request.json()
@@ -21,7 +22,7 @@ async function handleDelete(request: NextRequest) {
     }
 
     // Verify document belongs to tenant
-    const { data: doc, error: docError } = await auth.supabase
+    const { data: doc, error: docError } = await admin
       .from('documents')
       .select('id, file_name, matter_id')
       .eq('id', id)
@@ -52,7 +53,7 @@ async function handleDelete(request: NextRequest) {
     }
 
     // Delete document record (RLS-scoped)
-    const { error: deleteError } = await auth.supabase
+    const { error: deleteError } = await admin
       .from('documents')
       .delete()
       .eq('id', id)
@@ -66,7 +67,7 @@ async function handleDelete(request: NextRequest) {
 
     // Audit log
     await logAuditServer({
-      supabase: auth.supabase,
+      supabase: admin,
       tenantId: auth.tenantId,
       userId: auth.userId,
       entityType: 'document',

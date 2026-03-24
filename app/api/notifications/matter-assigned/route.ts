@@ -3,6 +3,7 @@ import { authenticateRequest } from '@/lib/services/auth'
 import { requirePermission } from '@/lib/services/require-role'
 import { sendInternalEmail } from '@/lib/services/email-service'
 import { log } from '@/lib/utils/logger'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 /**
  * POST /api/notifications/matter-assigned
@@ -15,6 +16,7 @@ import { log } from '@/lib/utils/logger'
 export async function POST(request: NextRequest) {
   try {
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'matters', 'view')
 
     const body = await request.json()
@@ -25,7 +27,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Fetch matter details + responsible lawyer + followup lawyer
-    const { data: matter, error: matterError } = await auth.supabase
+    const { data: matter, error: matterError } = await admin
       .from('matters')
       .select(`
         id,
@@ -81,7 +83,7 @@ export async function POST(request: NextRequest) {
     await Promise.allSettled(
       recipients.map((r) =>
         sendInternalEmail({
-          supabase: auth.supabase,
+          supabase: admin,
           tenantId: auth.tenantId,
           recipientEmail: r.email,
           recipientName: r.name,

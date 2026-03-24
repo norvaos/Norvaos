@@ -5,15 +5,7 @@ import { useBillingStats } from '@/lib/queries/invoicing'
 import { useTenant } from '@/lib/hooks/use-tenant'
 import { Skeleton } from '@/components/ui/skeleton'
 import { RequirePermission } from '@/components/require-permission'
-
-function formatCents(cents: number): string {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(cents / 100)
-}
+import { formatCents } from '@/lib/utils'
 
 interface StatCardProps {
   title: string

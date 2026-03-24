@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { authenticateRequest, AuthError } from '@/lib/services/auth'
 import { requirePermission } from '@/lib/services/require-role'
 import { cancelRequest } from '@/lib/services/esign-service'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 // ── POST /api/esign/cancel ───────────────────────────────────────────────────
 
@@ -38,7 +39,8 @@ async function handlePost(request: Request) {
       )
     }
 
-    const result = await cancelRequest(supabase as never, {
+    const admin = createAdminClient()
+    const result = await cancelRequest(admin as never, {
       tenantId,
       signingRequestId,
       reason,

@@ -44,6 +44,7 @@ export interface SchedulerResult {
   consultationReminders: number
   noShowRecovery: number
   autoClosures: number
+  deferredReactivations: number
   errors: number
 }
 
@@ -71,6 +72,7 @@ export async function processScheduledLeadAutomations(
     consultationReminders: 0,
     noShowRecovery: 0,
     autoClosures: 0,
+    deferredReactivations: 0,
     errors: 0,
   }
 
@@ -108,6 +110,13 @@ export async function processScheduledLeadAutomations(
     stats.autoClosures += await processAutoClosureCheck(ctx)
   } catch (e) {
     console.error(`[lead-scheduler] Auto-closure check failed for tenant ${tenantId}:`, e)
+    stats.errors++
+  }
+
+  try {
+    stats.deferredReactivations += await processDeferredReactivations(ctx)
+  } catch (e) {
+    console.error(`[lead-scheduler] Deferred reactivation failed for tenant ${tenantId}:`, e)
     stats.errors++
   }
 
@@ -482,4 +491,106 @@ async function checkAndAutoClose(
   })
 
   return result.executed
+}
+
+// ─── Deferred Lead Reactivation ──────────────────────────────────────────────
+
+/**
+ * Finds leads in a "Deferred" stage whose next_follow_up date has passed,
+ * and moves them back to "New Inquiry" (sort_order = 1 in their pipeline).
+ * This is the "Time Machine" feature — client said "call me in 6 months",
+ * we set a date, and on that date the lead reappears in the active funnel.
+ */
+async function processDeferredReactivations(ctx: TenantContext): Promise<number> {
+  const { supabase, tenantId } = ctx
+  let reactivated = 0
+
+  // Find all deferred stages for this tenant's lead pipelines
+  const { data: deferredStages } = await supabase
+    .from('pipeline_stages')
+    .select('id, pipeline_id')
+    .eq('tenant_id', tenantId)
+    .ilike('name', '%deferred%')
+
+  if (!deferredStages || deferredStages.length === 0) return 0
+
+  const deferredStageIds = deferredStages.map((s) => s.id)
+
+  // Find leads in deferred stages with a next_follow_up that has passed
+  const { data: deferredLeads } = await supabase
+    .from('leads')
+    .select('id, pipeline_id, next_follow_up')
+    .eq('tenant_id', tenantId)
+    .in('stage_id', deferredStageIds)
+    .not('next_follow_up', 'is', null)
+    .lte('next_follow_up', ctx.now.toISOString())
+
+  if (!deferredLeads || deferredLeads.length === 0) return 0
+
+  for (const lead of deferredLeads) {
+    try {
+      // Find the "New Inquiry" stage (sort_order = 1) in this lead's pipeline
+      const { data: newInquiryStage } = await supabase
+        .from('pipeline_stages')
+        .select('id')
+        .eq('pipeline_id', lead.pipeline_id!)
+        .eq('tenant_id', tenantId)
+        .order('sort_order', { ascending: true })
+        .limit(1)
+        .single()
+
+      if (!newInquiryStage) continue
+
+      // Move lead back to New Inquiry
+      const { error } = await supabase
+        .from('leads')
+        .update({
+          stage_id: newInquiryStage.id,
+          stage_entered_at: ctx.now.toISOString(),
+          next_follow_up: null, // Clear the reactivation date
+          updated_at: ctx.now.toISOString(),
+        })
+        .eq('id', lead.id)
+
+      if (error) {
+        console.error(`[lead-scheduler] Failed to reactivate lead ${lead.id}:`, error)
+        continue
+      }
+
+      // Log activity
+      await supabase.from('activities').insert({
+        tenant_id: tenantId,
+        activity_type: 'lead_reactivated',
+        title: 'Lead reactivated from Deferred',
+        description: 'Reactivation date reached. Lead moved back to New Inquiry.',
+        entity_type: 'lead',
+        entity_id: lead.id,
+      } as any)
+
+      // Log stage history
+      const deferredStageId = deferredStages.find(
+        (s) => s.pipeline_id === lead.pipeline_id,
+      )?.id
+
+      if (deferredStageId) {
+        await supabase.from('lead_stage_history').insert({
+          tenant_id: tenantId,
+          lead_id: lead.id,
+          from_stage_id: deferredStageId,
+          to_stage_id: newInquiryStage.id,
+          notes: 'Automatic reactivation — deferred date reached.',
+        } as any)
+      }
+
+      reactivated++
+    } catch (e) {
+      console.error(`[lead-scheduler] Error reactivating lead ${lead.id}:`, e)
+    }
+  }
+
+  if (reactivated > 0) {
+    console.log(`[lead-scheduler] Reactivated ${reactivated} deferred lead(s) for tenant ${tenantId}`)
+  }
+
+  return reactivated
 }

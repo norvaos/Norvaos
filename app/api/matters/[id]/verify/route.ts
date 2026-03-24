@@ -69,8 +69,11 @@ async function handlePost(
       )
     }
 
+    // Use admin client to bypass RLS — auth already verified above
+    const admin = createAdminClient()
+
     // Verify matter belongs to tenant
-    const { data: matter, error: matterErr } = await auth.supabase
+    const { data: matter, error: matterErr } = await admin
       .from('matters')
       .select('id, tenant_id')
       .eq('id', matterId)
@@ -156,7 +159,7 @@ async function handlePost(
 
     const successCount = results.filter((r) => r.ok).length
     await logAuditServer({
-      supabase: auth.supabase,
+      supabase: admin,
       tenantId: auth.tenantId,
       userId: auth.userId,
       entityType: 'matter',
@@ -203,8 +206,9 @@ async function processFieldTarget(
   notes: string | undefined,
   now: string,
 ) {
+  const admin = createAdminClient()
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { error } = await (auth.supabase as any)
+  const { error } = await (admin as any)
     .from('field_verifications')
     .upsert(
       {
@@ -228,7 +232,7 @@ async function processFieldTarget(
     ? 'field_verified'
     : 'field_rejected'
 
-  await auth.supabase.from('activities').insert({
+  await admin.from('activities').insert({
     tenant_id: auth.tenantId,
     matter_id: matterId,
     activity_type: activityType,
@@ -258,8 +262,9 @@ async function processDocumentTarget(
   rejectionReason: string | undefined,
   now: string,
 ) {
+  const admin = createAdminClient()
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { error } = await (auth.supabase as any)
+  const { error } = await (admin as any)
     .from('document_slots')
     .update({
       verification_status: verificationStatus,
@@ -278,7 +283,7 @@ async function processDocumentTarget(
     ? 'document_verified'
     : 'document_rejected'
 
-  await auth.supabase.from('activities').insert({
+  await admin.from('activities').insert({
     tenant_id: auth.tenantId,
     matter_id: matterId,
     activity_type: activityType,

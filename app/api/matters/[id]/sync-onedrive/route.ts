@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { authenticateRequest, AuthError } from '@/lib/services/auth'
 import { requirePermission } from '@/lib/services/require-role'
 import { withTiming } from '@/lib/middleware/request-timing'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 /**
  * POST /api/matters/[id]/sync-onedrive
@@ -19,10 +20,11 @@ async function handlePost(
   try {
     const { id: matterId } = await params
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'matters', 'edit')
 
     // 1. Verify matter belongs to tenant
-    const { data: matter, error: matterErr } = await auth.supabase
+    const { data: matter, error: matterErr } = await admin
       .from('matters')
       .select('id, tenant_id, matter_number, title')
       .eq('id', matterId)
@@ -78,7 +80,7 @@ async function handlePost(
     })
 
     // 5. Log activity
-    await auth.supabase.from('activities').insert({
+    await admin.from('activities').insert({
       tenant_id: auth.tenantId,
       matter_id: matterId,
       activity_type: 'onedrive_synced',
@@ -111,3 +113,5 @@ async function handlePost(
 }
 
 export const POST = withTiming(handlePost, 'POST /api/matters/[id]/sync-onedrive')
+
+const admin = createAdminClient()

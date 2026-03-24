@@ -3,6 +3,7 @@ import { authenticateRequest, AuthError } from '@/lib/services/auth'
 import { checkBillingPermission } from '@/lib/services/billing-permission'
 import { withTiming } from '@/lib/middleware/request-timing'
 import { finalizeInvoice } from '@/lib/services/billing/invoice-state.service'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 // ── POST /api/billing/invoices/[id]/finalize ─────────────────────────────────
 
@@ -22,10 +23,11 @@ async function handlePost(
     return NextResponse.json({ error: 'Authentication failed' }, { status: 401 })
   }
 
-  const { supabase, tenantId, userId } = auth
+  const { tenantId, userId } = auth
+  const admin = createAdminClient()
 
   const { allowed } = await checkBillingPermission(
-    supabase,
+    admin,
     userId,
     tenantId,
     'POST /api/billing/invoices/[id]/finalize',
@@ -48,7 +50,7 @@ async function handlePost(
     // Empty or non-JSON body — treat as no override
   }
 
-  const result = await finalizeInvoice({ supabase, invoiceId, tenantId, userId, overrideTaxCheck })
+  const result = await finalizeInvoice({ supabase: admin, invoiceId, tenantId, userId, overrideTaxCheck })
 
   if (!result.success) {
     return NextResponse.json({ error: result.error }, { status: 422 })

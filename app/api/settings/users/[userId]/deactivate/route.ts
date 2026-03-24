@@ -23,6 +23,7 @@ async function handlePost(
   try {
     const { userId } = await params
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'settings', 'edit')
 
     // Cannot deactivate yourself
@@ -33,7 +34,6 @@ async function handlePost(
       )
     }
 
-    const admin = createAdminClient()
 
     // Verify target user belongs to this tenant and is currently active
     const { data: targetUser, error: findErr } = await admin
@@ -93,7 +93,7 @@ async function handlePost(
     }
 
     await logAuditServer({
-      supabase: auth.supabase,
+      supabase: admin,
       tenantId: auth.tenantId,
       userId: auth.userId,
       entityType: 'user',

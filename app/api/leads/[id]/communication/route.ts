@@ -4,6 +4,7 @@ import { requirePermission } from '@/lib/services/require-role'
 import { logCommunicationEvent, type LogCommunicationEventParams } from '@/lib/services/lead-communication-engine'
 import { resolveTemplate, isAutomationEnabled, buildBaseTemplateContext } from '@/lib/services/lead-template-engine'
 import { withTiming } from '@/lib/middleware/request-timing'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 /**
  * POST /api/leads/[id]/communication
@@ -44,6 +45,7 @@ async function handlePost(
   try {
     const { id: leadId } = await params
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'leads', 'edit')
 
     const body = await request.json()
@@ -104,7 +106,7 @@ async function handlePost(
     }
 
     // Verify lead belongs to tenant
-    const { data: lead, error: leadErr } = await auth.supabase
+    const { data: lead, error: leadErr } = await admin
       .from('leads')
       .select('id, tenant_id')
       .eq('id', leadId)
@@ -125,19 +127,19 @@ async function handlePost(
 
     if (automationTriggerKey) {
       const enabled = await isAutomationEnabled(
-        auth.supabase,
+        admin,
         auth.tenantId,
         automationTriggerKey
       )
 
       if (enabled) {
         const context = await buildBaseTemplateContext(
-          auth.supabase,
+          admin,
           auth.tenantId,
           leadId
         )
         const template = await resolveTemplate(
-          auth.supabase,
+          admin,
           auth.tenantId,
           automationTriggerKey,
           channel,
@@ -156,7 +158,7 @@ async function handlePost(
     }
 
     const result = await logCommunicationEvent({
-      supabase: auth.supabase,
+      supabase: admin,
       tenantId: auth.tenantId,
       leadId,
       contactId: contactId || undefined,

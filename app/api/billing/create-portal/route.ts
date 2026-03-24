@@ -3,6 +3,7 @@ import { authenticateRequest, AuthError } from '@/lib/services/auth'
 import { requirePermission } from '@/lib/services/require-role'
 import { stripe } from '@/lib/stripe/config'
 import { withTiming } from '@/lib/middleware/request-timing'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 /**
  * POST /api/billing/create-portal
@@ -12,9 +13,10 @@ import { withTiming } from '@/lib/middleware/request-timing'
 async function handlePost() {
   try {
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'billing', 'view')
 
-    const { data: tenant } = await auth.supabase
+    const { data: tenant } = await admin
       .from('tenants')
       .select('stripe_customer_id')
       .eq('id', auth.tenantId)

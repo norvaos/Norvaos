@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { authenticateRequest, AuthError } from '@/lib/services/auth'
 import { withTiming } from '@/lib/middleware/request-timing'
 import { computeJRDeadline, validateRefusalInput } from '@/lib/services/refusal-engine'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 /**
  * POST /api/matters/[id]/ircc-correspondence/[corrId]/handle-refusal
@@ -36,6 +37,7 @@ async function handlePost(
 
     // 1. Authenticate
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
 
     // Role check: Lawyer or Admin only
     const role = auth.role?.name
@@ -54,7 +56,7 @@ async function handlePost(
     }
 
     // 3. Verify correspondence belongs to this matter + tenant
-    const { data: correspondence, error: corrErr } = await auth.supabase
+    const { data: correspondence, error: corrErr } = await admin
       .from('ircc_correspondence')
       .select('id, item_type, item_date, status, matter_id, tenant_id')
       .eq('id', corrId)
@@ -99,7 +101,7 @@ async function handlePost(
     const jrDeadline = computeJRDeadline(itemDate, jr_basis!)
 
     // 7. Update ircc_correspondence: jr_deadline, jr_basis, status='actioned'
-    const { error: updateCorrErr } = await auth.supabase
+    const { error: updateCorrErr } = await admin
       .from('ircc_correspondence')
       .update({
         jr_deadline: jrDeadline,
@@ -122,7 +124,7 @@ async function handlePost(
     dueDateUtc.setUTCHours(dueDateUtc.getUTCHours() + 48)
     const dueDate = dueDateUtc.toISOString().substring(0, 10)
 
-    const { data: urgentTask, error: taskErr } = await auth.supabase
+    const { data: urgentTask, error: taskErr } = await admin
       .from('tasks')
       .insert({
         tenant_id: auth.tenantId,
@@ -151,7 +153,7 @@ async function handlePost(
     }
 
     // 9. Update ircc_correspondence.urgent_task_id + client_notified_at
-    await auth.supabase
+    await admin
       .from('ircc_correspondence')
       .update({
         urgent_task_id: urgentTask.id,
@@ -162,7 +164,7 @@ async function handlePost(
 
     // 10. Log client notification via email_logs
     // (communications_log table does not exist; email_logs is the correct table)
-    await auth.supabase
+    await admin
       .from('email_logs')
       .insert({
         tenant_id: auth.tenantId,
@@ -176,7 +178,7 @@ async function handlePost(
       })
 
     // 11. Update matter status to 'refused'
-    await auth.supabase
+    await admin
       .from('matters')
       .update({ status: 'refused' })
       .eq('id', matterId)
@@ -210,12 +212,12 @@ async function handlePost(
       },
     ]
 
-    await auth.supabase
+    await admin
       .from('refusal_actions')
       .insert(refusalActionsPayload)
 
     // 13. Log activity
-    await auth.supabase.from('activities').insert({
+    await admin.from('activities').insert({
       tenant_id: auth.tenantId,
       matter_id: matterId,
       activity_type: 'ircc_refusal_actioned',
@@ -257,3 +259,5 @@ async function handlePost(
 }
 
 export const POST = withTiming(handlePost, 'POST /api/matters/[id]/ircc-correspondence/[corrId]/handle-refusal')
+
+const admin = createAdminClient()

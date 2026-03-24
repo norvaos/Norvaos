@@ -12,6 +12,7 @@ import { generateInstance, listInstances } from '@/lib/services/document-engine'
 export async function GET(request: NextRequest) {
   try {
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'document_generation', 'view')
 
     const { searchParams } = new URL(request.url)
@@ -20,7 +21,7 @@ export async function GET(request: NextRequest) {
     const status = searchParams.get('status') ?? undefined
     const documentFamily = searchParams.get('documentFamily') ?? undefined
 
-    const result = await listInstances(auth.supabase, {
+    const result = await listInstances(admin, {
       tenantId: auth.tenantId,
       matterId,
       contactId,
@@ -44,6 +45,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'document_generation', 'create')
 
     const body = await request.json()

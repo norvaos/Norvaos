@@ -3,6 +3,7 @@ import { authenticateRequest, AuthError } from '@/lib/services/auth'
 import { checkBillingPermission } from '@/lib/services/billing-permission'
 import { withTiming } from '@/lib/middleware/request-timing'
 import { voidInvoice } from '@/lib/services/billing/invoice-state.service'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 // ── POST /api/billing/invoices/[id]/void ─────────────────────────────────────
 
@@ -22,10 +23,11 @@ async function handlePost(
     return NextResponse.json({ error: 'Authentication failed' }, { status: 401 })
   }
 
-  const { supabase, tenantId, userId } = auth
+  const { tenantId, userId } = auth
+  const admin = createAdminClient()
 
   const { allowed } = await checkBillingPermission(
-    supabase,
+    admin,
     userId,
     tenantId,
     'POST /api/billing/invoices/[id]/void',
@@ -49,7 +51,7 @@ async function handlePost(
   }
 
   const result = await voidInvoice({
-    supabase,
+    supabase: admin,
     invoiceId,
     tenantId,
     userId,

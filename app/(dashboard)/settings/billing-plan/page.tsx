@@ -9,6 +9,7 @@ import {
   useCreatePortalSession,
 } from '@/lib/queries/billing'
 import { PLAN_TIERS, type PlanTier } from '@/lib/config/version'
+import { formatCents } from '@/lib/utils'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -86,10 +87,6 @@ const PLAN_ICONS: Record<string, React.ReactNode> = {
 }
 
 // ─── Helpers ────────────────────────────────────────────────────
-
-function formatCents(cents: number): string {
-  return `$${(cents / 100).toFixed(cents % 100 === 0 ? 0 : 2)}`
-}
 
 function getStatusColor(status: string): string {
   switch (status) {

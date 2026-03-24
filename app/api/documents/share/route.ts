@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
-import { createServerSupabaseClient } from '@/lib/supabase/server'
+import { authenticateRequest, AuthError } from '@/lib/services/auth'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 /**
  * PATCH /api/documents/share
@@ -9,14 +10,9 @@ import { createServerSupabaseClient } from '@/lib/supabase/server'
  */
 export async function PATCH(request: Request) {
   try {
-    const supabase = await createServerSupabaseClient()
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
-
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+    const auth = await authenticateRequest()
+    const { userId, tenantId } = auth
+    const admin = createAdminClient()
 
     const body = await request.json()
     const { document_id, share, display_name, category, description } = body as {
@@ -42,7 +38,7 @@ export async function PATCH(request: Request) {
 
     if (share) {
       updateData.shared_at = new Date().toISOString()
-      updateData.shared_by = user.id
+      updateData.shared_by = userId
     } else {
       updateData.shared_at = null
       updateData.shared_by = null
@@ -59,11 +55,13 @@ export async function PATCH(request: Request) {
       updateData.description = description
     }
 
+    // Write via admin client to bypass RLS; scope by tenant_id for isolation
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data, error } = await (supabase as any)
+    const { data, error } = await (admin as any)
       .from('documents')
       .update(updateData)
       .eq('id', document_id)
+      .eq('tenant_id', tenantId)
       .select('id, file_name, category, description, is_shared_with_client, shared_at')
       .single()
 
@@ -71,6 +69,9 @@ export async function PATCH(request: Request) {
 
     return NextResponse.json({ document: data })
   } catch (err) {
+    if (err instanceof AuthError) {
+      return NextResponse.json({ error: err.message }, { status: err.status })
+    }
     console.error('[Documents Share] Error:', err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }

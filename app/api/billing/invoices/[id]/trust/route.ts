@@ -3,6 +3,7 @@ import { authenticateRequest, AuthError } from '@/lib/services/auth'
 import { checkBillingPermission } from '@/lib/services/billing-permission'
 import { withTiming } from '@/lib/middleware/request-timing'
 import { requestTrustApplication } from '@/lib/services/billing/trust-application.service'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { z } from 'zod'
 
 // ── POST /api/billing/invoices/[id]/trust ─────────────────────────────────────
@@ -29,10 +30,11 @@ async function handlePost(
     return NextResponse.json({ error: 'Authentication failed' }, { status: 401 })
   }
 
-  const { supabase, tenantId, userId } = auth
+  const { tenantId, userId } = auth
+  const admin = createAdminClient()
 
   const { allowed } = await checkBillingPermission(
-    supabase,
+    admin,
     userId,
     tenantId,
     'POST /api/billing/invoices/[id]/trust',
@@ -55,7 +57,7 @@ async function handlePost(
 
   // Fetch matter_id from the invoice (needed by trust service)
   /* eslint-disable @typescript-eslint/no-explicit-any */
-  const { data: invoice, error: fetchErr } = await (supabase as any)
+  const { data: invoice, error: fetchErr } = await (admin as any)
     .from('invoices')
     .select('matter_id')
     .eq('id', invoiceId)
@@ -68,7 +70,7 @@ async function handlePost(
   }
 
   const result = await requestTrustApplication({
-    supabase,
+    supabase: admin,
     tenantId,
     invoiceId,
     matterId: invoice.matter_id,

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { authenticateRequest, AuthError } from '@/lib/services/auth'
 import { withTiming } from '@/lib/middleware/request-timing'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 /**
  * POST /api/matters/[id]/form-generation-jobs/[jobId]/retry
@@ -28,6 +29,7 @@ async function handlePost(
 
     // 1. Auth + role check
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     const role = auth.role?.name
     if (!role || !['Lawyer', 'Admin', 'Paralegal'].includes(role)) {
       return NextResponse.json(
@@ -37,7 +39,7 @@ async function handlePost(
     }
 
     // 2. Verify matter belongs to tenant
-    const { data: matter, error: matterErr } = await auth.supabase
+    const { data: matter, error: matterErr } = await admin
       .from('matters')
       .select('id, tenant_id')
       .eq('id', matterId)
@@ -53,7 +55,7 @@ async function handlePost(
 
     // 3. Fetch the job — must belong to this matter
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: job, error: jobErr } = await (auth.supabase as any)
+    const { data: job, error: jobErr } = await (admin as any)
       .from('form_generation_log')
       .select('id, matter_id, form_template_id, generation_key, status, retry_count, metadata')
       .eq('id', jobId)
@@ -90,7 +92,7 @@ async function handlePost(
 
     // 5. Reset job to pending
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error: updateErr } = await (auth.supabase as any)
+    const { error: updateErr } = await (admin as any)
       .from('form_generation_log')
       .update({
         status:                'pending',
@@ -143,7 +145,7 @@ async function handlePost(
           }
 
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          await (auth.supabase as any)
+          await (admin as any)
             .from('form_generation_log')
             .update({
               status:                'processing',
@@ -180,3 +182,5 @@ async function handlePost(
 }
 
 export const POST = withTiming(handlePost, 'POST /api/matters/[id]/form-generation-jobs/[jobId]/retry')
+
+const admin = createAdminClient()

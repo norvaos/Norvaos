@@ -3,6 +3,7 @@ import { createHash } from 'crypto'
 import { authenticateRequest, AuthError } from '@/lib/services/auth'
 import { withTiming } from '@/lib/middleware/request-timing'
 import type { RuleType } from '@/lib/types/database'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 // ── Hash Helper ───────────────────────────────────────────────────────────────
 
@@ -49,6 +50,7 @@ interface DriftResponse {
 async function handleGet(_request: Request) {
   try {
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
 
     // Require admin-level permission: settings:edit is the admin gate in NorvaOS
     if (!auth.role?.is_system) {
@@ -66,7 +68,7 @@ async function handleGet(_request: Request) {
     // Fetch all snapshots for the tenant (rule_type = matter_type_config only for now —
     // the config hash is the canonical drift signal for all 6 rule types).
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: snapshots, error: snapshotErr } = await (auth.supabase as any)
+    const { data: snapshots, error: snapshotErr } = await (admin as any)
       .from('matter_rule_snapshots')
       .select('matter_id, rule_type, version_hash, snapshot_data')
       .eq('tenant_id', auth.tenantId)
@@ -86,7 +88,7 @@ async function handleGet(_request: Request) {
 
     // Fetch matter numbers for the drifted matters
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: matters } = await (auth.supabase as any)
+    const { data: matters } = await (admin as any)
       .from('matters')
       .select('id, matter_number, matter_type_id')
       .in('id', matterIds)
@@ -112,7 +114,7 @@ async function handleGet(_request: Request) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: matterTypes } = matterTypeIds.length > 0
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      ? await (auth.supabase as any)
+      ? await (admin as any)
           .from('matter_types')
           .select('*')
           .in('id', matterTypeIds)

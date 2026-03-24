@@ -6,6 +6,7 @@
 
 import { NextResponse } from 'next/server'
 import { authenticateRequest, AuthError } from '@/lib/services/auth'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { requirePermission } from '@/lib/services/require-role'
 import { withTiming } from '@/lib/middleware/request-timing'
 import type { Json } from '@/lib/types/database'
@@ -183,6 +184,7 @@ async function handlePost(request: Request) {
     }
 
     const { supabase, tenantId, userId } = auth
+    const admin = createAdminClient()
     const { leadId, consultationId, outcome } = body
 
     // ── Idempotency check ─────────────────────────────────────────
@@ -297,7 +299,7 @@ async function handlePost(request: Request) {
         const p = body as SendRetainerPayload
 
         // 1. Update consultation
-        await supabase
+        await admin
           .from('lead_consultations')
           .update({
             status: 'completed',
@@ -306,11 +308,12 @@ async function handlePost(request: Request) {
             updated_at: new Date().toISOString(),
           })
           .eq('id', consultationId)
+          .eq('tenant_id', tenantId)
 
         commandSummary.push('Consultation outcome recorded (send_retainer)')
 
         // 2. Create retainer package
-        const { data: retainerPkg } = await supabase
+        const { data: retainerPkg } = await admin
           .from('lead_retainer_packages')
           .insert({
             tenant_id: tenantId,
@@ -379,10 +382,11 @@ async function handlePost(request: Request) {
           sendRetainerUpdate.stage_entered_at = new Date().toISOString()
         }
 
-        await supabase
+        await admin
           .from('leads')
           .update(sendRetainerUpdate)
           .eq('id', leadId)
+          .eq('tenant_id', tenantId)
 
         if (!body.skipStageAdvance && retainedStage) {
           newStage = { id: retainedStage.id, name: retainedStage.name }
@@ -399,16 +403,17 @@ async function handlePost(request: Request) {
             .maybeSingle()
 
           if (!existingProfile) {
-            await supabase.from('lead_intake_profiles').insert({
+            await admin.from('lead_intake_profiles').insert({
               tenant_id: tenantId,
               lead_id: leadId,
               mandatory_fields_complete: true,
             })
           } else {
-            await supabase
+            await admin
               .from('lead_intake_profiles')
               .update({ mandatory_fields_complete: true })
               .eq('id', existingProfile.id)
+              .eq('tenant_id', tenantId)
           }
         } catch (intakeErr) {
           console.warn('[record-consultation-outcome] Intake profile creation failed (non-blocking):', intakeErr)
@@ -429,7 +434,7 @@ async function handlePost(request: Request) {
         }
 
         // 6. Create task: Prepare and send retainer
-        const { data: task } = await supabase
+        const { data: task } = await admin
           .from('tasks')
           .insert({
             tenant_id: tenantId,
@@ -465,7 +470,7 @@ async function handlePost(request: Request) {
         const p = body as FollowUpLaterPayload
 
         // 1. Update consultation
-        await supabase
+        await admin
           .from('lead_consultations')
           .update({
             status: 'completed',
@@ -474,6 +479,7 @@ async function handlePost(request: Request) {
             updated_at: new Date().toISOString(),
           })
           .eq('id', consultationId)
+          .eq('tenant_id', tenantId)
 
         commandSummary.push('Consultation outcome recorded (follow_up_later)')
 
@@ -484,7 +490,7 @@ async function handlePost(request: Request) {
           /consult.*complet|complet.*consult|appointment.*complet/i.test(s.name)
         )
         if (!body.skipStageAdvance && completedStage) {
-          await supabase
+          await admin
             .from('leads')
             .update({
               stage_id: completedStage.id,
@@ -494,9 +500,10 @@ async function handlePost(request: Request) {
               ...(p.leadTemperature ? { temperature: p.leadTemperature } : {}),
             })
             .eq('id', leadId)
+            .eq('tenant_id', tenantId)
           newStage = { id: completedStage.id, name: completedStage.name }
         } else {
-          await supabase
+          await admin
             .from('leads')
             .update({
               consultation_status: 'completed',
@@ -504,10 +511,11 @@ async function handlePost(request: Request) {
               ...(p.leadTemperature ? { temperature: p.leadTemperature } : {}),
             })
             .eq('id', leadId)
+            .eq('tenant_id', tenantId)
         }
 
         // 3. Create follow-up task
-        const { data: task } = await supabase
+        const { data: task } = await admin
           .from('tasks')
           .insert({
             tenant_id: tenantId,
@@ -542,7 +550,7 @@ async function handlePost(request: Request) {
         const p = body as ClientDeclinedPayload
 
         // 1. Update consultation
-        await supabase
+        await admin
           .from('lead_consultations')
           .update({
             status: 'completed',
@@ -551,13 +559,14 @@ async function handlePost(request: Request) {
             updated_at: new Date().toISOString(),
           })
           .eq('id', consultationId)
+          .eq('tenant_id', tenantId)
 
         commandSummary.push('Consultation outcome recorded (client_declined)')
 
         // 2. Create closure record — target "Closed – Client Declined" stage
         const lostStage = stages.find((s) => /client.?declin/i.test(s.name))
           ?? stages.find((s) => s.is_lost_stage)
-        const { data: closure } = await supabase
+        const { data: closure } = await admin
           .from('lead_closure_records')
           .insert({
             tenant_id: tenantId,
@@ -576,7 +585,7 @@ async function handlePost(request: Request) {
         )
 
         // 3. Move to lost stage + mark lead as lost
-        await supabase
+        await admin
           .from('leads')
           .update({
             status: 'lost',
@@ -588,6 +597,7 @@ async function handlePost(request: Request) {
               : {}),
           })
           .eq('id', leadId)
+          .eq('tenant_id', tenantId)
 
         if (!body.skipStageAdvance && lostStage) {
           newStage = { id: lostStage.id, name: lostStage.name }
@@ -606,7 +616,7 @@ async function handlePost(request: Request) {
       case 'not_a_fit': {
         const p = body as NotAFitPayload
 
-        await supabase
+        await admin
           .from('lead_consultations')
           .update({
             status: 'completed',
@@ -615,12 +625,13 @@ async function handlePost(request: Request) {
             updated_at: new Date().toISOString(),
           })
           .eq('id', consultationId)
+          .eq('tenant_id', tenantId)
 
         commandSummary.push('Consultation outcome recorded (not_a_fit)')
 
         const lostStage = stages.find((s) => /not.?a?.?fit/i.test(s.name))
           ?? stages.find((s) => s.is_lost_stage)
-        const { data: closure } = await supabase
+        const { data: closure } = await admin
           .from('lead_closure_records')
           .insert({
             tenant_id: tenantId,
@@ -638,7 +649,7 @@ async function handlePost(request: Request) {
           `Closure record created: ${p.notFitReason}${p.notFitDetails ? ` — ${p.notFitDetails}` : ''}`
         )
 
-        await supabase
+        await admin
           .from('leads')
           .update({
             status: 'lost',
@@ -650,6 +661,7 @@ async function handlePost(request: Request) {
               : {}),
           })
           .eq('id', leadId)
+          .eq('tenant_id', tenantId)
 
         if (!body.skipStageAdvance && lostStage) {
           newStage = { id: lostStage.id, name: lostStage.name }
@@ -666,7 +678,7 @@ async function handlePost(request: Request) {
       case 'referred_out': {
         const p = body as ReferredOutPayload
 
-        await supabase
+        await admin
           .from('lead_consultations')
           .update({
             status: 'completed',
@@ -675,12 +687,13 @@ async function handlePost(request: Request) {
             updated_at: new Date().toISOString(),
           })
           .eq('id', consultationId)
+          .eq('tenant_id', tenantId)
 
         commandSummary.push('Consultation outcome recorded (referred_out)')
 
         const lostStage = stages.find((s) => /not.?a?.?fit|referred/i.test(s.name))
           ?? stages.find((s) => s.is_lost_stage)
-        const { data: closure } = await supabase
+        const { data: closure } = await admin
           .from('lead_closure_records')
           .insert({
             tenant_id: tenantId,
@@ -698,7 +711,7 @@ async function handlePost(request: Request) {
           `Referred to: ${p.referredToName} (${p.referralReason})`
         )
 
-        await supabase
+        await admin
           .from('leads')
           .update({
             status: 'lost',
@@ -710,6 +723,7 @@ async function handlePost(request: Request) {
               : {}),
           })
           .eq('id', leadId)
+          .eq('tenant_id', tenantId)
 
         if (!body.skipStageAdvance && lostStage) {
           newStage = { id: lostStage.id, name: lostStage.name }
@@ -725,19 +739,20 @@ async function handlePost(request: Request) {
       // ═══════════════════════════════════════════════════════════
       case 'no_show': {
         // 1. Update consultation status (no outcome — meeting didn't happen)
-        await supabase
+        await admin
           .from('lead_consultations')
           .update({
             status: 'no_show',
             updated_at: new Date().toISOString(),
           })
           .eq('id', consultationId)
+          .eq('tenant_id', tenantId)
 
         commandSummary.push('Consultation marked as No Show')
 
         // 2. Move to "No-Show" stage + update lead
         const noShowStage = stages.find((s) => /no.?show/i.test(s.name))
-        await supabase
+        await admin
           .from('leads')
           .update({
             consultation_status: 'no_show',
@@ -746,6 +761,7 @@ async function handlePost(request: Request) {
               : {}),
           })
           .eq('id', leadId)
+          .eq('tenant_id', tenantId)
         if (!body.skipStageAdvance && noShowStage) {
           newStage = { id: noShowStage.id, name: noShowStage.name }
         }
@@ -754,7 +770,7 @@ async function handlePost(request: Request) {
         const followUpDate = new Date()
         followUpDate.setDate(followUpDate.getDate() + 1)
 
-        const { data: task } = await supabase
+        const { data: task } = await admin
           .from('tasks')
           .insert({
             tenant_id: tenantId,
@@ -788,18 +804,19 @@ async function handlePost(request: Request) {
 
         // 1. If consultation had a meeting, mark as completed
         if (consultation.status === 'booked' || consultation.status === 'completed') {
-          await supabase
+          await admin
             .from('lead_consultations')
             .update({
               status: 'completed',
               updated_at: new Date().toISOString(),
             })
             .eq('id', consultationId)
+            .eq('tenant_id', tenantId)
         }
 
         // 2. Create new consultation record
         const typeLabel = p.followUpType === 'in_person' ? 'In-Person' : p.followUpType === 'video' ? 'Video' : 'Phone'
-        await supabase
+        await admin
           .from('lead_consultations')
           .insert({
             tenant_id: tenantId,
@@ -815,15 +832,16 @@ async function handlePost(request: Request) {
         )
 
         // 3. Update lead
-        await supabase
+        await admin
           .from('leads')
           .update({
             next_follow_up: p.followUpDate,
           })
           .eq('id', leadId)
+          .eq('tenant_id', tenantId)
 
         // 4. Create appointment task
-        const { data: task } = await supabase
+        const { data: task } = await admin
           .from('tasks')
           .insert({
             tenant_id: tenantId,
@@ -851,7 +869,7 @@ async function handlePost(request: Request) {
     }
 
     // ── Record idempotency key ──────────────────────────────────────
-    await supabase.from('lead_workflow_executions').insert({
+    await admin.from('lead_workflow_executions').insert({
       tenant_id: tenantId,
       lead_id: leadId,
       execution_type: 'consultation_outcome',
@@ -865,7 +883,7 @@ async function handlePost(request: Request) {
       ? 'Consultation: No Show'
       : `Consultation outcome: ${OUTCOME_LABELS[outcome]}`
 
-    await supabase.from('activities').insert({
+    await admin.from('activities').insert({
       tenant_id: tenantId,
       activity_type: 'consultation_outcome',
       title: activityTitle,

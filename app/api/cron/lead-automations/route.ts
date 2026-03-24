@@ -34,6 +34,7 @@ async function handlePost(request: Request) {
     consultationReminders: 0,
     noShowRecovery: 0,
     autoClosures: 0,
+    deferredReactivations: 0,
     errors: 0,
   }
 
@@ -54,6 +55,7 @@ async function handlePost(request: Request) {
         aggregateStats.consultationReminders += result.consultationReminders
         aggregateStats.noShowRecovery += result.noShowRecovery
         aggregateStats.autoClosures += result.autoClosures
+        aggregateStats.deferredReactivations += result.deferredReactivations
         aggregateStats.errors += result.errors
       } catch (e) {
         console.error(`[cron/lead-automations] Error processing tenant ${tenant.id}:`, e)

@@ -3,6 +3,7 @@ import { authenticateRequest, AuthError } from '@/lib/services/auth'
 import { requirePermission } from '@/lib/services/require-role'
 import { createDelegation, revokeDelegation, getActiveDelegations } from '@/lib/services/delegation'
 import { withTiming } from '@/lib/middleware/request-timing'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 /**
  * GET /api/admin/delegations
@@ -14,8 +15,9 @@ import { withTiming } from '@/lib/middleware/request-timing'
 async function handleGet() {
   try {
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
 
-    const delegations = await getActiveDelegations(auth.supabase, auth.userId)
+    const delegations = await getActiveDelegations(admin, auth.userId)
 
     return NextResponse.json({ success: true, delegations })
   } catch (error) {
@@ -39,6 +41,7 @@ async function handleGet() {
 async function handlePost(request: Request) {
   try {
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
 
     const body = await request.json()
     const { delegateUserId, matterId, accessLevel, reason, expiresAt } = body
@@ -58,7 +61,7 @@ async function handlePost(request: Request) {
     }
 
     const delegation = await createDelegation(
-      auth.supabase,
+      admin,
       auth.userId,
       delegateUserId,
       matterId ?? null,
@@ -85,6 +88,7 @@ async function handlePost(request: Request) {
 async function handleDelete(request: Request) {
   try {
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
 
     const { searchParams } = new URL(request.url)
     const delegationId = searchParams.get('id')
@@ -93,7 +97,7 @@ async function handleDelete(request: Request) {
       return NextResponse.json({ error: 'id parameter is required' }, { status: 400 })
     }
 
-    await revokeDelegation(auth.supabase, delegationId, auth.userId)
+    await revokeDelegation(admin, delegationId, auth.userId)
 
     return NextResponse.json({ success: true })
   } catch (error) {

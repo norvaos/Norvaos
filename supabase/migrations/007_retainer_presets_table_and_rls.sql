@@ -7,7 +7,8 @@ CREATE TABLE IF NOT EXISTS retainer_presets (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
   category TEXT NOT NULL CHECK (category IN ('professional_services', 'government_fees', 'disbursements')),
-  description TEXT NOT NULL,
+  name TEXT NOT NULL,
+  description TEXT,
   amount INTEGER NOT NULL DEFAULT 0,
   currency TEXT NOT NULL DEFAULT 'CAD',
   sort_order INTEGER NOT NULL DEFAULT 0,
@@ -16,9 +17,9 @@ CREATE TABLE IF NOT EXISTS retainer_presets (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
--- Uniqueness guard: no duplicate active presets per tenant + category + description
+-- Uniqueness guard: no duplicate active presets per tenant + category + name
 CREATE UNIQUE INDEX IF NOT EXISTS idx_retainer_presets_unique_active
-  ON retainer_presets (tenant_id, category, lower(description))
+  ON retainer_presets (tenant_id, category, lower(name))
   WHERE is_active = TRUE;
 
 CREATE INDEX IF NOT EXISTS idx_retainer_presets_tenant ON retainer_presets(tenant_id);

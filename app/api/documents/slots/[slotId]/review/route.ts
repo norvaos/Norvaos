@@ -7,6 +7,7 @@ import { invalidateGating } from '@/lib/services/cache-invalidation'
 import { syncImmigrationIntakeStatus } from '@/lib/services/immigration-status-engine'
 import { withTiming } from '@/lib/middleware/request-timing'
 import { checkAndFlagRepeatedRejections } from '@/lib/services/document-rejection-handler'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 /**
  * POST /api/documents/slots/[slotId]/review
@@ -23,6 +24,7 @@ async function handlePost(
   try {
     const { slotId } = await params
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'documents', 'edit')
 
     const limit = await checkTenantLimit(auth.tenantId, 'documents/review')
@@ -39,7 +41,7 @@ async function handlePost(
     }
 
     const result = await reviewDocumentSlot({
-      supabase: auth.supabase,
+      supabase: admin,
       tenantId: auth.tenantId,
       userId: auth.userId,
       slotId,
@@ -57,7 +59,7 @@ async function handlePost(
     }
 
     // Invalidate gating cache after successful review
-    const { data: slot } = await auth.supabase
+    const { data: slot } = await admin
       .from('document_slots')
       .select('matter_id')
       .eq('id', slotId)
@@ -67,14 +69,14 @@ async function handlePost(
       // Auto-sync immigration intake status so the matter advances (e.g. review_required →
       // intake_complete → drafting_enabled) without requiring a manual Recalculate click.
       try {
-        await syncImmigrationIntakeStatus(auth.supabase, slot.matter_id, auth.userId)
+        await syncImmigrationIntakeStatus(admin, slot.matter_id, auth.userId)
       } catch (err) {
         console.error('[document-review] Status sync failed (non-fatal):', err)
       }
       // Check for repeated rejections (3+) and raise DOCUMENT_AUTHENTICITY risk flag
       if (action === 'reject') {
         try {
-          await checkAndFlagRepeatedRejections(auth.supabase, auth.tenantId, slot.matter_id, slotId)
+          await checkAndFlagRepeatedRejections(admin, auth.tenantId, slot.matter_id, slotId)
         } catch (err) {
           console.error('[document-review] Rejection flag check failed (non-fatal):', err)
         }

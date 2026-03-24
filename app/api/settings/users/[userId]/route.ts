@@ -128,7 +128,7 @@ async function handlePatch(request: Request, { params }: { params: Promise<{ use
       changes.is_active = { from: false, to: true }
 
       await logAuditServer({
-        supabase: auth.supabase,
+        supabase: admin,
         tenantId: auth.tenantId,
         userId: auth.userId,
         entityType: 'user',
@@ -202,7 +202,7 @@ async function handlePatch(request: Request, { params }: { params: Promise<{ use
     const action = 'role_id' in changes ? 'role_changed' : 'user_updated'
 
     await logAuditServer({
-      supabase: auth.supabase,
+      supabase: admin,
       tenantId: auth.tenantId,
       userId: auth.userId,
       entityType: 'user',

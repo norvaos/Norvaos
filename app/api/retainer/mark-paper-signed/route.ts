@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from 'next/server'
-import { createServerSupabaseClient, createServiceRoleClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { authenticateRequest, AuthError } from '@/lib/services/auth'
 import { convertLeadToMatter } from '@/lib/services/lead-conversion-executor'
 import { requirePermission } from '@/lib/services/require-role'
@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
   try {
     const auth = await authenticateRequest()
     requirePermission(auth, 'leads', 'edit')
-    const supabase = await createServerSupabaseClient()
+    const supabase = createAdminClient()
 
     const formData = await request.formData()
     const retainerPackageId = formData.get('retainerPackageId') as string | null
@@ -80,8 +80,7 @@ export async function POST(request: NextRequest) {
       const storagePath = `retainers/${auth.tenantId}/${retainerPackageId}/signed-paper.${ext}`
       const buffer = Buffer.from(await file.arrayBuffer())
 
-      const adminClient = createServiceRoleClient()
-      const { error: uploadErr } = await adminClient.storage
+      const { error: uploadErr } = await supabase.storage
         .from('documents')
         .upload(storagePath, buffer, {
           contentType: file.type || 'application/pdf',

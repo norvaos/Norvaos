@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { authenticateRequest, AuthError } from '@/lib/services/auth'
 import { requirePermission } from '@/lib/services/require-role'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { withTiming } from '@/lib/middleware/request-timing'
 
 /**
@@ -14,10 +15,11 @@ async function handlePost(
   try {
     const auth = await authenticateRequest()
     requirePermission(auth, 'communications', 'view')
-    const { userId, supabase } = auth
+    const { userId } = auth
     const { channelId } = await params
+    const admin = createAdminClient()
 
-    const { error } = await supabase
+    const { error } = await admin
       .from('chat_channel_members')
       .update({ last_read_at: new Date().toISOString() })
       .eq('channel_id', channelId)

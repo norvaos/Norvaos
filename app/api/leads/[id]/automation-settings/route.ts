@@ -13,6 +13,7 @@ import {
   getTriggersByCategory,
 } from '@/lib/config/lead-automation-triggers'
 import { withTiming } from '@/lib/middleware/request-timing'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 /**
  * GET /api/leads/[id]/automation-settings
@@ -37,10 +38,11 @@ async function handleGet(
   try {
     const { id: leadId } = await params
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'leads', 'view')
 
     // Verify lead belongs to tenant
-    const { data: lead, error: leadErr } = await auth.supabase
+    const { data: lead, error: leadErr } = await admin
       .from('leads')
       .select('id, tenant_id, practice_area_id')
       .eq('id', leadId)
@@ -78,13 +80,13 @@ async function handleGet(
 
         const [enabled, channels, overrides] = await Promise.all([
           isAutomationEnabled(
-            auth.supabase,
+            admin,
             auth.tenantId,
             triggerKey,
             lead.practice_area_id ?? undefined
           ),
-          getEnabledChannels(auth.supabase, auth.tenantId, triggerKey),
-          getTriggerSettingsOverrides(auth.supabase, auth.tenantId, triggerKey),
+          getEnabledChannels(admin, auth.tenantId, triggerKey),
+          getTriggerSettingsOverrides(admin, auth.tenantId, triggerKey),
         ])
 
         const result: Record<string, unknown> = {
@@ -105,7 +107,7 @@ async function handleGet(
           const templates: Record<string, unknown> = {}
           for (const ch of channels) {
             const template = await resolveTemplate(
-              auth.supabase,
+              admin,
               auth.tenantId,
               triggerKey,
               ch,

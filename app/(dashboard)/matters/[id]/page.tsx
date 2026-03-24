@@ -80,7 +80,6 @@ import {
   SheetTitle,
   SheetDescription,
 } from '@/components/ui/sheet'
-import { ScrollArea } from '@/components/ui/scroll-area'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -1115,7 +1114,7 @@ export default function MatterDetailPage() {
               Update the details for {matter.title}.
             </SheetDescription>
           </SheetHeader>
-          <ScrollArea className="h-[calc(100vh-5rem)]">
+          <div className="h-[calc(100vh-5rem)] overflow-y-auto">
             <div className="px-6 py-4">
               <MatterForm
                 mode="edit"
@@ -1124,7 +1123,7 @@ export default function MatterDetailPage() {
                 isLoading={updateMatter.isPending}
               />
             </div>
-          </ScrollArea>
+          </div>
         </SheetContent>
       </Sheet>
 

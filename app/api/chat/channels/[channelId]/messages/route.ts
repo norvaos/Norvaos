@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { authenticateRequest, AuthError } from '@/lib/services/auth'
 import { requirePermission } from '@/lib/services/require-role'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { dispatchNotification } from '@/lib/services/notification-engine'
 import { withTiming } from '@/lib/middleware/request-timing'
 
@@ -110,8 +111,9 @@ async function handlePost(
     requirePermission(auth, 'communications', 'create')
     const { userId, tenantId, supabase } = auth
     const { channelId } = await params
+    const admin = createAdminClient()
 
-    // Verify membership
+    // Verify membership (read — auth client)
     const { data: membership } = await supabase
       .from('chat_channel_members')
       .select('id')
@@ -136,8 +138,8 @@ async function handlePost(
       return NextResponse.json({ error: 'content is required' }, { status: 400 })
     }
 
-    // Insert message
-    const { data: message, error: msgError } = await supabase
+    // Insert message (write — admin client)
+    const { data: message, error: msgError } = await admin
       .from('chat_messages')
       .insert({
         tenant_id: tenantId,
@@ -156,14 +158,14 @@ async function handlePost(
       return NextResponse.json({ error: 'Failed to send message' }, { status: 500 })
     }
 
-    // Update sender's last_read_at
-    await supabase
+    // Update sender's last_read_at (write — admin client)
+    await admin
       .from('chat_channel_members')
       .update({ last_read_at: new Date().toISOString() })
       .eq('channel_id', channelId)
       .eq('user_id', userId)
 
-    // Resolve sender name for response
+    // Resolve sender name for response (read — auth client)
     const { data: sender } = await supabase
       .from('users')
       .select('first_name, last_name, avatar_url')
@@ -174,7 +176,7 @@ async function handlePost(
       ? [sender.first_name, sender.last_name].filter(Boolean).join(' ') || 'Unknown'
       : 'Unknown'
 
-    // Dispatch notification to other channel members (non-blocking)
+    // Dispatch notification to other channel members (non-blocking, read — auth client)
     const { data: otherMembers } = await supabase
       .from('chat_channel_members')
       .select('user_id')
@@ -182,7 +184,7 @@ async function handlePost(
       .neq('user_id', userId)
 
     if (otherMembers && otherMembers.length > 0) {
-      dispatchNotification(supabase, {
+      dispatchNotification(admin, {
         tenantId,
         eventType: 'new_message',
         recipientUserIds: otherMembers.map((m) => m.user_id),

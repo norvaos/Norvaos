@@ -3,6 +3,7 @@ import { authenticateRequest, AuthError } from '@/lib/services/auth'
 import { requirePermission } from '@/lib/services/require-role'
 import { withTiming } from '@/lib/middleware/request-timing'
 import { createSnapshot, getSnapshot } from '@/lib/services/canonical-profile'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 /**
  * GET /api/matters/[id]/canonical-snapshot
@@ -18,13 +19,14 @@ async function handleGet(
   try {
     const { id: matterId } = await params
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'matters', 'read')
 
     const url = new URL(request.url)
     const profileId = url.searchParams.get('profileId')
 
     // Verify matter belongs to this tenant
-    const { data: matter, error: matterErr } = await auth.supabase
+    const { data: matter, error: matterErr } = await admin
       .from('matters')
       .select('id')
       .eq('id', matterId)
@@ -40,7 +42,7 @@ async function handleGet(
 
     if (!profileId) {
       // Return all snapshots for this matter
-      const { data: snapshots, error: snapErr } = await auth.supabase
+      const { data: snapshots, error: snapErr } = await admin
         .from('canonical_profile_snapshots')
         .select('*')
         .eq('matter_id', matterId)
@@ -50,7 +52,7 @@ async function handleGet(
       return NextResponse.json({ success: true, snapshots })
     }
 
-    const snapshot = await getSnapshot(auth.supabase, profileId, matterId)
+    const snapshot = await getSnapshot(admin, profileId, matterId)
     return NextResponse.json({ success: true, snapshot })
   } catch (error) {
     if (error instanceof AuthError) {
@@ -81,10 +83,11 @@ async function handlePost(
   try {
     const { id: matterId } = await params
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'matters', 'update')
 
     // Verify matter belongs to this tenant
-    const { data: matter, error: matterErr } = await auth.supabase
+    const { data: matter, error: matterErr } = await admin
       .from('matters')
       .select('id')
       .eq('id', matterId)
@@ -108,7 +111,7 @@ async function handlePost(
       )
     }
 
-    const snapshot = await createSnapshot(auth.supabase, profileId, matterId)
+    const snapshot = await createSnapshot(admin, profileId, matterId)
 
     return NextResponse.json(
       { success: true, snapshot },

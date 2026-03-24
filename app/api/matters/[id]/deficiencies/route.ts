@@ -13,6 +13,7 @@ import { authenticateRequest, AuthError } from '@/lib/services/auth'
 import { validateDeficiencyCreate } from '@/lib/services/deficiency-engine'
 import { returnMatterToStage } from '@/lib/services/exception-workflow'
 import type { MatterDeficiencyInsert } from '@/lib/types/database'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 // ─── GET ──────────────────────────────────────────────────────────────────────
 
@@ -23,9 +24,10 @@ export async function GET(
   try {
     const { id: matterId } = await params
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
 
     // Verify matter belongs to this tenant
-    const { data: matter, error: matterErr } = await auth.supabase
+    const { data: matter, error: matterErr } = await admin
       .from('matters')
       .select('id, tenant_id')
       .eq('id', matterId)
@@ -39,7 +41,7 @@ export async function GET(
       )
     }
 
-    const { data, error } = await auth.supabase
+    const { data, error } = await admin
       .from('matter_deficiencies')
       .select('*')
       .eq('matter_id', matterId)
@@ -70,9 +72,10 @@ export async function POST(
   try {
     const { id: matterId } = await params
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
 
     // Verify matter belongs to this tenant
-    const { data: matter, error: matterErr } = await auth.supabase
+    const { data: matter, error: matterErr } = await admin
       .from('matters')
       .select('id, tenant_id')
       .eq('id', matterId)
@@ -127,7 +130,7 @@ export async function POST(
       insert.stage_id = validationInput.stage_id
     }
 
-    const { data: created, error: insertErr } = await auth.supabase
+    const { data: created, error: insertErr } = await admin
       .from('matter_deficiencies')
       .insert(insert)
       .select()
@@ -142,7 +145,7 @@ export async function POST(
     // Both operations are fire-and-forget — they must not delay the 201 response.
     if (validationInput.severity === 'critical') {
       // 1. Log deficiency creation activity
-      auth.supabase
+      admin
         .from('activities')
         .insert({
           tenant_id: auth.tenantId,
@@ -168,7 +171,7 @@ export async function POST(
       //    we just created IS the open critical one, so we must skip that check.
       Promise.resolve().then(async () => {
         try {
-          const { data: stageState, error: stageStateErr } = await auth.supabase
+          const { data: stageState, error: stageStateErr } = await admin
             .from('matter_stage_state')
             .select('current_stage_id, previous_stage_id, pipeline_id')
             .eq('matter_id', matterId)
@@ -184,7 +187,7 @@ export async function POST(
 
           if (!previous_stage_id || previous_stage_id === current_stage_id) {
             // Matter is at first stage — no earlier stage to return to.
-            await auth.supabase
+            await admin
               .from('activities')
               .insert({
                 tenant_id: auth.tenantId,
@@ -199,7 +202,7 @@ export async function POST(
 
           const returnReason = `Auto-rollback: critical deficiency created — ${validationInput.category}: ${validationInput.description.slice(0, 100)}`
 
-          await returnMatterToStage(auth.supabase, {
+          await returnMatterToStage(admin, {
             matterId,
             tenantId: auth.tenantId,
             targetStageId: previous_stage_id,
@@ -208,7 +211,7 @@ export async function POST(
             skipCriticalDeficiencyCheck: true,
           })
 
-          await auth.supabase
+          await admin
             .from('activities')
             .insert({
               tenant_id: auth.tenantId,
@@ -225,7 +228,7 @@ export async function POST(
         } catch (rollbackErr) {
           console.error('[deficiencies POST] Auto-rollback failed:', rollbackErr)
           // Log failure to activities so it is auditable
-          auth.supabase
+          admin
             .from('activities')
             .insert({
               tenant_id: auth.tenantId,
@@ -255,3 +258,5 @@ export async function POST(
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
+
+const admin = createAdminClient()

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { authenticateRequest, AuthError } from '@/lib/services/auth'
 import { withTiming } from '@/lib/middleware/request-timing'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 /**
  * GET /api/admin/form-generation-jobs/stuck
@@ -20,6 +21,7 @@ async function handleGet(_request: Request) {
   try {
     // 1. Auth + Admin-only role check
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     const role = auth.role?.name
 
     if (role !== 'Admin') {
@@ -33,7 +35,7 @@ async function handleGet(_request: Request) {
     const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString()
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: jobs, error: queryErr } = await (auth.supabase as any)
+    const { data: jobs, error: queryErr } = await (admin as any)
       .from('form_generation_log')
       .select(
         'id, matter_id, form_template_id, status, retry_count, created_at, processing_started_at, error_message'

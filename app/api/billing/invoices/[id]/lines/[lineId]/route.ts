@@ -3,6 +3,7 @@ import { authenticateRequest, AuthError } from '@/lib/services/auth'
 import { checkBillingPermission } from '@/lib/services/billing-permission'
 import { withTiming } from '@/lib/middleware/request-timing'
 import { recalculateInvoice } from '@/lib/services/billing/invoice-calculation.service'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 // ── DELETE /api/billing/invoices/[id]/lines/[lineId] ─────────────────────────
 // Soft-delete a line item from a draft invoice (sets deleted_at).
@@ -23,10 +24,11 @@ async function handleDelete(
     return NextResponse.json({ error: 'Authentication failed' }, { status: 401 })
   }
 
-  const { supabase, tenantId } = auth
+  const { tenantId } = auth
+  const admin = createAdminClient()
 
   const { allowed } = await checkBillingPermission(
-    supabase,
+    admin,
     auth.userId,
     tenantId,
     'DELETE /api/billing/invoices/[id]/lines/[lineId]',
@@ -38,7 +40,7 @@ async function handleDelete(
   const now = new Date().toISOString()
 
   /* eslint-disable @typescript-eslint/no-explicit-any */
-  const { error } = await (supabase as any)
+  const { error } = await (admin as any)
     .from('invoice_line_items')
     .update({ deleted_at: now })
     .eq('id', lineId)
@@ -53,7 +55,7 @@ async function handleDelete(
   }
 
   // Recalculate invoice totals
-  await recalculateInvoice(supabase, invoiceId)
+  await recalculateInvoice(admin, invoiceId)
 
   return NextResponse.json({ success: true })
 }

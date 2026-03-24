@@ -3,6 +3,7 @@ import { authenticateRequest, AuthError } from '@/lib/services/auth'
 import { getMatterAccessInfo } from '@/lib/services/matter-access'
 import { requirePermission } from '@/lib/services/require-role'
 import { withTiming } from '@/lib/middleware/request-timing'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 /**
  * GET /api/matters/[id]/access
@@ -17,9 +18,10 @@ async function handleGet(
   try {
     const { id: matterId } = await params
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'matters', 'view')
 
-    const access = await getMatterAccessInfo(auth.supabase, auth.userId, matterId)
+    const access = await getMatterAccessInfo(admin, auth.userId, matterId)
 
     return NextResponse.json({ success: true, access })
   } catch (error) {

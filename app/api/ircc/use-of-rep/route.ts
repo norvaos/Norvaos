@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { authenticateRequest } from '@/lib/services/auth'
 import { requirePermission } from '@/lib/services/require-role'
 import { buildUseOfRepData } from '@/lib/ircc/use-of-rep-generator'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 /**
  * GET /api/ircc/use-of-rep?matterId=xxx
@@ -19,9 +20,10 @@ export async function GET(request: NextRequest) {
     }
 
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'matters', 'view')
 
-    const repData = await buildUseOfRepData(auth.supabase, auth.tenantId, matterId)
+    const repData = await buildUseOfRepData(admin, auth.tenantId, matterId)
     return NextResponse.json({ repData })
   } catch (err) {
     console.error('[use-of-rep] GET error:', err)
@@ -41,6 +43,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'matters', 'view')
 
     const body = await request.json() as { matterId: string }
@@ -50,7 +53,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'matterId required' }, { status: 400 })
     }
 
-    const repData = await buildUseOfRepData(auth.supabase, auth.tenantId, matterId)
+    const repData = await buildUseOfRepData(admin, auth.tenantId, matterId)
 
     // TODO: When Python script integration is ready, call xfa-filler here
     // For now, return the structured data so the client can review it

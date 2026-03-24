@@ -6,6 +6,7 @@ import { revalidateIntake } from '@/lib/services/intake-revalidate'
 import { logAuditServer } from '@/lib/queries/audit-logs'
 import { invalidateGating, invalidateMattersList } from '@/lib/services/cache-invalidation'
 import { withTiming } from '@/lib/middleware/request-timing'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 /**
  * POST /api/matters/[id]/save-intake
@@ -24,10 +25,11 @@ async function handlePost(
 
     // 1. Authenticate and get tenant context
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'matters', 'edit')
 
     // 2. Verify the matter belongs to this tenant
-    const { data: matter, error: matterErr } = await auth.supabase
+    const { data: matter, error: matterErr } = await admin
       .from('matters')
       .select('id, tenant_id, matter_type_id')
       .eq('id', matterId)
@@ -44,7 +46,7 @@ async function handlePost(
     // 2b. Auto-derive program_category from matter type
     let derivedProgramCategory: string | null = null
     if (matter.matter_type_id) {
-      const { data: matterType } = await auth.supabase
+      const { data: matterType } = await admin
         .from('matter_types')
         .select('program_category_key')
         .eq('id', matter.matter_type_id)
@@ -64,7 +66,7 @@ async function handlePost(
     }
 
     // 4. Upsert matter_intake (with auto-derived program_category)
-    const { data: intake, error: upsertErr } = await auth.supabase
+    const { data: intake, error: upsertErr } = await admin
       .from('matter_intake')
       .upsert(
         {
@@ -87,12 +89,12 @@ async function handlePost(
     }
 
     // 5. Auto-revalidate
-    const revalidation = await revalidateIntake(auth.supabase, matterId)
+    const revalidation = await revalidateIntake(admin, matterId)
     const { success: _revalSuccess, ...revalidationData } = revalidation
 
     // 6. Audit log (fire-and-forget)
     logAuditServer({
-      supabase: auth.supabase,
+      supabase: admin,
       tenantId: auth.tenantId,
       userId: auth.userId,
       entityType: 'matter_intake',
@@ -131,3 +133,5 @@ async function handlePost(
 }
 
 export const POST = withTiming(handlePost, 'POST /api/matters/[id]/save-intake')
+
+const admin = createAdminClient()

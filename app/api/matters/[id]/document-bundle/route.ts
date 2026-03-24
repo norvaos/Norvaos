@@ -22,10 +22,11 @@ async function handleGet(
   try {
     const { id: matterId } = await params
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'documents', 'view')
 
     // 1. Fetch matter details
-    const { data: matter, error: matterErr } = await auth.supabase
+    const { data: matter, error: matterErr } = await admin
       .from('matters')
       .select('id, title, matter_number, tenant_id')
       .eq('id', matterId)
@@ -38,7 +39,7 @@ async function handleGet(
 
     // Fetch primary contact name via matter_contacts
     let clientName = 'Client'
-    const { data: primaryMc } = await auth.supabase
+    const { data: primaryMc } = await admin
       .from('matter_contacts')
       .select('contact_id')
       .eq('matter_id', matterId)
@@ -46,7 +47,7 @@ async function handleGet(
       .maybeSingle()
 
     if (primaryMc?.contact_id) {
-      const { data: contact } = await auth.supabase
+      const { data: contact } = await admin
         .from('contacts')
         .select('first_name, last_name, organization_name')
         .eq('id', primaryMc.contact_id)
@@ -61,7 +62,7 @@ async function handleGet(
     }
 
     // 2. Fetch document slots with versions (ordered by sort_order)
-    const { data: slots } = await auth.supabase
+    const { data: slots } = await admin
       .from('document_slots')
       .select('id, slot_name, category, sort_order, current_document_id, current_version')
       .eq('matter_id', matterId)
@@ -75,7 +76,7 @@ async function handleGet(
 
     // 3. Fetch all versions for all slots
     const slotIds = slots.map((s) => s.id)
-    const { data: allVersions } = await auth.supabase
+    const { data: allVersions } = await admin
       .from('document_versions')
       .select('id, slot_id, version_number, storage_path, file_name, file_type, review_status')
       .in('slot_id', slotIds)

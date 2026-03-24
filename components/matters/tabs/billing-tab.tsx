@@ -25,7 +25,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { Plus, Trash2, Loader2, FileDown, CheckCircle2, Clock, AlertCircle, DollarSign } from 'lucide-react'
+import { Plus, Trash2, Loader2, FileDown, CheckCircle2, Clock, AlertCircle, DollarSign, Lock } from 'lucide-react'
 import { formatDate, formatCurrency } from '@/lib/utils/formatters'
 import { INVOICE_STATUSES, PAYMENT_METHODS } from '@/lib/utils/constants'
 import {
@@ -372,8 +372,41 @@ export function BillingTab({ matterId, tenantId, matter }: { matterId: string; t
   const invoiceStatusColor = (status: string) => INVOICE_STATUSES.find((s) => s.value === status)?.color ?? '#6b7280'
   const invoiceStatusLabel = (status: string) => INVOICE_STATUSES.find((s) => s.value === status)?.label ?? status
 
+  // Fee snapshot & tax info from matter (added by migration 153)
+  const feeSnapshot = (matter as any).fee_snapshot as { template_name: string; snapshotted_at: string } | null
+  const taxLabel = (matter as any).tax_label as string | null
+  const taxRate = (matter as any).tax_rate as number | null
+  const applicantLocation = (matter as any).applicant_location as string | null
+
+  const isOutsideCanada = applicantLocation ? applicantLocation.toLowerCase() === 'outside_canada' : false
+
   return (
     <div className="space-y-6">
+      {/* Snapshot indicator — shows when fees were locked */}
+      {feeSnapshot && (
+        <div className="flex items-center gap-2 rounded-md border border-slate-200 bg-slate-50 px-3 py-2">
+          <Lock className="h-3.5 w-3.5 text-slate-500 shrink-0" />
+          <span className="text-sm text-slate-600">
+            Fees locked from &lsquo;{feeSnapshot.template_name}&rsquo; template on{' '}
+            {new Date(feeSnapshot.snapshotted_at).toLocaleDateString('en-CA', {
+              year: 'numeric',
+              month: 'short',
+              day: 'numeric',
+            })}
+          </span>
+          {/* Tax badge */}
+          {isOutsideCanada ? (
+            <Badge variant="outline" className="ml-auto text-xs border-emerald-200 text-emerald-700 bg-emerald-50">
+              Zero-rated (non-resident)
+            </Badge>
+          ) : taxLabel && taxRate != null ? (
+            <Badge variant="outline" className="ml-auto text-xs border-slate-300 text-slate-700">
+              {applicantLocation} — {taxLabel} {taxRate}%
+            </Badge>
+          ) : null}
+        </div>
+      )}
+
       {/* Retainer Agreement (fee breakdown from signing) */}
       <RetainerAgreementCard matterId={matterId} />
 

@@ -4,6 +4,7 @@ import { requirePermission } from '@/lib/services/require-role'
 import { sendDocumentRequest } from '@/lib/services/document-request-service'
 import { withTiming } from '@/lib/middleware/request-timing'
 import { syncImmigrationIntakeStatus } from '@/lib/services/immigration-status-engine'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 /**
  * POST /api/matters/[id]/document-request
@@ -18,6 +19,7 @@ async function handlePost(
   try {
     const { id: matterId } = await params
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'matters', 'edit')
 
     // Parse body
@@ -32,7 +34,7 @@ async function handlePost(
     }
 
     // Verify matter belongs to tenant
-    const { data: matter } = await auth.supabase
+    const { data: matter } = await admin
       .from('matters')
       .select('id')
       .eq('id', matterId)
@@ -44,7 +46,7 @@ async function handlePost(
     }
 
     // Validate all slot_ids belong to this matter, are active, required, not accepted
-    const { data: validSlots } = await auth.supabase
+    const { data: validSlots } = await admin
       .from('document_slots')
       .select('id, status')
       .in('id', slot_ids)
@@ -64,7 +66,7 @@ async function handlePost(
     }
 
     const result = await sendDocumentRequest({
-      supabase: auth.supabase,
+      supabase: admin,
       tenantId: auth.tenantId,
       matterId,
       slotIds: outstandingSlotIds,
@@ -80,7 +82,7 @@ async function handlePost(
     // Sync immigration intake status — portal link/request now exists, so
     // the matter can advance from not_issued → issued automatically.
     try {
-      await syncImmigrationIntakeStatus(auth.supabase, matterId, auth.userId)
+      await syncImmigrationIntakeStatus(admin, matterId, auth.userId)
     } catch (err) {
       console.error('[document-request] Status sync failed (non-fatal):', err)
     }
@@ -110,9 +112,10 @@ async function handleGet(
   try {
     const { id: matterId } = await params
     const auth = await authenticateRequest()
+    const admin = createAdminClient()
     requirePermission(auth, 'matters', 'edit')
 
-    const { data: requests, error } = await auth.supabase
+    const { data: requests, error } = await admin
       .from('document_requests')
       .select('*')
       .eq('matter_id', matterId)

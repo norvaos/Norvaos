@@ -4,6 +4,7 @@ import { requirePermission } from '@/lib/services/require-role'
 import { logAuditServer } from '@/lib/queries/audit-logs'
 import { sendInvoiceEmail } from '@/lib/services/invoice-email-service'
 import { withTiming } from '@/lib/middleware/request-timing'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { log } from '@/lib/utils/logger'
 import { reportError } from '@/lib/monitoring/error-reporter'
 
@@ -24,17 +25,18 @@ async function handlePost(request: Request) {
       return NextResponse.json({ error: 'Maximum 50 invoices per batch' }, { status: 400 })
     }
 
+    const admin = createAdminClient()
     const sent: string[] = []
     const failed: { id: string; reason: string }[] = []
 
     for (const invoiceId of invoiceIds) {
-      const result = await sendInvoiceEmail(supabase, invoiceId, tenantId)
+      const result = await sendInvoiceEmail(admin, invoiceId, tenantId)
 
       if (result.success) {
         sent.push(invoiceId)
         // Audit each successful send
         await logAuditServer({
-          supabase,
+          supabase: admin,
           tenantId,
           userId,
           entityType: 'invoice',

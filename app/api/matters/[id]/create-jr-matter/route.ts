@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { authenticateRequest, AuthError } from '@/lib/services/auth'
-
+import { createAdminClient } from '@/lib/supabase/admin'
 import { withTiming } from '@/lib/middleware/request-timing'
 
 /**
@@ -35,8 +35,11 @@ async function handlePost(
     const body = await request.json().catch(() => ({}))
     const { matter_type_id: bodyMatterTypeId } = body as { matter_type_id?: string }
 
+    // Use admin client to bypass RLS — auth already verified above
+    const admin = createAdminClient()
+
     // 3. Verify source matter belongs to tenant
-    const { data: sourceMatter, error: matterErr } = await auth.supabase
+    const { data: sourceMatter, error: matterErr } = await admin
       .from('matters')
       .select('id, tenant_id, title, practice_area_id, responsible_lawyer_id, originating_lawyer_id')
       .eq('id', sourceMatterId)
@@ -55,7 +58,7 @@ async function handlePost(
 
     if (!resolvedMatterTypeId) {
       // Search for a matter type named like 'judicial review' or 'JR'
-      const { data: jrTypes } = await auth.supabase
+      const { data: jrTypes } = await admin
         .from('matter_types')
         .select('id, name')
         .eq('tenant_id', auth.tenantId)
@@ -66,7 +69,7 @@ async function handlePost(
         resolvedMatterTypeId = jrTypes[0].id
       } else {
         // Try 'JR' abbreviation
-        const { data: jrTypesAlt } = await auth.supabase
+        const { data: jrTypesAlt } = await admin
           .from('matter_types')
           .select('id, name')
           .eq('tenant_id', auth.tenantId)
@@ -80,7 +83,7 @@ async function handlePost(
     }
 
     // 5. Fetch principal applicant from source matter
-    const { data: principalApplicant } = await auth.supabase
+    const { data: principalApplicant } = await admin
       .from('matter_people')
       .select('contact_id, first_name, last_name, email, phone')
       .eq('matter_id', sourceMatterId)
@@ -92,7 +95,7 @@ async function handlePost(
     // This replaces the previous createAdminClient() bypass — the function
     // validates role and source matter access internally, then inserts with
     // elevated privileges in a controlled way.
-    const { data: newMatterJson, error: rpcErr } = await auth.supabase
+    const { data: newMatterJson, error: rpcErr } = await admin
       .rpc('create_judicial_review_matter', {
         p_source_matter_id: sourceMatterId,
         p_matter_type_id: resolvedMatterTypeId ?? undefined,
@@ -110,7 +113,7 @@ async function handlePost(
     const newMatter = { id: (newMatterJson as any).id as string }
 
     // 7. Create matter_intake for the new matter
-    await auth.supabase.from('matter_intake').insert({
+    await admin.from('matter_intake').insert({
       tenant_id: auth.tenantId,
       matter_id: newMatter.id,
       intake_status: 'incomplete',
@@ -119,7 +122,7 @@ async function handlePost(
 
     // 8. Carry forward principal applicant to new matter
     if (principalApplicant) {
-      await auth.supabase.from('matter_people').insert({
+      await admin.from('matter_people').insert({
         tenant_id: auth.tenantId,
         matter_id: newMatter.id,
         contact_id: principalApplicant.contact_id ?? null,
@@ -132,7 +135,7 @@ async function handlePost(
     }
 
     // 9. Update source matter: link jr_matter_id on ircc_correspondence (latest actioned refusal)
-    await auth.supabase
+    await admin
       .from('ircc_correspondence')
       .update({ jr_matter_id: newMatter.id, updated_at: new Date().toISOString() } as any)
       .eq('matter_id', sourceMatterId)
@@ -140,7 +143,7 @@ async function handlePost(
       .eq('status', 'actioned')
 
     // 10. Log refusal_actions row (best-effort — needs correspondence_id)
-    const { data: refusalCorr } = await auth.supabase
+    const { data: refusalCorr } = await admin
       .from('ircc_correspondence')
       .select('id')
       .eq('matter_id', sourceMatterId)
@@ -151,7 +154,7 @@ async function handlePost(
       .maybeSingle()
 
     if (refusalCorr?.id) {
-      await auth.supabase.from('refusal_actions').insert({
+      await admin.from('refusal_actions').insert({
         tenant_id: auth.tenantId,
         correspondence_id: refusalCorr.id,
         matter_id: sourceMatterId,
@@ -162,7 +165,7 @@ async function handlePost(
     }
 
     // 11. Log activity on source matter
-    await auth.supabase.from('activities').insert({
+    await admin.from('activities').insert({
       tenant_id: auth.tenantId,
       matter_id: sourceMatterId,
       activity_type: 'jr_matter_created',
