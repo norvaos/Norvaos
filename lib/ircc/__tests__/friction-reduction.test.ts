@@ -864,13 +864,11 @@ describe('Friction Reduction Test Pack', () => {
       console.log(`\nGap analysis — ${notImported.length} fields not imported (matter_specific classification):`)
       for (const p of notImported) console.log(`  - ${p}`)
 
-      // Current measured reduction: ~38% (60 → 37)
-      // To hit ≤ 30 target, expand REUSE_CATEGORY_MAP to include:
-      //   - contact_info.mailing_address.* (7 fields) → semi_stable
-      //   - occupation.current_title, occupation.current_employer → semi_stable
-      //   - family.mother_date_of_birth, family.father_date_of_birth, etc. → stable
-      expect(metrics.new_user_input_fields).toBeLessThanOrEqual(40)  // Current capability
-      expect(reductionPct).toBeGreaterThanOrEqual(30)  // At least 30% reduction with current MAP
+      // After REUSE_CATEGORY_MAP expansion (29 → 43 paths):
+      //   +4 stable: family dates/birthplaces
+      //   +10 semi_stable: granular address, occupation, marital.previous_marriages, residential_same
+      expect(metrics.new_user_input_fields).toBeLessThanOrEqual(25)  // KPI TARGET
+      expect(reductionPct).toBeGreaterThanOrEqual(50)  // At least 50% reduction
     })
   })
 
@@ -1053,12 +1051,10 @@ describe('Friction Reduction Test Pack', () => {
       console.log(`Absolute reduction: ${inputA - inputC} fields`)
       console.log(`Percentage:         ${Math.round((1 - inputC / inputA) * 100)}%`)
 
-      // ── KPI gate (current capability) ──
-      // Current REUSE_CATEGORY_MAP covers 29 paths → 38% reduction
-      // Expanding MAP to include granular address, family dates, occupation → target ≤ 30
-      expect(inputC).toBeLessThanOrEqual(40)  // Current measured ceiling
-      expect(inputA - inputC).toBeGreaterThanOrEqual(15)  // Meaningful absolute reduction
-      expect(inputC / inputA).toBeLessThan(0.7)  // >30% reduction achieved
+      // ── KPI gate (after REUSE_CATEGORY_MAP expansion) ──
+      expect(inputC).toBeLessThanOrEqual(25)  // Target: ≤ 25 new manual fields
+      expect(inputA - inputC).toBeGreaterThanOrEqual(30)  // ≥ 30 field absolute reduction
+      expect(inputC / inputA).toBeLessThan(0.5)  // > 50% reduction
     })
   })
 })

@@ -1,16 +1,37 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+/**
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * DocumentChecklistPanel — Lawyer-side document requirements manager
+ * ═══════════════════════════════════════════════════════════════════════════════
+ *
+ * Features:
+ *   1. N/A Toggle — mark items as not_applicable (hidden from client portal)
+ *   2. Custom Requirement — add ad-hoc document requests (blue highlight)
+ *   3. Bulk Actions — "Request All" to batch-update pending items
+ *   4. Portal Preview — opens client portal in new tab
+ */
+
+import { useState, useCallback, useMemo } from 'react'
 import { useUser } from '@/lib/hooks/use-user'
-import { useMatterChecklistItems, useUpdateChecklistItem, useInitializeChecklist } from '@/lib/queries/immigration'
+import {
+  useMatterChecklistItems,
+  useUpdateChecklistItem,
+  useCreateChecklistItem,
+  useInitializeChecklist,
+} from '@/lib/queries/immigration'
 import { useDocuments, useDocumentSignedUrl } from '@/lib/queries/documents'
+import { usePortalLinks } from '@/lib/queries/portal-links'
 import { CHECKLIST_CATEGORIES, CHECKLIST_STATUSES } from '@/lib/utils/constants'
 import { cn } from '@/lib/utils'
 
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Textarea } from '@/components/ui/textarea'
 import {
   Tooltip,
   TooltipContent,
@@ -23,6 +44,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog'
 import {
   Table,
   TableBody,
@@ -42,7 +70,12 @@ import {
   Download,
   Loader2,
   FileText,
+  Ban,
+  Plus,
+  ExternalLink,
+  CheckSquare,
 } from 'lucide-react'
+import { toast } from 'sonner'
 
 import type { Database } from '@/lib/types/database'
 
@@ -64,7 +97,7 @@ function getCategoryLabel(categoryValue: string) {
 }
 
 // ==========================================================
-// Document Action Button
+// Document Action Button (View / Download)
 // ==========================================================
 
 function DocumentActionButton({ document }: { document: Document }) {
@@ -143,6 +176,114 @@ function DocumentActionButton({ document }: { document: Document }) {
 }
 
 // ==========================================================
+// Custom Requirement Modal
+// ==========================================================
+
+function AddCustomDocumentModal({
+  open,
+  onOpenChange,
+  matterId,
+  tenantId,
+  existingCount,
+}: {
+  open: boolean
+  onOpenChange: (v: boolean) => void
+  matterId: string
+  tenantId: string
+  existingCount: number
+}) {
+  const [title, setTitle] = useState('')
+  const [description, setDescription] = useState('')
+  const [category, setCategory] = useState('general')
+  const createItem = useCreateChecklistItem()
+
+  const handleSubmit = useCallback(async () => {
+    if (!title.trim()) {
+      toast.error('Document title is required')
+      return
+    }
+    try {
+      await createItem.mutateAsync({
+        matter_id: matterId,
+        tenant_id: tenantId,
+        document_name: title.trim(),
+        description: description.trim() || null,
+        category,
+        is_required: true,
+        is_custom: true,
+        sort_order: existingCount + 1,
+        status: 'missing',
+      })
+      toast.success('Custom requirement added')
+      setTitle('')
+      setDescription('')
+      setCategory('general')
+      onOpenChange(false)
+    } catch {
+      // error toast from mutation
+    }
+  }, [title, description, category, matterId, tenantId, existingCount, createItem, onOpenChange])
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Add Custom Document Requirement</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4 py-2">
+          <div className="space-y-1.5">
+            <Label htmlFor="custom-title">
+              Document Title <span className="text-red-500">*</span>
+            </Label>
+            <Input
+              id="custom-title"
+              placeholder="e.g. Notarised Affidavit of Support"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="custom-desc">
+              Instructions for Client
+            </Label>
+            <Textarea
+              id="custom-desc"
+              placeholder="Describe what the client needs to upload..."
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              rows={3}
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="custom-cat">Category</Label>
+            <Select value={category} onValueChange={setCategory}>
+              <SelectTrigger id="custom-cat" className="h-9">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {CHECKLIST_CATEGORIES.map((c) => (
+                  <SelectItem key={c.value} value={c.value}>
+                    {c.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
+            Cancel
+          </Button>
+          <Button onClick={handleSubmit} disabled={createItem.isPending}>
+            {createItem.isPending ? 'Adding...' : 'Add Requirement'}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+// ==========================================================
 // Main Panel
 // ==========================================================
 
@@ -154,11 +295,19 @@ export function DocumentChecklistPanel({
   const { appUser } = useUser()
   const { data: items, isLoading } = useMatterChecklistItems(matterId)
   const { data: documents } = useDocuments({ tenantId, matterId })
+  const { data: portalLinks } = usePortalLinks(matterId)
   const updateChecklistItem = useUpdateChecklistItem()
   const initializeChecklist = useInitializeChecklist()
 
   const [collapsedCategories, setCollapsedCategories] = useState<Set<string>>(new Set())
   const [editingNotes, setEditingNotes] = useState<Record<string, string>>({})
+  const [customModalOpen, setCustomModalOpen] = useState(false)
+
+  // Portal link for Preview button
+  const activeLink = portalLinks?.[0] ?? null
+  const portalUrl = activeLink
+    ? `${typeof window !== 'undefined' ? window.location.origin : ''}/portal/${activeLink.token}`
+    : null
 
   // Build a map of document_id -> Document for fast lookup
   const documentMap = new Map<string, Document>()
@@ -191,6 +340,49 @@ export function DocumentChecklistPanel({
     },
     [updateChecklistItem, tenantId, appUser]
   )
+
+  // ── N/A Toggle ─────────────────────────────────────────────────────────
+  const handleMarkNA = useCallback(
+    (item: ChecklistItem) => {
+      const isCurrentlyNA = item.status === 'not_applicable'
+      const newStatus = isCurrentlyNA ? 'missing' : 'not_applicable'
+      updateChecklistItem.mutate({
+        id: item.id,
+        status: newStatus,
+        notes: isCurrentlyNA
+          ? item.notes
+          : `${item.notes ? item.notes + ' | ' : ''}Excluded by lawyer`,
+        tenantId,
+        userId: appUser?.id,
+      })
+      toast.info(
+        isCurrentlyNA
+          ? `"${item.document_name}" restored to checklist`
+          : `"${item.document_name}" marked as N/A — hidden from client portal`
+      )
+    },
+    [updateChecklistItem, tenantId, appUser]
+  )
+
+  // ── Bulk Request All ───────────────────────────────────────────────────
+  const pendingItems = useMemo(
+    () => (items ?? []).filter((i) => i.status === 'missing'),
+    [items]
+  )
+
+  const handleRequestAll = useCallback(() => {
+    if (pendingItems.length === 0) return
+    for (const item of pendingItems) {
+      updateChecklistItem.mutate({
+        id: item.id,
+        status: 'requested',
+        requested_at: new Date().toISOString(),
+        tenantId,
+        userId: appUser?.id,
+      })
+    }
+    toast.success(`${pendingItems.length} item(s) marked as "Requested from Client"`)
+  }, [pendingItems, updateChecklistItem, tenantId, appUser])
 
   const handleNotesBlur = useCallback(
     (itemId: string, notes: string) => {
@@ -287,33 +479,76 @@ export function DocumentChecklistPanel({
 
   return (
     <div className="space-y-4">
-      {/* File Completion Score */}
-      <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <span className="text-sm font-medium text-slate-700">File Completion Score</span>
-          <span className="text-sm font-semibold text-slate-900">{completionPercent}%</span>
+      {/* ── Toolbar: Score + Bulk Actions + Preview + Add Custom ──────── */}
+      <div className="space-y-3">
+        {/* Progress bar */}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium text-slate-700">File Completion Score</span>
+            <span className="text-sm font-semibold text-slate-900">{completionPercent}%</span>
+          </div>
+          <div className="h-2.5 w-full rounded-full bg-slate-100 overflow-hidden">
+            <div
+              className={cn(
+                'h-full rounded-full transition-all duration-500',
+                completionPercent === 100
+                  ? 'bg-green-500'
+                  : completionPercent >= 75
+                    ? 'bg-blue-500'
+                    : completionPercent >= 50
+                      ? 'bg-amber-500'
+                      : 'bg-red-500'
+              )}
+              style={{ width: `${completionPercent}%` }}
+            />
+          </div>
+          <p className="text-xs text-slate-500">
+            {completedItems} of {totalItems} items approved or N/A
+          </p>
         </div>
-        <div className="h-2.5 w-full rounded-full bg-slate-100 overflow-hidden">
-          <div
-            className={cn(
-              'h-full rounded-full transition-all duration-500',
-              completionPercent === 100
-                ? 'bg-green-500'
-                : completionPercent >= 75
-                  ? 'bg-blue-500'
-                  : completionPercent >= 50
-                    ? 'bg-amber-500'
-                    : 'bg-red-500'
-            )}
-            style={{ width: `${completionPercent}%` }}
-          />
+
+        {/* Action bar */}
+        <div className="flex items-center gap-2 flex-wrap">
+          {/* Bulk Request All */}
+          {pendingItems.length > 0 && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-7 gap-1 text-xs"
+              onClick={handleRequestAll}
+            >
+              <CheckSquare className="h-3 w-3" />
+              Request All ({pendingItems.length})
+            </Button>
+          )}
+
+          {/* Portal Preview */}
+          {portalUrl && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-7 gap-1 text-xs"
+              onClick={() => window.open(portalUrl, '_blank')}
+            >
+              <ExternalLink className="h-3 w-3" />
+              Preview as Client
+            </Button>
+          )}
+
+          {/* Add Custom */}
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-7 gap-1 text-xs"
+            onClick={() => setCustomModalOpen(true)}
+          >
+            <Plus className="h-3 w-3" />
+            Add Custom Document
+          </Button>
         </div>
-        <p className="text-xs text-slate-500">
-          {completedItems} of {totalItems} items approved or N/A
-        </p>
       </div>
 
-      {/* Category groups */}
+      {/* ── Category groups ──────────────────────────────────────────── */}
       <div className="space-y-3">
         {sortedCategories.map(([category, categoryItems]) => {
           const isCollapsed = collapsedCategories.has(category)
@@ -349,12 +584,13 @@ export function DocumentChecklistPanel({
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead className={hasAnyDocuments ? 'w-[30%]' : 'w-[35%]'}>Document</TableHead>
-                      <TableHead className="w-[20%]">Status</TableHead>
+                      <TableHead className="w-[30%]">Document</TableHead>
+                      <TableHead className="w-[15%]">Status</TableHead>
                       {hasAnyDocuments && (
-                        <TableHead className="w-[10%]">File</TableHead>
+                        <TableHead className="w-[8%]">File</TableHead>
                       )}
-                      <TableHead className={hasAnyDocuments ? 'w-[40%]' : 'w-[45%]'}>Notes</TableHead>
+                      <TableHead className={hasAnyDocuments ? 'w-[35%]' : 'w-[43%]'}>Notes</TableHead>
+                      <TableHead className="w-[12%] text-right">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -364,23 +600,41 @@ export function DocumentChecklistPanel({
                         const statusConfig = getStatusConfig(item.status)
                         const isEditingNotes = item.id in editingNotes
                         const linkedDoc = item.document_id ? documentMap.get(item.document_id) : null
+                        const isNA = item.status === 'not_applicable'
+                        const isCustom = item.is_custom
 
                         return (
-                          <TableRow key={item.id}>
+                          <TableRow
+                            key={item.id}
+                            className={cn(
+                              isNA && 'opacity-50 bg-slate-50',
+                              isCustom && !isNA && 'bg-blue-50/50 dark:bg-blue-950/20',
+                            )}
+                          >
                             {/* Document name */}
                             <TableCell>
-                              <div className="flex items-center gap-1">
-                                <span className="text-sm text-slate-900">
+                              <div className="flex items-center gap-1.5">
+                                <span className={cn('text-sm', isNA ? 'text-slate-400 line-through' : 'text-slate-900')}>
                                   {item.document_name}
                                 </span>
-                                {item.is_required && (
+                                {item.is_required && !isNA && (
                                   <Asterisk className="h-3 w-3 text-red-500 flex-shrink-0" />
                                 )}
+                                {isCustom && (
+                                  <Badge variant="outline" className="text-[10px] px-1 py-0 border-blue-300 text-blue-600 bg-blue-50">
+                                    Custom
+                                  </Badge>
+                                )}
                               </div>
-                              {item.description && (
+                              {item.description && !isNA && (
                                 <p className="text-xs text-slate-500 mt-0.5 line-clamp-1">
                                   {item.description}
                                 </p>
+                              )}
+                              {isNA && (
+                                <Badge variant="outline" className="text-[10px] mt-0.5 px-1 py-0 border-slate-300 text-slate-500">
+                                  Excluded by Lawyer
+                                </Badge>
                               )}
                             </TableCell>
 
@@ -483,6 +737,30 @@ export function DocumentChecklistPanel({
                                 </button>
                               )}
                             </TableCell>
+
+                            {/* N/A Toggle action */}
+                            <TableCell className="text-right">
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className={cn(
+                                      'h-7 w-7 p-0',
+                                      isNA
+                                        ? 'text-amber-600 hover:text-amber-700 hover:bg-amber-50'
+                                        : 'text-slate-400 hover:text-slate-600 hover:bg-slate-50',
+                                    )}
+                                    onClick={() => handleMarkNA(item)}
+                                  >
+                                    <Ban className="h-3.5 w-3.5" />
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  {isNA ? 'Restore to checklist' : 'Mark N/A (hide from client)'}
+                                </TooltipContent>
+                              </Tooltip>
+                            </TableCell>
                           </TableRow>
                         )
                       })}
@@ -493,6 +771,15 @@ export function DocumentChecklistPanel({
           )
         })}
       </div>
+
+      {/* ── Custom Requirement Modal ─────────────────────────────────── */}
+      <AddCustomDocumentModal
+        open={customModalOpen}
+        onOpenChange={setCustomModalOpen}
+        matterId={matterId}
+        tenantId={tenantId}
+        existingCount={totalItems}
+      />
     </div>
   )
 }

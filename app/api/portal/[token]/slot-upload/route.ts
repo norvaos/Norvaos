@@ -4,6 +4,7 @@ import { buildAutoRenamedPath } from '@/lib/services/document-slot-engine'
 import { createRateLimiter } from '@/lib/middleware/rate-limit'
 import { withTiming } from '@/lib/middleware/request-timing'
 import { validatePortalToken, PortalAuthError } from '@/lib/services/portal-auth'
+import { dispatchNotification } from '@/lib/services/notification-engine'
 
 // 30 requests per minute per IP — prevents brute-force token enumeration
 const tokenLookupLimiter = createRateLimiter({ windowMs: 60_000, maxRequests: 30 })
@@ -238,6 +239,31 @@ async function handlePost(
         portal_link_id: link.id,
       },
     })
+
+    // ── 11. Notify responsible lawyer about the client upload ────────
+    try {
+      const { data: matterDetail } = await admin
+        .from('matters')
+        .select('responsible_lawyer_id')
+        .eq('id', link.matter_id)
+        .single()
+
+      if (matterDetail?.responsible_lawyer_id) {
+        await dispatchNotification(admin, {
+          tenantId: link.tenant_id,
+          eventType: 'document_uploaded',
+          recipientUserIds: [matterDetail.responsible_lawyer_id],
+          title: 'Client uploaded a document',
+          message: `A document was uploaded to "${slot.slot_name}" via the client portal.`,
+          entityType: 'matter',
+          entityId: link.matter_id,
+          priority: 'normal',
+        })
+      }
+    } catch (e) {
+      // Non-blocking — don't fail the upload if notification fails
+      console.error('[slot-upload] Notification dispatch failed:', e)
+    }
 
     return NextResponse.json(
       { success: true, document_id: doc.id, version_number: versionNumber },

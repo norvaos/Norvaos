@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { PortalZoomWrapper } from './portal-zoom'
+import { PortalZoomWrapper } from './portal-zoom-client'
 
 export const metadata: Metadata = {
   title: 'Document Upload Portal',

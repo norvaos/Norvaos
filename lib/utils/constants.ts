@@ -142,12 +142,18 @@ export const CHECKLIST_STATUSES = [
 export const CHECKLIST_CATEGORIES = [
   { value: 'identity', label: 'Identity Documents' },
   { value: 'education', label: 'Education' },
+  { value: 'academic', label: 'Academic' },
   { value: 'employment', label: 'Employment' },
   { value: 'financial', label: 'Financial' },
   { value: 'language', label: 'Language Testing' },
   { value: 'background', label: 'Background / Police' },
+  { value: 'security', label: 'Security / Police' },
   { value: 'medical', label: 'Medical' },
   { value: 'relationship', label: 'Relationship Evidence' },
+  { value: 'sponsor', label: 'Sponsor Documents' },
+  { value: 'supporting', label: 'Supporting Documents' },
+  { value: 'provincial', label: 'Provincial Requirements' },
+  { value: 'forms', label: 'IRCC Forms' },
   { value: 'claim', label: 'Claim / Legal' },
   { value: 'other', label: 'Other' },
   { value: 'general', label: 'General' },
@@ -421,6 +427,47 @@ export const DOCUMENT_REJECTION_REASONS = [
   { value: 'wrong_format', label: 'Wrong File Format' },
   { value: 'other', label: 'Other' },
 ] as const
+
+// ============================================================================
+// Verification Rejection Presets
+// ============================================================================
+// Used by the VerificationRejectDialog for lawyer field/document verification.
+// Each preset has a slug, a lawyer-facing label, and a default client message.
+
+export const VERIFICATION_REJECTION_PRESETS = [
+  {
+    slug: 'blurry_scan',
+    label: 'Blurry / Unreadable',
+    clientMessage: 'The document uploaded is blurry. Please scan it in high resolution (300 DPI).',
+  },
+  {
+    slug: 'expired_doc',
+    label: 'Expired Document',
+    clientMessage: 'This document appears to be expired. Please provide a valid, current version.',
+  },
+  {
+    slug: 'wrong_type',
+    label: 'Wrong Document',
+    clientMessage: 'This is not the requested document. Please check the requirements and re-upload.',
+  },
+  {
+    slug: 'missing_pages',
+    label: 'Missing Pages',
+    clientMessage: 'The document is incomplete. Please ensure all pages (including blank ones) are included.',
+  },
+  {
+    slug: 'incorrect_info',
+    label: 'Incorrect Information',
+    clientMessage: 'The information provided does not match our records. Please review and correct.',
+  },
+  {
+    slug: 'other',
+    label: 'Other',
+    clientMessage: '',
+  },
+] as const
+
+export type VerificationRejectionSlug = (typeof VERIFICATION_REJECTION_PRESETS)[number]['slug']
 
 // ============================================================================
 // Document Slot Template Constants

@@ -365,11 +365,12 @@ export default async function PortalPage({ params }: Props) {
       enrichedSlots = allEnriched
     }
   } else {
-    // Non-enforcement: fetch legacy checklist items
+    // Non-enforcement: fetch legacy checklist items (exclude N/A — hidden from client)
     const { data: items } = await admin
       .from('matter_checklist_items')
       .select('*')
       .eq('matter_id', link.matter_id ?? "")
+      .neq('status', 'not_applicable')
       .order('sort_order', { ascending: true })
 
     checklistItems = items ?? []

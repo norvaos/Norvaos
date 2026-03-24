@@ -28,6 +28,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { HelperTip } from '@/components/ui/helper-tip'
 
 import {
   useActiveFilesByStage,
@@ -77,7 +78,7 @@ export function ActiveFilesByStageWidget({ tenantId }: WidgetProps) {
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-sm">
             <Briefcase className="h-4 w-4 text-muted-foreground" />
-            Active Files by Stage
+            Active Files by Stage <HelperTip contentKey="dashboard.active_files_by_stage" />
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">

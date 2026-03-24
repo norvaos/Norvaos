@@ -48,13 +48,37 @@ export async function validatePortalToken(token: string): Promise<PortalLink> {
   const admin = createAdminClient()
   const tokenHash = hashToken(token)
 
-  const { data: link, error } = await (admin as any)
+  // Try hash-based lookup first (new links), then raw token fallback (legacy links without token_hash)
+  let link: Record<string, unknown> | null = null
+
+  const { data: hashMatch } = await (admin as any)
     .from('portal_links')
     .select('id, tenant_id, matter_id, contact_id, is_active, expires_at, link_type, permissions, metadata, access_count, last_accessed_at')
     .eq('token_hash', tokenHash)
     .maybeSingle()
 
-  if (error || !link) {
+  if (hashMatch) {
+    link = hashMatch
+  } else {
+    // Fallback: legacy links where token_hash was never set
+    const { data: rawMatch } = await (admin as any)
+      .from('portal_links')
+      .select('id, tenant_id, matter_id, contact_id, is_active, expires_at, link_type, permissions, metadata, access_count, last_accessed_at')
+      .eq('token', token)
+      .maybeSingle()
+    if (rawMatch) {
+      link = rawMatch
+      // Backfill the hash so future lookups use hash-based path
+      ;(admin as any)
+        .from('portal_links')
+        .update({ token_hash: tokenHash })
+        .eq('id', rawMatch.id)
+        .then(() => {})
+        .catch(() => {})
+    }
+  }
+
+  if (!link) {
     throw new PortalAuthError('Invalid or expired portal link', 404)
   }
 

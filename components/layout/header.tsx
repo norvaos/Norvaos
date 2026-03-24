@@ -6,7 +6,11 @@ import { useUser } from '@/lib/hooks/use-user'
 import { useTenant } from '@/lib/hooks/use-tenant'
 import { useUIStore } from '@/lib/stores/ui-store'
 import { useEnabledPracticeAreas } from '@/lib/queries/practice-areas'
+import { useMatter } from '@/lib/queries/matters'
 import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { cn } from '@/lib/utils'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
   DropdownMenu,
@@ -113,6 +117,11 @@ export function Header() {
 
   const pageTitle = getPageTitle(pathname)
 
+  // ─── Matter context: show title + status when viewing a matter ──
+  const matterIdMatch = pathname.match(/^\/matters\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/)
+  const matterId = matterIdMatch?.[1] ?? ''
+  const { data: matterContext } = useMatter(matterId)
+
   const { data: practiceAreas } = useEnabledPracticeAreas(tenant?.id)
 
   async function handleSignOut() {
@@ -167,12 +176,58 @@ export function Header() {
         <Menu className="size-5" />
       </Button>
 
-      {/* Page title + active filter badge */}
-      <div className="flex items-center gap-2.5">
-        <h1 className="text-lg font-semibold tracking-tight">{pageTitle}</h1>
+      {/* Page title + matter context + active filter badge */}
+      <div className="flex items-center gap-2.5 min-w-0">
+        {matterContext ? (
+          <>
+            <h1 className="text-lg font-semibold tracking-tight truncate max-w-[300px]">
+              {matterContext.title}
+            </h1>
+            <Badge
+              className={cn(
+                'shrink-0 text-[10px]',
+                matterContext.status === 'active' && 'bg-emerald-100 text-emerald-700 hover:bg-emerald-100',
+                matterContext.status === 'on_hold' && 'bg-amber-100 text-amber-700 hover:bg-amber-100',
+                matterContext.status === 'closed_won' && 'bg-slate-100 text-slate-600 hover:bg-slate-100',
+                matterContext.status === 'closed_lost' && 'bg-red-100 text-red-600 hover:bg-red-100',
+                matterContext.status === 'closed_withdrawn' && 'bg-slate-100 text-slate-500 hover:bg-slate-100',
+              )}
+            >
+              {(matterContext.status ?? 'active').replace(/_/g, ' ')}
+            </Badge>
+            {/* Trust balance indicator */}
+            {matterContext.trust_balance !== null && matterContext.trust_balance !== undefined && (
+              (() => {
+                const bal = matterContext.trust_balance ?? 0
+                if (bal > 500) return null // Hidden when healthy
+                const isZero = bal <= 0
+                return (
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span
+                        className={cn(
+                          'size-2.5 shrink-0 rounded-full',
+                          isZero ? 'bg-red-500 animate-pulse' : 'bg-amber-400'
+                        )}
+                        aria-label={isZero ? 'Trust balance is zero' : 'Low trust balance'}
+                      />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      {isZero
+                        ? `Trust balance: $0.00 — no funds available`
+                        : `Low trust balance: $${bal.toFixed(2)}`}
+                    </TooltipContent>
+                  </Tooltip>
+                )
+              })()
+            )}
+          </>
+        ) : (
+          <h1 className="text-lg font-semibold tracking-tight">{pageTitle}</h1>
+        )}
         {isFiltered && accentName && (
           <span
-            className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium text-white"
+            className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium text-white shrink-0"
             style={{ backgroundColor: accentColor ?? '#6b7280' }}
           >
             <span className="size-1.5 rounded-full bg-white/60" />

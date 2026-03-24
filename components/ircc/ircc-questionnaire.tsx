@@ -9,6 +9,8 @@ import {
   ShieldCheck,
   ShieldAlert,
   ShieldOff,
+  Clock,
+  XCircle,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -32,7 +34,10 @@ import {
   useBulkVerifyFields,
   useUnverifyField,
   isVerificationStale,
+  isFieldLocked,
+  isFieldRejected,
 } from '@/lib/queries/field-verifications'
+import { VerificationRejectDialog } from '@/components/ircc/verification-reject-dialog'
 import {
   buildQuestionnaire,
   evaluateFieldCondition,
@@ -161,6 +166,18 @@ interface IRCCQuestionnaireProps {
    * Should be false for client-facing portal view.
    */
   canVerify?: boolean
+  /**
+   * When true, enables portal-mode rendering:
+   *   - Verified fields are rendered as disabled with a "Verified by Law Firm" badge
+   *   - Rejected fields have a red border and show the rejection reason
+   *   - Pending/submitted fields remain editable
+   */
+  portalMode?: boolean
+  /**
+   * Called when a client clicks "Fixed It" on a rejected field in portal mode.
+   * The parent component handles the API call to re-submit.
+   */
+  onFieldResubmit?: (profilePath: string) => void | Promise<void>
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
@@ -176,6 +193,8 @@ export function IRCCQuestionnaire({
   prebuiltQuestionnaire,
   matterId,
   canVerify = false,
+  portalMode = false,
+  onFieldResubmit,
 }: IRCCQuestionnaireProps) {
   // Build the questionnaire from form codes + existing data
   // If prebuiltQuestionnaire is provided (from DB engine), use it directly
@@ -201,6 +220,10 @@ export function IRCCQuestionnaire({
   )
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [isSaving, setIsSaving] = useState(false)
+
+  // ── Rejection dialog state ─────────────────────────────────────────────
+  const [rejectDialogOpen, setRejectDialogOpen] = useState(false)
+  const [rejectTarget, setRejectTarget] = useState<{ profilePath: string; label: string } | null>(null)
 
   // ── Field Verifications ──────────────────────────────────────────────────
   const { data: verifications = {} } = useFieldVerifications(matterId)
@@ -576,6 +599,29 @@ export function IRCCQuestionnaire({
                             {matterId && (() => {
                               const v = verifications[field.profile_path]
                               if (!v) return null
+
+                              // Portal mode: show "Verified by Law Firm" or "Needs Correction"
+                              if (portalMode) {
+                                if (isFieldLocked(v)) {
+                                  return (
+                                    <Badge variant="outline" className="text-[10px] px-1 py-0 h-4 border-green-300 text-green-700 bg-green-50 gap-0.5">
+                                      <ShieldCheck className="h-2.5 w-2.5" />
+                                      Verified by Law Firm
+                                    </Badge>
+                                  )
+                                }
+                                if (isFieldRejected(v)) {
+                                  return (
+                                    <Badge variant="outline" className="text-[10px] px-1 py-0 h-4 border-red-300 text-red-700 bg-red-50 gap-0.5">
+                                      <AlertCircle className="h-2.5 w-2.5" />
+                                      Needs Correction
+                                    </Badge>
+                                  )
+                                }
+                                return null
+                              }
+
+                              // Staff mode: show verified/stale badges
                               const stale = isVerificationStale(v, fieldValue)
                               return stale ? (
                                 <Badge variant="outline" className="text-[10px] px-1 py-0 h-4 border-amber-300 text-amber-700 bg-amber-50 gap-0.5">
@@ -592,10 +638,37 @@ export function IRCCQuestionnaire({
                           </div>
                         )}
 
-                      {renderField(field, fieldValue, readOnly, values, (val) =>
-                        updateValue(field.profile_path, val),
-                        fieldError,
-                      )}
+                      {(() => {
+                        const fv = verifications[field.profile_path]
+                        const fieldDisabled = readOnly || (portalMode && isFieldLocked(fv))
+                        const fieldRejected = portalMode && isFieldRejected(fv)
+                        return (
+                          <div className={cn(fieldRejected && 'rounded-md border-2 border-red-500 p-2')}>
+                            {renderField(field, fieldValue, fieldDisabled, values, (val) =>
+                              updateValue(field.profile_path, val),
+                              fieldError,
+                            )}
+                            {fieldRejected && fv?.rejection_reason && (
+                              <div className="mt-1.5 space-y-1.5">
+                                <p className="flex items-center gap-1 text-xs font-medium text-red-600">
+                                  <AlertCircle className="size-3 shrink-0" />
+                                  {fv.rejection_reason}
+                                </p>
+                                {onFieldResubmit && (
+                                  <button
+                                    type="button"
+                                    className="flex items-center gap-1 rounded-md border border-green-300 bg-green-50 px-2.5 py-1 text-[11px] font-medium text-green-700 hover:bg-green-100 transition-colors"
+                                    onClick={() => onFieldResubmit(field.profile_path)}
+                                  >
+                                    <Check className="h-3 w-3" />
+                                    Fixed It — Ready for Review
+                                  </button>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        )
+                      })()}
 
                       {field.description &&
                         field.field_type !== 'repeater' && (
@@ -630,6 +703,49 @@ export function IRCCQuestionnaire({
                         const v = verifications[field.profile_path]
                         const hasValue = fieldValue != null && fieldValue !== ''
                         if (!hasValue) return null
+
+                        // Waiting for Client: field was rejected, awaiting client correction
+                        if (v?.verification_status === 'rejected') {
+                          return (
+                            <div className="flex items-center gap-2">
+                              <span className="flex items-center gap-1 text-[11px] text-amber-600 font-medium">
+                                <Clock className="h-3 w-3 animate-pulse" />
+                                Waiting for Client
+                              </span>
+                              <button
+                                type="button"
+                                className="flex items-center gap-1 text-[11px] text-slate-400 hover:text-slate-600 transition-colors"
+                                disabled={unverifyField.isPending}
+                                onClick={() => unverifyField.mutate(field.profile_path)}
+                              >
+                                <ShieldOff className="h-3 w-3" />
+                                Clear
+                              </button>
+                            </div>
+                          )
+                        }
+
+                        // Re-submitted by client: ready for re-review
+                        if (v?.verification_status === 'submitted') {
+                          return (
+                            <div className="flex items-center gap-2">
+                              <Badge variant="outline" className="text-[10px] px-1 py-0 h-4 border-blue-300 text-blue-700 bg-blue-50 gap-0.5">
+                                <Clock className="h-2.5 w-2.5" />
+                                Re-submitted
+                              </Badge>
+                              <button
+                                type="button"
+                                className="flex items-center gap-1 text-[11px] text-blue-600 hover:text-blue-800 transition-colors font-medium"
+                                disabled={verifyField.isPending}
+                                onClick={() => verifyField.mutate({ profile_path: field.profile_path, verified_value: fieldValue })}
+                              >
+                                <ShieldCheck className="h-3 w-3" />
+                                Verify
+                              </button>
+                            </div>
+                          )
+                        }
+
                         const isVerified = v && !isVerificationStale(v, fieldValue)
                         if (isVerified) {
                           return (
@@ -645,15 +761,28 @@ export function IRCCQuestionnaire({
                           )
                         }
                         return (
-                          <button
-                            type="button"
-                            className="flex items-center gap-1 text-[11px] text-blue-600 hover:text-blue-800 transition-colors font-medium"
-                            disabled={verifyField.isPending}
-                            onClick={() => verifyField.mutate({ profile_path: field.profile_path, verified_value: fieldValue })}
-                          >
-                            <ShieldCheck className="h-3 w-3" />
-                            Verify
-                          </button>
+                          <div className="flex items-center gap-2">
+                            <button
+                              type="button"
+                              className="flex items-center gap-1 text-[11px] text-blue-600 hover:text-blue-800 transition-colors font-medium"
+                              disabled={verifyField.isPending}
+                              onClick={() => verifyField.mutate({ profile_path: field.profile_path, verified_value: fieldValue })}
+                            >
+                              <ShieldCheck className="h-3 w-3" />
+                              Verify
+                            </button>
+                            <button
+                              type="button"
+                              className="flex items-center gap-1 text-[11px] text-red-500 hover:text-red-700 transition-colors"
+                              onClick={() => {
+                                setRejectTarget({ profilePath: field.profile_path, label: field.label })
+                                setRejectDialogOpen(true)
+                              }}
+                            >
+                              <XCircle className="h-3 w-3" />
+                              Reject
+                            </button>
+                          </div>
                         )
                       })()}
                     </div>
@@ -703,6 +832,22 @@ export function IRCCQuestionnaire({
           </Button>
         )}
       </div>
+
+      {/* Rejection dialog — opened from per-field Reject button */}
+      {canVerify && matterId && rejectTarget && (
+        <VerificationRejectDialog
+          matterId={matterId}
+          targets={[{
+            type: 'field' as const,
+            profile_path: rejectTarget.profilePath,
+            verified_value: values[rejectTarget.profilePath],
+          }]}
+          itemLabel={rejectTarget.label}
+          open={rejectDialogOpen}
+          onOpenChange={setRejectDialogOpen}
+          onRejected={() => setRejectTarget(null)}
+        />
+      )}
     </div>
   )
 }

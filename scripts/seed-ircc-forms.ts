@@ -1681,12 +1681,945 @@ const IMM5476E_FORM: SeedFormDef = {
   array_maps: [],
 }
 
+// ── IMM 5257 Schedule 1 — Background/Declaration ─────────────────────────────
+// Companion form to IMM5257E. Covers background declarations, military service,
+// organizational affiliations, government positions, and travel history.
+// XFA root: Schedule1, 91 fields mapped from PDF.
+
+const IMM5257_SCHEDULE1_FORM: SeedFormDef = {
+  form_code: 'IMM5257B',
+  form_name: 'IMM 5257 — Schedule 1 (Background/Declaration)',
+  description: 'Schedule 1 companion to IMM5257E. Covers detailed background declarations, military service history, organizational affiliations, government positions, and previous travel to Canada.',
+  storage_path: 'ircc-forms/IMM5257B.pdf',
+  file_name: 'IMM5257B.pdf',
+  checksum_sha256: '12486ea3d55d7cfa7ab88a915389c506dd76204b453d04c26cec0bf9ded75f93',
+  xfa_root_element: 'Schedule1',
+  is_xfa: true,
+  scan_status: 'scanned',
+  mapping_version: 'IMM5257B-map-v1.0',
+  sections: [
+    // ── Section 1: Applicant Identification ──────────────────────────────
+    {
+      section_key: 'applicant_id',
+      title: 'Applicant Identification',
+      description: 'Identifies the applicant for this schedule.',
+      sort_order: 1,
+      fields: [
+        { xfa_path: 'Schedule1.page1.subNo1.Table1.Row1.familyName', profile_path: 'personal.family_name', label: 'Family Name', field_type: 'text', is_required: true, sort_order: 1, max_length: 60 },
+        { xfa_path: 'Schedule1.page1.subNo1.Table1.Row1.givenName', profile_path: 'personal.given_name', label: 'Given Name(s)', field_type: 'text', is_required: true, sort_order: 2, max_length: 60 },
+        { xfa_path: 'Schedule1.page1.subNo2.dateBox.DBYear', profile_path: 'personal.date_of_birth', label: 'Date of Birth — Year', field_type: 'date', is_required: true, sort_order: 3, date_split: 'year' },
+        { xfa_path: 'Schedule1.page1.subNo2.dateBox.DBMonth', profile_path: 'personal.date_of_birth', label: 'Date of Birth — Month', field_type: 'date', is_required: false, sort_order: 4, date_split: 'month' },
+        { xfa_path: 'Schedule1.page1.subNo2.dateBox.DBDay', profile_path: 'personal.date_of_birth', label: 'Date of Birth — Day', field_type: 'date', is_required: false, sort_order: 5, date_split: 'day' },
+        { xfa_path: 'Schedule1.page1.subNo2.UCI', profile_path: 'personal.uci_number', label: 'UCI Number', field_type: 'text', is_required: false, sort_order: 6, max_length: 20 },
+        { xfa_path: 'Schedule1.page1.subIndicate.applicant', profile_path: 'schedule1.applicant_type', label: 'Applicant or Spouse/Common-Law', field_type: 'select', is_required: true, sort_order: 7, options: [{ label: 'Applicant', value: 'applicant' }, { label: 'Spouse / Common-Law Partner', value: 'spouse' }] },
+      ],
+    },
+    // ── Section 2: Military Service ──────────────────────────────────────
+    {
+      section_key: 'military_service',
+      title: 'Military / Militia / Civil Defence Unit Service',
+      description: 'Have you ever served in the military, militia, or civil defence?',
+      sort_order: 2,
+      fields: [
+        { xfa_path: 'Schedule1.page1.MilitaryServiceheader.Yes', profile_path: 'background.military_service', label: 'Military Service?', field_type: 'boolean', is_required: true, sort_order: 1, value_format: { boolean_true: '1', boolean_false: '0' } },
+        // Repeater rows — questionnaire-only, mapped via array_maps
+        { xfa_path: '__questionnaire_only__military_history', profile_path: 'background.military_history', label: 'Military Service History', field_type: 'repeater', is_required: false, sort_order: 2,
+          show_when: { profile_path: 'background.military_service', operator: 'is_truthy' } },
+      ],
+    },
+    // ── Section 3: Ill Treatment / Detention ────────────────────────────
+    {
+      section_key: 'ill_treatment',
+      title: 'Ill Treatment / Prison / Detention',
+      description: 'Were you ever subject to ill treatment, torture, or detention?',
+      sort_order: 3,
+      fields: [
+        { xfa_path: 'Schedule1.page1.IllTreatSection.illtreatment.Yes', profile_path: 'background.ill_treatment', label: 'Ill Treatment or Detention?', field_type: 'boolean', is_required: true, sort_order: 1, value_format: { boolean_true: '1', boolean_false: '0' } },
+        { xfa_path: '__questionnaire_only__ill_treatment_history', profile_path: 'background.ill_treatment_history', label: 'Ill Treatment History', field_type: 'repeater', is_required: false, sort_order: 2,
+          show_when: { profile_path: 'background.ill_treatment', operator: 'is_truthy' } },
+      ],
+    },
+    // ── Section 4: Organization Affiliation ──────────────────────────────
+    {
+      section_key: 'organization_affiliation',
+      title: 'Organization / Group Affiliation',
+      description: 'Were you associated with any political, social, or other organizations?',
+      sort_order: 4,
+      fields: [
+        { xfa_path: 'Schedule1.page1.organizationSection.MilitaryServiceheader.Yes', profile_path: 'background.organization_involvement', label: 'Organization Affiliation?', field_type: 'boolean', is_required: true, sort_order: 1, value_format: { boolean_true: '1', boolean_false: '0' } },
+        { xfa_path: '__questionnaire_only__organization_history', profile_path: 'background.organization_history', label: 'Organization History', field_type: 'repeater', is_required: false, sort_order: 2,
+          show_when: { profile_path: 'background.organization_involvement', operator: 'is_truthy' } },
+      ],
+    },
+    // ── Section 5: Government Positions ──────────────────────────────────
+    {
+      section_key: 'government_positions',
+      title: 'Government Positions',
+      description: 'Have you ever held any government positions?',
+      sort_order: 5,
+      fields: [
+        { xfa_path: 'Schedule1.page1.positionsSection.MilitaryServiceheader.Yes', profile_path: 'background.government_position', label: 'Government Position?', field_type: 'boolean', is_required: true, sort_order: 1, value_format: { boolean_true: '1', boolean_false: '0' } },
+        { xfa_path: '__questionnaire_only__government_position_history', profile_path: 'background.government_position_history', label: 'Government Position History', field_type: 'repeater', is_required: false, sort_order: 2,
+          show_when: { profile_path: 'background.government_position', operator: 'is_truthy' } },
+      ],
+    },
+    // ── Section 6: Previous Travel to Canada ────────────────────────────
+    {
+      section_key: 'previous_travel',
+      title: 'Previous Travel to Canada',
+      description: 'Have you previously travelled to Canada?',
+      sort_order: 6,
+      fields: [
+        { xfa_path: 'Schedule1.page1.previousTravelSection.MilitaryServiceheader.Yes', profile_path: 'background.previous_travel_to_canada', label: 'Previously Travelled to Canada?', field_type: 'boolean', is_required: true, sort_order: 1, value_format: { boolean_true: '1', boolean_false: '0' } },
+        { xfa_path: '__questionnaire_only__previous_travel_history', profile_path: 'background.previous_travel_history', label: 'Previous Travel History', field_type: 'repeater', is_required: false, sort_order: 2,
+          show_when: { profile_path: 'background.previous_travel_to_canada', operator: 'is_truthy' } },
+      ],
+    },
+    // ── Section 7: Signature ────────────────────────────────────────────
+    {
+      section_key: 'signature',
+      title: 'Signature',
+      description: 'Applicant declaration and signature.',
+      sort_order: 7,
+      fields: [
+        { xfa_path: 'Schedule1.SignatureField1', profile_path: null, label: 'Signature', field_type: 'text', is_required: false, sort_order: 1, is_meta_field: true, meta_field_key: '__signature' },
+      ],
+    },
+  ],
+  array_maps: [
+    // Military Service History — repeating rows
+    {
+      profile_path: 'background.military_history',
+      xfa_base_path: 'Schedule1.page1.Table1',
+      xfa_entry_name: 'Row1',
+      max_entries: 10,
+      sub_fields: {
+        from_year: 'from.Year',
+        from_month: 'from.Month',
+        to_year: 'to.Year',
+        to_month: 'to.Month',
+        stationed: 'stationed',
+        province: 'prov',
+        country: 'country',
+      },
+    },
+    // Ill Treatment History
+    {
+      profile_path: 'background.ill_treatment_history',
+      xfa_base_path: 'Schedule1.page1.IllTreatSection.illTreatTable.bodypart.BodyTable',
+      xfa_entry_name: 'Row1',
+      max_entries: 10,
+      sub_fields: {
+        from_year: 'from.Year',
+        from_month: 'from.Month',
+        to_year: 'to.Year',
+        to_month: 'to.Month',
+        location: 'location',
+        province: 'prov',
+        country: 'country',
+      },
+    },
+    // Organization Affiliation History
+    {
+      profile_path: 'background.organization_history',
+      xfa_base_path: 'Schedule1.page1.organizationSection.Table1',
+      xfa_entry_name: 'Row1',
+      max_entries: 10,
+      sub_fields: {
+        from_year: 'from.Year',
+        from_month: 'from.Month',
+        to_year: 'to.Year',
+        to_month: 'to.Month',
+        organization: 'organization',
+        activities: 'activities',
+        province: 'prov',
+        country: 'country',
+      },
+    },
+    // Government Position History
+    {
+      profile_path: 'background.government_position_history',
+      xfa_base_path: 'Schedule1.page1.positionsSection.Table1',
+      xfa_entry_name: 'Row1',
+      max_entries: 10,
+      sub_fields: {
+        from_year: 'from.Year',
+        from_month: 'from.Month',
+        to_year: 'to.Year',
+        to_month: 'to.Month',
+        country: 'country',
+        jurisdiction: 'jurisdiction',
+        department: 'department',
+        activities: 'activities',
+      },
+    },
+    // Previous Travel to Canada
+    {
+      profile_path: 'background.previous_travel_history',
+      xfa_base_path: 'Schedule1.page1.previousTravelSection.Table1',
+      xfa_entry_name: 'Row1',
+      max_entries: 10,
+      sub_fields: {
+        from_year: 'from.Year',
+        from_month: 'from.Month',
+        to_year: 'to.Year',
+        to_month: 'to.Month',
+        country: 'country',
+        location: 'location',
+        purpose: 'purpose',
+      },
+    },
+  ],
+}
+
+// ── IMM 5562E — Supplementary Travel Document ────────────────────────────────
+// Simple form for travel document application. Heavy reuse of personal data
+// from IMM5257E. Primarily covers travel history sections A, B, and C.
+// XFA root: IMM_5562, 27 user-facing fields.
+
+const IMM5562E_FORM: SeedFormDef = {
+  form_code: 'IMM5562E',
+  form_name: 'IMM 5562E — Supplementary Travel Document',
+  description: 'Supplementary travel document form. Covers applicant identification and detailed travel history in three sections (A, B, C).',
+  storage_path: 'ircc-forms/IMM5562E.pdf',
+  file_name: 'IMM5562E.pdf',
+  checksum_sha256: '73da00f1f1b026297471bce0e3eac9b6989f69c5576b307abe568aeaf788f569',
+  xfa_root_element: 'IMM_5562',
+  is_xfa: true,
+  scan_status: 'scanned',
+  mapping_version: 'IMM5562E-map-v1.0',
+  sections: [
+    // ── Section 1: Applicant Identification ──────────────────────────────
+    {
+      section_key: 'applicant_id',
+      title: 'Applicant Identification',
+      description: 'Identifies the applicant for this travel document.',
+      sort_order: 1,
+      fields: [
+        { xfa_path: 'IMM_5562.Page1.Name.Item1.FamilyName', profile_path: 'personal.family_name', label: 'Family Name', field_type: 'text', is_required: true, sort_order: 1, max_length: 60 },
+        { xfa_path: 'IMM_5562.Page1.Name.Item1.GivenNames', profile_path: 'personal.given_name', label: 'Given Name(s)', field_type: 'text', is_required: true, sort_order: 2, max_length: 60 },
+      ],
+    },
+    // ── Section 2A: Travel History (Section A) ──────────────────────────
+    {
+      section_key: 'travel_section_a',
+      title: 'Travel History — Section A',
+      description: 'List your travel history for Section A.',
+      sort_order: 2,
+      fields: [
+        { xfa_path: 'IMM_5562.Item2A.Header.CheckBox1', profile_path: 'travel_doc.section_a_applicable', label: 'Section A Applicable?', field_type: 'boolean', is_required: false, sort_order: 1, value_format: { boolean_true: '1', boolean_false: '0' } },
+        { xfa_path: '__questionnaire_only__travel_history_a', profile_path: 'travel_doc.travel_history_a', label: 'Travel History (Section A)', field_type: 'repeater', is_required: false, sort_order: 2 },
+      ],
+    },
+    // ── Section 2B: Travel History (Section B) ──────────────────────────
+    {
+      section_key: 'travel_section_b',
+      title: 'Travel History — Section B',
+      description: 'List your travel history for Section B.',
+      sort_order: 3,
+      fields: [
+        { xfa_path: 'IMM_5562.Item2B.CheckBox1', profile_path: 'travel_doc.section_b_applicable', label: 'Section B Applicable?', field_type: 'boolean', is_required: false, sort_order: 1, value_format: { boolean_true: '1', boolean_false: '0' } },
+        { xfa_path: '__questionnaire_only__travel_history_b', profile_path: 'travel_doc.travel_history_b', label: 'Travel History (Section B)', field_type: 'repeater', is_required: false, sort_order: 2 },
+      ],
+    },
+    // ── Section 2C: Travel History (Section C / Other) ───────────────────
+    {
+      section_key: 'travel_section_c',
+      title: 'Travel History — Section C (Other)',
+      description: 'Additional travel history.',
+      sort_order: 4,
+      fields: [
+        { xfa_path: '__questionnaire_only__travel_history_c', profile_path: 'travel_doc.travel_history_c', label: 'Travel History (Section C)', field_type: 'repeater', is_required: false, sort_order: 1 },
+      ],
+    },
+    // ── Section 3: Signature ────────────────────────────────────────────
+    {
+      section_key: 'signature',
+      title: 'Signature',
+      description: 'Applicant signature and date.',
+      sort_order: 5,
+      fields: [
+        { xfa_path: 'Page2.Item3.Signature', profile_path: null, label: 'Signature', field_type: 'text', is_required: false, sort_order: 1, is_meta_field: true, meta_field_key: '__signature' },
+        { xfa_path: 'Page2.Item3.SignedDate', profile_path: null, label: 'Signed Date', field_type: 'date', is_required: false, sort_order: 2, is_meta_field: true, meta_field_key: '__signed_date' },
+      ],
+    },
+  ],
+  array_maps: [
+    // Section A travel history
+    {
+      profile_path: 'travel_doc.travel_history_a',
+      xfa_base_path: 'IMM_5562.Item2A.PaddedList2A.List2A',
+      xfa_entry_name: 's1',
+      max_entries: 20,
+      sub_fields: {
+        from_date: 'fromDate',
+        to_date: 'toDate',
+        duration: 'Duration',
+        destination: 'Destination',
+        purpose: 'PurposeofTravel',
+        details: 'Details',
+      },
+    },
+    // Section B travel history
+    {
+      profile_path: 'travel_doc.travel_history_b',
+      xfa_base_path: 'IMM_5562.PaddedList2B.List2B',
+      xfa_entry_name: 's1',
+      max_entries: 20,
+      sub_fields: {
+        from_date: 'fromDate',
+        to_date: 'toDate',
+        duration: 'Duration',
+        destination: 'Destination',
+        purpose: 'PurposeofTravel',
+        details: 'Details',
+      },
+    },
+    // Section C travel history
+    {
+      profile_path: 'travel_doc.travel_history_c',
+      xfa_base_path: 'PaddedList2X.List2X',
+      xfa_entry_name: 's1',
+      max_entries: 20,
+      sub_fields: {
+        from_date: 'fromDate',
+        to_date: 'toDate',
+        duration: 'Duration',
+        destination: 'Destination',
+        purpose: 'PurposeofTravel',
+        details: 'Details',
+      },
+    },
+  ],
+}
+
+// ── IMM 1294E — Application for Study Permit ─────────────────────────────────
+// Study permit application. Heavy reuse of personal/passport/contact from IMM5257E.
+// New domain: study_program.* for institution, DLI, program, costs.
+// XFA root: form1, 259 fields (many shared with IMM5257E XFA structure).
+
+const IMM1294E_FORM: SeedFormDef = {
+  form_code: 'IMM1294E',
+  form_name: 'IMM 1294E — Application for Study Permit',
+  description: 'Study permit application. Covers personal details, passport, contact information, study program details, financial support, education history, employment history, and background declarations.',
+  storage_path: 'ircc-forms/IMM1294E.pdf',
+  file_name: 'IMM1294E.pdf',
+  checksum_sha256: 'bd27c58cec8ea10a28bc75d3f5b1ae220d627cfe2f6e678be7a504ca174d2c2a',
+  xfa_root_element: 'form1',
+  is_xfa: true,
+  scan_status: 'scanned',
+  mapping_version: 'IMM1294E-map-v1.0',
+  sections: [
+    // ── Section 1: Personal Details (reuse from IMM5257E) ─────────────
+    {
+      section_key: 'personal_details',
+      title: 'Personal Details',
+      description: 'Applicant personal information. Reuses profile paths from IMM5257E.',
+      sort_order: 1,
+      fields: [
+        { xfa_path: 'form1.Page1.PersonalDetails.ServiceIn.ServiceIn', profile_path: 'personal.service_in', label: 'Preferred Language of Service', field_type: 'select', is_required: true, sort_order: 1, options: [{ label: 'English', value: 'english' }, { label: 'French', value: 'french' }] },
+        { xfa_path: 'form1.Page1.PersonalDetails.UCIClientID', profile_path: 'personal.uci_number', label: 'UCI / Client ID', field_type: 'text', is_required: false, sort_order: 2, max_length: 20 },
+        { xfa_path: 'form1.Page1.PersonalDetails.Name.FamilyName', profile_path: 'personal.family_name', label: 'Family Name', field_type: 'text', is_required: true, sort_order: 3, max_length: 60 },
+        { xfa_path: 'form1.Page1.PersonalDetails.Name.GivenName', profile_path: 'personal.given_name', label: 'Given Name(s)', field_type: 'text', is_required: true, sort_order: 4, max_length: 60 },
+        { xfa_path: 'form1.Page1.PersonalDetails.Sex.Sex', profile_path: 'personal.sex', label: 'Sex', field_type: 'select', is_required: true, sort_order: 5, options: [{ label: 'Male', value: 'male' }, { label: 'Female', value: 'female' }, { label: 'Other', value: 'other' }] },
+        { xfa_path: 'form1.Page1.PersonalDetails.DOBYear', profile_path: 'personal.date_of_birth', label: 'Date of Birth — Year', field_type: 'date', is_required: true, sort_order: 6, date_split: 'year' },
+        { xfa_path: 'form1.Page1.PersonalDetails.DOBMonth', profile_path: 'personal.date_of_birth', label: 'Date of Birth — Month', field_type: 'date', is_required: false, sort_order: 7, date_split: 'month' },
+        { xfa_path: 'form1.Page1.PersonalDetails.DOBDay', profile_path: 'personal.date_of_birth', label: 'Date of Birth — Day', field_type: 'date', is_required: false, sort_order: 8, date_split: 'day' },
+        { xfa_path: 'form1.Page1.PersonalDetails.PlaceBirthCity', profile_path: 'personal.place_of_birth_city', label: 'Place of Birth — City', field_type: 'text', is_required: true, sort_order: 9, max_length: 40 },
+        { xfa_path: 'form1.Page1.PersonalDetails.PlaceBirthCountry', profile_path: 'personal.place_of_birth_country', label: 'Place of Birth — Country', field_type: 'country', is_required: true, sort_order: 10 },
+        { xfa_path: 'form1.Page1.PersonalDetails.Citizenship.Citizenship', profile_path: 'personal.citizenship', label: 'Citizenship', field_type: 'country', is_required: true, sort_order: 11 },
+        { xfa_path: 'form1.Page1.PersonalDetails.CurrentCOR.Row2.Country', profile_path: 'personal.current_country_of_residence', label: 'Current Country of Residence', field_type: 'country', is_required: true, sort_order: 12 },
+        { xfa_path: 'form1.Page1.PersonalDetails.CurrentCOR.Row2.Status', profile_path: 'personal.residence_status', label: 'Immigration Status', field_type: 'text', is_required: false, sort_order: 13 },
+        { xfa_path: 'form1.Page1.PersonalDetails.AliasName.AliasNameIndicator.Yes', profile_path: 'personal.has_alias', label: 'Used Another Name?', field_type: 'boolean', is_required: true, sort_order: 14, value_format: { boolean_true: '1', boolean_false: '0' } },
+        { xfa_path: 'form1.Page1.PersonalDetails.AliasName.AliasFamilyName', profile_path: 'personal.alias_family_name', label: 'Alias Family Name', field_type: 'text', is_required: false, sort_order: 15, max_length: 60, show_when: { profile_path: 'personal.has_alias', operator: 'is_truthy' } },
+        { xfa_path: 'form1.Page1.PersonalDetails.AliasName.AliasGivenName', profile_path: 'personal.alias_given_name', label: 'Alias Given Name', field_type: 'text', is_required: false, sort_order: 16, max_length: 60, show_when: { profile_path: 'personal.has_alias', operator: 'is_truthy' } },
+      ],
+    },
+    // ── Section 2: Marital Status ────────────────────────────────────────
+    {
+      section_key: 'marital_status',
+      title: 'Marital Status',
+      description: 'Current and previous marital information.',
+      sort_order: 2,
+      fields: [
+        { xfa_path: 'form1.Page1.MaritalStatus.SectionA.MaritalStatus', profile_path: 'marital.status', label: 'Current Marital Status', field_type: 'select', is_required: true, sort_order: 1, options: MARITAL_STATUS_OPTIONS },
+        { xfa_path: 'form1.Page1.MaritalStatus.SectionA.MarriageDate.FromYr', profile_path: 'marital.date_of_current_relationship', label: 'Marriage Date — Year', field_type: 'date', is_required: false, sort_order: 2, date_split: 'year', show_when: { profile_path: 'marital.status', operator: 'equals', value: 'married' } },
+        { xfa_path: 'form1.Page1.MaritalStatus.SectionA.MarriageDate.FromMM', profile_path: 'marital.date_of_current_relationship', label: 'Marriage Date — Month', field_type: 'date', is_required: false, sort_order: 3, date_split: 'month', show_when: { profile_path: 'marital.status', operator: 'equals', value: 'married' } },
+        { xfa_path: 'form1.Page1.MaritalStatus.SectionA.MarriageDate.FromDD', profile_path: 'marital.date_of_current_relationship', label: 'Marriage Date — Day', field_type: 'date', is_required: false, sort_order: 4, date_split: 'day', show_when: { profile_path: 'marital.status', operator: 'equals', value: 'married' } },
+        { xfa_path: 'form1.Page1.MaritalStatus.SectionA.FamilyName', profile_path: 'marital.spouse_family_name', label: 'Spouse Family Name', field_type: 'text', is_required: false, sort_order: 5, max_length: 60, show_when: { profile_path: 'marital.status', operator: 'equals', value: 'married' } },
+        { xfa_path: 'form1.Page1.MaritalStatus.SectionA.GivenName', profile_path: 'marital.spouse_given_name', label: 'Spouse Given Name', field_type: 'text', is_required: false, sort_order: 6, max_length: 60, show_when: { profile_path: 'marital.status', operator: 'equals', value: 'married' } },
+      ],
+    },
+    // ── Section 3: Language ──────────────────────────────────────────────
+    {
+      section_key: 'language',
+      title: 'Language',
+      description: 'Language abilities.',
+      sort_order: 3,
+      fields: [
+        { xfa_path: 'form1.Page2.MaritalStatus.SectionA.Languages.languages.nativeLang.nativeLang', profile_path: 'language.native_language', label: 'Native Language', field_type: 'text', is_required: true, sort_order: 1, max_length: 30 },
+        { xfa_path: 'form1.Page2.MaritalStatus.SectionA.Languages.languages.ableToCommunicate.ableToCommunicate', profile_path: 'language.language_of_interview', label: 'Language for Interview', field_type: 'select', is_required: true, sort_order: 2, options: [{ label: 'English', value: 'english' }, { label: 'French', value: 'french' }, { label: 'Both', value: 'both' }] },
+      ],
+    },
+    // ── Section 4: Passport ─────────────────────────────────────────────
+    {
+      section_key: 'passport',
+      title: 'Passport / Travel Document',
+      description: 'Passport details.',
+      sort_order: 4,
+      fields: [
+        { xfa_path: 'form1.Page2.MaritalStatus.SectionA.Passport.PassportNum.PassportNum', profile_path: 'passport.number', label: 'Passport Number', field_type: 'text', is_required: true, sort_order: 1, max_length: 20 },
+        { xfa_path: 'form1.Page2.MaritalStatus.SectionA.Passport.CountryofIssue.CountryofIssue', profile_path: 'passport.country_of_issue', label: 'Country of Issue', field_type: 'country', is_required: true, sort_order: 2 },
+        { xfa_path: 'form1.Page2.MaritalStatus.SectionA.Passport.IssueYYYY', profile_path: 'passport.issue_date', label: 'Issue Date — Year', field_type: 'date', is_required: true, sort_order: 3, date_split: 'year' },
+        { xfa_path: 'form1.Page2.MaritalStatus.SectionA.Passport.IssueMM', profile_path: 'passport.issue_date', label: 'Issue Date — Month', field_type: 'date', is_required: false, sort_order: 4, date_split: 'month' },
+        { xfa_path: 'form1.Page2.MaritalStatus.SectionA.Passport.IssueDD', profile_path: 'passport.issue_date', label: 'Issue Date — Day', field_type: 'date', is_required: false, sort_order: 5, date_split: 'day' },
+        { xfa_path: 'form1.Page2.MaritalStatus.SectionA.Passport.expiryYYYY', profile_path: 'passport.expiry_date', label: 'Expiry Date — Year', field_type: 'date', is_required: true, sort_order: 6, date_split: 'year' },
+        { xfa_path: 'form1.Page2.MaritalStatus.SectionA.Passport.expiryMM', profile_path: 'passport.expiry_date', label: 'Expiry Date — Month', field_type: 'date', is_required: false, sort_order: 7, date_split: 'month' },
+        { xfa_path: 'form1.Page2.MaritalStatus.SectionA.Passport.expiryDD', profile_path: 'passport.expiry_date', label: 'Expiry Date — Day', field_type: 'date', is_required: false, sort_order: 8, date_split: 'day' },
+      ],
+    },
+    // ── Section 5: Contact Information ───────────────────────────────────
+    {
+      section_key: 'contact_info',
+      title: 'Contact Information',
+      description: 'Mailing address, phone, and email.',
+      sort_order: 5,
+      fields: [
+        { xfa_path: 'form1.Page2.contact.AddressRow1.StreetNum.StreetNum', profile_path: 'contact_info.mailing_address.street_number', label: 'Street Number', field_type: 'text', is_required: true, sort_order: 1, max_length: 10 },
+        { xfa_path: 'form1.Page2.contact.AddressRow1.Streetname.Streetname', profile_path: 'contact_info.mailing_address.street_name', label: 'Street Name', field_type: 'text', is_required: true, sort_order: 2, max_length: 40 },
+        { xfa_path: 'form1.Page2.contact.AddressRow1.Apt.AptUnit', profile_path: 'contact_info.mailing_address.apt_unit', label: 'Apt / Unit', field_type: 'text', is_required: false, sort_order: 3, max_length: 10 },
+        { xfa_path: 'form1.Page2.contact.AddressRow2.CityTow.CityTown', profile_path: 'contact_info.mailing_address.city', label: 'City / Town', field_type: 'text', is_required: true, sort_order: 4, max_length: 30 },
+        { xfa_path: 'form1.Page2.contact.AddressRow2.Country.Country', profile_path: 'contact_info.mailing_address.country', label: 'Country', field_type: 'country', is_required: true, sort_order: 5 },
+        { xfa_path: 'form1.Page2.contact.AddressRow2.ProvinceState.ProvinceState', profile_path: 'contact_info.mailing_address.province_state', label: 'Province / State', field_type: 'text', is_required: false, sort_order: 6, max_length: 30 },
+        { xfa_path: 'form1.Page2.contact.AddressRow2.PostalCode.PostalCode', profile_path: 'contact_info.mailing_address.postal_code', label: 'Postal Code', field_type: 'text', is_required: false, sort_order: 7, max_length: 10 },
+        { xfa_path: '__questionnaire_only__telephone_1294', profile_path: 'contact_info.telephone', label: 'Telephone', field_type: 'phone', is_required: true, sort_order: 8, is_client_visible: true },
+        { xfa_path: 'form1.Page3.FaxEmail.Email', profile_path: 'contact_info.email', label: 'Email Address', field_type: 'email', is_required: true, sort_order: 9, max_length: 80 },
+      ],
+    },
+    // ── Section 6: Study Details (NEW DOMAIN: study_program.*) ──────────
+    {
+      section_key: 'study_details',
+      title: 'Study Details',
+      description: 'Details of the study program in Canada.',
+      sort_order: 6,
+      fields: [
+        { xfa_path: 'form1.Page3.DetailsOfStudy.PurposeRow1.schoolName.SchoolName', profile_path: 'study_program.institution_name', label: 'Institution Name', field_type: 'text', is_required: true, sort_order: 1, max_length: 60 },
+        { xfa_path: 'form1.Page3.DetailsOfStudy.PurposeRow1.DLI', profile_path: 'study_program.dli_number', label: 'Designated Learning Institution (DLI) #', field_type: 'text', is_required: true, sort_order: 2, max_length: 20 },
+        { xfa_path: 'form1.Page3.DetailsOfStudy.PurposeRow1.schoolName.Program', profile_path: 'study_program.program_name', label: 'Program / Field of Study', field_type: 'text', is_required: true, sort_order: 3, max_length: 60 },
+        { xfa_path: 'form1.Page3.DetailsOfStudy.PurposeRow1.schoolName.Level', profile_path: 'study_program.level', label: 'Level of Study', field_type: 'select', is_required: true, sort_order: 4, options: [
+          { label: 'Secondary', value: 'secondary' },
+          { label: 'Post-Secondary (non-university)', value: 'post_secondary' },
+          { label: 'University — Undergraduate', value: 'undergraduate' },
+          { label: 'University — Graduate (Masters)', value: 'masters' },
+          { label: 'University — Doctorate / PhD', value: 'doctorate' },
+          { label: 'Language Studies', value: 'language' },
+          { label: 'Other', value: 'other' },
+        ] },
+        { xfa_path: 'form1.Page3.DetailsOfStudy.PurposeRow1.ProvinceState.Prov', profile_path: 'study_program.province', label: 'Province / Territory', field_type: 'text', is_required: true, sort_order: 5, max_length: 30 },
+        { xfa_path: 'form1.Page3.DetailsOfStudy.PurposeRow1.CityTown.CityTown', profile_path: 'study_program.city', label: 'City / Town', field_type: 'text', is_required: true, sort_order: 6, max_length: 30 },
+        { xfa_path: 'form1.Page3.DetailsOfStudy.PurposeRow1.Address.Address', profile_path: 'study_program.address', label: 'School Address', field_type: 'text', is_required: false, sort_order: 7, max_length: 80 },
+        { xfa_path: 'form1.Page3.DetailsOfStudy.PurposeRow1.HowLongStudy.FromDate', profile_path: 'study_program.from_date', label: 'Study From Date', field_type: 'date', is_required: true, sort_order: 8 },
+        { xfa_path: 'form1.Page3.DetailsOfStudy.PurposeRow1.HowLongStudy.ToDate', profile_path: 'study_program.to_date', label: 'Study To Date', field_type: 'date', is_required: true, sort_order: 9 },
+        { xfa_path: 'form1.Page3.DetailsOfStudy.PurposeRow1.StudentNo', profile_path: 'study_program.student_number', label: 'Student Number', field_type: 'text', is_required: false, sort_order: 10, max_length: 20 },
+      ],
+    },
+    // ── Section 7: Financial Support ────────────────────────────────────
+    {
+      section_key: 'financial_support',
+      title: 'Financial Support',
+      description: 'Estimated costs and funding sources for studies.',
+      sort_order: 7,
+      fields: [
+        { xfa_path: 'form1.Page3.Contacts_Row1.tuition.amount', profile_path: 'study_program.tuition_amount', label: 'Tuition (CAD)', field_type: 'number', is_required: true, sort_order: 1 },
+        { xfa_path: 'form1.Page3.Contacts_Row1.roomBoard.amount', profile_path: 'study_program.room_board_amount', label: 'Room & Board (CAD)', field_type: 'number', is_required: true, sort_order: 2 },
+        { xfa_path: 'form1.Page3.Contacts_Row1.other.amount', profile_path: 'study_program.other_expenses_amount', label: 'Other Expenses (CAD)', field_type: 'number', is_required: false, sort_order: 3 },
+        { xfa_path: 'form1.Page3.Contacts_Row1.expensesPaid.Funds.Funds', profile_path: 'study_program.funds_available', label: 'Funds Available (CAD)', field_type: 'number', is_required: true, sort_order: 4 },
+        { xfa_path: 'form1.Page3.Contacts_Row1.expensesPaid.expensesPaidBy', profile_path: 'study_program.expenses_paid_by', label: 'Expenses Paid By', field_type: 'select', is_required: true, sort_order: 5, options: [
+          { label: 'Self', value: 'self' },
+          { label: 'Parents', value: 'parents' },
+          { label: 'Scholarship', value: 'scholarship' },
+          { label: 'Other', value: 'other' },
+        ] },
+        { xfa_path: 'form1.Page3.Contacts_Row1.expensesPaid.Other', profile_path: 'study_program.expenses_paid_by_other', label: 'If Other, specify', field_type: 'text', is_required: false, sort_order: 6, max_length: 40, show_when: { profile_path: 'study_program.expenses_paid_by', operator: 'equals', value: 'other' } },
+      ],
+    },
+    // ── Section 8: Education History ────────────────────────────────────
+    {
+      section_key: 'education',
+      title: 'Education History',
+      description: 'Previous education.',
+      sort_order: 8,
+      fields: [
+        { xfa_path: 'form1.Page3.Education.Yes', profile_path: 'education.has_post_secondary', label: 'Post-Secondary Education?', field_type: 'boolean', is_required: true, sort_order: 1, value_format: { boolean_true: '1', boolean_false: '0' } },
+        { xfa_path: '__questionnaire_only__education_history_1294', profile_path: 'education.history', label: 'Education History', field_type: 'repeater', is_required: false, sort_order: 2, show_when: { profile_path: 'education.has_post_secondary', operator: 'is_truthy' } },
+      ],
+    },
+    // ── Section 9: Employment History ───────────────────────────────────
+    {
+      section_key: 'employment',
+      title: 'Employment History',
+      description: 'Past 10 years of employment.',
+      sort_order: 9,
+      fields: [
+        { xfa_path: '__questionnaire_only__employment_history_1294', profile_path: 'employment.history', label: 'Employment History (Past 10 Years)', field_type: 'repeater', is_required: true, sort_order: 1 },
+      ],
+    },
+    // ── Section 10: Background ──────────────────────────────────────────
+    {
+      section_key: 'background',
+      title: 'Background Information',
+      description: 'Medical, criminal, and refusal declarations.',
+      sort_order: 10,
+      fields: [
+        { xfa_path: 'form1.Page4.BackgroundInfo.Yes', profile_path: 'background.tuberculosis_contact', label: 'Medical Condition / TB Contact?', field_type: 'boolean', is_required: true, sort_order: 1, value_format: { boolean_true: '1', boolean_false: '0' } },
+        { xfa_path: 'form1.Page4.PageWrapper.BackgroundInfo2.Yes', profile_path: 'background.refused_visa', label: 'Refused Visa / Denied Entry?', field_type: 'boolean', is_required: true, sort_order: 2, value_format: { boolean_true: '1', boolean_false: '0' } },
+        { xfa_path: 'form1.Page4.PageWrapper.BackgroundInfo3.Yes', profile_path: 'background.criminal_record', label: 'Criminal Record?', field_type: 'boolean', is_required: true, sort_order: 3, value_format: { boolean_true: '1', boolean_false: '0' } },
+        { xfa_path: 'form1.Page4.PageWrapper.Military.Yes', profile_path: 'background.military_service', label: 'Military Service?', field_type: 'boolean', is_required: true, sort_order: 4, value_format: { boolean_true: '1', boolean_false: '0' } },
+        { xfa_path: 'form1.Page4.PageWrapper.Occupation.Yes', profile_path: 'background.organization_involvement', label: 'Political Organisation?', field_type: 'boolean', is_required: true, sort_order: 5, value_format: { boolean_true: '1', boolean_false: '0' } },
+        { xfa_path: 'form1.Page4.PageWrapper.GovPosition.Yes', profile_path: 'background.government_position', label: 'Government Position?', field_type: 'boolean', is_required: true, sort_order: 6, value_format: { boolean_true: '1', boolean_false: '0' } },
+      ],
+    },
+    // ── Section 11: Signature ───────────────────────────────────────────
+    {
+      section_key: 'signature',
+      title: 'Signature',
+      description: 'Applicant declaration and signature.',
+      sort_order: 11,
+      fields: [
+        { xfa_path: 'form1.Page4.Consent1.TextField2', profile_path: null, label: 'Signature', field_type: 'text', is_required: false, sort_order: 1, is_meta_field: true, meta_field_key: '__signature' },
+        { xfa_path: 'form1.Page4.Consent1.C1CertificateIssueDate', profile_path: null, label: 'Signed Date', field_type: 'date', is_required: false, sort_order: 2, is_meta_field: true, meta_field_key: '__signed_date' },
+      ],
+    },
+  ],
+  array_maps: [
+    // Education history rows (3 static rows in PDF)
+    {
+      profile_path: 'education.history',
+      xfa_base_path: 'form1.Page3.Education',
+      xfa_entry_name: 'Edu_Row1',
+      max_entries: 3,
+      sub_fields: {
+        from_year: 'FromYear',
+        from_month: 'FromMonth',
+        to_year: 'ToYear',
+        to_month: 'ToMonth',
+        field_of_study: 'FieldOfStudy',
+        school: 'School',
+        city: 'CityTown',
+        country: 'Country.Country',
+        province: 'ProvState',
+      },
+    },
+    // Employment history rows (3 static rows)
+    {
+      profile_path: 'employment.history',
+      xfa_base_path: 'form1.Page3.Occupation',
+      xfa_entry_name: 'OccupationRow1',
+      max_entries: 3,
+      sub_fields: {
+        from_year: 'FromYear',
+        from_month: 'FromMonth',
+        to_year: 'ToYear',
+        to_month: 'ToMonth',
+        occupation: 'Occupation.Occupation',
+        employer: 'Employer',
+        city: 'CityTown.CityTown',
+        country: 'Country.Country',
+        province: 'ProvState',
+      },
+    },
+  ],
+}
+
+// ── IMM 5645E — Family Information ───────────────────────────────────────────
+// Family information form with Sections A (parents/spouse), B (children dep),
+// and C (children not accompanying). Heavy reuse of family.* domain from IMM5406.
+// XFA root: IMM_5645, 59 user-facing fields.
+
+const IMM5645E_FORM: SeedFormDef = {
+  form_code: 'IMM5645E',
+  form_name: 'IMM 5645E — Family Information',
+  description: 'Family information form covering applicant details, spouse, parents (Section A), dependent children (Section B), and non-accompanying children (Section C).',
+  storage_path: 'ircc-forms/IMM5645E.pdf',
+  file_name: 'IMM5645E.pdf',
+  checksum_sha256: 'd6ba4cab0363c22135d4a28e6f8d7bc08814827f3bfb3fdb25a4d944ffac7096',
+  xfa_root_element: 'IMM_5645',
+  is_xfa: true,
+  scan_status: 'scanned',
+  mapping_version: 'IMM5645E-map-v1.0',
+  sections: [
+    // ── Section A: Applicant + Spouse + Parents ─────────────────────────
+    {
+      section_key: 'section_a_applicant',
+      title: 'Section A — Applicant Details',
+      description: 'Applicant personal details for family information form.',
+      sort_order: 1,
+      fields: [
+        { xfa_path: 'IMM_5645.page1.Subform1.Visitor', profile_path: 'family_info.application_type', label: 'Application Type', field_type: 'select', is_required: true, sort_order: 1, options: [{ label: 'Visitor', value: 'visitor' }, { label: 'Worker', value: 'worker' }, { label: 'Student', value: 'student' }, { label: 'Other', value: 'other' }] },
+        { xfa_path: 'IMM_5645.page1.SectionA.Applicant.AppName', profile_path: 'personal.full_name', label: 'Applicant Name', field_type: 'text', is_required: true, sort_order: 2, max_length: 80 },
+        { xfa_path: 'IMM_5645.page1.SectionA.Applicant.AppDOB', profile_path: 'personal.date_of_birth', label: 'Date of Birth', field_type: 'date', is_required: true, sort_order: 3 },
+        { xfa_path: 'IMM_5645.page1.SectionA.Applicant.AppCOB', profile_path: 'personal.place_of_birth_country', label: 'Country of Birth', field_type: 'country', is_required: true, sort_order: 4 },
+        { xfa_path: 'IMM_5645.page1.SectionA.Applicant.AppAddress', profile_path: 'contact_info.mailing_address', label: 'Address', field_type: 'text', is_required: false, sort_order: 5, max_length: 100 },
+        { xfa_path: 'IMM_5645.page1.SectionA.Applicant.AppOccupation', profile_path: 'employment.current_occupation', label: 'Occupation', field_type: 'text', is_required: false, sort_order: 6, max_length: 40 },
+        { xfa_path: 'IMM_5645.page1.SectionA.Applicant.ChildMStatus', profile_path: 'marital.status', label: 'Marital Status', field_type: 'select', is_required: true, sort_order: 7, options: MARITAL_STATUS_OPTIONS },
+      ],
+    },
+    {
+      section_key: 'section_a_spouse',
+      title: 'Section A — Spouse / Common-Law Partner',
+      description: 'Spouse or common-law partner details. Reuses family domain from IMM5406.',
+      sort_order: 2,
+      fields: [
+        // Reuses marital.spouse_* from IMM5406 (Fill-Once)
+        { xfa_path: 'IMM_5645.page1.SectionA.Spouse.SpouseName', profile_path: 'marital.spouse_full_name', label: 'Spouse Name', field_type: 'text', is_required: false, sort_order: 1, max_length: 80 },
+        { xfa_path: 'IMM_5645.page1.SectionA.Spouse.SpouseDOB', profile_path: 'marital.spouse_date_of_birth', label: 'Spouse Date of Birth', field_type: 'date', is_required: false, sort_order: 2 },
+        { xfa_path: 'IMM_5645.page1.SectionA.Spouse.SpouseCOB', profile_path: 'marital.spouse_country_of_birth', label: 'Spouse Country of Birth', field_type: 'country', is_required: false, sort_order: 3 },
+        { xfa_path: 'IMM_5645.page1.SectionA.Spouse.SpouseAddress', profile_path: 'marital.spouse_address', label: 'Spouse Address', field_type: 'text', is_required: false, sort_order: 4, max_length: 100 },
+        { xfa_path: 'IMM_5645.page1.SectionA.Spouse.SpouseOccupation', profile_path: 'marital.spouse_occupation', label: 'Spouse Occupation', field_type: 'text', is_required: false, sort_order: 5, max_length: 40 },
+        { xfa_path: 'IMM_5645.page1.SectionA.Spouse.SpouseYes', profile_path: 'marital.spouse_accompanying', label: 'Spouse Accompanying?', field_type: 'boolean', is_required: false, sort_order: 6, value_format: { boolean_true: '1', boolean_false: '0' } },
+        { xfa_path: 'IMM_5645.page1.SectionA.Spouse.ChildMStatus', profile_path: 'marital.spouse_marital_status', label: 'Spouse Marital Status', field_type: 'select', is_required: false, sort_order: 7, options: MARITAL_STATUS_OPTIONS },
+      ],
+    },
+    {
+      section_key: 'section_a_mother',
+      title: 'Section A — Mother',
+      description: 'Mother details. Reuses family.mother.* from IMM5406.',
+      sort_order: 3,
+      fields: [
+        // Reuses family.mother.* from IMM5406 (Fill-Once)
+        { xfa_path: 'IMM_5645.page1.SectionA.Mother.MotherName', profile_path: 'family.mother_full_name', label: 'Mother Name', field_type: 'text', is_required: true, sort_order: 1, max_length: 80 },
+        { xfa_path: 'IMM_5645.page1.SectionA.Mother.MotherDOB', profile_path: 'family.mother.date_of_birth', label: 'Mother Date of Birth', field_type: 'date', is_required: false, sort_order: 2 },
+        { xfa_path: 'IMM_5645.page1.SectionA.Mother.MotherCOB', profile_path: 'family.mother.country_of_birth', label: 'Mother Country of Birth', field_type: 'country', is_required: false, sort_order: 3 },
+        { xfa_path: 'IMM_5645.page1.SectionA.Mother.MotherAddress', profile_path: 'family.mother.address', label: 'Mother Address', field_type: 'text', is_required: false, sort_order: 4, max_length: 100 },
+        { xfa_path: 'IMM_5645.page1.SectionA.Mother.MotherOccupation', profile_path: 'family.mother.occupation', label: 'Mother Occupation', field_type: 'text', is_required: false, sort_order: 5, max_length: 40 },
+        { xfa_path: 'IMM_5645.page1.SectionA.Mother.MotherYes', profile_path: 'family.mother.accompanying', label: 'Mother Accompanying?', field_type: 'boolean', is_required: false, sort_order: 6, value_format: { boolean_true: '1', boolean_false: '0' } },
+        { xfa_path: 'IMM_5645.page1.SectionA.Mother.ChildMStatus', profile_path: 'family.mother.marital_status', label: 'Mother Marital Status', field_type: 'select', is_required: false, sort_order: 7, options: MARITAL_STATUS_OPTIONS },
+      ],
+    },
+    {
+      section_key: 'section_a_father',
+      title: 'Section A — Father',
+      description: 'Father details. Reuses family.father.* from IMM5406.',
+      sort_order: 4,
+      fields: [
+        // Reuses family.father.* from IMM5406 (Fill-Once)
+        { xfa_path: 'IMM_5645.page1.SectionA.Father.FatherName', profile_path: 'family.father_full_name', label: 'Father Name', field_type: 'text', is_required: true, sort_order: 1, max_length: 80 },
+        { xfa_path: 'IMM_5645.page1.SectionA.Father.FatherDOB', profile_path: 'family.father.date_of_birth', label: 'Father Date of Birth', field_type: 'date', is_required: false, sort_order: 2 },
+        { xfa_path: 'IMM_5645.page1.SectionA.Father.FatherCOB', profile_path: 'family.father.country_of_birth', label: 'Father Country of Birth', field_type: 'country', is_required: false, sort_order: 3 },
+        { xfa_path: 'IMM_5645.page1.SectionA.Father.FatherAddress', profile_path: 'family.father.address', label: 'Father Address', field_type: 'text', is_required: false, sort_order: 4, max_length: 100 },
+        { xfa_path: 'IMM_5645.page1.SectionA.Father.FatherOccupation', profile_path: 'family.father.occupation', label: 'Father Occupation', field_type: 'text', is_required: false, sort_order: 5, max_length: 40 },
+        { xfa_path: 'IMM_5645.page1.SectionA.Father.FatherYes', profile_path: 'family.father.accompanying', label: 'Father Accompanying?', field_type: 'boolean', is_required: false, sort_order: 6, value_format: { boolean_true: '1', boolean_false: '0' } },
+        { xfa_path: 'IMM_5645.page1.SectionA.Father.ChildMStatus', profile_path: 'family.father.marital_status', label: 'Father Marital Status', field_type: 'select', is_required: false, sort_order: 7, options: MARITAL_STATUS_OPTIONS },
+      ],
+    },
+    // ── Section B: Dependent Children ───────────────────────────────────
+    {
+      section_key: 'section_b_children',
+      title: 'Section B — Dependent Children',
+      description: 'Children who are accompanying the applicant.',
+      sort_order: 5,
+      fields: [
+        { xfa_path: '__questionnaire_only__dependent_children', profile_path: 'family.dependent_children', label: 'Dependent Children', field_type: 'repeater', is_required: false, sort_order: 1 },
+      ],
+    },
+    // ── Section C: Non-Accompanying Children ────────────────────────────
+    {
+      section_key: 'section_c_children',
+      title: 'Section C — Children Not Accompanying',
+      description: 'Children who are NOT accompanying the applicant.',
+      sort_order: 6,
+      fields: [
+        { xfa_path: '__questionnaire_only__non_accompanying_children', profile_path: 'family.non_accompanying_children', label: 'Non-Accompanying Children', field_type: 'repeater', is_required: false, sort_order: 1 },
+      ],
+    },
+    // ── Signatures ──────────────────────────────────────────────────────
+    {
+      section_key: 'signatures',
+      title: 'Signatures',
+      description: 'Section signatures and dates.',
+      sort_order: 7,
+      fields: [
+        { xfa_path: 'IMM_5645.page1.SectionA.SectionAsignature', profile_path: null, label: 'Section A Signature', field_type: 'text', is_required: false, sort_order: 1, is_meta_field: true, meta_field_key: '__section_a_signature' },
+        { xfa_path: 'IMM_5645.page1.SectionA.SectionAdate', profile_path: null, label: 'Section A Date', field_type: 'date', is_required: false, sort_order: 2, is_meta_field: true, meta_field_key: '__section_a_date' },
+        { xfa_path: 'IMM_5645.SectionB.SectionBsignature', profile_path: null, label: 'Section B Signature', field_type: 'text', is_required: false, sort_order: 3, is_meta_field: true, meta_field_key: '__section_b_signature' },
+        { xfa_path: 'IMM_5645.SectionB.SectionBdate', profile_path: null, label: 'Section B Date', field_type: 'date', is_required: false, sort_order: 4, is_meta_field: true, meta_field_key: '__section_b_date' },
+        { xfa_path: 'SectionC.SectionCsignature', profile_path: null, label: 'Section C Signature', field_type: 'text', is_required: false, sort_order: 5, is_meta_field: true, meta_field_key: '__section_c_signature' },
+        { xfa_path: 'SectionC.SectionCdate', profile_path: null, label: 'Section C Date', field_type: 'date', is_required: false, sort_order: 6, is_meta_field: true, meta_field_key: '__section_c_date' },
+      ],
+    },
+  ],
+  array_maps: [
+    // Section B — Dependent children
+    {
+      profile_path: 'family.dependent_children',
+      xfa_base_path: 'IMM_5645.SectionB',
+      xfa_entry_name: 'Child',
+      max_entries: 10,
+      sub_fields: {
+        name: 'ChildName',
+        marital_status: 'ChildMStatus',
+        relationship: 'ChildRelationship',
+        date_of_birth: 'ChildDOB',
+        country_of_birth: 'ChildCOB',
+        address: 'ChildAddress',
+        occupation: 'ChildOccupation',
+        accompanying: 'ChildYes',
+      },
+    },
+    // Section C — Non-accompanying children
+    {
+      profile_path: 'family.non_accompanying_children',
+      xfa_base_path: 'SectionC',
+      xfa_entry_name: 'Child',
+      max_entries: 10,
+      sub_fields: {
+        name: 'ChildName',
+        marital_status: 'ChildMStatus',
+        relationship: 'ChildRelationship',
+        date_of_birth: 'ChildDOB',
+        country_of_birth: 'ChildCOB',
+        address: 'ChildAddress',
+        occupation: 'ChildOccupation',
+        accompanying: 'ChildYes',
+      },
+    },
+  ],
+}
+
+// ── IMM 5710E — Application to Change Conditions / Extend Stay / Work Permit ──
+// Work permit application with new sponsor.* domain for employer/sponsor details.
+// XFA root: form1, 251 fields. Heavy reuse of personal/passport/contact from IMM5257E.
+
+const IMM5710E_FORM: SeedFormDef = {
+  form_code: 'IMM5710E',
+  form_name: 'IMM 5710E — Application to Change Conditions, Extend Stay, or Remain in Canada',
+  description: 'Work permit and stay extension application. Covers applicant details, sponsor/employer information, work details, education, employment history, and background declarations.',
+  storage_path: 'ircc-forms/IMM5710E.pdf',
+  file_name: 'IMM5710E.pdf',
+  checksum_sha256: '49195989d18ca67a91414341944baecbf64ec1a29d35122cf89bb1322d9f1273',
+  xfa_root_element: 'form1',
+  is_xfa: true,
+  scan_status: 'scanned',
+  mapping_version: 'IMM5710E-map-v1.0',
+  sections: [
+    // ── Section 1: Personal Details (reused from IMM5257E) ─────────────
+    {
+      section_key: 'personal_details',
+      title: 'Personal Details',
+      description: 'Applicant personal information.',
+      sort_order: 1,
+      fields: [
+        { xfa_path: 'form1.Page1.PersonalDetails.ServiceIn.ServiceIn', profile_path: 'personal.service_in', label: 'Preferred Language of Service', field_type: 'select', is_required: true, sort_order: 1, options: [{ label: 'English', value: 'english' }, { label: 'French', value: 'french' }] },
+        { xfa_path: 'form1.Page1.PersonalDetails.ServiceIn.UCIClientID', profile_path: 'personal.uci_number', label: 'UCI / Client ID', field_type: 'text', is_required: false, sort_order: 2, max_length: 20 },
+        { xfa_path: 'form1.Page1.PersonalDetails.Name.FamilyName', profile_path: 'personal.family_name', label: 'Family Name', field_type: 'text', is_required: true, sort_order: 3, max_length: 60 },
+        { xfa_path: 'form1.Page1.PersonalDetails.Name.GivenName', profile_path: 'personal.given_name', label: 'Given Name(s)', field_type: 'text', is_required: true, sort_order: 4, max_length: 60 },
+        { xfa_path: 'form1.Page1.PersonalDetails.q3-4-5.sex.Sex', profile_path: 'personal.sex', label: 'Sex', field_type: 'select', is_required: true, sort_order: 5, options: [{ label: 'Male', value: 'male' }, { label: 'Female', value: 'female' }, { label: 'Other', value: 'other' }] },
+        { xfa_path: 'form1.Page1.PersonalDetails.q3-4-5.dob.DOBYear', profile_path: 'personal.date_of_birth', label: 'Date of Birth — Year', field_type: 'date', is_required: true, sort_order: 6, date_split: 'year' },
+        { xfa_path: 'form1.Page1.PersonalDetails.q3-4-5.dob.DOBMonth', profile_path: 'personal.date_of_birth', label: 'Date of Birth — Month', field_type: 'date', is_required: false, sort_order: 7, date_split: 'month' },
+        { xfa_path: 'form1.Page1.PersonalDetails.q3-4-5.dob.DOBDay', profile_path: 'personal.date_of_birth', label: 'Date of Birth — Day', field_type: 'date', is_required: false, sort_order: 8, date_split: 'day' },
+        { xfa_path: 'form1.Page1.PersonalDetails.q3-4-5.pob.PlaceBirthCity', profile_path: 'personal.place_of_birth_city', label: 'Place of Birth — City', field_type: 'text', is_required: true, sort_order: 9, max_length: 40 },
+        { xfa_path: 'form1.Page1.PersonalDetails.q3-4-5.pob.PlaceBirthCountry', profile_path: 'personal.place_of_birth_country', label: 'Place of Birth — Country', field_type: 'country', is_required: true, sort_order: 10 },
+        { xfa_path: 'form1.Page1.PersonalDetails.Citizenship.Citizenship', profile_path: 'personal.citizenship', label: 'Citizenship', field_type: 'country', is_required: true, sort_order: 11 },
+        { xfa_path: 'form1.Page1.PersonalDetails.CurrentCOR.CurrentCOR.Row2.Country', profile_path: 'personal.current_country_of_residence', label: 'Country of Residence', field_type: 'country', is_required: true, sort_order: 12 },
+        { xfa_path: 'form1.Page1.PersonalDetails.CurrentCOR.CurrentCOR.Row2.Status', profile_path: 'personal.residence_status', label: 'Immigration Status', field_type: 'text', is_required: false, sort_order: 13 },
+        { xfa_path: 'form1.Page1.PersonalDetails.AliasName.AliasNameIndicator.Yes', profile_path: 'personal.has_alias', label: 'Used Another Name?', field_type: 'boolean', is_required: true, sort_order: 14, value_format: { boolean_true: '1', boolean_false: '0' } },
+      ],
+    },
+    // ── Section 2: Application Type ─────────────────────────────────────
+    {
+      section_key: 'application_type',
+      title: 'Application Type',
+      description: 'What are you applying for?',
+      sort_order: 2,
+      fields: [
+        { xfa_path: 'form1.Page1.PersonalDetails.ApplyingFor.Extend', profile_path: 'work_permit.applying_for_extend', label: 'Extend Stay', field_type: 'boolean', is_required: false, sort_order: 1, value_format: { boolean_true: '1', boolean_false: '0' } },
+        { xfa_path: 'form1.Page1.PersonalDetails.ApplyingFor.NewEmployer', profile_path: 'work_permit.applying_for_new_employer', label: 'New Employer', field_type: 'boolean', is_required: false, sort_order: 2, value_format: { boolean_true: '1', boolean_false: '0' } },
+        { xfa_path: 'form1.Page1.PersonalDetails.ApplyingFor.RestoreStat', profile_path: 'work_permit.applying_for_restore', label: 'Restore Status', field_type: 'boolean', is_required: false, sort_order: 3, value_format: { boolean_true: '1', boolean_false: '0' } },
+        { xfa_path: 'form1.Page1.PersonalDetails.ApplyingFor.TRP', profile_path: 'work_permit.applying_for_trp', label: 'Temporary Resident Permit', field_type: 'boolean', is_required: false, sort_order: 4, value_format: { boolean_true: '1', boolean_false: '0' } },
+      ],
+    },
+    // ── Section 3: Marital Status ───────────────────────────────────────
+    {
+      section_key: 'marital_status',
+      title: 'Marital Status',
+      description: 'Current marital information.',
+      sort_order: 3,
+      fields: [
+        { xfa_path: 'form1.Page1.MaritalStatus.Current.MaritalStatus', profile_path: 'marital.status', label: 'Current Marital Status', field_type: 'select', is_required: true, sort_order: 1, options: MARITAL_STATUS_OPTIONS },
+        { xfa_path: 'form1.Page1.MaritalStatus.Current.b.MarriageDate.FromYr', profile_path: 'marital.date_of_current_relationship', label: 'Marriage Date — Year', field_type: 'date', is_required: false, sort_order: 2, date_split: 'year', show_when: { profile_path: 'marital.status', operator: 'equals', value: 'married' } },
+        { xfa_path: 'form1.Page1.MaritalStatus.Current.b.MarriageDate.FromMM', profile_path: 'marital.date_of_current_relationship', label: 'Marriage Date — Month', field_type: 'date', is_required: false, sort_order: 3, date_split: 'month', show_when: { profile_path: 'marital.status', operator: 'equals', value: 'married' } },
+        { xfa_path: 'form1.Page1.MaritalStatus.Current.b.MarriageDate.FromDD', profile_path: 'marital.date_of_current_relationship', label: 'Marriage Date — Day', field_type: 'date', is_required: false, sort_order: 4, date_split: 'day', show_when: { profile_path: 'marital.status', operator: 'equals', value: 'married' } },
+        { xfa_path: 'form1.Page1.MaritalStatus.Current.c.FamilyName', profile_path: 'marital.spouse_family_name', label: 'Spouse Family Name', field_type: 'text', is_required: false, sort_order: 5, max_length: 60, show_when: { profile_path: 'marital.status', operator: 'equals', value: 'married' } },
+        { xfa_path: 'form1.Page1.MaritalStatus.Current.c.GivenName', profile_path: 'marital.spouse_given_name', label: 'Spouse Given Name', field_type: 'text', is_required: false, sort_order: 6, max_length: 60, show_when: { profile_path: 'marital.status', operator: 'equals', value: 'married' } },
+      ],
+    },
+    // ── Section 4: Language ─────────────────────────────────────────────
+    {
+      section_key: 'language',
+      title: 'Language',
+      description: 'Language abilities.',
+      sort_order: 4,
+      fields: [
+        { xfa_path: 'form1.Page2.Languages.nativeLang', profile_path: 'language.native_language', label: 'Native Language', field_type: 'text', is_required: true, sort_order: 1, max_length: 30 },
+        { xfa_path: 'form1.Page2.Languages.communicateLang', profile_path: 'language.language_of_interview', label: 'Language for Interview', field_type: 'select', is_required: true, sort_order: 2, options: [{ label: 'English', value: 'english' }, { label: 'French', value: 'french' }, { label: 'Both', value: 'both' }] },
+      ],
+    },
+    // ── Section 5: Passport ─────────────────────────────────────────────
+    {
+      section_key: 'passport',
+      title: 'Passport',
+      description: 'Passport details.',
+      sort_order: 5,
+      fields: [
+        { xfa_path: 'form1.Page2.Passport.PassportNum', profile_path: 'passport.number', label: 'Passport Number', field_type: 'text', is_required: true, sort_order: 1, max_length: 20 },
+        { xfa_path: 'form1.Page2.Passport.CountryofIssue', profile_path: 'passport.country_of_issue', label: 'Country of Issue', field_type: 'country', is_required: true, sort_order: 2 },
+        { xfa_path: 'form1.Page2.Passport.Issue.YYYY', profile_path: 'passport.issue_date', label: 'Issue Date — Year', field_type: 'date', is_required: true, sort_order: 3, date_split: 'year' },
+        { xfa_path: 'form1.Page2.Passport.Issue.MM', profile_path: 'passport.issue_date', label: 'Issue Date — Month', field_type: 'date', is_required: false, sort_order: 4, date_split: 'month' },
+        { xfa_path: 'form1.Page2.Passport.Issue.DD', profile_path: 'passport.issue_date', label: 'Issue Date — Day', field_type: 'date', is_required: false, sort_order: 5, date_split: 'day' },
+        { xfa_path: 'form1.Page2.Passport.Expiry.YYYY', profile_path: 'passport.expiry_date', label: 'Expiry Date — Year', field_type: 'date', is_required: true, sort_order: 6, date_split: 'year' },
+        { xfa_path: 'form1.Page2.Passport.Expiry.MM', profile_path: 'passport.expiry_date', label: 'Expiry Date — Month', field_type: 'date', is_required: false, sort_order: 7, date_split: 'month' },
+        { xfa_path: 'form1.Page2.Passport.Expiry.DD', profile_path: 'passport.expiry_date', label: 'Expiry Date — Day', field_type: 'date', is_required: false, sort_order: 8, date_split: 'day' },
+      ],
+    },
+    // ── Section 6: Contact Information ──────────────────────────────────
+    {
+      section_key: 'contact_info',
+      title: 'Contact Information',
+      description: 'Mailing address, phone, email.',
+      sort_order: 6,
+      fields: [
+        { xfa_path: 'form1.Page2.ContactInformation.Mailing.AddrLine1.StreetNum', profile_path: 'contact_info.mailing_address.street_number', label: 'Street Number', field_type: 'text', is_required: true, sort_order: 1, max_length: 10 },
+        { xfa_path: 'form1.Page2.ContactInformation.Mailing.AddrLine1.Streetname', profile_path: 'contact_info.mailing_address.street_name', label: 'Street Name', field_type: 'text', is_required: true, sort_order: 2, max_length: 40 },
+        { xfa_path: 'form1.Page2.ContactInformation.Mailing.AddrLine1.AptUnit', profile_path: 'contact_info.mailing_address.apt_unit', label: 'Apt / Unit', field_type: 'text', is_required: false, sort_order: 3, max_length: 10 },
+        { xfa_path: 'form1.Page2.ContactInformation.Mailing.AddrLine2.City', profile_path: 'contact_info.mailing_address.city', label: 'City', field_type: 'text', is_required: true, sort_order: 4, max_length: 30 },
+        { xfa_path: 'form1.Page2.ContactInformation.Mailing.AddrLine2.Country', profile_path: 'contact_info.mailing_address.country', label: 'Country', field_type: 'country', is_required: true, sort_order: 5 },
+        { xfa_path: 'form1.Page2.ContactInformation.Mailing.AddrLine2.Prov', profile_path: 'contact_info.mailing_address.province_state', label: 'Province / State', field_type: 'text', is_required: false, sort_order: 6, max_length: 30 },
+        { xfa_path: 'form1.Page2.ContactInformation.Mailing.AddrLine2.PostalCode', profile_path: 'contact_info.mailing_address.postal_code', label: 'Postal Code', field_type: 'text', is_required: false, sort_order: 7, max_length: 10 },
+        { xfa_path: 'form1.Page2.ContactInformation.q5-6.Email.Email', profile_path: 'contact_info.email', label: 'Email', field_type: 'email', is_required: true, sort_order: 8, max_length: 80 },
+        { xfa_path: '__questionnaire_only__telephone_5710', profile_path: 'contact_info.telephone', label: 'Telephone', field_type: 'phone', is_required: true, sort_order: 9, is_client_visible: true },
+      ],
+    },
+    // ── Section 7: Entry to Canada ──────────────────────────────────────
+    {
+      section_key: 'entry_details',
+      title: 'Entry to Canada',
+      description: 'Details of original and most recent entry to Canada.',
+      sort_order: 7,
+      fields: [
+        { xfa_path: 'form1.Page3.ComingIntoCda.OrigEntry.DateLastEntry', profile_path: 'work_permit.original_entry_date', label: 'Date of Original Entry', field_type: 'date', is_required: true, sort_order: 1 },
+        { xfa_path: 'form1.Page3.ComingIntoCda.OrigEntry.Place', profile_path: 'work_permit.original_entry_place', label: 'Place of Original Entry', field_type: 'text', is_required: true, sort_order: 2, max_length: 40 },
+        { xfa_path: 'form1.Page3.ComingIntoCda.PurposeOfVisit.PurposeOfVisit', profile_path: 'work_permit.purpose_of_visit', label: 'Purpose of Visit', field_type: 'text', is_required: true, sort_order: 3, max_length: 40 },
+        { xfa_path: 'form1.Page3.ComingIntoCda.RecentEntry.DateLastEntry', profile_path: 'work_permit.recent_entry_date', label: 'Date of Most Recent Entry', field_type: 'date', is_required: false, sort_order: 4 },
+        { xfa_path: 'form1.Page3.ComingIntoCda.RecentEntry.Place', profile_path: 'work_permit.recent_entry_place', label: 'Place of Most Recent Entry', field_type: 'text', is_required: false, sort_order: 5, max_length: 40 },
+        { xfa_path: 'form1.Page3.ComingIntoCda.PrevDocNum.docNum', profile_path: 'work_permit.previous_document_number', label: 'Previous Document Number', field_type: 'text', is_required: false, sort_order: 6, max_length: 20 },
+      ],
+    },
+    // ── Section 8: Sponsor / Employer Details (NEW DOMAIN: sponsor.*) ──
+    {
+      section_key: 'sponsor_details',
+      title: 'Sponsor / Employer Information',
+      description: 'Details of the employer or sponsor for the work permit.',
+      sort_order: 8,
+      fields: [
+        { xfa_path: 'form1.Page3.DetailsOfWork.Purpose.Type', profile_path: 'sponsor.work_type', label: 'Type of Work', field_type: 'text', is_required: true, sort_order: 1, max_length: 40 },
+        { xfa_path: 'form1.Page3.DetailsOfWork.Employer.Name', profile_path: 'sponsor.employer_name', label: 'Employer / Sponsor Name', field_type: 'text', is_required: true, sort_order: 2, max_length: 60 },
+        { xfa_path: 'form1.Page3.DetailsOfWork.Employer.Addr', profile_path: 'sponsor.employer_address', label: 'Employer Address', field_type: 'text', is_required: true, sort_order: 3, max_length: 80 },
+        { xfa_path: 'form1.Page3.DetailsOfWork.Location.Prov', profile_path: 'sponsor.work_province', label: 'Work Province', field_type: 'text', is_required: true, sort_order: 4, max_length: 30 },
+        { xfa_path: 'form1.Page3.DetailsOfWork.Location.City', profile_path: 'sponsor.work_city', label: 'Work City', field_type: 'text', is_required: true, sort_order: 5, max_length: 30 },
+        { xfa_path: 'form1.Page3.DetailsOfWork.Location.Addr', profile_path: 'sponsor.work_address', label: 'Work Location Address', field_type: 'text', is_required: false, sort_order: 6, max_length: 80 },
+        { xfa_path: 'form1.Page3.DetailsOfWork.Occupation.Job', profile_path: 'sponsor.job_title', label: 'Job Title', field_type: 'text', is_required: true, sort_order: 7, max_length: 40 },
+        { xfa_path: 'form1.Page3.DetailsOfWork.Occupation.Desc', profile_path: 'sponsor.job_description', label: 'Job Description', field_type: 'textarea', is_required: false, sort_order: 8, max_length: 200 },
+        { xfa_path: 'form1.Page3.DetailsOfWork.Duration.FromDate', profile_path: 'sponsor.work_from_date', label: 'Work From Date', field_type: 'date', is_required: true, sort_order: 9 },
+        { xfa_path: 'form1.Page3.DetailsOfWork.Duration.ToDate', profile_path: 'sponsor.work_to_date', label: 'Work To Date', field_type: 'date', is_required: true, sort_order: 10 },
+        { xfa_path: 'form1.Page3.DetailsOfWork.Duration.LMO', profile_path: 'sponsor.lmia_number', label: 'LMIA / LMO Number', field_type: 'text', is_required: false, sort_order: 11, max_length: 20 },
+        { xfa_path: 'form1.Page3.DetailsOfWork.CAQ.CertNum', profile_path: 'sponsor.caq_number', label: 'CAQ Certificate Number', field_type: 'text', is_required: false, sort_order: 12, max_length: 20 },
+        { xfa_path: 'form1.Page3.DetailsOfWork.ProvNominee.Yes', profile_path: 'sponsor.provincial_nominee', label: 'Provincial Nominee?', field_type: 'boolean', is_required: false, sort_order: 13, value_format: { boolean_true: '1', boolean_false: '0' } },
+        { xfa_path: '__questionnaire_only__sponsor_annual_income', profile_path: 'sponsor.annual_income', label: 'Sponsor Annual Income (CAD)', field_type: 'number', is_required: false, sort_order: 14, is_client_visible: true },
+        { xfa_path: '__questionnaire_only__sponsor_family_size', profile_path: 'sponsor.family_size', label: 'Family Size', field_type: 'number', is_required: false, sort_order: 15, is_client_visible: true },
+      ],
+    },
+    // ── Section 9: Education ────────────────────────────────────────────
+    {
+      section_key: 'education',
+      title: 'Education',
+      description: 'Education history.',
+      sort_order: 9,
+      fields: [
+        { xfa_path: 'form1.Page3.Education.Yes', profile_path: 'education.has_post_secondary', label: 'Post-Secondary Education?', field_type: 'boolean', is_required: true, sort_order: 1, value_format: { boolean_true: '1', boolean_false: '0' } },
+        { xfa_path: '__questionnaire_only__education_5710', profile_path: 'education.history', label: 'Education History', field_type: 'repeater', is_required: false, sort_order: 2, show_when: { profile_path: 'education.has_post_secondary', operator: 'is_truthy' } },
+      ],
+    },
+    // ── Section 10: Employment History ──────────────────────────────────
+    {
+      section_key: 'employment',
+      title: 'Employment History',
+      description: 'Past employment.',
+      sort_order: 10,
+      fields: [
+        { xfa_path: '__questionnaire_only__employment_5710', profile_path: 'employment.history', label: 'Employment History', field_type: 'repeater', is_required: true, sort_order: 1 },
+      ],
+    },
+    // ── Section 11: Background ──────────────────────────────────────────
+    {
+      section_key: 'background',
+      title: 'Background Information',
+      description: 'Medical, criminal, military declarations.',
+      sort_order: 11,
+      fields: [
+        { xfa_path: 'form1.Page4.BackgroundInfo.HealthQ.Yes', profile_path: 'background.tuberculosis_contact', label: 'Medical Condition?', field_type: 'boolean', is_required: true, sort_order: 1, value_format: { boolean_true: '1', boolean_false: '0' } },
+        { xfa_path: 'form1.Page4.BackgroundInfo.PrevApplied.Yes', profile_path: 'background.refused_visa', label: 'Previously Refused?', field_type: 'boolean', is_required: true, sort_order: 2, value_format: { boolean_true: '1', boolean_false: '0' } },
+        { xfa_path: 'form1.Page4.BackgroundInfo.Criminal.Yes', profile_path: 'background.criminal_record', label: 'Criminal Record?', field_type: 'boolean', is_required: true, sort_order: 3, value_format: { boolean_true: '1', boolean_false: '0' } },
+        { xfa_path: 'form1.Page4.BackgroundInfo.Military.Yes', profile_path: 'background.military_service', label: 'Military Service?', field_type: 'boolean', is_required: true, sort_order: 4, value_format: { boolean_true: '1', boolean_false: '0' } },
+        { xfa_path: 'form1.Page4.BackgroundInfo.Occupation.Yes', profile_path: 'background.organization_involvement', label: 'Political Organisation?', field_type: 'boolean', is_required: true, sort_order: 5, value_format: { boolean_true: '1', boolean_false: '0' } },
+        { xfa_path: 'form1.Page4.BackgroundInfo.GovPosition.Yes', profile_path: 'background.government_position', label: 'Government Position?', field_type: 'boolean', is_required: true, sort_order: 6, value_format: { boolean_true: '1', boolean_false: '0' } },
+        { xfa_path: 'form1.Page4.BackgroundInfo.Illtreatment.Yes', profile_path: 'background.ill_treatment', label: 'Ill Treatment?', field_type: 'boolean', is_required: true, sort_order: 7, value_format: { boolean_true: '1', boolean_false: '0' } },
+      ],
+    },
+    // ── Section 12: Signature ───────────────────────────────────────────
+    {
+      section_key: 'signature',
+      title: 'Signature',
+      description: 'Applicant declaration.',
+      sort_order: 12,
+      fields: [
+        { xfa_path: 'form1.Page4.Consent1.Signature.TextField2', profile_path: null, label: 'Signature', field_type: 'text', is_required: false, sort_order: 1, is_meta_field: true, meta_field_key: '__signature' },
+        { xfa_path: 'form1.Page4.Consent1.Signature.C1CertificateIssueDate', profile_path: null, label: 'Signed Date', field_type: 'date', is_required: false, sort_order: 2, is_meta_field: true, meta_field_key: '__signed_date' },
+      ],
+    },
+  ],
+  array_maps: [
+    // Employment history (3 static rows in PDF — split across pages)
+    {
+      profile_path: 'employment.history',
+      xfa_base_path: 'form1.Page3.Employment',
+      xfa_entry_name: 'EmpRec1',
+      max_entries: 3,
+      sub_fields: {
+        from_year: 'Line1.From.YYYY',
+        from_month: 'Line1.From.MM',
+        to_year: 'Line2.To.YYYY',
+        to_month: 'Line2.To.MM',
+        occupation: 'Line1.Occupation',
+        employer: 'Line1.Employer',
+        city: 'Line2.City',
+        country: 'Line2.Country',
+        province: 'Line2.ProvState',
+      },
+    },
+  ],
+}
+
 // ── All form definitions ─────────────────────────────────────────────────────
 
 const ALL_FORMS: SeedFormDef[] = [
   IMM5257E_FORM,
   IMM5406_FORM,
   IMM5476E_FORM,
+  IMM5257_SCHEDULE1_FORM,
+  IMM5562E_FORM,
+  IMM1294E_FORM,
+  IMM5645E_FORM,
+  IMM5710E_FORM,
 ]
 
 // ═══════════════════════════════════════════════════════════════════════════════

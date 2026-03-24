@@ -98,6 +98,7 @@ export function useMatter(id: string) {
       return data as Matter
     },
     enabled: !!id,
+    staleTime: 1000 * 60 * 2, // 2 min — cached data shows instantly (e.g. header context) while revalidating
   })
 }
 

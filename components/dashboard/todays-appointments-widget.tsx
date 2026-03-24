@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { EmptyState } from '@/components/shared/empty-state'
 import { cn } from '@/lib/utils'
+import { HelperTip } from '@/components/ui/helper-tip'
 import {
   useTodaysAppointments,
   useCheckInAppointment,
@@ -50,7 +51,7 @@ export const TodaysAppointmentsWidget = memo(function TodaysAppointmentsWidget({
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-base">
           <CalendarDays className="h-4 w-4 text-muted-foreground" />
-          Today&apos;s Appointments
+          Today&apos;s Appointments <HelperTip contentKey="dashboard.todays_appointments" />
         </CardTitle>
       </CardHeader>
       <CardContent>

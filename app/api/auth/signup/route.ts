@@ -3,6 +3,8 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { createRateLimiter } from '@/lib/middleware/rate-limit'
 import { isJurisdictionEnabled, DEFAULT_JURISDICTION } from '@/lib/config/jurisdictions'
 import { withTiming } from '@/lib/middleware/request-timing'
+import { Resend } from 'resend'
+import { renderVerificationEmail } from '@/lib/email-templates/verification-email'
 import { z } from 'zod'
 
 const signupSchema = z.object({
@@ -12,6 +14,7 @@ const signupSchema = z.object({
   email: z.string().email('Invalid email address'),
   password: z.string().min(8, 'Password must be at least 8 characters'),
   jurisdictionCode: z.string().optional(),
+  membershipNo: z.string().max(100).optional(),
 })
 
 // 5 signups per IP per minute
@@ -39,7 +42,7 @@ async function handlePost(request: Request) {
       )
     }
 
-    const { firmName, firstName, lastName, email, password, jurisdictionCode } = parsed.data
+    const { firmName, firstName, lastName, email, password, jurisdictionCode, membershipNo } = parsed.data
 
     // Validate jurisdiction
     const jurisdiction = jurisdictionCode || DEFAULT_JURISDICTION
@@ -61,7 +64,7 @@ async function handlePost(request: Request) {
       await supabase.auth.admin.createUser({
         email,
         password,
-        email_confirm: true,
+        email_confirm: false,
         user_metadata: {
           first_name: firstName,
           last_name: lastName,
@@ -100,8 +103,22 @@ async function handlePost(request: Request) {
           { status: 400 }
         )
       }
+
       // Update password so the user can sign in with the credentials they just provided
       await supabase.auth.admin.updateUserById(existing.id, { password })
+
+      // If the existing user is not email-confirmed, re-trigger verification
+      if (!existing.email_confirmed_at) {
+        // Generate a new signup confirmation link — Supabase will send the email
+        await supabase.auth.admin.generateLink({
+          type: 'signup',
+          email,
+          password,
+        }).catch((e) => {
+          console.warn('[signup] Failed to regenerate verification for existing user:', e)
+        })
+      }
+
       authUserId = existing.id
     } else {
       authUserId = authData.user.id
@@ -215,6 +232,7 @@ async function handlePost(request: Request) {
         device_tokens: [],
         calendar_sync_enabled: false,
         settings: {},
+        ...(membershipNo ? { rep_membership_number: membershipNo } : {}),
       })
       .select()
       .single()
@@ -229,9 +247,70 @@ async function handlePost(request: Request) {
       )
     }
 
+    // ─── Send branded verification email via Resend ──
+    // Supabase does NOT auto-send verification emails when using admin.createUser
+    // with email_confirm: false. We must send it explicitly.
+    let emailStatus = 'not_attempted'
+    try {
+      console.log('[signup] Generating verification link for:', email)
+      const { data: linkData, error: linkError } = await supabase.auth.admin.generateLink({
+        type: 'magiclink',
+        email,
+      })
+
+      if (linkError) {
+        console.error('[signup] generateLink error:', linkError.message)
+        emailStatus = `link_error: ${linkError.message}`
+      } else if (!linkData?.properties?.action_link) {
+        console.warn('[signup] generateLink returned no action_link')
+        emailStatus = 'no_action_link'
+      } else {
+        console.log('[signup] Verification link generated, sending via Resend...')
+        const resendApiKey = process.env.RESEND_API_KEY
+        if (!resendApiKey) {
+          console.error('[signup] RESEND_API_KEY is not set!')
+          emailStatus = 'missing_api_key'
+        } else {
+          const fromDomain = process.env.RESEND_FROM_DOMAIN || 'notifications.norvaos.com'
+          const fromAddress = fromDomain === 'resend.dev'
+            ? 'onboarding@resend.dev'
+            : `NorvaOS <notifications@${fromDomain}>`
+
+          console.log('[signup] Sending from:', fromAddress, 'to:', email)
+
+          const { html, text, subject } = await renderVerificationEmail({
+            firmName,
+            firstName,
+            verificationUrl: linkData.properties.action_link,
+          })
+
+          const resend = new Resend(resendApiKey)
+          const { data: sendData, error: sendError } = await resend.emails.send({
+            from: fromAddress,
+            to: email,
+            subject,
+            html,
+            text,
+          })
+
+          if (sendError) {
+            console.error('[signup] Resend API error:', JSON.stringify(sendError))
+            emailStatus = `send_error: ${JSON.stringify(sendError)}`
+          } else {
+            console.log('[signup] Verification email sent successfully. Resend ID:', sendData?.id)
+            emailStatus = 'sent'
+          }
+        }
+      }
+    } catch (emailErr) {
+      console.error('[signup] Verification email exception:', emailErr)
+      emailStatus = `exception: ${emailErr}`
+    }
+
     return NextResponse.json({
       data: { user, tenant },
       error: null,
+      _emailStatus: emailStatus, // Temporary debug field — remove after testing
     })
   } catch {
     return NextResponse.json(

@@ -6,6 +6,8 @@ import dynamic from 'next/dynamic'
 import { usePathname, useRouter } from 'next/navigation'
 import { useUIStore } from '@/lib/stores/ui-store'
 import { useUserRole } from '@/lib/hooks/use-user-role'
+import { useUser } from '@/lib/hooks/use-user'
+import { useTenant } from '@/lib/hooks/use-tenant'
 import { navigation } from '@/lib/config/navigation'
 import { Header } from '@/components/layout/header'
 import { Breadcrumbs } from '@/components/layout/breadcrumbs'
@@ -428,6 +430,8 @@ export default function DashboardLayout({
 }) {
   const router = useRouter()
   const { role } = useUserRole()
+  const { isLoading: userLoading } = useUser()
+  const { isLoading: tenantLoading } = useTenant()
 
   // ─── Route locking: front-desk-only users cannot access dashboard ──
   // If a user has front_desk:view but does NOT have matters:view,
@@ -443,6 +447,20 @@ export default function DashboardLayout({
       router.replace('/front-desk')
     }
   }, [role, router])
+
+  // ─── Hydration gate: branded loading screen while auth resolves ──
+  if (userLoading || tenantLoading) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center bg-background">
+        <div className="flex flex-col items-center gap-3">
+          <Scale className="size-10 text-primary animate-pulse" />
+          <span className="text-lg font-semibold tracking-tight text-foreground">
+            NorvaOS
+          </span>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="flex h-screen overflow-hidden">

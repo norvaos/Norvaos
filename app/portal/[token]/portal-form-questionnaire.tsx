@@ -16,6 +16,7 @@ import {
   type PortalLocale,
 } from '@/lib/utils/portal-translations'
 import { track } from '@/lib/utils/portal-analytics'
+import { useVerificationRealtime } from '@/lib/hooks/use-verification-realtime'
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -28,6 +29,8 @@ interface PortalFormQuestionnaireProps {
   language?: PortalLocale
   readOnly?: boolean
   onBack: () => void
+  /** Matter ID — enables verification-aware rendering and realtime updates */
+  matterId?: string | null
 }
 
 // ── Component ────────────────────────────────────────────────────────────────
@@ -41,8 +44,12 @@ export function PortalFormQuestionnaire({
   language = 'en',
   readOnly = false,
   onBack,
+  matterId = null,
 }: PortalFormQuestionnaireProps) {
   const tr = getTranslations(language)
+
+  // Subscribe to realtime verification broadcasts so portal updates instantly
+  useVerificationRealtime(matterId)
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [questionnaire, setQuestionnaire] = useState<any>(null)
@@ -238,6 +245,21 @@ export function PortalFormQuestionnaire({
         onComplete={handleComplete}
         readOnly={readOnly}
         prebuiltQuestionnaire={questionnaire}
+        matterId={matterId}
+        portalMode={!!matterId}
+        onFieldResubmit={matterId ? async (profilePath) => {
+          try {
+            await fetch(`/api/portal/${token}/field-verifications/resubmit`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                targets: [{ type: 'field', profile_path: profilePath }],
+              }),
+            })
+          } catch {
+            // Silent — the field data is already saved
+          }
+        } : undefined}
       />
     </div>
   )

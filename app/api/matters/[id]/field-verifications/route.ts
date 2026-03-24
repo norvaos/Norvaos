@@ -22,7 +22,7 @@ async function handleGet(
 
     const { data, error } = await auth.supabase
       .from('field_verifications')
-      .select('id, profile_path, verified_value, verified_by, verified_at, notes')
+      .select('id, profile_path, verified_value, verified_by, verified_at, notes, verification_status, rejection_reason')
       .eq('matter_id', matterId)
       .eq('tenant_id', auth.tenantId)
       .order('verified_at', { ascending: false })

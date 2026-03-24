@@ -46,7 +46,7 @@ const DEFAULT_TRIGGERS: Record<string, ChannelConfig> = {
   stage_change:         { in_app: true, email: true,  push: false },
   task_assigned:        { in_app: true, email: true,  push: true  },
   task_completed:       { in_app: true, email: false, push: false },
-  document_uploaded:    { in_app: true, email: false, push: false },
+  document_uploaded:    { in_app: true, email: true,  push: false },
   new_message:          { in_app: true, email: true,  push: true  },
   deadline_approaching: { in_app: true, email: true,  push: true  },
   matter_updated:       { in_app: true, email: false, push: false },

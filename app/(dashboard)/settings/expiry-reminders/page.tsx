@@ -63,6 +63,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { Label } from '@/components/ui/label'
+import { HelperTip } from '@/components/ui/helper-tip'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -325,7 +326,10 @@ export default function ExpiryRemindersSettingsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-900">Expiry Reminders</h1>
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl font-semibold text-slate-900">Expiry Reminders</h1>
+            <HelperTip contentKey="settings.expiry_rules" />
+          </div>
           <p className="mt-1 text-sm text-slate-500">
             Configure reminder timing rules for document and status expiry dates.
           </p>

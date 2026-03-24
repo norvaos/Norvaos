@@ -16,12 +16,15 @@
 
 import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import { useEffect } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { Loader2, AlertTriangle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { WorkplaceShell } from '@/components/shell/WorkplaceShell'
+import { ImmigrationFunnel } from '@/components/funnel/ImmigrationFunnel'
 import type { ZoneDProps } from '@/components/shell/ZoneD'
 import { useMatter } from '@/lib/queries/matters'
 import { useTenant } from '@/lib/hooks/use-tenant'
+import { createClient } from '@/lib/supabase/client'
 
 // Valid ZoneD tab IDs — keep in sync with ZoneD's TabId union.
 const VALID_TABS = new Set<ZoneDProps['initialTab']>([
@@ -52,6 +55,8 @@ export default function MatterShellPage() {
   // ?tab=billing → open ZoneD at the Billing tab on first render
   const initialTab = parseTabParam(searchParams.get('tab'))
 
+  // Legacy escape hatch removed — funnel is the only UI for immigration matters
+
   const { tenant, isLoading: tenantLoading } = useTenant()
   const tenantId = tenant?.id ?? ''
 
@@ -60,6 +65,25 @@ export default function MatterShellPage() {
     isLoading: matterLoading,
     error: matterError,
   } = useMatter(matterId)
+
+  // ── Immigration detection (must be before early returns — Rules of Hooks)
+  const { data: matterTypeData } = useQuery({
+    queryKey: ['matter_types', 'single', matter?.matter_type_id],
+    queryFn: async () => {
+      const supabase = createClient()
+      const { data, error } = await supabase
+        .from('matter_types')
+        .select('id, enforcement_enabled')
+        .eq('id', matter!.matter_type_id!)
+        .single()
+      if (error) throw error
+      return data as { id: string; enforcement_enabled: boolean }
+    },
+    enabled: !!matter?.matter_type_id,
+    staleTime: 5 * 60 * 1000,
+  })
+  const enforcementEnabled = matterTypeData?.enforcement_enabled ?? false
+  const isImmigrationFunnel = (!!matter?.case_type_id || enforcementEnabled) && !!matter
 
   // Bounce to matters list if matter is not found after loading completes
   useEffect(() => {
@@ -98,7 +122,20 @@ export default function MatterShellPage() {
   // ── Not found guard ──────────────────────────────────────────────────────
   if (!matter) return null
 
-  // ── Shell ────────────────────────────────────────────────────────────────
+  // ── Immigration Funnel ───────────────────────────────────────────────
+  if (isImmigrationFunnel) {
+    return (
+      <div className="h-full overflow-hidden">
+        <ImmigrationFunnel
+          matterId={matterId}
+          tenantId={tenantId}
+          matterTitle={matter.title ?? matter.matter_number ?? undefined}
+        />
+      </div>
+    )
+  }
+
+  // ── Standard Shell ────────────────────────────────────────────────────
   return (
     <div className="h-full overflow-hidden">
       <WorkplaceShell matter={matter} tenantId={tenantId} initialTab={initialTab} />

@@ -13,6 +13,15 @@ type MatterStageState = Database['public']['Tables']['matter_stage_state']['Row'
 type MatterTypeSchema = Database['public']['Tables']['matter_type_schema']['Row']
 type MatterCustomData = Database['public']['Tables']['matter_custom_data']['Row']
 
+/** Shape of the `json_schema` column when used for mandatory-field tracking */
+export interface MandatoryFieldSchema {
+  sections: {
+    name: string
+    label: string
+    fields: { key: string; label: string; required: boolean }[]
+  }[]
+}
+
 // ─── Query Key Factory ──────────────────────────────────────────────────────
 
 export const matterStageKeys = {
@@ -1146,7 +1155,7 @@ export function useMatterTypeSchema(matterTypeId: string | null | undefined) {
       return data as MatterTypeSchema | null
     },
     enabled: !!matterTypeId,
-    staleTime: 3 * 60 * 1000,
+    staleTime: 1000 * 60 * 10, // 10 min — schema rarely changes
   })
 }
 

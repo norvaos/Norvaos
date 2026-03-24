@@ -11,6 +11,7 @@ interface ExpiryReminderStats {
   tasksCreated: number
   emailsQueued: number
   recordsChecked: number
+  deadlinesChecked: number
 }
 
 interface UpcomingExpiry {
@@ -43,6 +44,7 @@ export async function checkExpiryReminders(
     tasksCreated: 0,
     emailsQueued: 0,
     recordsChecked: 0,
+    deadlinesChecked: 0,
   }
 
   // 1. Ensure reminder rules are seeded
@@ -180,6 +182,46 @@ export async function checkExpiryReminders(
     }
   }
 
+  // ─── Bridge: Also check matter_deadlines for upcoming due dates ──────────
+  // This allows lawyers to add any deadline (LOA expiry, passport expiry,
+  // filing dates) to the Matter Deadlines tab and have the cron pick it up.
+  const { data: deadlineRecords } = await supabase
+    .from('matter_deadlines')
+    .select('id, matter_id, title, due_date, deadline_type, reminder_days')
+    .eq('tenant_id', tenantId)
+    .eq('is_active', true)
+    .gte('due_date', today.toISOString().split('T')[0])
+    .lte('due_date', checkDate.toISOString().split('T')[0])
+
+  if (deadlineRecords && deadlineRecords.length > 0) {
+    stats.deadlinesChecked = deadlineRecords.length
+
+    for (const deadline of deadlineRecords) {
+      const dueDate = new Date(deadline.due_date)
+      const daysUntilDue = Math.ceil((dueDate.getTime() - today.getTime()) / 86400000)
+
+      // Determine which offsets to check: per-deadline overrides or global rules
+      const deadlineReminderDays = Array.isArray(deadline.reminder_days) && deadline.reminder_days.length > 0
+        ? (deadline.reminder_days as number[])
+        : null
+
+      if (deadlineReminderDays) {
+        // Use the deadline's own reminder_days offsets
+        for (const offsetDay of deadlineReminderDays) {
+          if (daysUntilDue !== offsetDay) continue
+          await processDeadlineReminder(supabase, tenantId, deadline, daysUntilDue, offsetDay, today, stats)
+        }
+      } else {
+        // Fall back to global expiry_reminder_rules
+        for (const rule of rules) {
+          const reminderDay = Math.abs(rule.reminder_offset_days)
+          if (daysUntilDue !== reminderDay) continue
+          await processDeadlineReminder(supabase, tenantId, deadline, daysUntilDue, reminderDay, today, stats)
+        }
+      }
+    }
+  }
+
   return stats
 }
 
@@ -222,6 +264,55 @@ export async function getUpcomingExpiries(
   }))
 }
 
+// ─── Deadline Reminder Helper ───────────────────────────────────────────────
+
+interface DeadlineRecord {
+  id: string
+  matter_id: string
+  title: string
+  due_date: string
+  deadline_type: string | null
+  reminder_days: unknown
+}
+
+async function processDeadlineReminder(
+  supabase: SupabaseClient<Database>,
+  tenantId: string,
+  deadline: DeadlineRecord,
+  daysUntilDue: number,
+  offsetDay: number,
+  today: Date,
+  stats: ExpiryReminderStats
+): Promise<void> {
+  // Idempotency: check if a notification already exists for this deadline + offset
+  const { data: existingNotif } = await supabase
+    .from('notifications')
+    .select('id')
+    .eq('entity_id', deadline.id)
+    .eq('notification_type', 'expiry_reminder')
+    .eq('title', `Deadline in ${offsetDay} days`)
+    .limit(1)
+
+  if (existingNotif && existingNotif.length > 0) return
+
+  // Find the responsible lawyer via the matter
+  const recipientId = await findResponsibleUserForMatter(supabase, tenantId, deadline.matter_id)
+  if (!recipientId) return
+
+  await supabase.from('notifications').insert({
+    tenant_id: tenantId,
+    user_id: recipientId,
+    title: `Deadline in ${offsetDay} days`,
+    message: `Deadline approaching: ${deadline.title} — due in ${daysUntilDue} days (${deadline.due_date})`,
+    notification_type: 'expiry_reminder',
+    entity_type: 'matter',
+    entity_id: deadline.matter_id,
+    channels: ['in_app'],
+    priority: offsetDay <= 14 ? 'high' : 'normal',
+  })
+  stats.notificationsCreated++
+}
+
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
 async function findResponsibleUser(
@@ -250,6 +341,31 @@ async function findResponsibleUser(
   const contact = contactRaw as (typeof contactRaw & { responsible_lawyer_id?: string | null }) | null
 
   if (contact?.responsible_lawyer_id) return contact.responsible_lawyer_id
+
+  // Fall back to first active user in tenant
+  const { data: user } = await supabase
+    .from('users')
+    .select('id')
+    .eq('tenant_id', tenantId)
+    .eq('is_active', true)
+    .limit(1)
+    .maybeSingle()
+
+  return user?.id ?? null
+}
+
+async function findResponsibleUserForMatter(
+  supabase: SupabaseClient<Database>,
+  tenantId: string,
+  matterId: string
+): Promise<string | null> {
+  const { data: matter } = await supabase
+    .from('matters')
+    .select('responsible_lawyer_id')
+    .eq('id', matterId)
+    .single()
+
+  if (matter?.responsible_lawyer_id) return matter.responsible_lawyer_id
 
   // Fall back to first active user in tenant
   const { data: user } = await supabase

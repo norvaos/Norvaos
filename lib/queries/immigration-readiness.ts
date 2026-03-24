@@ -94,6 +94,13 @@ export interface ImmigrationReadinessData {
 
   /** Readiness matrix with 6 domains (null if playbook lacks matrix rules) */
   readinessMatrix: ReadinessMatrix | null
+
+  /** Eligibility verification gate (funnel step 1) */
+  eligibility: {
+    verifiedAt: string | null
+    verifiedBy: string | null
+    outcome: 'pass' | 'fail' | null
+  }
 }
 
 // ── Query Keys ───────────────────────────────────────────────────────────────
@@ -394,6 +401,11 @@ export function useImmigrationReadiness(matterId: string | null | undefined) {
         nextAction,
         portalForms,
         readinessMatrix,
+        eligibility: {
+          verifiedAt: intake.eligibility_verified_at ?? null,
+          verifiedBy: intake.eligibility_verified_by ?? null,
+          outcome: (intake.eligibility_outcome as 'pass' | 'fail' | null) ?? null,
+        },
       }
 
       // ── Auto-heal: status stuck at not_issued despite portal link / activity ──
@@ -459,6 +471,68 @@ export function useImmigrationReadiness(matterId: string | null | undefined) {
     },
     enabled: !!matterId,
     staleTime: 30_000,
+  })
+}
+
+// ── Eligibility Verification Mutation (Funnel Gate) ─────────────────────────
+
+export function useVerifyEligibility() {
+  const qc = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (params: {
+      matterId: string
+      outcome: 'pass' | 'fail'
+      userId: string
+    }) => {
+      const supabase = createClient()
+      const now = new Date().toISOString()
+
+      const { error } = await supabase
+        .from('matter_intake')
+        .update({
+          eligibility_verified_at: now,
+          eligibility_verified_by: params.userId,
+          eligibility_outcome: params.outcome,
+        })
+        .eq('matter_id', params.matterId)
+
+      if (error) throw error
+
+      // Log activity
+      const { data: intake } = await supabase
+        .from('matter_intake')
+        .select('tenant_id')
+        .eq('matter_id', params.matterId)
+        .single()
+
+      if (intake) {
+        await supabase.from('activities').insert({
+          tenant_id: intake.tenant_id,
+          matter_id: params.matterId,
+          user_id: params.userId,
+          activity_type: 'eligibility_verification',
+          title: params.outcome === 'pass'
+            ? 'Eligibility verified — passed'
+            : 'Eligibility verified — failed',
+          description: params.outcome === 'pass'
+            ? 'Client passed eligibility verification — workspace unlocked'
+            : 'Client failed eligibility verification — matter blocked',
+        })
+      }
+    },
+    onSuccess: (_, vars) => {
+      qc.invalidateQueries({ queryKey: readinessKeys.detail(vars.matterId) })
+      toast.success(
+        vars.outcome === 'pass'
+          ? 'Eligibility verified — workspace unlocked'
+          : 'Eligibility failed — matter flagged',
+      )
+    },
+    onError: (error: Error) => {
+      console.error('[useVerifyEligibility] mutation failed:', error.message)
+      toast.error('Failed to record eligibility verification')
+    },
   })
 }
 

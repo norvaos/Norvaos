@@ -4,7 +4,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       <div className="w-full max-w-md">
         <div className="mb-8 text-center">
           <h1 className="text-2xl font-bold tracking-tight text-slate-900">NorvaOS</h1>
-          <p className="text-sm text-slate-500">Legal Operating System</p>
+          <p className="text-sm text-slate-500">A Complete Legal Operating System</p>
         </div>
         {children}
       </div>

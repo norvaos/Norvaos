@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { authenticateRequest, AuthError } from '@/lib/services/auth'
-import { createAdminClient } from '@/lib/supabase/admin'
+
 import { withTiming } from '@/lib/middleware/request-timing'
 
 /**
@@ -88,42 +88,26 @@ async function handlePost(
       .eq('is_active', true)
       .maybeSingle()
 
-    // 6. Create the JR matter
-    // Use admin client for INSERT: matters INSERT+RETURNING hits PostgREST RLS on
-    // the RETURNING clause before any matter_access record exists. Application-level
-    // role check (Lawyer/Admin) already enforces the security boundary.
-    const admin = createAdminClient()
-    const { data: newMatter, error: insertErr } = await admin
-      .from('matters')
-      .insert({
-        tenant_id: auth.tenantId,
-        title: `Judicial Review — ${sourceMatter.title}`,
-        description: `Judicial Review matter linked from: ${sourceMatter.title} (${sourceMatterId})`,
-        practice_area_id: sourceMatter.practice_area_id ?? null,
-        matter_type_id: resolvedMatterTypeId,
-        responsible_lawyer_id: sourceMatter.responsible_lawyer_id ?? auth.userId,
-        originating_lawyer_id: sourceMatter.originating_lawyer_id ?? null,
-        status: 'active',
-        priority: 'urgent',
-        billing_type: 'flat_fee',
-        date_opened: new Date().toISOString().substring(0, 10),
-        // Store link to parent in custom_fields since parent_matter_id column
-        // does not exist on the matters table
-        custom_fields: {
-          parent_matter_id: sourceMatterId,
-          matter_relationship: 'judicial_review',
-        } as any,
+    // 6. Create the JR matter via SECURITY DEFINER function
+    // This replaces the previous createAdminClient() bypass — the function
+    // validates role and source matter access internally, then inserts with
+    // elevated privileges in a controlled way.
+    const { data: newMatterJson, error: rpcErr } = await auth.supabase
+      .rpc('create_judicial_review_matter', {
+        p_source_matter_id: sourceMatterId,
+        p_matter_type_id: resolvedMatterTypeId ?? undefined,
+        p_auth_user_id: auth.authUserId,
       })
-      .select('id')
-      .single()
 
-    if (insertErr || !newMatter) {
-      console.error('[create-jr-matter] Insert error:', insertErr?.message)
+    if (rpcErr || !newMatterJson) {
+      console.error('[create-jr-matter] RPC error:', rpcErr?.message)
       return NextResponse.json(
-        { success: false, error: insertErr?.message ?? 'Failed to create JR matter' },
+        { success: false, error: rpcErr?.message ?? 'Failed to create JR matter' },
         { status: 500 }
       )
     }
+
+    const newMatter = { id: (newMatterJson as any).id as string }
 
     // 7. Create matter_intake for the new matter
     await auth.supabase.from('matter_intake').insert({

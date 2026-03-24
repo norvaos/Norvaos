@@ -237,6 +237,7 @@ export async function updateSession(request: NextRequest) {
       pathname.startsWith('/forms') ||
       pathname.startsWith('/invite') ||
       pathname.startsWith('/signing') ||
+      pathname.startsWith('/provisioning') ||
       pathname.startsWith('/_next')
     )
 

@@ -31,7 +31,7 @@ export interface ReuseEvent {
 
 /** Classification of canonical fields for cross-matter reuse */
 export const REUSE_CATEGORY_MAP: Record<string, ReuseCategory> = {
-  // Stable — auto-accept unless unverified
+  // Stable — auto-accept unless unverified (17 paths)
   'personal.family_name': 'stable',
   'personal.given_name': 'stable',
   'personal.date_of_birth': 'stable',
@@ -44,19 +44,33 @@ export const REUSE_CATEGORY_MAP: Record<string, ReuseCategory> = {
   'personal.uci_number': 'stable',
   'family.mother_full_name': 'stable',
   'family.father_full_name': 'stable',
+  'family.mother_date_of_birth': 'stable',
+  'family.father_date_of_birth': 'stable',
+  'family.mother_place_of_birth': 'stable',
+  'family.father_place_of_birth': 'stable',
   'language.native_language': 'stable',
 
-  // Semi-stable — require confirmation
+  // Semi-stable — require confirmation (26 paths)
   'marital.status': 'semi_stable',
   'marital.spouse_family_name': 'semi_stable',
   'marital.spouse_given_name': 'semi_stable',
+  'marital.previous_marriages': 'semi_stable',
   'contact_info.mailing_address': 'semi_stable',
+  'contact_info.mailing_address.street_number': 'semi_stable',
+  'contact_info.mailing_address.street_name': 'semi_stable',
+  'contact_info.mailing_address.city': 'semi_stable',
+  'contact_info.mailing_address.province_state': 'semi_stable',
+  'contact_info.mailing_address.postal_code': 'semi_stable',
+  'contact_info.mailing_address.country': 'semi_stable',
+  'contact_info.residential_same_as_mailing': 'semi_stable',
   'contact_info.telephone': 'semi_stable',
   'contact_info.email': 'semi_stable',
   'passport.number': 'semi_stable',
   'passport.country_of_issue': 'semi_stable',
   'passport.issue_date': 'semi_stable',
   'passport.expiry_date': 'semi_stable',
+  'occupation.current_title': 'semi_stable',
+  'occupation.current_employer': 'semi_stable',
   'employment.current_occupation': 'semi_stable',
   'education.highest_level': 'semi_stable',
   'background.refused_visa': 'semi_stable',

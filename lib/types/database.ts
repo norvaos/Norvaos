@@ -2191,6 +2191,62 @@ export type Database = {
           },
         ]
       }
+      requirement_templates: {
+        Row: {
+          id: string
+          tenant_id: string | null
+          program_category: string
+          jurisdiction: string
+          document_name: string
+          description: string | null
+          category: string
+          is_required: boolean
+          sort_order: number
+          applies_if: Json | null
+          is_active: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          tenant_id?: string | null
+          program_category: string
+          jurisdiction?: string
+          document_name: string
+          description?: string | null
+          category?: string
+          is_required?: boolean
+          sort_order?: number
+          applies_if?: Json | null
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          tenant_id?: string | null
+          program_category?: string
+          jurisdiction?: string
+          document_name?: string
+          description?: string | null
+          category?: string
+          is_required?: boolean
+          sort_order?: number
+          applies_if?: Json | null
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "requirement_templates_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       cheques: {
         Row: {
           account_type: string
@@ -2536,6 +2592,133 @@ export type Database = {
           validation_rules?: Json
         }
         Relationships: []
+      }
+      communication_logs: {
+        Row: {
+          id: string
+          tenant_id: string
+          matter_id: string
+          sender_id: string | null
+          recipient_email: string
+          template_slug: string | null
+          channel: string
+          rendered_subject: string | null
+          rendered_body: string | null
+          sent_at: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          tenant_id: string
+          matter_id: string
+          sender_id?: string | null
+          recipient_email: string
+          template_slug?: string | null
+          channel?: string
+          rendered_subject?: string | null
+          rendered_body?: string | null
+          sent_at?: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          tenant_id?: string
+          matter_id?: string
+          sender_id?: string | null
+          recipient_email?: string
+          template_slug?: string | null
+          channel?: string
+          rendered_subject?: string | null
+          rendered_body?: string | null
+          sent_at?: string
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "communication_logs_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "communication_logs_matter_id_fkey"
+            columns: ["matter_id"]
+            isOneToOne: false
+            referencedRelation: "matters"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "communication_logs_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      communication_templates: {
+        Row: {
+          id: string
+          tenant_id: string
+          slug: string
+          name: string
+          subject: string
+          body: string
+          jurisdiction: string
+          category: string
+          is_system_default: boolean
+          is_active: boolean
+          created_by: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          tenant_id: string
+          slug: string
+          name: string
+          subject: string
+          body: string
+          jurisdiction?: string
+          category?: string
+          is_system_default?: boolean
+          is_active?: boolean
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          tenant_id?: string
+          slug?: string
+          name?: string
+          subject?: string
+          body?: string
+          jurisdiction?: string
+          category?: string
+          is_system_default?: boolean
+          is_active?: boolean
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "communication_templates_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "communication_templates_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       communications: {
         Row: {
@@ -11042,6 +11225,7 @@ export type Database = {
           created_at: string
           description: string | null
           document_id: string | null
+          is_custom: boolean
           document_name: string
           id: string
           is_required: boolean
@@ -11064,6 +11248,7 @@ export type Database = {
           document_id?: string | null
           document_name: string
           id?: string
+          is_custom?: boolean
           is_required?: boolean
           matter_id: string
           notes?: string | null
@@ -11084,6 +11269,7 @@ export type Database = {
           document_id?: string | null
           document_name?: string
           id?: string
+          is_custom?: boolean
           is_required?: boolean
           matter_id?: string
           notes?: string | null
@@ -11758,6 +11944,9 @@ export type Database = {
           relationship_start_date: string | null
           second_language_test_type: string | null
           second_language_test_scores: Json | null
+          intended_destination: string | null
+          target_entry_date: string | null
+          has_representative: boolean | null
         }
         Insert: {
           application_number?: string | null
@@ -11822,6 +12011,9 @@ export type Database = {
           relationship_start_date?: string | null
           second_language_test_type?: string | null
           second_language_test_scores?: Json | null
+          intended_destination?: string | null
+          target_entry_date?: string | null
+          has_representative?: boolean | null
         }
         Update: {
           application_number?: string | null
@@ -11886,6 +12078,9 @@ export type Database = {
           relationship_start_date?: string | null
           second_language_test_type?: string | null
           second_language_test_scores?: Json | null
+          intended_destination?: string | null
+          target_entry_date?: string | null
+          has_representative?: boolean | null
         }
         Relationships: [
           {
@@ -11952,6 +12147,9 @@ export type Database = {
           lawyer_review_by: string | null
           lawyer_review_at: string | null
           lawyer_review_notes: string | null
+          eligibility_verified_at: string | null
+          eligibility_verified_by: string | null
+          eligibility_outcome: string | null
         }
         Insert: {
           completion_pct?: number
@@ -11986,6 +12184,9 @@ export type Database = {
           lawyer_review_by?: string | null
           lawyer_review_at?: string | null
           lawyer_review_notes?: string | null
+          eligibility_verified_at?: string | null
+          eligibility_verified_by?: string | null
+          eligibility_outcome?: string | null
         }
         Update: {
           completion_pct?: number
@@ -12020,6 +12221,9 @@ export type Database = {
           lawyer_review_by?: string | null
           lawyer_review_at?: string | null
           lawyer_review_notes?: string | null
+          eligibility_verified_at?: string | null
+          eligibility_verified_by?: string | null
+          eligibility_outcome?: string | null
         }
         Relationships: [
           {
@@ -18462,6 +18666,14 @@ export type Database = {
       }
     }
     Functions: {
+      create_judicial_review_matter: {
+        Args: {
+          p_source_matter_id: string
+          p_matter_type_id?: string
+          p_auth_user_id?: string
+        }
+        Returns: Json
+      }
       acquire_idempotency_lock: {
         Args: { p_idempotency_key: string }
         Returns: Json
@@ -18615,6 +18827,15 @@ export type Database = {
           p_storage_path: string
           p_tenant_id: string
           p_uploaded_by: string
+        }
+        Returns: number
+      }
+      populate_checklist_from_stream: {
+        Args: {
+          p_matter_id: string
+          p_tenant_id: string
+          p_program_cat: string
+          p_jurisdiction: string
         }
         Returns: number
       }

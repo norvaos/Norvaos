@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useRiskOverview } from '@/lib/queries/matter-intake'
 import { RISK_LEVELS } from '@/lib/utils/constants'
+import { HelperTip } from '@/components/ui/helper-tip'
 
 interface RiskOverviewWidgetProps {
   tenantId: string
@@ -38,7 +39,7 @@ export function RiskOverviewWidget({ tenantId, practiceAreaId }: RiskOverviewWid
         <CardHeader className="pb-2">
           <CardTitle className="flex items-center gap-2 text-sm font-medium">
             <Shield className="size-4 text-slate-400" />
-            Risk Overview
+            Risk Overview <HelperTip contentKey="dashboard.risk_overview" />
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -55,7 +56,7 @@ export function RiskOverviewWidget({ tenantId, practiceAreaId }: RiskOverviewWid
       <CardHeader className="pb-2">
         <CardTitle className="flex items-center gap-2 text-sm font-medium">
           <Shield className="size-4 text-slate-400" />
-          Risk Overview
+          Risk Overview <HelperTip contentKey="dashboard.risk_overview" />
           <span className="text-muted-foreground font-normal ml-auto text-xs">
             {counts.total} matter{counts.total !== 1 ? 's' : ''}
           </span>

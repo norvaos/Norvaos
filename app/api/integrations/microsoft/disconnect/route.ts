@@ -16,6 +16,8 @@ async function handlePost() {
     const admin = createAdminClient()
 
     // Soft-delete the connection
+    // Note: microsoft_connections is 1:1 with users (unique on user_id),
+    // so filtering by user_id alone is sufficient and avoids tenant_id mismatches.
     const { error: updateError } = await admin
       .from('microsoft_connections')
       .update({
@@ -26,11 +28,22 @@ async function handlePost() {
         updated_at: new Date().toISOString(),
       })
       .eq('user_id', auth.userId)
-      .eq('tenant_id', auth.tenantId)
 
     if (updateError) {
       throw updateError
     }
+
+    // Also deactivate email accounts for this user so email sync stops
+    await admin
+      .from('email_accounts')
+      .update({
+        is_active: false,
+        sync_enabled: false,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('user_id', auth.userId)
+      .eq('tenant_id', auth.tenantId)
+      .eq('provider', 'microsoft')
 
     // Reset user calendar provider
     await admin

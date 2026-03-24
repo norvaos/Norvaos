@@ -16,8 +16,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Plus, Trash2, Calendar, AlertTriangle } from 'lucide-react'
+import { Plus, Trash2, Calendar, AlertTriangle, Check } from 'lucide-react'
 import { formatDate } from '@/lib/utils/formatters'
+import { toast } from 'sonner'
+import { HelperTip } from '@/components/ui/helper-tip'
 import {
   useMatterDeadlines,
   useDeadlineTypes,
@@ -70,6 +72,9 @@ export function DeadlinesTab({
           setNewDate('')
           setNewTypeId('')
           setNewDescription('')
+          toast.success('Deadline secured', {
+            description: 'Automation reminders are now active.',
+          })
         },
       }
     )
@@ -92,6 +97,7 @@ export function DeadlinesTab({
           <CardTitle className="flex items-center gap-2 text-base">
             <AlertTriangle className="h-4 w-4 text-orange-500" />
             Key Deadlines
+            <HelperTip contentKey="matter.deadlines" />
           </CardTitle>
           <CardAction>
             <Button
@@ -159,9 +165,10 @@ export function DeadlinesTab({
                   className="h-9 text-sm"
                 />
               </div>
-              <div className="flex items-center gap-2">
+              <div className="sticky bottom-0 flex items-center gap-2 bg-slate-50 py-1">
                 <Button
                   size="sm"
+                  className="bg-primary text-primary-foreground"
                   onClick={handleAdd}
                   disabled={!newDate || createDeadline.isPending}
                 >
@@ -185,17 +192,16 @@ export function DeadlinesTab({
 
           {/* List */}
           {!deadlines || deadlines.length === 0 ? (
-            <div className="py-8 text-center">
-              <Calendar className="mx-auto mb-2 h-8 w-8 text-slate-300" />
-              <p className="text-sm text-muted-foreground">No deadlines added yet.</p>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                Add key deadlines to track important dates for this matter.
+            <div className="flex flex-col items-center justify-center py-12 text-center">
+              <Calendar className="size-10 text-muted-foreground/30 mb-3" />
+              <p className="text-sm font-medium text-foreground">No deadlines set</p>
+              <p className="mt-1 text-xs text-muted-foreground max-w-[280px]">
+                Click the &quot;+&quot; button above to add a milestone, or use a Study Permit template to auto-populate IRCC deadlines.
               </p>
             </div>
           ) : (
             <div className="divide-y">
               {deadlines.map((dl: MatterDeadlineRow) => {
-                const today = new Date().toISOString().split('T')[0]
                 const isComplete = dl.status === 'completed' || dl.status === 'dismissed'
                 let daysLeft = 0
                 try {
@@ -203,16 +209,37 @@ export function DeadlinesTab({
                 } catch {
                   daysLeft = 0
                 }
-                const isOverdue = dl.due_date && dl.due_date < today && !isComplete
-                const isUrgent = daysLeft >= 0 && daysLeft <= 3 && !isComplete
-                const isWarning = daysLeft > 3 && daysLeft <= 7 && !isComplete
+                const isOverdue = daysLeft < 0 && !isComplete
+                const isDueToday = daysLeft === 0 && !isComplete
+                const isRed = (isOverdue || isDueToday) && !isComplete
+                const isAmber = daysLeft >= 1 && daysLeft <= 14 && !isComplete
+                const isGreen = daysLeft >= 15 && !isComplete
+
+                // Human-readable relative label
+                const relativeLabel = daysLeft < 0
+                  ? `(${Math.abs(daysLeft)} day${Math.abs(daysLeft) !== 1 ? 's' : ''} overdue)`
+                  : daysLeft === 0
+                    ? '(Today)'
+                    : daysLeft === 1
+                      ? '(Tomorrow)'
+                      : `(In ${daysLeft} day${daysLeft !== 1 ? 's' : ''})`
+
+                // Amber countdown text
+                const countdownLabel = daysLeft === 0
+                  ? 'Due today'
+                  : daysLeft === 1
+                    ? 'Tomorrow'
+                    : `Due in ${daysLeft} days`
 
                 return (
                   <div
                     key={dl.id}
                     className={cn(
-                      'flex items-start gap-3 py-3',
-                      isComplete && 'opacity-50'
+                      'group flex items-start gap-3 py-3 px-3 rounded-md transition-colors',
+                      isComplete && 'opacity-50',
+                      isRed && 'bg-red-50 border-l-4 border-l-red-500',
+                      isAmber && 'bg-amber-50/50 border-l-4 border-l-amber-400',
+                      isGreen && 'border-l-4 border-l-emerald-300',
                     )}
                   >
                     <Checkbox
@@ -229,10 +256,15 @@ export function DeadlinesTab({
                       aria-label={`Mark deadline ${dl.title} as ${isComplete ? 'incomplete' : 'complete'}`}
                     />
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        {isRed && (
+                          <AlertTriangle className="size-3.5 text-red-500 shrink-0" />
+                        )}
                         <span
                           className={cn(
-                            'text-sm font-medium',
+                            'text-sm',
+                            isRed && 'font-bold',
+                            !isRed && 'font-medium',
                             isComplete && 'line-through text-muted-foreground'
                           )}
                         >
@@ -241,13 +273,20 @@ export function DeadlinesTab({
                         {isOverdue && (
                           <Badge variant="destructive" className="text-xs">Overdue</Badge>
                         )}
-                        {isUrgent && !isOverdue && (
-                          <Badge variant="destructive" className="text-xs">{daysLeft}d</Badge>
+                        {isDueToday && (
+                          <Badge variant="destructive" className="text-xs">Due today</Badge>
                         )}
-                        {isWarning && (
-                          <Badge variant="outline" className="text-xs border-orange-400 text-orange-600 bg-orange-50">
-                            {daysLeft}d
+                        {isAmber && (
+                          <Badge variant="outline" className="text-xs border-amber-400 text-amber-600 bg-amber-50">
+                            {countdownLabel}
                           </Badge>
+                        )}
+                        {/* Automation sync badge for active deadlines */}
+                        {!isComplete && (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-medium text-emerald-600">
+                            <Check className="size-3" />
+                            Reminders active
+                          </span>
                         )}
                       </div>
                       {dl.description && (
@@ -255,8 +294,19 @@ export function DeadlinesTab({
                       )}
                       <p className="text-xs text-muted-foreground">
                         {formatDate(dl.due_date)}
+                        <span className="text-xs text-muted-foreground ml-1">{relativeLabel}</span>
                       </p>
                     </div>
+                    {/* Hover action: Create follow-up task */}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="opacity-0 group-hover:opacity-100 transition-opacity text-xs h-7"
+                      onClick={() => {/* open task creation with deadline context */}}
+                    >
+                      <Plus className="size-3 mr-1" />
+                      Create task
+                    </Button>
                     <Button
                       variant="ghost"
                       size="icon"

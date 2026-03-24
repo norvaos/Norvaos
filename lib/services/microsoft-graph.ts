@@ -39,7 +39,7 @@ export const MICROSOFT_SCOPES = [
   'Mail.Send',
   'Calendars.ReadWrite',
   'Tasks.ReadWrite',
-  'Files.ReadWrite.All',
+  'Files.ReadWrite',
 ]
 
 // ─── Token Encryption (AES-256-GCM) ─────────────────────────────────────────
@@ -217,7 +217,28 @@ export async function getValidAccessToken(
   }
 
   // Refresh the token
-  const tokens = await refreshAccessToken(conn.refresh_token_encrypted)
+  let tokens: TokenResponse
+  try {
+    tokens = await refreshAccessToken(conn.refresh_token_encrypted)
+  } catch (refreshErr) {
+    // Consent revoked or token permanently invalid — mark connection inactive
+    // so the UI shows "reconnect" instead of looping refresh failures.
+    const errMsg = refreshErr instanceof Error ? refreshErr.message : String(refreshErr)
+    const isConsentError = errMsg.includes('AADSTS65001') || errMsg.includes('AADSTS70011') || errMsg.includes('AADSTS70008')
+    if (isConsentError) {
+      await adminClient
+        .from('microsoft_connections')
+        .update({
+          is_active: false,
+          last_error: errMsg,
+          last_error_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', connectionId)
+    }
+    throw refreshErr
+  }
+
   const newExpiresAt = new Date(Date.now() + tokens.expires_in * 1000).toISOString()
 
   await adminClient
@@ -226,6 +247,8 @@ export async function getValidAccessToken(
       access_token_encrypted: encryptToken(tokens.access_token),
       refresh_token_encrypted: encryptToken(tokens.refresh_token),
       token_expires_at: newExpiresAt,
+      error_count: 0,
+      last_error: null,
       updated_at: new Date().toISOString(),
     })
     .eq('id', connectionId)

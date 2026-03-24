@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'NorvaOS — Practice Management Software for Canadian Immigration Law Firms',
+  title: 'NorvaOS - A Complete Legal Operating System',
   description:
     'NorvaOS is the all-in-one practice management platform built for Canadian immigration law practices. Matter management, IRCC form automation, client portal, billing, and document organisation in one place. Book a demo.',
   keywords: [
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     url: 'https://norvaos.com/',
-    title: 'NorvaOS — Practice Management for Canadian Immigration Law Firms',
+    title: 'NorvaOS - A Complete Legal Operating System',
     description:
       'Replace five disconnected tools with one platform built specifically for Canadian immigration law practices.',
     // NOTE: Create a 1200x630px image and place it at /public/og-image.png
@@ -42,7 +42,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'NorvaOS — Practice Management for Canadian Immigration Law Firms',
+    title: 'NorvaOS - A Complete Legal Operating System',
     description:
       'Replace five disconnected tools with one platform built for Canadian immigration law practices.',
     // NOTE: Create a 1200x630px image and place it at /public/og-image.png

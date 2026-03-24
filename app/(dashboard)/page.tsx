@@ -44,6 +44,7 @@ import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Skeleton } from '@/components/ui/skeleton'
 import { EmptyState } from '@/components/shared/empty-state'
+import { HelperTip } from '@/components/ui/helper-tip'
 import { cn } from '@/lib/utils'
 import type { Database } from '@/lib/types/database'
 // Lazy-load today's appointments widget
@@ -82,6 +83,12 @@ const ImmigrationDeadlinesWidget = dynamic(
 const StaffWorkloadWidget = dynamic(
   () => import('@/components/immigration/dashboard-widgets').then((m) => ({ default: m.StaffWorkloadWidget })),
   { loading: () => <ImmigrationWidgetSkeleton /> }
+)
+
+// Lazy-load quick-start checklist — only shown for empty tenants
+const QuickStartChecklist = dynamic(
+  () => import('@/components/dashboard/quick-start-checklist').then((m) => ({ default: m.QuickStartChecklist })),
+  { ssr: false }
 )
 
 // Skeleton placeholder used while immigration widgets load
@@ -231,6 +238,33 @@ function useDashboardStats(tenantId: string, userId: string, practiceAreaId: str
     },
     enabled: !!tenantId && !!userId,
     staleTime: 2 * 60 * 1000, // 2 minutes
+  })
+}
+
+/** Lightweight check for Quick Start checklist — contacts + trust accounts */
+function useQuickStartStatus(tenantId: string) {
+  return useQuery({
+    queryKey: ['dashboard', 'quick-start', tenantId],
+    queryFn: async () => {
+      const supabase = createClient()
+      const [contactsRes, trustRes] = await Promise.all([
+        supabase
+          .from('contacts')
+          .select('id', { count: 'exact', head: true })
+          .eq('tenant_id', tenantId),
+        supabase
+          .from('trust_bank_accounts')
+          .select('id', { count: 'exact', head: true })
+          .eq('tenant_id', tenantId)
+          .eq('is_active', true),
+      ])
+      return {
+        hasContacts: (contactsRes.count ?? 0) > 0,
+        hasTrustAccount: (trustRes.count ?? 0) > 0,
+      }
+    },
+    enabled: !!tenantId,
+    staleTime: 5 * 60 * 1000, // 5 minutes — reference data
   })
 }
 
@@ -778,7 +812,7 @@ function UpcomingDeadlinesWidget({ tenantId }: { tenantId: string }) {
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-base">
           <AlertTriangle className="h-4 w-4 text-muted-foreground" />
-          Upcoming Deadlines
+          Upcoming Deadlines <HelperTip contentKey="dashboard.upcoming_deadlines" />
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -854,7 +888,7 @@ function DeadlinesIn14DaysWidget({
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-base">
           <AlertTriangle className="h-4 w-4 text-orange-500" />
-          Deadlines — Next 14 Days
+          Deadlines — Next 14 Days <HelperTip contentKey="dashboard.upcoming_deadlines" />
         </CardTitle>
         <CardAction>
           <Button variant="ghost" size="sm" asChild>
@@ -1015,6 +1049,8 @@ export default function DashboardPage() {
     isLoading: statsLoading,
   } = useDashboardStats(tenantId, userId, activePracticeFilter)
 
+  const { data: quickStart } = useQuickStartStatus(tenantId)
+
   // Compute greeting and date once per mount (not per render)
   const greeting = useMemo(() => getGreeting(), [])
   const todayStr = useMemo(() => formatDate(new Date()), [])
@@ -1071,6 +1107,14 @@ export default function DashboardPage() {
           </Button>
         </div>
       </div>
+
+      {/* ---- Quick Start Checklist (empty-state onboarding) ---- */}
+      {quickStart && (
+        <QuickStartChecklist
+          hasContacts={quickStart.hasContacts}
+          hasTrustAccount={quickStart.hasTrustAccount}
+        />
+      )}
 
       {/* ---- Stats Row ---- */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">

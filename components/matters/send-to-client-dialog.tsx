@@ -11,8 +11,20 @@
  * (called directly from the CommandToolbar to avoid nested dialogs).
  */
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useRef } from 'react'
 import { Mail, Link2, Loader2, Copy, ExternalLink, RotateCcw, Plus } from 'lucide-react'
+
+/** Fallback clipboard copy for HTTP contexts where navigator.clipboard is unavailable */
+function fallbackCopy(text: string) {
+  const textarea = document.createElement('textarea')
+  textarea.value = text
+  textarea.style.position = 'fixed'
+  textarea.style.opacity = '0'
+  document.body.appendChild(textarea)
+  textarea.select()
+  document.execCommand('copy')
+  document.body.removeChild(textarea)
+}
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -219,8 +231,20 @@ function PortalLinkTab({
 
   const handleCopy = useCallback(() => {
     if (!portalUrl) return
-    navigator.clipboard.writeText(portalUrl)
-    toast.success('Portal link copied')
+    // Try modern clipboard API first, fall back to legacy execCommand
+    if (navigator.clipboard?.writeText) {
+      navigator.clipboard.writeText(portalUrl).then(
+        () => toast.success('Portal link copied'),
+        () => {
+          // Fallback for HTTP or permission denied
+          fallbackCopy(portalUrl)
+          toast.success('Portal link copied')
+        },
+      )
+    } else {
+      fallbackCopy(portalUrl)
+      toast.success('Portal link copied')
+    }
   }, [portalUrl])
 
   return (
@@ -232,9 +256,24 @@ function PortalLinkTab({
               <Badge className="bg-emerald-100 text-emerald-700 border border-emerald-300">
                 Active Portal Link
               </Badge>
-              <span className="text-xs text-muted-foreground">
-                Expires {new Date(activePortalLink.expires_at).toLocaleDateString('en-CA')}
-              </span>
+              {activePortalLink.expires_at ? (
+                <Badge
+                  variant="outline"
+                  className={
+                    new Date(activePortalLink.expires_at) < new Date(Date.now() + 7 * 86400000)
+                      ? 'text-amber-700 border-amber-300 bg-amber-50 text-xs'
+                      : 'text-slate-600 border-slate-300 text-xs'
+                  }
+                >
+                  {new Date(activePortalLink.expires_at) < new Date()
+                    ? `Expired ${new Date(activePortalLink.expires_at).toLocaleDateString('en-CA')}`
+                    : `Expires ${new Date(activePortalLink.expires_at).toLocaleDateString('en-CA', { month: 'short', day: 'numeric', year: 'numeric' })}`}
+                </Badge>
+              ) : (
+                <Badge variant="outline" className="text-xs text-slate-500 border-slate-300">
+                  No Expiry (Persistent)
+                </Badge>
+              )}
             </div>
             <code className="block text-xs text-slate-600 truncate bg-white rounded border px-2 py-1.5">
               {portalUrl}

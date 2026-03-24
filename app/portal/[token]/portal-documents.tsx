@@ -46,6 +46,10 @@ export interface PortalSlot {
   current_version: number
   latest_review_reason: string | null
   rejection_reason_code: string | null
+  /** Lawyer verification status: pending | submitted | verified | rejected */
+  verification_status?: string | null
+  /** Reason for rejection from lawyer verification flow */
+  verification_rejection_reason?: string | null
 }
 
 interface PortalDocumentsProps {
@@ -196,8 +200,12 @@ export function PortalDocuments({
     })
   }
 
-  const canUpload = (status: string) =>
-    status === 'empty' || status === 'needs_re_upload' || status === 'rejected' || status === 'pending_review'
+  const canUpload = (slot: PortalSlot) => {
+    // Verified documents are locked — no re-upload allowed
+    if (slot.verification_status === 'verified') return false
+    const status = slot.status
+    return status === 'empty' || status === 'needs_re_upload' || status === 'rejected' || status === 'pending_review'
+  }
 
   /**
    * Fallback descriptions for common document slot names.
@@ -369,6 +377,8 @@ export function PortalDocuments({
     const isPending = slot.status === 'pending_review'
     const needsReUpload = slot.status === 'needs_re_upload' || slot.status === 'rejected'
     const justUploaded = successIds.has(slot.id)
+    const isVerified = slot.verification_status === 'verified'
+    const isVerificationRejected = slot.verification_status === 'rejected'
 
     return (
       <div
@@ -401,13 +411,27 @@ export function PortalDocuments({
 
           {/* Status + action */}
           <div className="flex items-center gap-2 shrink-0">
-            <Badge
-              variant="outline"
-              className={cn('text-xs py-0 px-1.5 border', statusBg.bgClass)}
-            >
-              {statusLabel}
-            </Badge>
-            {isAccepted ? (
+            {isVerified ? (
+              <Badge variant="outline" className="text-xs py-0 px-1.5 border border-green-300 bg-green-50 text-green-700 gap-0.5">
+                <CheckCircle2 className="h-3 w-3" />
+                Verified by Law Firm
+              </Badge>
+            ) : isVerificationRejected ? (
+              <Badge variant="outline" className="text-xs py-0 px-1.5 border border-red-300 bg-red-50 text-red-700 gap-0.5">
+                <AlertCircle className="h-3 w-3" />
+                Needs Correction
+              </Badge>
+            ) : (
+              <Badge
+                variant="outline"
+                className={cn('text-xs py-0 px-1.5 border', statusBg.bgClass)}
+              >
+                {statusLabel}
+              </Badge>
+            )}
+            {isVerified ? (
+              <CheckCircle2 className="h-5 w-5 text-green-500" />
+            ) : isAccepted ? (
               <CheckCircle2 className="h-5 w-5 text-green-500" />
             ) : isPending ? (
               <div className="flex items-center gap-1.5">
@@ -509,8 +533,54 @@ export function PortalDocuments({
           return null
         })()}
 
+        {/* Verification rejection reason (from lawyer review) */}
+        {isVerificationRejected && slot.verification_rejection_reason && (
+          <div className="mt-2 rounded-md border border-red-200 bg-red-50 px-3 py-2">
+            <div className="flex items-start gap-1.5">
+              <AlertCircle className="mt-0.5 h-3.5 w-3.5 text-red-600 flex-shrink-0" />
+              <p className="text-xs text-red-800">
+                <span className="font-medium">Law firm feedback:</span>{' '}
+                {slot.verification_rejection_reason}
+              </p>
+            </div>
+            {/* "Fixed It" button — signals lawyer the client has corrected the issue */}
+            <div className="mt-2 flex justify-end">
+              <Button
+                size="sm"
+                variant="outline"
+                className="h-7 text-xs border-green-300 text-green-700 hover:bg-green-50"
+                onClick={async () => {
+                  try {
+                    const res = await fetch(`/api/portal/${token}/field-verifications/resubmit`, {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        targets: [{ type: 'document', slot_id: slot.id }],
+                      }),
+                    })
+                    if (res.ok) {
+                      setSlots((prev) =>
+                        prev.map((s) =>
+                          s.id === slot.id
+                            ? { ...s, verification_status: 'submitted', verification_rejection_reason: null }
+                            : s
+                        )
+                      )
+                    }
+                  } catch {
+                    // Silent failure — the document upload already saved
+                  }
+                }}
+              >
+                <CheckCircle2 className="h-3 w-3 mr-1" />
+                Fixed It — Ready for Review
+              </Button>
+            </div>
+          </div>
+        )}
+
         {/* In-context upload guidance — shown near upload button for empty/re-upload slots */}
-        {canUpload(slot.status) && !isAccepted && !isPending && (
+        {canUpload(slot) && !isAccepted && !isPending && (
           <p className="mt-1.5 text-[11px] text-slate-400">
             {tr.upload_guidance ?? 'Upload a clear colour scan (PDF or image). Photos of documents may be rejected.'}
           </p>

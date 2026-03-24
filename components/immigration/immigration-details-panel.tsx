@@ -7,6 +7,8 @@ import {
   useUpdateMatterImmigration,
   useCaseTypes,
 } from '@/lib/queries/immigration'
+import { useMatter } from '@/lib/queries/matters'
+import { useMatterTypeSchema, type MandatoryFieldSchema } from '@/lib/queries/matter-types'
 import {
   VISA_STATUSES,
   LANGUAGE_TEST_TYPES,
@@ -27,6 +29,11 @@ import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Progress } from '@/components/ui/progress'
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+} from '@/components/ui/tooltip'
 import {
   Select,
   SelectContent,
@@ -305,6 +312,7 @@ interface CollapsibleSectionProps {
   filledCount?: number
   totalCount?: number
   defaultOpen?: boolean
+  missingFields?: string[]
 }
 
 function CollapsibleSection({
@@ -315,6 +323,7 @@ function CollapsibleSection({
   filledCount,
   totalCount,
   defaultOpen = true,
+  missingFields,
 }: CollapsibleSectionProps) {
   const [isOpen, setIsOpen] = useState(defaultOpen)
 
@@ -343,10 +352,27 @@ function CollapsibleSection({
         <h3 className="text-sm font-semibold text-slate-900 group-hover:text-slate-700">{title}</h3>
 
         {hasCompletion && (
-          <div className="flex items-center gap-2 ml-auto">
-            <Progress value={pct} className={cn('h-1.5 w-16', progressColor)} />
-            <span className="text-[10px] text-slate-400 tabular-nums">{filledCount}/{totalCount}</span>
-          </div>
+          missingFields && missingFields.length > 0 && pct < 80 ? (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="flex items-center gap-2 ml-auto cursor-help">
+                  <Progress value={pct} className={cn('h-1.5 w-16', progressColor)} />
+                  <span className="text-[10px] text-slate-400 tabular-nums">{filledCount}/{totalCount}</span>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent className="max-w-[280px]">
+                <p className="font-medium text-xs mb-1">Missing fields:</p>
+                <ul className="text-xs space-y-0.5">
+                  {missingFields.map(f => <li key={f}>• {f}</li>)}
+                </ul>
+              </TooltipContent>
+            </Tooltip>
+          ) : (
+            <div className="flex items-center gap-2 ml-auto">
+              <Progress value={pct} className={cn('h-1.5 w-16', progressColor)} />
+              <span className="text-[10px] text-slate-400 tabular-nums">{filledCount}/{totalCount}</span>
+            </div>
+          )
         )}
       </button>
 
@@ -381,6 +407,30 @@ function countFilled(immigration: MatterImmigration, keys: (keyof MatterImmigrat
   return filled
 }
 
+function getMissingFields(
+  record: Record<string, unknown> | null | undefined,
+  fields: { key: string; label: string }[]
+): string[] {
+  if (!record) return fields.map(f => f.label)
+  return fields
+    .filter(f => {
+      const val = record[f.key as keyof typeof record]
+      return val === null || val === undefined || val === '' || val === 0 || val === false
+    })
+    .map(f => f.label)
+}
+
+/** Extract required fields from a schema section, falling back to hardcoded defaults */
+function schemaFieldsOrFallback(
+  schema: MandatoryFieldSchema | null | undefined,
+  sectionName: string,
+  fallback: { key: string; label: string }[],
+): { key: string; label: string }[] {
+  const section = schema?.sections.find((s) => s.name === sectionName)
+  if (!section) return fallback
+  return section.fields.filter((f) => f.required).map((f) => ({ key: f.key, label: f.label }))
+}
+
 /** Detect case type category from the case type name */
 function detectCategory(
   caseTypeName: string | undefined | null,
@@ -408,6 +458,11 @@ export function ImmigrationDetailsPanel({ matterId, tenantId, fieldConfig }: Imm
   const updateImmigration = useUpdateMatterImmigration()
   const { data: caseTypes } = useCaseTypes(tenantId)
   const [showCrsCalculator, setShowCrsCalculator] = useState(false)
+
+  // Fetch matter to get matter_type_id, then load mandatory field schema
+  const { data: matter } = useMatter(matterId)
+  const { data: matterTypeSchemaRow } = useMatterTypeSchema(matter?.matter_type_id)
+  const schema = matterTypeSchemaRow?.json_schema as MandatoryFieldSchema | null
 
   /** Check if a field should be visible (defaults to true when no config) */
   const isFieldVisible = useCallback(
@@ -462,47 +517,111 @@ export function ImmigrationDetailsPanel({ matterId, tenantId, fieldConfig }: Imm
     [caseTypeName, immigration?.program_category],
   )
 
-  // Section completion counts
+  // Section completion counts (schema-driven with hardcoded fallback)
+  const caseInfoFields = useMemo(() => schemaFieldsOrFallback(schema, 'case_info', [
+    { key: 'case_type_id', label: 'Case Type' },
+    { key: 'application_number', label: 'Application Number' },
+    { key: 'uci_number', label: 'UCI Number' },
+    { key: 'program_category', label: 'Programme Category' },
+  ]), [schema])
+
   const caseInfoCompletion = useMemo(() => {
-    if (!immigration) return { filled: 0, total: 4 }
+    if (!immigration) return { filled: 0, total: caseInfoFields.length, missing: caseInfoFields.map(f => f.label) }
+    const keys = caseInfoFields.map(f => f.key) as (keyof MatterImmigration)[]
     return {
-      filled: countFilled(immigration, ['case_type_id', 'application_number', 'uci_number', 'program_category']),
-      total: 4,
+      filled: countFilled(immigration, keys),
+      total: caseInfoFields.length,
+      missing: getMissingFields(immigration as unknown as Record<string, unknown>, caseInfoFields),
     }
-  }, [immigration])
+  }, [immigration, caseInfoFields])
+
+  const profileFields = useMemo(() => schemaFieldsOrFallback(schema, 'profile', [
+    { key: 'country_of_citizenship', label: 'Country of Citizenship' },
+    { key: 'country_of_residence', label: 'Country of Residence' },
+    { key: 'current_visa_status', label: 'Current Visa Status' },
+    { key: 'current_visa_expiry', label: 'Visa Expiry' },
+    { key: 'passport_number', label: 'Passport Number' },
+    { key: 'passport_expiry', label: 'Passport Expiry' },
+  ]), [schema])
 
   const profileCompletion = useMemo(() => {
-    if (!immigration) return { filled: 0, total: 6 }
+    if (!immigration) return { filled: 0, total: profileFields.length, missing: profileFields.map(f => f.label) }
+    const keys = profileFields.map(f => f.key) as (keyof MatterImmigration)[]
     return {
-      filled: countFilled(immigration, ['country_of_citizenship', 'country_of_residence', 'current_visa_status', 'current_visa_expiry', 'passport_number', 'passport_expiry']),
-      total: 6,
+      filled: countFilled(immigration, keys),
+      total: profileFields.length,
+      missing: getMissingFields(immigration as unknown as Record<string, unknown>, profileFields),
     }
-  }, [immigration])
+  }, [immigration, profileFields])
+
+  const datesFields = useMemo(() => schemaFieldsOrFallback(schema, 'dates', [
+    { key: 'date_filed', label: 'Date Filed' },
+    { key: 'date_biometrics', label: 'Biometrics Date' },
+    { key: 'date_medical', label: 'Medical Exam Date' },
+    { key: 'date_interview', label: 'Interview Date' },
+    { key: 'date_decision', label: 'Decision Date' },
+    { key: 'date_landing', label: 'Landing Date' },
+  ]), [schema])
 
   const datesCompletion = useMemo(() => {
-    if (!immigration) return { filled: 0, total: 6 }
+    if (!immigration) return { filled: 0, total: datesFields.length, missing: datesFields.map(f => f.label) }
+    const keys = datesFields.map(f => f.key) as (keyof MatterImmigration)[]
     return {
-      filled: countFilled(immigration, ['date_filed', 'date_biometrics', 'date_medical', 'date_interview', 'date_decision', 'date_landing']),
-      total: 6,
+      filled: countFilled(immigration, keys),
+      total: datesFields.length,
+      missing: getMissingFields(immigration as unknown as Record<string, unknown>, datesFields),
     }
-  }, [immigration])
+  }, [immigration, datesFields])
+
+  const langFields = useMemo(() => schemaFieldsOrFallback(schema, 'language', [
+    { key: 'language_test_type', label: 'Language Test Type' },
+    { key: 'language_test_scores', label: 'Language Test Scores' },
+    { key: 'education_credential', label: 'Education Credential' },
+    { key: 'eca_status', label: 'ECA Status' },
+  ]), [schema])
 
   const langCompletion = useMemo(() => {
-    if (!immigration) return { filled: 0, total: 3 }
+    if (!immigration) return { filled: 0, total: langFields.length, missing: langFields.map(f => f.label) }
     const scores = immigration.language_test_scores as Record<string, number> | null
     const hasScores = scores && Object.keys(scores).length > 0
-    return {
-      filled: countFilled(immigration, ['language_test_type', 'education_credential', 'eca_status']) + (hasScores ? 1 : 0),
-      total: 4,
+    // language_test_scores is a JSON object; override the generic check
+    const nonScoreFields = langFields.filter(f => f.key !== 'language_test_scores')
+    const nonScoreKeys = nonScoreFields.map(f => f.key) as (keyof MatterImmigration)[]
+    const missing = getMissingFields(immigration as unknown as Record<string, unknown>, nonScoreFields)
+    if (langFields.some(f => f.key === 'language_test_scores') && !hasScores) {
+      missing.unshift('Language Test Scores')
     }
-  }, [immigration])
+    return {
+      filled: countFilled(immigration, nonScoreKeys) + (hasScores ? 1 : 0),
+      total: langFields.length,
+      missing,
+    }
+  }, [immigration, langFields])
+
+  const employmentBaseFields = useMemo(() => schemaFieldsOrFallback(schema, 'employment', [
+    { key: 'work_experience_years', label: 'Work Experience (Years)' },
+    { key: 'canadian_work_experience_years', label: 'Canadian Work Experience (Years)' },
+    { key: 'employer_name', label: 'Employer Name' },
+  ]), [schema])
 
   const employmentCompletion = useMemo(() => {
-    if (!immigration) return { filled: 0, total: 3 }
-    const keys: (keyof MatterImmigration)[] = ['work_experience_years', 'canadian_work_experience_years', 'employer_name']
-    if (category === 'work') keys.push('job_title', 'lmia_number', 'job_offer_noc')
-    return { filled: countFilled(immigration, keys), total: keys.length }
-  }, [immigration, category])
+    // For "work" category matters, add extra fields beyond what the schema defines
+    const workExtras = category === 'work'
+      ? [
+          { key: 'job_title', label: 'Job Title' },
+          { key: 'lmia_number', label: 'LMIA Number' },
+          { key: 'job_offer_noc', label: 'NOC Code' },
+        ]
+      : []
+    const allFields = [...employmentBaseFields, ...workExtras]
+    if (!immigration) return { filled: 0, total: allFields.length, missing: allFields.map(f => f.label) }
+    const keys = allFields.map(f => f.key) as (keyof MatterImmigration)[]
+    return {
+      filled: countFilled(immigration, keys),
+      total: keys.length,
+      missing: getMissingFields(immigration as unknown as Record<string, unknown>, allFields),
+    }
+  }, [immigration, category, employmentBaseFields])
 
   // Loading skeleton
   if (isLoading) {
@@ -565,6 +684,7 @@ export function ImmigrationDetailsPanel({ matterId, tenantId, fieldConfig }: Imm
         columns={3}
         filledCount={caseInfoCompletion.filled}
         totalCount={caseInfoCompletion.total}
+        missingFields={caseInfoCompletion.missing}
       >
         {isFieldVisible('case_type_id') && (
           <InlineSelectField
@@ -638,6 +758,7 @@ export function ImmigrationDetailsPanel({ matterId, tenantId, fieldConfig }: Imm
         columns={3}
         filledCount={profileCompletion.filled}
         totalCount={profileCompletion.total}
+        missingFields={profileCompletion.missing}
       >
         {isFieldVisible('country_of_citizenship') && (
           <InlineTextField
@@ -755,6 +876,7 @@ export function ImmigrationDetailsPanel({ matterId, tenantId, fieldConfig }: Imm
             defaultOpen={category === 'work'}
             filledCount={employmentCompletion.filled}
             totalCount={employmentCompletion.total}
+            missingFields={employmentCompletion.missing}
           >
             <InlineSelectField
               label="Work Permit Type"
@@ -927,6 +1049,7 @@ export function ImmigrationDetailsPanel({ matterId, tenantId, fieldConfig }: Imm
         columns={3}
         filledCount={datesCompletion.filled}
         totalCount={datesCompletion.total}
+        missingFields={datesCompletion.missing}
       >
         {isFieldVisible('date_filed') && (
           <InlineTextField
@@ -1026,6 +1149,7 @@ export function ImmigrationDetailsPanel({ matterId, tenantId, fieldConfig }: Imm
         columns={3}
         filledCount={langCompletion.filled}
         totalCount={langCompletion.total}
+        missingFields={langCompletion.missing}
       >
         <InlineSelectField
           label="Language Test Type"

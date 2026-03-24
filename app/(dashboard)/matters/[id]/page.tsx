@@ -146,6 +146,7 @@ import { CoreDataSummaryPanel } from '@/components/matters/core-data-summary-pan
 import { CoreDataCardTab } from '@/components/matters/core-data-card-tab'
 import { SendDocumentRequestDialog } from '@/components/matters/send-document-request-dialog'
 import { ImmigrationReadinessHub } from '@/components/matters/immigration-readiness-hub'
+import { MatterReadinessBadge } from '@/components/matters/matter-readiness-badge'
 import { useImmigrationReadiness } from '@/lib/queries/immigration-readiness'
 import { ClientNotificationsTab } from '@/components/matters/client-notifications-tab'
 import { useRegenerateSlots, useDocumentSlots } from '@/lib/queries/document-slots'
@@ -747,6 +748,9 @@ export default function MatterDetailPage() {
         matterTypeName={matter.matter_type ?? null}
         readinessData={readinessData}
       />
+
+      {/* Aggregate matter readiness percentage */}
+      <MatterReadinessBadge matterId={matterId} />
 
       {/* Central Action Panel: primary + secondary actions */}
       <CentralActionPanel

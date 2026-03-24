@@ -46,9 +46,13 @@ async function handlePost(
     const {
       closed_reason,
       status: closureStatus,
+      override_trust_check,
+      trust_override_reason,
     } = body as {
       closed_reason?: string
       status?: 'closed_won' | 'closed_lost' | 'closed_withdrawn'
+      override_trust_check?: boolean
+      trust_override_reason?: string
     }
 
     // 3. Verify matter belongs to tenant
@@ -118,23 +122,42 @@ async function handlePost(
     }
 
     // Guard 3: Trust reconciliation
-    // Simple balance check: debits !== credits indicates unreconciled state
+    // Balance check using correct transaction types from DB CHECK constraint (migration 100)
+    const CREDIT_TYPES = ['deposit', 'transfer_in', 'interest', 'opening_balance']
+    const DEBIT_TYPES = ['disbursement', 'transfer_out', 'refund', 'bank_fee', 'reversal']
+
+    let trustBalance = 0
     if (trustResult.data && trustResult.data.length > 0) {
-      let balance = 0
       for (const txn of trustResult.data) {
         const amt = (txn as any).amount_cents ?? 0
         const type = (txn as any).transaction_type ?? ''
-        // Receipts add to trust; disbursements deduct
-        if (['receipt', 'transfer_in', 'interest'].includes(type)) {
-          balance += amt
-        } else if (['disbursement', 'transfer_out', 'fee', 'reversal'].includes(type)) {
-          balance -= amt
+        if (CREDIT_TYPES.includes(type)) {
+          trustBalance += amt
+        } else if (DEBIT_TYPES.includes(type)) {
+          trustBalance -= amt
+        } else if (type === 'adjustment') {
+          // Adjustments use signed amount: positive = credit, negative = debit
+          trustBalance += amt
         }
       }
-      if (balance !== 0) {
+    }
+
+    if (trustBalance !== 0) {
+      const isAdmin = role === 'Admin'
+      const hasOverride = override_trust_check === true
+      const hasReason = (trust_override_reason?.trim().length ?? 0) >= 30
+
+      if (isAdmin && hasOverride && hasReason) {
+        // Admin override — allowed with audit trail (logged in activity below)
+      } else if (isAdmin && hasOverride && !hasReason) {
+        blockers.push({
+          type: 'trust_override_missing_reason',
+          message: 'Trust check override requires a documented reason (minimum 30 characters)',
+        })
+      } else {
         blockers.push({
           type: 'unreconciled_trust',
-          message: 'Trust transactions are not reconciled — outstanding balance must be cleared before closing',
+          message: `Trust transactions are not reconciled — outstanding balance of ${trustBalance} cents must be cleared before closing`,
         })
       }
     }
@@ -194,7 +217,15 @@ async function handlePost(
       entity_type: 'matter',
       entity_id: matterId,
       user_id: auth.userId,
-      metadata: { status: resolvedStatus, closed_at: closedAt } as any,
+      metadata: {
+        status: resolvedStatus,
+        closed_at: closedAt,
+        ...(override_trust_check && {
+          trust_override: true,
+          trust_override_reason: trust_override_reason?.trim(),
+          trust_balance_at_close_cents: trustBalance,
+        }),
+      } as any,
     })
 
     return NextResponse.json(

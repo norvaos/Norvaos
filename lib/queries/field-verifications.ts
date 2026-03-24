@@ -4,6 +4,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
+export type VerificationStatus = 'pending' | 'submitted' | 'verified' | 'rejected'
+
 export interface FieldVerification {
   id: string
   profile_path: string
@@ -11,6 +13,22 @@ export interface FieldVerification {
   verified_by: string
   verified_at: string
   notes: string | null
+  verification_status: VerificationStatus
+  rejection_reason: string | null
+}
+
+export interface VerifyTarget {
+  type: 'field' | 'document'
+  profile_path?: string
+  verified_value?: unknown
+  slot_id?: string
+}
+
+export interface VerifyRequest {
+  action: 'verify' | 'reject'
+  targets: VerifyTarget[]
+  rejection_reason?: string
+  notes?: string
 }
 
 // ── Query keys ────────────────────────────────────────────────────────────────
@@ -31,6 +49,16 @@ export function isVerificationStale(
   currentValue: unknown,
 ): boolean {
   return JSON.stringify(verification.verified_value) !== JSON.stringify(currentValue)
+}
+
+/** Returns true when the field has been verified and should be read-only. */
+export function isFieldLocked(verification: FieldVerification | undefined): boolean {
+  return verification?.verification_status === 'verified'
+}
+
+/** Returns true when the field has been rejected and needs correction. */
+export function isFieldRejected(verification: FieldVerification | undefined): boolean {
+  return verification?.verification_status === 'rejected'
 }
 
 // ── Hooks ─────────────────────────────────────────────────────────────────────
@@ -116,6 +144,31 @@ export function useUnverifyField(matterId: string) {
         body: JSON.stringify({ profile_path: profilePath }),
       })
       if (!res.ok) throw new Error('Failed to remove field verification')
+      return res.json()
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: fieldVerificationKeys.matter(matterId) })
+    },
+  })
+}
+
+/**
+ * Unified verify/reject mutation using POST /api/matters/[id]/verify.
+ * Supports both field and document targets in a single call.
+ */
+export function useVerifyTargets(matterId: string) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (input: VerifyRequest) => {
+      const res = await fetch(`/api/matters/${matterId}/verify`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(input),
+      })
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: 'Request failed' }))
+        throw new Error(err.error || 'Verification failed')
+      }
       return res.json()
     },
     onSuccess: () => {

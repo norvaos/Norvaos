@@ -346,6 +346,38 @@ async function handlePost() {
       )
     } catch { errors.push('data_import_intent') }
 
+    // ── Seed default automation rules ──────────────────────────────────────────
+    // 1. Expiry Reminder Rules (30-day, 7-day, 1-day before expiry)
+    try {
+      const existingRulesRes = await admin
+        .from('expiry_reminder_rules')
+        .select('id')
+        .eq('tenant_id', auth.tenantId)
+        .limit(1)
+        .maybeSingle()
+      const existingRule = (existingRulesRes as unknown as { data: { id: string } | null }).data
+      if (!existingRule) {
+        await admin.from('expiry_reminder_rules').insert([
+          { tenant_id: auth.tenantId, reminder_offset_days: 30, reminder_type: 'email',        is_active: true },
+          { tenant_id: auth.tenantId, reminder_offset_days: 7,  reminder_type: 'notification', is_active: true },
+          { tenant_id: auth.tenantId, reminder_offset_days: 1,  reminder_type: 'email',        is_active: true },
+        ] as never)
+      }
+    } catch { errors.push('expiry_reminder_rules') }
+
+    // 2. Notification preferences in tenant settings
+    try {
+      const settings = await getTenantSettings()
+      const existing = (settings.notifications as Record<string, unknown>) ?? {}
+      settings.notifications = {
+        ...existing,
+        stage_change_email:       true,
+        document_upload_email:    true,
+        deadline_reminder_email:  true,
+      }
+      await admin.from('tenants').update({ settings: j(settings) } as never).eq('id', auth.tenantId)
+    } catch { errors.push('notification_preferences') }
+
     const success = errors.length === 0
     const status  = success ? 'default_applied' : 'draft'
 

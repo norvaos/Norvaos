@@ -44,6 +44,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { Textarea } from '@/components/ui/textarea'
+import { Checkbox } from '@/components/ui/checkbox'
 import {
   FileDown,
   Loader2,
@@ -52,9 +54,13 @@ import {
   ShieldCheck,
   TrendingUp,
   TrendingDown,
+  AlertTriangle,
+  Undo2,
 } from 'lucide-react'
 import { formatDate } from '@/lib/utils/formatters'
+import { HelperTip } from '@/components/ui/helper-tip'
 import { PAYMENT_METHODS } from '@/lib/utils/constants'
+import { useUser } from '@/lib/hooks/use-user'
 import {
   useInvoices,
   useCreateInvoice,
@@ -105,9 +111,306 @@ function statusLabel(status: string | null): string {
     .join(' ')
 }
 
+// ── Record Trust Transaction Dialog ──────────────────────────────────────────
+
+const TRUST_TRANSACTION_TYPES = [
+  { value: 'deposit', label: 'Deposit' },
+  { value: 'disbursement', label: 'Disbursement' },
+  { value: 'transfer_in', label: 'Transfer In' },
+  { value: 'transfer_out', label: 'Transfer Out' },
+  { value: 'refund', label: 'Refund' },
+  { value: 'bank_fee', label: 'Bank Fee' },
+  { value: 'adjustment', label: 'Adjustment' },
+] as const
+
+interface RecordTrustTransactionDialogProps {
+  open: boolean
+  onOpenChange: (v: boolean) => void
+  matterId: string
+  tenantId: string
+}
+
+function RecordTrustTransactionDialog({
+  open,
+  onOpenChange,
+  matterId,
+  tenantId,
+}: RecordTrustTransactionDialogProps) {
+  const supabase = createClient()
+  const queryClient = useQueryClient()
+  const { appUser } = useUser()
+
+  const [txType, setTxType] = useState('deposit')
+  const [amount, setAmount] = useState('')
+  const [description, setDescription] = useState('')
+  const [isCorrection, setIsCorrection] = useState(false)
+  const [reversalOfId, setReversalOfId] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+
+  // Fetch all recent transactions for this matter (for reversal picker)
+  const { data: allTxns = [] } = useQuery({
+    queryKey: ['trust-transactions-all', matterId],
+    queryFn: async (): Promise<TrustTransaction[]> => {
+      const { data, error } = await supabase
+        .from('trust_transactions')
+        .select('*')
+        .eq('matter_id', matterId)
+        .order('effective_date', { ascending: false })
+        .limit(50)
+      if (error) throw error
+      return (data ?? []) as TrustTransaction[]
+    },
+    enabled: open && !!matterId,
+    staleTime: 30 * 1000,
+  })
+
+  // Fetch the trust account ID for this matter (from existing transactions or default)
+  const { data: trustAccountId } = useQuery({
+    queryKey: ['trust-account-for-matter', matterId],
+    queryFn: async (): Promise<string | null> => {
+      // First try to get from existing transactions
+      const { data: txn } = await supabase
+        .from('trust_transactions')
+        .select('trust_account_id')
+        .eq('matter_id', matterId)
+        .limit(1)
+        .single()
+      if (txn?.trust_account_id) return txn.trust_account_id
+
+      // Fallback: get any trust bank account for this tenant
+      const { data: account } = await supabase
+        .from('trust_bank_accounts')
+        .select('id')
+        .limit(1)
+        .single()
+      return account?.id ?? null
+    },
+    enabled: open && !!matterId,
+    staleTime: 5 * 60 * 1000,
+  })
+
+  // When a reversal target is selected, auto-fill amount as the negation
+  const selectedOriginal = allTxns.find((t) => t.id === reversalOfId)
+
+  const handleCorrectionToggle = (checked: boolean) => {
+    setIsCorrection(checked)
+    if (checked) {
+      setTxType('reversal')
+      setReversalOfId('')
+      setAmount('')
+      setDescription('')
+    } else {
+      setTxType('deposit')
+      setReversalOfId('')
+      setAmount('')
+      setDescription('')
+    }
+  }
+
+  const handleReversalSelect = (txnId: string) => {
+    setReversalOfId(txnId)
+    const original = allTxns.find((t) => t.id === txnId)
+    if (original) {
+      // Negate the amount: if original was +500, reversal is -500 (stored as absolute cents)
+      setAmount((Math.abs(original.amount_cents) / 100).toFixed(2))
+      setDescription(`Reversal: ${original.description}`)
+    }
+  }
+
+  const resetForm = () => {
+    setTxType('deposit')
+    setAmount('')
+    setDescription('')
+    setIsCorrection(false)
+    setReversalOfId('')
+    setSubmitting(false)
+  }
+
+  const handleSubmit = async () => {
+    if (!appUser?.id || !trustAccountId) return
+    const cents = Math.round(parseFloat(amount || '0') * 100)
+    if (cents <= 0 || !description.trim()) return
+
+    setSubmitting(true)
+    try {
+      // For reversals, negate the original amount direction
+      let finalAmountCents = cents
+      if (isCorrection && selectedOriginal) {
+        // If the original was positive (deposit), the reversal is negative (and vice versa)
+        finalAmountCents = selectedOriginal.amount_cents >= 0 ? -cents : cents
+      } else {
+        // Standard types: deposits/transfers_in are positive, disbursements etc. are negative
+        const negativeTypes = ['disbursement', 'transfer_out', 'refund', 'bank_fee']
+        if (negativeTypes.includes(txType)) {
+          finalAmountCents = -cents
+        }
+      }
+
+      const { error } = await supabase
+        .from('trust_transactions')
+        .insert({
+          tenant_id: tenantId,
+          trust_account_id: trustAccountId,
+          matter_id: matterId,
+          transaction_type: isCorrection ? 'reversal' : txType,
+          amount_cents: finalAmountCents,
+          description: description.trim(),
+          authorized_by: appUser.id,
+          recorded_by: appUser.id,
+          effective_date: new Date().toISOString().split('T')[0],
+          is_cleared: true,
+          reversal_of_id: isCorrection && reversalOfId ? reversalOfId : null,
+        })
+
+      if (error) {
+        if (error.message?.includes('cannot go negative')) {
+          toast.error('Insufficient trust balance for this transaction')
+        } else {
+          toast.error(`Failed to record transaction: ${error.message}`)
+        }
+        return
+      }
+
+      queryClient.invalidateQueries({ queryKey: ['trust-transactions', matterId] })
+      queryClient.invalidateQueries({ queryKey: ['trust-transactions-all', matterId] })
+      queryClient.invalidateQueries({ queryKey: ['matters'] })
+      toast.success('Trust transaction recorded')
+      resetForm()
+      onOpenChange(false)
+    } catch {
+      toast.error('Failed to record transaction')
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={(v) => { if (!v) resetForm(); onOpenChange(v) }}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Record Trust Transaction</DialogTitle>
+          <DialogDescription>
+            Add a transaction to the trust ledger for this matter.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-4">
+          {/* Correction toggle */}
+          <div className="flex items-center gap-2 rounded-md border border-amber-200 bg-amber-50 px-3 py-2">
+            <Checkbox
+              id="correction-toggle"
+              checked={isCorrection}
+              onCheckedChange={(checked) => handleCorrectionToggle(checked === true)}
+            />
+            <label htmlFor="correction-toggle" className="flex items-center gap-1.5 text-sm cursor-pointer">
+              <Undo2 className="h-3.5 w-3.5 text-amber-600" />
+              This is a correction (reversal of a previous transaction)
+            </label>
+          </div>
+
+          {/* Reversal target picker (shown when correction is on) */}
+          {isCorrection && (
+            <div>
+              <Label className="text-xs">Transaction to Reverse</Label>
+              <Select value={reversalOfId} onValueChange={handleReversalSelect}>
+                <SelectTrigger className="mt-1">
+                  <SelectValue placeholder="Select a transaction…" />
+                </SelectTrigger>
+                <SelectContent>
+                  {allTxns
+                    .filter((t) => t.transaction_type !== 'reversal')
+                    .map((t) => (
+                      <SelectItem key={t.id} value={t.id}>
+                        {formatDate(t.effective_date)} — {t.description} ({fmtCents(t.amount_cents)})
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+              </Select>
+              {selectedOriginal && (
+                <p className="mt-1.5 text-xs text-muted-foreground">
+                  Original: {selectedOriginal.transaction_type} for {fmtCents(selectedOriginal.amount_cents)} on {formatDate(selectedOriginal.effective_date)}
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* Transaction type (hidden when correction is on — auto-set to reversal) */}
+          {!isCorrection && (
+            <div>
+              <Label className="text-xs">Transaction Type</Label>
+              <Select value={txType} onValueChange={setTxType}>
+                <SelectTrigger className="mt-1">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {TRUST_TRANSACTION_TYPES.map((t) => (
+                    <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
+          {/* Amount */}
+          <div>
+            <Label className="text-xs">Amount ($)</Label>
+            <Input
+              type="number"
+              step="0.01"
+              min="0"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              className="mt-1"
+              placeholder="0.00"
+              disabled={isCorrection && !!reversalOfId}
+            />
+            {isCorrection && reversalOfId && (
+              <p className="mt-1 text-xs text-amber-600">
+                Amount auto-filled from the original transaction.
+              </p>
+            )}
+          </div>
+
+          {/* Description */}
+          <div>
+            <Label className="text-xs">Description</Label>
+            <Textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className="mt-1 min-h-[60px]"
+              placeholder="Description of the transaction…"
+            />
+          </div>
+        </div>
+
+        <DialogFooter>
+          <Button variant="outline" onClick={() => { resetForm(); onOpenChange(false) }}>
+            Cancel
+          </Button>
+          <Button
+            onClick={handleSubmit}
+            disabled={
+              submitting ||
+              !amount ||
+              !description.trim() ||
+              !trustAccountId ||
+              (isCorrection && !reversalOfId)
+            }
+          >
+            {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {isCorrection ? 'Record Reversal' : 'Record Transaction'}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
 // ── Trust Account Widget ──────────────────────────────────────────────────────
 
-function TrustWidget({ matterId, trustBalance }: { matterId: string; trustBalance: number | null }) {
+function TrustWidget({ matterId, tenantId, trustBalance }: { matterId: string; tenantId: string; trustBalance: number | null }) {
+  const [showRecordDialog, setShowRecordDialog] = useState(false)
+
   const { data: txns, isLoading } = useQuery({
     queryKey: ['trust-transactions', matterId],
     queryFn: async (): Promise<TrustTransaction[]> => {
@@ -134,9 +437,21 @@ function TrustWidget({ matterId, trustBalance }: { matterId: string; trustBalanc
   return (
     <Card className="border-emerald-200 bg-emerald-50/30">
       <CardHeader className="pb-2">
-        <div className="flex items-center gap-2">
-          <ShieldCheck className="h-4 w-4 text-emerald-600" />
-          <CardTitle className="text-sm font-semibold">Trust Account</CardTitle>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <ShieldCheck className="h-4 w-4 text-emerald-600" />
+            <CardTitle className="text-sm font-semibold">Trust Account</CardTitle>
+            <HelperTip contentKey="billing.trust_account" />
+          </div>
+          <Button
+            size="sm"
+            variant="outline"
+            className="h-7 text-xs"
+            onClick={() => setShowRecordDialog(true)}
+          >
+            <Plus className="mr-1 h-3 w-3" />
+            Record Transaction
+          </Button>
         </div>
       </CardHeader>
       <CardContent className="pt-0 space-y-2">
@@ -146,6 +461,13 @@ function TrustWidget({ matterId, trustBalance }: { matterId: string; trustBalanc
             {fmtCents((trustBalance ?? 0) * 100)}
           </span>
         </div>
+
+        {(trustBalance ?? 0) > 0 && (trustBalance ?? 0) < 50000 && (
+          <div className="flex items-center gap-2 rounded-md bg-amber-50 border border-amber-200 px-3 py-2 text-xs text-amber-700">
+            <AlertTriangle className="size-4 shrink-0" />
+            <span>Low trust balance — consider requesting a retainer top-up from the client.</span>
+          </div>
+        )}
 
         {isLoading ? (
           <div className="space-y-1.5">
@@ -157,7 +479,10 @@ function TrustWidget({ matterId, trustBalance }: { matterId: string; trustBalanc
               Recent Transactions
             </p>
             {txns!.map((tx) => {
-              const isCredit = ['deposit', 'receipt', 'transfer_in'].includes(tx.transaction_type)
+              const isAdjustment = tx.transaction_type === 'adjustment'
+              const isCredit = isAdjustment
+                ? tx.amount_cents >= 0
+                : ['deposit', 'transfer_in', 'interest', 'opening_balance'].includes(tx.transaction_type)
               return (
                 <div
                   key={tx.id}
@@ -178,6 +503,13 @@ function TrustWidget({ matterId, trustBalance }: { matterId: string; trustBalanc
           </div>
         ) : null}
       </CardContent>
+
+      <RecordTrustTransactionDialog
+        open={showRecordDialog}
+        onOpenChange={setShowRecordDialog}
+        matterId={matterId}
+        tenantId={tenantId}
+      />
     </Card>
   )
 }
@@ -934,7 +1266,7 @@ export function BillingTab({ matterId, tenantId, matter }: BillingTabProps) {
       <MilestonesPanel matterId={matterId} tenantId={tenantId} />
 
       {/* ── E. Trust Account Widget ────────────────────────────────────────── */}
-      <TrustWidget matterId={matterId} trustBalance={matter.trust_balance} />
+      <TrustWidget matterId={matterId} tenantId={tenantId} trustBalance={matter.trust_balance} />
 
       {/* ── Generate Invoice Sheet ─────────────────────────────────────────── */}
       <GenerateInvoiceSheet

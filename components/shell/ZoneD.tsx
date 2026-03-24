@@ -32,8 +32,7 @@ import { BillingTab }             from '@/components/shell/tabs/BillingTab'
 import { TasksTab }               from '@/components/matters/tabs/tasks-tab'
 import { NotesEditor }            from '@/components/shared/notes-editor'
 import { ActivityTimeline }       from '@/components/shared/activity-timeline'
-import { QuestionsWorkflowSection }     from '@/components/matters/workflow/questions-section'
-import { useImmigrationReadiness }      from '@/lib/queries/immigration-readiness'
+import { IRCCIntakeTab }               from '@/app/(dashboard)/matters/[id]/ircc-intake-tab'
 import { ReviewTab }              from '@/components/shell/tabs/ReviewTab'
 import { CommunicationsTab }      from '@/components/shell/tabs/CommunicationsTab'
 import { CorrespondenceTab }      from '@/components/shell/tabs/CorrespondenceTab'
@@ -79,28 +78,7 @@ export interface ZoneDProps {
 
 // ── Internal wrappers for readiness-dependent tabs ───────────────────────────
 
-/**
- * Questionnaire tab — fetches readiness data internally so ZoneD
- * doesn't need to fetch it at the outer level.
- */
-function QuestionnaireTabContent({
-  matterId,
-  onNavigateToField,
-}: {
-  matterId: string
-  onNavigateToField?: (profilePath: string) => void
-}) {
-  const { data: readinessData } = useImmigrationReadiness(matterId)
-  return (
-    <div className="p-4">
-      <QuestionsWorkflowSection
-        readinessData={readinessData}
-        defaultExpanded={true}
-        onNavigateToField={onNavigateToField}
-      />
-    </div>
-  )
-}
+// QuestionnaireTabContent removed — Questionnaire tab now renders IRCCIntakeTab directly
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
@@ -239,7 +217,12 @@ export function ZoneD({ matter, tenantId, initialTab = 'details' }: ZoneDProps) 
 
         {/* 4 — Questionnaire */}
         <TabsContent value="questionnaire" className="flex-1 overflow-y-auto m-0 p-0">
-          <QuestionnaireTabContent matterId={matter.id} />
+          <IRCCIntakeTab
+            matterId={matter.id}
+            contactId={primaryContactId ?? null}
+            tenantId={tenantId}
+            matterTypeId={matter.matter_type_id ?? null}
+          />
         </TabsContent>
 
         {/* 5 — Review */}

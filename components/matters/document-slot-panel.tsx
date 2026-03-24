@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useCallback, useMemo } from 'react'
+import { useState, useRef, useCallback, useMemo, type DragEvent } from 'react'
 import {
   useDocumentSlots,
   useDocumentSlotVersions,
@@ -64,6 +64,7 @@ import {
   ScanSearch,
 } from 'lucide-react'
 import { Input } from '@/components/ui/input'
+import { cn } from '@/lib/utils'
 import { DocumentScanButton } from '@/components/shared/document-scan-button'
 
 // ─── Types ──────────────────────────────────────────────────────────────────────
@@ -172,6 +173,7 @@ export function SlotCard({
   const [showReview, setShowReview] = useState(false)
   const [showViewer, setShowViewer] = useState(false)
   const [isSharing, setIsSharing] = useState(false)
+  const [isDragging, setIsDragging] = useState(false)
   const [pendingFile, setPendingFile] = useState<File | null>(null)
   const [slotScanExtracted, setSlotScanExtracted] = useState<Record<string, string | number | null> | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -223,8 +225,46 @@ export function SlotCard({
     setShowUpload(false)
   }, [pendingFile, slot.id, matterId, uploadMutation])
 
+  const handleDragOver = useCallback((e: DragEvent<HTMLDivElement>) => {
+    e.preventDefault()
+    e.stopPropagation()
+  }, [])
+
+  const handleDragEnter = useCallback((e: DragEvent<HTMLDivElement>) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDragging(true)
+  }, [])
+
+  const handleDragLeave = useCallback((e: DragEvent<HTMLDivElement>) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDragging(false)
+  }, [])
+
+  const handleDrop = useCallback((e: DragEvent<HTMLDivElement>) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDragging(false)
+    const file = e.dataTransfer.files?.[0]
+    if (file) {
+      setPendingFile(file)
+      setSlotScanExtracted(null)
+      setShowUpload(true)
+    }
+  }, [])
+
   return (
-    <div className="border rounded-lg p-4 space-y-3">
+    <div
+      className={cn(
+        'border rounded-lg p-4 space-y-3',
+        isDragging && 'border-primary border-dashed bg-primary/5'
+      )}
+      onDragOver={handleDragOver}
+      onDragEnter={handleDragEnter}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
+    >
       {/* Header row */}
       <div className="flex items-start justify-between gap-2">
         <div className="flex-1 min-w-0">

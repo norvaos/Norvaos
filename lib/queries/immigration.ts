@@ -166,6 +166,51 @@ export function useUpdateMatterImmigration() {
   })
 }
 
+// ─── 6b. usePopulateChecklist ────────────────────────────────────────────────────
+// Calls the DB function populate_checklist_from_stream() which copies
+// requirement_templates → matter_checklist_items for the given stream.
+// Idempotent: skips documents that already exist.
+
+export function usePopulateChecklist() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async ({
+      matterId,
+      tenantId,
+      programCategory,
+      jurisdiction = 'CA',
+    }: {
+      matterId: string
+      tenantId: string
+      programCategory: string
+      jurisdiction?: string
+    }) => {
+      const supabase = createClient()
+      const { data, error } = await supabase.rpc(
+        'populate_checklist_from_stream',
+        {
+          p_matter_id: matterId,
+          p_tenant_id: tenantId,
+          p_program_cat: programCategory,
+          p_jurisdiction: jurisdiction,
+        },
+      )
+
+      if (error) throw error
+      return data as number // rows inserted
+    },
+    onSuccess: (_count, vars) => {
+      queryClient.invalidateQueries({
+        queryKey: immigrationKeys.checklistItems(vars.matterId),
+      })
+    },
+    onError: () => {
+      toast.error('Failed to populate document checklist')
+    },
+  })
+}
+
 // ─── 7. useMatterChecklistItems ─────────────────────────────────────────────────
 
 export function useMatterChecklistItems(matterId: string) {

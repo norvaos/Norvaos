@@ -62,3 +62,6 @@ __pycache__/
 
 # os
 Thumbs.db
+
+# Local Netlify folder
+.netlify
