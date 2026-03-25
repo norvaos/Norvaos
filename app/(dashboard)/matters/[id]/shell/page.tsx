@@ -17,8 +17,9 @@
 import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import { useEffect } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { Loader2, AlertTriangle } from 'lucide-react'
+import { AlertTriangle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { Skeleton } from '@/components/ui/skeleton'
 import { WorkplaceShell } from '@/components/shell/WorkplaceShell'
 import { ImmigrationFunnel } from '@/components/funnel/ImmigrationFunnel'
 import type { ZoneDProps } from '@/components/shell/ZoneD'
@@ -93,10 +94,37 @@ export default function MatterShellPage() {
   }, [matterLoading, matter, matterError, router])
 
   // ── Loading ──────────────────────────────────────────────────────────────
+  // ── Loading — layout-matching skeleton to prevent flicker ─────────────
   if (tenantLoading || matterLoading) {
     return (
-      <div className="flex h-full items-center justify-center">
-        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+      <div className="flex h-full flex-col overflow-hidden">
+        {/* Header skeleton */}
+        <div className="flex items-center justify-between border-b px-6 py-3">
+          <Skeleton className="h-5 w-48" />
+          <Skeleton className="h-4 w-24" />
+        </div>
+        {/* Step indicator / tab bar skeleton */}
+        <div className="flex items-center gap-4 border-b px-6 py-3">
+          <Skeleton className="h-8 w-8 rounded-full" />
+          <Skeleton className="h-0.5 w-16" />
+          <Skeleton className="h-8 w-8 rounded-full" />
+          <Skeleton className="h-0.5 w-16" />
+          <Skeleton className="h-8 w-8 rounded-full" />
+        </div>
+        {/* Content area skeleton */}
+        <div className="flex flex-1 gap-4 p-6">
+          <div className="flex-1 space-y-4">
+            <Skeleton className="h-10 w-full rounded-lg" />
+            <Skeleton className="h-10 w-full rounded-lg" />
+            <Skeleton className="h-10 w-full rounded-lg" />
+            <Skeleton className="h-10 w-full rounded-lg" />
+            <Skeleton className="h-10 w-full rounded-lg" />
+            <Skeleton className="h-10 w-full rounded-lg" />
+          </div>
+          <div className="flex-1">
+            <Skeleton className="h-64 w-full rounded-lg" />
+          </div>
+        </div>
       </div>
     )
   }

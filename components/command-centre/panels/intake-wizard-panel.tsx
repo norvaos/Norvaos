@@ -16,6 +16,7 @@
 
 import { useState, useCallback, useMemo, useEffect } from 'react'
 import { useCommandCentre } from '../command-centre-context'
+import { useMatterTypes } from '@/lib/queries/matter-types'
 import { createClient } from '@/lib/supabase/client'
 import { useQueryClient } from '@tanstack/react-query'
 import { leadKeys } from '@/lib/queries/leads'
@@ -25,6 +26,7 @@ import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import {
+  Briefcase,
   ChevronLeft,
   CheckCircle2,
   Sparkles,
@@ -57,12 +59,21 @@ type WizardState = 'idle' | 'active' | 'completed'
 
 export function IntakeWizardPanel() {
   const { lead, tenantId, entityType } = useCommandCentre()
+  const { data: matterTypes } = useMatterTypes(tenantId, lead?.practice_area_id || undefined)
+
   if (entityType !== 'lead' || !lead) return null
+
+  // Resolve current matter type name for recommendation filtering
+  const selectedMatterType = matterTypes?.find((m) => m.id === lead.matter_type_id)
+
   return (
     <IntakeWizardInner
       leadId={lead.id}
       tenantId={tenantId}
       existingAnswers={(lead.custom_fields as IntakeAnswers | null) ?? {}}
+      matterTypeName={selectedMatterType?.name ?? null}
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      matterTypeConfig={(selectedMatterType?.matter_type_config ?? null) as Record<string, any> | null}
     />
   )
 }
@@ -73,10 +84,15 @@ function IntakeWizardInner({
   leadId,
   tenantId: _tenantId,
   existingAnswers,
+  matterTypeName,
+  matterTypeConfig,
 }: {
   leadId: string
   tenantId: string
   existingAnswers: IntakeAnswers
+  matterTypeName: string | null
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  matterTypeConfig: Record<string, any> | null
 }) {
   const queryClient = useQueryClient()
 
@@ -190,8 +206,35 @@ function IntakeWizardInner({
 
   const recommendations = useMemo((): IntakeRecommendation[] => {
     if (wizardState !== 'completed') return []
-    return generateRecommendations(answers)
-  }, [wizardState, answers])
+    const recs = generateRecommendations(answers)
+
+    // If a matter type is selected, boost matching recommendations and deprioritise non-matching ones
+    if (matterTypeName && recs.length > 0) {
+      const mtLower = matterTypeName.toLowerCase()
+      // Build keyword set from the matter type name
+      const mtKeywords = mtLower.split(/[\s—–\-/()]+/).filter((w) => w.length > 2)
+
+      const scored = recs.map((rec) => {
+        const titleLower = rec.title.toLowerCase()
+        const codeLower = rec.code.toLowerCase()
+        // Check if this recommendation matches the selected matter type
+        const titleMatch = mtKeywords.some((kw) => titleLower.includes(kw) || codeLower.includes(kw))
+        const nameInTitle = titleLower.includes(mtLower) || mtLower.includes(titleLower.split('—')[0].trim())
+        return { rec, score: nameInTitle ? 2 : titleMatch ? 1 : 0 }
+      })
+
+      // Sort: matching recs first, then by original order
+      scored.sort((a, b) => b.score - a.score)
+
+      // Upgrade confidence for matching, downgrade for non-matching
+      return scored.map(({ rec, score }) => ({
+        ...rec,
+        confidence: score > 0 ? 'strong' as const : rec.confidence === 'strong' ? 'possible' as const : rec.confidence,
+      }))
+    }
+
+    return recs
+  }, [wizardState, answers, matterTypeName])
 
   // ── Shared header ──────────────────────────────────────────────
   const header = (
@@ -330,6 +373,17 @@ function IntakeWizardInner({
                   )}
                 </div>
               ))}
+              {matterTypeName && (
+                <div className="rounded border border-indigo-200 bg-indigo-50/60 px-2.5 py-1.5 flex items-center gap-2">
+                  <Briefcase className="h-3 w-3 text-indigo-500 shrink-0" />
+                  <p className="text-[10px] text-indigo-700">
+                    <span className="font-semibold">Selected matter type:</span> {matterTypeName}
+                    {matterTypeConfig?.eligibility_summary && (
+                      <span className="text-indigo-600"> — {matterTypeConfig.eligibility_summary}</span>
+                    )}
+                  </p>
+                </div>
+              )}
               <p className="text-[10px] text-slate-400 italic leading-relaxed">
                 ✦ Recommendations are rule-based and should be validated against current IRCC policy before advising the client.
               </p>

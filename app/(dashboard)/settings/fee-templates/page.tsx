@@ -320,6 +320,9 @@ export default function FeeTemplatesPage() {
     effectiveScopeFilter
   )
 
+  // Unfiltered fetch so we can find all siblings when toggling default
+  const { data: allTemplates } = useRetainerFeeTemplates(tenantId)
+
   // Mutations
   const createTemplate = useCreateRetainerFeeTemplate()
   const updateTemplate = useUpdateRetainerFeeTemplate()
@@ -423,13 +426,38 @@ export default function FeeTemplatesPage() {
     }
   }
 
-  // Toggle default
+  // Toggle default — ensure only one template per matter_type_id + person_scope is default
   const handleToggleDefault = async (template: RetainerFeeTemplate) => {
+    const newDefault = !template.is_default
+
     try {
+      if (newDefault && allTemplates) {
+        // Find sibling templates with the same matter_type_id + person_scope that are currently default
+        const siblingsToUndefault = allTemplates.filter(
+          (t) =>
+            t.id !== template.id &&
+            t.matter_type_id === template.matter_type_id &&
+            t.person_scope === template.person_scope &&
+            t.is_default
+        )
+
+        // Un-default all siblings first
+        await Promise.all(
+          siblingsToUndefault.map((t) =>
+            updateTemplate.mutateAsync({
+              id: t.id,
+              tenantId,
+              updates: { is_default: false },
+            })
+          )
+        )
+      }
+
+      // Now set the selected template
       await updateTemplate.mutateAsync({
         id: template.id,
         tenantId,
-        updates: { is_default: !template.is_default },
+        updates: { is_default: newDefault },
       })
     } catch {
       // Handled by mutation hook

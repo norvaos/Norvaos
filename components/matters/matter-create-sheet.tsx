@@ -6,7 +6,6 @@ import { useTenant } from '@/lib/hooks/use-tenant'
 import { useUser } from '@/lib/hooks/use-user'
 import { useUIStore } from '@/lib/stores/ui-store'
 import { useCreateMatter } from '@/lib/queries/matters'
-import { createClient } from '@/lib/supabase/client'
 import type { MatterFormValues } from '@/lib/schemas/matter'
 import { CANADIAN_TAX_RATES } from '@/lib/config/tax-rates'
 import {
@@ -43,6 +42,17 @@ export function MatterCreateSheet({ open, onOpenChange, defaultContactId }: Matt
     const taxRate = isOutsideCanada ? 0 : (provinceTax?.rate ?? 0)
     const taxLabel = isOutsideCanada ? 'N/A' : (provinceTax?.label ?? 'HST')
 
+    // Build contact_ids array for server-side linking (no more client-side insert)
+    const contactLinks: Array<{ contact_id: string; role: string; is_primary: boolean }> = []
+    if (contact_id) {
+      contactLinks.push({ contact_id, role: 'client', is_primary: true })
+    }
+    if (additional_contacts?.length) {
+      for (const ac of additional_contacts) {
+        contactLinks.push({ contact_id: ac.contact_id, role: ac.role, is_primary: false })
+      }
+    }
+
     const result = await createMatter.mutateAsync({
       tenant_id: tenant.id,
       title: matterValues.title,
@@ -74,46 +84,15 @@ export function MatterCreateSheet({ open, onOpenChange, defaultContactId }: Matt
       created_by: appUser.id,
     })
 
-    // Link contacts to matter
-    const supabase = createClient()
-    const contactInserts: Array<{
-      tenant_id: string
-      matter_id: string
-      contact_id: string
-      role: string
-      is_primary: boolean
-    }> = []
-
-    // Primary contact
-    if (contact_id) {
-      contactInserts.push({
-        tenant_id: tenant.id,
-        matter_id: result.id,
-        contact_id: contact_id,
-        role: 'client',
-        is_primary: true,
-      })
-    }
-
-    // Additional contacts
-    if (additional_contacts && additional_contacts.length > 0) {
-      for (const ac of additional_contacts) {
-        contactInserts.push({
-          tenant_id: tenant.id,
-          matter_id: result.id,
-          contact_id: ac.contact_id,
-          role: ac.role,
-          is_primary: false,
-        })
-      }
-    }
-
-    if (contactInserts.length > 0) {
-      await supabase.from('matter_contacts').insert(contactInserts)
-    }
-
     onOpenChange(false)
-    router.push(`/matters/${result.id}`)
+
+    // Pass matter_type_id in URL to eliminate readiness fetch delay on shell page
+    const typeParam = matterValues.case_type_id
+      ? `?layout=funnel`
+      : matterValues.matter_type_id
+        ? `?layout=shell`
+        : ''
+    router.push(`/matters/${result.id}${typeParam}`)
   }
 
   return (

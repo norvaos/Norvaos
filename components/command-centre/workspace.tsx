@@ -324,6 +324,102 @@ function CoreDataCard({ lead, entityId, tenantId, users, practiceAreas, isConver
   // Matter types — filtered by practice area when selected, all types when not
   const { data: matterTypes } = useMatterTypes(tenantId, watchedPracticeAreaId || undefined)
 
+  // Handle matter type change: auto-populate immigration intelligence from matter_type_config
+  const handleMatterTypeChange = useCallback(
+    (val: string) => {
+      skipWatchRef.current.add('matter_type_id')
+      setValue('matter_type_id', val)
+
+      // Find the selected matter type's config
+      const mt = (matterTypes ?? []).find((m) => m.id === val)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const config = (mt?.matter_type_config ?? {}) as Record<string, any>
+
+      // Auto-populate processing stream and client location from matter type config
+      // Only set if the field is currently empty (don't overwrite user-entered data)
+      const currentStream = watch('processing_stream')
+      const currentLocation = watch('client_location')
+
+      const updates: Record<string, unknown> = { matter_type_id: val || null }
+      const cf = (lead?.custom_fields ?? {}) as Record<string, unknown>
+      const cfUpdates = { ...cf }
+
+      if (!currentStream && config.default_processing_stream) {
+        skipWatchRef.current.add('processing_stream')
+        setValue('processing_stream', config.default_processing_stream)
+        cfUpdates.processing_stream = config.default_processing_stream
+      }
+
+      if (!currentLocation && config.default_client_location) {
+        skipWatchRef.current.add('client_location')
+        setValue('client_location', config.default_client_location)
+        cfUpdates.client_location = config.default_client_location
+      }
+
+      // Store program category in custom_fields for display elsewhere
+      if (config.program_category) {
+        cfUpdates.program_category = config.program_category
+      }
+      if (config.eligibility_summary) {
+        cfUpdates.eligibility_summary = config.eligibility_summary
+      }
+      if (config.typical_processing_time) {
+        cfUpdates.typical_processing_time = config.typical_processing_time
+      }
+
+      // Check if custom_fields changed
+      if (JSON.stringify(cfUpdates) !== JSON.stringify(cf)) {
+        updates.custom_fields = cfUpdates
+      }
+
+      if (!isConverted && lead) {
+        updateLead.mutate({ id: entityId, ...updates })
+      }
+    },
+    [lead, isConverted, entityId, updateLead, setValue, skipWatchRef, matterTypes, watch]
+  )
+
+  // Auto-populate intelligence fields from matter_type_config on initial load
+  // (when matter_type_id is already set but processing_stream/client_location are empty)
+  useEffect(() => {
+    if (!lead?.matter_type_id || !matterTypes?.length || isConverted) return
+    const mt = matterTypes.find((m) => m.id === lead.matter_type_id)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const config = (mt?.matter_type_config ?? {}) as Record<string, any>
+    if (!config.default_processing_stream && !config.default_client_location) return
+
+    const cf = (lead.custom_fields ?? {}) as Record<string, unknown>
+    const currentStream = (cf.processing_stream as string) || ''
+    const currentLocation = (cf.client_location as string) || ''
+
+    // Only auto-fill if both are empty (don't overwrite user data)
+    if (currentStream || currentLocation) return
+
+    const cfUpdates = { ...cf }
+    let changed = false
+
+    if (config.default_processing_stream) {
+      skipWatchRef.current.add('processing_stream')
+      setValue('processing_stream', config.default_processing_stream)
+      cfUpdates.processing_stream = config.default_processing_stream
+      changed = true
+    }
+    if (config.default_client_location) {
+      skipWatchRef.current.add('client_location')
+      setValue('client_location', config.default_client_location)
+      cfUpdates.client_location = config.default_client_location
+      changed = true
+    }
+    if (config.program_category) { cfUpdates.program_category = config.program_category; changed = true }
+    if (config.eligibility_summary) { cfUpdates.eligibility_summary = config.eligibility_summary; changed = true }
+    if (config.typical_processing_time) { cfUpdates.typical_processing_time = config.typical_processing_time; changed = true }
+
+    if (changed) {
+      updateLead.mutate({ id: entityId, custom_fields: cfUpdates as unknown as import('@/lib/types/database').Json })
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lead?.matter_type_id, matterTypes])
+
   // Handle practice area change: clear matter type atomically
   const handlePracticeAreaChange = useCallback(
     (val: string) => {
@@ -384,7 +480,7 @@ function CoreDataCard({ lead, entityId, tenantId, users, practiceAreas, isConver
             </Label>
             <Select
               value={watchedMatterTypeId}
-              onValueChange={(val) => setValue('matter_type_id', val)}
+              onValueChange={handleMatterTypeChange}
               disabled={isConverted}
             >
               <SelectTrigger className="h-9 text-sm">
@@ -720,6 +816,42 @@ function CoreDataCard({ lead, entityId, tenantId, users, practiceAreas, isConver
 
           </div>
         </div>
+
+        {/* ── Matter Type Intelligence Summary ──────────────────────── */}
+        {(() => {
+          const selectedMt = (matterTypes ?? []).find((m) => m.id === watchedMatterTypeId)
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const mtConfig = (selectedMt?.matter_type_config ?? {}) as Record<string, any>
+          if (!selectedMt || (!mtConfig.program_category && !mtConfig.eligibility_summary)) return null
+          return (
+            <div className="mt-4 pt-4 border-t border-slate-100">
+              <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wide mb-2 flex items-center gap-1.5">
+                <BadgeInfo className="h-3 w-3" />
+                {selectedMt.name} — Programme Intelligence
+              </p>
+              <div className="rounded-lg border border-indigo-100 bg-indigo-50/40 px-3 py-2.5 space-y-1.5">
+                {mtConfig.program_category && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] text-slate-500 w-24 shrink-0">Category</span>
+                    <span className="text-xs font-medium text-indigo-700">{mtConfig.program_category}</span>
+                  </div>
+                )}
+                {mtConfig.eligibility_summary && (
+                  <div className="flex items-start gap-2">
+                    <span className="text-[10px] text-slate-500 w-24 shrink-0 pt-0.5">Eligibility</span>
+                    <span className="text-xs text-slate-700">{mtConfig.eligibility_summary}</span>
+                  </div>
+                )}
+                {mtConfig.typical_processing_time && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] text-slate-500 w-24 shrink-0">Processing</span>
+                    <span className="text-xs text-slate-700">{mtConfig.typical_processing_time}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          )
+        })()}
       </CardContent>
     </Card>
   )

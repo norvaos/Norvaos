@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, lazy, Suspense } from 'react'
 import { CommandCentreProvider, useCommandCentre } from './command-centre-context'
 import { ConvertedBanner } from './converted-banner'
 import { HeroHeader } from './hero-header'
@@ -9,6 +9,13 @@ import { Workspace } from './workspace'
 import { ActivityTimeline } from '@/components/shared/activity-timeline'
 import { StatusRequests } from './panels/status-requests'
 import { ScreeningAnswers } from './panels/screening-answers'
+
+// Lazy-load the live intake sidebar (it includes Web Speech API + MediaRecorder)
+const LiveIntakeSidebar = lazy(() =>
+  import('@/components/leads/workflow/live-intake-sidebar').then((m) => ({
+    default: m.LiveIntakeSidebar,
+  })),
+)
 import {
   Sheet,
   SheetContent,
@@ -37,10 +44,12 @@ function CommandCentreShell() {
     tenantId,
     isConverted,
     isLoading,
+    userId,
   } = useCommandCentre()
 
   const [activityOpen, setActivityOpen] = useState(false)
   const [screeningOpen, setScreeningOpen] = useState(false)
+  const [intakeSessionOpen, setIntakeSessionOpen] = useState(false)
 
   // Realtime check-in notifications (Rule #16: additive, not the only channel)
   useCheckinRealtime(tenantId, contact?.id)
@@ -85,6 +94,8 @@ function CommandCentreShell() {
         activityOpen={activityOpen}
         onToggleScreening={() => setScreeningOpen((prev) => !prev)}
         screeningOpen={screeningOpen}
+        onToggleIntakeSession={() => setIntakeSessionOpen((prev) => !prev)}
+        intakeSessionOpen={intakeSessionOpen}
       />
 
       {/* Sticky meeting timer (only visible when running) */}
@@ -132,6 +143,25 @@ function CommandCentreShell() {
             </SheetHeader>
             <div className="flex-1 overflow-y-auto p-4">
               <ScreeningAnswers />
+            </div>
+          </SheetContent>
+        </Sheet>
+      )}
+
+      {/* Live Intake Session slide-out panel */}
+      {entityType === 'lead' && lead && (
+        <Sheet open={intakeSessionOpen} onOpenChange={setIntakeSessionOpen}>
+          <SheetContent side="right" className="w-full sm:w-[520px] sm:max-w-[520px] p-0">
+            <SheetHeader className="px-4 py-3 border-b">
+              <SheetTitle className="text-base">Live Intake Session</SheetTitle>
+              <SheetDescription className="sr-only">
+                Voice transcription and entity extraction for live client intake
+              </SheetDescription>
+            </SheetHeader>
+            <div className="flex-1 overflow-y-auto">
+              <Suspense fallback={<Skeleton className="h-64 w-full m-4" />}>
+                <LiveIntakeSidebar leadId={entityId} tenantId={tenantId} userId={userId} />
+              </Suspense>
             </div>
           </SheetContent>
         </Sheet>

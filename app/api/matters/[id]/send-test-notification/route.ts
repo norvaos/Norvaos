@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createServerSupabaseClient as createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { sendClientEmail } from '@/lib/services/email-service'
 import { withTiming } from '@/lib/middleware/request-timing'
 
@@ -107,9 +108,12 @@ async function handlePost(
 
     const matterRef = matter.matter_number || matter.title || 'your case'
 
+    // Use admin client for the write operations inside sendClientEmail
+    const admin = createAdminClient()
+
     // Send test notification
     await sendClientEmail({
-      supabase,
+      supabase: admin,
       tenantId: appUser.tenant_id,
       matterId,
       contactId: contactRow.contact_id,

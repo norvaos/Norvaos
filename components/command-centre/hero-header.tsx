@@ -39,6 +39,7 @@ import {
   Activity,
   AlertTriangle,
   Eye,
+  Mic,
   Play,
   Timer,
   Square,
@@ -52,9 +53,11 @@ interface HeroHeaderProps {
   activityOpen: boolean
   onToggleScreening?: () => void
   screeningOpen?: boolean
+  onToggleIntakeSession?: () => void
+  intakeSessionOpen?: boolean
 }
 
-export function HeroHeader({ onToggleActivity, activityOpen, onToggleScreening, screeningOpen }: HeroHeaderProps) {
+export function HeroHeader({ onToggleActivity, activityOpen, onToggleScreening, screeningOpen, onToggleIntakeSession, intakeSessionOpen }: HeroHeaderProps) {
   const router = useRouter()
   const {
     entityType,
@@ -172,6 +175,17 @@ export function HeroHeader({ onToggleActivity, activityOpen, onToggleScreening, 
                 <Square className="h-3 w-3 fill-current" />
               </Button>
             </div>
+          )}
+          {entityType === 'lead' && onToggleIntakeSession && (
+            <Button
+              variant={intakeSessionOpen ? 'secondary' : 'outline'}
+              size="sm"
+              className="h-8 gap-1.5"
+              onClick={onToggleIntakeSession}
+            >
+              <Mic className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">Live Intake</span>
+            </Button>
           )}
           {entityType === 'lead' && onToggleScreening && (
             <Button

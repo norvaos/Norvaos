@@ -310,7 +310,6 @@ async function handlePost(request: Request) {
     return NextResponse.json({
       data: { user, tenant },
       error: null,
-      _emailStatus: emailStatus, // Temporary debug field — remove after testing
     })
   } catch {
     return NextResponse.json(

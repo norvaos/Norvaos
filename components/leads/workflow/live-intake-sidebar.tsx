@@ -20,7 +20,7 @@ import { Separator } from '@/components/ui/separator'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { cn } from '@/lib/utils'
 
-// Web Speech API type declarations (not in all TS libs)
+// Web Speech API type declarations (not fully in TS DOM lib yet)
 declare global {
   interface Window {
     SpeechRecognition: new () => SpeechRecognition
@@ -42,7 +42,7 @@ declare global {
     error: string
   }
   interface SpeechRecognitionResultList {
-    length: number
+    readonly length: number
     [index: number]: SpeechRecognitionResult
   }
 }

@@ -238,7 +238,7 @@ async function handleGet(
   // ── 7. Audit event ───────────────────────────────────────────
 
   await logAuditServer({
-    supabase,
+    supabase: admin,
     tenantId,
     userId,
     entityType: 'invoice',

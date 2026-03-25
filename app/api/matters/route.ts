@@ -9,12 +9,20 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { captureRuleSnapshots } from '@/lib/services/rule-snapshot-engine'
 import { z } from 'zod'
 
+const contactLinkSchema = z.object({
+  contact_id: z.string().uuid(),
+  role: z.string().max(50).default('client'),
+  is_primary: z.boolean().default(false),
+})
+
 const createMatterSchema = z.object({
   title: z.string().min(1, 'Title is required').max(255),
   practice_area_id: z.string().uuid().optional().nullable(),
   matter_type_id: z.string().uuid().optional().nullable(),
   case_type_id: z.string().uuid().optional().nullable(),
   contact_id: z.string().uuid().optional().nullable(),
+  // Consolidated contact linking — replaces client-side matter_contacts insert
+  contact_ids: z.array(contactLinkSchema).optional().nullable(),
   responsible_lawyer_id: z.string().uuid().optional().nullable(),
   originating_lawyer_id: z.string().uuid().optional().nullable(),
   followup_lawyer_id: z.string().uuid().optional().nullable(),
@@ -100,6 +108,7 @@ async function handlePost(request: Request) {
       stage_id,
       matter_stage_pipeline_id,
       initial_matter_stage_id,
+      contact_ids,
     } = parsed.data
 
     // 3. Insert the matter (use admin client to bypass RLS — auth already verified above)
@@ -140,6 +149,20 @@ async function handlePost(request: Request) {
         { success: false, error: insertError?.message || 'Failed to create matter' },
         { status: 500 }
       )
+    }
+
+    // 3a. Link contacts to matter (server-side, replaces client-side insert)
+    if (contact_ids && contact_ids.length > 0) {
+      const contactInserts = contact_ids.map((c) => ({
+        tenant_id: auth.tenantId,
+        matter_id: matter.id,
+        contact_id: c.contact_id,
+        role: c.role,
+        is_primary: c.is_primary,
+      }))
+      await admin.from('matter_contacts').insert(contactInserts).then(({ error }) => {
+        if (error) console.error('Contact linking error (non-fatal):', error)
+      })
     }
 
     // 3b. Snapshot the fee template (non-fatal)
