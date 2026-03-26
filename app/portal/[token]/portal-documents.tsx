@@ -630,13 +630,13 @@ export function PortalDocuments({
                   return (
                     <div
                       key={sub.subKey}
-                      className="rounded-lg border border-slate-200 bg-white overflow-hidden"
+                      className="rounded-2xl border border-slate-200/60 bg-white/80 backdrop-blur-sm overflow-hidden transition-all hover:shadow-sm"
                     >
                       {/* Category header */}
                       <button
                         type="button"
                         onClick={() => toggleGroup(sub.subKey)}
-                        className="flex items-center justify-between w-full px-4 py-3 hover:bg-slate-50 transition-colors text-left"
+                        className="flex items-center justify-between w-full px-4 py-3.5 hover:bg-slate-50/50 transition-colors text-left"
                       >
                         <div className="flex items-center gap-2">
                           {isCollapsed ? (

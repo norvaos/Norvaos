@@ -248,8 +248,8 @@ export function PortalMessages({ token, primaryColor, language = 'en' }: PortalM
   if (error && messages.length === 0) {
     return (
       <div>
-        <div className="rounded-lg border border-red-200 bg-red-50 p-6 text-center">
-          <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-red-100">
+        <div className="rounded-2xl border border-red-200/60 bg-gradient-to-br from-red-50 to-white p-6 text-center shadow-sm">
+          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-red-100 shadow-sm">
             <svg
               className="h-5 w-5 text-red-600"
               fill="none"
@@ -264,7 +264,7 @@ export function PortalMessages({ token, primaryColor, language = 'en' }: PortalM
               />
             </svg>
           </div>
-          <p className="text-sm font-medium text-red-800">{tr.messages_error_title}</p>
+          <p className="text-sm font-bold text-red-800">{tr.messages_error_title}</p>
           <p className="mt-1 text-sm text-red-600">{error}</p>
         </div>
       </div>
@@ -279,9 +279,10 @@ export function PortalMessages({ token, primaryColor, language = 'en' }: PortalM
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4" style={{ maxHeight: '400px', minHeight: '200px' }}>
         {messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 text-center">
-            <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-slate-100">
+            <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl shadow-sm" style={{ backgroundColor: `${accent}10` }}>
               <svg
-                className="h-6 w-6 text-slate-400"
+                className="h-6 w-6"
+                style={{ color: accent }}
                 fill="none"
                 viewBox="0 0 24 24"
                 strokeWidth={1.5}
@@ -294,7 +295,7 @@ export function PortalMessages({ token, primaryColor, language = 'en' }: PortalM
                 />
               </svg>
             </div>
-            <p className="text-sm font-medium text-slate-700">{tr.messages_empty_title}</p>
+            <p className="text-sm font-bold text-slate-700">{tr.messages_empty_title}</p>
             <p className="mt-1 text-sm text-slate-500">
               {tr.messages_empty_description}
             </p>
@@ -310,12 +311,12 @@ export function PortalMessages({ token, primaryColor, language = 'en' }: PortalM
               >
                 {/* Avatar */}
                 <div
-                  className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-medium ${
+                  className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-xs font-bold shadow-sm ${
                     isClient
                       ? 'text-white'
-                      : 'bg-slate-200 text-slate-600'
+                      : 'bg-slate-100 text-slate-600'
                   }`}
-                  style={isClient ? { backgroundColor: accent } : undefined}
+                  style={isClient ? { background: `linear-gradient(135deg, ${accent}, ${accent}cc)` } : undefined}
                 >
                   {getInitials(msg.author_name)}
                 </div>
@@ -337,12 +338,12 @@ export function PortalMessages({ token, primaryColor, language = 'en' }: PortalM
                     </span>
                   </div>
                   <div
-                    className={`rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
+                    className={`rounded-2xl px-4 py-2.5 text-sm leading-relaxed shadow-sm ${
                       isClient
                         ? 'rounded-br-md text-white'
-                        : 'rounded-bl-md bg-slate-100 text-slate-800'
+                        : 'rounded-bl-md bg-slate-50/80 text-slate-800 border border-slate-100'
                     }`}
-                    style={isClient ? { backgroundColor: accent } : undefined}
+                    style={isClient ? { background: `linear-gradient(135deg, ${accent}, ${accent}dd)` } : undefined}
                   >
                     <p className="whitespace-pre-wrap break-words">{msg.content}</p>
                   </div>
@@ -368,7 +369,7 @@ export function PortalMessages({ token, primaryColor, language = 'en' }: PortalM
       )}
 
       {/* Compose Area */}
-      <div className="border-t border-slate-200 px-4 py-4">
+      <div className="border-t border-slate-200/60 px-4 py-4 bg-gradient-to-t from-slate-50/50 to-transparent">
         <div className="flex gap-3">
           <textarea
             ref={textareaRef}
@@ -377,15 +378,17 @@ export function PortalMessages({ token, primaryColor, language = 'en' }: PortalM
             onKeyDown={handleKeyDown}
             placeholder={tr.messages_placeholder}
             rows={2}
-            className="flex-1 resize-none rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 placeholder-slate-400 outline-none transition-colors focus:border-slate-300 focus:bg-white focus:ring-2 focus:ring-offset-0"
-            style={{ ['--tw-ring-color' as string]: accent + '30' } as React.CSSProperties}
+            className="flex-1 resize-none rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 placeholder-slate-400 outline-none transition-all focus:border-slate-300 focus:ring-1 focus:ring-slate-300"
             disabled={isSending}
           />
           <button
             onClick={handleSend}
             disabled={!content.trim() || isSending}
-            className="flex h-10 w-10 shrink-0 items-center justify-center self-end rounded-full text-white transition-opacity disabled:opacity-40"
-            style={{ backgroundColor: accent }}
+            className="flex h-10 w-10 shrink-0 items-center justify-center self-end rounded-xl text-white transition-all disabled:opacity-40 shadow-lg hover:brightness-110 active:scale-95"
+            style={{
+              background: `linear-gradient(135deg, ${accent}, ${accent}cc)`,
+              boxShadow: `0 4px 12px ${accent}30`,
+            }}
             title={tr.messages_send_title}
           >
             {isSending ? (

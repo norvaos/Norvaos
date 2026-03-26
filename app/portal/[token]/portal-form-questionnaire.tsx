@@ -189,8 +189,8 @@ export function PortalFormQuestionnaire({
     return (
       <div className="space-y-4">
         <BackButton onBack={onBack} primaryColor={primaryColor} />
-        <div className="rounded-lg border border-red-200 bg-red-50 p-6 text-center">
-          <p className="text-sm font-medium text-red-800">{tr.ircc_error_title}</p>
+        <div className="rounded-2xl border border-red-200/60 bg-gradient-to-br from-red-50 to-white p-6 text-center shadow-sm">
+          <p className="text-sm font-bold text-red-800">{tr.ircc_error_title}</p>
           <p className="mt-1 text-sm text-red-600">{error}</p>
         </div>
       </div>
@@ -203,16 +203,16 @@ export function PortalFormQuestionnaire({
     return (
       <div className="space-y-4">
         <BackButton onBack={onBack} primaryColor={primaryColor} />
-        <div className="rounded-lg border border-green-200 bg-green-50 p-6 text-center">
-          <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-green-100">
-            <svg className="h-5 w-5 text-green-600" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+        <div className="rounded-2xl border border-emerald-200/60 bg-gradient-to-br from-emerald-50 to-white p-6 text-center shadow-lg">
+          <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-100 shadow-sm">
+            <svg className="h-6 w-6 text-emerald-600" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
             </svg>
           </div>
-          <h3 className="text-base font-semibold text-green-800">
+          <h3 className="text-base font-bold text-emerald-800">
             {formCode} Completed
           </h3>
-          <p className="mt-1 text-sm text-green-700">
+          <p className="mt-1 text-sm text-emerald-700">
             Your responses for {formName} have been saved. Returning to form list...
           </p>
         </div>
@@ -227,11 +227,17 @@ export function PortalFormQuestionnaire({
       {/* Back button + form header */}
       <BackButton onBack={onBack} primaryColor={primaryColor} />
 
-      <div>
-        <h3 className="text-base font-semibold text-slate-900">
+      <div
+        className="rounded-2xl border border-slate-200/60 p-4 backdrop-blur-sm"
+        style={{
+          background: `linear-gradient(135deg, white 0%, ${primaryColor || '#3b82f6'}06 100%)`,
+          boxShadow: `0 2px 12px ${primaryColor || '#3b82f6'}06`,
+        }}
+      >
+        <h3 className="text-base font-bold text-slate-900 tracking-tight">
           {formName}
         </h3>
-        <p className="mt-1 text-sm text-slate-600">
+        <p className="mt-1 text-sm text-slate-500">
           {readOnly
             ? 'Viewing submitted responses (read-only).'
             : 'Please complete all fields below. Your progress is saved automatically.'}
@@ -277,10 +283,13 @@ function BackButton({
   return (
     <button
       onClick={onBack}
-      className="inline-flex items-center gap-1.5 text-sm font-medium transition-colors hover:opacity-80"
-      style={{ color: primaryColor || '#3b82f6' }}
+      className="inline-flex items-center gap-1.5 text-sm font-bold transition-all hover:opacity-80 rounded-xl px-3 py-1.5"
+      style={{
+        color: primaryColor || '#3b82f6',
+        backgroundColor: `${primaryColor || '#3b82f6'}08`,
+      }}
     >
-      <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
         <path d="M15 18l-6-6 6-6" />
       </svg>
       Back to Forms

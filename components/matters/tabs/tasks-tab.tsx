@@ -34,7 +34,7 @@ import {
   Loader2,
 } from 'lucide-react'
 import { formatDate } from '@/lib/utils/formatters'
-import { TaskCreateDialog } from '@/components/tasks/task-create-dialog'
+import { SovereignTaskCreator } from '@/components/tasks/sovereign-task-creator'
 import { TaskDetailSheet } from '@/components/tasks/task-detail-sheet'
 import {
   getUserName,
@@ -284,7 +284,7 @@ export function TasksTab({
       )}
 
       {/* Create Task Dialog (pre-filled with this matter + primary contact) */}
-      <TaskCreateDialog
+      <SovereignTaskCreator
         open={createOpen}
         onOpenChange={setCreateOpen}
         matterId={matterId}

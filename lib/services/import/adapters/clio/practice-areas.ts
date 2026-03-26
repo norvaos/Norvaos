@@ -6,6 +6,7 @@ export const clioPracticeAreasAdapter: EntityAdapter = {
   displayName: 'Practice Areas',
   sourceDisplayName: 'Clio Practice Areas',
   description: 'Import practice areas from Clio for matter categorisation.',
+  omitEngineFields: ['created_by'],
   fieldMappings: [
     {
       sourceColumn: '__source_id',
@@ -17,18 +18,6 @@ export const clioPracticeAreasAdapter: EntityAdapter = {
       targetColumn: 'name',
       required: true,
       aliases: ['Name', 'practice_area', 'Practice Area'],
-    },
-    {
-      sourceColumn: 'code',
-      targetColumn: 'code',
-      required: false,
-      aliases: ['Code'],
-    },
-    {
-      sourceColumn: 'category',
-      targetColumn: 'category',
-      required: false,
-      aliases: ['Category'],
     },
   ],
   validate: (row) => {

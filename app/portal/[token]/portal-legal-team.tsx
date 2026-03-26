@@ -40,7 +40,7 @@ function ContactColumn({
       <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-1.5">
         {label}
       </p>
-      <p className="text-sm font-semibold text-slate-900">{name}</p>
+      <p className="text-sm font-bold text-slate-900">{name}</p>
       {email && (
         <a
           href={`mailto:${email}`}
@@ -85,8 +85,8 @@ export function PortalLegalTeam({
   const hasBoth = hasLawyer && hasSupport
 
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-      <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3">
+    <div className="rounded-2xl border border-slate-200/60 bg-white/80 backdrop-blur-sm p-5 shadow-sm">
+      <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">
         {tr.section_legal_team ?? 'Your Legal Team'}
       </h3>
 

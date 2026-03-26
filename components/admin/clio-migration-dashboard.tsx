@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * Clio Migration Dashboard — Directive 035: Sovereign Extraction Bridge
+ * Clio Migration Dashboard  -  Directive 035: Sovereign Extraction Bridge
  *
  * Glassmorphism bento UI showing real-time migration progress as Clio data
  * flows into the Norva Fortress. Each phase appears as a "jade block"
@@ -163,9 +163,60 @@ export function ClioMigrationDashboard() {
     },
   })
 
-  const phases = migration?.progress?.phases ?? []
+  // Also check import_batches so wizard-imported data is reflected on the bridge
+  const { data: importBatches } = useQuery({
+    queryKey: ['clio-import-batches', tenant?.id],
+    queryFn: async () => {
+      const supabase = createClient()
+      const { data } = await (supabase as any)
+        .from('import_batches')
+        .select('entity_type, status, succeeded_rows, failed_rows, total_rows, completed_at')
+        .eq('tenant_id', tenant!.id)
+        .eq('source_platform', 'clio')
+        .in('status', ['completed', 'completed_with_errors'])
+        .order('completed_at', { ascending: false })
+      return (data ?? []) as Array<{
+        entity_type: string
+        status: string
+        succeeded_rows: number
+        failed_rows: number
+        total_rows: number
+        completed_at: string | null
+      }>
+    },
+    enabled: !!tenant?.id,
+  })
+
+  // Map import_batches entity types to bridge phase keys
+  const ENTITY_TO_PHASE: Record<string, string> = {
+    contacts: 'contacts',
+    matters: 'matters',
+    documents: 'documents',
+    trust_entries: 'trust_ledger',
+    trust_ledger: 'trust_ledger',
+  }
+
+  // Build effective phases: migration phases take precedence; fall back to import_batches
+  const migrationPhases = migration?.progress?.phases ?? []
+  const phases: PhaseProgress[] = (Object.keys(PHASE_CONFIG) as PhaseKey[]).map((key) => {
+    const fromMigration = migrationPhases.find((p) => p.phase === key)
+    if (fromMigration) return fromMigration
+    // Find the most recently completed import batch for this phase
+    const batch = (importBatches ?? []).find((b) => ENTITY_TO_PHASE[b.entity_type] === key)
+    if (batch) {
+      return {
+        phase: key,
+        status: 'completed',
+        total: batch.total_rows,
+        processed: batch.succeeded_rows + batch.failed_rows,
+        errors: batch.failed_rows,
+      }
+    }
+    return { phase: key, status: 'pending', total: 0, processed: 0, errors: 0 }
+  })
+
   const isRunning = migration?.status === 'in_progress'
-  const isComplete = migration?.status === 'completed'
+  const isComplete = migration?.status === 'completed' || phases.every((p) => p.status === 'completed')
   const gapAlerts = migration?.progress?.gapAlerts ?? 0
 
   return (
@@ -198,15 +249,15 @@ export function ClioMigrationDashboard() {
         )}
       </div>
 
-      {/* Phase Cards — Bento Grid */}
+      {/* Phase Cards  -  Bento Grid */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         {(Object.keys(PHASE_CONFIG) as PhaseKey[]).map((key) => {
           const config = PHASE_CONFIG[key]
-          const phase = phases.find((p) => p.phase === key)
+          const phase = phases.find((p) => p.phase === key)!
           const Icon = config.icon
-          const progress = phase ? Math.round((phase.processed / Math.max(phase.total, 1)) * 100) : 0
-          const isActive = phase?.status === 'in_progress'
-          const isDone = phase?.status === 'completed'
+          const progress = Math.round((phase.processed / Math.max(phase.total, 1)) * 100)
+          const isActive = phase.status === 'in_progress'
+          const isDone = phase.status === 'completed'
 
           return (
             <div
@@ -241,11 +292,11 @@ export function ClioMigrationDashboard() {
                     <p className="text-[10px] text-muted-foreground">{config.action}</p>
                   </div>
                 </div>
-                {phase ? statusBadge(phase.status) : statusBadge('pending')}
+                {statusBadge(phase.status)}
               </div>
 
-              {/* Progress bar */}
-              {phase && (
+              {/* Progress bar  -  only when there's real data */}
+              {phase.total > 0 && (
                 <div className="mt-4">
                   <div className="flex items-center justify-between text-xs text-muted-foreground">
                     <span>

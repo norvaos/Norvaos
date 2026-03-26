@@ -87,6 +87,7 @@ export async function updateSession(request: NextRequest) {
     // Only check for dashboard routes (skip front-desk, api, auth, portal, etc.)
     const isDashboardRoute = (
       !pathname.startsWith('/front-desk') &&
+      !pathname.startsWith('/nexus') &&
       !pathname.startsWith('/api') &&
       !pathname.startsWith('/auth') &&
       !pathname.startsWith('/login') &&
@@ -177,6 +178,7 @@ export async function updateSession(request: NextRequest) {
     const isApiRoute      = pathname.startsWith('/api')
     const isSystemRoute   = (
       pathname.startsWith('/front-desk') ||
+      pathname.startsWith('/nexus') ||
       pathname.startsWith('/auth') ||
       pathname.startsWith('/portal') ||
       pathname.startsWith('/kiosk') ||
@@ -232,6 +234,7 @@ export async function updateSession(request: NextRequest) {
     const isApiRoute        = pathname.startsWith('/api')
     const isSystemRoute     = (
       pathname.startsWith('/front-desk') ||
+      pathname.startsWith('/nexus') ||
       pathname.startsWith('/auth') ||
       pathname.startsWith('/change-password') ||
       pathname.startsWith('/portal') ||

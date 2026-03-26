@@ -104,7 +104,7 @@ export default function DataImportPage() {
             </div>
           </div>
 
-          {/* Clio Migration Dashboard — shown when connected */}
+          {/* Clio Migration Dashboard  -  shown when connected */}
           {clioConn?.isActive && (
             <ClioMigrationDashboard />
           )}

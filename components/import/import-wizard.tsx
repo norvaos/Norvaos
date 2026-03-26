@@ -1,6 +1,6 @@
 'use client'
 
-import { useReducer, useCallback } from 'react'
+import { useReducer, useCallback, useEffect } from 'react'
 import { SelectPlatform } from './steps/select-platform'
 import { SelectEntity } from './steps/select-entity'
 import { ChooseImportMode, type ImportMode } from './steps/choose-import-mode'
@@ -10,7 +10,7 @@ import { MapColumns } from './steps/map-columns'
 import { PreviewValidate } from './steps/preview-validate'
 import { ImportProgress } from './steps/import-progress'
 import { ImportResults } from './steps/import-results'
-import { useUploadImport, useValidateImport, useExecuteImport, useApiFetch } from '@/lib/queries/data-import'
+import { useUploadImport, useValidateImport, useExecuteImport, useApiFetch, useImportHistory } from '@/lib/queries/data-import'
 import { useGhlConnection, useClioConnection } from '@/lib/queries/platform-connections'
 import { useTenant } from '@/lib/hooks/use-tenant'
 import type { SourcePlatform, ImportEntityType, DuplicateStrategy } from '@/lib/services/import/types'
@@ -54,6 +54,7 @@ type WizardAction =
   | { type: 'GO_TO_STEP'; step: WizardStep }
   | { type: 'IMPORT_ANOTHER' }
   | { type: 'RESET' }
+  | { type: 'SET_COMPLETED_FROM_HISTORY'; entities: ImportEntityType[] }
 
 const initialState: WizardState = {
   step: 'platform',
@@ -147,6 +148,11 @@ function reducer(state: WizardState, action: WizardAction): WizardState {
       }
     case 'RESET':
       return initialState
+    case 'SET_COMPLETED_FROM_HISTORY':
+      return {
+        ...state,
+        completedEntities: [...new Set([...state.completedEntities, ...action.entities])],
+      }
     default:
       return state
   }
@@ -182,6 +188,24 @@ export function ImportWizard({ onDone }: ImportWizardProps) {
   const validateMutation = useValidateImport()
   const executeMutation = useExecuteImport()
   const apiFetchMutation = useApiFetch()
+
+  // Pre-populate completedEntities from past successful imports for this platform
+  const { data: importHistory } = useImportHistory(tenant?.id ?? '')
+  useEffect(() => {
+    if (!importHistory || !state.platform) return
+    const done = importHistory
+      .filter(
+        (b) =>
+          b.sourcePlatform === state.platform &&
+          (b.status === 'completed' || b.status === 'completed_with_errors') &&
+          b.succeededRows > 0,
+      )
+      .map((b) => b.entityType as ImportEntityType)
+    const unique = [...new Set(done)]
+    if (unique.length > 0) {
+      dispatch({ type: 'SET_COMPLETED_FROM_HISTORY', entities: unique })
+    }
+  }, [importHistory, state.platform])
 
   // Connection status
   const { data: ghlConnection } = useGhlConnection(tenant?.id ?? '')
@@ -349,6 +373,16 @@ export function ImportWizard({ onDone }: ImportWizardProps) {
           previewRows={state.previewRows}
           isFetching={apiFetchMutation.isPending}
           onFetch={handleApiFetch}
+          onFetchComplete={(result) => {
+            dispatch({
+              type: 'API_FETCH_SUCCESS',
+              batchId: result.batchId,
+              headers: result.detectedHeaders,
+              mapping: result.suggestedMapping,
+              previewRows: result.previewRows,
+              totalRows: result.totalRows,
+            })
+          }}
           onNext={() => dispatch({ type: 'GO_TO_STEP', step: 'map' })}
           onBack={() => dispatch({ type: 'GO_TO_STEP', step: 'mode' })}
         />
@@ -370,6 +404,7 @@ export function ImportWizard({ onDone }: ImportWizardProps) {
 
       {state.step === 'validate' && (
         <PreviewValidate
+          batchId={state.batchId}
           totalRows={state.totalRows}
           validRows={state.validRows}
           invalidRows={state.invalidRows}

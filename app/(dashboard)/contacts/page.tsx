@@ -10,7 +10,7 @@ import { createClient } from '@/lib/supabase/client'
 import { CONTACT_SOURCES, CONTACT_TYPES } from '@/lib/utils/constants'
 import { ClassificationBadge } from '@/components/contacts/classification-badge'
 import { formatDate, formatPhoneNumber, formatFullName, formatInitials } from '@/lib/utils/formatters'
-import { ContactCreateDialog } from '@/components/contacts/contact-create-dialog'
+import { SovereignContactCreator } from '@/components/contacts/sovereign-contact-creator'
 import { EmptyState } from '@/components/shared/empty-state'
 
 import { Button } from '@/components/ui/button'
@@ -568,7 +568,7 @@ export default function ContactsPage() {
       </div>
 
       {/* Create Contact Sheet */}
-      <ContactCreateDialog open={createOpen} onOpenChange={setCreateOpen} />
+      <SovereignContactCreator open={createOpen} onOpenChange={setCreateOpen} />
     </div>
   )
 }

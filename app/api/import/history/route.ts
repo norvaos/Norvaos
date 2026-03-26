@@ -18,7 +18,7 @@ async function handleGet() {
 
     const { data: batches, error } = await admin
       .from('import_batches')
-      .select('id, source_platform, entity_type, status, file_name, total_rows, succeeded_rows, failed_rows, skipped_rows, created_at, completed_at, rolled_back_at')
+      .select('id, source_platform, entity_type, status, file_name, total_rows, succeeded_rows, failed_rows, skipped_rows, duplicate_strategy, created_at, completed_at, rolled_back_at')
       .eq('tenant_id', auth.tenantId)
       .order('created_at', { ascending: false })
       .limit(50)
@@ -39,6 +39,7 @@ async function handleGet() {
         succeededRows: b.succeeded_rows,
         failedRows: b.failed_rows,
         skippedRows: b.skipped_rows,
+        duplicateStrategy: b.duplicate_strategy,
         createdAt: b.created_at,
         completedAt: b.completed_at,
         rolledBackAt: b.rolled_back_at,

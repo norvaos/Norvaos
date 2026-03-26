@@ -12,6 +12,7 @@
  */
 
 import { useState, useCallback } from 'react'
+import { useSovereignGuard } from '@/components/ui/sovereign-guard'
 import { useTenant } from '@/lib/hooks/use-tenant'
 import {
   useWikiSnippets,
@@ -53,6 +54,7 @@ const SNIPPET_TYPES: { value: WikiSnippetType; label: string; icon: typeof Mail 
 
 export default function SnippetsPage() {
   const { tenant } = useTenant()
+  const guard = useSovereignGuard()
   const tenantId = tenant?.id ?? ''
 
   const [search, setSearch] = useState('')
@@ -150,9 +152,16 @@ export default function SnippetsPage() {
   }, [editingId, formTitle, formContent, formType, formCategoryId, formTags, tenantId, createSnippet, updateSnippet, resetForm])
 
   const handleDelete = useCallback(async (id: string) => {
-    if (!confirm('Delete this snippet?')) return
+    const keep = await guard.confirm({
+      variant: 'delete',
+      title: 'Delete Snippet?',
+      message: 'This snippet will be permanently removed from the Fortress. This action cannot be undone.',
+      confirmLabel: 'Keep Snippet',
+      cancelLabel: 'Delete Permanently',
+    })
+    if (keep) return
     await deleteSnippet.mutateAsync(id)
-  }, [deleteSnippet])
+  }, [deleteSnippet, guard])
 
   const addFormTag = useCallback(() => {
     const tag = formTagInput.trim().toLowerCase()

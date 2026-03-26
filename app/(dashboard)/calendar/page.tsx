@@ -71,7 +71,7 @@ import { cn } from '@/lib/utils'
 import { createClient } from '@/lib/supabase/client'
 
 import { TaskDetailSheet } from '@/components/tasks/task-detail-sheet'
-import { EventCreateDialog } from '@/components/calendar/event-create-dialog'
+import { SovereignEventCreator } from '@/components/calendar/sovereign-event-creator'
 import { EventDetailSheet } from '@/components/calendar/event-detail-sheet'
 import { ContactSearch } from '@/components/shared/contact-search'
 import { EmptyState } from '@/components/shared/empty-state'
@@ -1714,7 +1714,7 @@ export default function CalendarPage() {
       />
 
       {/* ── Event Create Dialog ── */}
-      <EventCreateDialog
+      <SovereignEventCreator
         open={eventCreateOpen}
         onOpenChange={setEventCreateOpen}
         initialDate={quickCreateDate}

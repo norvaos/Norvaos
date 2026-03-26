@@ -51,8 +51,8 @@ export function PortalPaymentSection({
   if (loading) {
     return (
       <div className="space-y-3 animate-pulse">
-        <div className="h-16 bg-slate-100 rounded-lg" />
-        <div className="h-16 bg-slate-100 rounded-lg" />
+        <div className="h-16 bg-slate-100 rounded-2xl" />
+        <div className="h-16 bg-slate-100 rounded-2xl" />
       </div>
     )
   }
@@ -76,30 +76,30 @@ export function PortalPaymentSection({
 
       {/* Account Summary Card  -  only when invoices exist */}
       {invoices.length === 0 ? null : (<>{/* Account Summary Card */}
-      <div className="rounded-xl border border-slate-200 bg-white overflow-hidden">
+      <div className="rounded-2xl border border-slate-200/60 bg-white/80 backdrop-blur-sm overflow-hidden shadow-sm">
         {/* Header */}
-        <div className="px-4 py-2.5 bg-slate-50 border-b border-slate-100">
-          <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Account Summary</h3>
+        <div className="px-4 py-3 bg-gradient-to-r from-slate-50 to-white border-b border-slate-100/60">
+          <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider">Account Summary</h3>
         </div>
 
         {/* Metrics */}
-        <div className="grid grid-cols-3 divide-x divide-slate-100">
-          <div className="px-4 py-3 text-center">
-            <p className="text-[11px] text-slate-400 font-medium mb-0.5">Total Due</p>
-            <p className="text-lg font-bold text-slate-800">
+        <div className="grid grid-cols-3 divide-x divide-slate-100/60">
+          <div className="px-4 py-4 text-center">
+            <p className="text-[11px] text-slate-400 font-semibold mb-0.5">Total Due</p>
+            <p className="text-xl font-bold text-slate-800">
               ${(summary.totalDue / 100).toLocaleString(undefined, { minimumFractionDigits: 2 })}
             </p>
           </div>
-          <div className="px-4 py-3 text-center">
-            <p className="text-[11px] text-slate-400 font-medium mb-0.5">Paid to Date</p>
-            <p className="text-lg font-bold text-green-600">
+          <div className="px-4 py-4 text-center">
+            <p className="text-[11px] text-slate-400 font-semibold mb-0.5">Paid to Date</p>
+            <p className="text-xl font-bold text-emerald-600">
               ${(summary.totalPaid / 100).toLocaleString(undefined, { minimumFractionDigits: 2 })}
             </p>
           </div>
-          <div className="px-4 py-3 text-center">
-            <p className="text-[11px] text-slate-400 font-medium mb-0.5">Balance</p>
+          <div className="px-4 py-4 text-center">
+            <p className="text-[11px] text-slate-400 font-semibold mb-0.5">Balance</p>
             <p className={cn(
-              'text-lg font-bold',
+              'text-xl font-bold',
               summary.totalOutstanding <= 0
                 ? 'text-green-600'
                 : summary.overdueAmount > 0
@@ -116,16 +116,21 @@ export function PortalPaymentSection({
         {/* Progress bar */}
         {summary.totalDue > 0 && (
           <div className="px-4 pb-3">
-            <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+            <div className="h-2.5 bg-slate-100 rounded-full overflow-hidden">
               <div
-                className={cn(
-                  'h-full rounded-full transition-all duration-500',
-                  summary.totalPaid >= summary.totalDue ? 'bg-green-500' : 'bg-blue-500'
-                )}
-                style={{ width: `${Math.min((summary.totalPaid / summary.totalDue) * 100, 100)}%` }}
+                className="h-full rounded-full transition-all duration-700 ease-out"
+                style={{
+                  width: `${Math.min((summary.totalPaid / summary.totalDue) * 100, 100)}%`,
+                  background: summary.totalPaid >= summary.totalDue
+                    ? 'linear-gradient(90deg, #16a34a, #22c55e)'
+                    : `linear-gradient(90deg, ${primaryColor}, ${primaryColor}cc)`,
+                  boxShadow: summary.totalPaid >= summary.totalDue
+                    ? '0 0 8px rgba(22,163,106,0.3)'
+                    : `0 0 8px ${primaryColor}30`,
+                }}
               />
             </div>
-            <p className="text-[10px] text-slate-400 mt-1 text-right">
+            <p className="text-[10px] text-slate-400 mt-1 text-right font-medium">
               {Math.round((summary.totalPaid / summary.totalDue) * 100)}% paid
             </p>
           </div>
@@ -209,10 +214,10 @@ function RetainerFeeCard({
     `$${(cents / 100).toLocaleString(language, { minimumFractionDigits: 2 })}`
 
   return (
-    <div className="rounded-xl border border-slate-200 bg-white overflow-hidden">
+    <div className="rounded-2xl border border-slate-200/60 bg-white/80 backdrop-blur-sm overflow-hidden shadow-sm">
       {/* Header */}
-      <div className="px-4 py-2.5 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
-        <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+      <div className="px-4 py-3 bg-gradient-to-r from-slate-50 to-white border-b border-slate-100/60 flex items-center justify-between">
+        <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider">
           Fee Agreement
         </h3>
         <button
@@ -350,8 +355,10 @@ function InvoiceRow({
   return (
     <div
       className={cn(
-        'rounded-lg border p-4',
-        invoice.isOverdue ? 'border-red-200 bg-red-50/30' : 'border-slate-200',
+        'rounded-2xl border p-4 backdrop-blur-sm transition-all',
+        invoice.isOverdue
+          ? 'border-red-200/60 bg-gradient-to-br from-red-50/50 to-white shadow-sm shadow-red-100/30'
+          : 'border-slate-200/60 bg-gradient-to-br from-slate-50/30 to-white',
       )}
     >
       <div className="flex items-start justify-between gap-3">
@@ -462,17 +469,17 @@ function ETransferBlock({
   }
 
   return (
-    <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
-      <p className="text-xs font-medium text-slate-600 mb-2">
+    <div className="rounded-2xl border border-slate-200/60 bg-gradient-to-br from-slate-50 to-white p-4 backdrop-blur-sm">
+      <p className="text-xs font-semibold text-slate-600 mb-2">
         {tr.payment_etransfer_email ?? 'e-Transfer to'}
       </p>
       <div className="flex items-center gap-2">
-        <code className="flex-1 text-sm font-medium text-slate-800 truncate">
+        <code className="flex-1 text-sm font-bold text-slate-800 truncate">
           {email}
         </code>
         <button
           onClick={handleCopy}
-          className="shrink-0 rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+          className="shrink-0 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-all hover:shadow-sm"
         >
           {copied ? (tr.payment_copied ?? 'Copied!') : (tr.payment_copy ?? 'Copy')}
         </button>
@@ -511,8 +518,11 @@ function CreditCardBlock({
           invoice_id: invoiceId ?? 'unknown',
           provider: providerName,
         })}
-        className="inline-flex items-center gap-2 rounded-lg px-6 py-3 text-sm font-medium text-white transition-colors hover:opacity-90"
-        style={{ backgroundColor: primaryColor }}
+        className="inline-flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-bold text-white transition-all hover:brightness-110 active:scale-[0.98] shadow-lg"
+        style={{
+          background: `linear-gradient(135deg, ${primaryColor}, ${primaryColor}dd)`,
+          boxShadow: `0 4px 14px ${primaryColor}30`,
+        }}
       >
         {/* Lock icon */}
         <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">

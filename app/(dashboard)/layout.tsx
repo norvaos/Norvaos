@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
 import { usePathname, useRouter } from 'next/navigation'
@@ -16,11 +16,14 @@ import { useGlobalPing } from '@/lib/hooks/use-global-ping'
 import { LocaleDebugFooter } from '@/components/debug/locale-debug-footer'
 import { ComplianceOnboardingTourProvider } from '@/components/onboarding/compliance-onboarding-tour'
 
-// Lazy-load heavy overlays  -  CommandPalette is only visible on Cmd+K and
-// imports 13 icons + 4 Supabase queries. Compiling it eagerly on every
-// page navigation is unnecessary.
-const CommandPalette = dynamic(
-  () => import('@/components/layout/command-palette').then(m => ({ default: m.CommandPalette })),
+// Lazy-load heavy overlays  -  SovereignHUD (Directive 045) replaces the
+// legacy CommandPalette with prestige glass styling + slash commands.
+const SovereignHUD = dynamic(
+  () => import('@/components/layout/sovereign-hud').then(m => ({ default: m.SovereignHUD })),
+  { ssr: false },
+)
+const SovereignWalkthrough = dynamic(
+  () => import('@/components/onboarding/sovereign-walkthrough').then(m => ({ default: m.SovereignWalkthrough })),
   { ssr: false },
 )
 import { ScrollArea } from '@/components/ui/scroll-area'
@@ -442,6 +445,38 @@ export default function DashboardLayout({
   const { appUser, isLoading: userLoading } = useUser()
   const { tenant, isLoading: tenantLoading } = useTenant()
 
+  // ─── Sovereign Walkthrough: show 5-slide carousel on first login ────
+  const [walkthroughOpen, setWalkthroughOpen] = useState(false)
+
+  useEffect(() => {
+    if (!appUser || userLoading) return
+    if (appUser.has_completed_onboarding_walkthrough) return
+    // localStorage fallback: if DB flag failed to persist, respect local dismissal
+    if (typeof window !== 'undefined' && localStorage.getItem('norva-walkthrough-dismissed') === 'true') return
+    // Small delay so the dashboard renders first
+    const t = setTimeout(() => setWalkthroughOpen(true), 600)
+    return () => clearTimeout(t)
+  }, [appUser, userLoading])
+
+  const handleWalkthroughComplete = useCallback(async () => {
+    setWalkthroughOpen(false)
+    // Always persist to localStorage as a fallback
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('norva-walkthrough-dismissed', 'true')
+    }
+    if (!appUser) return
+    try {
+      const { createClient } = await import('@/lib/supabase/client')
+      const supabase = createClient()
+      await supabase
+        .from('users')
+        .update({ has_completed_onboarding_walkthrough: true } as any)
+        .eq('id', appUser.id)
+    } catch {
+      // Non-critical - localStorage fallback handles persistence
+    }
+  }, [appUser])
+
   // ─── Global Ping: toast notifications for team-wide events ──────────
   useGlobalPing({
     tenantId: tenant?.id ?? null,
@@ -513,7 +548,10 @@ export default function DashboardLayout({
           <MobileNav />
 
           {/* Command palette overlay */}
-          <CommandPalette />
+          <SovereignHUD />
+
+          {/* Sovereign Walkthrough  -  first-time onboarding carousel */}
+          <SovereignWalkthrough open={walkthroughOpen} onComplete={handleWalkthroughComplete} />
 
           {/* NUCLEAR FIX #3: Visual Debug  -  shows locale state vs DB vs localStorage */}
           <LocaleDebugFooter />

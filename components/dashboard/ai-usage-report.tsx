@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * Sovereign AI Usage Report — Directive 037
+ * Sovereign AI Usage Report  -  Directive 037
  *
  * Bento-card dashboard showing AI efficiency metrics:
  *   - Human Hours Saved
@@ -74,7 +74,7 @@ export function AIUsageReport() {
                 Human Hours Saved
               </p>
               <p className="mt-1 text-3xl font-bold tabular-nums text-emerald-900">
-                {isLoading ? '—' : `${hoursSaved}`}
+                {isLoading ? ' - ' : `${hoursSaved}`}
               </p>
               <p className="mt-0.5 text-xs text-emerald-600/70">This month</p>
             </div>
@@ -94,7 +94,7 @@ export function AIUsageReport() {
                 Cost Efficiency Ratio
               </p>
               <p className="mt-1 text-3xl font-bold tabular-nums text-indigo-900">
-                {isLoading ? '—' : `${roi}x`}
+                {isLoading ? ' - ' : `${roi}x`}
               </p>
               <p className="mt-0.5 text-xs text-indigo-600/70">ROI</p>
             </div>
@@ -113,7 +113,7 @@ export function AIUsageReport() {
                 Total AI Spend
               </p>
               <p className="mt-1 text-3xl font-bold tabular-nums text-violet-900">
-                {isLoading ? '—' : `$${spendDollars.toFixed(2)}`}
+                {isLoading ? ' - ' : `$${spendDollars.toFixed(2)}`}
               </p>
               <p className="mt-0.5 text-xs text-violet-600/70">Infrastructure cost</p>
             </div>

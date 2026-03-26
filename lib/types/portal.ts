@@ -33,6 +33,8 @@ export type PortalEventType =
   | 'message_team_clicked'
   | 'team_card_email_clicked'
   | 'team_card_phone_clicked'
+  | 'sovereign_chat_opened'
+  | 'sovereign_chat_message_sent'
 
 // ── Payment configuration ───────────────────────────────────────────────────────
 

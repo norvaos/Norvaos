@@ -127,11 +127,10 @@ export async function executeImport(params: ExecuteImportParams): Promise<void> 
           const resolvedData = await resolveRelationships(admin, tenantId, platform, entityType, row.data, entityAdapter)
 
           // Insert new record
-          const insertData = {
-            tenant_id: tenantId,
-            created_by: userId,
-            ...resolvedData,
-          }
+          const omit = new Set(entityAdapter.omitEngineFields ?? [])
+          const insertData: Record<string, unknown> = { tenant_id: tenantId }
+          if (!omit.has('created_by')) insertData.created_by = userId
+          Object.assign(insertData, resolvedData)
 
           // Remove internal fields (prefixed with __)
           const cleanData: Record<string, unknown> = {}
@@ -295,6 +294,47 @@ async function resolveRelationships(
     const matterId = idMap.get(matterSourceId)
     if (matterId) {
       resolved.matter_id = matterId
+    }
+  }
+
+  // Resolve practice area by name  -  auto-create if not found (for matters import)
+  const practiceAreaName = data.__practice_area_name as string | undefined
+  if (practiceAreaName?.trim()) {
+    const name = practiceAreaName.trim()
+    const { data: existing } = await admin
+      .from('practice_areas')
+      .select('id')
+      .eq('tenant_id', tenantId)
+      .ilike('name', name)
+      .maybeSingle()
+    if (existing) {
+      resolved.practice_area_id = existing.id
+    } else {
+      // Auto-create so matters aren't orphaned; user can merge in Settings later
+      const { data: created } = await admin
+        .from('practice_areas')
+        .insert({ tenant_id: tenantId, name, is_active: true, is_enabled: true })
+        .select('id')
+        .single()
+      if (created) resolved.practice_area_id = created.id
+    }
+  }
+
+  // Resolve responsible lawyer by name (for matters import)
+  const lawyerName = data.__responsible_lawyer_name as string | undefined
+  if (lawyerName) {
+    const nameParts = lawyerName.trim().split(/\s+/)
+    const firstName = nameParts[0] ?? ''
+    const lastName = nameParts.slice(1).join(' ')
+    const { data: lawyer } = await admin
+      .from('users')
+      .select('id')
+      .eq('tenant_id', tenantId)
+      .ilike('first_name', firstName)
+      .ilike('last_name', lastName || '%')
+      .maybeSingle()
+    if (lawyer) {
+      resolved.assigned_to = lawyer.id
     }
   }
 

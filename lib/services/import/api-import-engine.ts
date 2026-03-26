@@ -56,6 +56,7 @@ type FetcherFn = (
   connectionId: string,
   admin: SupabaseClient<Database>,
   locationIdOrUnused: string,
+  onProgress?: (fetched: number) => Promise<void>,
 ) => Promise<{ rows: Record<string, string>[]; totalRows: number }>
 
 const GHL_FETCHERS: Partial<Record<ImportEntityType, FetcherFn>> = {
@@ -114,6 +115,7 @@ interface ApiFetchParams {
   userId: string
   platform: 'ghl' | 'clio'
   entityType: ImportEntityType
+  onProgress?: (fetched: number) => Promise<void>
 }
 
 /**
@@ -127,7 +129,7 @@ export async function apiFetchData(params: ApiFetchParams): Promise<{
   suggestedMapping: Record<string, string>
   detectedHeaders: string[]
 }> {
-  const { admin, tenantId, userId, platform, entityType } = params
+  const { admin, tenantId, userId, platform, entityType, onProgress } = params
 
   // Get connection
   const { data: connection } = await admin
@@ -149,7 +151,7 @@ export async function apiFetchData(params: ApiFetchParams): Promise<{
   }
 
   // Fetch data from API
-  const { rows, totalRows } = await fetcher(connection.id, admin, connection.location_id ?? '')
+  const { rows, totalRows } = await fetcher(connection.id, admin, connection.location_id ?? '', onProgress)
 
   if (rows.length === 0) {
     throw new Error(`No ${entityType} data found in your ${platform.toUpperCase()} account.`)
@@ -304,15 +306,32 @@ export async function executeApiImport(params: ExecuteApiImportParams): Promise<
     )
     const duplicateRowNumbers = new Set(duplicates.map((d) => d.rowNumber))
 
-    let processedRows = 0
-    let succeededRows = 0
-    let failedRows = invalidRows.length
-    let skippedRows = 0
+    // On resume: load already-processed row numbers from import_records so we skip them
+    const { data: existingRecords } = await admin
+      .from('import_records')
+      .select('row_number')
+      .eq('batch_id', batchId)
+    const alreadyProcessed = new Set((existingRecords ?? []).map((r) => r.row_number))
+    const isResume = alreadyProcessed.size > 0
+
+    // Seed counters from existing DB state when resuming
+    const { data: batchCounters } = await admin
+      .from('import_batches')
+      .select('processed_rows, succeeded_rows, failed_rows, skipped_rows')
+      .eq('id', batchId)
+      .single()
+
+    let processedRows = isResume ? (batchCounters?.processed_rows ?? 0) : 0
+    let succeededRows = isResume ? (batchCounters?.succeeded_rows ?? 0) : 0
+    let failedRows = isResume ? (batchCounters?.failed_rows ?? 0) : invalidRows.length
+    let skippedRows = isResume ? (batchCounters?.skipped_rows ?? 0) : 0
     const importErrors: ImportError[] = [...allErrors]
 
-    // Record invalid rows
-    for (const invalid of invalidRows) {
-      await recordImportRow(admin, tenantId, batchId, entityType, invalid.rowNumber, invalid.data, null, 'failed', invalid.errors[0]?.message ?? 'Validation failed')
+    // Record invalid rows (skip if already recorded on a previous run)
+    if (!isResume) {
+      for (const invalid of invalidRows) {
+        await recordImportRow(admin, tenantId, batchId, entityType, invalid.rowNumber, invalid.data, null, 'failed', invalid.errors[0]?.message ?? 'Validation failed')
+      }
     }
 
     // Process valid rows in batches
@@ -320,6 +339,9 @@ export async function executeApiImport(params: ExecuteApiImportParams): Promise<
       const batchSlice = validRows.slice(i, i + BATCH_SIZE)
 
       for (const row of batchSlice) {
+        // Skip rows already handled in a previous run
+        if (alreadyProcessed.has(row.rowNumber)) continue
+
         try {
           const isDuplicate = duplicateRowNumbers.has(row.rowNumber)
           const duplicateMatch = duplicates.find((d) => d.rowNumber === row.rowNumber)
@@ -348,10 +370,9 @@ export async function executeApiImport(params: ExecuteApiImportParams): Promise<
           const resolvedData = await resolveRelationships(admin, tenantId, platform, entityType, row.data, entityAdapter)
 
           // Insert
-          const insertData: Record<string, unknown> = {
-            tenant_id: tenantId,
-            created_by: userId,
-          }
+          const omit = new Set(entityAdapter.omitEngineFields ?? [])
+          const insertData: Record<string, unknown> = { tenant_id: tenantId }
+          if (!omit.has('created_by')) insertData.created_by = userId
           for (const [key, value] of Object.entries(resolvedData)) {
             if (!key.startsWith('__')) {
               insertData[key] = value
@@ -387,17 +408,33 @@ export async function executeApiImport(params: ExecuteApiImportParams): Promise<
         processedRows++
       }
 
-      // Update progress
+      // Update progress after each batch of 50
       await admin
         .from('import_batches')
         .update({
-          processed_rows: processedRows + invalidRows.length,
+          processed_rows: processedRows,
           succeeded_rows: succeededRows,
           failed_rows: failedRows,
           skipped_rows: skippedRows,
           updated_at: new Date().toISOString(),
         })
         .eq('id', batchId)
+
+      // Check pause flag  -  stop cleanly between batches
+      const { data: pauseCheck } = await admin
+        .from('import_batches')
+        .select('pause_requested')
+        .eq('id', batchId)
+        .single()
+
+      if (pauseCheck?.pause_requested) {
+        await admin
+          .from('import_batches')
+          .update({ status: 'paused', pause_requested: false, updated_at: new Date().toISOString() })
+          .eq('id', batchId)
+        log.info('[api-import-engine] Import paused', { tenant_id: tenantId, batch_id: batchId, processed_rows: processedRows })
+        return
+      }
     }
 
     // Finalise
@@ -498,6 +535,46 @@ async function resolveRelationships(
     const matterId = idMap.get(matterSourceId)
     if (matterId) {
       resolved.matter_id = matterId
+    }
+  }
+
+  // Resolve practice area by name  -  auto-create if not found (for matters import)
+  const practiceAreaName = data.__practice_area_name as string | undefined
+  if (practiceAreaName?.trim()) {
+    const name = practiceAreaName.trim()
+    const { data: existing } = await admin
+      .from('practice_areas')
+      .select('id')
+      .eq('tenant_id', tenantId)
+      .ilike('name', name)
+      .maybeSingle()
+    if (existing) {
+      resolved.practice_area_id = existing.id
+    } else {
+      const { data: created } = await admin
+        .from('practice_areas')
+        .insert({ tenant_id: tenantId, name, is_active: true, is_enabled: true })
+        .select('id')
+        .single()
+      if (created) resolved.practice_area_id = created.id
+    }
+  }
+
+  // Resolve responsible lawyer by name (for matters import)
+  const lawyerName = data.__responsible_lawyer_name as string | undefined
+  if (lawyerName) {
+    const nameParts = lawyerName.trim().split(/\s+/)
+    const firstName = nameParts[0] ?? ''
+    const lastName = nameParts.slice(1).join(' ')
+    const { data: lawyer } = await admin
+      .from('users')
+      .select('id')
+      .eq('tenant_id', tenantId)
+      .ilike('first_name', firstName)
+      .ilike('last_name', lastName || '%')
+      .maybeSingle()
+    if (lawyer) {
+      resolved.assigned_to = lawyer.id
     }
   }
 

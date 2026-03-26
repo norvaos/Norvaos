@@ -29,21 +29,18 @@ export async function fetchClioMatters(
   )
 
   const rows = matters.map((m) => ({
+    // Internal fields (__ prefix) bypass column mapping and go straight to relationship resolver
     __source_id: String(m.id),
-    displayNumber: m.display_number ?? '',
-    description: m.description ?? '',
-    status: m.status ?? '',
-    openDate: m.open_date ?? '',
-    closeDate: m.close_date ?? '',
-    billingMethod: m.billing_method ?? '',
-    clientId: m.client ? String(m.client.id) : '',
-    clientName: m.client?.name ?? '',
-    practiceArea: m.practice_area?.name ?? '',
-    practiceAreaId: m.practice_area ? String(m.practice_area.id) : '',
-    responsibleAttorney: m.responsible_attorney?.name ?? '',
-    originatingAttorney: m.originating_attorney?.name ?? '',
-    customFields: m.custom_field_values ? JSON.stringify(m.custom_field_values) : '',
-    createdAt: m.created_at ?? '',
+    __contact_source_id: m.client ? String(m.client.id) : '',
+    __practice_area_name: m.practice_area?.name ?? '',
+    __responsible_lawyer_name: m.responsible_attorney?.name ?? '',
+    // Mapped fields  -  names match adapter sourceColumn / aliases exactly
+    'Display Number': (m.display_number ?? '').slice(0, 50),
+    'Description': m.description ?? '',
+    'Status': m.status ?? '',
+    'Open Date': m.open_date ?? '',
+    'Close Date': m.close_date ?? '',
+    'Billing Method': m.billing_method ?? '',
   }))
 
   return { rows, totalRows: rows.length }

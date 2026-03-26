@@ -20,7 +20,7 @@ const handleGet = withPlatformAdmin(async (_request, { params }) => {
   const admin = createAdminClient()
   const { data: tenant, error } = await admin
     .from('tenants')
-    .select('feature_flags, updated_at')
+    .select('feature_flags, subscription_tier, updated_at')
     .eq('id', tenantId)
     .single()
 
@@ -33,8 +33,9 @@ const handleGet = withPlatformAdmin(async (_request, { params }) => {
   return NextResponse.json({
     data: {
       raw,
-      effective: getEffectiveFeatures(raw),
+      effective: getEffectiveFeatures(raw, tenant.subscription_tier),
       defaults: PLATFORM_FEATURE_DEFAULTS,
+      subscription_tier: tenant.subscription_tier,
       updated_at: tenant.updated_at,
     },
     error: null,
@@ -161,11 +162,19 @@ const handlePatch = withPlatformAdmin(async (request, { params, adminCtx, ip, us
     changed_keys: Object.keys(featureFlags),
   })
 
+  // Re-read tier for accurate effective computation
+  const { data: updatedTenant } = await admin
+    .from('tenants')
+    .select('subscription_tier')
+    .eq('id', tenantId)
+    .single()
+
   return NextResponse.json({
     data: {
       raw: mergedFlags,
-      effective: getEffectiveFeatures(mergedFlags),
+      effective: getEffectiveFeatures(mergedFlags, updatedTenant?.subscription_tier),
       defaults: PLATFORM_FEATURE_DEFAULTS,
+      subscription_tier: updatedTenant?.subscription_tier,
     },
     error: null,
   })

@@ -17,15 +17,12 @@ export async function fetchClioPracticeAreas(
 ): Promise<{ rows: Record<string, string>[]; totalRows: number }> {
   const areas = await clioPaginateAll<ClioPracticeArea>(
     connectionId, admin, 'practice_areas',
-    ['id', 'name', 'code', 'category', 'created_at', 'updated_at'],
+    ['id', 'name'],
   )
 
   const rows = areas.map((a) => ({
     __source_id: String(a.id),
     name: a.name ?? '',
-    code: a.code ?? '',
-    category: a.category ?? '',
-    createdAt: a.created_at ?? '',
   }))
 
   return { rows, totalRows: rows.length }

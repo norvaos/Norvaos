@@ -29,6 +29,7 @@ import {
   FOLLOW_UP_TYPES,
   type ConsultationOutcomeValue,
 } from '@/lib/utils/constants'
+import { useSovereignGuard } from '@/components/ui/sovereign-guard'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
@@ -125,6 +126,7 @@ export function ConsultationOutcomePanel() {
 
   const router = useRouter()
   const queryClient = useQueryClient()
+  const guard = useSovereignGuard()
   const { canMarkRetained, canCloseLost } = useCommandPermissions()
 
   // ── State ─────────────────────────────────────────────────────
@@ -747,10 +749,14 @@ export function ConsultationOutcomePanel() {
   const [isCancelling, setIsCancelling] = useState(false)
   const cancelRetainer = useCallback(async () => {
     if (!lead?.id || !latestRetainer) return
-    const confirmed = window.confirm(
-      'Cancel this retainer package? The lead will remain in the pipeline but the retainer will be voided.'
-    )
-    if (!confirmed) return
+    const keepRetainer = await guard.confirm({
+      variant: 'delete',
+      title: 'Cancel Retainer?',
+      message: 'This will void the retainer package. The lead will remain in the pipeline but the retainer will be permanently cancelled.',
+      confirmLabel: 'Keep Retainer',
+      cancelLabel: 'Cancel Retainer',
+    })
+    if (keepRetainer) return
 
     setIsCancelling(true)
     try {
@@ -794,7 +800,7 @@ export function ConsultationOutcomePanel() {
     } finally {
       setIsCancelling(false)
     }
-  }, [lead?.id, latestRetainer, queryClient])
+  }, [lead?.id, latestRetainer, queryClient, guard])
 
   // ── Helper: open e-sign dialog ─────────────────────────────────
   const openESignDialog = useCallback(() => {

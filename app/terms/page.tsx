@@ -6,7 +6,7 @@ import type { Metadata } from 'next'
 export const metadata: Metadata = {
   title: 'Terms of Service | NorvaOS',
   description:
-    'NorvaOS Terms of Service — the agreement governing your use of the NorvaOS legal operating system.',
+    'NorvaOS Terms of Service  -  the agreement governing your use of the NorvaOS legal operating system.',
 }
 
 export default function TermsOfServicePage() {

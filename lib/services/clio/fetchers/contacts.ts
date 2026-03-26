@@ -24,10 +24,13 @@ interface ClioContact {
 export async function fetchClioContacts(
   connectionId: string,
   admin: SupabaseClient<Database>,
+  _unused: string,
+  onProgress?: (fetched: number) => Promise<void>,
 ): Promise<{ rows: Record<string, string>[]; totalRows: number }> {
   const contacts = await clioPaginateAll<ClioContact>(
     connectionId, admin, 'contacts',
     ['id', 'type', 'first_name', 'last_name', 'middle_name', 'name', 'title', 'company', 'email_addresses', 'phone_numbers', 'addresses', 'web_sites', 'date_of_birth', 'custom_field_values', 'created_at', 'updated_at'],
+    {}, 200, onProgress,
   )
 
   const rows = contacts.map((c) => {

@@ -156,59 +156,103 @@ export function PortalClientUpload({
           />
         </div>
 
-        {/* File drop zone */}
+        {/* "Breeze" Upload Drop Zone (Directive 046) */}
         <div
           onDragOver={(e) => { e.preventDefault(); setDragOver(true) }}
           onDragLeave={() => setDragOver(false)}
           onDrop={handleDrop}
           className={cn(
-            'rounded-lg border-2 border-dashed p-4 text-center transition-colors cursor-pointer',
-            dragOver ? 'border-blue-400 bg-blue-50' : 'border-slate-200 bg-slate-50',
-            selectedFile && 'border-green-300 bg-green-50',
+            'relative rounded-2xl border-2 border-dashed p-8 text-center transition-all duration-300 cursor-pointer overflow-hidden',
+            dragOver
+              ? 'border-emerald-400 scale-[1.01]'
+              : selectedFile
+                ? 'border-emerald-300'
+                : 'border-slate-200 hover:border-slate-300',
           )}
+          style={{
+            background: dragOver
+              ? `linear-gradient(135deg, ${primaryColor}10 0%, #ecfdf510 50%, ${primaryColor}08 100%)`
+              : selectedFile
+                ? 'linear-gradient(135deg, #ecfdf5 0%, white 100%)'
+                : 'linear-gradient(135deg, #f8fafc 0%, white 100%)',
+            boxShadow: dragOver
+              ? `0 0 30px ${primaryColor}15, inset 0 0 30px ${primaryColor}05`
+              : selectedFile
+                ? '0 4px 12px rgba(16,185,129,0.08)'
+                : undefined,
+          }}
           onClick={() => fileInputRef.current?.click()}
         >
+          {/* Glow effect on drag */}
+          {dragOver && (
+            <div className="absolute inset-0 animate-pulse" style={{
+              background: `radial-gradient(circle at center, ${primaryColor}10 0%, transparent 70%)`,
+            }} />
+          )}
+
           <input
             ref={fileInputRef}
             type="file"
             className="hidden"
             accept=".pdf,.jpg,.jpeg,.png,.gif,.webp,.doc,.docx,.xls,.xlsx"
+            capture="environment"
             onChange={(e) => {
               const file = e.target.files?.[0]
               if (file) handleFileSelect(file)
             }}
           />
           {selectedFile ? (
-            <div className="flex items-center justify-center gap-2 text-sm text-green-700">
-              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                <polyline points="14 2 14 8 20 8" />
-              </svg>
-              <span className="font-medium truncate">{selectedFile.name}</span>
-              <span className="text-xs text-green-600">({formatFileSize(selectedFile.size)})</span>
+            <div className="relative flex flex-col items-center gap-2">
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-100 shadow-sm">
+                <svg className="h-6 w-6 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                  <polyline points="14 2 14 8 20 8" />
+                </svg>
+              </div>
+              <span className="text-sm font-semibold text-emerald-800 truncate max-w-full">{selectedFile.name}</span>
+              <span className="text-xs text-emerald-600 font-medium">{formatFileSize(selectedFile.size)}</span>
             </div>
           ) : (
-            <div className="text-sm text-slate-500">
-              <svg className="mx-auto h-6 w-6 text-slate-400 mb-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                <polyline points="17 8 12 3 7 8" />
-                <line x1="12" y1="3" x2="12" y2="15" />
-              </svg>
-              Drop file here or click to browse
+            <div className="relative flex flex-col items-center gap-3">
+              <div
+                className="flex h-14 w-14 items-center justify-center rounded-2xl shadow-lg"
+                style={{
+                  background: `linear-gradient(135deg, ${primaryColor}, ${primaryColor}cc)`,
+                  boxShadow: `0 4px 16px ${primaryColor}25`,
+                }}
+              >
+                <svg className="h-7 w-7 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="17 8 12 3 7 8" />
+                  <line x1="12" y1="3" x2="12" y2="15" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-slate-700">
+                  {dragOver ? 'Drop to upload' : 'Tap to upload or take a photo'}
+                </p>
+                <p className="text-xs text-slate-400 mt-0.5">PDF, images, Word, Excel  -  up to 10 MB</p>
+              </div>
             </div>
           )}
         </div>
 
         {/* Error */}
         {error && (
-          <p className="text-xs text-red-600">{error}</p>
+          <div className="flex items-center gap-2 rounded-xl bg-red-50 border border-red-200/60 px-3 py-2">
+            <svg className="h-4 w-4 text-red-500 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><line x1="15" y1="9" x2="9" y2="15" /><line x1="9" y1="9" x2="15" y2="15" /></svg>
+            <p className="text-xs text-red-700 font-medium">{error}</p>
+          </div>
         )}
 
         {/* Success */}
         {success && (
-          <p className="text-xs text-green-600">
-            {tr.client_upload_success ?? 'Document submitted successfully'}
-          </p>
+          <div className="flex items-center gap-2 rounded-xl bg-emerald-50 border border-emerald-200/60 px-3 py-2">
+            <svg className="h-4 w-4 text-emerald-500 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
+            <p className="text-xs text-emerald-700 font-medium">
+              {tr.client_upload_success ?? 'Document submitted successfully'}
+            </p>
+          </div>
         )}
 
         {/* Upload button */}
@@ -216,8 +260,11 @@ export function PortalClientUpload({
           type="button"
           onClick={handleUpload}
           disabled={uploading || !selectedFile || !documentName.trim()}
-          className="w-full rounded-lg px-4 py-2.5 text-sm font-medium text-white transition-colors disabled:opacity-50"
-          style={{ backgroundColor: primaryColor || '#2563eb' }}
+          className="w-full rounded-xl px-4 py-3 text-sm font-bold text-white transition-all disabled:opacity-40 shadow-lg hover:brightness-110 active:scale-[0.98]"
+          style={{
+            background: `linear-gradient(135deg, ${primaryColor || '#2563eb'}, ${primaryColor || '#2563eb'}dd)`,
+            boxShadow: `0 4px 14px ${primaryColor || '#2563eb'}30`,
+          }}
         >
           {uploading ? (
             <span className="flex items-center justify-center gap-2">

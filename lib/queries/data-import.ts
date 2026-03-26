@@ -21,6 +21,7 @@ interface ImportBatchSummary {
   succeededRows: number
   failedRows: number
   skippedRows: number
+  duplicateStrategy: string | null
   createdAt: string
   completedAt: string | null
   rolledBackAt: string | null
@@ -190,6 +191,31 @@ export function useExecuteImport() {
 }
 
 /**
+ * Pause a running import batch.
+ */
+export function usePauseImport() {
+  const qc = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (batchId: string) => {
+      const res = await fetch(`/api/import/${batchId}/pause`, { method: 'POST' })
+      if (!res.ok) {
+        const json = await res.json()
+        throw new Error(json.error ?? 'Failed to pause import')
+      }
+      return res.json()
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: importKeys.all })
+      toast.success('Import pausing after current batch...')
+    },
+    onError: (err: Error) => {
+      toast.error(err.message)
+    },
+  })
+}
+
+/**
  * Fetch data from a connected platform API.
  */
 export function useApiFetch() {
@@ -214,6 +240,34 @@ export function useApiFetch() {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: importKeys.all })
+    },
+    onError: (err: Error) => {
+      toast.error(err.message)
+    },
+  })
+}
+
+/**
+ * Delete a pending/validating/failed import batch.
+ */
+export function useDeleteImport() {
+  const qc = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (batchId: string) => {
+      const res = await fetch(`/api/import/${batchId}`, {
+        method: 'DELETE',
+      })
+
+      if (!res.ok) {
+        const json = await res.json()
+        throw new Error(json.error ?? 'Delete failed')
+      }
+      return res.json()
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: importKeys.all })
+      toast.success('Import deleted.')
     },
     onError: (err: Error) => {
       toast.error(err.message)

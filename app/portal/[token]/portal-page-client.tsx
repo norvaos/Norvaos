@@ -37,6 +37,8 @@ import { PortalDashboardCards } from './portal-dashboard-cards'
 import { PortalTimeline } from './portal-timeline'
 import { PortalSharedDocuments } from './portal-shared-documents'
 import { ClientProgressTracker } from './client-progress-tracker'
+import { PortalReadinessRing } from './portal-readiness-ring'
+import { PortalSovereignChat } from './portal-sovereign-chat'
 import { PortalTeamMicroCards } from './portal-team-micro-cards'
 import { PortalMessageTeam } from './portal-message-team'
 
@@ -535,32 +537,102 @@ export function PortalPageClient({
 
   // ── Render ─────────────────────────────────────────────────────────────
 
+  const accent = tenant.primaryColor || '#10b981'
+
   return (
-    <div className="min-h-screen bg-slate-50" dir={rtl ? 'rtl' : 'ltr'}>
-      {/* ── Header ──────────────────────────────────────────────────────── */}
-      <header className="bg-white border-b border-slate-200 px-4 py-4">
-        <div className="mx-auto max-w-3xl flex items-center gap-3">
-          {tenant.logoUrl && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={tenant.logoUrl} alt={tenant.name} className="h-8 w-auto" />
-          )}
-          <div className="flex-1">
-            <h1 className="text-lg font-semibold" style={{ color: tenant.primaryColor }}>
-              {tenant.name}
-            </h1>
-            <p className="text-xs text-slate-500">{tr.portal_title}</p>
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-50" dir={rtl ? 'rtl' : 'ltr'}>
+      {/* ── Sovereign Header ──────────────────────────────────────────── */}
+      <header
+        className="relative overflow-hidden border-b border-slate-200/60"
+        style={{
+          background: `linear-gradient(135deg, ${accent}08 0%, white 50%, ${accent}04 100%)`,
+        }}
+      >
+        {/* Glassmorphism overlay */}
+        <div className="absolute inset-0 backdrop-blur-xl bg-white/70" />
+        <div className="relative mx-auto max-w-3xl px-4 py-5">
+          <div className="flex items-center gap-4">
+            {tenant.logoUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={tenant.logoUrl} alt={tenant.name} className="h-10 w-auto drop-shadow-sm" />
+            ) : (
+              <div
+                className="flex h-10 w-10 items-center justify-center rounded-xl text-white font-bold text-sm shadow-lg"
+                style={{ backgroundColor: accent, boxShadow: `0 4px 14px ${accent}30` }}
+              >
+                {tenant.name.charAt(0)}
+              </div>
+            )}
+            <div className="flex-1">
+              <h1 className="text-lg font-bold tracking-tight text-slate-900">
+                {tenant.name}
+              </h1>
+              <p className="text-xs font-medium" style={{ color: accent }}>
+                {tr.portal_title}
+              </p>
+            </div>
+            {/* Universal Globe Language Selector (Directive 16.2) */}
+            <UniversalGlobeSelector
+              value={currentLang}
+              onChange={(code) => setCurrentLang(code as PortalLocale)}
+              audience="client"
+            />
           </div>
-          {/* Universal Globe Language Selector (Directive 16.2) */}
-          <UniversalGlobeSelector
-            value={currentLang}
-            onChange={(code) => setCurrentLang(code as PortalLocale)}
-            audience="client"
-          />
         </div>
       </header>
 
       {/* ── Main content ───────────────────────────────────────────────── */}
       <main className="mx-auto max-w-3xl px-4 py-6 space-y-4">
+        {/* 0. Readiness Ring  -  "The Mirror" (Directive 046) */}
+        {sectionCounts && (
+          <section
+            className="rounded-2xl border border-slate-200/60 p-6 shadow-lg flex flex-col items-center relative overflow-hidden"
+            style={{
+              background: `linear-gradient(135deg, white 0%, ${accent}04 50%, white 100%)`,
+              boxShadow: `0 4px 24px ${accent}10, 0 1px 4px rgba(0,0,0,0.04)`,
+            }}
+          >
+            <PortalReadinessRing
+              score={
+                sectionCounts.documents.total > 0
+                  ? Math.round((sectionCounts.documents.uploaded / sectionCounts.documents.total) * 100)
+                  : 0
+              }
+              accentColor={tenant.primaryColor}
+              size={180}
+              breakdown={[
+                {
+                  label: tr.tab_documents ?? 'Documents',
+                  value: sectionCounts.documents.uploaded,
+                  max: sectionCounts.documents.total,
+                },
+                ...(sectionCounts.questions.exists
+                  ? [{
+                      label: tr.tab_questions ?? 'Questionnaire',
+                      value: sectionCounts.questions.progress,
+                      max: 100,
+                    }]
+                  : []),
+                ...(sectionCounts.payment.invoiceCount > 0
+                  ? [{
+                      label: tr.section_payment ?? 'Payment',
+                      value: sectionCounts.payment.totalPaid,
+                      max: sectionCounts.payment.totalDue || 1,
+                      colour: sectionCounts.payment.overdueCount > 0 ? '#ef4444' : undefined,
+                    }]
+                  : []),
+                ...(sectionCounts.tasks.total > 0
+                  ? [{
+                      label: tr.tab_tasks ?? 'Tasks',
+                      value: sectionCounts.tasks.completed,
+                      max: sectionCounts.tasks.total,
+                    }]
+                  : []),
+              ]}
+            />
+          </section>
+        )}
+
         {/* 1. Matter Summary  -  always visible */}
         <PortalMatterSummary
           matterTitle={matterTitle}
@@ -670,11 +742,17 @@ export function PortalPageClient({
         />
 
         {/* 5b. Book a Consultation  -  prominent standalone section */}
-        <section className="rounded-2xl border border-blue-200 bg-gradient-to-br from-blue-50 to-white p-4 shadow-sm">
-          <div className="flex items-center gap-2 mb-3">
+        <section
+          className="rounded-2xl border border-blue-200/60 p-5 shadow-lg backdrop-blur-sm relative overflow-hidden"
+          style={{
+            background: `linear-gradient(135deg, #eff6ff 0%, white 50%, ${accent}04 100%)`,
+            boxShadow: '0 4px 20px rgba(59,130,246,0.08), 0 1px 3px rgba(0,0,0,0.04)',
+          }}
+        >
+          <div className="flex items-center gap-3 mb-3">
             <div
-              className="flex h-8 w-8 items-center justify-center rounded-lg text-white shrink-0"
-              style={{ backgroundColor: tenant.primaryColor || '#2563eb' }}
+              className="flex h-10 w-10 items-center justify-center rounded-xl text-white shrink-0 shadow-lg"
+              style={{ backgroundColor: accent, boxShadow: `0 4px 12px ${accent}30` }}
             >
               <CalendarIcon />
             </div>
@@ -682,7 +760,7 @@ export function PortalPageClient({
               <h3 className="text-sm font-bold text-slate-900">
                 {tr.booking_title ?? 'Book a Consultation'}
               </h3>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-500 font-medium">
                 {(tr as any).booking_subtitle ?? 'Schedule a meeting with your legal team in 2 clicks'}
               </p>
             </div>
@@ -933,7 +1011,8 @@ export function PortalPageClient({
       </main>
 
       {/* ── Footer ──────────────────────────────────────────────────────── */}
-      <footer className="mx-auto max-w-3xl px-4 pb-8 pt-4">
+      <footer className="mx-auto max-w-3xl px-4 pb-8 pt-6">
+        <div className="mb-4 border-t border-slate-200/60" />
         <p className="text-center text-xs text-slate-500 mb-3">
           {supportContact.email ? (
             <>
@@ -959,6 +1038,13 @@ export function PortalPageClient({
           {tr.powered_by}
         </p>
       </footer>
+
+      {/* Sovereign Chat  -  Sentinel Lite (Directive 046) */}
+      <PortalSovereignChat
+        token={token}
+        primaryColor={tenant.primaryColor}
+        firmName={tenant.name}
+      />
     </div>
   )
 }

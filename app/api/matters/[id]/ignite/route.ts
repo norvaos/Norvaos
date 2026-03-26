@@ -192,7 +192,7 @@ async function handlePost(
     // 1. Verify matter belongs to tenant and check readiness_score
     const { data: matter, error: matterErr } = await admin
       .from('matters')
-      .select('id, tenant_id, readiness_score, status, is_locked, title')
+      .select('id, tenant_id, readiness_score, status, is_locked, title, conflict_status')
       .eq('id', matterId)
       .eq('tenant_id', auth.tenantId)
       .single()
@@ -208,6 +208,15 @@ async function handlePost(
     if ((matter as any).readiness_score < 100) {
       return NextResponse.json(
         { error: 'Readiness score must be 100 to ignite' },
+        { status: 403 },
+      )
+    }
+
+    // Directive 066: Conflict check must be cleared or waiver approved
+    const conflictStatus = (matter as any).conflict_status
+    if (conflictStatus && conflictStatus !== 'cleared' && conflictStatus !== 'waiver_approved') {
+      return NextResponse.json(
+        { error: 'Cannot ignite a matter with an unresolved conflict of interest. Conflict must be cleared or a waiver must be approved by the Principal.' },
         { status: 403 },
       )
     }

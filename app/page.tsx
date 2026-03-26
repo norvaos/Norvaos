@@ -119,10 +119,10 @@ export default async function LandingPage() {
               </span>
             </h1>
             <p className="mt-6 text-xl leading-8 text-gray-900 max-w-2xl mx-auto">
-              Most Canadian practices run on four or five apps that don&rsquo;t talk to each other. NorvaOS replaces them all — matters, documents, deadlines, billing, trust accounting, and client communication — so your file is audit-ready from day one.
+              Most Canadian practices run on four or five apps that don&rsquo;t talk to each other. NorvaOS replaces them all  -  matters, documents, deadlines, billing, trust accounting, and client communication  -  so your file is audit-ready from day one.
             </p>
             <p className="mt-4 text-base font-medium text-gray-700">
-              Close files 80% faster. Always audit-ready. No IT department required — just open it and go.
+              Close files 80% faster. Always audit-ready. No IT department required  -  just open it and go.
             </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Link

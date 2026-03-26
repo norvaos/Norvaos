@@ -2,6 +2,7 @@
 
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { Download } from 'lucide-react'
 import {
   Select,
   SelectContent,
@@ -26,6 +27,7 @@ interface PreviewRow {
 }
 
 interface PreviewValidateProps {
+  batchId: string | null
   totalRows: number
   validRows: number
   invalidRows: number
@@ -40,6 +42,7 @@ interface PreviewValidateProps {
 }
 
 export function PreviewValidate({
+  batchId,
   totalRows,
   validRows,
   invalidRows,
@@ -112,16 +115,30 @@ export function PreviewValidate({
 
       {/* Errors */}
       {errors.length > 0 && (
-        <div className="rounded-lg border border-red-200 bg-red-50 p-4 space-y-2 max-h-40 overflow-y-auto">
-          <p className="text-xs font-medium text-red-800">Validation errors:</p>
-          {errors.slice(0, 20).map((err, i) => (
-            <p key={i} className="text-xs text-red-700">
-              Row {err.rowNumber}: {err.message}
-            </p>
-          ))}
-          {errors.length > 20 && (
-            <p className="text-xs text-red-500">...and {errors.length - 20} more errors</p>
-          )}
+        <div className="rounded-lg border border-red-200 bg-red-50 p-4 space-y-2">
+          <div className="flex items-center justify-between">
+            <p className="text-xs font-medium text-red-800">Validation errors:</p>
+            {batchId && (
+              <a
+                href={`/api/import/validate/errors?batchId=${batchId}`}
+                download
+                className="inline-flex items-center gap-1.5 text-xs text-red-700 hover:text-red-900 underline underline-offset-2"
+              >
+                <Download className="h-3 w-3" />
+                Download all {invalidRows} error rows as CSV
+              </a>
+            )}
+          </div>
+          <div className="max-h-40 overflow-y-auto space-y-1">
+            {errors.slice(0, 20).map((err, i) => (
+              <p key={i} className="text-xs text-red-700">
+                Row {err.rowNumber}: {err.message}
+              </p>
+            ))}
+            {errors.length > 20 && (
+              <p className="text-xs text-red-500 italic">...and {invalidRows - 20} more  -  download CSV for full list</p>
+            )}
+          </div>
         </div>
       )}
 

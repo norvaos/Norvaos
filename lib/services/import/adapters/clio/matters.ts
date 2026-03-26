@@ -25,12 +25,14 @@ export const clioMattersAdapter: EntityAdapter = {
       targetColumn: 'matter_number',
       required: false,
       aliases: ['display_number', 'Matter Number', 'File Number', 'file_number'],
+      transform: (val) => val ? val.slice(0, 100) : null,
     },
     {
       sourceColumn: 'Description',
       targetColumn: 'title',
       required: true,
       aliases: ['description', 'Title', 'title', 'Matter Name', 'name', 'Name', 'Subject'],
+      transform: (val) => val ? val.slice(0, 500) : val,
     },
     {
       sourceColumn: 'Client',
@@ -50,9 +52,11 @@ export const clioMattersAdapter: EntityAdapter = {
       required: false,
       aliases: ['status'],
       transform: (val) => {
-        const lower = val.toLowerCase()
+        const lower = val.toLowerCase().trim()
         if (lower === 'open' || lower === 'active' || lower === 'pending') return 'active'
-        if (lower === 'closed') return 'closed'
+        if (lower === 'closed' || lower === 'closed_won') return 'closed_won'
+        if (lower === 'closed_lost' || lower === 'lost' || lower === 'cancelled') return 'closed_lost'
+        if (lower === 'on_hold' || lower === 'hold' || lower === 'suspended') return 'on_hold'
         return 'active'
       },
       defaultValue: 'active',

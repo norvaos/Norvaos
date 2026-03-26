@@ -6,7 +6,7 @@ import type { Metadata } from 'next'
 export const metadata: Metadata = {
   title: 'Privacy Policy | NorvaOS',
   description:
-    'NorvaOS Privacy Policy — how we collect, use, and protect your personal information under PIPEDA.',
+    'NorvaOS Privacy Policy  -  how we collect, use, and protect your personal information under PIPEDA.',
 }
 
 export default function PrivacyPolicyPage() {

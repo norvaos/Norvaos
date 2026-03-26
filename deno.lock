@@ -46,6 +46,7 @@
         "npm:docx@^9.6.0",
         "npm:eslint-config-next@16.1.6",
         "npm:eslint@9",
+        "npm:framer-motion@^12.38.0",
         "npm:jsdom@^28.1.0",
         "npm:lucide-react@0.575",
         "npm:next-themes@~0.4.6",

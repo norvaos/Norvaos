@@ -38,7 +38,7 @@ export function PlatformConnectionCard({
 
   const handleConnect = useCallback(() => {
     setConnectError(null)
-    // Navigate the browser directly — OAuth requires a full page redirect,
+    // Navigate the browser directly  -  OAuth requires a full page redirect,
     // not a fetch() call (fetch follows the cross-origin redirect and hits CORS).
     window.location.href = `/api/integrations/${platform}/connect`
   }, [platform])

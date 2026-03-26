@@ -850,7 +850,7 @@ export function SovereignContactStep({
         </Select>
       </div>
 
-      {/* Province/State — dropdown for Canada, free text otherwise */}
+      {/* Province/State  -  dropdown for Canada, free text otherwise */}
       <div className="animate-in fade-in slide-in-from-bottom-2 delay-[675ms] space-y-2">
         <Label htmlFor="province_state">
           {watch('country') === 'CA' ? 'Province' : 'Province / State'} (optional)

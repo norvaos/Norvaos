@@ -9,6 +9,7 @@ import { TenantProvider } from '@/lib/hooks/use-tenant'
 import { UserProvider, useUser } from '@/lib/hooks/use-user'
 import { useCrossTabSync } from '@/lib/hooks/use-cross-tab-sync'
 import { I18nProvider } from '@/lib/i18n/i18n-provider'
+import { SovereignGuardProvider } from '@/components/ui/sovereign-guard'
 import { createClient } from '@/lib/supabase/client'
 
 /** Invisible component that activates cross-tab query sync via BroadcastChannel. */
@@ -83,9 +84,11 @@ export function Providers({ children }: { children: ReactNode }) {
           <UserProvider>
             <I18nDbBridge>
               <TenantProvider>
-                <CrossTabSync />
-                {children}
-                <Toaster position="top-right" richColors closeButton />
+                <SovereignGuardProvider>
+                  <CrossTabSync />
+                  {children}
+                  <Toaster position="top-right" richColors closeButton />
+                </SovereignGuardProvider>
               </TenantProvider>
             </I18nDbBridge>
           </UserProvider>

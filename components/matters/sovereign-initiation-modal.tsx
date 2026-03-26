@@ -2,19 +2,23 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { X, Search, ChevronRight, ChevronLeft, Scale, Briefcase, DollarSign, Clock, Users, Sparkles, Check, HelpCircle } from 'lucide-react'
+import { X, Search, ChevronRight, ChevronLeft, Scale, Briefcase, DollarSign, Clock, Users, Sparkles, Check, HelpCircle, Plus, Shield, Hash } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
+import { toast } from 'sonner'
 
+import { useSovereignGuard } from '@/components/ui/sovereign-guard'
 import { useTenant } from '@/lib/hooks/use-tenant'
 import { useUser } from '@/lib/hooks/use-user'
 import { useUIStore } from '@/lib/stores/ui-store'
-import { useCreateMatter } from '@/lib/queries/matters'
+import { useCreateMatter, usePreviewMatterNumber } from '@/lib/queries/matters'
 import { useMatterTypes } from '@/lib/queries/matter-types'
 import { CANADIAN_TAX_RATES } from '@/lib/config/tax-rates'
 import { createClient } from '@/lib/supabase/client'
 import type { Database } from '@/lib/types/database'
 import { cn } from '@/lib/utils'
 import { NorvaGuardianTooltip } from '@/components/ui/norva-guardian-tooltip'
+import { SovereignIntakeDialog } from '@/components/contacts/sovereign-intake/sovereign-intake-dialog'
+import { SovereignConflictShield, type ConflictShieldResult, type ConflictStatus } from '@/components/matters/sovereign-conflict-shield'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -119,8 +123,9 @@ const backdropVariants = {
 }
 
 const modalVariants = {
-  hidden: { opacity: 0, scale: 0.95, y: 20 },
-  visible: { opacity: 1, scale: 1, y: 0 },
+  hidden: { opacity: 0, scale: 0.95, y: 20, filter: 'blur(0px)' },
+  visible: { opacity: 1, scale: 1, y: 0, filter: 'blur(0px)' },
+  receded: { opacity: 0.6, scale: 0.96, y: 0, filter: 'blur(4px)' },
 }
 
 // ---------------------------------------------------------------------------
@@ -129,7 +134,7 @@ const modalVariants = {
 
 function StepIndicator({ currentStep }: { currentStep: Step }) {
   const steps = [1, 2, 3] as const
-  const labels = ['Identity Anchor', 'Logic Gate', 'Command Assignment']
+  const labels = ['Identity + Conflict', 'Case Details', 'Assign Team']
 
   return (
     <div className="flex items-center justify-center gap-3 pb-6">
@@ -240,6 +245,7 @@ export function SovereignInitiationModal({
 }: SovereignInitiationModalProps) {
   const { tenant } = useTenant()
   const { appUser } = useUser()
+  const guard = useSovereignGuard()
   const activePracticeFilter = useUIStore((s) => s.activePracticeFilter)
   const createMatter = useCreateMatter()
 
@@ -247,14 +253,19 @@ export function SovereignInitiationModal({
   const [step, setStep] = useState<Step>(1)
   const [direction, setDirection] = useState<'forward' | 'backward'>('forward')
 
-  // ---- Step 1: Identity Anchor ----
+  // ---- Step 1: Norva Contact ----
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedContactId, setSelectedContactId] = useState<string | null>(defaultContactId ?? null)
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null)
   const [title, setTitle] = useState('')
   const searchInputRef = useRef<HTMLInputElement>(null)
+  // showCreateContact replaced by childModalOpen (Directive 068)
 
-  // ---- Step 2: Logic Gate ----
+  // ---- Conflict Shield (Directive 066) ----
+  const [conflictStatus, setConflictStatus] = useState<ConflictStatus>('pending')
+  const [conflictResult, setConflictResult] = useState<ConflictShieldResult | null>(null)
+
+  // ---- Step 2: Norva Details ----
   const [practiceAreaId, setPracticeAreaId] = useState<string | null>(
     activePracticeFilter !== 'all' ? activePracticeFilter : null,
   )
@@ -262,11 +273,19 @@ export function SovereignInitiationModal({
   const [billingType, setBillingType] = useState<BillingType>('hourly')
   const [feeAmount, setFeeAmount] = useState<string>('')
 
-  // ---- Step 3: Command Assignment ----
+  // ---- Step 3: Norva Team ----
   const [responsibleLawyerId, setResponsibleLawyerId] = useState<string | null>(appUser?.id ?? null)
 
   // ---- General ----
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+  // ---- Directive 068/069: Sovereign Layering Protocol ----
+  const [childModalOpen, setChildModalOpen] = useState(false)
+  const [contactPulseActive, setContactPulseActive] = useState(false)
+
+  // ---- Directive 071: Sovereign Identity ----
+  const [sovereignIdRevealed, setSovereignIdRevealed] = useState(false)
+  const [typewriterText, setTypewriterText] = useState('')
 
   const tenantId = tenant?.id ?? ''
 
@@ -275,6 +294,34 @@ export function SovereignInitiationModal({
   const practiceAreas = usePracticeAreas(tenantId)
   const matterTypes = useMatterTypes(tenantId, practiceAreaId)
   const staff = useStaff(tenantId)
+
+  // ---- Directive 071: Sovereign Identity Preview ----
+  const clientLast = selectedContact?.last_name ?? null
+  const typeCode = matterTypes.data?.find((mt) => mt.id === matterTypeId)?.name?.slice(0, 3) ?? null
+  const matterNumberPreview = usePreviewMatterNumber(tenantId, clientLast, typeCode)
+
+  // Typewriter reveal effect when Sovereign ID first resolves
+  useEffect(() => {
+    if (matterNumberPreview.data && selectedContactId && !sovereignIdRevealed) {
+      const target = matterNumberPreview.data
+      setSovereignIdRevealed(true)
+      setTypewriterText('')
+      let i = 0
+      const interval = setInterval(() => {
+        i++
+        setTypewriterText(target.slice(0, i))
+        if (i >= target.length) clearInterval(interval)
+      }, 35)
+      return () => clearInterval(interval)
+    }
+  }, [matterNumberPreview.data, selectedContactId, sovereignIdRevealed])
+
+  // Update typewriter text when preview changes (e.g. matter type selected)
+  useEffect(() => {
+    if (matterNumberPreview.data && sovereignIdRevealed) {
+      setTypewriterText(matterNumberPreview.data)
+    }
+  }, [matterNumberPreview.data, sovereignIdRevealed])
 
   // ---- Reset on open ----
   useEffect(() => {
@@ -291,6 +338,13 @@ export function SovereignInitiationModal({
       setFeeAmount('')
       setResponsibleLawyerId(appUser?.id ?? null)
       setIsSubmitting(false)
+      // showCreateContact removed - replaced by childModalOpen
+      setConflictStatus('pending')
+      setConflictResult(null)
+      setChildModalOpen(false)
+      setContactPulseActive(false)
+      setSovereignIdRevealed(false)
+      setTypewriterText('')
     }
   }, [open, defaultContactId, activePracticeFilter, appUser?.id])
 
@@ -315,13 +369,19 @@ export function SovereignInitiationModal({
   // ---- Close guard ----
   const hasData = !!(selectedContactId || title || practiceAreaId || matterTypeId)
 
-  function handleClose() {
+  async function handleClose() {
     if (step === 1 && !hasData) {
       onOpenChange(false)
       return
     }
-    // Simple confirmation for now - can be replaced with a proper dialog later
-    if (window.confirm('Discard this matter initiation? Unsaved data will be lost.')) {
+    const keepBuilding = await guard.confirm({
+      variant: 'discard',
+      title: 'Hold on...',
+      message: "You've started building this matter. If you leave now, the Fortress will lose this progress. Should we stay and finish?",
+      confirmLabel: 'Keep Building',
+      cancelLabel: 'Discard Progress',
+    })
+    if (!keepBuilding) {
       onOpenChange(false)
     }
   }
@@ -331,6 +391,9 @@ export function SovereignInitiationModal({
     setSelectedContactId(contact.id)
     setSelectedContact(contact)
     setSearchTerm('')
+    // Reset conflict shield when contact changes
+    setConflictStatus('pending')
+    setConflictResult(null)
     // Auto-suggest title
     const lastName = contact.last_name ?? contact.first_name ?? 'Client'
     if (!title) {
@@ -369,7 +432,21 @@ export function SovereignInitiationModal({
         status: 'active',
         priority: 'normal',
         created_by: appUser.id,
-      })
+        conflict_status: conflictStatus,
+        conflict_certified_by: conflictStatus === 'cleared' ? appUser.id : null,
+        conflict_certified_at: conflictResult?.certifiedAt || null,
+        conflict_notes: conflictResult?.notes || null,
+      } as any)
+
+      // Log conflict certification to audit trail (fire-and-forget)
+      fetch(`/api/matters/${result.id}/conflict`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          status: conflictStatus,
+          notes: conflictResult?.notes || null,
+        }),
+      }).catch(() => {}) // Non-blocking
 
       onOpenChange(false)
       onSuccess?.(result.id)
@@ -400,7 +477,9 @@ export function SovereignInitiationModal({
   const enterVariant = direction === 'forward' ? 'enterRight' : 'enterLeft'
   const exitVariant = direction === 'forward' ? 'exitLeft' : 'exitRight'
 
-  const canProceedStep1 = !!(selectedContactId && title.trim().length > 2)
+  // Conflict shield gate: must be cleared OR have a waiver uploaded to proceed
+  const conflictGatePassed = conflictStatus === 'cleared' || conflictStatus === 'waiver_pending' || conflictStatus === 'waiver_approved'
+  const canProceedStep1 = !!(selectedContactId && title.trim().length > 2 && conflictGatePassed)
   const canProceedStep2 = !!practiceAreaId
   const canInitiate = canProceedStep1 && canProceedStep2 && !!responsibleLawyerId
 
@@ -423,21 +502,22 @@ export function SovereignInitiationModal({
         onClick={handleClose}
       />
 
-      {/* Modal shell */}
+      {/* Modal shell - recedes when child modal (Contact Creator) is open */}
       <motion.div
         className="relative z-10 mx-4 flex w-full max-w-3xl flex-col overflow-hidden rounded-3xl border border-gray-200 dark:border-white/[0.08] bg-white dark:bg-zinc-950/95 shadow-2xl backdrop-blur-xl"
         variants={modalVariants}
         initial="hidden"
-        animate="visible"
+        animate={childModalOpen ? 'receded' : 'visible'}
         exit="hidden"
-        transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+        transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
         onClick={(e) => e.stopPropagation()}
+        style={childModalOpen ? { pointerEvents: 'none' } : undefined}
       >
         {/* Header */}
         <div className="flex items-center justify-between border-b border-gray-200 dark:border-white/[0.06] px-8 pt-7 pb-0">
           <div>
             <h2 className="text-lg font-semibold tracking-tight text-gray-900 dark:text-white">Start New Case</h2>
-            <p className="mt-0.5 text-xs text-gray-500 dark:text-white/40">We&apos;ll walk you through it — step by step</p>
+            <p className="mt-0.5 text-xs text-gray-500 dark:text-white/40">We&apos;ll walk you through it  -  step by step</p>
           </div>
           <button
             type="button"
@@ -457,7 +537,7 @@ export function SovereignInitiationModal({
         <div className="relative min-h-[360px] overflow-hidden px-8 pb-6">
           <AnimatePresence mode="wait" custom={direction}>
             {/* ============================================================ */}
-            {/* STEP 1: Identity Anchor                                        */}
+            {/* STEP 1: Norva Contact                                        */}
             {/* ============================================================ */}
             {step === 1 && (
               <motion.div
@@ -482,7 +562,7 @@ export function SovereignInitiationModal({
                       type="text"
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      placeholder="Type a name or email — if they're in the system, we'll find them"
+                      placeholder="Type a name or email  -  if they're in the system, we'll find them"
                       className="w-full rounded-xl border border-emerald-500/30 bg-gray-50 dark:bg-white/[0.04] py-3.5 pl-12 pr-4 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-white/30 outline-none transition-shadow focus:border-emerald-500/60 focus:shadow-[0_0_20px_rgba(16,185,129,0.15)] focus:ring-0"
                     />
                   </div>
@@ -494,7 +574,17 @@ export function SovereignInitiationModal({
                         <div className="px-4 py-3 text-xs text-gray-400 dark:text-white/40">Searching...</div>
                       )}
                       {contactSearch.data?.length === 0 && !contactSearch.isLoading && (
-                        <div className="px-4 py-3 text-xs text-gray-400 dark:text-white/40">No contacts found</div>
+                        <div className="flex flex-col">
+                          <div className="px-4 py-2 text-xs text-gray-400 dark:text-white/40">No contacts found</div>
+                          <button
+                            type="button"
+                            onClick={() => setChildModalOpen(true)}
+                            className="flex w-full items-center gap-2 border-t border-gray-100 dark:border-white/[0.06] px-4 py-3 text-left text-sm font-medium text-emerald-600 dark:text-emerald-400 transition-colors hover:bg-emerald-500/10"
+                          >
+                            <Plus className="h-4 w-4" />
+                            Create &ldquo;{searchTerm.trim()}&rdquo; as a new contact
+                          </button>
+                        </div>
                       )}
                       {contactSearch.data?.map((contact) => (
                         <button
@@ -518,12 +608,32 @@ export function SovereignInitiationModal({
                           </div>
                         </button>
                       ))}
+
+                      {/* Always show "Create new" at the bottom of search results */}
+                      {(contactSearch.data?.length ?? 0) > 0 && (
+                        <button
+                          type="button"
+                          onClick={() => setChildModalOpen(true)}
+                          className="flex w-full items-center gap-2 border-t border-gray-100 dark:border-white/[0.06] px-4 py-2.5 text-left text-xs font-medium text-emerald-600 dark:text-emerald-400 transition-colors hover:bg-emerald-500/10"
+                        >
+                          <Plus className="h-3.5 w-3.5" />
+                          Not here? Create a new contact
+                        </button>
+                      )}
                     </div>
                   )}
 
-                  {/* Selected contact badge */}
+                  {/* Selected contact badge - pulses on injection from child modal */}
                   {selectedContact && (
-                    <div className="mt-3 flex items-center gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-2">
+                    <motion.div
+                      className={cn(
+                        'mt-3 flex items-center gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 transition-all',
+                        contactPulseActive && 'sovereign-contact-pulse',
+                      )}
+                      initial={contactPulseActive ? { scale: 0.95, opacity: 0 } : false}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                    >
                       <div className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500/30 text-[10px] font-bold text-emerald-300">
                         {(selectedContact.first_name?.[0] ?? '').toUpperCase()}
                         {(selectedContact.last_name?.[0] ?? '').toUpperCase()}
@@ -531,19 +641,52 @@ export function SovereignInitiationModal({
                       <span className="text-sm font-medium text-emerald-700 dark:text-emerald-300">
                         {selectedContact.first_name} {selectedContact.last_name}
                       </span>
+                      {contactPulseActive && (
+                        <motion.span
+                          initial={{ opacity: 0, scale: 0 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          className="ml-1"
+                        >
+                          <Check className="h-3.5 w-3.5 text-emerald-500" />
+                        </motion.span>
+                      )}
                       <button
                         type="button"
                         onClick={() => {
                           setSelectedContactId(null)
                           setSelectedContact(null)
+                          setSovereignIdRevealed(false)
+                          setTypewriterText('')
                         }}
                         className="ml-auto text-emerald-500/60 dark:text-emerald-400/60 transition-colors hover:text-emerald-600 dark:hover:text-emerald-300"
                       >
                         <X className="h-3.5 w-3.5" />
                       </button>
-                    </div>
+                    </motion.div>
                   )}
                 </div>
+
+                {/* Sovereign Identity Preview (Directive 071) */}
+                {typewriterText && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, delay: 0.2 }}
+                    className="flex items-center gap-2.5"
+                  >
+                    <div className="flex items-center gap-2 rounded-xl border border-emerald-500/20 bg-emerald-500/5 px-3.5 py-2">
+                      <Hash className="h-3.5 w-3.5 text-emerald-500/60" />
+                      <span className="font-mono text-sm font-semibold tracking-wider text-emerald-700 dark:text-emerald-300">
+                        {typewriterText}
+                      </span>
+                      <span className="inline-block h-4 w-px animate-pulse bg-emerald-500/60" />
+                    </div>
+                    <NorvaGuardianTooltip
+                      fieldKey="caseTitle"
+                      text="Sovereign Identity - This is the permanent forensic tracker for this matter. Use this ID in all correspondence to maintain the Breeze."
+                    />
+                  </motion.div>
+                )}
 
                 {/* Matter title */}
                 <div>
@@ -555,15 +698,31 @@ export function SovereignInitiationModal({
                     type="text"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    placeholder="Type the client's last name, then the case type (e.g. Khan — Spousal Sponsorship)"
+                    placeholder="Type the client's last name, then the case type (e.g. Khan  -  Spousal Sponsorship)"
                     className="w-full rounded-xl border border-gray-200 dark:border-white/[0.1] bg-gray-50 dark:bg-white/[0.04] px-4 py-3 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-white/25 outline-none transition-shadow focus:border-emerald-500/40 focus:shadow-[0_0_16px_rgba(16,185,129,0.1)] focus:ring-0"
                   />
                 </div>
+
+                {/* Directive 066/067: Sovereign Conflict Shield */}
+                {selectedContactId && title.trim().length > 2 && (
+                  <SovereignConflictShield
+                    clientName={
+                      selectedContact
+                        ? `${selectedContact.first_name ?? ''} ${selectedContact.last_name ?? ''}`.trim()
+                        : title.trim()
+                    }
+                    initialStatus={conflictStatus}
+                    onResult={(result) => {
+                      setConflictStatus(result.status)
+                      setConflictResult(result)
+                    }}
+                  />
+                )}
               </motion.div>
             )}
 
             {/* ============================================================ */}
-            {/* STEP 2: Logic Gate                                         */}
+            {/* STEP 2: Norva Details                                         */}
             {/* ============================================================ */}
             {step === 2 && (
               <motion.div
@@ -704,7 +863,7 @@ export function SovereignInitiationModal({
             )}
 
             {/* ============================================================ */}
-            {/* STEP 3: Command Assignment                                            */}
+            {/* STEP 3: Norva Team                                            */}
             {/* ============================================================ */}
             {step === 3 && (
               <motion.div
@@ -809,6 +968,21 @@ export function SovereignInitiationModal({
                       {billingType === 'flat_fee' ? 'Flat Fee' : billingType === 'hourly' ? 'Hourly' : 'Retainer'}
                       {feeAmount ? ` - $${parseFloat(feeAmount).toFixed(2)}` : ''}
                     </div>
+                    <div className="text-gray-400 dark:text-white/40">Conflict Check</div>
+                    <div className={cn(
+                      'font-medium flex items-center gap-1.5',
+                      conflictStatus === 'cleared'
+                        ? 'text-emerald-600 dark:text-emerald-400'
+                        : conflictStatus === 'waiver_pending'
+                        ? 'text-amber-600 dark:text-amber-400'
+                        : 'text-gray-700 dark:text-white/80',
+                    )}>
+                      {conflictStatus === 'cleared' && <><Shield className="h-3 w-3" /> Cleared</>}
+                      {conflictStatus === 'waiver_pending' && <><Shield className="h-3 w-3" /> Waiver Pending</>}
+                      {conflictStatus === 'waiver_approved' && <><Shield className="h-3 w-3" /> Waiver Approved</>}
+                      {conflictStatus === 'pending' && 'Pending'}
+                      {conflictStatus === 'conflict_found' && 'Conflict Found'}
+                    </div>
                   </div>
                 </div>
 
@@ -821,7 +995,7 @@ export function SovereignInitiationModal({
           </AnimatePresence>
         </div>
 
-        {/* Sticky footer — always visible so the user never gets stuck */}
+        {/* Sticky footer  -  always visible so the user never gets stuck */}
         <div className="sticky bottom-0 z-10 flex items-center justify-between border-t border-gray-200 dark:border-white/[0.06] bg-white/95 dark:bg-zinc-950/95 backdrop-blur-lg px-8 py-5">
           <div>
             {step > 1 && (
@@ -888,7 +1062,38 @@ export function SovereignInitiationModal({
         </div>
       </motion.div>
 
-      {/* Sovereign Sparkle CSS animation (injected once) */}
+      {/* Inline contact creator - Directive 068: Sovereign Layering Protocol */}
+      <SovereignIntakeDialog
+        open={childModalOpen}
+        onOpenChange={(v) => {
+          setChildModalOpen(v)
+        }}
+        onComplete={async (contactId) => {
+          // The Handshake: fetch newly created contact and auto-inject
+          setChildModalOpen(false)
+          try {
+            const supabase = createClient()
+            const { data } = await supabase
+              .from('contacts')
+              .select('id, first_name, last_name, email_primary, organization_name, phone_primary')
+              .eq('id', contactId)
+              .single()
+            if (data) {
+              handleSelectContact(data as Contact)
+              // Directive 070: Emerald Success Pulse
+              setContactPulseActive(true)
+              const contactName = [data.first_name, data.last_name].filter(Boolean).join(' ')
+              toast.success(`Norva Contact Added - ${contactName} has been linked to this matter.`)
+              setTimeout(() => setContactPulseActive(false), 1200)
+            }
+          } catch {
+            setSelectedContactId(contactId)
+          }
+          setSearchTerm('')
+        }}
+      />
+
+      {/* Sovereign CSS animations (injected once) */}
       <style jsx global>{`
         @keyframes sovereign-sparkle {
           0%, 100% {
@@ -900,6 +1105,18 @@ export function SovereignInitiationModal({
         }
         .sovereign-sparkle {
           animation: sovereign-sparkle 2s ease-in-out infinite;
+        }
+
+        /* Directive 070: Emerald Success Pulse */
+        @keyframes sovereign-contact-pulse {
+          0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+          70% { box-shadow: 0 0 0 15px rgba(16, 185, 129, 0); }
+          100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+        .sovereign-contact-pulse {
+          animation: sovereign-contact-pulse 0.8s ease-out;
+          border-color: rgb(16, 185, 129);
+          background-color: rgba(16, 185, 129, 0.1);
         }
       `}</style>
     </motion.div>

@@ -15,8 +15,8 @@
  */
 
 import { useParams, useRouter, useSearchParams } from 'next/navigation'
-import { useEffect, useState, useMemo } from 'react'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useEffect, useState, useMemo, useCallback } from 'react'
+import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query'
 import { AlertTriangle, LayoutDashboard, PanelLeft } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -31,6 +31,8 @@ import { AuraHeader } from '@/components/front-desk/AuraHeader'
 import { SovereignSeal } from '@/components/matters/sovereign-seal'
 import { AiDraftPanel } from '@/components/matters/ai-draft-panel'
 import { NorvaEarPanel } from '@/components/matters/norva-ear-panel'
+import { EmeraldPathWalkthrough, GenesisToast } from '@/components/onboarding/emerald-path-walkthrough'
+import { shouldShowWalkthrough } from '@/lib/services/onboarding-orchestrator'
 import { NorvaWelcomeBanner } from '@/components/shell/NorvaWelcomeBanner'
 import type { ZoneDProps } from '@/components/shell/ZoneD'
 import { fetchMatterDetail, fetchMatterTypeEnforcement, matterKeys } from '@/lib/queries/matters'
@@ -151,6 +153,53 @@ export default function MatterShellPage() {
   })
   const enforcementEnabled = matterTypeData?.enforcement_enabled ?? false
   const isImmigrationFunnel = (!!matter?.case_type_id || enforcementEnabled) && !!matter
+
+  // ── Directive 044: Emerald Path Walkthrough ────────────────────────────
+  const [walkthroughPhase, setWalkthroughPhase] = useState<'idle' | 'toast' | 'active' | 'done'>('idle')
+
+  // Check if matter has genesis block sealed
+  const { data: genesisData } = useQuery({
+    queryKey: ['genesis-block', matterId],
+    queryFn: async () => {
+      const { createClient } = await import('@/lib/supabase/client')
+      const supabase = createClient()
+      const { data } = await supabase
+        .from('matter_genesis_metadata')
+        .select('id')
+        .eq('matter_id', matterId)
+        .eq('is_revoked', false)
+        .maybeSingle()
+      return !!data
+    },
+    enabled: !!matterId,
+    staleTime: 1000 * 60 * 10,
+  })
+
+  const hasGenesis = genesisData ?? false
+  const hasCompletedWalkthrough = appUser?.has_completed_onboarding_walkthrough ?? false
+  const showWalkthrough = shouldShowWalkthrough(hasCompletedWalkthrough, hasGenesis)
+
+  // Show toast after workspace loads if walkthrough needed
+  useEffect(() => {
+    if (showWalkthrough && matter && walkthroughPhase === 'idle') {
+      const timer = setTimeout(() => setWalkthroughPhase('toast'), 1500)
+      return () => clearTimeout(timer)
+    }
+  }, [showWalkthrough, matter, walkthroughPhase])
+
+  const completeWalkthrough = useCallback(async () => {
+    setWalkthroughPhase('done')
+    try {
+      const { createClient } = await import('@/lib/supabase/client')
+      const supabase = createClient()
+      await supabase
+        .from('users')
+        .update({ has_completed_onboarding_walkthrough: true })
+        .eq('id', userId)
+    } catch {
+      // Non-fatal  -  flag will be set on next load
+    }
+  }, [userId])
 
   // Elevated-priority matters default to Intelligence tab (Directive 26.0)
   const initialTab = explicitTab
@@ -350,7 +399,17 @@ export default function MatterShellPage() {
 
       {/* Norva Ear  -  floating consultation recorder */}
       {matter && (
-        <NorvaEarPanel matterId={matterId} matterTitle={matter.title} />
+        <div data-walkthrough="meeting-recorder">
+          <NorvaEarPanel matterId={matterId} matterTitle={matter.title} />
+        </div>
+      )}
+
+      {/* Directive 044: Emerald Path Walkthrough */}
+      {walkthroughPhase === 'toast' && (
+        <GenesisToast onStart={() => setWalkthroughPhase('active')} />
+      )}
+      {walkthroughPhase === 'active' && (
+        <EmeraldPathWalkthrough onComplete={completeWalkthrough} />
       )}
     </div>
   )

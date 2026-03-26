@@ -1,5 +1,5 @@
 /**
- * ClioMigrationEngine — Directive 035: Sovereign Extraction Bridge
+ * ClioMigrationEngine  -  Directive 035: Sovereign Extraction Bridge
  *
  * One-way forensic pull from Clio Manage into the Norva schema.
  * Uses the existing Clio API client (lib/services/clio/client.ts) and
@@ -412,7 +412,7 @@ export class ClioMigrationEngine {
             tenant_id: this.tenantId,
             matter_id: matterId,
             amount_cents: Math.round(parseFloat(row.balance || '0') * 100),
-            description: `Clio trust import — ${row.matterName || row.__source_id}`,
+            description: `Clio trust import  -  ${row.matterName || row.__source_id}`,
             transaction_type: 'receipt',
             transaction_date: new Date().toISOString().split('T')[0],
             clio_source_id: row.__source_id,

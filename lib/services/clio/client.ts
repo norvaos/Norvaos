@@ -143,6 +143,7 @@ export async function clioPaginateAll<T>(
   fields: string[] = [],
   extraParams: Record<string, string | number> = {},
   pageSize = 200,
+  onProgress?: (fetched: number) => Promise<void>,
 ): Promise<T[]> {
   const allItems: T[] = []
   let nextUrl: string | null = null
@@ -191,6 +192,7 @@ export async function clioPaginateAll<T>(
 
     const items = data.data ?? []
     allItems.push(...items)
+    if (onProgress) await onProgress(allItems.length)
 
     nextUrl = data.meta?.paging?.next ?? null
     if (!nextUrl || items.length === 0) break

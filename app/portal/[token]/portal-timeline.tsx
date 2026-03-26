@@ -42,7 +42,7 @@ export function PortalTimeline({ token, primaryColor, language = 'en' }: PortalT
 
   if (loading) {
     return (
-      <div className="bg-white rounded-lg border border-slate-200 p-4">
+      <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-slate-200/60 p-4">
         <div className="flex items-center gap-2 text-slate-400">
           <Loader2 className="h-4 w-4 animate-spin" />
           <span className="text-xs">{tr.timeline_loading}</span>
@@ -54,8 +54,8 @@ export function PortalTimeline({ token, primaryColor, language = 'en' }: PortalT
   if (timeline.length === 0) return null
 
   return (
-    <div className="bg-white rounded-lg border border-slate-200 p-4">
-      <h3 className="text-sm font-semibold text-slate-700 mb-4">{tr.timeline_title}</h3>
+    <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-slate-200/60 p-5 shadow-sm">
+      <h3 className="text-sm font-bold text-slate-700 mb-4 tracking-tight">{tr.timeline_title}</h3>
 
       <div className="relative">
         {/* Vertical connecting line */}

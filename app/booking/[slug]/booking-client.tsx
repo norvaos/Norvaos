@@ -89,6 +89,7 @@ export default function BookingClient({ bookingPage, tenant }: BookingClientProp
   const [loadingSlots, setLoadingSlots] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [confirmationMessage, setConfirmationMessage] = useState('')
+  const [bookingError, setBookingError] = useState<string | null>(null)
 
   // Form fields
   const [guestName, setGuestName] = useState('')
@@ -154,6 +155,7 @@ export default function BookingClient({ bookingPage, tenant }: BookingClientProp
     if (!selectedDate || !selectedTime) return
 
     setSubmitting(true)
+    setBookingError(null)
     try {
       const res = await fetch(`/api/booking/${bookingPage.slug}/submit`, {
         method: 'POST',
@@ -174,10 +176,10 @@ export default function BookingClient({ bookingPage, tenant }: BookingClientProp
         setConfirmationMessage(data.confirmation_message || bookingPage.confirmation_message || 'Booking confirmed!')
         setStep('confirmed')
       } else {
-        alert(data.error || 'Failed to book. Please try again.')
+        setBookingError(data.error || 'Failed to book. Please try again.')
       }
     } catch {
-      alert('An error occurred. Please try again.')
+      setBookingError('An error occurred. Please try again.')
     } finally {
       setSubmitting(false)
     }
@@ -448,6 +450,12 @@ export default function BookingClient({ bookingPage, tenant }: BookingClientProp
                     placeholder="Anything you'd like us to know before the meeting..."
                   />
                 </div>
+
+                {bookingError && (
+                  <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                    {bookingError}
+                  </div>
+                )}
 
                 <button
                   type="submit"

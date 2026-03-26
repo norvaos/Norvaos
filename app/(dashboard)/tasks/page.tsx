@@ -28,7 +28,7 @@ import { useTaskTableStore } from '@/lib/stores/task-table-store'
 import { cn } from '@/lib/utils'
 import type { Database } from '@/lib/types/database'
 
-import { TaskCreateDialog } from '@/components/tasks/task-create-dialog'
+import { SovereignTaskCreator } from '@/components/tasks/sovereign-task-creator'
 import { TaskDetailSheet } from '@/components/tasks/task-detail-sheet'
 import { TaskTable } from '@/components/tasks/task-table'
 import { TaskTableToolbar } from '@/components/tasks/task-table-toolbar'
@@ -447,7 +447,7 @@ export default function TasksPage() {
         )}
 
         {/* Create Dialog */}
-        <TaskCreateDialog open={createOpen} onOpenChange={setCreateOpen} />
+        <SovereignTaskCreator open={createOpen} onOpenChange={setCreateOpen} />
 
         {/* Task Detail Sheet */}
         <TaskDetailSheet

@@ -343,3 +343,30 @@ export function useUpdateMatterStage() {
     },
   })
 }
+
+// ─── Sovereign Identity Preview ──────────────────────────────────────────────
+// Calls fn_preview_matter_number via RPC to show a non-incrementing preview
+// of the next matter number while the wizard is open.
+
+export function usePreviewMatterNumber(
+  tenantId: string,
+  clientLast: string | null,
+  typeCode: string | null,
+) {
+  return useQuery({
+    queryKey: ['matter-number-preview', tenantId, clientLast, typeCode],
+    queryFn: async () => {
+      const supabase = createClient()
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data, error } = await (supabase as any).rpc('fn_preview_matter_number', {
+        p_tenant_id: tenantId,
+        p_client_last: clientLast,
+        p_type_code: typeCode,
+      })
+      if (error) throw error
+      return data as string
+    },
+    enabled: !!tenantId,
+    staleTime: 1000 * 30,
+  })
+}

@@ -29,6 +29,27 @@
   status = 301
   force  = true
 
+# ── Blue-Green Deployment (Directive 041) ────────────────────────────────────
+# Production (Blue): main branch deploys  -  norvaos.ca
+# Staging (Green):   deploy previews + branch deploys  -  staging.norvaos.ca
+#
+# Deploy context overrides:
+#   - Production context inherits [build] above (Blue slot)
+#   - Branch-deploy and deploy-preview contexts use Green slot env vars
+# ─────────────────────────────────────────────────────────────────────────────
+
+[context.production.environment]
+  NEXT_PUBLIC_DEPLOY_SLOT = "blue"
+  NEXT_PUBLIC_DEPLOY_ENV  = "production"
+
+[context.branch-deploy.environment]
+  NEXT_PUBLIC_DEPLOY_SLOT = "green"
+  NEXT_PUBLIC_DEPLOY_ENV  = "staging"
+
+[context.deploy-preview.environment]
+  NEXT_PUBLIC_DEPLOY_SLOT = "green"
+  NEXT_PUBLIC_DEPLOY_ENV  = "staging"
+
 # ── Security headers ──────────────────────────────────────────────────────────
 [[headers]]
   for = "/*"

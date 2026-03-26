@@ -74,6 +74,8 @@ export interface EntityAdapter {
   validate?: (row: Record<string, unknown>) => string[]
   /** Post-process an entire batch of rows before insert */
   postProcess?: (rows: Record<string, unknown>[]) => Record<string, unknown>[]
+  /** Fields the engine auto-injects (e.g. created_by) that this table does not have */
+  omitEngineFields?: string[]
 }
 
 export interface PlatformAdapter {

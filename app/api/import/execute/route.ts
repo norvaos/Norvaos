@@ -47,8 +47,8 @@ async function handlePost(request: Request) {
 
     const isApiMode = (batch as Record<string, unknown>).import_mode === 'api'
 
-    // API batches can start from 'pending', CSV batches require 'validating'
-    const allowedStatuses = isApiMode ? ['pending', 'validating'] : ['validating']
+    // API batches can start from 'pending', 'validating', or 'paused'; CSV batches require 'validating' or 'paused'
+    const allowedStatuses = isApiMode ? ['pending', 'validating', 'paused'] : ['validating', 'paused']
     if (!allowedStatuses.includes(batch.status)) {
       return NextResponse.json(
         { error: `Cannot execute a batch with status "${batch.status}".${isApiMode ? '' : ' Validate first.'}` },

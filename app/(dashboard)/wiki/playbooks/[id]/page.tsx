@@ -23,6 +23,7 @@ import {
   useDeletePlaybook,
   useWikiCategories,
 } from '@/lib/queries/wiki'
+import { useSovereignGuard } from '@/components/ui/sovereign-guard'
 import { cn } from '@/lib/utils'
 import type { WikiBlockContent, Json } from '@/lib/types/database'
 import {
@@ -115,6 +116,7 @@ export default function PlaybookEditorPage({
   const { id } = use(params)
   const isNew = id === 'new'
   const router = useRouter()
+  const guard = useSovereignGuard()
   const { tenant } = useTenant()
   const tenantId = tenant?.id ?? ''
 
@@ -309,10 +311,17 @@ export default function PlaybookEditorPage({
 
   const handleDelete = useCallback(async () => {
     if (!currentIdRef.current) return
-    if (!confirm('Delete this playbook? This action cannot be undone.')) return
+    const keep = await guard.confirm({
+      variant: 'delete',
+      title: 'Delete Playbook?',
+      message: 'This playbook and all its versions will be permanently removed from the Fortress. This action cannot be undone.',
+      confirmLabel: 'Keep Playbook',
+      cancelLabel: 'Delete Permanently',
+    })
+    if (keep) return
     await deletePlaybook.mutateAsync(currentIdRef.current)
     router.push('/wiki')
-  }, [deletePlaybook, router])
+  }, [deletePlaybook, router, guard])
 
   // ── Loading State ──────────────────────────────────────────────────────────
 

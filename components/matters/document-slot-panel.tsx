@@ -15,6 +15,7 @@ import { formatDate } from '@/lib/utils/formatters'
 import { DocumentViewer } from '@/components/shared/document-viewer'
 import { FolderTreePanel } from '@/components/matters/folder-tree-panel'
 
+import { toast } from 'sonner'
 import { DOCUMENT_REJECTION_REASONS } from '@/lib/utils/constants'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -872,7 +873,7 @@ export function DocumentSlotPanel({
       }
     } catch (err) {
       console.error('Bundle error:', err)
-      alert(err instanceof Error ? err.message : 'Failed to generate document bundle')
+      toast.error(err instanceof Error ? err.message : 'Failed to generate document bundle')
     } finally {
       setBundleLoading(null)
     }

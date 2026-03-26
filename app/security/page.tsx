@@ -6,7 +6,7 @@ import type { Metadata } from 'next'
 export const metadata: Metadata = {
   title: 'Security | NorvaOS',
   description:
-    'NorvaOS Security — a technical overview of our encryption, infrastructure, and compliance architecture.',
+    'NorvaOS Security  -  a technical overview of our encryption, infrastructure, and compliance architecture.',
 }
 
 export default function SecurityPage() {
@@ -80,7 +80,7 @@ export default function SecurityPage() {
               title: 'Document Integrity',
               subtitle: 'SHA-256 Genesis Hash',
               description:
-                'Every document stored in the Norva Vault receives a SHA-256 cryptographic hash at the moment of upload — the Genesis Block. This tamper-evident fingerprint provides irrefutable proof that a document has not been altered since it was first stored. Ideal for audit trails and evidentiary integrity.',
+                'Every document stored in the Norva Vault receives a SHA-256 cryptographic hash at the moment of upload  -  the Genesis Block. This tamper-evident fingerprint provides irrefutable proof that a document has not been altered since it was first stored. Ideal for audit trails and evidentiary integrity.',
               color: 'bg-emerald-600',
             },
             {
@@ -88,7 +88,7 @@ export default function SecurityPage() {
               title: 'Application-Level PII Encryption',
               subtitle: 'AES-256-GCM',
               description:
-                'Sensitive personally identifiable information — including passport numbers, dates of birth, UCI numbers, and contact details — is encrypted at the application level using AES-256-GCM before being written to the database. Each value uses a unique initialisation vector (IV), ensuring that identical inputs produce different ciphertext.',
+                'Sensitive personally identifiable information  -  including passport numbers, dates of birth, UCI numbers, and contact details  -  is encrypted at the application level using AES-256-GCM before being written to the database. Each value uses a unique initialisation vector (IV), ensuring that identical inputs produce different ciphertext.',
               color: 'bg-rose-600',
             },
             {
@@ -96,7 +96,7 @@ export default function SecurityPage() {
               title: 'Tenant Isolation',
               subtitle: 'Row-Level Security',
               description:
-                'NorvaOS enforces strict tenant isolation at the database level using PostgreSQL Row-Level Security (RLS) policies. Every query is scoped to the authenticated tenant, making it architecturally impossible for one firm to access another firm\'s data — even in the event of an application-layer vulnerability.',
+                'NorvaOS enforces strict tenant isolation at the database level using PostgreSQL Row-Level Security (RLS) policies. Every query is scoped to the authenticated tenant, making it architecturally impossible for one firm to access another firm\'s data  -  even in the event of an application-layer vulnerability.',
               color: 'bg-amber-600',
             },
             {
@@ -129,7 +129,7 @@ export default function SecurityPage() {
             NorvaOS infrastructure is hosted entirely within Canada. Our primary hosting provider,
             AWS, operates the ca-central-1 region in Montr&eacute;al, Qu&eacute;bec. Our database provider,
             Supabase, is configured to use Canadian data centres exclusively. <strong>No data leaves
-            Canadian borders</strong> — not for backups, not for analytics, not for processing.
+            Canadian borders</strong>  -  not for backups, not for analytics, not for processing.
           </p>
 
           <h3>Backups</h3>

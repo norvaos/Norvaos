@@ -25,6 +25,10 @@ COMMENT ON COLUMN tenants.matter_naming_template IS
 -- PART 2: Replace fn_next_matter_number with template support
 -- ============================================================
 
+-- Drop the old 1-param overload from migration 174 to avoid
+-- "function name is not unique" ambiguity errors.
+DROP FUNCTION IF EXISTS fn_next_matter_number(UUID);
+
 CREATE OR REPLACE FUNCTION fn_next_matter_number(
   p_tenant_id   UUID,
   p_client_last TEXT DEFAULT NULL,
@@ -105,7 +109,7 @@ BEGIN
 END;
 $$;
 
-COMMENT ON FUNCTION fn_next_matter_number IS
+COMMENT ON FUNCTION fn_next_matter_number(UUID, TEXT, TEXT) IS
   'Gapless, collision-proof matter number generator. Supports template mode (Sovereign Naming) and legacy prefix/year/seq mode. Advisory-locked per tenant per year.';
 
 -- ============================================================
@@ -253,7 +257,7 @@ BEGIN
 END;
 $$;
 
-COMMENT ON FUNCTION fn_preview_matter_number IS
+COMMENT ON FUNCTION fn_preview_matter_number(UUID, TEXT, TEXT) IS
   'Non-incrementing preview of the next matter number. For live UI previews. {RANDOM_HEX} shown as ____ since it changes per call.';
 
 COMMIT;

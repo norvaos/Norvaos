@@ -26,27 +26,27 @@ interface PortalNextActionProps {
 const COLOR_CONFIG = {
   red: {
     border: 'border-l-red-500',
-    bg: 'bg-red-50/70',
+    bg: 'bg-gradient-to-br from-red-50/80 to-white',
     label: 'text-red-700',
-    icon: '🔴',
+    glow: 'shadow-red-100/50',
   },
   amber: {
     border: 'border-l-amber-500',
-    bg: 'bg-amber-50/70',
+    bg: 'bg-gradient-to-br from-amber-50/80 to-white',
     label: 'text-amber-700',
-    icon: '🟡',
+    glow: 'shadow-amber-100/50',
   },
   blue: {
     border: 'border-l-blue-500',
-    bg: 'bg-blue-50/70',
+    bg: 'bg-gradient-to-br from-blue-50/80 to-white',
     label: 'text-blue-700',
-    icon: '🔵',
+    glow: 'shadow-blue-100/50',
   },
   green: {
     border: 'border-l-green-500',
-    bg: 'bg-green-50/70',
+    bg: 'bg-gradient-to-br from-green-50/80 to-white',
     label: 'text-green-700',
-    icon: '🟢',
+    glow: 'shadow-emerald-100/50',
   },
 }
 
@@ -96,9 +96,9 @@ export function PortalNextActionPanel({
 
   if (loading) {
     return (
-      <div className="rounded-xl border-l-4 border-l-slate-300 border bg-slate-50/50 p-4 animate-pulse">
-        <div className="h-4 w-48 bg-slate-200 rounded" />
-        <div className="h-3 w-72 bg-slate-100 rounded mt-2" />
+      <div className="rounded-2xl border-l-[3px] border-l-slate-300 border border-slate-200/60 bg-gradient-to-br from-slate-50 to-white p-5 animate-pulse backdrop-blur-sm">
+        <div className="h-4 w-48 bg-slate-200 rounded-lg" />
+        <div className="h-3 w-72 bg-slate-100 rounded-lg mt-2" />
       </div>
     )
   }
@@ -117,12 +117,14 @@ export function PortalNextActionPanel({
       : null
 
     return (
-      <div className="rounded-xl border-l-4 border-l-green-500 border border-green-200 bg-green-50/70 p-5">
+      <div className="rounded-2xl border-l-[3px] border-l-emerald-500 border border-emerald-200/60 bg-gradient-to-br from-emerald-50/80 to-white p-5 shadow-md shadow-emerald-100/50 backdrop-blur-sm">
         <div className="flex items-start gap-3">
-          <svg className="h-6 w-6 text-green-600 shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-            <polyline points="22 4 12 14.01 9 11.01" />
-          </svg>
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-100 shadow-sm">
+            <svg className="h-5 w-5 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+              <polyline points="22 4 12 14.01 9 11.01" />
+            </svg>
+          </div>
           <div className="flex-1">
             <h3 className="text-sm font-semibold text-green-800">
               {tr.next_action_awaiting_review_title ?? 'All items submitted'}
@@ -196,27 +198,31 @@ export function PortalNextActionPanel({
   return (
     <div
       className={cn(
-        'rounded-xl border-l-4 border p-4',
+        'rounded-2xl border-l-[3px] border border-slate-200/60 p-5 backdrop-blur-sm shadow-md',
         colors.border,
         colors.bg,
+        colors.glow,
       )}
     >
       <div className="flex items-center justify-between gap-3">
         <div className="min-w-0 flex-1">
-          <p className={cn('text-[10px] font-semibold uppercase tracking-wider', colors.label)}>
+          <p className={cn('text-[10px] font-bold uppercase tracking-wider', colors.label)}>
             {tr.next_action_title ?? 'What You Need to Do Next'}
           </p>
-          <p className="text-sm font-medium text-slate-800 mt-1">{message}</p>
+          <p className="text-sm font-semibold text-slate-800 mt-1.5">{message}</p>
           {reason && (
-            <p className="text-xs text-slate-600 mt-0.5">{reason}</p>
+            <p className="text-xs text-slate-600 mt-1">{reason}</p>
           )}
         </div>
 
         {action.scrollTarget && (
           <button
             onClick={handleGo}
-            className="shrink-0 rounded-lg px-4 py-2 text-sm font-medium text-white transition-colors hover:opacity-90"
-            style={{ backgroundColor: primaryColor }}
+            className="shrink-0 rounded-xl px-5 py-2.5 text-sm font-bold text-white transition-all hover:brightness-110 active:scale-[0.97] shadow-lg"
+            style={{
+              background: `linear-gradient(135deg, ${primaryColor}, ${primaryColor}dd)`,
+              boxShadow: `0 4px 14px ${primaryColor}30`,
+            }}
           >
             {tr.next_action_go ?? 'Go'} →
           </button>

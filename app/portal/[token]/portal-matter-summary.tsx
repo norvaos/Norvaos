@@ -80,51 +80,68 @@ export function PortalMatterSummary({
   const allSubmitted = outstandingItems.length === 0 && sections && sections.documents.total > 0
 
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+    <div
+      className="rounded-2xl border border-slate-200/60 p-5 shadow-lg backdrop-blur-sm relative overflow-hidden"
+      style={{
+        background: `linear-gradient(135deg, white 0%, ${primaryColor}06 50%, white 100%)`,
+        boxShadow: `0 4px 20px ${primaryColor}08, 0 1px 3px rgba(0,0,0,0.04)`,
+      }}
+    >
+      {/* Accent line */}
+      <div className="absolute top-0 left-0 right-0 h-[3px] rounded-t-2xl" style={{ background: `linear-gradient(90deg, ${primaryColor}, ${primaryColor}60)` }} />
+
       {/* Matter identity */}
-      <h2 className="text-base font-semibold text-slate-900">{matterTitle || matterNumber}</h2>
-      <div className="mt-1 flex flex-wrap items-center gap-x-2 text-xs text-slate-500">
+      <h2 className="text-lg font-bold text-slate-900 tracking-tight mt-1">{matterTitle || matterNumber}</h2>
+      <div className="mt-1.5 flex flex-wrap items-center gap-x-2 text-xs">
         {matterNumber && (
-          <span>
+          <span className="inline-flex items-center rounded-md bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-600">
             {tr.matter_file_label ?? 'File'}: {matterNumber}
           </span>
         )}
         {matterTypeName && (
-          <>
-            <span className="text-slate-300">·</span>
-            <span>
-              {tr.matter_case_label ?? 'Case'}: {matterTypeName}
-            </span>
-          </>
+          <span className="inline-flex items-center rounded-md px-2 py-0.5 text-[11px] font-medium" style={{ backgroundColor: `${primaryColor}10`, color: primaryColor }}>
+            {matterTypeName}
+          </span>
         )}
       </div>
 
       {/* Concrete outstanding counts  -  PRIMARY signal */}
       <div className="mt-3">
         {allSubmitted ? (
-          <p className="text-sm font-medium text-green-700">
-            {tr.summary_all_submitted ?? 'All items submitted'} ✓
-          </p>
+          <div className="flex items-center gap-2 rounded-xl bg-emerald-50 border border-emerald-200/60 px-3 py-2">
+            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-100">
+              <svg className="h-3.5 w-3.5 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
+            </div>
+            <p className="text-sm font-semibold text-emerald-700">
+              {tr.summary_all_submitted ?? 'All items submitted'}
+            </p>
+          </div>
         ) : outstandingItems.length > 0 ? (
-          <p className="text-sm font-medium text-slate-700">
-            {outstandingItems.join(' · ')}
-          </p>
+          <div className="flex items-center gap-2 rounded-xl bg-amber-50/80 border border-amber-200/60 px-3 py-2">
+            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-amber-100">
+              <svg className="h-3.5 w-3.5 text-amber-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>
+            </div>
+            <p className="text-sm font-medium text-slate-700">
+              {outstandingItems.join(' · ')}
+            </p>
+          </div>
         ) : null}
       </div>
 
-      {/* Thin progress bar  -  SECONDARY signal */}
+      {/* Progress bar  -  SECONDARY signal */}
       {sections && sections.documents.total > 0 && !allSubmitted && (
-        <div className="mt-2.5 flex items-center gap-2">
-          <div className="flex-1 h-1.5 rounded-full bg-slate-100 overflow-hidden">
+        <div className="mt-3 flex items-center gap-3">
+          <div className="flex-1 h-2 rounded-full bg-slate-100 overflow-hidden">
             <div
-              className="h-full rounded-full transition-all duration-500"
+              className="h-full rounded-full transition-all duration-700 ease-out"
               style={{
                 width: `${Math.min(progressPercent, 100)}%`,
-                backgroundColor: primaryColor,
+                background: `linear-gradient(90deg, ${primaryColor}, ${primaryColor}cc)`,
+                boxShadow: `0 0 8px ${primaryColor}30`,
               }}
             />
           </div>
-          <span className="text-[11px] text-slate-400 tabular-nums shrink-0">
+          <span className="text-xs font-bold tabular-nums shrink-0" style={{ color: primaryColor }}>
             {progressPercent}%
           </span>
         </div>
@@ -132,7 +149,7 @@ export function PortalMatterSummary({
 
       {/* Last updated */}
       {lastUpdated && (
-        <p className="mt-2 text-[11px] text-slate-400">
+        <p className="mt-3 text-[11px] text-slate-400 font-medium">
           {tr.matter_last_updated ?? 'Last updated'}:{' '}
           {new Date(lastUpdated).toLocaleDateString(language, {
             month: 'short',

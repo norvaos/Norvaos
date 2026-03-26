@@ -32,6 +32,7 @@ interface AppUser {
   settings: Record<string, unknown>
   practice_filter_preference?: string | null
   locale_preference?: string | null
+  has_completed_onboarding_walkthrough?: boolean | null
 }
 
 interface UserContextType {

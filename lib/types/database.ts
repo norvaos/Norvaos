@@ -7613,6 +7613,7 @@ export type Database = {
           id: string
           import_errors: Json
           import_mode: string
+          pause_requested: boolean
           processed_rows: number
           rolled_back_at: string | null
           rolled_back_by: string | null
@@ -7641,6 +7642,7 @@ export type Database = {
           id?: string
           import_errors?: Json
           import_mode?: string
+          pause_requested?: boolean
           processed_rows?: number
           rolled_back_at?: string | null
           rolled_back_by?: string | null
@@ -7669,6 +7671,7 @@ export type Database = {
           id?: string
           import_errors?: Json
           import_mode?: string
+          pause_requested?: boolean
           processed_rows?: number
           rolled_back_at?: string | null
           rolled_back_by?: string | null
@@ -13554,6 +13557,7 @@ export type Database = {
           sort_order: number
           tenant_id: string
           updated_at: string
+          ghost_document_config: Json | null
         }
         Insert: {
           auto_send_document_request?: boolean | null
@@ -13576,6 +13580,7 @@ export type Database = {
           sort_order?: number
           tenant_id: string
           updated_at?: string
+          ghost_document_config?: Json | null
         }
         Update: {
           auto_send_document_request?: boolean | null
@@ -13598,6 +13603,7 @@ export type Database = {
           sort_order?: number
           tenant_id?: string
           updated_at?: string
+          ghost_document_config?: Json | null
         }
         Relationships: [
           {
@@ -18400,6 +18406,7 @@ export type Database = {
           updated_at: string | null
           utilization_target_hours: number | null
           locale_preference: string | null
+          has_completed_onboarding_walkthrough: boolean | null
         }
         Insert: {
           auth_user_id?: string | null
@@ -18430,6 +18437,7 @@ export type Database = {
           updated_at?: string | null
           utilization_target_hours?: number | null
           locale_preference?: string | null
+          has_completed_onboarding_walkthrough?: boolean | null
         }
         Update: {
           auth_user_id?: string | null
@@ -18460,6 +18468,7 @@ export type Database = {
           updated_at?: string | null
           utilization_target_hours?: number | null
           locale_preference?: string | null
+          has_completed_onboarding_walkthrough?: boolean | null
         }
         Relationships: [
           {

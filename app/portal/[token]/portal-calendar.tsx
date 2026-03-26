@@ -145,14 +145,14 @@ export function PortalCalendar({ token, primaryColor, language = 'en' }: PortalC
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center">
-        <div className="mx-auto h-10 w-10 rounded-full bg-red-50 flex items-center justify-center mb-3">
+        <div className="mx-auto h-12 w-12 rounded-2xl bg-gradient-to-br from-red-50 to-white flex items-center justify-center mb-3 shadow-sm">
           <svg className="h-5 w-5 text-red-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <circle cx="12" cy="12" r="10" />
             <line x1="12" y1="8" x2="12" y2="12" />
             <line x1="12" y1="16" x2="12.01" y2="16" />
           </svg>
         </div>
-        <p className="text-sm text-slate-500">{tr.error_generic}</p>
+        <p className="text-sm font-medium text-slate-500">{tr.error_generic}</p>
       </div>
     )
   }
@@ -160,15 +160,15 @@ export function PortalCalendar({ token, primaryColor, language = 'en' }: PortalC
   if (events.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center">
-        <div className="mx-auto h-10 w-10 rounded-full bg-slate-100 flex items-center justify-center mb-3">
-          <svg className="h-5 w-5 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <div className="mx-auto h-12 w-12 rounded-2xl flex items-center justify-center mb-3 shadow-sm" style={{ backgroundColor: `${primaryColor || '#3b82f6'}10` }}>
+          <svg className="h-5 w-5" style={{ color: primaryColor || '#3b82f6' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
             <line x1="16" y1="2" x2="16" y2="6" />
             <line x1="8" y1="2" x2="8" y2="6" />
             <line x1="3" y1="10" x2="21" y2="10" />
           </svg>
         </div>
-        <p className="text-sm text-slate-500">{tr.no_upcoming_events ?? 'No upcoming events scheduled.'}</p>
+        <p className="text-sm font-medium text-slate-500">{tr.no_upcoming_events ?? 'No upcoming events scheduled.'}</p>
       </div>
     )
   }
@@ -190,8 +190,8 @@ export function PortalCalendar({ token, primaryColor, language = 'en' }: PortalC
               </span>
               {today && (
                 <span
-                  className="inline-flex items-center rounded-full px-1.5 py-0.5 text-[10px] font-medium text-white"
-                  style={{ backgroundColor: primaryColor || '#3b82f6' }}
+                  className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-bold text-white shadow-sm"
+                  style={{ background: `linear-gradient(135deg, ${primaryColor || '#3b82f6'}, ${primaryColor || '#3b82f6'}cc)` }}
                 >
                   {tr.calendar_today ?? 'Today'}
                 </span>
@@ -203,7 +203,7 @@ export function PortalCalendar({ token, primaryColor, language = 'en' }: PortalC
               {dateEvents.map((event) => (
                 <div
                   key={event.id}
-                  className="rounded-lg border border-slate-200 bg-white p-4"
+                  className="rounded-2xl border border-slate-200/60 bg-gradient-to-br from-slate-50/30 to-white p-4 backdrop-blur-sm transition-all hover:shadow-sm"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1 min-w-0">

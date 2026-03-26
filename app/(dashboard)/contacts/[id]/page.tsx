@@ -121,7 +121,7 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
-import { MatterCreateSheet } from '@/components/matters/matter-create-sheet'
+import { SovereignInitiationModal } from '@/components/matters/sovereign-initiation-modal'
 import { ContactReadinessZone } from '@/components/contacts/contact-readiness-zone'
 import { VaultMonitor } from '@/components/contacts/vault-monitor'
 import { SovereignLayout } from '@/components/contacts/sovereign-layout'
@@ -1577,8 +1577,8 @@ function MattersTab({
         </DialogContent>
       </Dialog>
 
-      {/* Create New Matter Sheet */}
-      <MatterCreateSheet
+      {/* Create New Matter */}
+      <SovereignInitiationModal
         open={createSheetOpen}
         onOpenChange={setCreateSheetOpen}
         defaultContactId={contactId}

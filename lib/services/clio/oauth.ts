@@ -188,7 +188,7 @@ export async function getClioProfile(accessToken: string): Promise<{ id: number;
 
   if (!res.ok) {
     const body = await res.text().catch(() => '')
-    throw new Error(`Failed to fetch Clio profile: ${res.status} ${res.statusText} — ${body}`)
+    throw new Error(`Failed to fetch Clio profile: ${res.status} ${res.statusText}  -  ${body}`)
   }
 
   const data = await res.json()

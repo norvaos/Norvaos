@@ -17,6 +17,7 @@
  */
 
 import { useState, useMemo, useCallback, useRef } from 'react'
+import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 import {
   useDocumentSlots,
@@ -959,7 +960,7 @@ export function DocumentsTab({
         }
       } catch (err) {
         console.error('Bundle error:', err)
-        alert(err instanceof Error ? err.message : 'Failed to generate document bundle')
+        toast.error(err instanceof Error ? err.message : 'Failed to generate document bundle')
       } finally {
         setBundleLoading(null)
       }

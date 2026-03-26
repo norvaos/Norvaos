@@ -24,6 +24,8 @@ export const SOVEREIGN_EVENT_TYPES = [
   'CLIENT_PORTAL_ACCESS',
   'RETAINER_SIGNED',
   'STAGE_ADVANCED',
+  'CONFLICT_CLEARED',
+  'CONFLICT_DETECTED',
 ] as const
 
 export type SovereignEventType = (typeof SOVEREIGN_EVENT_TYPES)[number]
@@ -345,6 +347,57 @@ export async function logClientPortalAccess(params: {
       after: {
         matter_id: params.matterId,
         accessed_at: new Date().toISOString(),
+      },
+    },
+  })
+}
+
+/** Log a conflict-of-interest clearance (Directive 066). */
+export async function logConflictCleared(params: {
+  tenantId: string
+  userId: string
+  matterId: string
+  matterTitle: string
+  certifiedBy: string
+}): Promise<void> {
+  await logAuditEvent({
+    tenantId: params.tenantId,
+    userId: params.userId,
+    eventType: 'CONFLICT_CLEARED',
+    severity: 'info',
+    tableName: 'matters',
+    recordId: params.matterId,
+    metadata: {
+      after: {
+        conflict_status: 'cleared',
+        matter_title: params.matterTitle,
+        certified_by: params.certifiedBy,
+        certified_at: new Date().toISOString(),
+      },
+    },
+  })
+}
+
+/** Log a conflict-of-interest detection (Directive 066). */
+export async function logConflictDetected(params: {
+  tenantId: string
+  userId: string
+  matterId: string
+  matterTitle: string
+  notes?: string
+}): Promise<void> {
+  await logAuditEvent({
+    tenantId: params.tenantId,
+    userId: params.userId,
+    eventType: 'CONFLICT_DETECTED',
+    severity: 'warning',
+    tableName: 'matters',
+    recordId: params.matterId,
+    metadata: {
+      after: {
+        conflict_status: 'conflict_found',
+        matter_title: params.matterTitle,
+        notes: params.notes,
       },
     },
   })

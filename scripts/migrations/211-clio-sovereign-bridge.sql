@@ -1,5 +1,5 @@
 -- ============================================================================
--- Migration 211: Clio Sovereign Bridge — Directive 035
+-- Migration 211: Clio Sovereign Bridge  -  Directive 035
 --
 -- Tables for Clio OAuth connections, migration tracking, and error logging.
 -- Also adds clio_source_id columns to contacts, matters, and trust_transactions
