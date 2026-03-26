@@ -393,11 +393,11 @@ function ProfessionalCredentialsCard({ userId, currentSettings }: ProfentialsCre
                 name="lso_number"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>LSO Number</FormLabel>
+                    <FormLabel>Law Society / College ID</FormLabel>
                     <FormControl>
                       <Input placeholder="e.g. 12345P" {...field} value={field.value ?? ''} />
                     </FormControl>
-                    <FormDescription>Law Society of Ontario member number.</FormDescription>
+                    <FormDescription>Your Law Society or regulatory college member number.</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}

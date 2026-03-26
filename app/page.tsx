@@ -1044,7 +1044,7 @@ export default async function LandingPage() {
                     <Landmark className="h-4 w-4 text-emerald-100" />
                     <span className="text-sm font-semibold text-white">Trust Ledger: Waseer Law PC</span>
                   </div>
-                  <span className="rounded-full bg-emerald-600 px-2.5 py-0.5 text-[10px] font-bold text-white uppercase tracking-wide">Law Society Compliant</span>
+                  <span className="rounded-full bg-emerald-600 px-2.5 py-0.5 text-[10px] font-bold text-white uppercase tracking-wide">Regulatory Compliant</span>
                 </div>
 
                 {/* Summary cards */}
@@ -1104,7 +1104,7 @@ export default async function LandingPage() {
                   <Shield className="h-3.5 w-3.5 text-white" />
                 </div>
                 <div>
-                  <div className="text-xs font-semibold text-gray-900">Law Society Ready</div>
+                  <div className="text-xs font-semibold text-gray-900">Compliance Ready</div>
                   <div className="text-xs text-gray-500">Audit-trail built in</div>
                 </div>
               </div>
@@ -1124,7 +1124,7 @@ export default async function LandingPage() {
                 </span>
               </h2>
               <p className="mt-4 text-lg text-gray-900">
-                NorvaOS includes a Law Society–compliant trust accounting module that handles
+                NorvaOS includes a regulator-compliant trust accounting module that handles
                 receipts, disbursements, three-way reconciliation, and client trust statements,
                 all inside the same platform where the legal work happens.
               </p>
@@ -1150,14 +1150,14 @@ export default async function LandingPage() {
                     color: 'text-violet-600',
                     bg: 'bg-violet-50',
                     title: 'Client trust statements',
-                    desc: 'Generate a complete trust statement for any client or matter in one click, formatted for Law Society spot audits.',
+                    desc: 'Generate a complete trust statement for any client or matter in one click, formatted for regulatory spot audits.',
                   },
                   {
                     icon: Shield,
                     color: 'text-amber-600',
                     bg: 'bg-amber-50',
-                    title: 'Law Society–ready audit log',
-                    desc: 'Every trust transaction is immutably logged with timestamp, user, and reason. Ready for a Law Society of Ontario examination at any time.',
+                    title: 'Compliance-ready audit log',
+                    desc: 'Every trust transaction is immutably logged with timestamp, user, and reason. Ready for an examination by your Law Society or College at any time.',
                   },
                   {
                     icon: BellRing,
@@ -1686,7 +1686,7 @@ export default async function LandingPage() {
                       'Last-minute panics the night before a hearing to find a document no one can locate',
                       'Trust account tracked in a spreadsheet, error-prone, unauditable, and one formula away from a problem',
                       'No visibility into which files are behind schedule across the whole office',
-                      'No way to know if the office is compliant with Law Society requirements or ICCRC college obligations',
+                      'No way to know if the office is compliant with regulatory requirements or regulatory college obligations',
                       'Consultants calling late at night about an appeal with no shared file context anywhere',
                       'No single view of what a client owes, what is overdue, or what the next step is',
                     ].map(pain => (
@@ -1735,7 +1735,7 @@ export default async function LandingPage() {
 
                   {[
                     { icon: BadgeCheck, title: 'Founder & Principal Lawyer', org: 'Waseer Law Office, Ontario', period: '2007 to Present', color: 'bg-indigo-50', iconColor: 'text-indigo-600', border: 'border-indigo-100' },
-                    { icon: Scale,      title: 'Barrister & Solicitor, Ontario', org: 'Law Society of Ontario', period: '2019 to Present', color: 'bg-rose-50', iconColor: 'text-rose-600', border: 'border-rose-100' },
+                    { icon: Scale,      title: 'Barrister & Solicitor, Ontario (Example)', org: 'Law Society of Ontario (Example)', period: '2019 to Present', color: 'bg-rose-50', iconColor: 'text-rose-600', border: 'border-rose-100' },
                     { icon: Scale,      title: 'Immigration Law Practice', org: 'Immigration, Appeals & Refugee', period: '2012 to Present', color: 'bg-emerald-50', iconColor: 'text-emerald-700', border: 'border-emerald-100' },
                     { icon: BookOpen,   title: 'Qualified Solicitor, England & Wales', org: 'Solicitors Regulation Authority', period: '2012', color: 'bg-teal-50', iconColor: 'text-teal-700', border: 'border-teal-100' },
                     { icon: Building2,  title: 'Project Manager, Government IT', org: 'Land Registry, Transport, Immigration', period: '2003 to 2006', color: 'bg-violet-50', iconColor: 'text-violet-600', border: 'border-violet-100' },
@@ -1861,7 +1861,7 @@ export default async function LandingPage() {
               </div>
               <h3 className="text-lg font-bold text-gray-900">Canadian Data Residency</h3>
               <p className="mt-3 text-sm leading-6 text-gray-600">
-                Your data never leaves Canada. Strictly hosted in AWS ca-central-1 to meet Law Society and PIPEDA standards. No cross-border transfers, no exceptions.
+                Your data never leaves Canada. Strictly hosted in AWS ca-central-1 to meet Canadian regulatory and privacy standards. No cross-border transfers, no exceptions.
               </p>
               <div className="mt-5 flex items-center gap-2 text-xs font-medium text-indigo-600">
                 <span className="inline-block h-1.5 w-1.5 rounded-full bg-indigo-600" />
@@ -1891,7 +1891,7 @@ export default async function LandingPage() {
               </div>
               <h3 className="text-lg font-bold text-gray-900">Sovereign Compliance</h3>
               <p className="mt-3 text-sm leading-6 text-gray-600">
-                Real-time compliance matrices at the Firm, Matter, and Client levels. Audit-ready by design, with automated checks against Law Society requirements.
+                Real-time compliance matrices at the Firm, Matter, and Client levels. Audit-ready by design, with automated checks against regulatory requirements.
               </p>
               <div className="mt-5 flex items-center gap-2 text-xs font-medium text-emerald-600">
                 <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-600" />

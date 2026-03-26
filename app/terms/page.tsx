@@ -46,7 +46,7 @@ export default function TermsOfServicePage() {
             NorvaOS is a cloud-based legal operating system that provides practice management, client intake,
             document management, trust accounting, billing, scheduling, and compliance tools for Canadian
             law firms and licensed immigration consultants. The platform is designed to support compliance
-            with Law Society rules and PIPEDA requirements.
+            with regulatory rules and PIPEDA requirements.
           </p>
 
           <h2>2. Subscription Model</h2>
@@ -102,7 +102,7 @@ export default function TermsOfServicePage() {
             Upon termination or cancellation, your data will be retained for 90 days to facilitate account
             recovery. After this period, all data will be permanently and irrecoverably deleted from our
             systems and backups, unless a longer retention period is required by law (e.g., trust accounting
-            records under Law Society rules).
+            records under regulatory rules).
           </p>
 
           <h2>4. The Sovereign Guarantee</h2>
@@ -128,7 +128,7 @@ export default function TermsOfServicePage() {
           <ul>
             <li>Provide accurate and current registration information</li>
             <li>Maintain the confidentiality of account credentials and notify us immediately of any unauthorised access</li>
-            <li>Ensure that your use of the platform complies with applicable laws, professional regulations, and Law Society rules</li>
+            <li>Ensure that your use of the platform complies with applicable laws, professional regulations, and regulatory rules</li>
             <li>Obtain appropriate consent from your clients before entering their personal information into the platform</li>
             <li>Use the platform only for lawful purposes related to the practice of law or licensed immigration consulting</li>
             <li>Not attempt to reverse-engineer, decompile, or circumvent any security measures of the platform</li>

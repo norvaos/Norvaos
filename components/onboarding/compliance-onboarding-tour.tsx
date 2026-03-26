@@ -4,8 +4,9 @@
  * ComplianceOnboardingTour  -  Directive: Compliance Onboarding
  *
  * A guided product tour for new users that walks through every
- * compliance surface in NorvaOS, with dedicated Law Society of Ontario
- * compliance guidance. Features light/dark mode toggle inside the tour.
+ * compliance surface in NorvaOS, with dedicated regulatory
+ * compliance guidance for Canadian law societies and immigration
+ * consultant colleges. Features light/dark mode toggle inside the tour.
  *
  * Activation:
  *   - Auto-triggers on first login (user_metadata.onboarding_tour_completed is not set)
@@ -17,9 +18,9 @@
  *
  * Tour Stops (10):
  *   1. Welcome  -  What NorvaOS protects
- *   2. LSO Compliance Overview  -  What the Law Society requires
- *   3. LSO Trust Accounting Rules  -  Rule 3.7, bookkeeping, reconciliation
- *   4. LSO Record Keeping & Audit Readiness  -  How to stay compliant at all times
+ *   2. Regulatory Compliance Overview  -  What your regulator requires
+ *   3. Trust Accounting Rules  -  Rule 3.7, bookkeeping, reconciliation
+ *   4. Record Keeping & Audit Readiness  -  How to stay compliant at all times
  *   5. Glass Fortress  -  The Sovereign Matrix dashboard
  *   6. Readiness Ring  -  Matter shield domains & score
  *   7. Genesis Block  -  Pre-Flight Checklist & Sovereign Sparkle
@@ -91,41 +92,41 @@ const TOUR_STEPS: TourStep[] = [
     ],
   },
   {
-    id: 'lso-overview',
-    title: 'Law Society of Ontario  -  Your Obligations',
-    description: 'As a licensed lawyer in Ontario, you are bound by the Rules of Professional Conduct and the By-Laws of the Law Society of Ontario (LSO). NorvaOS automates and enforces these obligations.',
+    id: 'regulatory-overview',
+    title: 'Your Regulatory Obligations',
+    description: 'As a licensed legal professional in Canada, you are bound by the Rules of Professional Conduct and the By-Laws of your Law Society or College. NorvaOS automates and enforces these obligations.',
     icon: <Scale className="h-6 w-6" />,
     accentDark: 'text-amber-400',
     accentLight: 'text-amber-600',
     details: [
-      'By-Law 9: Trust accounting, record retention, and financial obligations',
-      'Rule 3.1: Competence  -  you must understand your compliance tools',
+      'Trust accounting by-laws (e.g. By-Law 9): Trust accounting, record retention, and financial obligations',
+      'Professional competence rules (e.g. Rule 3.1): Competence  -  you must understand your compliance tools',
       'Rule 3.2: Quality of Service  -  client files must be accurate and current',
       'Rule 3.3: Confidentiality  -  client data must be protected at all times',
       'Rule 3.7: Trust accounting  -  funds must be properly handled and reconciled',
       'Rule 5.1: Supervision  -  partners must oversee all compliance obligations',
     ],
-    complianceNote: 'LSO spot audits can happen at any time. NorvaOS keeps you audit-ready 24/7  -  but YOU must ensure the data entered is accurate. The system verifies integrity, not truth.',
+    complianceNote: 'Regulatory spot audits can happen at any time. NorvaOS keeps you audit-ready 24/7  -  but YOU must ensure the data entered is accurate. The system verifies integrity, not truth.',
   },
   {
-    id: 'lso-trust-rules',
-    title: 'LSO Trust Accounting  -  Rules You Must Follow',
-    description: 'Trust accounting violations are the #1 cause of LSO discipline proceedings. NorvaOS enforces these rules at the database level so mistakes become structurally impossible.',
+    id: 'trust-rules',
+    title: 'Trust Accounting  -  Rules You Must Follow',
+    description: 'Trust accounting violations are the #1 cause of regulatory discipline proceedings. NorvaOS enforces these rules at the database level so mistakes become structurally impossible.',
     icon: <Landmark className="h-6 w-6" />,
     accentDark: 'text-emerald-400',
     accentLight: 'text-emerald-600',
     details: [
-      'By-Law 9, s.18: Trust funds must never be overdrawn  -  NorvaOS blocks this at DB level',
-      'By-Law 9, s.27: Monthly three-way reconciliation  -  NorvaOS runs this automatically nightly',
-      'By-Law 9, s.18(6): Client trust ledger must show each receipt and disbursement  -  our ledger is append-only',
-      'By-Law 9, s.26: Maintain a book of duplicate receipts  -  every transaction auto-generates an audit entry',
+      'Trust accounting by-laws (e.g. By-Law 9, s.18): Trust funds must never be overdrawn  -  NorvaOS blocks this at DB level',
+      'Trust accounting by-laws (e.g. By-Law 9, s.27): Monthly three-way reconciliation  -  NorvaOS runs this automatically nightly',
+      'Trust accounting by-laws (e.g. By-Law 9, s.18(6)): Client trust ledger must show each receipt and disbursement  -  our ledger is append-only',
+      'Trust accounting by-laws (e.g. By-Law 9, s.26): Maintain a book of duplicate receipts  -  every transaction auto-generates an audit entry',
       'Rule 3.7-2: Zero-balance before file closure  -  NorvaOS blocks closing with residual funds',
-      'Tip: Run "Simulate LSO Examination" monthly from the Compliance Dashboard to verify everything',
+      'Tip: Run "Simulate Regulatory Examination" monthly from the Compliance Dashboard to verify everything',
     ],
-    complianceNote: 'If the LSO auditor asks to see your trust ledger, use the "Export Audit" button on any matter. The PDF is password-protected, hash-chained, and includes the Global Firm Hash on every page.',
+    complianceNote: 'If a regulatory auditor asks to see your trust ledger, use the "Export Audit" button on any matter. The PDF is password-protected, hash-chained, and includes the Global Firm Hash on every page.',
   },
   {
-    id: 'lso-record-keeping',
+    id: 'record-keeping',
     title: 'Staying Compliant at All Times',
     description: 'Compliance is not a one-time event  -  it is a continuous practice. Here is how NorvaOS helps you maintain compliance every single day.',
     icon: <BookOpen className="h-6 w-6" />,
@@ -134,7 +135,7 @@ const TOUR_STEPS: TourStep[] = [
     details: [
       'Daily: NorvaOS runs Continuity Sequence at 02:00 AM  -  checks address gaps, document expiry, stale matters',
       'Weekly: Review the Compliance Dashboard for any warnings or integrity issues',
-      'Monthly: Run the "Simulate LSO Examination" to generate a full Battle-Ready scorecard',
+      'Monthly: Run the "Simulate Regulatory Examination" to generate a full Battle-Ready scorecard',
       'Per Matter: Always complete the Pre-Flight Checklist before activating (Identity, History, Trust)',
       'Per Closure: Verify zero trust balance before closing any file (automated by NorvaOS)',
       'Always: Never bypass the conflict check  -  NorvaOS logs every override to SENTINEL',
@@ -185,7 +186,7 @@ const TOUR_STEPS: TourStep[] = [
       'All three green → "Generate Genesis Block" activates inside the modal',
       'Genesis seal → Sovereign Confetti → matter status changes to ACTIVE',
     ],
-    complianceNote: 'The Genesis Block contains the SHA-256 hash of your conflict check, KYC verification, and retainer status at the moment of activation. This is immutable evidence for LSO audits.',
+    complianceNote: 'The Genesis Block contains the SHA-256 hash of your conflict check, KYC verification, and retainer status at the moment of activation. This is immutable evidence for regulatory audits.',
   },
   {
     id: 'trust-ledger',
@@ -198,14 +199,14 @@ const TOUR_STEPS: TourStep[] = [
       'INSERT-only enforcement via database triggers + Row-Level Security',
       'Running balance computed atomically  -  overdraft blocked at the DB level',
       'Every transaction auto-generates a trust_ledger_audit entry with SHA-256 hash',
-      'Zero-balance verification enforced before matter closure (LSO By-Law 9)',
+      'Zero-balance verification enforced before matter closure (trust accounting by-laws, e.g. By-Law 9)',
       'Three-way reconciliation runs nightly and flags discrepancies immediately',
     ],
   },
   {
     id: 'compliance-dashboard',
     title: 'Compliance Dashboard & Audit Simulation',
-    description: 'The admin compliance view shows real-time firm health. Run a full "Simulate LSO Examination" to verify every hash chain across every active matter.',
+    description: 'The admin compliance view shows real-time firm health. Run a full "Simulate Regulatory Examination" to verify every hash chain across every active matter.',
     icon: <BarChart3 className="h-6 w-6" />,
     accentDark: 'text-emerald-400',
     accentLight: 'text-emerald-600',
@@ -215,9 +216,9 @@ const TOUR_STEPS: TourStep[] = [
       'Encryption Status: Verifies PII ciphertext format (AES-256-GCM)',
       'Audit Parity: trust_transactions count must equal trust_ledger_audit count',
       'SENTINEL Summary: 24-hour security event breakdown by severity',
-      'Simulate LSO Examination: Full integrity check on every matter → per-matter PDF export',
+      'Simulate Regulatory Examination: Full integrity check on every matter → per-matter PDF export',
     ],
-    complianceNote: 'Run the simulation monthly. If it returns "BATTLE-READY," your firm can withstand an unannounced LSO spot audit. If it returns "ISSUES FOUND," address every red item immediately.',
+    complianceNote: 'Run the simulation monthly. If it returns "BATTLE-READY," your firm can withstand an unannounced regulatory spot audit. If it returns "ISSUES FOUND," address every red item immediately.',
   },
   {
     id: 'academy-ignite',
@@ -234,7 +235,7 @@ const TOUR_STEPS: TourStep[] = [
       'All three complete → norva_certified: true → Gold Sparkle border on your sidebar avatar',
       '/ignite: The Sovereign Ignition ceremony  -  hold-to-ignite for 3 seconds with 3D confetti',
     ],
-    complianceNote: 'LSO Rule 3.1 requires lawyers to maintain competence. Completing the Norva Sovereign Academy demonstrates your understanding of the compliance tools protecting your practice.',
+    complianceNote: 'Professional competence rules (e.g. Rule 3.1) require lawyers and consultants to maintain competence. Completing the Norva Sovereign Academy demonstrates your understanding of the compliance tools protecting your practice.',
   },
 ]
 
@@ -552,7 +553,7 @@ function TourOverlay({
             </ul>
           </div>
 
-          {/* LSO Compliance Note  -  highlighted callout */}
+          {/* Regulatory Compliance Note  -  highlighted callout */}
           {tourStep.complianceNote && (
             <div className={cn(
               'rounded-2xl border-2 p-4 mb-4',
@@ -570,7 +571,7 @@ function TourOverlay({
                     'text-[10px] font-bold uppercase tracking-wider mb-1',
                     isDark ? 'text-amber-400/70' : 'text-amber-700',
                   )}>
-                    LSO Compliance Note
+                    Regulatory Compliance Note
                   </p>
                   <p className={cn(
                     'text-xs leading-relaxed',

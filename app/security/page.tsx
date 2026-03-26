@@ -104,7 +104,7 @@ export default function SecurityPage() {
               title: 'Audit Logging',
               subtitle: 'Sentinel Engine',
               description:
-                'The NorvaOS Sentinel Engine maintains a comprehensive, immutable audit trail of all significant actions: logins, data access, document uploads, permission changes, and administrative operations. Audit logs are retained for the full life of the account and are available for Law Society audit review.',
+                'The NorvaOS Sentinel Engine maintains a comprehensive, immutable audit trail of all significant actions: logins, data access, document uploads, permission changes, and administrative operations. Audit logs are retained for the full life of the account and are available for regulatory audit review.',
               color: 'bg-cyan-600',
             },
           ].map((card) => (
@@ -194,7 +194,7 @@ export default function SecurityPage() {
             NorvaOS supports compliance with Canadian Law Society requirements, including:
           </p>
           <ul>
-            <li>Trust accounting with three-way reconciliation (Law Society of Ontario By-Law 9)</li>
+            <li>Trust accounting with three-way reconciliation (applicable Law Society by-laws, e.g. By-Law 9)</li>
             <li>Client identification and verification record-keeping</li>
             <li>Seven-year document and financial record retention</li>
             <li>Real-time compliance scoring at the firm, matter, and client levels</li>
