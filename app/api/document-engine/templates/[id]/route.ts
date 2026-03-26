@@ -1,7 +1,7 @@
 /**
- * GET    /api/document-engine/templates/[id] — Get template with version details
- * PATCH  /api/document-engine/templates/[id] — Update template metadata
- * DELETE /api/document-engine/templates/[id] — Soft-delete template (empty drafts only)
+ * GET    /api/document-engine/templates/[id]  -  Get template with version details
+ * PATCH  /api/document-engine/templates/[id]  -  Update template metadata
+ * DELETE /api/document-engine/templates/[id]  -  Soft-delete template (empty drafts only)
  */
 
 import { NextRequest, NextResponse } from 'next/server'

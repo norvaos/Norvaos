@@ -39,7 +39,7 @@ interface IntakeField {
 // ─── Helpers ────────────────────────────────────────────────────────
 
 function formatFieldValue(value: unknown): string {
-  if (value === null || value === undefined || value === '') return '—'
+  if (value === null || value === undefined || value === '') return ' - '
 
   if (typeof value === 'boolean') return value ? 'Yes' : 'No'
 
@@ -143,7 +143,7 @@ export function ScreeningAnswers() {
       .filter((ci) => ci.kioskAnswers.length > 0)
   }, [checkIns])
 
-  // For backward compat — use the latest check-in that has answers
+  // For backward compat  -  use the latest check-in that has answers
   const latestCheckIn = checkInsWithAnswers[0] ?? null
   const kioskAnswers = latestCheckIn?.kioskAnswers ?? []
 
@@ -329,7 +329,7 @@ export function ScreeningAnswers() {
                       </p>
                       <p className={cn(
                         'text-xs text-slate-800 break-words font-medium',
-                        displayValue === '—' && 'text-slate-400 font-normal'
+                        displayValue === ' - ' && 'text-slate-400 font-normal'
                       )}>
                         {displayValue}
                       </p>
@@ -403,7 +403,7 @@ export function ScreeningAnswers() {
                       </p>
                       <p className={cn(
                         'text-xs text-slate-800 break-words font-medium',
-                        displayValue === '—' && 'text-slate-400 font-normal'
+                        displayValue === ' - ' && 'text-slate-400 font-normal'
                       )}>
                         {displayValue}
                       </p>

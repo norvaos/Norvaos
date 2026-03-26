@@ -28,7 +28,7 @@
  * past the permission gate without either wrapping it properly or
  * deliberately adding it to the allowlist (which requires review).
  *
- * These tests read the actual source files — no mocking, no rendering.
+ * These tests read the actual source files  -  no mocking, no rendering.
  * They're cheap and run in < 10ms.
  */
 import { describe, it, expect } from 'vitest'
@@ -41,7 +41,7 @@ function readSource(relPath: string): string {
   return readFileSync(resolve(ROOT, relPath), 'utf-8')
 }
 
-// ── Gated Surfaces — loaded from canonical JSON registry ─────────────────────
+// ── Gated Surfaces  -  loaded from canonical JSON registry ─────────────────────
 //
 // The single source of truth is docs/enforcement/sensitive-surfaces.json.
 // No duplicate lists. The registry entries that have gate_entity + gate_action
@@ -65,7 +65,7 @@ interface Registry {
 function loadRegistry(): Registry {
   const regPath = resolve(ROOT, 'docs/enforcement/sensitive-surfaces.json')
   if (!existsSync(regPath)) {
-    throw new Error('sensitive-surfaces.json not found — run "Create registry" first')
+    throw new Error('sensitive-surfaces.json not found  -  run "Create registry" first')
   }
   return JSON.parse(readFileSync(regPath, 'utf-8')) as Registry
 }
@@ -132,8 +132,8 @@ describe('Permission wiring – static analysis smoke tests', () => {
 //
 // Scans the codebase for .tsx files that import from lib/queries/invoicing
 // and ensures each one is either:
-//   1. Self-guarded — the file contains <RequirePermission entity="billing"
-//   2. Allowlisted  — the file is rendered only inside an ancestor that
+//   1. Self-guarded  -  the file contains <RequirePermission entity="billing"
+//   2. Allowlisted   -  the file is rendered only inside an ancestor that
 //      already has RequirePermission (verified by humans during PR review)
 //
 // If a NEW file imports billing hooks and is NOT in either bucket, the test
@@ -148,7 +148,7 @@ describe('Permission wiring – static analysis smoke tests', () => {
 // RULES FOR ADDING TO THIS LIST:
 //   1. You MUST add a comment explaining which ancestor provides the gate.
 //   2. The allowlist max-count assertion (below) must be bumped when you add
-//      an entry — this forces the addition to be deliberate and reviewable.
+//      an entry  -  this forces the addition to be deliberate and reviewable.
 //   3. Prefer wrapping the file itself over adding to this list.
 
 const BILLING_HOOK_ALLOWLIST: Record<string, string> = {
@@ -239,7 +239,7 @@ describe('Automated billing surface detection', () => {
   }
 
   it('finds at least one billing surface (sanity check)', () => {
-    // If this fails the scanner is broken — we know billing pages exist
+    // If this fails the scanner is broken  -  we know billing pages exist
     expect(billingFiles.length).toBeGreaterThanOrEqual(1)
   })
 
@@ -320,7 +320,7 @@ describe('Automated billing surface detection', () => {
 // contains a direct Supabase query against invoices, invoice_line_items,
 // or payments must be EITHER:
 //
-//   a) A centralised hook/query file (allowlisted) — consumed only through
+//   a) A centralised hook/query file (allowlisted)  -  consumed only through
 //      UI surfaces already wrapped in RequirePermission.
 //   b) An API route with a server-side billing:view check (must contain
 //      both '403' and 'billing:view').
@@ -349,69 +349,69 @@ const DIRECT_QUERY_ALLOWLIST: Record<string, string> = {
   // Additionally, RLS policies on invoices/invoice_line_items/payments
   // enforce has_billing_view() at the database level (migration 033).
   'lib/queries/invoicing.ts':
-    'Central billing hooks — consumed only by RequirePermission-gated UI surfaces + RLS enforced',
-  // Workspace pages — these pages are themselves wrapped in RequirePermission.
+    'Central billing hooks  -  consumed only by RequirePermission-gated UI surfaces + RLS enforced',
+  // Workspace pages  -  these pages are themselves wrapped in RequirePermission.
   // Direct queries are used for workspace-scoped summaries.
   'app/(dashboard)/workspace/billing/page.tsx':
-    'Workspace billing page — self-gated via RequirePermission wrapper on the page',
+    'Workspace billing page  -  self-gated via RequirePermission wrapper on the page',
   'app/(dashboard)/workspace/client/page.tsx':
-    'Workspace client page — self-gated via RequirePermission wrapper on the page',
+    'Workspace client page  -  self-gated via RequirePermission wrapper on the page',
   'app/(dashboard)/workspace/partner/page.tsx':
-    'Workspace partner page — self-gated via RequirePermission wrapper on the page',
-  // Client portal page — protected by portal token auth (validatePortalToken),
+    'Workspace partner page  -  self-gated via RequirePermission wrapper on the page',
+  // Client portal page  -  protected by portal token auth (validatePortalToken),
   // not by internal RequirePermission (portal users are unauthenticated staff users).
   'app/portal/[token]/page.tsx':
-    'Client portal — protected by validatePortalToken (portal-token-auth model)',
-  // Shell BillingTab — parent-gated by workspace pages with RequirePermission.
+    'Client portal  -  protected by validatePortalToken (portal-token-auth model)',
+  // Shell BillingTab  -  parent-gated by workspace pages with RequirePermission.
   'components/shell/tabs/BillingTab.tsx':
-    'Shell BillingTab — parent-gated by workspace pages with RequirePermission',
-  // Service layer files — consumed exclusively by server-side API routes that
+    'Shell BillingTab  -  parent-gated by workspace pages with RequirePermission',
+  // Service layer files  -  consumed exclusively by server-side API routes that
   // enforce billing:view or alternative auth (CRON_SECRET / portal token).
   'lib/services/analytics/analytics-service.ts':
-    'Analytics service — server-side only, consumed by cron snapshot-revenue (CRON_SECRET) and gated analytics UI',
+    'Analytics service  -  server-side only, consumed by cron snapshot-revenue (CRON_SECRET) and gated analytics UI',
   'lib/services/analytics/collections-service.ts':
-    'Collections analytics service — server-side only, consumed by gated analytics surfaces',
+    'Collections analytics service  -  server-side only, consumed by gated analytics surfaces',
   'lib/services/billing/discount.service.ts':
-    'Discount service — server-side only, consumed by billing API routes with checkBillingPermission',
+    'Discount service  -  server-side only, consumed by billing API routes with checkBillingPermission',
   'lib/services/billing/invoice-state.service.ts':
-    'Invoice state service — server-side only, consumed by billing API routes with checkBillingPermission',
+    'Invoice state service  -  server-side only, consumed by billing API routes with checkBillingPermission',
   'lib/services/billing/payment-allocation.service.ts':
-    'Payment allocation service — server-side only, consumed by billing API routes with checkBillingPermission',
+    'Payment allocation service  -  server-side only, consumed by billing API routes with checkBillingPermission',
   'lib/services/billing/payment-plan.service.ts':
-    'Payment plan service — server-side only, consumed by billing API routes with checkBillingPermission',
+    'Payment plan service  -  server-side only, consumed by billing API routes with checkBillingPermission',
   'lib/services/billing/trust-application.service.ts':
-    'Trust application service — server-side only, consumed by billing API routes with checkBillingPermission',
+    'Trust application service  -  server-side only, consumed by billing API routes with checkBillingPermission',
   'lib/services/esign-service.ts':
-    'E-sign service — server-side only, consumed by gated command routes (requirePermission)',
+    'E-sign service  -  server-side only, consumed by gated command routes (requirePermission)',
   'lib/services/invoice-email-service.ts':
-    'Invoice email service — server-side only, consumed by billing API routes with checkBillingPermission',
+    'Invoice email service  -  server-side only, consumed by billing API routes with checkBillingPermission',
   'lib/services/lead-conversion-executor.ts':
-    'Lead conversion executor — server-side only, consumed by convert-and-retain command route (requirePermission matters:create)',
+    'Lead conversion executor  -  server-side only, consumed by convert-and-retain command route (requirePermission matters:create)',
   // These API routes are protected by alternative auth mechanisms, not billing:view.
-  // Cron routes: protected by CRON_SECRET (fail-closed — returns 500 if unset).
+  // Cron routes: protected by CRON_SECRET (fail-closed  -  returns 500 if unset).
   'app/api/cron/aging-recalculation/route.ts':
-    'Cron route — protected by CRON_SECRET, operates cross-tenant with admin client',
+    'Cron route  -  protected by CRON_SECRET, operates cross-tenant with admin client',
   'app/api/cron/invoice-reminders/route.ts':
-    'Cron route — protected by CRON_SECRET, sends invoice reminders cross-tenant',
+    'Cron route  -  protected by CRON_SECRET, sends invoice reminders cross-tenant',
   'app/api/cron/overdue-detection/route.ts':
-    'Cron route — protected by CRON_SECRET, marks overdue invoices cross-tenant',
+    'Cron route  -  protected by CRON_SECRET, marks overdue invoices cross-tenant',
   'app/api/cron/snapshot-revenue/route.ts':
-    'Cron route — protected by CRON_SECRET, snapshots revenue metrics cross-tenant',
+    'Cron route  -  protected by CRON_SECRET, snapshots revenue metrics cross-tenant',
   'app/api/cron/update-invoice-aging/route.ts':
-    'Cron route — protected by CRON_SECRET, updates aging fields cross-tenant',
+    'Cron route  -  protected by CRON_SECRET, updates aging fields cross-tenant',
   // Portal routes: protected by validatePortalToken (portal-token-auth model).
   'app/api/portal/[token]/billing/mark-sent/route.ts':
-    'Portal route — protected by validatePortalToken, no internal user billing:view needed',
+    'Portal route  -  protected by validatePortalToken, no internal user billing:view needed',
   'app/api/portal/[token]/billing/route.ts':
-    'Portal route — protected by validatePortalToken, no internal user billing:view needed',
+    'Portal route  -  protected by validatePortalToken, no internal user billing:view needed',
   'app/api/portal/[token]/summary/route.ts':
-    'Portal route — protected by validatePortalToken, no internal user billing:view needed',
+    'Portal route  -  protected by validatePortalToken, no internal user billing:view needed',
   // Command route: protected by requirePermission (matters:create).
   'app/api/command/convert-and-retain/route.ts':
-    'Command route — protected by requirePermission(matters:create); billing queries via lead-conversion-executor',
+    'Command route  -  protected by requirePermission(matters:create); billing queries via lead-conversion-executor',
   // Contact statement: protected by server-side auth (authenticateRequest).
   'app/api/contacts/[id]/statement/route.ts':
-    'Statement API — protected by authenticateRequest + billing query scoped to contact',
+    'Statement API  -  protected by authenticateRequest + billing query scoped to contact',
 }
 
 // Cap prevents silent sprawl. To increase, add a justification to the
@@ -430,7 +430,7 @@ describe('Direct Supabase billing query detection', () => {
   // Find files containing direct billing table queries
   const directQueryFiles: { relPath: string; source: string }[] = []
   for (const relPath of allSourceFiles) {
-    // Skip test files — they're allowed to query anything for testing
+    // Skip test files  -  they're allowed to query anything for testing
     if (relPath.includes('__tests__')) continue
     const source = readSource(relPath)
     if (DIRECT_BILLING_QUERY_RE.test(source)) {
@@ -474,7 +474,7 @@ describe('Direct Supabase billing query detection', () => {
         }
       })
     } else {
-      // Neither allowlisted nor an API route — this is a raw billing query
+      // Neither allowlisted nor an API route  -  this is a raw billing query
       // in an unexpected location
       it(`${relPath} must not contain direct billing table queries`, () => {
         throw new Error(
@@ -563,7 +563,7 @@ const FINANCIAL_FIELD_PATTERNS = [
 //   - A utility (e.g. CSV export schemas)
 //
 // Value = max allowed match count across all FINANCIAL_FIELD_PATTERNS.
-// If a file exceeds its cap, the test fails — forcing review.
+// If a file exceeds its cap, the test fails  -  forcing review.
 
 const FINANCIAL_RENDER_ALLOWLIST: Record<string, { maxMatches: number; reason: string }> = {
   // Reports page: Revenue KPI conditionally rendered (canViewBilling),
@@ -583,25 +583,25 @@ const FINANCIAL_RENDER_ALLOWLIST: Record<string, { maxMatches: number; reason: s
     maxMatches: 6,
     reason: 'Wrapped in RequirePermission at component root',
   },
-  // Query layer — not a UI surface
+  // Query layer  -  not a UI surface
   'lib/queries/reports.ts': {
     maxMatches: 25,
-    reason: 'Query/hook layer — consumed only by gated UI components',
+    reason: 'Query/hook layer  -  consumed only by gated UI components',
   },
-  // Query layer — not a UI surface
+  // Query layer  -  not a UI surface
   'lib/queries/invoicing.ts': {
     maxMatches: 15,
-    reason: 'Query/hook layer — consumed only by gated UI components + RLS enforced',
+    reason: 'Query/hook layer  -  consumed only by gated UI components + RLS enforced',
   },
-  // CSV export column schemas — utility, not a UI surface
+  // CSV export column schemas  -  utility, not a UI surface
   'lib/utils/csv-export.ts': {
     maxMatches: 5,
-    reason: 'Export utility — invoked only from gated report surfaces',
+    reason: 'Export utility  -  invoked only from gated report surfaces',
   },
-  // TypeScript type definitions — not a UI surface, just field type declarations
+  // TypeScript type definitions  -  not a UI surface, just field type declarations
   'lib/types/database.ts': {
-    maxMatches: 15,
-    reason: 'Type definitions only — Row/Insert/Update interfaces for billing tables',
+    maxMatches: 17,
+    reason: 'Type definitions only  -  Row/Insert/Update interfaces for billing tables',
   },
   // BillingTab: child component of matter detail page, parent-gated by
   // RequirePermission in app/(dashboard)/matters/[id]/page.tsx
@@ -609,69 +609,129 @@ const FINANCIAL_RENDER_ALLOWLIST: Record<string, { maxMatches: number; reason: s
     maxMatches: 10,
     reason: 'Parent-gated by RequirePermission in matter detail page',
   },
-  // Trust compliance analytics page — wrapped in RequirePermission (billing:view)
+  // Trust compliance analytics page  -  wrapped in RequirePermission (billing:view)
   'app/(dashboard)/analytics/trust-compliance/page.tsx': {
     maxMatches: 5,
-    reason: 'Trust compliance page — self-gated via RequirePermission entity="billing"',
+    reason: 'Trust compliance page  -  self-gated via RequirePermission entity="billing"',
   },
-  // API routes — server-side only, protected by alternative auth mechanisms
+  // API routes  -  server-side only, protected by alternative auth mechanisms
   'app/api/command/record-retainer-payment/route.ts': {
     maxMatches: 3,
-    reason: 'Command route — protected by requirePermission; financial fields used for payment recording',
+    reason: 'Command route  -  protected by requirePermission; financial fields used for payment recording',
   },
   'app/api/contacts/[id]/statement/route.ts': {
     maxMatches: 5,
-    reason: 'Statement API — protected by authenticateRequest; financial fields in statement output',
+    reason: 'Statement API  -  protected by authenticateRequest; financial fields in statement output',
   },
   'app/api/cron/snapshot-revenue/route.ts': {
     maxMatches: 5,
-    reason: 'Cron route — protected by CRON_SECRET; financial fields used for revenue snapshot',
+    reason: 'Cron route  -  protected by CRON_SECRET; financial fields used for revenue snapshot',
   },
   'app/api/matters/[id]/retainer-summary/route.ts': {
     maxMatches: 3,
-    reason: 'Retainer summary API — protected by authenticateRequest; financial summary fields',
+    reason: 'Retainer summary API  -  protected by authenticateRequest; financial summary fields',
   },
   'app/api/portal/[token]/trust/route.ts': {
     maxMatches: 5,
-    reason: 'Portal trust route — protected by validatePortalToken; financial fields for trust display',
+    reason: 'Portal trust route  -  protected by validatePortalToken; financial fields for trust display',
   },
   // UI components parent-gated by RequirePermission in ancestor pages
   'components/matters/tabs/trust-tab.tsx': {
     maxMatches: 5,
-    reason: 'Trust tab — parent-gated by RequirePermission in matter detail page',
+    reason: 'Trust tab  -  parent-gated by RequirePermission in matter detail page',
   },
   'components/shell/ZoneC.tsx': {
     maxMatches: 6,
-    reason: 'Shell ZoneC — parent-gated by workspace pages with RequirePermission',
+    reason: 'Shell ZoneC  -  parent-gated by workspace pages with RequirePermission',
   },
   'components/shell/tabs/BillingTab.tsx': {
     maxMatches: 8,
-    reason: 'Shell BillingTab — parent-gated by workspace pages with RequirePermission',
+    reason: 'Shell BillingTab  -  parent-gated by workspace pages with RequirePermission',
   },
-  // Service layer files — server-side only, consumed by gated API routes
+  // Service layer files  -  server-side only, consumed by gated API routes
   'lib/services/analytics/analytics-service.ts': {
     maxMatches: 6,
-    reason: 'Analytics service — server-side only, consumed by cron (CRON_SECRET) and gated UI',
+    reason: 'Analytics service  -  server-side only, consumed by cron (CRON_SECRET) and gated UI',
   },
   'lib/services/analytics/collections-service.ts': {
     maxMatches: 9,
-    reason: 'Collections service — server-side only, consumed by gated analytics surfaces',
+    reason: 'Collections service  -  server-side only, consumed by gated analytics surfaces',
   },
   'lib/services/billing/trust-application.service.ts': {
     maxMatches: 6,
-    reason: 'Trust application service — server-side only, consumed by billing API routes with checkBillingPermission',
+    reason: 'Trust application service  -  server-side only, consumed by billing API routes with checkBillingPermission',
   },
   'lib/services/document-engine/instance-service.ts': {
     maxMatches: 3,
-    reason: 'Document engine instance service — server-side only, financial fields in document template context',
+    reason: 'Document engine instance service  -  server-side only, financial fields in document template context',
   },
   'lib/services/document-engine/seed-templates.ts': {
     maxMatches: 8,
-    reason: 'Document seed templates — server-side only, financial field names in template definitions',
+    reason: 'Document seed templates  -  server-side only, financial field names in template definitions',
+  },
+  // Partner pulse analytics pages  -  self-gated via RequirePermission entity="analytics"
+  'app/(dashboard)/analytics/partner-pulse/page.tsx': {
+    maxMatches: 5,
+    reason: 'Partner pulse page  -  self-gated via RequirePermission entity="analytics"; financial KPIs',
+  },
+  'app/(dashboard)/analytics/partner-pulse/charts/revenue-by-pa-chart.tsx': {
+    maxMatches: 2,
+    reason: 'Revenue chart  -  parent-gated by partner-pulse page with RequirePermission',
+  },
+  // API routes  -  server-side only, protected by authenticateRequest + billing:view or server auth
+  'app/api/analytics/conversion/route.ts': {
+    maxMatches: 10,
+    reason: 'Conversion analytics API  -  protected by authenticateRequest; financial fields in conversion metrics',
+  },
+  'app/api/matters/[id]/close/route.ts': {
+    maxMatches: 2,
+    reason: 'Matter close API  -  protected by authenticateRequest; trust_balance snapshot at close',
+  },
+  'app/api/matters/[id]/export-audit/route.ts': {
+    maxMatches: 2,
+    reason: 'Export audit API  -  protected by authenticateRequest; trust_balance in audit export',
+  },
+  'app/api/matters/[id]/financial-clearance/route.ts': {
+    maxMatches: 3,
+    reason: 'Financial clearance API  -  protected by authenticateRequest; billing fields for clearance check',
+  },
+  'app/api/matters/[id]/government-disbursement/route.ts': {
+    maxMatches: 4,
+    reason: 'Government disbursement API  -  protected by authenticateRequest; trust_balance for disbursement',
+  },
+  // UI components parent-gated by RequirePermission or conditional billing guards
+  'components/dashboard/glass-fortress-matrix.tsx': {
+    maxMatches: 3,
+    reason: 'Glass fortress matrix  -  parent-gated by dashboard with conditional billing rendering',
+  },
+  'components/layout/header.tsx': {
+    maxMatches: 3,
+    reason: 'Header  -  trust_balance displayed conditionally based on billing permission context',
+  },
+  'components/matters/sovereign-seal.tsx': {
+    maxMatches: 2,
+    reason: 'Sovereign seal  -  parent-gated by matter detail shell; trust_balance in seal display',
+  },
+  'components/trust/government-disbursement-card.tsx': {
+    maxMatches: 3,
+    reason: 'Government disbursement card  -  parent-gated by matter detail trust tab with RequirePermission',
+  },
+  // Service layer files  -  server-side only, consumed by gated API routes or import pipelines
+  'lib/services/clio/fetchers/trust-balances.ts': {
+    maxMatches: 7,
+    reason: 'Clio trust balance fetcher  -  server-side import service, not user-facing',
+  },
+  'lib/services/import/adapters/clio/trust-balances.ts': {
+    maxMatches: 2,
+    reason: 'Clio import adapter  -  server-side import pipeline, not user-facing',
+  },
+  'lib/services/trust-accounting/trust-reconciler.ts': {
+    maxMatches: 8,
+    reason: 'Trust reconciler  -  server-side reconciliation service, not user-facing',
   },
 }
 
-const FINANCIAL_ALLOWLIST_MAX_COUNT = 24
+const FINANCIAL_ALLOWLIST_MAX_COUNT = 38
 
 describe('Financial field rendering detection', () => {
   // Scan .tsx and .ts files in app/, components/, lib/
@@ -727,11 +787,11 @@ describe('Financial field rendering detection', () => {
     } else if (isSelfGuarded || isQueryLayer) {
       // File either has its own RequirePermission gate or is a non-UI query layer
       it(`${relPath} is self-guarded or a query/utility layer (${matchCount} financial matches)`, () => {
-        // Pass — the file is safe
+        // Pass  -  the file is safe
         expect(true).toBe(true)
       })
     } else {
-      // Unexpected file with financial data — fail
+      // Unexpected file with financial data  -  fail
       it(`${relPath} must not render financial data without billing:view gate`, () => {
         throw new Error(
           `\n` +

@@ -736,12 +736,12 @@ export default function MattersPage() {
 }
 
 // -------------------------------------------------------------------
-// Virtualized Matter Table — only renders visible rows in the DOM
+// Virtualized Matter Table  -  only renders visible rows in the DOM
 // -------------------------------------------------------------------
 
 type Matter = Database['public']['Tables']['matters']['Row']
 
-const ROW_HEIGHT = 48 // px — matches TableRow height with py-2 + content
+const ROW_HEIGHT = 48 // px  -  matches TableRow height with py-2 + content
 const TABLE_MAX_HEIGHT = 'calc(100vh - 340px)' // leaves room for header, filters, pagination
 
 function VirtualizedMatterTable({
@@ -790,7 +790,7 @@ function VirtualizedMatterTable({
 
   return (
     <div className="rounded-lg border">
-      {/* Sticky header — always visible */}
+      {/* Sticky header  -  always visible */}
       <Table>
         <TableHeader>
           <TableRow>

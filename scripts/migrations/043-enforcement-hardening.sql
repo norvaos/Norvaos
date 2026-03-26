@@ -52,7 +52,7 @@ DROP INDEX IF EXISTS idx_workflow_actions_idempotency;
 CREATE UNIQUE INDEX IF NOT EXISTS idx_workflow_actions_idempotency_unique
   ON workflow_actions(idempotency_key) WHERE idempotency_key IS NOT NULL;
 
--- ── 6E: Tighten RLS — add WITH CHECK to core tables ────────────────────────
+-- ── 6E: Tighten RLS  -  add WITH CHECK to core tables ────────────────────────
 
 -- Replace USING-only policies with full USING + WITH CHECK policies
 -- Also upgrades from inline subquery to cached get_current_tenant_id()
@@ -103,12 +103,12 @@ BEGIN
   LIMIT 1;
 
   IF v_existing_id IS NOT NULL THEN
-    -- Duplicate found — release lock and report
+    -- Duplicate found  -  release lock and report
     PERFORM pg_advisory_unlock(v_lock_id);
     RETURN jsonb_build_object('locked', false, 'existing_id', v_existing_id);
   END IF;
 
-  -- Lock held — caller proceeds with execute() then triple-write
+  -- Lock held  -  caller proceeds with execute() then triple-write
   RETURN jsonb_build_object('locked', true, 'existing_id', NULL);
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;

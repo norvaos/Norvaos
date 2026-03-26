@@ -1,5 +1,5 @@
 /**
- * Tagalog (tl) — Tagalog/Filipino dictionary.
+ * Tagalog (tl)  -  Tagalog/Filipino dictionary.
  */
 
 import type { DictionaryKey } from './en'
@@ -70,7 +70,7 @@ export const tl: Partial<Record<DictionaryKey, string>> = {
   'dashboard.deadline_today': 'Today',
   'dashboard.deadline_1_day': '1 day',
   'dashboard.deadline_days': '{days} days',
-  'dashboard.deadlines_14_days': 'Deadlines — Next 14 Days',
+  'dashboard.deadlines_14_days': 'Deadlines  -  Next 14 Days',
   'dashboard.no_deadlines_14': 'No deadlines in the next 14 days',
   'dashboard.no_deadlines_14_desc': 'Typed deadlines on matters will appear here.',
   'dashboard.unknown_matter': 'Unknown matter',
@@ -100,12 +100,12 @@ export const tl: Partial<Record<DictionaryKey, string>> = {
   'common.save': 'I-save',
   'common.view': 'Tingnan',
 
-  // ── Direktiba 41.0 — Mga Kontak at Vault ─────────────────────────────────
+  // ── Direktiba 41.0  -  Mga Kontak at Vault ─────────────────────────────────
   'contact.badge.retained_client': 'Nakakontratang Kliyente',
   'contact.badge.prospective_lead': 'Posibleng Lead',
   'contact.badge.contact': 'Kontak',
   'contact.command_centre': 'Sentro ng Kumand',
-  'contact.command_centre_red_alert': 'Ang marka ng kahandaan ay kritikal na mababa — kailangan ng agarang pansin',
+  'contact.command_centre_red_alert': 'Ang marka ng kahandaan ay kritikal na mababa  -  kailangan ng agarang pansin',
   'contact.intake_funnel': 'Funnel ng Pagtanggap',
   'contact.intake_progress': 'Progreso ng Pagtanggap',
   'contact.matter_readiness': 'Kahandaan ng Kaso',
@@ -118,13 +118,13 @@ export const tl: Partial<Record<DictionaryKey, string>> = {
   'vault.title': 'Norva Vault',
   'vault.empty': 'Walang Laman ang Norva Vault',
   'vault.empty_description': 'Walang mga dokumentong na-upload para sa kontakt na ito.',
-  'vault.sentinel_eye': 'Sentinel Eye — Tingnan at I-verify',
+  'vault.sentinel_eye': 'Sentinel Eye  -  Tingnan at I-verify',
   'vault.file_tampered': 'Babala: Binago ang File',
   'vault.sha256_verified': 'SHA-256 Na-verify',
   'vault.hash_pending': 'Nakabinbing Hash',
   'vault.integrity_alert': 'Alerto sa Integridad',
   'vault.untracked': 'Hindi Sinusubaybayan',
-  'vault.no_preview': 'Walang preview — nawawala ang URL ng file',
+  'vault.no_preview': 'Walang preview  -  nawawala ang URL ng file',
 
   // ── Mga Legal na Deklarasyon ───────────────────────────────────────────
   'legal.retainer_title': 'Kasunduan sa Serbisyong Legal',
@@ -210,12 +210,12 @@ export const tl: Partial<Record<DictionaryKey, string>> = {
   'status.days_remaining': '{days} araw na natitira',
   'status.verified': 'Na-verify na',
   'status.expiry_label': 'Expiry',
-  'status.sentinel_tamper_title': 'SENTINEL ALERT — May Nakitang Pagbabago',
+  'status.sentinel_tamper_title': 'SENTINEL ALERT  -  May Nakitang Pagbabago',
   'status.sentinel_tamper_body': 'Hindi tugma ang hash ng dokumento. Binago ang dokumentong ito sa labas ng NorvaOS.',
-  'status.vault_verified_title': 'Norva Vault — Na-verify ang Integridad',
+  'status.vault_verified_title': 'Norva Vault  -  Na-verify ang Integridad',
   'status.vault_verified_body': 'Hash-locked ang dokumentong ito sa Norva Vault. Matutuklasan ang anumang pagbabago.',
 
-  // ── Leads Command Centre (Directive 40.0 — Sovereign Layer) ─────────────
+  // ── Leads Command Centre (Directive 40.0  -  Sovereign Layer) ─────────────
   'leads.title': 'Mga Lead',
   'leads.add_lead': 'Magdagdag ng lead',
   'leads.import': 'I-import',
@@ -338,7 +338,7 @@ export const tl: Partial<Record<DictionaryKey, string>> = {
   'form.notes_placeholder': 'Add any additional notes about this contact...',
   'form.create_contact': 'Create Contact',
   'form.save_changes': 'Save Changes',
-  'form.review_required_ocr': 'Review Required — OCR could not extract',
+  'form.review_required_ocr': 'Review Required  -  OCR could not extract',
   'form.section_basic_info': 'Basic Information',
   'form.section_contact_details': 'Contact Details',
   'form.section_address': 'Address',

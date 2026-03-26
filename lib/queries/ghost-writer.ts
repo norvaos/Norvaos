@@ -1,5 +1,5 @@
 /**
- * Ghost-Writer query hooks — fetch and manage AI-generated email reply drafts.
+ * Ghost-Writer query hooks  -  fetch and manage AI-generated email reply drafts.
  */
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
@@ -37,7 +37,7 @@ export function useGhostDrafts(matterId: string, threadId?: string) {
       return json.drafts as GhostDraftSummary[]
     },
     enabled: !!matterId,
-    staleTime: 1000 * 30, // 30 seconds — drafts are time-sensitive
+    staleTime: 1000 * 30, // 30 seconds  -  drafts are time-sensitive
   })
 }
 

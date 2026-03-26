@@ -1,5 +1,5 @@
 /**
- * Tests for the Document Engine — Render Engine (DOCX Generation)
+ * Tests for the Document Engine  -  Render Engine (DOCX Generation)
  *
  * Covers:
  *   - renderDocument(): full pipeline (fields → conditions → DOCX)
@@ -109,7 +109,7 @@ function makeParams(overrides?: Partial<RenderDocumentParams>): RenderDocumentPa
 
 // ── Full Pipeline ────────────────────────────────────────────────────────────
 
-describe('renderDocument — full pipeline', () => {
+describe('renderDocument  -  full pipeline', () => {
   it('produces a valid DOCX buffer with correct structure', async () => {
     const result = await renderDocument(makeParams())
 
@@ -155,14 +155,14 @@ describe('renderDocument — full pipeline', () => {
     const result = await renderDocument(makeParams())
 
     // Built-in fields are added to the field map but not to resolvedFields array
-    // They appear in the rendered output — we verify the pipeline doesn't throw
+    // They appear in the rendered output  -  we verify the pipeline doesn't throw
     expect(result.buffer.length).toBeGreaterThan(0)
   })
 })
 
 // ── Element Types ────────────────────────────────────────────────────────────
 
-describe('renderDocument — element types', () => {
+describe('renderDocument  -  element types', () => {
   it('renders paragraph elements', async () => {
     const result = await renderDocument(makeParams())
     // The paragraph contains "This agreement is between John Smith and ABC Law Firm."
@@ -311,7 +311,7 @@ describe('renderDocument — element types', () => {
 
 // ── Conditions ───────────────────────────────────────────────────────────────
 
-describe('renderDocument — conditions', () => {
+describe('renderDocument  -  conditions', () => {
   it('excludes sections where condition evaluates false', async () => {
     const body = makeTemplateBody({
       sections: [
@@ -369,7 +369,7 @@ describe('renderDocument — conditions', () => {
         created_at: new Date().toISOString(),
       } as DocumentTemplateConditionRow,
     ]
-    // billing_type resolves to 'flat_fee' — condition passes
+    // billing_type resolves to 'flat_fee'  -  condition passes
     const mappings = [
       ...makeMappings(),
       {
@@ -390,7 +390,7 @@ describe('renderDocument — conditions', () => {
 
 // ── Page Formatting ──────────────────────────────────────────────────────────
 
-describe('renderDocument — page formatting', () => {
+describe('renderDocument  -  page formatting', () => {
   it('supports A4 page size', async () => {
     const body = makeTemplateBody()
     body.metadata.page_size = 'a4'
@@ -400,9 +400,9 @@ describe('renderDocument — page formatting', () => {
 
   it('renders without header and footer', async () => {
     const body = makeTemplateBody()
-    // @ts-expect-error — testing null header/footer
+    // @ts-expect-error  -  testing null header/footer
     body.header = undefined
-    // @ts-expect-error — testing null footer
+    // @ts-expect-error  -  testing null footer
     body.footer = undefined
     const result = await renderDocument(makeParams({ templateBody: body }))
     expect(result.buffer.length).toBeGreaterThan(0)
@@ -418,10 +418,10 @@ describe('renderDocument — page formatting', () => {
 
 // ── File Name Sanitization ───────────────────────────────────────────────────
 
-describe('renderDocument — file name', () => {
+describe('renderDocument  -  file name', () => {
   it('sanitizes special characters from document title', async () => {
-    const result = await renderDocument(makeParams({ documentTitle: 'Smith & Jones — Retainer (2024)' }))
-    // & — ( ) are stripped, spaces collapsed to single underscore
+    const result = await renderDocument(makeParams({ documentTitle: 'Smith & Jones  -  Retainer (2024)' }))
+    // &  -  ( ) are stripped, spaces collapsed to single underscore
     expect(result.fileName).toBe('Smith_Jones_Retainer_2024.docx')
   })
 

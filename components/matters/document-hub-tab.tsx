@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * DocumentHubTab — enhanced document management panel for the matter command centre.
+ * DocumentHubTab  -  enhanced document management panel for the matter command centre.
  *
  * Wraps DocumentSlotPanel with:
  * - Real-time search filter

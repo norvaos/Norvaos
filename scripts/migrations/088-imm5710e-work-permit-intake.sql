@@ -47,7 +47,7 @@ BEGIN
     LIMIT 1;
 
     IF v_form_id IS NULL THEN
-      RAISE NOTICE '[088] Tenant %: IMM5710E not found — skipping', v_tenant.tenant_id;
+      RAISE NOTICE '[088] Tenant %: IMM5710E not found  -  skipping', v_tenant.tenant_id;
       CONTINUE;
     END IF;
 
@@ -357,7 +357,7 @@ BEGIN
     LIMIT 1;
 
     IF v_mt_id IS NULL THEN
-      RAISE NOTICE '[088] Tenant %: No "Work Permit" matter type found — skipping stream form link', v_tenant.tenant_id;
+      RAISE NOTICE '[088] Tenant %: No "Work Permit" matter type found  -  skipping stream form link', v_tenant.tenant_id;
       CONTINUE;
     END IF;
 

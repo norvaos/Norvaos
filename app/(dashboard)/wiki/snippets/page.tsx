@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * Snippet Library — reusable email templates and document clauses.
+ * Snippet Library  -  reusable email templates and document clauses.
  *
  * Features:
  * - Filter by type (email, clause, template, note) and category

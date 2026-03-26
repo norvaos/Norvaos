@@ -34,7 +34,7 @@ export function TenantViolationAlert({
               <ShieldAlert className="h-5 w-5 text-destructive" />
             </div>
             <CardTitle className="text-lg text-destructive">
-              Access Denied — Error 403
+              Access Denied  -  Error 403
             </CardTitle>
           </div>
         </CardHeader>

@@ -29,20 +29,20 @@ interface IRCCSideBySideEngineProps {
 // ─── Component ───────────────────────────────────────────────────────────────
 
 /**
- * Norva Submission Engine — IRCC Side-by-Side Mode
+ * Norva Submission Engine  -  IRCC Side-by-Side Mode
  *
  * Optimised for 50/50 screen splitting: lawyer has NorvaOS on one half
  * and the IRCC portal on the other. Compact, single-column layout at 11px.
  *
  * Three sub-panels:
- *   1. Field-to-Clip — one-click copy for every IRCC portal field
- *   2. Submission Sync — track what's been uploaded to the portal
- *   3. Final Package — approved forms and documents ready to attach
+ *   1. Field-to-Clip  -  one-click copy for every IRCC portal field
+ *   2. Submission Sync  -  track what's been uploaded to the portal
+ *   3. Final Package  -  approved forms and documents ready to attach
  */
 export function IRCCSideBySideEngine({ matterId, tenantId, contactId }: IRCCSideBySideEngineProps) {
   const [activePanel, setActivePanel] = useState<'clip' | 'checklist' | 'package'>('clip')
 
-  // Fetch the contact's immigration_data (JSONB) — the single source of truth
+  // Fetch the contact's immigration_data (JSONB)  -  the single source of truth
   const { data: profile, isLoading } = useQuery({
     queryKey: ['ircc-profile', contactId],
     queryFn: async () => {
@@ -92,7 +92,7 @@ export function IRCCSideBySideEngine({ matterId, tenantId, contactId }: IRCCSide
             <li>Go to the <strong>Details</strong> tab</li>
             <li>Add a contact in the <strong>People</strong> section</li>
             <li>Mark them as <strong>Primary Contact</strong></li>
-            <li>Return here — your data will load automatically</li>
+            <li>Return here  -  your data will load automatically</li>
           </ol>
         </div>
       </div>
@@ -101,11 +101,11 @@ export function IRCCSideBySideEngine({ matterId, tenantId, contactId }: IRCCSide
 
   return (
     <div className="flex flex-col h-full">
-      {/* Top bar — Norva Submission Engine mode hint */}
+      {/* Top bar  -  Norva Submission Engine mode hint */}
       <div className="flex-none px-3 py-1.5 bg-blue-50 dark:bg-blue-950/20 border-b flex items-center gap-2">
         <Monitor className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
         <span className="text-[10px] text-blue-700 dark:text-blue-300 flex-1">
-          Norva Submission Engine — split your screen 50/50 with the IRCC Portal for one-click data entry
+          Norva Submission Engine  -  split your screen 50/50 with the IRCC Portal for one-click data entry
         </span>
         <Tooltip>
           <TooltipTrigger asChild>

@@ -249,7 +249,7 @@ export function ReturnForCorrectionModal({
 
           {sendMutation.isError && (
             <p className="text-xs text-destructive">
-              Failed to send — please try again.
+              Failed to send  -  please try again.
             </p>
           )}
         </div>

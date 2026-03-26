@@ -1,5 +1,5 @@
 -- ═══════════════════════════════════════════════════════════════════════════════
--- Migration 080: Consultation Command Centre — Controlled Workflow
+-- Migration 080: Consultation Command Centre  -  Controlled Workflow
 -- ═══════════════════════════════════════════════════════════════════════════════
 --
 -- Creates the retainer fee template system and extends existing tables for
@@ -10,11 +10,11 @@
 -- file opening are distinct operational layers.
 --
 -- New tables:
---   1. retainer_fee_templates — fee structure templates per matter_type + person_scope
+--   1. retainer_fee_templates  -  fee structure templates per matter_type + person_scope
 --
 -- Extended tables:
---   2. lead_retainer_packages — add matter_type_id, person_scope, template link
---   3. matters — add person_scope
+--   2. lead_retainer_packages  -  add matter_type_id, person_scope, template link
+--   3. matters  -  add person_scope
 --
 -- Note: lead_consultations.outcome already supports send_retainer, follow_up_later,
 --       need_more_documents, client_declined, not_a_fit. We add referred_out and
@@ -83,7 +83,7 @@ ALTER TABLE lead_retainer_packages
 
 -- ─── 3. Extend matters table ──────────────────────────────────────────────────
 -- person_scope: phase-one billing abstraction (single / joint).
--- See note above — this is not the final domain model.
+-- See note above  -  this is not the final domain model.
 
 ALTER TABLE matters
   ADD COLUMN IF NOT EXISTS person_scope TEXT DEFAULT 'single'

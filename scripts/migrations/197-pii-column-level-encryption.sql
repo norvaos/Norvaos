@@ -1,5 +1,5 @@
 -- ============================================================================
--- Migration 197 — PII Column-Level Encryption (Norva Vault)
+-- Migration 197  -  PII Column-Level Encryption (Norva Vault)
 -- ============================================================================
 -- Adds AES-256 column-level encryption for PII fields on contacts and leads
 -- tables using pgcrypto's PGP symmetric encryption functions.
@@ -70,7 +70,7 @@ ALTER TABLE contacts ADD COLUMN IF NOT EXISTS passport_number_encrypted BYTEA;
 ALTER TABLE contacts ADD COLUMN IF NOT EXISTS phone_encrypted           BYTEA;
 ALTER TABLE contacts ADD COLUMN IF NOT EXISTS email_encrypted           BYTEA;
 
-COMMENT ON COLUMN contacts.first_name_encrypted      IS 'PGP-AES-256 encrypted first_name. Dual-write phase — plaintext column retained until validation complete.';
+COMMENT ON COLUMN contacts.first_name_encrypted      IS 'PGP-AES-256 encrypted first_name. Dual-write phase  -  plaintext column retained until validation complete.';
 COMMENT ON COLUMN contacts.last_name_encrypted       IS 'PGP-AES-256 encrypted last_name. Dual-write phase.';
 COMMENT ON COLUMN contacts.date_of_birth_encrypted   IS 'PGP-AES-256 encrypted date_of_birth. Dual-write phase.';
 COMMENT ON COLUMN contacts.address_encrypted         IS 'PGP-AES-256 encrypted address. Dual-write phase.';
@@ -86,7 +86,7 @@ ALTER TABLE leads ADD COLUMN IF NOT EXISTS last_name_encrypted  BYTEA;
 ALTER TABLE leads ADD COLUMN IF NOT EXISTS email_encrypted      BYTEA;
 ALTER TABLE leads ADD COLUMN IF NOT EXISTS phone_encrypted      BYTEA;
 
-COMMENT ON COLUMN leads.first_name_encrypted IS 'PGP-AES-256 encrypted first_name. Dual-write phase — plaintext column retained until validation complete.';
+COMMENT ON COLUMN leads.first_name_encrypted IS 'PGP-AES-256 encrypted first_name. Dual-write phase  -  plaintext column retained until validation complete.';
 COMMENT ON COLUMN leads.last_name_encrypted  IS 'PGP-AES-256 encrypted last_name. Dual-write phase.';
 COMMENT ON COLUMN leads.email_encrypted      IS 'PGP-AES-256 encrypted email. Dual-write phase.';
 COMMENT ON COLUMN leads.phone_encrypted      IS 'PGP-AES-256 encrypted phone. Dual-write phase.';
@@ -94,7 +94,7 @@ COMMENT ON COLUMN leads.phone_encrypted      IS 'PGP-AES-256 encrypted phone. Du
 -- ---------------------------------------------------------------------------
 -- 6. One-time backfill function: migrate_pii_to_encrypted
 --    Encrypts existing plaintext PII into the new encrypted columns.
---    Safe to re-run — only processes rows where encrypted column is still NULL.
+--    Safe to re-run  -  only processes rows where encrypted column is still NULL.
 --    Does NOT drop or modify the original plaintext columns.
 --
 --    Usage (run once from a secure session):

@@ -1,5 +1,5 @@
 /**
- * GET /api/analytics/revenue — Revenue analytics report
+ * GET /api/analytics/revenue  -  Revenue analytics report
  */
 
 import { NextRequest, NextResponse } from 'next/server'

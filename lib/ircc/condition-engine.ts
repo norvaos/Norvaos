@@ -1,5 +1,5 @@
 /**
- * IRCC Forms Engine — Unified Condition Engine
+ * IRCC Forms Engine  -  Unified Condition Engine
  *
  * Pure function module (no I/O, no database, no side effects).
  * Works identically on client and server.
@@ -189,7 +189,7 @@ export function evaluateRule(
     }
 
     default: {
-      // Unknown operator — fail closed (return false)
+      // Unknown operator  -  fail closed (return false)
       const _exhaustive: never = rule.operator
       return false
     }
@@ -211,7 +211,7 @@ function evaluateGroup(
   trace: boolean
 ): { result: boolean; evalResult?: ConditionEvalResult } {
   if (depth > MAX_NESTING_DEPTH) {
-    // Exceeded nesting cap — fail closed
+    // Exceeded nesting cap  -  fail closed
     return {
       result: false,
       evalResult: trace
@@ -254,7 +254,7 @@ function evaluateGroup(
 
   let result: boolean
   if (allBooleans.length === 0) {
-    // Empty group — vacuously true
+    // Empty group  -  vacuously true
     result = true
   } else if (condition.logic === 'AND') {
     result = allBooleans.every(Boolean)
@@ -407,7 +407,7 @@ export function extractDependencyPaths(
  *
  * Returns a map of `{ parent_profile_path: field_id[] }` where each parent
  * is a profile_path referenced in some field's `show_when` or `required_condition`.
- * Both legacy and unified formats are accepted — they are normalised internally.
+ * Both legacy and unified formats are accepted  -  they are normalised internally.
  *
  * @param fields  Array of objects with id, show_when, and required_condition
  * @returns Adjacency map for change propagation

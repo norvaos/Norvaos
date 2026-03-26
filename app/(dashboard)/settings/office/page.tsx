@@ -60,15 +60,15 @@ const TIMEZONES = [
 ]
 
 const CURRENCIES = [
-  { code: 'CAD', label: 'CAD — Canadian Dollar' },
-  { code: 'USD', label: 'USD — US Dollar' },
-  { code: 'GBP', label: 'GBP — British Pound' },
-  { code: 'EUR', label: 'EUR — Euro' },
-  { code: 'AUD', label: 'AUD — Australian Dollar' },
-  { code: 'NZD', label: 'NZD — New Zealand Dollar' },
-  { code: 'INR', label: 'INR — Indian Rupee' },
-  { code: 'PKR', label: 'PKR — Pakistani Rupee' },
-  { code: 'AED', label: 'AED — UAE Dirham' },
+  { code: 'CAD', label: 'CAD  -  Canadian Dollar' },
+  { code: 'USD', label: 'USD  -  US Dollar' },
+  { code: 'GBP', label: 'GBP  -  British Pound' },
+  { code: 'EUR', label: 'EUR  -  Euro' },
+  { code: 'AUD', label: 'AUD  -  Australian Dollar' },
+  { code: 'NZD', label: 'NZD  -  New Zealand Dollar' },
+  { code: 'INR', label: 'INR  -  Indian Rupee' },
+  { code: 'PKR', label: 'PKR  -  Pakistani Rupee' },
+  { code: 'AED', label: 'AED  -  UAE Dirham' },
 ]
 
 const IANA_TZ_REGEX = /^[A-Za-z_]+\/[A-Za-z_/]+$/

@@ -82,7 +82,7 @@ function PortalHeaderMockup() {
       <div className="px-6 py-4 space-y-3">
         {/* Matter Summary */}
         <div className="bg-white rounded-2xl border border-gray-200 p-4">
-          <p className="font-semibold text-gray-900 text-sm">Ajaypal Singh — Visitor / Work Permit / Entry Matters</p>
+          <p className="font-semibold text-gray-900 text-sm">Ajaypal Singh  -  Visitor / Work Permit / Entry Matters</p>
           <div className="flex gap-3 mt-1 text-xs text-gray-400">
             <span>File: 2026-0019</span>
             <span>Case: Visitor / Work Permit / Entry Matters</span>
@@ -119,7 +119,7 @@ function PortalHeaderMockup() {
         <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-center justify-between">
           <div>
             <p className="text-xs font-bold text-amber-700 uppercase tracking-wider">What You Need To Do Next</p>
-            <p className="font-semibold text-gray-900 text-sm mt-0.5">Upload your Bank Statements — Last 3 Months</p>
+            <p className="font-semibold text-gray-900 text-sm mt-0.5">Upload your Bank Statements  -  Last 3 Months</p>
           </div>
           <button className="rounded-lg bg-gray-900 px-3 py-1.5 text-xs font-semibold text-white whitespace-nowrap">Go →</button>
         </div>
@@ -129,7 +129,7 @@ function PortalHeaderMockup() {
             { label: 'Documents', value: '1/2', sub: 'needed', color: 'border-amber-200 bg-amber-50' },
             { label: 'Shared Documents', value: '0', sub: '', color: 'border-gray-200 bg-white' },
             { label: 'Questions', value: '17%', sub: '', color: 'border-amber-200 bg-amber-50' },
-            { label: 'Payment & Retainer', value: '—', sub: '', color: 'border-gray-200 bg-white' },
+            { label: 'Payment & Retainer', value: ' - ', sub: '', color: 'border-gray-200 bg-white' },
             { label: 'Tasks', value: '1', sub: '1 overdue', color: 'border-red-200 bg-red-50' },
             { label: 'Messages', value: '0', sub: '', color: 'border-gray-200 bg-white' },
           ].map(({ label, value, sub, color }) => (
@@ -172,7 +172,7 @@ function DocumentsSectionMockup() {
           <div className="rounded-xl bg-gray-50 border border-gray-100 p-3 flex items-center justify-between">
             <div>
               <div className="flex items-center gap-2">
-                <p className="text-sm font-medium text-gray-800">Valid Passport — Bio Page & Stamped Pages</p>
+                <p className="text-sm font-medium text-gray-800">Valid Passport  -  Bio Page & Stamped Pages</p>
                 <SectionLabel label="REQUIRED" color="bg-red-50 text-red-600" />
               </div>
               <p className="text-xs text-gray-400 mt-0.5">Upload a clear colour scan of your passport bio/data page and ALL stamped pages.</p>
@@ -191,7 +191,7 @@ function DocumentsSectionMockup() {
           <div className="rounded-xl bg-gray-50 border border-gray-100 p-3 flex items-start justify-between">
             <div className="flex-1">
               <div className="flex items-center gap-2">
-                <p className="text-sm font-medium text-gray-800">Bank Statements — Last 3 Months</p>
+                <p className="text-sm font-medium text-gray-800">Bank Statements  -  Last 3 Months</p>
                 <SectionLabel label="REQUIRED" color="bg-red-50 text-red-600" />
               </div>
               <p className="text-xs text-gray-400 mt-0.5">Upload official bank statements showing sufficient funds.</p>
@@ -231,9 +231,9 @@ function QuestionsSectionMockup() {
         <p className="text-xs text-gray-500 mb-3">Overall progress: 18%</p>
         <div className="space-y-2">
           {[
-            { code: 'IMM 5257', name: 'Application for Temporary Resident Visa', status: 'In Progress — 17%', fields: '17 of 101 fields', pct: 17, isNext: true },
-            { code: 'IMM 5406', name: 'Additional Family Information', status: 'In Progress — 17%', fields: '4 of 24 fields', pct: 17, isNext: false },
-            { code: 'IMM 5476', name: 'Use of a Representative', status: 'In Progress — 60%', fields: '3 of 5 fields', pct: 60, isNext: false },
+            { code: 'IMM 5257', name: 'Application for Temporary Resident Visa', status: 'In Progress  -  17%', fields: '17 of 101 fields', pct: 17, isNext: true },
+            { code: 'IMM 5406', name: 'Additional Family Information', status: 'In Progress  -  17%', fields: '4 of 24 fields', pct: 17, isNext: false },
+            { code: 'IMM 5476', name: 'Use of a Representative', status: 'In Progress  -  60%', fields: '3 of 5 fields', pct: 60, isNext: false },
           ].map(({ code, name, status, fields, pct, isNext }) => (
             <div key={code} className={`rounded-xl border p-3 ${isNext ? 'border-l-4 border-l-indigo-500 border-gray-200' : 'border-gray-100 bg-gray-50'}`}>
               <div className="flex items-center justify-between">
@@ -250,7 +250,7 @@ function QuestionsSectionMockup() {
             </div>
           ))}
         </div>
-        <p className="text-xs text-gray-400 mt-3 text-center">Next: Complete "IMM 5257 — IMM 5257E — Application for Temporary Resident Visa"</p>
+        <p className="text-xs text-gray-400 mt-3 text-center">Next: Complete "IMM 5257  -  IMM 5257E  -  Application for Temporary Resident Visa"</p>
       </div>
     </div>
   )
@@ -260,7 +260,7 @@ function FirmSidePortalMockup() {
   return (
     <div className="rounded-2xl border border-gray-200 overflow-hidden shadow-sm bg-white">
       <div className="border-b border-gray-100 px-5 py-3 bg-gray-50">
-        <p className="text-xs font-semibold text-gray-600">Matter page — Portal link row (firm view)</p>
+        <p className="text-xs font-semibold text-gray-600">Matter page  -  Portal link row (firm view)</p>
       </div>
       <div className="px-5 py-4 space-y-3">
         <div className="flex items-center justify-between rounded-xl border border-gray-200 bg-gray-50 px-4 py-3">
@@ -283,15 +283,15 @@ function FirmSidePortalMockup() {
         <div className="rounded-xl bg-indigo-50 border border-indigo-100 px-4 py-3">
           <p className="text-xs font-semibold text-indigo-800 mb-1">How to send this to the client</p>
           <ol className="space-y-1 text-xs text-indigo-700">
-            <li>1. Click <strong>Copy</strong> — the full portal URL is copied to your clipboard</li>
+            <li>1. Click <strong>Copy</strong>  -  the full portal URL is copied to your clipboard</li>
             <li>2. Paste it into an email, WhatsApp, or SMS to the client</li>
-            <li>3. The client clicks the link — no login or password required</li>
+            <li>3. The client clicks the link  -  no login or password required</li>
             <li>4. The link is unique to this matter and works for the life of the file</li>
           </ol>
         </div>
         <div className="rounded-xl bg-amber-50 border border-amber-100 px-4 py-3">
           <p className="text-xs font-semibold text-amber-800 mb-1 flex items-center gap-1"><Shield className="h-3.5 w-3.5" /> Security</p>
-          <p className="text-xs text-amber-700">The portal link is a long, unique, unguessable token — like a secure one-time key. Do not share it publicly. It gives access to this client's documents and forms.</p>
+          <p className="text-xs text-amber-700">The portal link is a long, unique, unguessable token  -  like a secure one-time key. Do not share it publicly. It gives access to this client's documents and forms.</p>
         </div>
       </div>
     </div>
@@ -304,7 +304,7 @@ const onPageSections = [
   { id: 'overview', label: 'Overview' },
   { id: 'access', label: 'How clients access the portal' },
   { id: 'firm-side', label: 'Finding the portal link (firm)' },
-  { id: 'portal-home', label: 'Portal home — what clients see' },
+  { id: 'portal-home', label: 'Portal home  -  what clients see' },
   { id: 'documents', label: 'Documents section' },
   { id: 'document-statuses', label: 'Document statuses explained' },
   { id: 'questions', label: 'Questions / IRCC forms' },
@@ -387,7 +387,7 @@ export default function ClientPortalHelpPage() {
               </div>
               <div>
                 <h1 className="text-3xl font-bold text-gray-900">Client Portal</h1>
-                <p className="text-gray-500 mt-0.5">Complete guide — for both firms and clients</p>
+                <p className="text-gray-500 mt-0.5">Complete guide  -  for both firms and clients</p>
               </div>
             </div>
             <div className="flex gap-3 flex-wrap text-xs">
@@ -403,10 +403,10 @@ export default function ClientPortalHelpPage() {
             <h2 className="text-xl font-bold text-gray-900 mb-4">Overview</h2>
             <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm space-y-5">
               <p className="text-sm text-gray-600 leading-relaxed">
-                The <strong>Client Portal</strong> is a private, secure webpage that NorvaOS generates for every matter. You share the link with the client — they click it and land directly in their personal portal. <strong>No login, no password, no app download required.</strong>
+                The <strong>Client Portal</strong> is a private, secure webpage that NorvaOS generates for every matter. You share the link with the client  -  they click it and land directly in their personal portal. <strong>No login, no password, no app download required.</strong>
               </p>
               <p className="text-sm text-gray-600 leading-relaxed">
-                From their portal, clients can upload required documents, fill in IRCC questionnaire forms, view their case progress, see invoices, receive messages, and complete tasks — all without calling the office or sending unsecured emails.
+                From their portal, clients can upload required documents, fill in IRCC questionnaire forms, view their case progress, see invoices, receive messages, and complete tasks  -  all without calling the office or sending unsecured emails.
               </p>
 
               <div className="grid grid-cols-2 gap-4">
@@ -414,7 +414,7 @@ export default function ClientPortalHelpPage() {
                   <p className="font-semibold text-indigo-800 text-sm mb-2">What the firm gets</p>
                   <ul className="space-y-1.5 text-xs text-indigo-700">
                     {[
-                      'Documents arrive directly into the matter — no email attachments',
+                      'Documents arrive directly into the matter  -  no email attachments',
                       'IRCC forms auto-filled from client answers',
                       'Automatic notifications when client uploads or completes something',
                       'Full audit trail of what the client submitted and when',
@@ -426,7 +426,7 @@ export default function ClientPortalHelpPage() {
                   <p className="font-semibold text-emerald-800 text-sm mb-2">What the client gets</p>
                   <ul className="space-y-1.5 text-xs text-emerald-700">
                     {[
-                      'One link — everything in one place',
+                      'One link  -  everything in one place',
                       'Knows exactly what documents are needed and why',
                       'Can upload from phone, tablet, or computer',
                       'Sees when documents are accepted or need re-upload',
@@ -457,14 +457,14 @@ export default function ClientPortalHelpPage() {
           <section id="access" className="mb-12 scroll-mt-6">
             <h2 className="text-xl font-bold text-gray-900 mb-4">How Clients Access the Portal</h2>
             <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm space-y-5">
-              <p className="text-sm text-gray-600">The portal uses a <strong>secure link token</strong> — no account, no password. The client just clicks the link.</p>
+              <p className="text-sm text-gray-600">The portal uses a <strong>secure link token</strong>  -  no account, no password. The client just clicks the link.</p>
 
               <div className="space-y-3">
                 {[
                   { n: 1, title: 'Firm copies the portal link from the matter page', desc: 'Every matter has a Portal row below the Next Action panel. Click Copy to get the full URL.' },
                   { n: 2, title: 'Firm sends the link to the client', desc: 'Paste it into an email, WhatsApp, SMS, or any other communication. The client doesn\'t need to create an account.' },
-                  { n: 3, title: 'Client clicks the link', desc: 'They land directly on their portal page — the matter title, their legal team, what they need to do, and all sections are visible immediately.' },
-                  { n: 4, title: 'Client completes their actions', desc: 'They upload documents, fill forms, read messages — at their own pace, from any device.' },
+                  { n: 3, title: 'Client clicks the link', desc: 'They land directly on their portal page  -  the matter title, their legal team, what they need to do, and all sections are visible immediately.' },
+                  { n: 4, title: 'Client completes their actions', desc: 'They upload documents, fill forms, read messages  -  at their own pace, from any device.' },
                   { n: 5, title: 'Firm sees updates instantly', desc: 'Every upload or form completion is reflected immediately in the matter workspace. The firm receives an in-system notification.' },
                 ].map(({ n, title, desc }) => (
                   <div key={n} className="flex gap-4 rounded-xl border border-gray-100 p-4">
@@ -478,7 +478,7 @@ export default function ClientPortalHelpPage() {
               </div>
 
               <Callout type="warning" title="The link works permanently">
-                The portal link doesn't expire. It works for the entire life of the matter. If you need to revoke access, contact your system admin — this creates a new token and invalidates the old one.
+                The portal link doesn't expire. It works for the entire life of the matter. If you need to revoke access, contact your system admin  -  this creates a new token and invalidates the old one.
               </Callout>
 
               <Callout type="tip" title="Works on any device">
@@ -523,9 +523,9 @@ export default function ClientPortalHelpPage() {
 
           {/* Portal Home */}
           <section id="portal-home" className="mb-12 scroll-mt-6">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">Portal Home — What Clients See</h2>
+            <h2 className="text-xl font-bold text-gray-900 mb-4">Portal Home  -  What Clients See</h2>
             <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm space-y-6">
-              <p className="text-sm text-gray-600">When a client opens their portal link, this is what they see — from top to bottom:</p>
+              <p className="text-sm text-gray-600">When a client opens their portal link, this is what they see  -  from top to bottom:</p>
 
               <PortalHeaderMockup />
 
@@ -544,11 +544,11 @@ export default function ClientPortalHelpPage() {
                   <p className="text-sm text-gray-600 mb-2">The first card shows the matter's identity:</p>
                   <div className="grid grid-cols-2 gap-2 text-xs">
                     {[
-                      { label: 'Matter title', desc: 'The name of the matter, e.g. "Ajaypal Singh — Visitor / Work Permit"' },
-                      { label: 'File number', desc: 'e.g. 2026-0019 — referenced in all communications' },
+                      { label: 'Matter title', desc: 'The name of the matter, e.g. "Ajaypal Singh  -  Visitor / Work Permit"' },
+                      { label: 'File number', desc: 'e.g. 2026-0019  -  referenced in all communications' },
                       { label: 'Case type', desc: 'e.g. "Visitor / Work Permit / Entry Matters"' },
                       { label: 'Summary counts', desc: 'How many documents needed, sections incomplete, tasks to do' },
-                      { label: 'Progress bar', desc: 'Overall completion as a percentage — increases as client completes items' },
+                      { label: 'Progress bar', desc: 'Overall completion as a percentage  -  increases as client completes items' },
                       { label: 'Last updated', desc: 'When anything was last changed on this matter' },
                     ].map(({ label, desc }) => (
                       <div key={label} className="rounded-lg bg-gray-50 border border-gray-100 p-2.5">
@@ -588,13 +588,13 @@ export default function ClientPortalHelpPage() {
                   <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
                     <span className="rounded-full bg-gray-900 text-white text-xs px-2 py-0.5">⑤</span> What You Need To Do Next (amber panel)
                   </h3>
-                  <p className="text-sm text-gray-600 mb-2">This is the most important element on the portal. It tells the client the single most important action to take right now — in plain language, not legal jargon. It updates automatically as they complete items.</p>
+                  <p className="text-sm text-gray-600 mb-2">This is the most important element on the portal. It tells the client the single most important action to take right now  -  in plain language, not legal jargon. It updates automatically as they complete items.</p>
                   <div className="space-y-1.5">
                     {[
-                      '"Upload your Bank Statements — Last 3 Months"',
-                      '"Complete IMM 5257 — Application for Temporary Resident Visa"',
+                      '"Upload your Bank Statements  -  Last 3 Months"',
+                      '"Complete IMM 5257  -  Application for Temporary Resident Visa"',
                       '"Sign and return your retainer agreement"',
-                      '"All done — your lawyer is reviewing your file"',
+                      '"All done  -  your lawyer is reviewing your file"',
                     ].map(msg => (
                       <div key={msg} className="flex items-center gap-2 rounded-lg bg-amber-50 border border-amber-100 px-3 py-2">
                         <ArrowRight className="h-3.5 w-3.5 text-amber-600 shrink-0" />
@@ -634,7 +634,7 @@ export default function ClientPortalHelpPage() {
           <section id="documents" className="mb-12 scroll-mt-6">
             <h2 className="text-xl font-bold text-gray-900 mb-4">Documents Section</h2>
             <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm space-y-5">
-              <p className="text-sm text-gray-600">The Documents section is where clients upload every file the firm needs. It is pre-populated with exactly the documents required for this specific matter type — the client doesn't need to guess what to send.</p>
+              <p className="text-sm text-gray-600">The Documents section is where clients upload every file the firm needs. It is pre-populated with exactly the documents required for this specific matter type  -  the client doesn't need to guess what to send.</p>
 
               <DocumentsSectionMockup />
 
@@ -652,11 +652,11 @@ export default function ClientPortalHelpPage() {
                   <div className="space-y-2">
                     {[
                       { n: 1, text: 'Find the document row that shows "Not uploaded" status' },
-                      { n: 2, text: 'Read the description carefully — it explains exactly what format is required' },
+                      { n: 2, text: 'Read the description carefully  -  it explains exactly what format is required' },
                       { n: 3, text: 'Click the Upload button' },
                       { n: 4, text: 'Select the file from your device (PDF, JPG, or PNG accepted)' },
                       { n: 5, text: 'The status changes to "Under Review" immediately after upload' },
-                      { n: 6, text: 'Wait for the firm to review it — status will change to "Accepted" or "Re-upload Required"' },
+                      { n: 6, text: 'Wait for the firm to review it  -  status will change to "Accepted" or "Re-upload Required"' },
                     ].map(({ n, text }) => (
                       <div key={n} className="flex items-center gap-3 rounded-lg bg-gray-50 border border-gray-100 px-3 py-2">
                         <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-xs font-bold text-indigo-700">{n}</span>
@@ -668,7 +668,7 @@ export default function ClientPortalHelpPage() {
 
                 <div>
                   <h3 className="font-semibold text-gray-900 mb-2">Submit a Document (custom upload)</h3>
-                  <p className="text-sm text-gray-600">Below the required document list is a <strong>Submit a Document</strong> collapsible panel. Clients can use this to send additional documents that weren't in the checklist — for example, a support letter they want to include or a document the lawyer asked for verbally.</p>
+                  <p className="text-sm text-gray-600">Below the required document list is a <strong>Submit a Document</strong> collapsible panel. Clients can use this to send additional documents that weren't in the checklist  -  for example, a support letter they want to include or a document the lawyer asked for verbally.</p>
                 </div>
 
                 <Callout type="tip" title="Photos are accepted but scans are better">
@@ -704,7 +704,7 @@ export default function ClientPortalHelpPage() {
                     color: 'bg-blue-50 border-blue-200',
                     badge: 'bg-blue-50 text-blue-700',
                     icon: <Eye className="h-5 w-5 text-blue-500" />,
-                    firmAction: 'Client has uploaded — firm needs to review and either accept or request re-upload.',
+                    firmAction: 'Client has uploaded  -  firm needs to review and either accept or request re-upload.',
                     clientAction: 'Nothing to do. Wait for the firm to review your upload.',
                     blocksProgress: true,
                   },
@@ -722,7 +722,7 @@ export default function ClientPortalHelpPage() {
                     color: 'bg-red-50 border-red-200',
                     badge: 'bg-red-50 text-red-700',
                     icon: <RefreshCw className="h-5 w-5 text-red-500" />,
-                    firmAction: 'Firm rejected the document — client will see a reason and must re-upload.',
+                    firmAction: 'Firm rejected the document  -  client will see a reason and must re-upload.',
                     clientAction: 'Read the rejection reason shown below the document name. Upload a corrected version.',
                     blocksProgress: true,
                   },
@@ -773,7 +773,7 @@ export default function ClientPortalHelpPage() {
                   <div className="space-y-2 text-sm text-gray-600">
                     <p>Each form is shown as a card with: form code (e.g. IMM 5257), form name, status badge (In Progress / Completed), field count (e.g. "17 of 101 fields"), and a progress bar.</p>
                     <p>The <strong>Next</strong> badge highlights which form the client should complete first. The system recommends the most important form based on readiness status.</p>
-                    <p>Below the form list: guidance text showing what to work on next — e.g. "Next: Complete IMM 5257 — Application for Temporary Resident Visa".</p>
+                    <p>Below the form list: guidance text showing what to work on next  -  e.g. "Next: Complete IMM 5257  -  Application for Temporary Resident Visa".</p>
                   </div>
                 </div>
 
@@ -782,10 +782,10 @@ export default function ClientPortalHelpPage() {
                   <div className="space-y-2">
                     {[
                       { n: 1, text: 'Click Continue on the form card marked "Next"' },
-                      { n: 2, text: 'The form opens as a step-by-step questionnaire — one section at a time' },
+                      { n: 2, text: 'The form opens as a step-by-step questionnaire  -  one section at a time' },
                       { n: 3, text: 'Fill in each field. Fields already filled by the lawyer are pre-populated' },
                       { n: 4, text: 'Click Save & Continue to move to the next section' },
-                      { n: 5, text: 'You can stop anytime and come back later — progress is saved automatically' },
+                      { n: 5, text: 'You can stop anytime and come back later  -  progress is saved automatically' },
                       { n: 6, text: 'Once all fields are filled, the form status changes to "Complete"' },
                     ].map(({ n, text }) => (
                       <div key={n} className="flex items-center gap-3 rounded-lg bg-gray-50 border border-gray-100 px-3 py-2">
@@ -803,8 +803,8 @@ export default function ClientPortalHelpPage() {
 
                 <div className="grid grid-cols-3 gap-3 text-xs">
                   {[
-                    { form: 'IMM 5257E', name: 'Application for Temporary Resident Visa', fields: 101, desc: 'Main application form — personal info, travel history, employment, finances' },
-                    { form: 'IMM 5406', name: 'Additional Family Information', fields: 24, desc: 'Family members\' details — parents, siblings, spouse, children' },
+                    { form: 'IMM 5257E', name: 'Application for Temporary Resident Visa', fields: 101, desc: 'Main application form  -  personal info, travel history, employment, finances' },
+                    { form: 'IMM 5406', name: 'Additional Family Information', fields: 24, desc: 'Family members\' details  -  parents, siblings, spouse, children' },
                     { form: 'IMM 5476E', name: 'Use of a Representative', fields: 5, desc: 'Authorises the lawyer to act on the applicant\'s behalf' },
                   ].map(({ form, name, fields, desc }) => (
                     <div key={form} className="rounded-xl border border-gray-100 bg-gray-50 p-3">
@@ -817,7 +817,7 @@ export default function ClientPortalHelpPage() {
                 </div>
 
                 <Callout type="tip" title="Clients can come back and continue later">
-                  Progress is saved after every field. If a client runs out of time or doesn't have information ready, they can close the portal and come back later — all previous answers are preserved.
+                  Progress is saved after every field. If a client runs out of time or doesn't have information ready, they can close the portal and come back later  -  all previous answers are preserved.
                 </Callout>
 
                 <Callout type="info" title="Some fields are pre-filled by the lawyer">
@@ -831,7 +831,7 @@ export default function ClientPortalHelpPage() {
           <section id="payment" className="mb-12 scroll-mt-6">
             <h2 className="text-xl font-bold text-gray-900 mb-4">Payment & Retainer</h2>
             <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm space-y-4">
-              <p className="text-sm text-gray-600">The Payment & Retainer section shows the client all financial activity on their file — retainer agreement status, invoices, and outstanding balances.</p>
+              <p className="text-sm text-gray-600">The Payment & Retainer section shows the client all financial activity on their file  -  retainer agreement status, invoices, and outstanding balances.</p>
 
               <div className="space-y-3">
                 <div>
@@ -839,7 +839,7 @@ export default function ClientPortalHelpPage() {
                   <div className="space-y-2 text-sm">
                     {[
                       { item: 'Retainer agreement', desc: 'The engagement agreement between the client and the firm. Shown as a document with a Sign button if not yet signed.' },
-                      { item: 'Invoice list', desc: 'All invoices for this matter — retainer deposit, milestone payments, disbursements. Each shows amount, date, and paid/outstanding status.' },
+                      { item: 'Invoice list', desc: 'All invoices for this matter  -  retainer deposit, milestone payments, disbursements. Each shows amount, date, and paid/outstanding status.' },
                       { item: 'Outstanding balance', desc: 'If any invoice is unpaid, the total outstanding is shown prominently. A Pay Now button allows online payment if Stripe is configured.' },
                       { item: 'Payment history', desc: 'A record of all payments made, with dates and amounts.' },
                     ].map(({ item, desc }) => (
@@ -886,7 +886,7 @@ export default function ClientPortalHelpPage() {
           <section id="messages" className="mb-12 scroll-mt-6">
             <h2 className="text-xl font-bold text-gray-900 mb-4">Messages</h2>
             <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm space-y-4">
-              <p className="text-sm text-gray-600">The Messages section is a simple, secure messaging channel between the firm and the client — directly inside the portal.</p>
+              <p className="text-sm text-gray-600">The Messages section is a simple, secure messaging channel between the firm and the client  -  directly inside the portal.</p>
               <div className="space-y-3 text-sm">
                 {[
                   { icon: MessageSquare, title: 'How it works', desc: 'Messages sent from the firm\'s matter page appear here. The client can read them and reply. All messages are stored in the matter\'s communication log on the firm side.' },
@@ -1003,7 +1003,7 @@ export default function ClientPortalHelpPage() {
                 <div className="space-y-2">
                   {[
                     { tip: 'Send the portal link in your first email after creating the matter', detail: 'The sooner the client has the link, the sooner they can start uploading. Don\'t wait until everything is perfectly set up.' },
-                    { tip: 'Add a short note explaining what the link is', detail: 'e.g. "This is your secure portal where you can upload all documents and fill in your application forms. No login required — just click the link."' },
+                    { tip: 'Add a short note explaining what the link is', detail: 'e.g. "This is your secure portal where you can upload all documents and fill in your application forms. No login required  -  just click the link."' },
                     { tip: 'Review and accept/reject documents within 24 hours', detail: 'Clients check back frequently. If their upload sits in "Under Review" for days, they assume something is wrong and call the office.' },
                     { tip: 'Use the portal for all document collection', detail: 'Avoid accepting documents by email. Using the portal keeps everything in one place and creates a clean audit trail.' },
                     { tip: 'Verify portal display using the Open button', detail: 'Before sending the link to a client, click Open to preview exactly what they\'ll see. Make sure the correct documents are listed and the matter details are accurate.' },
@@ -1024,8 +1024,8 @@ export default function ClientPortalHelpPage() {
                 <div className="space-y-2">
                   {[
                     { mistake: 'Sending the portal link before the matter type is set', fix: 'If the matter type is wrong, the document checklist will be wrong too. Set Practice Area and Matter Type first, then send the link.' },
-                    { mistake: 'Accepting poor-quality document scans', fix: 'A blurry photo that gets accepted now may be rejected by IRCC later. Set the standard high — clear, colour scans of the full document including all pages.' },
-                    { mistake: 'Not adding rejection reasons when declining a document', fix: 'Always type a clear reason in the rejection note. "Please re-upload your passport scan — the stamped pages are missing." The client sees this and knows exactly what to fix.' },
+                    { mistake: 'Accepting poor-quality document scans', fix: 'A blurry photo that gets accepted now may be rejected by IRCC later. Set the standard high  -  clear, colour scans of the full document including all pages.' },
+                    { mistake: 'Not adding rejection reasons when declining a document', fix: 'Always type a clear reason in the rejection note. "Please re-upload your passport scan  -  the stamped pages are missing." The client sees this and knows exactly what to fix.' },
                     { mistake: 'Sharing the portal link in a group message or chat', fix: 'The portal link gives access to the client\'s sensitive documents. Send it only to the client directly via a private message or email.' },
                   ].map(({ mistake, fix }) => (
                     <div key={mistake} className="flex gap-2 rounded-lg bg-red-50 border border-red-100 p-3">

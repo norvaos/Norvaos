@@ -42,7 +42,7 @@ export function SigningDeclinedEmail({
     day: 'numeric',
   })
 
-  const subject = `Document Declined — ${documentTitle}`
+  const subject = `Document Declined  -  ${documentTitle}`
 
   return (
     <Html>
@@ -108,7 +108,7 @@ export function SigningDeclinedEmail({
             </Section>
 
             <Text style={signoffStyle}>
-              — NorvaOS Notifications
+               -  NorvaOS Notifications
             </Text>
           </Section>
 
@@ -136,7 +136,7 @@ export async function renderSigningDeclinedEmail(
   props: SigningDeclinedEmailProps
 ): Promise<{ html: string; text: string; subject: string }> {
   const html = await render(<SigningDeclinedEmail {...props} />)
-  const subject = `Document Declined — ${props.documentTitle}`
+  const subject = `Document Declined  -  ${props.documentTitle}`
 
   const formattedDeclinedAt = new Date(props.declinedAt).toLocaleDateString('en-US', {
     year: 'numeric',
@@ -155,7 +155,7 @@ export async function renderSigningDeclinedEmail(
     '',
     `View Matter: ${props.matterUrl}`,
     '',
-    '— NorvaOS Notifications',
+    ' -  NorvaOS Notifications',
   ]
     .filter(Boolean)
     .join('\n')

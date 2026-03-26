@@ -997,7 +997,7 @@ function SubmissionDetailSheet({
   const displayPhone = phoneField ? String(data[phoneField.id] ?? '') : ''
 
   function formatValue(fieldId: string, value: unknown): string {
-    if (value === null || value === undefined) return '—'
+    if (value === null || value === undefined) return ' - '
     if (Array.isArray(value)) return value.join(', ')
     if (typeof value === 'boolean') return value ? 'Yes' : 'No'
     if (typeof value === 'object') {
@@ -1747,7 +1747,7 @@ function FormBuilderPanel({
                 <label className="text-sm font-medium">Auto-create Lead in Pipeline</label>
                 <Select value={formPipelineId || '__none__'} onValueChange={(v) => { setFormPipelineId(v === '__none__' ? '' : v); setFormStageId('') }}>
                   <SelectTrigger className="mt-1.5 w-full">
-                    <SelectValue placeholder="None — don't create leads" />
+                    <SelectValue placeholder="None  -  don't create leads" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="__none__">None</SelectItem>

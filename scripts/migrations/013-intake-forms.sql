@@ -9,7 +9,7 @@
 BEGIN;
 
 -- --------------------------------------------------------------------------
--- 1. intake_forms — form definitions with JSONB field config
+-- 1. intake_forms  -  form definitions with JSONB field config
 -- --------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS intake_forms (
   id            uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -36,7 +36,7 @@ CREATE INDEX IF NOT EXISTS idx_intake_forms_tenant ON intake_forms(tenant_id);
 CREATE INDEX IF NOT EXISTS idx_intake_forms_status ON intake_forms(status);
 
 -- --------------------------------------------------------------------------
--- 2. intake_submissions — public form responses
+-- 2. intake_submissions  -  public form responses
 -- --------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS intake_submissions (
   id            uuid PRIMARY KEY DEFAULT gen_random_uuid(),

@@ -8,7 +8,7 @@ import { logSentinelEvent } from '@/lib/services/sentinel-audit'
 /**
  * GET /api/documents/view?path=...&bucket=...
  *
- * Directive 005.4 — Zero-Knowledge Preview
+ * Directive 005.4  -  Zero-Knowledge Preview
  *
  * Generates a temporary signed URL (60-second TTL) for document access.
  * No document in the vault is accessible via a static or permanent URL.
@@ -93,7 +93,7 @@ async function handleGet(request: NextRequest) {
 
     // For PDFs and images: proxy the content through server to avoid
     // CORS issues and X-Frame-Options blocking on signed URLs.
-    // The signed URL is used server-side only — never exposed to client.
+    // The signed URL is used server-side only  -  never exposed to client.
     const contentType = doc.file_type || 'application/octet-stream'
     const isPdfOrImage =
       contentType === 'application/pdf' || contentType.startsWith('image/')
@@ -114,7 +114,7 @@ async function handleGet(request: NextRequest) {
         headers: {
           'Content-Type': contentType,
           'Content-Disposition': `inline; filename="${encodeURIComponent(doc.file_name)}"`,
-          // No long-lived cache — forces re-auth on every access
+          // No long-lived cache  -  forces re-auth on every access
           'Cache-Control': 'private, no-store, max-age=0',
           'X-Content-Type-Options': 'nosniff',
         },

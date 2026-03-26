@@ -1,6 +1,6 @@
 -- ══════════════════════════════════════════════════════════════════════════════
 -- Migration 147: Communication Templates & Communication Logs
--- Phase 6 — Multi-Tenant Dynamic Template Engine
+-- Phase 6  -  Multi-Tenant Dynamic Template Engine
 -- ══════════════════════════════════════════════════════════════════════════════
 
 -- ── communication_templates ─────────────────────────────────────────────────

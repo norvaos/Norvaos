@@ -11,10 +11,10 @@ import { withTiming } from '@/lib/middleware/request-timing'
  *
  * Search today's appointments by name, email, or phone.
  *
- * Rule #7: Kiosk token security — validated first.
+ * Rule #7: Kiosk token security  -  validated first.
  * Rule #8: Only shows booker_name before identity verification.
  *          No matter/lawyer details exposed.
- * Rule #17: Multi-tenant isolation — tenant_id from token.
+ * Rule #17: Multi-tenant isolation  -  tenant_id from token.
  */
 async function handlePost(
   request: Request,
@@ -83,7 +83,7 @@ async function handlePost(
       return NextResponse.json({ error: 'Search failed' }, { status: 500 })
     }
 
-    // 4. Batch-resolve booking page titles (no N+1 — Rule #19)
+    // 4. Batch-resolve booking page titles (no N+1  -  Rule #19)
     const pageIds = [...new Set((appointments ?? []).map((a) => a.booking_page_id).filter(Boolean))]
     let pagesMap: Record<string, string> = {}
     if (pageIds.length > 0) {

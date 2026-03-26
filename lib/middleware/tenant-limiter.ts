@@ -37,7 +37,7 @@ export interface LimitResult {
  *
  * @param tenantId - The tenant's UUID
  * @param routeKey - One of the keys in ROUTE_LIMITS (e.g. 'invoices/pdf')
- * @returns LimitResult — allowed: true if request can proceed
+ * @returns LimitResult  -  allowed: true if request can proceed
  */
 export async function checkTenantLimit(
   tenantId: string,
@@ -50,7 +50,7 @@ export async function checkTenantLimit(
 
   const config = ROUTE_LIMITS[routeKey]
   if (!config) {
-    // No limit defined for this route — allow
+    // No limit defined for this route  -  allow
     return { allowed: true, remaining: Infinity, retryAfterSeconds: 0 }
   }
 

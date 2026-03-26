@@ -1,11 +1,11 @@
-# Phase 8 — Evidence Addendum (Risk Item Responses)
+# Phase 8  -  Evidence Addendum (Risk Item Responses)
 
 **Date**: 2026-03-15
 **Purpose**: Address four risk items flagged during evidence review
 
 ---
 
-## Risk Item 1: User Deactivation — Live Negative Test
+## Risk Item 1: User Deactivation  -  Live Negative Test
 
 **Test performed**: Set Front Desk user (`3e6864e9`) to `is_active = false` in the live database.
 
@@ -25,7 +25,7 @@ const { data: appUser } = await supabase
   .eq('auth_user_id', authUser.id)
   .single()
 
-// Block deactivated users — immediate enforcement regardless of session state
+// Block deactivated users  -  immediate enforcement regardless of session state
 if (appUser.is_active === false) {
   throw new AuthError('Account deactivated', 403)
 }
@@ -59,7 +59,7 @@ UPDATE users SET is_active = true WHERE id = '3e6864e9-...'
 
 ---
 
-## Risk Item 2: Schema Drift — Known Limitation
+## Risk Item 2: Schema Drift  -  Known Limitation
 
 **Acknowledged**: The current `check-schema-drift.mjs` script performs static analysis of migration SQL files cross-referenced against manual TypeScript interfaces. This is a detection mechanism, not a prevention mechanism.
 
@@ -73,11 +73,11 @@ UPDATE users SET is_active = true WHERE id = '3e6864e9-...'
 
 ---
 
-## Risk Item 3: Portal Token Validation — Live Round-Trip Proof
+## Risk Item 3: Portal Token Validation  -  Live Round-Trip Proof
 
 ### 3a. Old plaintext lookup path is dead
 ```sql
--- All tokens are 'REDACTED' — no plaintext value can match a specific link
+-- All tokens are 'REDACTED'  -  no plaintext value can match a specific link
 SELECT token FROM portal_links WHERE is_active = true LIMIT 3;
 -- Result: all return token = 'REDACTED'
 ```
@@ -222,13 +222,13 @@ All hashes are proper 64-character hex-encoded SHA-256 values.
 | `api/push/subscribe` | POST | authenticateRequest | (self-service) | EXEMPT |
 
 ### Intentionally Public Routes (outside scope)
-- `auth/*` — signup/login
-- `signing/[token]/*` — public document signing (token-authenticated)
-- `portal/[token]/*` — client portal (token-authenticated via `validatePortalToken`)
-- `forms/[slug]/*` — public form submissions
-- `booking/*` — public booking
-- `health/*` — health checks
-- `webhooks/stripe/*` — Stripe webhooks (signature-verified)
+- `auth/*`  -  signup/login
+- `signing/[token]/*`  -  public document signing (token-authenticated)
+- `portal/[token]/*`  -  client portal (token-authenticated via `validatePortalToken`)
+- `forms/[slug]/*`  -  public form submissions
+- `booking/*`  -  public booking
+- `health/*`  -  health checks
+- `webhooks/stripe/*`  -  Stripe webhooks (signature-verified)
 
 ### Summary
 | Category | Total | Auth | Permission | Exempt (self-service) |

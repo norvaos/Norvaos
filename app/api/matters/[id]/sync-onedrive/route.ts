@@ -8,7 +8,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
  * POST /api/matters/[id]/sync-onedrive
  *
  * Creates or re-syncs the OneDrive folder structure for an existing matter.
- * Safe to call multiple times — idempotent (skips folders already synced).
+ * Safe to call multiple times  -  idempotent (skips folders already synced).
  *
  * Uses the calling user's Microsoft connection. If the user has no active
  * OneDrive connection, returns 400.

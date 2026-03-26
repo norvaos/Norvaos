@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Intake Session Privacy Policy — Audio Retention Rules
+ * Intake Session Privacy Policy  -  Audio Retention Rules
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * LEGAL PRIVILEGE PROTECTION:
@@ -19,9 +19,9 @@
  *      the browser.
  *
  *   3. TEXT ONLY: The database stores ONLY:
- *      - `transcript` — The finalised text transcription
- *      - `summary` — An AI-generated summary of the session
- *      - `extracted_entities` — Structured data extracted from the transcript
+ *      - `transcript`  -  The finalised text transcription
+ *      - `summary`  -  An AI-generated summary of the session
+ *      - `extracted_entities`  -  Structured data extracted from the transcript
  *
  *   4. NO SERVER-SIDE AUDIO: If a Whisper/OpenAI endpoint is used for enhanced
  *      transcription, the audio chunk must be sent via a streaming endpoint

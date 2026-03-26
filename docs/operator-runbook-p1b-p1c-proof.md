@@ -1,4 +1,4 @@
-# Operator Runbook — Priority 1b + 1c Runtime Proof Execution
+# Operator Runbook  -  Priority 1b + 1c Runtime Proof Execution
 
 **Date:** 2026-03-16
 **Requires:** Environment access (see Prerequisites)
@@ -28,7 +28,7 @@ For each proof, capture the **full console/log output** and the **DB row state**
 
 ---
 
-## Part A — GHL Proofs
+## Part A  -  GHL Proofs
 
 ### A1. Expired token → refresh succeeds
 
@@ -52,7 +52,7 @@ curl -s -b cookies.txt https://localhost:3000/api/integrations/ghl/status
 - Server log output showing the proactive refresh path executed
 - DB row after: `token_expires_at` should be updated to a future time
 
-**Expected log line (structured):** none emitted on success path — absence of error log is the signal. The `token_expires_at` update in the DB is the proof.
+**Expected log line (structured):** none emitted on success path  -  absence of error log is the signal. The `token_expires_at` update in the DB is the proof.
 
 ---
 
@@ -97,7 +97,7 @@ WHERE id = '<your-ghl-connection-id>';
 
 **Setup:** This requires intercepting the GHL API response. Options:
 
-Option A — Use a local mock server:
+Option A  -  Use a local mock server:
 ```bash
 # In a separate terminal: simple server that always returns 429
 node -e "
@@ -110,7 +110,7 @@ http.createServer((req, res) => {
 ```
 Then temporarily point `GHL_BASE_URL` to `http://localhost:9001` and trigger a fetch.
 
-Option B — If the GHL sandbox account is rate-limited, trigger rapid sequential imports.
+Option B  -  If the GHL sandbox account is rate-limited, trigger rapid sequential imports.
 
 **Capture:**
 - 5 log lines: `ghl.client.rate_limited` with `retry_count: 1` through `retry_count: 5`
@@ -149,7 +149,7 @@ Same setup as A3, but set `Retry-After: 2` on the mock server.
 
 ---
 
-## Part B — Clio Proofs
+## Part B  -  Clio Proofs
 
 Identical to Part A with the following substitutions:
 
@@ -178,7 +178,7 @@ Identical to Part A with the following substitutions:
 
 ---
 
-## Part C — Microsoft Graph Proofs
+## Part C  -  Microsoft Graph Proofs
 
 ### C1. Repeated 429 terminates after 5 retries
 
@@ -199,7 +199,7 @@ Point `MICROSOFT_GRAPH_URL` to `http://localhost:9002` temporarily.
 **Capture:**
 - 5 retry sleep cycles visible in timing (5 × `Retry-After` delay)
 - Final thrown error: `Graph API rate limit exhausted after 5 retries`
-- No stack overflow — process remains alive
+- No stack overflow  -  process remains alive
 
 **Expected error:**
 ```
@@ -230,7 +230,7 @@ Acceptable evidence: process still alive after C1 completes; no `RangeError: Max
 
 ---
 
-## Part D — Tenant-scope confirmation (GHL and Clio)
+## Part D  -  Tenant-scope confirmation (GHL and Clio)
 
 After running A2 and B2, confirm the disconnect write did not affect unrelated rows.
 
@@ -249,7 +249,7 @@ ORDER BY updated_at DESC;
 
 ---
 
-## Part E — UI impact note
+## Part E  -  UI impact note
 
 After running all proofs, check:
 1. Navigate to the integrations settings page for the test tenant
@@ -257,7 +257,7 @@ After running all proofs, check:
 
 **Capture:** Screenshot of the integrations settings page after the disconnect proof.
 
-If the UI does not reflect the disconnected state, record: `UI does not reflect status='disconnected' automatically — separate UI concern, not part of this proof set.`
+If the UI does not reflect the disconnected state, record: `UI does not reflect status='disconnected' automatically  -  separate UI concern, not part of this proof set.`
 
 ---
 

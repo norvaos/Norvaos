@@ -39,7 +39,7 @@ import { CONTACT_SOURCES } from '@/lib/utils/constants'
 import type { IntakeState } from '../sovereign-stepper'
 
 /* ------------------------------------------------------------------ */
-/*  Schema — Directive 42.1/42.2: Identity Injection + Verifier        */
+/*  Schema  -  Directive 42.1/42.2: Identity Injection + Verifier        */
 /* ------------------------------------------------------------------ */
 
 const stepSchema = z.object({
@@ -276,7 +276,7 @@ export function SovereignContactStep({
   }
 
   /* ---------------------------------------------------------------- */
-  /*  Submit — create contact (+ lead unless general contact)          */
+  /*  Submit  -  create contact (+ lead unless general contact)          */
   /* ---------------------------------------------------------------- */
 
   async function onSubmit(values: StepValues) {
@@ -551,7 +551,7 @@ export function SovereignContactStep({
             <div className="flex items-center gap-2 rounded-lg border border-emerald-300 bg-emerald-50 px-4 py-3 text-emerald-800 animate-in fade-in slide-in-from-top-2">
               <CheckCircle2 className="size-4 shrink-0" />
               <p className="text-sm font-medium">
-                Identity data extracted — auto-filled fields are highlighted
+                Identity data extracted  -  auto-filled fields are highlighted
                 below. Please verify each field.
               </p>
             </div>
@@ -562,7 +562,7 @@ export function SovereignContactStep({
             <div className="flex items-center gap-2 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-amber-800 animate-in fade-in slide-in-from-top-2">
               <AlertTriangle className="size-4 shrink-0" />
               <p className="text-sm">
-                {scanError} — you can fill the fields manually.
+                {scanError}  -  you can fill the fields manually.
               </p>
             </div>
           )}

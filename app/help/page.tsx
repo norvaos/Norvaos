@@ -204,7 +204,7 @@ export default function HelpPage() {
               <h3 className="mb-4 font-semibold text-gray-900">Welcome to NorvaOS</h3>
               <p className="mb-6 text-sm leading-relaxed text-gray-600">
                 NorvaOS is a complete legal operations platform built for law firms. It replaces your document storage,
-                e-signing, scheduling, case management, and billing tools — all in one tab. Here's how to get started in under 10 minutes.
+                e-signing, scheduling, case management, and billing tools  -  all in one tab. Here's how to get started in under 10 minutes.
               </p>
 
               <div className="space-y-5">
@@ -283,7 +283,7 @@ export default function HelpPage() {
                   <h3 className="font-semibold text-gray-900">Contacts</h3>
                   <SectionTag color="bg-emerald-50 text-emerald-700" label="Clients & People" />
                 </div>
-                <p className="text-sm text-gray-600 leading-relaxed">A contact is any person associated with your firm — current client, former client, opposing counsel, or witness. Every matter must be linked to a contact.</p>
+                <p className="text-sm text-gray-600 leading-relaxed">A contact is any person associated with your firm  -  current client, former client, opposing counsel, or witness. Every matter must be linked to a contact.</p>
                 <ul className="mt-3 space-y-1.5">
                   {['Add a contact: Contacts → New Contact → fill in name, email, phone', 'Link to a matter: from the contact profile, click "Open Matter"', 'View full history: all matters, documents, invoices, and communications in one place', 'Merge duplicates: select two contacts → Actions → Merge'].map(item => (
                     <li key={item} className="flex items-start gap-2 text-sm text-gray-600">
@@ -333,7 +333,7 @@ export default function HelpPage() {
                 <div className="space-y-2">
                   {[
                     { stage: 'Intake', desc: 'Initial information gathering, conflicts check, retainer setup' },
-                    { stage: 'Active', desc: 'Work in progress — tasks, documents, and deadlines tracked here' },
+                    { stage: 'Active', desc: 'Work in progress  -  tasks, documents, and deadlines tracked here' },
                     { stage: 'Pending Review', desc: 'Waiting for lawyer sign-off, court decision, or external action' },
                     { stage: 'Closing', desc: 'File being wrapped up, final invoices sent' },
                     { stage: 'Closed', desc: 'Matter complete and archived. Can be reopened if needed.' },
@@ -351,9 +351,9 @@ export default function HelpPage() {
                 <div className="space-y-3">
                   {[
                     { icon: Layers, title: 'Readiness & Blockers', desc: 'Shows exactly what\'s blocking the case from moving forward. Ranked by severity.' },
-                    { icon: FolderOpen, title: 'Documents', desc: 'All documents for this matter — uploaded by staff or client. Review, accept, request re-upload.' },
+                    { icon: FolderOpen, title: 'Documents', desc: 'All documents for this matter  -  uploaded by staff or client. Review, accept, request re-upload.' },
                     { icon: CheckCircle, title: 'Tasks', desc: 'All tasks linked to this matter. Assign to team members, set due dates, mark complete.' },
-                    { icon: Calendar, title: 'Deadlines', desc: 'Court dates, filing deadlines, IRCC submission dates — all tracked here.' },
+                    { icon: Calendar, title: 'Deadlines', desc: 'Court dates, filing deadlines, IRCC submission dates  -  all tracked here.' },
                     { icon: CreditCard, title: 'Billing', desc: 'Retainer, invoices, time entries, and payment history for this matter.' },
                     { icon: MessageSquare, title: 'Communications', desc: 'All emails, notes, and client messages linked to this matter.' },
                     { icon: BookOpen, title: 'Onboarding', desc: 'Client intake form, risk flags, dynamic questions based on matter type.' },
@@ -434,7 +434,7 @@ export default function HelpPage() {
 
               <div className="space-y-3">
                 {[
-                  { icon: Globe, title: 'Public booking page', desc: 'Share your unique booking link. Clients select a time, fill in their details, and confirm — no back-and-forth.' },
+                  { icon: Globe, title: 'Public booking page', desc: 'Share your unique booking link. Clients select a time, fill in their details, and confirm  -  no back-and-forth.' },
                   { icon: Bell, title: 'Automatic reminders', desc: 'Clients receive email reminders 24 hours and 1 hour before their appointment.' },
                   { icon: CheckCircle, title: 'Consultation outcomes', desc: 'After a consultation, mark it as Completed, No Show, or Cancelled. Completed consultations can be converted to a matter.' },
                   { icon: Clock, title: 'Availability settings', desc: 'Set your working hours, buffer time between appointments, and blocked dates in Settings → Availability.' },
@@ -476,7 +476,7 @@ export default function HelpPage() {
                 <ul className="space-y-1.5">
                   {[
                     'Create tasks from a matter page so they stay linked to the case',
-                    'Assign tasks to specific team members — they\'ll see it in their dashboard',
+                    'Assign tasks to specific team members  -  they\'ll see it in their dashboard',
                     'Set priority (Low / Medium / High / Urgent) so your team knows what to tackle first',
                     'Use the Tasks board view (Kanban) to see all work in progress at a glance',
                   ].map(tip => (
@@ -508,7 +508,7 @@ export default function HelpPage() {
               <div className="space-y-3">
                 {[
                   { icon: Mail, title: 'Email integration', desc: 'Send emails directly from NorvaOS. They are automatically logged against the matter.' },
-                  { icon: MessageSquare, title: 'Internal notes', desc: 'Leave notes on a matter for your team. Notes are internal — clients cannot see them.' },
+                  { icon: MessageSquare, title: 'Internal notes', desc: 'Leave notes on a matter for your team. Notes are internal  -  clients cannot see them.' },
                   { icon: Bell, title: 'Automated notifications', desc: 'System sends clients automatic updates when their matter moves to a new stage or a document is accepted.' },
                   { icon: Zap, title: 'Message templates', desc: 'Save commonly used emails as templates. Insert matter data automatically with smart fields.' },
                 ].map(({ icon: Icon, title, desc }) => (
@@ -531,7 +531,7 @@ export default function HelpPage() {
             </div>
 
             <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm space-y-6">
-              <p className="text-sm text-gray-600 leading-relaxed">NorvaOS handles the full billing lifecycle — from retainer collection to final invoice. Clients can view and pay invoices through the client portal.</p>
+              <p className="text-sm text-gray-600 leading-relaxed">NorvaOS handles the full billing lifecycle  -  from retainer collection to final invoice. Clients can view and pay invoices through the client portal.</p>
 
               <div className="space-y-3">
                 {[
@@ -560,7 +560,7 @@ export default function HelpPage() {
             </div>
 
             <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm space-y-6">
-              <p className="text-sm text-gray-600 leading-relaxed">The Immigration Module gives immigration matters a specialized workspace with readiness tracking, IRCC form generation, and client review flows — all driven by a playbook engine that knows exactly what each application needs.</p>
+              <p className="text-sm text-gray-600 leading-relaxed">The Immigration Module gives immigration matters a specialized workspace with readiness tracking, IRCC form generation, and client review flows  -  all driven by a playbook engine that knows exactly what each application needs.</p>
 
               <div>
                 <h3 className="font-semibold text-gray-900 mb-3">Supported Application Streams</h3>
@@ -576,7 +576,7 @@ export default function HelpPage() {
                   { icon: Target, title: 'Readiness matrix', desc: 'Shows exactly which documents, questions, and reviews are blocking the application. Ranked by severity.' },
                   { icon: FileText, title: 'IRCC form generation', desc: 'System auto-fills IRCC forms (IMM5257E, IMM5406, IMM5476E) from questionnaire data. Draft and final packs.' },
                   { icon: CheckCircle, title: 'Field verification', desc: 'Lawyers verify individual form fields before final pack generation. Unverified fields block submission.' },
-                  { icon: Users, title: 'Multi-person support', desc: 'Handles principal applicant, spouse, and dependants — each with their own documents and questionnaire.' },
+                  { icon: Users, title: 'Multi-person support', desc: 'Handles principal applicant, spouse, and dependants  -  each with their own documents and questionnaire.' },
                   { icon: Shield, title: 'Lawyer review gate', desc: 'Final form pack cannot be generated without lawyer sign-off. Full audit trail maintained.' },
                 ].map(({ icon: Icon, title, desc }) => (
                   <FeatureRow key={title} icon={Icon} title={title} desc={desc} />
@@ -585,7 +585,7 @@ export default function HelpPage() {
 
               <div className="rounded-xl bg-blue-50 border border-blue-100 p-4">
                 <p className="text-sm font-semibold text-blue-700">How the readiness system works</p>
-                <p className="text-xs text-blue-600 mt-1">The system checks 6 domains: Identity Documents, Family Documents, Financial Documents, Travel History, Employment, and Supporting Evidence. Each domain has rules based on the application stream. Blockers are shown in plain language — "Spouse passport missing", "Marriage certificate needs re-upload" — so anyone on the team knows exactly what to do next.</p>
+                <p className="text-xs text-blue-600 mt-1">The system checks 6 domains: Identity Documents, Family Documents, Financial Documents, Travel History, Employment, and Supporting Evidence. Each domain has rules based on the application stream. Blockers are shown in plain language  -  "Spouse passport missing", "Marriage certificate needs re-upload"  -  so anyone on the team knows exactly what to do next.</p>
               </div>
             </div>
           </section>
@@ -603,7 +603,7 @@ export default function HelpPage() {
             </div>
 
             <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-              <p className="text-sm text-gray-600 leading-relaxed mb-4">Reports give you a clear view of how your firm is performing — matters, revenue, team workload, and client pipeline.</p>
+              <p className="text-sm text-gray-600 leading-relaxed mb-4">Reports give you a clear view of how your firm is performing  -  matters, revenue, team workload, and client pipeline.</p>
               <div className="grid grid-cols-2 gap-3">
                 {[
                   { title: 'Matter Pipeline', desc: 'How many matters are in each stage' },
@@ -640,7 +640,7 @@ export default function HelpPage() {
                 { title: 'Team Members', desc: 'Invite staff, assign roles (Admin / Lawyer / Paralegal / Front Desk), and manage access.' },
                 { title: 'Matter Types', desc: 'Define case types your firm handles. Add intake questions, document checklists, and default tasks per type.' },
                 { title: 'Availability', desc: 'Set working hours for online booking. Block time off and manage buffer settings.' },
-                { title: 'Profile', desc: 'Your personal profile — name, signature, membership number, email, and notification preferences.' },
+                { title: 'Profile', desc: 'Your personal profile  -  name, signature, membership number, email, and notification preferences.' },
                 { title: 'Billing Settings', desc: 'Tax rates, invoice numbering, default payment terms, and payment gateway connection.' },
                 { title: 'IRCC Form Library', desc: 'View and configure IRCC form field mappings used in auto-fill. Admin only.' },
               ].map(item => (
@@ -668,7 +668,7 @@ export default function HelpPage() {
             </div>
 
             <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm space-y-5">
-              <p className="text-sm text-gray-600 leading-relaxed">Each client gets a secure, private portal where they can track their matter, upload documents, sign forms, and view invoices — without calling your office.</p>
+              <p className="text-sm text-gray-600 leading-relaxed">Each client gets a secure, private portal where they can track their matter, upload documents, sign forms, and view invoices  -  without calling your office.</p>
 
               <div className="space-y-3">
                 {[
@@ -684,7 +684,7 @@ export default function HelpPage() {
 
               <div className="rounded-xl bg-indigo-50 border border-indigo-100 p-4">
                 <p className="text-sm font-semibold text-indigo-700">How clients access the portal</p>
-                <p className="text-xs text-indigo-600 mt-1">Clients receive a secure link by email. No password required — access is via a unique token that expires. You can re-send the link at any time from the matter page.</p>
+                <p className="text-xs text-indigo-600 mt-1">Clients receive a secure link by email. No password required  -  access is via a unique token that expires. You can re-send the link at any time from the matter page.</p>
               </div>
 
               <div className="border-t border-gray-100 pt-5">
@@ -694,8 +694,8 @@ export default function HelpPage() {
                   className="flex items-center justify-between rounded-xl bg-indigo-600 px-5 py-4 text-white hover:bg-indigo-700 transition-colors"
                 >
                   <div>
-                    <p className="font-semibold">Full guide: Client Portal — complete walkthrough</p>
-                    <p className="text-indigo-200 text-sm mt-0.5">Every section explained for both firm staff and clients — with annotated UI mockups, document statuses, IRCC forms, and firm monitoring</p>
+                    <p className="font-semibold">Full guide: Client Portal  -  complete walkthrough</p>
+                    <p className="text-indigo-200 text-sm mt-0.5">Every section explained for both firm staff and clients  -  with annotated UI mockups, document statuses, IRCC forms, and firm monitoring</p>
                   </div>
                   <ArrowRight className="h-5 w-5 text-indigo-300 shrink-0" />
                 </Link>
@@ -716,13 +716,13 @@ export default function HelpPage() {
             </div>
 
             <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm space-y-5">
-              <p className="text-sm text-gray-600 leading-relaxed">Place a tablet at your front desk. Clients tap their name, confirm their appointment, sign consent forms, and upload documents — all before they sit down. Your team is notified instantly. Accessible via QR code or direct link.</p>
+              <p className="text-sm text-gray-600 leading-relaxed">Place a tablet at your front desk. Clients tap their name, confirm their appointment, sign consent forms, and upload documents  -  all before they sit down. Your team is notified instantly. Accessible via QR code or direct link.</p>
 
               <div className="space-y-3">
                 {[
                   { icon: CheckCircle, title: 'Self check-in', desc: 'Client taps their name from the day\'s appointment list and confirms arrival.' },
                   { icon: PenLine, title: 'Sign consent forms', desc: 'Present consent forms on arrival. Clients sign on the tablet before the meeting.' },
-                  { icon: FolderOpen, title: 'Document upload', desc: 'Clients photograph and upload documents on the spot — no waiting to scan later.' },
+                  { icon: FolderOpen, title: 'Document upload', desc: 'Clients photograph and upload documents on the spot  -  no waiting to scan later.' },
                   { icon: Bell, title: 'Instant staff notification', desc: 'As soon as a client checks in, the assigned lawyer and support staff are notified.' },
                 ].map(({ icon: Icon, title, desc }) => (
                   <FeatureRow key={title} icon={Icon} title={title} desc={desc} />
@@ -751,9 +751,9 @@ export default function HelpPage() {
             <div className="rounded-2xl border border-gray-200 bg-white px-6 shadow-sm">
               <FAQ question="Can multiple lawyers work on the same matter?" answer="Yes. Every matter has a responsible lawyer but all team members with access to that matter can view and update it. You can also assign tasks to different people within the same matter." />
               <FAQ question="How secure is the client portal?" answer="Each client portal link uses a unique cryptographic token. Links are time-limited and can be revoked at any time. All data is encrypted in transit and at rest. No client sees another client's data." />
-              <FAQ question="Can I import my existing client data?" answer="Yes. You can import contacts and matters from a CSV file. Go to Settings → Import. We also offer a migration service for firms switching from other platforms — contact support@norvaos.com." />
+              <FAQ question="Can I import my existing client data?" answer="Yes. You can import contacts and matters from a CSV file. Go to Settings → Import. We also offer a migration service for firms switching from other platforms  -  contact support@norvaos.com." />
               <FAQ question="What happens if a client uploads the wrong document?" answer="You can reject the document with a note explaining what's needed. The client receives a notification and can re-upload. The old document is kept in version history." />
-              <FAQ question="Can clients access the portal from their phone?" answer="Yes. The client portal is fully responsive and works on any device — phone, tablet, or computer. No app download required." />
+              <FAQ question="Can clients access the portal from their phone?" answer="Yes. The client portal is fully responsive and works on any device  -  phone, tablet, or computer. No app download required." />
               <FAQ question="How do I add a new user to my firm?" answer="Go to Settings → Team Members → Invite. Enter their email and select their role. They will receive an invitation email with a link to set up their account." />
               <FAQ question="Is there a limit on the number of matters or documents?" answer="NorvaOS does not impose hard limits on matters or documents. Storage is generous and scales with your firm's needs. Contact us if you anticipate very high volumes." />
               <FAQ question="Can I customize the intake questions for each matter type?" answer="Yes. Go to Settings → Matter Types → select a type → scroll to Intake Questions. You can add any number of custom fields. Answers are collected in the Onboarding tab of each matter." />

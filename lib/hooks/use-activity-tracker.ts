@@ -3,7 +3,7 @@
 import { useEffect, useRef, useCallback, useState } from 'react'
 
 /**
- * Activity Tracker Hook — detects meaningful interaction events.
+ * Activity Tracker Hook  -  detects meaningful interaction events.
  *
  * Sends heartbeat events every 60s when active.
  * Detects 10-minute idle gaps → logs idle_gap event with duration.
@@ -61,7 +61,7 @@ export function useActivityTracker(options: UseActivityTrackerOptions): Activity
     const wasIdle = Date.now() - lastActivityRef.current > idleThresholdMs
 
     if (wasIdle && idleLogged.current) {
-      // We were idle and now resuming — the idle_gap event was already logged
+      // We were idle and now resuming  -  the idle_gap event was already logged
       idleLogged.current = false
       longIdleFired.current = false
     }

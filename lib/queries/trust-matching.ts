@@ -71,7 +71,7 @@ export function useTransactionMatches(matterId: string) {
       return data.suggestions ?? []
     },
     enabled: !!matterId,
-    staleTime: 1000 * 30, // 30s — financial data stays fresh
+    staleTime: 1000 * 30, // 30s  -  financial data stays fresh
   })
 }
 
@@ -110,7 +110,7 @@ export function useApplyTrustMatch(matterId: string) {
       qc.invalidateQueries({ queryKey: ['readiness'] })
 
       if (data.invoice_paid) {
-        toast.success(`Invoice ${data.invoice_number ?? ''} fully paid — balance cleared`)
+        toast.success(`Invoice ${data.invoice_number ?? ''} fully paid  -  balance cleared`)
       } else {
         const applied = (data.amount_cents / 100).toFixed(2)
         toast.success(`$${applied} applied to Invoice ${data.invoice_number ?? ''}`)
@@ -153,7 +153,7 @@ export function useReverseTrustMatch(matterId: string) {
       qc.invalidateQueries({ queryKey: ['matters'] })
       qc.invalidateQueries({ queryKey: ['readiness'] })
 
-      toast.success('Allocation reversed — offsetting entry created')
+      toast.success('Allocation reversed  -  offsetting entry created')
     },
     onError: (error: Error) => {
       toast.error(error.message)

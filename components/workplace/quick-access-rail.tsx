@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * QuickAccessRail (Zone 4) — Vertical icon button bar.
+ * QuickAccessRail (Zone 4)  -  Vertical icon button bar.
  *
  * Each click opens the corresponding panel in Zone 5 (right drawer).
  * Active item is highlighted.

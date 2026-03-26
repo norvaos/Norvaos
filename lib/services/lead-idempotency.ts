@@ -9,7 +9,7 @@
  *
  * Pattern: Attempt INSERT into lead_workflow_executions with a deterministic
  * execution_key. If unique constraint violation (23505), the operation has
- * already been executed — return skipped. Otherwise, execute the handler.
+ * already been executed  -  return skipped. Otherwise, execute the handler.
  *
  * Prevents: duplicate milestone creation, duplicate task completion, duplicate
  * stage transitions, duplicate closure records, duplicate conversions, and
@@ -80,10 +80,10 @@ export async function executeIdempotent<T = void>(
   // Step 2: Check for duplicate (unique constraint violation)
   if (insertError) {
     if (insertError.code === '23505') {
-      // Already executed — idempotency protection fired
+      // Already executed  -  idempotency protection fired
       return { executed: false, skipped: true }
     }
-    // Unexpected error — let it propagate
+    // Unexpected error  -  let it propagate
     throw new Error(`Idempotency ledger insert failed: ${insertError.message}`)
   }
 

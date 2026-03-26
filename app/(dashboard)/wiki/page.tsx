@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * Wiki Search — VELOCITY-powered searchable knowledge base.
+ * Wiki Search  -  VELOCITY-powered searchable knowledge base.
  *
  * Features:
  * - Full-text search via PostgreSQL tsvector (< 100ms target)
@@ -118,7 +118,7 @@ export default function WikiPage() {
                 <NorvaWhisper contentKey="global.cmd_k" />
               </h1>
               <p className="text-sm text-muted-foreground mt-1">
-                Your firm&apos;s playbooks, SOPs, and reusable snippets — searchable in under 100ms.
+                Your firm&apos;s playbooks, SOPs, and reusable snippets  -  searchable in under 100ms.
               </p>
             </div>
             <button

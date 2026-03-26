@@ -1,5 +1,5 @@
 -- ═══════════════════════════════════════════════════════════════════════════════
--- Migration 169 — Intelligent Gatekeeper: Lead Readiness & Validation Engine
+-- Migration 169  -  Intelligent Gatekeeper: Lead Readiness & Validation Engine
 -- ═══════════════════════════════════════════════════════════════════════════════
 -- Deliverables:
 --   1. jurisdictions lookup table (global, no RLS)

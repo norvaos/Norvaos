@@ -7,18 +7,18 @@
  * Can also be invoked in bulk via POST /api/matters/risk-flags/evaluate-all.
  *
  * Flag types (12):
- *  1.  PRIOR_REFUSAL               — prior_refusals === true
- *  2.  STATUS_EXPIRY_IMMINENT      — current_visa_expiry within 60 days
- *  3.  INADMISSIBILITY_INDICATOR   — has_medical_issues === true
- *  4.  CRIMINAL_RECORD             — has_criminal_record === true
- *  5.  TRAVEL_HISTORY_GAP          — passport present but no country_of_residence
- *  6.  MISREPRESENTATION_RISK      — intake contradiction_flags array non-empty
- *  7.  DOCUMENT_AUTHENTICITY       — handled downstream by document rejection handler
- *  8.  FINANCIAL_INSUFFICIENCY     — retainer_amount proxy < $500
- *  9.  MEDICAL_INADMISSIBILITY     — covered by INADMISSIBILITY_INDICATOR (deduped)
- * 10.  RELATIONSHIP_GENUINENESS    — sponsor_relationship set but no relationship_start_date
- * 11.  MINOR_INVOLVED              — dependents_count > 0
- * 12.  CONCURRENT_APPLICATION      — prior_refusals + active application_number
+ *  1.  PRIOR_REFUSAL                -  prior_refusals === true
+ *  2.  STATUS_EXPIRY_IMMINENT       -  current_visa_expiry within 60 days
+ *  3.  INADMISSIBILITY_INDICATOR    -  has_medical_issues === true
+ *  4.  CRIMINAL_RECORD              -  has_criminal_record === true
+ *  5.  TRAVEL_HISTORY_GAP           -  passport present but no country_of_residence
+ *  6.  MISREPRESENTATION_RISK       -  intake contradiction_flags array non-empty
+ *  7.  DOCUMENT_AUTHENTICITY        -  handled downstream by document rejection handler
+ *  8.  FINANCIAL_INSUFFICIENCY      -  retainer_amount proxy < $500
+ *  9.  MEDICAL_INADMISSIBILITY      -  covered by INADMISSIBILITY_INDICATOR (deduped)
+ * 10.  RELATIONSHIP_GENUINENESS     -  sponsor_relationship set but no relationship_start_date
+ * 11.  MINOR_INVOLVED               -  dependents_count > 0
+ * 12.  CONCURRENT_APPLICATION       -  prior_refusals + active application_number
  */
 
 import type { SupabaseClient } from '@supabase/supabase-js'
@@ -150,7 +150,7 @@ function detectFlags(
   }
 
   // 7. DOCUMENT_AUTHENTICITY ────────────────────────────────────────────────
-  // Intentionally not auto-detected here — handled downstream by the document
+  // Intentionally not auto-detected here  -  handled downstream by the document
   // rejection handler which has access to reviewer decisions.
 
   // 8. FINANCIAL_INSUFFICIENCY ──────────────────────────────────────────────
@@ -170,7 +170,7 @@ function detectFlags(
   }
 
   // 9. MEDICAL_INADMISSIBILITY ──────────────────────────────────────────────
-  // Covered by INADMISSIBILITY_INDICATOR above — deduplication intentional.
+  // Covered by INADMISSIBILITY_INDICATOR above  -  deduplication intentional.
 
   // 10. RELATIONSHIP_GENUINENESS ────────────────────────────────────────────
   if (immigration?.sponsor_relationship && !immigration?.relationship_start_date) {
@@ -226,7 +226,7 @@ function detectFlags(
  * matter_risk_flags.  Existing open flags of the same type are updated in
  * place; new flags are inserted.  Closed/resolved flags are never reopened.
  *
- * This function is intentionally fire-and-forget safe — it captures all
+ * This function is intentionally fire-and-forget safe  -  it captures all
  * per-flag errors internally and returns a summary rather than throwing.
  */
 export async function evaluateRiskFlags(

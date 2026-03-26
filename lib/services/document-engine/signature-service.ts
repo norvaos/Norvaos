@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Document Engine — Signature Service (Manual Tracking — Phase 1)
+ * Document Engine  -  Signature Service (Manual Tracking  -  Phase 1)
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Manual signature status tracking. Users create signature requests and
@@ -243,7 +243,7 @@ async function checkSignatureCompletion(
       eventPayload: { completion_type: 'all_signers_signed' },
     })
   } else if (someSigned) {
-    // Partial — update request and instance to partially_signed
+    // Partial  -  update request and instance to partially_signed
     if (request.status !== 'partially_signed') {
       await supabase
         .from('document_signature_requests')

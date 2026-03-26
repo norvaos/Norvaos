@@ -106,7 +106,7 @@ export function LogMeetingDialog({
     const descParts: string[] = [outcomeInfo.label]
     if (duration) descParts.push(`(${formatDuration(duration)})`)
     if (location) descParts.push(`at ${location}`)
-    if (notes) descParts.push(`— ${notes}`)
+    if (notes) descParts.push(` -  ${notes}`)
     const description = descParts.join(' ')
 
     try {

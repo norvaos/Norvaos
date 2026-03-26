@@ -238,7 +238,7 @@ export default function TenantSetupPage({
                 Bootstrap
               </h3>
               <p className="text-xs text-muted-foreground">
-                Seeds system roles and practice areas from a starter pack. Idempotent — already-applied actions are skipped.
+                Seeds system roles and practice areas from a starter pack. Idempotent  -  already-applied actions are skipped.
               </p>
               <Button
                 size="sm"

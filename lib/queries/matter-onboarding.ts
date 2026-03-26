@@ -57,7 +57,7 @@ export function useMatterOnboardingSteps(matterId: string) {
       return map
     },
     enabled: !!matterId && !!tenant,
-    staleTime: 1000 * 30, // 30s — onboarding state changes infrequently
+    staleTime: 1000 * 30, // 30s  -  onboarding state changes infrequently
   })
 }
 

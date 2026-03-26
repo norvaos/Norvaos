@@ -7,10 +7,10 @@ import { createServerSupabaseClient } from '@/lib/supabase/server'
 /**
  * GET /api/matters/[id]/trust-match
  *
- * Smart-Match Engine — calls fn_suggest_transaction_matches RPC
+ * Smart-Match Engine  -  calls fn_suggest_transaction_matches RPC
  * to find unallocated deposits that match open invoices.
  *
- * Auth: Sentinel 403 — authenticateRequest() + requirePermission('billing', 'view')
+ * Auth: Sentinel 403  -  authenticateRequest() + requirePermission('billing', 'view')
  * Tenant isolation enforced both here AND inside the RPC.
  */
 async function handleGet(
@@ -49,10 +49,10 @@ async function handleGet(
 /**
  * POST /api/matters/[id]/trust-match
  *
- * Apply a suggested match — calls fn_apply_trust_allocation RPC.
+ * Apply a suggested match  -  calls fn_apply_trust_allocation RPC.
  * Body: { invoiceId, transactionId, amountCents, notes? }
  *
- * Auth: Sentinel 403 — authenticateRequest() + requirePermission('billing', 'manage')
+ * Auth: Sentinel 403  -  authenticateRequest() + requirePermission('billing', 'manage')
  */
 async function handlePost(
   request: Request,
@@ -110,11 +110,11 @@ async function handlePost(
 /**
  * DELETE /api/matters/[id]/trust-match
  *
- * Reverse an allocation — calls fn_reverse_trust_allocation RPC.
+ * Reverse an allocation  -  calls fn_reverse_trust_allocation RPC.
  * Creates an offsetting entry; never deletes the original.
  * Body: { allocationId, reason }
  *
- * Auth: Sentinel 403 — authenticateRequest() + requirePermission('billing', 'manage')
+ * Auth: Sentinel 403  -  authenticateRequest() + requirePermission('billing', 'manage')
  */
 async function handleDelete(
   request: Request,

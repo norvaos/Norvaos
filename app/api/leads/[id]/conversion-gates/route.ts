@@ -10,7 +10,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
  * GET /api/leads/[id]/conversion-gates
  *
  * Evaluate all conversion gates for a lead without executing conversion.
- * Returns the current status of each gate — useful for UI pre-checks
+ * Returns the current status of each gate  -  useful for UI pre-checks
  * and showing the user what needs to be resolved before converting.
  */
 async function handleGet(

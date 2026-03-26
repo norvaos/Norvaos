@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * ZoneA — Control Header
+ * ZoneA  -  Control Header
  *
  * Fixed top bar. Always visible. ~80px height.
  * Shows: matter number, title, matter-type pill, status badge, priority
@@ -35,9 +35,9 @@ type Matter = Database['public']['Tables']['matters']['Row']
 const STATUS_CONFIG: Record<string, { label: string; className: string }> = {
   active:            { label: 'Active',              className: 'bg-green-100 text-green-800 border-green-300' },
   intake:            { label: 'Intake',              className: 'bg-blue-100 text-blue-800 border-blue-300' },
-  closed_won:        { label: 'Closed — Won',        className: 'bg-slate-100 text-slate-700 border-slate-300' },
-  closed_refused:    { label: 'Closed — Refused',    className: 'bg-red-100 text-red-800 border-red-300' },
-  closed_withdrawn:  { label: 'Closed — Withdrawn',  className: 'bg-amber-100 text-amber-700 border-amber-300' },
+  closed_won:        { label: 'Closed  -  Won',        className: 'bg-slate-100 text-slate-700 border-slate-300' },
+  closed_refused:    { label: 'Closed  -  Refused',    className: 'bg-red-100 text-red-800 border-red-300' },
+  closed_withdrawn:  { label: 'Closed  -  Withdrawn',  className: 'bg-amber-100 text-amber-700 border-amber-300' },
   on_hold:           { label: 'On Hold',             className: 'bg-yellow-100 text-yellow-800 border-yellow-300' },
 }
 
@@ -60,9 +60,9 @@ const RISK_LEVEL_CONFIG: Record<string, string> = {
 export interface ZoneAProps {
   matter: Matter
   tenantId: string
-  /** Optional: called when user clicks Flag button — e.g. open risk-flag modal */
+  /** Optional: called when user clicks Flag button  -  e.g. open risk-flag modal */
   onFlagClick?: () => void
-  /** Optional: called when user clicks Notes — e.g. scroll to notes tab */
+  /** Optional: called when user clicks Notes  -  e.g. scroll to notes tab */
   onNotesClick?: () => void
 }
 
@@ -77,7 +77,7 @@ export function ZoneA({ matter, tenantId, onFlagClick, onNotesClick }: ZoneAProp
   // Composite readiness score
   const { data: readiness, isLoading: readinessLoading } = useReadinessScore(matter.id)
 
-  // Determine if retainer is already signed — used to decide button label/style
+  // Determine if retainer is already signed  -  used to decide button label/style
   const { data: latestRetainer } = useLatestRetainerAgreement(matter.id)
 
   // Matter-type name + colour
@@ -278,7 +278,7 @@ export function ZoneA({ matter, tenantId, onFlagClick, onNotesClick }: ZoneAProp
             <Share2 className="h-3.5 w-3.5" />
             Share
           </Button>
-          {/* Retainer button — only shown when retainer is not yet signed */}
+          {/* Retainer button  -  only shown when retainer is not yet signed */}
           {latestRetainer?.status !== 'signed' && (
             <Button
               variant="outline"

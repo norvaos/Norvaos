@@ -1,5 +1,5 @@
 /**
- * Packet Assembler — Merges IRCC forms + uploaded documents into a single PDF.
+ * Packet Assembler  -  Merges IRCC forms + uploaded documents into a single PDF.
  *
  * Assembly order (legal standard):
  *   1. Cover Page (matter title, client name, date, form/document count)
@@ -136,7 +136,7 @@ export async function assembleSubmissionPackage(
 
   currentPage++
 
-  // ── Table of Contents (placeholder — page numbers filled after merge) ──
+  // ── Table of Contents (placeholder  -  page numbers filled after merge) ──
 
   const tocPage = mergedPdf.addPage([612, 792])
   tocPage.drawText('TABLE OF CONTENTS', {
@@ -170,12 +170,12 @@ export async function assembleSubmissionPackage(
     tocY -= 18
 
     for (const inst of formInstances ?? []) {
-      const label = `${tocIndex}. ${inst.form_code} — ${inst.form_name}`
+      const label = `${tocIndex}. ${inst.form_code}  -  ${inst.form_name}`
       tocPage.drawText(label, { x: 90, y: tocY, size: 10, font: helvetica, color: rgb(0.2, 0.2, 0.2) })
       tocPage.drawText(`p. ${pageAfterToc}`, { x: 490, y: tocY, size: 10, font: helvetica, color: rgb(0.5, 0.5, 0.5) })
       items.push({
         type: 'ircc_form',
-        label: `${inst.form_code} — ${inst.form_name}`,
+        label: `${inst.form_code}  -  ${inst.form_name}`,
         formCode: inst.form_code,
         pageCount: 0, // Updated after form PDF is merged
         startPage: pageAfterToc,

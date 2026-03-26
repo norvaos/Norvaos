@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * BlockerCards — Shows blocking items preventing matter progress.
+ * BlockerCards  -  Shows blocking items preventing matter progress.
  *
  * Cards for: missing required documents, unresolved canonical profile conflicts,
  * incomplete questionnaire sections, pending verifications, overdue tasks.

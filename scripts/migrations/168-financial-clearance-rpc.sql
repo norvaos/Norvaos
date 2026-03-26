@@ -1,12 +1,12 @@
 -- ============================================================================
--- Migration 168: Financial Kill-Switch — check_financial_clearance RPC
+-- Migration 168: Financial Kill-Switch  -  check_financial_clearance RPC
 -- ============================================================================
 -- Returns financial clearance status for a matter.
 -- A matter is NOT cleared for submission if:
 --   1. outstanding_cents > 0  (client still owes money)
 --   2. unallocated_cents > 0  (trust funds sitting idle, not applied to fees)
 --
--- All calculations happen in Postgres — zero frontend math.
+-- All calculations happen in Postgres  -  zero frontend math.
 -- Inherits RLS tenant isolation via auth.uid().
 -- ============================================================================
 
@@ -84,7 +84,7 @@ BEGIN
    ORDER BY created_at DESC
    LIMIT 1;
 
-  -- No trust transactions at all — balance is 0
+  -- No trust transactions at all  -  balance is 0
   IF v_trust_balance IS NULL THEN
     v_trust_balance := 0;
   END IF;
@@ -101,7 +101,7 @@ BEGIN
     v_blockers := v_blockers || jsonb_build_array(
       jsonb_build_object(
         'code',    'OUTSTANDING_BALANCE',
-        'message', format('Client owes %s — outstanding balance of $%s must be cleared before submission.',
+        'message', format('Client owes %s  -  outstanding balance of $%s must be cleared before submission.',
                           format('%s cents', v_outstanding),
                           to_char(v_outstanding / 100.0, 'FM999,999,990.00')),
         'cents',   v_outstanding
@@ -113,7 +113,7 @@ BEGIN
     v_blockers := v_blockers || jsonb_build_array(
       jsonb_build_object(
         'code',    'UNALLOCATED_TRUST_FUNDS',
-        'message', format('$%s in unallocated trust funds — apply or refund before submission.',
+        'message', format('$%s in unallocated trust funds  -  apply or refund before submission.',
                           to_char(v_unallocated / 100.0, 'FM999,999,990.00')),
         'cents',   v_unallocated
       )
@@ -140,4 +140,4 @@ GRANT EXECUTE ON FUNCTION check_financial_clearance(UUID) TO authenticated;
 COMMENT ON FUNCTION check_financial_clearance IS
   'Financial Kill-Switch: returns clearance status for matter submission. '
   'Blocks if outstanding balance > 0 or unallocated trust funds exist. '
-  'All calculations happen in Postgres — zero frontend math.';
+  'All calculations happen in Postgres  -  zero frontend math.';

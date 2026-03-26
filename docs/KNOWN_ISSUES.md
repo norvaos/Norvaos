@@ -4,14 +4,14 @@ This document tracks known issues in NorvaOS. Issues are logged here
 when they are identified, partially mitigated, or intentionally deferred.
 P0 blockers must be resolved before any production release.
 
-Last updated: 2026-03-17 — Sprint 6 close-out
+Last updated: 2026-03-17  -  Sprint 6 close-out
 
 ---
 
-## ISSUE-001 — Pending form generation jobs have no automatic retry or timeout
+## ISSUE-001  -  Pending form generation jobs have no automatic retry or timeout
 
 **Severity**: P1 (high)
-**Status**: Partially mitigated — code complete, deployment pending (Release Gate B1)
+**Status**: Partially mitigated  -  code complete, deployment pending (Release Gate B1)
 **Component**: `form_generation_log` / `GET /api/internal/job-worker` / Python sidecar
 **Description**: `form_generation_log` rows with `status='pending'` have no
 automatic retry logic or timeout enforced at the database layer. If the Python
@@ -28,11 +28,11 @@ admin visibility. Migration 131 adds `retry_count` column.
 - Migration 131 is applied and confirmed in production (verify `retry_count` column exists).
 - Vercel Cron entry (`*/2 * * * *` → `/api/internal/job-worker`) is confirmed active and receiving calls with a valid `WORKER_SECRET` header.
 - At least one stuck job smoke-test passes end-to-end (insert old pending row, confirm worker transitions it to `failed` within one cron cycle).
-**Resolution target**: Sprint 6 Week 3 — blocked on migration 131 deployment and cron registration.
+**Resolution target**: Sprint 6 Week 3  -  blocked on migration 131 deployment and cron registration.
 
 ---
 
-## ISSUE-002 — Admin client used for matters INSERT in create-jr-matter
+## ISSUE-002  -  Admin client used for matters INSERT in create-jr-matter
 
 **Severity**: P2 (medium)
 **Status**: Open
@@ -42,7 +42,7 @@ role key) to perform the `INSERT` on the `matters` table. This is a workaround
 for a PostgREST limitation: RLS policies with `RETURNING` clauses cannot be
 satisfied by the authenticated client in certain upsert scenarios.
 **Impact**: Tenant isolation is not enforced at the database layer for this
-specific INSERT — it is enforced at the application layer by explicitly setting
+specific INSERT  -  it is enforced at the application layer by explicitly setting
 `tenant_id` from the authenticated session. A bug in the application code could
 theoretically write a row to the wrong tenant. No current exploit path is known.
 **Mitigation**: Application-layer enforcement: `tenant_id` is always set from
@@ -54,7 +54,7 @@ inserting, removing the need for service-role access.
 
 ---
 
-## ISSUE-003 — Python sidecar not production-ready (dev PDF output only)
+## ISSUE-003  -  Python sidecar not production-ready (dev PDF output only)
 
 **Severity**: P1 (high)
 **Status**: Open
@@ -76,7 +76,7 @@ significant. Must be completed before form generation is exposed to clients.
 
 ---
 
-## ISSUE-004 — Generated PDF output_path is a local filesystem path, not Supabase Storage URL
+## ISSUE-004  -  Generated PDF output_path is a local filesystem path, not Supabase Storage URL
 
 **Severity**: P1 (high)
 **Status**: Open
@@ -97,10 +97,10 @@ environment.
 
 ---
 
-## ISSUE-005 — Worker secret falls back to 'dev-secret' if WORKER_SECRET not set
+## ISSUE-005  -  Worker secret falls back to 'dev-secret' if WORKER_SECRET not set
 
-**Severity**: P0 (blocker) — in production; P3 (low) — in development
-**Status**: Resolved — code fix applied 2026-03-17 (Release Gate B2 closed)
+**Severity**: P0 (blocker)  -  in production; P3 (low)  -  in development
+**Status**: Resolved  -  code fix applied 2026-03-17 (Release Gate B2 closed)
 **Component**: `worker/sidecar.py` / `GET /api/internal/job-worker` / `POST /api/internal/form-generation-callback`
 **Description**: The Python sidecar contains a hardcoded fallback value `'dev-secret'`
 for `WORKER_SECRET` when the environment variable is not set (pattern:
@@ -127,7 +127,7 @@ fallback if the sidecar's env is misconfigured. The issue is bilateral.
    X-Worker-Key if X-Job-ID is present) must also be fixed: require X-Worker-Key
    on all protected endpoints when WORKER_SECRET is set.
 **Resolution applied 2026-03-17**:
-1. Startup assertion added: `if not WORKER_SECRET: raise RuntimeError(...)` — sidecar refuses to start if env var is missing or empty.
+1. Startup assertion added: `if not WORKER_SECRET: raise RuntimeError(...)`  -  sidecar refuses to start if env var is missing or empty.
 2. `_send_callback` now uses `WORKER_SECRET` directly with no fallback string.
 3. Auth middleware hardened: `X-Job-ID` no longer grants implicit auth. All POST requests must supply a valid `X-Worker-Key` when `WORKER_SECRET` is set. Missing key = `''` ≠ `WORKER_SECRET` → 401.
 4. Confirmed: string `'dev-secret'` does not appear anywhere in `sidecar.py`.
@@ -135,10 +135,10 @@ fallback if the sidecar's env is misconfigured. The issue is bilateral.
 
 ---
 
-## ISSUE-006 — form_generation_log missing retry_count column
+## ISSUE-006  -  form_generation_log missing retry_count column
 
 **Severity**: P2 (medium)
-**Status**: Open — resolved by migration 131
+**Status**: Open  -  resolved by migration 131
 **Component**: `form_generation_log` table / `GET /api/internal/job-worker`
 **Description**: The `form_generation_log` table created in migration 130 does
 not include a `retry_count` column. The job-worker route (`GET /api/internal/job-worker`)
@@ -156,11 +156,11 @@ dashboard before registering the cron job.
 
 ---
 
-## ISSUE-007 — Matter closure trust balance check does not handle partial reconciliations
+## ISSUE-007  -  Matter closure trust balance check does not handle partial reconciliations
 
 **Severity**: P2 (medium)
 **Status**: Deferred
-**Component**: `POST /api/matters/[id]/close` — trust reconciliation guard
+**Component**: `POST /api/matters/[id]/close`  -  trust reconciliation guard
 **Description**: The closure guard performs a simple debit/credit balance check:
 it sums all `trust_transactions` for the matter and blocks closure if the net
 balance is non-zero. This does not account for partial reconciliations, escrow

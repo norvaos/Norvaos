@@ -85,7 +85,7 @@ export async function clioFetch<T = unknown>(
       body: body ? JSON.stringify(body) : undefined,
     })
 
-    // Rate limiting — bounded retry respecting Retry-After
+    // Rate limiting  -  bounded retry respecting Retry-After
     if (res.status === 429) {
       if (rateLimit429Count >= MAX_CLIO_RATE_LIMIT_RETRIES) {
         throw new ClioApiError(
@@ -104,7 +104,7 @@ export async function clioFetch<T = unknown>(
       continue
     }
 
-    // Expired or revoked token — attempt one forced refresh, then retry
+    // Expired or revoked token  -  attempt one forced refresh, then retry
     // getValidClioToken({ force: true }) throws ClioConnectionError on refresh failure,
     // which propagates to the caller without further retries.
     if (res.status === 401 && !tokenRefreshed) {
@@ -161,7 +161,7 @@ export async function clioPaginateAll<T>(
 
       if (res.status === 429) {
         if (nextUrlRateLimit429Count >= MAX_CLIO_RATE_LIMIT_RETRIES) {
-          // Abort pagination rather than loop forever — return partial results
+          // Abort pagination rather than loop forever  -  return partial results
           log.warn('clio.client.pagination_rate_limit_exhausted', {
             connection_id: connectionId,
             pages_fetched: page,

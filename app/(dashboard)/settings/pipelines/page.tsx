@@ -955,7 +955,7 @@ export default function PipelinesPage() {
   // If filter changes and selected pipeline is no longer visible, clear selection
   useMemo(() => {
     if (selectedPipelineId && effectivePipelines.length > 0 && !hasSelection) {
-      // Selection was lost due to filter change — do nothing, let user re-select
+      // Selection was lost due to filter change  -  do nothing, let user re-select
     }
   }, [selectedPipelineId, effectivePipelines, hasSelection])
 

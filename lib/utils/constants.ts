@@ -306,9 +306,9 @@ export const IMMIGRATION_STATUSES = [
   { value: 'implied_status', label: 'Implied Status' },
   { value: 'bridging_open_wp', label: 'Bridging Open Work Permit' },
   { value: 'expired', label: 'Expired Status' },
-  { value: 'outside_canada_pending', label: 'Outside Canada — Application Pending' },
-  { value: 'outside_canada_awaiting', label: 'Outside Canada — Awaiting Decision' },
-  { value: 'outside_canada_no_application', label: 'Outside Canada — No Application' },
+  { value: 'outside_canada_pending', label: 'Outside Canada  -  Application Pending' },
+  { value: 'outside_canada_awaiting', label: 'Outside Canada  -  Awaiting Decision' },
+  { value: 'outside_canada_no_application', label: 'Outside Canada  -  No Application' },
   { value: 'unknown', label: 'Unknown' },
 ] as const
 
@@ -570,7 +570,7 @@ export const IMMIGRATION_SERVICE_PRESETS = [
   { description: 'Electronic Travel Authorization (eTA)', unitPrice: 300 },
   // ── Citizenship ──
   { description: 'Citizenship Application', unitPrice: 1200 },
-  { description: 'Citizenship — Minor Application', unitPrice: 1000 },
+  { description: 'Citizenship  -  Minor Application', unitPrice: 1000 },
   { description: 'Proof of Citizenship', unitPrice: 800 },
   { description: 'Citizenship Resumption', unitPrice: 1500 },
   // ── Humanitarian & Refugee ──
@@ -588,8 +588,8 @@ export const IMMIGRATION_SERVICE_PRESETS = [
   { description: 'Authorization to Return to Canada (ARC)', unitPrice: 2000 },
   // ── Judicial Review & Federal Court ──
   { description: 'Judicial Review', unitPrice: 5000 },
-  { description: 'Federal Court — Leave Application', unitPrice: 5000 },
-  { description: 'Federal Court — Full Hearing', unitPrice: 8000 },
+  { description: 'Federal Court  -  Leave Application', unitPrice: 5000 },
+  { description: 'Federal Court  -  Full Hearing', unitPrice: 8000 },
   { description: 'Stay of Removal Motion', unitPrice: 3500 },
   // ── Status Changes & Restoration ──
   { description: 'Status Restoration', unitPrice: 1500 },
@@ -631,7 +631,7 @@ export const GOVERNMENT_FEE_PRESETS = [
   { description: 'Citizenship Resumption Fee', amount: 630 },
   // ── Biometrics ──
   { description: 'Biometrics Fee (Individual)', amount: 85 },
-  { description: 'Biometrics Fee (Family — max)', amount: 170 },
+  { description: 'Biometrics Fee (Family  -  max)', amount: 170 },
   // ── Status & Restoration ──
   { description: 'Status Restoration Fee', amount: 229 },
   { description: 'PR Card Renewal Fee', amount: 50 },
@@ -678,7 +678,7 @@ export const PAYMENT_MILESTONES = [
 
 /**
  * Person scope for retainer fee templates and matters.
- * Phase-one billing abstraction — NOT the final domain model for all practice areas.
+ * Phase-one billing abstraction  -  NOT the final domain model for all practice areas.
  */
 export const PERSON_SCOPES = [
   { value: 'single', label: 'Single Applicant' },
@@ -686,20 +686,20 @@ export const PERSON_SCOPES = [
 ] as const
 
 /**
- * Consultation outcomes — used by the inline Consultation Outcome Panel.
+ * Consultation outcomes  -  used by the inline Consultation Outcome Panel.
  * Each outcome maps to a distinct set of downstream actions (see plan).
  */
 export const CONSULTATION_OUTCOMES = [
   {
     value: 'send_retainer',
-    label: 'Retained — Pending Retainer',
+    label: 'Retained  -  Pending Retainer',
     icon: 'Trophy',
     color: '#22c55e',
     description: 'Lead intends to retain. Prepare retainer package.',
   },
   {
     value: 'follow_up_later',
-    label: 'Thinking — Follow-up Required',
+    label: 'Thinking  -  Follow-up Required',
     icon: 'Clock',
     color: '#f59e0b',
     description: 'Lead needs more time to decide.',

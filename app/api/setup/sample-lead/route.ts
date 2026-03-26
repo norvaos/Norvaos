@@ -66,7 +66,7 @@ export async function POST() {
         stage_id: pipeline.stageId,
         temperature: 'warm',
         source: 'referral',
-        source_detail: 'Onboarding Sample — Test Case',
+        source_detail: 'Onboarding Sample  -  Test Case',
         notes: 'This is a sample lead created during onboarding. Use it to explore NorvaOS features like ID scanning, conflict checks, and the Command Centre.',
         status: 'open',
         created_by: userId,

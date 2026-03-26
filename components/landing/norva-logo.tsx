@@ -1,5 +1,5 @@
 /**
- * NorvaOS Logomark — geometric N mark on an indigo→violet gradient background.
+ * NorvaOS Logomark  -  geometric N mark on an indigo→violet gradient background.
  * Accepts `size` (px) and `id` (unique prefix for SVG gradient IDs when rendered
  * multiple times on the same page).
  */
@@ -17,7 +17,7 @@ export function NorvaLogo({ size = 32, id = 'norva' }: { size?: number; id?: str
       aria-label="NorvaOS"
     >
       <defs>
-        {/* Main diagonal gradient — top-left indigo to bottom-right violet */}
+        {/* Main diagonal gradient  -  top-left indigo to bottom-right violet */}
         <linearGradient id={bgId} x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
           <stop offset="0%" stopColor="#4f46e5" />
           <stop offset="100%" stopColor="#7c3aed" />
@@ -37,7 +37,7 @@ export function NorvaLogo({ size = 32, id = 'norva' }: { size?: number; id?: str
       {/* ── N lettermark ─────────────────────────────────────────────────── */}
       {/* Left vertical bar */}
       <rect x="6.5" y="7" width="3.5" height="18" rx="1" fill="white" />
-      {/* Diagonal — parallelogram connecting top of left bar to bottom of right bar */}
+      {/* Diagonal  -  parallelogram connecting top of left bar to bottom of right bar */}
       <polygon points="10,7 13.5,7 22,25 18.5,25" fill="white" />
       {/* Right vertical bar */}
       <rect x="22" y="7" width="3.5" height="18" rx="1" fill="white" />

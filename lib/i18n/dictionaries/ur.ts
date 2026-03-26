@@ -1,5 +1,5 @@
 /**
- * اردو (ur) — Urdu dictionary.
+ * اردو (ur)  -  Urdu dictionary.
  */
 
 import type { DictionaryKey } from './en'
@@ -70,7 +70,7 @@ export const ur: Partial<Record<DictionaryKey, string>> = {
   'dashboard.deadline_today': 'Today',
   'dashboard.deadline_1_day': '1 day',
   'dashboard.deadline_days': '{days} days',
-  'dashboard.deadlines_14_days': 'Deadlines — Next 14 Days',
+  'dashboard.deadlines_14_days': 'Deadlines  -  Next 14 Days',
   'dashboard.no_deadlines_14': 'No deadlines in the next 14 days',
   'dashboard.no_deadlines_14_desc': 'Typed deadlines on matters will appear here.',
   'dashboard.unknown_matter': 'Unknown matter',
@@ -100,12 +100,12 @@ export const ur: Partial<Record<DictionaryKey, string>> = {
   'common.save': 'محفوظ کریں',
   'common.view': 'دیکھیں',
 
-  // ── حکم نامہ 41.0 — شناخت اور والٹ لیبلز ─────────────────────────────
+  // ── حکم نامہ 41.0  -  شناخت اور والٹ لیبلز ─────────────────────────────
   'contact.badge.retained_client': 'برقرار موکل',
   'contact.badge.prospective_lead': 'ممکنہ لیڈ',
   'contact.badge.contact': 'رابطہ',
   'contact.command_centre': 'کمانڈ سینٹر',
-  'contact.command_centre_red_alert': 'تیاری کا اسکور انتہائی کم ہے — فوری توجہ درکار ہے',
+  'contact.command_centre_red_alert': 'تیاری کا اسکور انتہائی کم ہے  -  فوری توجہ درکار ہے',
   'contact.intake_funnel': 'داخلہ فنل',
   'contact.intake_progress': 'داخلہ کی پیش رفت',
   'contact.matter_readiness': 'مقدمے کی تیاری',
@@ -118,13 +118,13 @@ export const ur: Partial<Record<DictionaryKey, string>> = {
   'vault.title': 'نوروا والٹ',
   'vault.empty': 'نوروا والٹ خالی ہے',
   'vault.empty_description': 'اس رابطے کے لیے کوئی دستاویز اپ لوڈ نہیں ہوئی۔',
-  'vault.sentinel_eye': 'سینٹینل آئی — دیکھیں اور تصدیق کریں',
+  'vault.sentinel_eye': 'سینٹینل آئی  -  دیکھیں اور تصدیق کریں',
   'vault.file_tampered': 'خبردار: فائل میں تبدیلی',
   'vault.sha256_verified': 'SHA-256 تصدیق شدہ',
   'vault.hash_pending': 'ہیش زیر التواء',
   'vault.integrity_alert': 'سالمیت الرٹ',
   'vault.untracked': 'غیر ٹریک شدہ',
-  'vault.no_preview': 'پیش نظارہ دستیاب نہیں — فائل URL موجود نہیں',
+  'vault.no_preview': 'پیش نظارہ دستیاب نہیں  -  فائل URL موجود نہیں',
 
   // ── قانونی اعلامیے ────────────────────────────────────────────────────
   'legal.retainer_title': 'وکالت نامہ',
@@ -212,12 +212,12 @@ export const ur: Partial<Record<DictionaryKey, string>> = {
   'status.days_remaining': '{days} دن باقی',
   'status.verified': 'تصدیق شدہ',
   'status.expiry_label': 'میعاد',
-  'status.sentinel_tamper_title': 'سینٹینل الرٹ — تبدیلی کا پتہ چلا',
+  'status.sentinel_tamper_title': 'سینٹینل الرٹ  -  تبدیلی کا پتہ چلا',
   'status.sentinel_tamper_body': 'دستاویز کی ہیش مماثلت نہیں ہے۔ یہ دستاویز نوروا او ایس سے باہر تبدیل کی گئی ہے۔',
-  'status.vault_verified_title': 'نوروا والٹ — سالمیت کی تصدیق',
+  'status.vault_verified_title': 'نوروا والٹ  -  سالمیت کی تصدیق',
   'status.vault_verified_body': 'یہ دستاویز نوروا والٹ میں ہیش لاک ہے۔ کسی بھی تبدیلی کا پتہ لگایا جائے گا۔',
 
-  // ── لیڈز کمانڈ سینٹر (ہدایت نامہ 40.0 — سوورن لیئر) ─────────────────
+  // ── لیڈز کمانڈ سینٹر (ہدایت نامہ 40.0  -  سوورن لیئر) ─────────────────
   'leads.title': 'لیڈز',
   'leads.add_lead': 'لیڈ شامل کریں',
   'leads.import': 'درآمد',
@@ -340,7 +340,7 @@ export const ur: Partial<Record<DictionaryKey, string>> = {
   'form.notes_placeholder': 'Add any additional notes about this contact...',
   'form.create_contact': 'Create Contact',
   'form.save_changes': 'Save Changes',
-  'form.review_required_ocr': 'Review Required — OCR could not extract',
+  'form.review_required_ocr': 'Review Required  -  OCR could not extract',
   'form.section_basic_info': 'Basic Information',
   'form.section_contact_details': 'Contact Details',
   'form.section_address': 'Address',

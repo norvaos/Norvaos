@@ -95,7 +95,7 @@ export default function CriticalActionsPage() {
           <div>
             <h1 className="text-xl font-semibold tracking-tight">Critical Actions</h1>
             <p className="text-sm text-muted-foreground">
-              Matters requiring immediate attention — escalation level: Critical
+              Matters requiring immediate attention  -  escalation level: Critical
             </p>
           </div>
         </div>
@@ -138,7 +138,7 @@ export default function CriticalActionsPage() {
             {rows.map((row) => {
               const dueLabel = row.next_action_due_at
                 ? format(parseISO(row.next_action_due_at), "MMM d, yyyy 'at' h:mm a")
-                : '—'
+                : ' - '
 
               return (
                 <button
@@ -149,7 +149,7 @@ export default function CriticalActionsPage() {
                 >
                   {/* Matter number */}
                   <span className="font-mono text-xs text-muted-foreground truncate">
-                    {row.matter_number ?? '—'}
+                    {row.matter_number ?? ' - '}
                   </span>
 
                   {/* Title */}
@@ -166,7 +166,7 @@ export default function CriticalActionsPage() {
                       CRITICAL
                     </Badge>
                     <span className="text-xs text-red-900 leading-snug line-clamp-2">
-                      {row.next_action_description ?? '—'}
+                      {row.next_action_description ?? ' - '}
                     </span>
                   </div>
 
@@ -177,7 +177,7 @@ export default function CriticalActionsPage() {
 
                   {/* Lawyer */}
                   <span className="text-xs text-muted-foreground truncate">
-                    {row.lawyer_name ?? '—'}
+                    {row.lawyer_name ?? ' - '}
                   </span>
                 </button>
               )

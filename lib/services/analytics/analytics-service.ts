@@ -233,7 +233,7 @@ export async function getAgedReceivables(
   try {
     const client = auth.supabase
 
-    // FIXED: was querying 'balance_due'/'total' — corrected to compute from total_amount - amount_paid
+    // FIXED: was querying 'balance_due'/'total'  -  corrected to compute from total_amount - amount_paid
     // Build the query for outstanding invoices
     let query = client
       .from('invoices')
@@ -327,7 +327,7 @@ export async function getMatterProfitability(
     const client = auth.supabase
 
     // Fetch matters with their practice area names
-    // Exclude import_reverted matters — they are not business matters and must not appear in profitability reports
+    // Exclude import_reverted matters  -  they are not business matters and must not appear in profitability reports
     let matterQuery = client
       .from('matters')
       .select('id, title, practice_area_id, practice_areas (name)')
@@ -365,7 +365,7 @@ export async function getMatterProfitability(
 
     const matterIds = matters.map((m: any) => m.id)
 
-    // FIXED: was querying 'balance_due'/'total' — corrected to compute from total_amount - amount_paid
+    // FIXED: was querying 'balance_due'/'total'  -  corrected to compute from total_amount - amount_paid
     // Fetch invoices for revenue (amount_paid), billed (total_amount), and worked (from time_entries)
     const [invoicesResult, timeEntriesResult] = await Promise.all([
       client
@@ -623,7 +623,7 @@ export async function getRevenueAnalytics(
     const endDate = filters.end_date ?? new Date().toISOString().split('T')[0]
     const startDate = filters.start_date ?? new Date(new Date(endDate).getFullYear(), 0, 1).toISOString().split('T')[0]
 
-    // FIXED: was querying 'balance_due'/'total' — corrected to compute from total_amount - amount_paid
+    // FIXED: was querying 'balance_due'/'total'  -  corrected to compute from total_amount - amount_paid
     // Fetch invoices in the date range
     let invQuery = client
       .from('invoices')
@@ -987,7 +987,7 @@ export async function getKpiScorecard(
         .gte('issue_date', period.prior_start_date)
         .lte('issue_date', period.prior_end_date),
 
-      // FIXED: was querying 'balance_due'/'total' — corrected to compute from total_amount - amount_paid
+      // FIXED: was querying 'balance_due'/'total'  -  corrected to compute from total_amount - amount_paid
       // Outstanding invoices (for receivables)
       client
         .from('invoices')
@@ -1011,7 +1011,7 @@ export async function getKpiScorecard(
         .eq('is_billable', true)
         .eq('is_invoiced', false),
 
-      // Matters opened/closed in period — exclude import_reverted so pipeline counts are not inflated
+      // Matters opened/closed in period  -  exclude import_reverted so pipeline counts are not inflated
       client
         .from('matters')
         .select('id, status, created_at, closed_at')
@@ -1137,7 +1137,7 @@ export async function getKpiScorecard(
 
     const avgDaysToClose = closedWithDates > 0 ? Math.round(totalDaysToClose / closedWithDates) : 0
 
-    // FIXED: was querying 'balance_due'/'total' — corrected to compute from total_amount - amount_paid
+    // FIXED: was querying 'balance_due'/'total'  -  corrected to compute from total_amount - amount_paid
     // ── Collection Rate ──────────────────────────────────────────────────────
     const billedCents = (currentInvoicesResult.data ?? []).reduce((s: number, inv: any) => {
       if (['sent', 'paid', 'overdue'].includes(inv.status)) {

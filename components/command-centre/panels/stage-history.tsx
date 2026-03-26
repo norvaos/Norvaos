@@ -101,7 +101,7 @@ export function StageHistory() {
 
   return (
     <div className="px-4 pb-2">
-      {/* Summary bar — always visible */}
+      {/* Summary bar  -  always visible */}
       <Button
         variant="ghost"
         size="sm"

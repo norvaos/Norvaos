@@ -16,7 +16,7 @@ interface TriggerParams {
 /**
  * Process an automation trigger: find matching rules and execute their actions.
  * Called from stage advancement, deadline cron, and checklist updates.
- * All actions are idempotent — safe to call multiple times.
+ * All actions are idempotent  -  safe to call multiple times.
  */
 export async function processAutomationTrigger(params: TriggerParams): Promise<void> {
   const { supabase, tenantId, matterId, triggerType, triggerContext, userId } = params

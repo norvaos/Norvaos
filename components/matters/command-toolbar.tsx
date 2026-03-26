@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * CommandToolbar — always-visible action bar at the top of the matter command centre.
+ * CommandToolbar  -  always-visible action bar at the top of the matter command centre.
  *
  * Provides quick access to: Add Document (with real file upload), Send to Client,
  * Schedule, Document Search, OneDrive Sync, and matter actions.

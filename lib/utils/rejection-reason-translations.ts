@@ -42,7 +42,7 @@ const en: RejectionTranslationMap = {
     label: 'Corners or edges are cut off',
     guidance:
       'Please retake the photo so that all four corners of the document are fully visible within the frame. Do not crop or zoom in too closely.',
-    tip: 'Place the document on a dark background — this makes it easier to see all edges and frame the photo correctly.',
+    tip: 'Place the document on a dark background  -  this makes it easier to see all edges and frame the photo correctly.',
   },
   not_readable: {
     label: 'Text is not readable',
@@ -95,7 +95,7 @@ const fr: RejectionTranslationMap = {
     label: 'Coins ou bords rognés',
     guidance:
       'Veuillez reprendre la photo pour que les quatre coins du document soient entièrement visibles dans le cadre. Ne recadrez pas trop près.',
-    tip: "Placez le document sur un fond sombre — cela facilite la vision de tous les bords et le cadrage correct de la photo.",
+    tip: "Placez le document sur un fond sombre  -  cela facilite la vision de tous les bords et le cadrage correct de la photo.",
   },
   not_readable: {
     label: 'Texte illisible',
@@ -299,7 +299,7 @@ const hi: RejectionTranslationMap = {
     label: 'कोने या किनारे कटे हुए हैं',
     guidance:
       'कृपया फ़ोटो को फिर से लें ताकि दस्तावेज़ के सभी चार कोने पूरी तरह से फ्रेम में दिखाई दें। बहुत अधिक क्रॉप या ज़ूम न करें।',
-    tip: 'दस्तावेज़ को गहरे रंग की पृष्ठभूमि पर रखें — इससे सभी किनारे देखना और सही फ्रेम करना आसान हो जाता है।',
+    tip: 'दस्तावेज़ को गहरे रंग की पृष्ठभूमि पर रखें  -  इससे सभी किनारे देखना और सही फ्रेम करना आसान हो जाता है।',
   },
   not_readable: {
     label: 'पाठ पढ़ा नहीं जा सकता',
@@ -352,7 +352,7 @@ const pt: RejectionTranslationMap = {
     label: 'Cantos ou bordas cortados',
     guidance:
       'Por favor, retire a foto para que todos os quatro cantos do documento estejam totalmente visíveis no enquadramento. Não recorte nem dê zoom em excesso.',
-    tip: 'Coloque o documento sobre um fundo escuro — isso facilita ver todas as bordas e enquadrar a foto corretamente.',
+    tip: 'Coloque o documento sobre um fundo escuro  -  isso facilita ver todas as bordas e enquadrar a foto corretamente.',
   },
   not_readable: {
     label: 'Texto ilegível',
@@ -405,7 +405,7 @@ const ur: RejectionTranslationMap = {
     label: 'کونے یا کنارے کٹے ہوئے ہیں',
     guidance:
       'براہ کرم تصویر دوبارہ لیں تاکہ دستاویز کے چاروں کونے مکمل طور پر فریم میں نظر آئیں۔ بہت زیادہ کروپ یا زوم نہ کریں۔',
-    tip: 'دستاویز کو گہرے رنگ کی پس منظر پر رکھیں — اس سے تمام کنارے دیکھنا اور صحیح فریم کرنا آسان ہو جاتا ہے۔',
+    tip: 'دستاویز کو گہرے رنگ کی پس منظر پر رکھیں  -  اس سے تمام کنارے دیکھنا اور صحیح فریم کرنا آسان ہو جاتا ہے۔',
   },
   not_readable: {
     label: 'متن پڑھا نہیں جا سکتا',
@@ -511,7 +511,7 @@ const tl: RejectionTranslationMap = {
     label: 'Nap-putol ang mga sulok o gilid',
     guidance:
       'Mangyaring muling kumuha ng litrato upang lahat ng apat na sulok ng dokumento ay ganap na makikita sa frame. Huwag mag-crop o mag-zoom nang sobra.',
-    tip: 'Ilagay ang dokumento sa madilim na background — mas madaling makita ang lahat ng gilid.',
+    tip: 'Ilagay ang dokumento sa madilim na background  -  mas madaling makita ang lahat ng gilid.',
   },
   not_readable: {
     label: 'Hindi mabasa ang teksto',

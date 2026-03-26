@@ -1,5 +1,5 @@
 /**
- * Success-Reverb — Gold Standard Template Extractor (Directive 1.6)
+ * Success-Reverb  -  Gold Standard Template Extractor (Directive 1.6)
  *
  * When a matter moves to "Approved", this service reverse-engineers
  * the file to create a Gold Standard Template capturing:

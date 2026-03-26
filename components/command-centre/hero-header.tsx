@@ -408,7 +408,7 @@ export function HeroHeader({ onToggleActivity, activityOpen, onToggleScreening, 
                       </TooltipTrigger>
                       <TooltipContent side="bottom" className="text-xs max-w-xs">
                         <p className="font-medium text-red-600">{stage.name}</p>
-                        <p className="text-slate-400">Closed stage — moves lead to lost</p>
+                        <p className="text-slate-400">Closed stage  -  moves lead to lost</p>
                         {stage.description && (
                           <p className="text-slate-500 mt-0.5 max-w-[220px] leading-snug">{stage.description}</p>
                         )}
@@ -452,10 +452,10 @@ export function HeroHeader({ onToggleActivity, activityOpen, onToggleScreening, 
 
       <Separator />
 
-      {/* Consultation outcome panel — lead mode */}
+      {/* Consultation outcome panel  -  lead mode */}
       {entityType === 'lead' && !isConverted && <ConsultationOutcomePanel />}
 
-      {/* Meeting outcome buttons — matter mode */}
+      {/* Meeting outcome buttons  -  matter mode */}
       {entityType === 'matter' && <MatterOutcomes />}
     </div>
   )

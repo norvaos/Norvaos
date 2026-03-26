@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Lead Stage Engine — Guarded Stage Transition System
+ * Lead Stage Engine  -  Guarded Stage Transition System
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Validates transitions via the workflow definition registry, creates relational
@@ -187,11 +187,11 @@ export async function advanceLeadStage(params: StageAdvanceParams): Promise<Stag
 
   // Handle idempotent skip
   if (result.skipped) {
-    return { success: true } // Already advanced — idempotency protection
+    return { success: true } // Already advanced  -  idempotency protection
   }
 
   // Clean up idempotency entry when guards blocked the transition.
-  // A guard-blocked advance should NOT consume the idempotency key —
+  // A guard-blocked advance should NOT consume the idempotency key  - 
   // the transition didn't happen, so future attempts must re-evaluate guards.
   if (result.executed && result.data && !result.data.success && result.data.blockedReasons) {
     await supabase
@@ -217,7 +217,7 @@ export async function evaluateTransitionGuards(
 ): Promise<GuardEvaluation> {
   const currentStage = ctx.currentStage as LeadStage | null
   if (!currentStage) {
-    return { allowed: true, blockedReasons: [] } // No current stage — initial entry
+    return { allowed: true, blockedReasons: [] } // No current stage  -  initial entry
   }
 
   const rules = STAGE_TRANSITION_RULES[currentStage]
@@ -368,7 +368,7 @@ export function getAvailableTransitions(currentStage: string | null): AvailableT
 
 /**
  * Get available transitions with guard evaluation results.
- * Useful for UI — shows which transitions are available and which are blocked.
+ * Useful for UI  -  shows which transitions are available and which are blocked.
  */
 export async function getAvailableTransitionsWithStatus(
   supabase: SupabaseClient<Database>,

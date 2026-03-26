@@ -21,7 +21,7 @@ import {
 } from '@/components/ui/select'
 
 /**
- * Notify Staff Dialog — Front Desk
+ * Notify Staff Dialog  -  Front Desk
  *
  * Quick message presets (client is here, running late, etc.)
  * plus a free-text custom message option.
@@ -60,7 +60,7 @@ const MESSAGE_PRESETS = [
   },
   {
     id: 'urgent',
-    label: '🚨 Urgent — please come to front desk',
+    label: '🚨 Urgent  -  please come to front desk',
     text: 'Please come to the front desk immediately.',
   },
   {
@@ -192,7 +192,7 @@ export function NotifyStaffDialog({
                   if (isCustom) {
                     setCustomMessage(e.target.value)
                   } else {
-                    // Allow editing the preset — switches to custom mode
+                    // Allow editing the preset  -  switches to custom mode
                     setSelectedPreset('custom')
                     setCustomMessage(e.target.value)
                   }

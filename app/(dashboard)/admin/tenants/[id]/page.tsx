@@ -140,7 +140,7 @@ const ACTION_BADGE_VARIANT: Record<string, 'default' | 'secondary' | 'destructiv
 }
 
 /**
- * Platform-admin tenant detail page — full management console.
+ * Platform-admin tenant detail page  -  full management console.
  * Tabs: Overview, Features, Users, Invites, Audit, Operations
  */
 export default function TenantDetailPage() {
@@ -662,7 +662,7 @@ export default function TenantDetailPage() {
                           <Badge variant={inv.status === 'pending' ? 'default' : 'secondary'}>{inv.status}</Badge>
                         </TableCell>
                         <TableCell className="text-sm">{new Date(inv.expires_at).toLocaleDateString()}</TableCell>
-                        <TableCell className="text-sm">{inv.invited_by ?? '—'}</TableCell>
+                        <TableCell className="text-sm">{inv.invited_by ?? ' - '}</TableCell>
                         <TableCell className="text-right">
                           {inv.status === 'pending' && (
                             <Button variant="outline" size="sm" onClick={() => openActionDialog('revoke-invite', inv.id, inv.email)}>
@@ -847,7 +847,7 @@ export default function TenantDetailPage() {
             </div>
             {needsSlugConfirmation && (
               <div className="space-y-2 rounded-md border border-destructive/50 bg-destructive/5 p-3">
-                <p className="text-sm font-medium text-destructive">Large increase — more than 2× current limit.</p>
+                <p className="text-sm font-medium text-destructive">Large increase  -  more than 2× current limit.</p>
                 <Label>Type <code className="rounded bg-muted px-1 py-0.5 text-xs font-mono">{tenant.slug}</code> to confirm</Label>
                 <Input value={slugConfirm} onChange={(e) => setSlugConfirm(e.target.value)} placeholder={tenant.slug} autoComplete="off" />
               </div>

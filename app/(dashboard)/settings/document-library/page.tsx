@@ -159,7 +159,7 @@ function EntryFormDialog({
             <Input
               value={form.slot_name}
               onChange={(e) => setForm((f) => ({ ...f, slot_name: e.target.value }))}
-              placeholder="e.g. Valid Passport — Bio Page & Stamped Pages"
+              placeholder="e.g. Valid Passport  -  Bio Page & Stamped Pages"
             />
           </div>
           <div className="grid grid-cols-2 gap-3">
@@ -263,7 +263,7 @@ function EntryRow({
   async function handleToggle() {
     if (entry.is_active) {
       await deactivate.mutateAsync({ id: entry.id, tenantId })
-      toast.success('Entry deactivated — no longer available when adding to matter types')
+      toast.success('Entry deactivated  -  no longer available when adding to matter types')
     } else {
       await restore.mutateAsync({ id: entry.id, tenantId })
       toast.success('Entry restored')

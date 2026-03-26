@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Document Engine — Render Engine (DOCX Generation)
+ * Document Engine  -  Render Engine (DOCX Generation)
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Orchestrates the full render pipeline:
@@ -245,7 +245,7 @@ function renderParagraph(
 ): Paragraph {
   const text = substituteFields(element.content, fieldMap)
 
-  // Build options — construct complete object since IParagraphOptions properties are read-only
+  // Build options  -  construct complete object since IParagraphOptions properties are read-only
   let heading: (typeof HeadingLevel)[keyof typeof HeadingLevel] | undefined
   let bullet: { level: number } | undefined
   let numbering: { reference: string; level: number } | undefined
@@ -521,6 +521,8 @@ function mapAlignment(alignment?: string): (typeof AlignmentType)[keyof typeof A
 function sanitizeFileName(name: string): string {
   return name
     .replace(/[^a-zA-Z0-9\s\-_]/g, '')
+    .replace(/\s+-\s+/g, ' ')       // collapse " - " (dash separators) to single space
     .replace(/\s+/g, '_')
+    .replace(/_+/g, '_')            // collapse multiple underscores
     .substring(0, 100)
 }

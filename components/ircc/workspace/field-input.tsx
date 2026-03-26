@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * FieldInput — Single field input component for the questionnaire renderer.
+ * FieldInput  -  Single field input component for the questionnaire renderer.
  *
  * Handles different field types (text, select, date, number, boolean, country,
  * email, phone, textarea) and renders the appropriate shadcn/ui control.

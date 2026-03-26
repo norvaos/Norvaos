@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * Front Desk Concierge — The Ghost-Receptionist (Directives 32.0 + 33.0)
+ * Front Desk Concierge  -  The Ghost-Receptionist (Directives 32.0 + 33.0)
  *
  * Zero-friction public entry point. No authentication required.
  * Three actions:
@@ -45,7 +45,7 @@ export default function ConciergePage() {
       {/* Directive 32.0 §1: Aura Header with polyglot cycle */}
       <AuraHeader />
 
-      {/* Main content — centered with max-width */}
+      {/* Main content  -  centered with max-width */}
       <main className="flex-1 flex flex-col items-center justify-center px-6 py-12">
         {/* Firm trust signal */}
         <div className="text-center mb-10">

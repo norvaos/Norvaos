@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * IRCC Form Management Platform — Type Definitions
+ * IRCC Form Management Platform  -  Type Definitions
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Database-driven form management types. These map to the tables created in
@@ -386,7 +386,7 @@ export interface FolderScanItem {
   fileSizeBytes: number
   checksumSha256: string
   status: FolderScanItemStatus
-  /** Present only for 'updated' items — the existing form's current data */
+  /** Present only for 'updated' items  -  the existing form's current data */
   existingForm?: {
     id: string
     form_code: string
@@ -397,7 +397,7 @@ export interface FolderScanItem {
     current_version: number
     form_date: string | null
   }
-  /** Present only for 'missing' items — form in DB but not in folder */
+  /** Present only for 'missing' items  -  form in DB but not in folder */
   missingForm?: {
     id: string
     form_code: string

@@ -10,7 +10,7 @@ import { renderBookingNoShowEmail } from '@/lib/email-templates/booking-no-show'
 function getResend(): Resend | null {
   const apiKey = process.env.RESEND_API_KEY
   if (!apiKey) {
-    console.warn('[booking-email] RESEND_API_KEY not configured — emails will be skipped')
+    console.warn('[booking-email] RESEND_API_KEY not configured  -  emails will be skipped')
     return null
   }
   return new Resend(apiKey)

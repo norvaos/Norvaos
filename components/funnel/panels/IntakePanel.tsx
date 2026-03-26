@@ -105,7 +105,7 @@ const HIDDEN_SECTIONS: Record<string, string[]> = {
 export function IntakePanel({ matterId, matterTypeId, onProfileChange }: IntakePanelProps) {
   const { tenantId } = useFunnelContext()
 
-  // ── Existing profile (empty on first load — prefill handled by engine) ──
+  // ── Existing profile (empty on first load  -  prefill handled by engine) ──
   const [existingProfile] = useState<Partial<IRCCProfile>>({})
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 

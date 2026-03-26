@@ -1,5 +1,5 @@
 /**
- * Compliance Override Service — Directive 026
+ * Compliance Override Service  -  Directive 026
  *
  * Emergency Override: allows Partner/Admin to bypass "Red" readiness blockers
  * (stale documents, continuity gaps, compliance pillars) with:

@@ -4,7 +4,7 @@
 -- All SECURITY DEFINER functions must include SET search_path = public
 -- to prevent schema-hijacking attacks via search_path manipulation.
 -- This migration re-declares every affected function with the fix applied.
--- Safe to re-run — all statements are CREATE OR REPLACE.
+-- Safe to re-run  -  all statements are CREATE OR REPLACE.
 -- ============================================================
 
 -- ── 1. apply_risk_override (025) ─────────────────────────────────────────────
@@ -115,7 +115,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 
--- ── 3. review_document_version (032 — latest version) ────────────────────────
+-- ── 3. review_document_version (032  -  latest version) ────────────────────────
 
 CREATE OR REPLACE FUNCTION review_document_version(
   p_tenant_id      UUID,
@@ -259,7 +259,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 
--- ── 7. execute_action_atomic (053 — latest 18-param version) ─────────────────
+-- ── 7. execute_action_atomic (053  -  latest 18-param version) ─────────────────
 
 CREATE OR REPLACE FUNCTION execute_action_atomic(
   p_tenant_id            UUID,

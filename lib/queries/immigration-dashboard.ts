@@ -365,6 +365,6 @@ export function useImmigrationMonthlyTrend(tenantId: string) {
       })
     },
     enabled: !!tenantId,
-    staleTime: 5 * 60 * 1000, // 5 min — trend data doesn't change often
+    staleTime: 5 * 60 * 1000, // 5 min  -  trend data doesn't change often
   })
 }

@@ -14,8 +14,9 @@ import { Breadcrumbs } from '@/components/layout/breadcrumbs'
 import { SearchProvider } from '@/components/search/SearchContext'
 import { useGlobalPing } from '@/lib/hooks/use-global-ping'
 import { LocaleDebugFooter } from '@/components/debug/locale-debug-footer'
+import { ComplianceOnboardingTourProvider } from '@/components/onboarding/compliance-onboarding-tour'
 
-// Lazy-load heavy overlays — CommandPalette is only visible on Cmd+K and
+// Lazy-load heavy overlays  -  CommandPalette is only visible on Cmd+K and
 // imports 13 icons + 4 Supabase queries. Compiling it eagerly on every
 // page navigation is unnecessary.
 const CommandPalette = dynamic(
@@ -489,32 +490,34 @@ export default function DashboardLayout({
   }
 
   return (
-    <SearchProvider>
-      <div className="flex h-screen overflow-hidden">
-        {/* Sidebar (desktop only) */}
-        <Sidebar />
+    <ComplianceOnboardingTourProvider>
+      <SearchProvider>
+        <div className="flex h-screen overflow-hidden">
+          {/* Sidebar (desktop only) */}
+          <Sidebar />
 
-        {/* Main content area */}
-        <div className="flex flex-1 flex-col overflow-hidden">
-          {/* Header */}
-          <Header />
+          {/* Main content area */}
+          <div className="flex flex-1 flex-col overflow-hidden">
+            {/* Header */}
+            <Header />
 
-          {/* Page content */}
-          <main className="flex-1 overflow-y-auto bg-background p-4 lg:p-6">
-            <Breadcrumbs />
-            {children}
-          </main>
+            {/* Page content */}
+            <main className="flex-1 overflow-y-auto bg-background p-4 lg:p-6">
+              <Breadcrumbs />
+              {children}
+            </main>
+          </div>
+
+          {/* Mobile navigation sheet */}
+          <MobileNav />
+
+          {/* Command palette overlay */}
+          <CommandPalette />
+
+          {/* NUCLEAR FIX #3: Visual Debug  -  shows locale state vs DB vs localStorage */}
+          <LocaleDebugFooter />
         </div>
-
-        {/* Mobile navigation sheet */}
-        <MobileNav />
-
-        {/* Command palette overlay */}
-        <CommandPalette />
-
-        {/* NUCLEAR FIX #3: Visual Debug — shows locale state vs DB vs localStorage */}
-        <LocaleDebugFooter />
-      </div>
-    </SearchProvider>
+      </SearchProvider>
+    </ComplianceOnboardingTourProvider>
   )
 }

@@ -1,6 +1,6 @@
 /**
- * GET  /api/trust-accounting/reconciliations — List reconciliations
- * POST /api/trust-accounting/reconciliations — Create a new draft reconciliation
+ * GET  /api/trust-accounting/reconciliations  -  List reconciliations
+ * POST /api/trust-accounting/reconciliations  -  Create a new draft reconciliation
  */
 
 import { NextRequest, NextResponse } from 'next/server'

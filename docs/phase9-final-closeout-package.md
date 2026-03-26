@@ -1,4 +1,4 @@
-# Phase 9 Final Closeout Package — Revenue Operations: Invoice Lifecycle Automation
+# Phase 9 Final Closeout Package  -  Revenue Operations: Invoice Lifecycle Automation
 
 **Date**: 2026-03-16
 **Supabase Project**: ztsjvsutlrfisnrwdwfl
@@ -9,13 +9,13 @@
 
 ## Production Limitation
 
-**RESEND_API_KEY is configured in dev** (`re_2bqr****` in `.env.local`). All send/receipt proofs in this package executed the full email dispatch flow end-to-end through the Resend SDK. This is **not** a simulation — emails were delivered, PDFs were generated, and all DB state transitions completed.
+**RESEND_API_KEY is configured in dev** (`re_2bqr****` in `.env.local`). All send/receipt proofs in this package executed the full email dispatch flow end-to-end through the Resend SDK. This is **not** a simulation  -  emails were delivered, PDFs were generated, and all DB state transitions completed.
 
 If RESEND_API_KEY is absent in a deployment, the send/receipt/reminder routes return `{ success: false, error: "RESEND_API_KEY not configured" }` with HTTP 400. No state changes occur and no email is sent. This is by design: the service fails fast and never transitions invoice status without confirmed delivery.
 
 ---
 
-## 0. Invoice Lifecycle — Phase 9 Schema
+## 0. Invoice Lifecycle  -  Phase 9 Schema
 
 ### Status Constraint (Migrations 001–106)
 
@@ -25,7 +25,7 @@ The `invoices.status` column has a CHECK constraint allowing exactly these value
 draft | sent | viewed | partially_paid | paid | overdue | void | written_off
 ```
 
-There is **no `finalized` status** in the Phase 9 schema. Migration 107 (Phase 10 — Billing Module) will add `finalized` to the constraint. Phase 9 code operates against the schema as-applied through Migration 106.
+There is **no `finalized` status** in the Phase 9 schema. Migration 107 (Phase 10  -  Billing Module) will add `finalized` to the constraint. Phase 9 code operates against the schema as-applied through Migration 106.
 
 ### Lifecycle Transitions Relevant to Phase 9
 
@@ -66,7 +66,7 @@ Aging buckets are recalculated daily (4 AM UTC) for invoices with `status IN ('s
 ### Terminology Used in This Package
 
 - **"send"** always means: generate PDF, dispatch email via Resend, update `sent_at`/`sent_to_email`, transition `draft → sent`
-- **"receipt"** always means: generate receipt PDF, dispatch email, set `receipt_sent_at` — no status change
+- **"receipt"** always means: generate receipt PDF, dispatch email, set `receipt_sent_at`  -  no status change
 - **"overdue"** is a status set by cron, not by user action
 - **"reminder"** is an email sent to the client for an overdue invoice; tracked by `reminder_count` and `last_reminder_at`
 
@@ -106,7 +106,7 @@ Aging buckets are recalculated daily (4 AM UTC) for invoices with `status IN ('s
 
 | Defect | Root Cause | Fix |
 |---|---|---|
-| `sendInvoiceEmail` checked `status !== 'finalized'` | Schema-code sequencing error: code written for Migration 107's schema (Phase 10) but deployed against Migration 106's schema (Phase 9). See DEF-P9-002 for full process failure analysis. | Changed to `status !== 'draft'` — correct for Phase 9 schema. Must revert to `!== 'finalized'` when Migration 107 is applied. |
+| `sendInvoiceEmail` checked `status !== 'finalized'` | Schema-code sequencing error: code written for Migration 107's schema (Phase 10) but deployed against Migration 106's schema (Phase 9). See DEF-P9-002 for full process failure analysis. | Changed to `status !== 'draft'`  -  correct for Phase 9 schema. Must revert to `!== 'finalized'` when Migration 107 is applied. |
 | `payment_date` column reference in 3 locations | Column doesn't exist in payments table | Changed to `created_at` in invoice-email-service.ts (2 locations) and statement route (1 location) |
 | `reference` column reference in payment mappings | Column doesn't exist in payments table | Changed to `notes` in invoice-email-service.ts (2 locations) |
 
@@ -156,7 +156,7 @@ Aging buckets are recalculated daily (4 AM UTC) for invoices with `status IN ('s
 
 ## 3. Migration Impact Analysis
 
-### Migration 105 — Invoice Lifecycle Columns
+### Migration 105  -  Invoice Lifecycle Columns
 
 **DDL:**
 ```sql
@@ -170,12 +170,12 @@ ALTER TABLE invoices ADD COLUMN IF NOT EXISTS receipt_sent_at TIMESTAMPTZ;
 **Impact:** Additive only. All columns are nullable with safe defaults. No existing data modified. No constraints changed. Immutability trigger updated to allow metadata fields (sent_at, receipt_sent_at, reminder_count, last_reminder_at) on paid invoices while continuing to block financial field mutations.
 
 **Indexes added:**
-- `idx_invoices_status_due_date` — partial index on (status, due_date) WHERE status IN ('sent', 'viewed', 'overdue')
-- `idx_invoices_reminder_tracking` — partial index on (status, due_date, last_reminder_at) WHERE status IN ('sent', 'viewed', 'overdue')
+- `idx_invoices_status_due_date`  -  partial index on (status, due_date) WHERE status IN ('sent', 'viewed', 'overdue')
+- `idx_invoices_reminder_tracking`  -  partial index on (status, due_date, last_reminder_at) WHERE status IN ('sent', 'viewed', 'overdue')
 
 **Backward compatibility:** Full. All new columns have defaults. Existing code unaffected.
 
-### Migration 106 — Column Rename: total → total_amount
+### Migration 106  -  Column Rename: total → total_amount
 
 **DDL:**
 ```sql
@@ -194,7 +194,7 @@ CREATE OR REPLACE FUNCTION prevent_paid_invoice_mutation() ...
 All proofs executed 2026-03-16 against live Supabase (project ztsjvsutlrfisnrwdwfl).
 Test data: 5 invoices (INV-P9-001 through INV-P9-005) seeded on tenant `a0000000-...`, 1 payment.
 
-### P1 — Send Invoice (Authenticated)
+### P1  -  Send Invoice (Authenticated)
 
 **Route:** `POST /api/invoices/[id]/send`
 **Invoice:** INV-P9-001 (id: b0000001-a9c0-4000-8000-000000000001), $565.00, contact: Alice
@@ -230,7 +230,7 @@ POST /api/invoices/b0000001-a9c0-4000-8000-000000000001/send
 }
 ```
 
-**PDF Generation:** Confirmed — Resend SDK received PDF attachment (`INV-INV-P9-001.pdf`) as base64-encoded content. Email dispatched via Resend API.
+**PDF Generation:** Confirmed  -  Resend SDK received PDF attachment (`INV-INV-P9-001.pdf`) as base64-encoded content. Email dispatched via Resend API.
 
 **State transitions verified:**
 - status: draft → sent ✓
@@ -238,7 +238,7 @@ POST /api/invoices/b0000001-a9c0-4000-8000-000000000001/send
 - sent_to_email: null → alice@example.com ✓
 - audit_logs: entry created with action=invoice_sent ✓
 
-### P2 — Send Receipt (Authenticated)
+### P2  -  Send Receipt (Authenticated)
 
 **Route:** `POST /api/invoices/[id]/receipt`
 **Invoice:** INV-P9-004 (id: b0000004-a9c0-4000-8000-000000000004), $1,130.00 paid, contact: Alice
@@ -274,14 +274,14 @@ POST /api/invoices/b0000004-a9c0-4000-8000-000000000004/receipt
 }
 ```
 
-**Receipt PDF Generation:** Confirmed — Resend received receipt PDF attachment (`RECEIPT-INV-P9-004.pdf`).
+**Receipt PDF Generation:** Confirmed  -  Resend received receipt PDF attachment (`RECEIPT-INV-P9-004.pdf`).
 
 **State transitions verified:**
 - status: paid → paid (unchanged, correct) ✓
 - receipt_sent_at: null → timestamp ✓
 - audit_logs: entry created with action=receipt_sent ✓
 
-### P3 — Batch Send (Authenticated)
+### P3  -  Batch Send (Authenticated)
 
 **Route:** `POST /api/invoices/batch-send`
 **Invoices:** INV-P9-002 (b0000002-...) and INV-P9-003 (b0000003-...), both draft
@@ -337,7 +337,7 @@ Response: HTTP 400
 
 **Partial failure structure:** The batch route processes each invoice independently. If one fails, others still proceed. The response always contains both `sent[]` and `failed[]` arrays.
 
-### P4 — Client Statement (Authenticated, with Isolation)
+### P4  -  Client Statement (Authenticated, with Isolation)
 
 **Route:** `GET /api/contacts/[id]/statement`
 
@@ -345,8 +345,8 @@ Response: HTTP 400
 
 | Layer | Mechanism | Scope | Enforcement Point |
 |---|---|---|---|
-| Authentication | `authenticateRequest()` | Identity verification | Code — rejects unauthenticated requests before any query |
-| RBAC Permission | `requirePermission(auth, 'billing', 'view')` | Tenant-wide role check | Code — checks `billing.view` in role's permissions JSONB |
+| Authentication | `authenticateRequest()` | Identity verification | Code  -  rejects unauthenticated requests before any query |
+| RBAC Permission | `requirePermission(auth, 'billing', 'view')` | Tenant-wide role check | Code  -  checks `billing.view` in role's permissions JSONB |
 | Tenant Isolation | RLS policy `tenant_isolation_contacts` + explicit `.eq('tenant_id', tenantId)` on every query | Row-level | Database + Code (defense in depth) |
 
 **How `billing:view` is resolved:** `authenticateRequest()` fetches the user's role from the `roles` table (joined via `users.role_id`). The role's `permissions` JSONB column is checked for `permissions.billing.view === true`. Admin role has full access. Other roles require explicit `billing.view` grant.
@@ -355,11 +355,11 @@ Response: HTTP 400
 
 **What is NOT enforced:** Matter-scoped access control. The route returns all invoices for a contact across all matters in the tenant, without calling `checkMatterAccess()`. A user with `billing:view` sees billing data for all matters on the contact, including restricted matters they may not otherwise access. This is a known gap documented as Open Risk #6 in Section 9.
 
-**Cross-contact isolation:** Each query filters by `contact_id` — Alice's statement returns only Alice's invoices, not Bob's. Verified in P4a/P4b below.
+**Cross-contact isolation:** Each query filters by `contact_id`  -  Alice's statement returns only Alice's invoices, not Bob's. Verified in P4a/P4b below.
 
 **Cross-tenant denial:** RLS prevents any cross-tenant data access. A contact ID from another tenant returns HTTP 404 "Contact not found". Verified in P4c below.
 
-#### P4a — Contact 1 (Alice) Statement
+#### P4a  -  Contact 1 (Alice) Statement
 
 **Authenticated Request:**
 ```
@@ -399,7 +399,7 @@ GET /api/contacts/c0000000-0000-0000-0000-000000000001/statement
 - INV-P9-001/002/003: `status=sent`, `amount_paid=0`, `payments` array empty ✓
 - `total_outstanding = total_invoiced - total_paid = 2260 - 1130 = 1130` ✓
 
-#### P4b — Cross-Contact Isolation
+#### P4b  -  Cross-Contact Isolation
 
 **Request for Contact 2 (Bob):**
 ```
@@ -416,7 +416,7 @@ GET /api/contacts/c0000000-0000-0000-0000-000000000002/statement
 
 Bob sees only INV-P9-005 ($847.50). Alice's 4 invoices are not visible. ✓
 
-#### P4c — Cross-Tenant Denial
+#### P4c  -  Cross-Tenant Denial
 
 **Request for contact from tenant da1788a2-... (different tenant):**
 ```
@@ -430,7 +430,7 @@ GET /api/contacts/916e392c-b9e6-42a5-a58a-d9a032a67e23/statement
 
 RLS prevents cross-tenant data access. Contact exists in DB but is invisible to the authenticated user's tenant. ✓
 
-### P5 — Overdue Detection Cron (Runtime Proof)
+### P5  -  Overdue Detection Cron (Runtime Proof)
 
 **Route:** `POST /api/cron/overdue-detection`
 **Auth:** Bearer CRON_SECRET
@@ -469,7 +469,7 @@ Authorization: Bearer staging-cron-secret-norvaos-2026
 
 All 4 unpaid invoices already overdue; no further transitions. Paid invoice CRON-05 excluded from query entirely. ✓ Idempotent.
 
-### P6 — Invoice Reminders Cron (Runtime Proof)
+### P6  -  Invoice Reminders Cron (Runtime Proof)
 
 **Route:** `POST /api/cron/invoice-reminders`
 **Auth:** Bearer CRON_SECRET
@@ -493,7 +493,7 @@ Authorization: Bearer staging-cron-secret-norvaos-2026
 - CRON-02: `reminder_count = 1`, `last_reminder_at = 2026-03-16T...` ✓
 - CRON-03: `reminder_count = 1`, `last_reminder_at = 2026-03-16T...` ✓
 - CRON-04: `reminder_count = 1`, `last_reminder_at = 2026-03-16T...` ✓
-- CRON-05 (paid): untouched — not included in overdue query ✓
+- CRON-05 (paid): untouched  -  not included in overdue query ✓
 
 **Rerun (idempotency proof, within 24h):**
 ```json
@@ -502,7 +502,7 @@ Authorization: Bearer staging-cron-secret-norvaos-2026
 
 All 4 invoices skipped because `last_reminder_at` is within the 24-hour guard window. ✓ Idempotent within 24h cycle.
 
-### P7 — Aging Recalculation Cron (Runtime Proof)
+### P7  -  Aging Recalculation Cron (Runtime Proof)
 
 **Route:** `POST /api/cron/aging-recalculation`
 **Auth:** Bearer CRON_SECRET
@@ -517,7 +517,7 @@ All 4 invoices skipped because `last_reminder_at` is within the 24-hour guard wi
 | CRON-02 | 40 | 31-60 |
 | CRON-03 | 70 | 61-90 |
 | CRON-04 | 100 | 90+ |
-| CRON-05 (paid) | — | excluded from query |
+| CRON-05 (paid) |  -  | excluded from query |
 
 **Run 1:**
 ```
@@ -557,7 +557,7 @@ Identical output. No writes when buckets are stable. ✓ Idempotent.
 
 ---
 
-## 5. Security Proof — Unauthenticated Denial
+## 5. Security Proof  -  Unauthenticated Denial
 
 All routes tested via curl (no cookies, no auth headers) against localhost:3000.
 
@@ -579,7 +579,7 @@ All 7 routes deny unauthenticated access. ✓
 
 ---
 
-## 6. Migration 106 Blast Radius — Targeted Evidence
+## 6. Migration 106 Blast Radius  -  Targeted Evidence
 
 ### Codebase Grep Audit
 
@@ -592,12 +592,12 @@ All 7 routes deny unauthenticated access. ✓
 
 **Detail on 6 `'total'` matches (all safe):**
 
-1. `lib/utils/csv-export.ts:106` — Task completion metrics column header, not invoice-related
-2. `lib/services/import/adapters/clio/bills.ts:47` — Clio API field mapping: `sourceColumn: 'total'` → `targetColumn: 'total_amount'` (correctly configured)
-3. `lib/services/import/adapters/ghl/payments.ts:32` — GHL import alias `['Amount', 'total', 'Total']` for payment amount
-4. `lib/services/document-engine/__tests__/field-resolver.test.ts:326` — Maps `field_key: 'total'` to `source_path: 'total_amount'` (correctly mapped)
-5. `lib/services/clio/fetchers/time-entries.ts:30` — Clio external API response field
-6. `lib/services/clio/fetchers/bills.ts:29` — Clio external API response field
+1. `lib/utils/csv-export.ts:106`  -  Task completion metrics column header, not invoice-related
+2. `lib/services/import/adapters/clio/bills.ts:47`  -  Clio API field mapping: `sourceColumn: 'total'` → `targetColumn: 'total_amount'` (correctly configured)
+3. `lib/services/import/adapters/ghl/payments.ts:32`  -  GHL import alias `['Amount', 'total', 'Total']` for payment amount
+4. `lib/services/document-engine/__tests__/field-resolver.test.ts:326`  -  Maps `field_key: 'total'` to `source_path: 'total_amount'` (correctly mapped)
+5. `lib/services/clio/fetchers/time-entries.ts:30`  -  Clio external API response field
+6. `lib/services/clio/fetchers/bills.ts:29`  -  Clio external API response field
 
 ### Live Database Object Audit
 
@@ -629,7 +629,7 @@ No external integrations or portal routes reference `invoices.total`. The Clio i
 
 ## 7. Defect Register
 
-### DEF-P9-001 — invoices.total / total_amount Column Mismatch
+### DEF-P9-001  -  invoices.total / total_amount Column Mismatch
 
 | Field | Value |
 |---|---|
@@ -640,20 +640,20 @@ No external integrations or portal routes reference `invoices.total`. The Clio i
 | **Fix** | Migration 106: `ALTER TABLE invoices RENAME COLUMN total TO total_amount` + trigger rebuild. 3 files patched for stale references. |
 | **Regression checks** | Full codebase grep (6 searches, 0 stale refs). Live DB function/view audit (0 stale refs). TypeScript types confirmed aligned. |
 
-### DEF-P9-002 — Status Check: 'finalized' Not in DB Constraint (Process Failure)
+### DEF-P9-002  -  Status Check: 'finalized' Not in DB Constraint (Process Failure)
 
 | Field | Value |
 |---|---|
-| **Severity** | High (upgraded from Medium — process failure, not minor bug) |
+| **Severity** | High (upgraded from Medium  -  process failure, not minor bug) |
 | **Classification** | Schema-code sequencing error |
-| **Root cause** | `sendInvoiceEmail` line 72 checked `invoice.status !== 'finalized'`, but the `finalized` status does not exist in the Phase 9 schema (Migrations 001–106). The status was written for Migration 107 (Phase 10 — Billing Module), which adds `finalized` to the CHECK constraint. The code was deployed against the wrong schema version. |
-| **Discovery** | Phase 9 proof execution: Send Invoice returned `"Only finalised invoices can be sent"` for a draft invoice. Because no invoice can ever have `status = 'finalized'` under the current constraint, the condition `!== 'finalized'` was **always true**, meaning the guard was a no-op — any non-finalized invoice (including paid, overdue, void) would pass the check and proceed to email dispatch. |
+| **Root cause** | `sendInvoiceEmail` line 72 checked `invoice.status !== 'finalized'`, but the `finalized` status does not exist in the Phase 9 schema (Migrations 001–106). The status was written for Migration 107 (Phase 10  -  Billing Module), which adds `finalized` to the CHECK constraint. The code was deployed against the wrong schema version. |
+| **Discovery** | Phase 9 proof execution: Send Invoice returned `"Only finalised invoices can be sent"` for a draft invoice. Because no invoice can ever have `status = 'finalized'` under the current constraint, the condition `!== 'finalized'` was **always true**, meaning the guard was a no-op  -  any non-finalized invoice (including paid, overdue, void) would pass the check and proceed to email dispatch. |
 | **Impact** | Without the fix, calling Send Invoice on a paid or voided invoice would generate and send a PDF for an invoice that should not be re-dispatched. The only reason this didn't cause data corruption in testing is that no paid/void invoices were tested against the send flow before the defect was caught. |
-| **Fix applied** | Changed to `invoice.status !== 'draft'` — under Phase 9's schema, the send flow accepts only draft invoices. When Migration 107 is applied (Phase 10), this check should be updated to `invoice.status !== 'finalized'` to enforce the finalize-before-send workflow. |
-| **Process failure analysis** | This defect reveals a process gap: code was written assuming a future schema state (Migration 107) would be applied before the code went live. No validation step confirmed that the schema and code were in sync at deployment time. **Recommendation:** Before any phase closeout, run a schema-code alignment check — every status literal in application code must exist in the DB CHECK constraint at the currently-applied migration level. |
+| **Fix applied** | Changed to `invoice.status !== 'draft'`  -  under Phase 9's schema, the send flow accepts only draft invoices. When Migration 107 is applied (Phase 10), this check should be updated to `invoice.status !== 'finalized'` to enforce the finalize-before-send workflow. |
+| **Process failure analysis** | This defect reveals a process gap: code was written assuming a future schema state (Migration 107) would be applied before the code went live. No validation step confirmed that the schema and code were in sync at deployment time. **Recommendation:** Before any phase closeout, run a schema-code alignment check  -  every status literal in application code must exist in the DB CHECK constraint at the currently-applied migration level. |
 | **Regression note** | Migration 107 adds `finalized` to the invoice status constraint, a `finalized_at` timestamp, and a `finalized_by` user reference. When that migration is applied, the send guard must be changed back to `!== 'finalized'` to enforce draft → finalized → sent as the canonical lifecycle. A TODO comment has not been added to the code to avoid noise, but this is documented here as a Phase 10 prerequisite. |
 
-### DEF-P9-003 — Non-Existent Column References: payment_date, reference
+### DEF-P9-003  -  Non-Existent Column References: payment_date, reference
 
 | Field | Value |
 |---|---|
@@ -673,9 +673,9 @@ All test data seeded for proof execution has been removed.
 
 Two immutability triggers block deletion of test artifacts under normal conditions:
 
-1. **`prevent_paid_invoice_mutation()`** (Migration 102) — Blocks UPDATE on paid invoices where any financial field changes. Because the trigger fires on UPDATE, and the related `prevent_paid_invoice_delete()` trigger blocks DELETE of paid invoices entirely, test invoice CRON-05 (status=paid) and INV-P9-004 (status=paid) could not be deleted without temporarily disabling user triggers.
+1. **`prevent_paid_invoice_mutation()`** (Migration 102)  -  Blocks UPDATE on paid invoices where any financial field changes. Because the trigger fires on UPDATE, and the related `prevent_paid_invoice_delete()` trigger blocks DELETE of paid invoices entirely, test invoice CRON-05 (status=paid) and INV-P9-004 (status=paid) could not be deleted without temporarily disabling user triggers.
 
-2. **`prevent_audit_log_mutation()`** (Migration 098) — Blocks all UPDATE and DELETE on the `audit_logs` table. This is an integrity control: audit entries are append-only in production. Test audit entries (invoice_sent, receipt_sent actions) created during proof execution could not be deleted without temporarily disabling this trigger.
+2. **`prevent_audit_log_mutation()`** (Migration 098)  -  Blocks all UPDATE and DELETE on the `audit_logs` table. This is an integrity control: audit entries are append-only in production. Test audit entries (invoice_sent, receipt_sent actions) created during proof execution could not be deleted without temporarily disabling this trigger.
 
 **Procedure used:**
 ```sql
@@ -686,7 +686,7 @@ DELETE FROM invoices WHERE invoice_number LIKE 'INV-P9-%' OR invoice_number LIKE
 -- Step 3: Re-enable triggers immediately
 ALTER TABLE invoices ENABLE TRIGGER USER;
 ```
-The same 3-step procedure was applied to `audit_logs`. Triggers were disabled for the duration of the DELETE statement only and re-enabled in the same SQL session. No production data was affected — all deletes targeted rows with known test IDs seeded during this proof session.
+The same 3-step procedure was applied to `audit_logs`. Triggers were disabled for the duration of the DELETE statement only and re-enabled in the same SQL session. No production data was affected  -  all deletes targeted rows with known test IDs seeded during this proof session.
 
 ### Cleanup Results
 
@@ -694,7 +694,7 @@ The same 3-step procedure was applied to `audit_logs`. Triggers were disabled fo
 |---|---|---|---|
 | Test invoices (INV-P9-001 through INV-P9-005) | 5 | 0 | DELETE with triggers disabled/re-enabled |
 | Cron test invoices (CRON-01 through CRON-05) | 5 | 0 | DELETE with triggers disabled/re-enabled |
-| Test payment (b0000010-...) | 1 | 0 | DELETE (no trigger conflict — payment was not on a paid invoice at delete time) |
+| Test payment (b0000010-...) | 1 | 0 | DELETE (no trigger conflict  -  payment was not on a paid invoice at delete time) |
 | Test audit log entries (invoice_sent, receipt_sent) | 3 | 0 | DELETE with triggers disabled/re-enabled |
 | Reminder-state artifacts (last_reminder_at, reminder_count) | 4 | 0 | Deleted with parent CRON invoice rows |
 | Aging-state artifacts (aging_bucket, aging_updated_at) | 4 | 0 | Deleted with parent CRON invoice rows |
@@ -736,7 +736,7 @@ SELECT tgname, tgenabled FROM pg_trigger WHERE tgrelid = 'invoices'::regclass AN
 
 Issued 2026-03-16 against the revised closeout package. This section contains the five items requested for final sign-off review.
 
-### C1 — Final Acceptance Copy of the Invoice Lifecycle
+### C1  -  Final Acceptance Copy of the Invoice Lifecycle
 
 **All valid Phase 9 statuses** (CHECK constraint, Migrations 001–106):
 
@@ -758,20 +758,20 @@ Issued 2026-03-16 against the revised closeout package. This section contains th
 - `sent`, `viewed`, `partially_paid`, `paid`, `overdue`, `written_off`
 
 **Overdue-eligible statuses** (queried by overdue-detection cron):
-- `sent`, `viewed`, `partially_paid` — invoices in these statuses with `due_date < today` are transitioned to `overdue`.
+- `sent`, `viewed`, `partially_paid`  -  invoices in these statuses with `due_date < today` are transitioned to `overdue`.
 
 **Mutable statuses** (not blocked by immutability triggers):
-- `draft`, `sent`, `viewed`, `partially_paid`, `overdue` — all financial and metadata fields may be updated.
-- `paid` — metadata fields only (`sent_at`, `receipt_sent_at`, `reminder_count`, `last_reminder_at`). Financial fields blocked by trigger.
-- `void`, `written_off` — terminal, no further transitions defined in Phase 9.
+- `draft`, `sent`, `viewed`, `partially_paid`, `overdue`  -  all financial and metadata fields may be updated.
+- `paid`  -  metadata fields only (`sent_at`, `receipt_sent_at`, `reminder_count`, `last_reminder_at`). Financial fields blocked by trigger.
+- `void`, `written_off`  -  terminal, no further transitions defined in Phase 9.
 
 No Phase 9 code references `finalized`. That status is introduced by Migration 107 (Phase 10).
 
 ---
 
-### C2 — Cron Proof Artifacts
+### C2  -  Cron Proof Artifacts
 
-#### C2a — Overdue Detection
+#### C2a  -  Overdue Detection
 
 **Seeded invoice identifiers:**
 
@@ -822,7 +822,7 @@ Idempotent. No further transitions possible.
 
 ---
 
-#### C2b — Invoice Reminders
+#### C2b  -  Invoice Reminders
 
 **Before state:**
 All 4 overdue invoices (CRON-01 through CRON-04): `reminder_count = 0`, `last_reminder_at = NULL`.
@@ -857,7 +857,7 @@ Authorization: Bearer staging-cron-secret-norvaos-2026
 
 ---
 
-#### C2c — Aging Recalculation
+#### C2c  -  Aging Recalculation
 
 **Before state:**
 All 4 unpaid invoices had `aging_bucket` set from a prior execution during proof setup. CRON-05 (paid) excluded from aging query.
@@ -889,7 +889,7 @@ Authorization: Bearer staging-cron-secret-norvaos-2026
 | CRON-02 | 40 | `31-60` | yes |
 | CRON-03 | 70 | `61-90` | yes |
 | CRON-04 | 100 | `90+` | yes |
-| CRON-05 | — | excluded | yes |
+| CRON-05 |  -  | excluded | yes |
 
 **Rerun result:**
 ```json
@@ -903,7 +903,7 @@ Identical. No writes when buckets are stable. Idempotent.
 
 ---
 
-### C3 — Cleanup Safety Confirmation
+### C3  -  Cleanup Safety Confirmation
 
 1. **Environment:** All trigger-disabled cleanup was performed in the development environment only, against the Supabase project `ztsjvsutlrfisnrwdwfl`, tenant `a0000000-0000-0000-0000-000000000001` (Vanguard Law). This is a development/staging project, not a production database.
 
@@ -926,7 +926,7 @@ Identical. No writes when buckets are stable. Idempotent.
 
 ---
 
-### C4 — Statement Authorization Limitation — Disposition
+### C4  -  Statement Authorization Limitation  -  Disposition
 
 **Gap:** The client statement route (`GET /api/contacts/[id]/statement`) does not call `checkMatterAccess()`. A user with `billing:view` can see billing data for contacts on restricted matters they should not access. This violates Level 1 Locked Condition 1 ("matter-scoped access is inviolable").
 
@@ -938,30 +938,30 @@ Identical. No writes when buckets are stable. Idempotent.
 
 ---
 
-### C5 — DEF-P9-002 Final Sign-Off Classification
+### C5  -  DEF-P9-002 Final Sign-Off Classification
 
 **Severity:** High
 
-**Classification:** Process failure — schema-code sequencing error
+**Classification:** Process failure  -  schema-code sequencing error
 
 **Root cause preserved:** Code was written for Migration 107's schema (`finalized` status) but deployed against Migration 106's schema (no `finalized` status). The status guard `!== 'finalized'` was a no-op under the current constraint because no invoice could ever reach `finalized` status.
 
-**Fix:** `invoice.status !== 'draft'` — correct for Phase 9 schema. Must revert to `!== 'finalized'` when Migration 107 is applied.
+**Fix:** `invoice.status !== 'draft'`  -  correct for Phase 9 schema. Must revert to `!== 'finalized'` when Migration 107 is applied.
 
 **Post-fix recheck:** After applying the DEF-P9-002 correction, all 19 Phase 9 implementation files were searched for remaining references to `finalized`. Result: **zero matches**. The only file that referenced `finalized` was `lib/services/invoice-email-service.ts` (the fixed file). The remaining 13 `finalized` references in the broader codebase are in Phase 10 files (`invoice-state.service.ts`, `/api/billing/invoices/[id]/finalize/route.ts`, `migration 107`, `lib/queries/invoicing.ts`, `lib/types/database.ts`) which correctly anticipate the Migration 107 schema and are not part of the Phase 9 delivery.
 
-**Process recommendation preserved:** Before any phase closeout, run a schema-code alignment check — every status literal in application code must exist in the DB CHECK constraint at the currently-applied migration level.
+**Process recommendation preserved:** Before any phase closeout, run a schema-code alignment check  -  every status literal in application code must exist in the DB CHECK constraint at the currently-applied migration level.
 
 ---
 
 ## 11. Sign-Off Record
 
-**Phase 9: APPROVED / CLOSED** — 2026-03-16
+**Phase 9: APPROVED / CLOSED**  -  2026-03-16
 
 **Approval classification:** Approved for Phase 9 closeout with one carry-forward condition.
 
 **Carry-forward condition:**
-- Open Risk #6 — `/api/contacts/[id]/statement` lacks matter-scoped access control. Accepted for Phase 9 closeout only as a deferred authorization gap. This is a mandatory prerequisite for Phase 10 closeout. The statement route must not be treated as production-ready for unrestricted deployment until `checkMatterAccess()` filtering is added.
+- Open Risk #6  -  `/api/contacts/[id]/statement` lacks matter-scoped access control. Accepted for Phase 9 closeout only as a deferred authorization gap. This is a mandatory prerequisite for Phase 10 closeout. The statement route must not be treated as production-ready for unrestricted deployment until `checkMatterAccess()` filtering is added.
 
 **Accepted lifecycle position:**
 - Valid statuses: `draft`, `sent`, `viewed`, `partially_paid`, `paid`, `overdue`, `void`, `written_off`

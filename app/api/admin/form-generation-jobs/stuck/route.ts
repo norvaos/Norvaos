@@ -15,7 +15,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
  * Returns: { jobs: [{ id, matter_id, form_template_id, status, retry_count,
  *                     created_at, processing_started_at, error_message }] }
  *
- * Sprint 6, Week 3 — 2026-03-17
+ * Sprint 6, Week 3  -  2026-03-17
  */
 async function handleGet(_request: Request) {
   try {

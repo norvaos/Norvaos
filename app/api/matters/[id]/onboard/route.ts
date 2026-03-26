@@ -10,9 +10,9 @@ import { createAdminClient } from '@/lib/supabase/admin'
  *
  * Execute the "One-Click" onboarding factory for a newly retained matter.
  * This triggers the 3-step sequence:
- *   1. Fee Snapshot — Lock fees and tax rates
- *   2. Portal Birth — Create client portal + send welcome email
- *   3. Blueprint Injection — Load 12-slot document checklist
+ *   1. Fee Snapshot  -  Lock fees and tax rates
+ *   2. Portal Birth  -  Create client portal + send welcome email
+ *   3. Blueprint Injection  -  Load 12-slot document checklist
  *
  * Body: { leadId?: string }
  */

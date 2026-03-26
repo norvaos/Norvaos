@@ -1,5 +1,5 @@
 /**
- * RTL Auto-Mirror — Directive 15.0 Protocol 2
+ * RTL Auto-Mirror  -  Directive 15.0 Protocol 2
  *
  * When Arabic, Urdu, or Farsi is selected, the entire UI flips:
  *   - "Back" button moves to the right

@@ -265,7 +265,7 @@ export function TrustTab({ matterId, tenantId, matter }: TrustTabProps) {
 
   return (
     <div className="space-y-6">
-      {/* Header — Trust Balance Summary */}
+      {/* Header  -  Trust Balance Summary */}
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
         <Card className={isZeroOrNegative ? 'border-red-300 bg-red-50' : ''}>
           <CardContent className="p-4">
@@ -323,7 +323,7 @@ export function TrustTab({ matterId, tenantId, matter }: TrustTabProps) {
             <SelectContent>
               {accounts.map((acct) => (
                 <SelectItem key={acct.id} value={acct.id}>
-                  {acct.account_name} — {acct.bank_name}
+                  {acct.account_name}  -  {acct.bank_name}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -403,7 +403,7 @@ export function TrustTab({ matterId, tenantId, matter }: TrustTabProps) {
                       {fmtCents(tx.running_balance_cents)}
                     </span>
                     <span className="text-xs text-muted-foreground truncate">
-                      {tx.reference_number ?? '—'}
+                      {tx.reference_number ?? ' - '}
                     </span>
                     <Badge
                       variant="outline"

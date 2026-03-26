@@ -21,7 +21,7 @@ const createMatterSchema = z.object({
   matter_type_id: z.string().uuid().optional().nullable(),
   case_type_id: z.string().uuid().optional().nullable(),
   contact_id: z.string().uuid().optional().nullable(),
-  // Consolidated contact linking — replaces client-side matter_contacts insert
+  // Consolidated contact linking  -  replaces client-side matter_contacts insert
   contact_ids: z.array(contactLinkSchema).optional().nullable(),
   responsible_lawyer_id: z.string().uuid().optional().nullable(),
   originating_lawyer_id: z.string().uuid().optional().nullable(),
@@ -111,7 +111,7 @@ async function handlePost(request: Request) {
       contact_ids,
     } = parsed.data
 
-    // 3. Insert the matter (use admin client to bypass RLS — auth already verified above)
+    // 3. Insert the matter (use admin client to bypass RLS  -  auth already verified above)
     const admin = createAdminClient()
     const { data: matter, error: insertError } = await admin
       .from('matters')
@@ -242,7 +242,7 @@ async function handlePost(request: Request) {
         })
       }
     } catch (kitError) {
-      // Kit activation failure is non-fatal — matter already created
+      // Kit activation failure is non-fatal  -  matter already created
       console.error('Kit activation error (non-fatal):', kitError)
     }
 
@@ -298,7 +298,7 @@ async function handlePost(request: Request) {
               .single()
 
             // Carry-forward: snapshot contacts.immigration_data → matter_people.profile_data
-            // Non-fatal — if contact has no immigration_data, profile_data starts as {}
+            // Non-fatal  -  if contact has no immigration_data, profile_data starts as {}
             // and staff can populate it in the workbench.
             if (newPerson?.id) {
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -318,7 +318,7 @@ async function handlePost(request: Request) {
       // Revalidate intake to compute initial completion %, risk, and status
       await revalidateIntake(admin, matter.id)
     } catch (intakeError) {
-      // Intake initialization failure is non-fatal — matter already created
+      // Intake initialization failure is non-fatal  -  matter already created
       console.error('Intake initialization error (non-fatal):', intakeError)
     }
 
@@ -341,7 +341,7 @@ async function handlePost(request: Request) {
 
     await invalidateMattersList(auth.tenantId)
 
-    // 7. Fire-and-forget rule snapshot capture — non-blocking
+    // 7. Fire-and-forget rule snapshot capture  -  non-blocking
     captureRuleSnapshots(matter.id, auth.tenantId, admin).catch(
       (e) => console.error('[matters] Rule snapshot capture failed (non-fatal):', e)
     )

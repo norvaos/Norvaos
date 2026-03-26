@@ -14,7 +14,7 @@
 | 2 | `app/api/portal/[token]/billing/route.ts` | Team 4 | Client-facing portal billing |
 | 3 | `app/api/portal/[token]/billing/mark-sent/route.ts` | Team 4 | Client-facing e-transfer mark |
 | 4 | `app/api/portal/[token]/statement/route.ts` | Team 4 | Client-facing portal statement |
-| 5 | `lib/services/analytics/collections-service.ts` | Team 4 | `getClientStatement()` — backing service for portal statement |
+| 5 | `lib/services/analytics/collections-service.ts` | Team 4 | `getClientStatement()`  -  backing service for portal statement |
 | 6 | `lib/services/invoice-email-service.ts` | Team 1 | Email dispatch (invoice, receipt, reminder) |
 | 7 | `lib/utils/invoice-pdf.ts` | Shared | Invoice PDF generator |
 | 8 | `lib/utils/receipt-pdf.ts` | Shared | Receipt PDF generator |
@@ -56,14 +56,14 @@
 **Contrast:** The portal billing route (line 48) correctly filters `.not('status', 'in', '("draft","finalized","cancelled","void")')`. The statement API (Team 1) correctly filters via `NON_CLIENT_VISIBLE_STATUSES`.
 **Impact:** Client can see draft and finalized invoices (internal states) and void/cancelled invoices (irrelevant to them) via the portal statement endpoint.
 **Owner:** Team 4 (`collections-service.ts` and `portal/[token]/statement/route.ts`)
-**Recommendation:** Apply the same filter used by portal billing — exclude draft, finalized, cancelled, void from the client statement query.
+**Recommendation:** Apply the same filter used by portal billing  -  exclude draft, finalized, cancelled, void from the client statement query.
 
-### INC-2: Invoice PDF Showed "Finalized" to Client (Team 1 — FIXED)
+### INC-2: Invoice PDF Showed "Finalized" to Client (Team 1  -  FIXED)
 
 **Surface:** `sendInvoiceEmail()` → `generateInvoicePdf()`
 **Issue:** The send guard requires `status === 'finalized'`. The PDF was generated with `status: invoice.status` (= `'finalized'`), then the status was updated to `'sent'` after email dispatch. The client received a PDF showing "Finalized" as the status.
 **Fix:** Changed line 140 in `invoice-email-service.ts` from `status: invoice.status` to `status: 'sent'` with a comment explaining the pre-transition override.
-**Impact:** Cosmetic — client now sees "Sent" in the PDF, matching the actual post-send state.
+**Impact:** Cosmetic  -  client now sees "Sent" in the PDF, matching the actual post-send state.
 
 ---
 
@@ -84,8 +84,8 @@ The PDF status fix was verified as part of the OR-7 closure proof run (S2). The 
 No additional runtime proof is needed for this audit because:
 - Statement API: already proven in Phase 10 10.1 (P1–P5)
 - Portal billing and portal statement: not Team 1 owned, no changes made
-- Receipt PDF: no status field rendered — correct, no change
-- Reminder email: no status in subject or body — correct, no change
+- Receipt PDF: no status field rendered  -  correct, no change
+- Reminder email: no status in subject or body  -  correct, no change
 
 ---
 
@@ -94,7 +94,7 @@ No additional runtime proof is needed for this audit because:
 | ID | Severity | File | Description | Status |
 |----|----------|------|-------------|--------|
 | DEF-AUDIT-001 | Low | `invoice-email-service.ts:140` | Invoice PDF showed "Finalized" to client instead of "Sent" | FIXED |
-| INC-1 | Medium | `collections-service.ts` (Team 4) | Portal statement returns all statuses to client including draft/finalized/void/cancelled | NOT FIXED — flagged for Team 4 |
+| INC-1 | Medium | `collections-service.ts` (Team 4) | Portal statement returns all statuses to client including draft/finalized/void/cancelled | NOT FIXED  -  flagged for Team 4 |
 
 ---
 
@@ -102,7 +102,7 @@ No additional runtime proof is needed for this audit because:
 
 | # | Risk | Owner | Status |
 |---|------|-------|--------|
-| OR-8 | Portal statement endpoint (`/api/portal/[token]/statement`) leaks draft, finalized, void, and cancelled invoices to unauthenticated clients. `getClientStatement()` has no status filter. | Team 4 | NEW — requires Team 4 remediation |
+| OR-8 | Portal statement endpoint (`/api/portal/[token]/statement`) leaks draft, finalized, void, and cancelled invoices to unauthenticated clients. `getClientStatement()` has no status filter. | Team 4 | NEW  -  requires Team 4 remediation |
 
 ---
 

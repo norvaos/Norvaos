@@ -1,5 +1,5 @@
 -- ═══════════════════════════════════════════════════════════════════════════════
--- Migration 157 — Seed matter_type_config with processing stream + program category
+-- Migration 157  -  Seed matter_type_config with processing stream + program category
 -- ═══════════════════════════════════════════════════════════════════════════════
 --
 -- Populates the `matter_type_config` JSONB and `program_category_key` columns on
@@ -7,11 +7,11 @@
 -- Client Location, and Immigration Intelligence fields when a matter type is selected.
 --
 -- Keys stored in matter_type_config:
---   default_processing_stream  — 'inland' | 'outland' | 'hybrid' | null
---   default_client_location    — 'inland' | 'outside' | null
---   program_category           — human-readable label (e.g. "Temporary Residence")
---   eligibility_summary        — short text describing who qualifies
---   typical_processing_time    — e.g. "4–8 weeks"
+--   default_processing_stream   -  'inland' | 'outland' | 'hybrid' | null
+--   default_client_location     -  'inland' | 'outside' | null
+--   program_category            -  human-readable label (e.g. "Temporary Residence")
+--   eligibility_summary         -  short text describing who qualifies
+--   typical_processing_time     -  e.g. "4–8 weeks"
 
 -- Study Permit
 UPDATE matter_types SET
@@ -61,7 +61,7 @@ UPDATE matter_types SET
   )
 WHERE name = 'PR Application' AND matter_type_config = '{}'::jsonb;
 
--- Visitor Visa — Inside Canada
+-- Visitor Visa  -  Inside Canada
 UPDATE matter_types SET
   program_category_key = 'temporary_residence',
   matter_type_config = jsonb_build_object(
@@ -71,9 +71,9 @@ UPDATE matter_types SET
     'eligibility_summary', 'Extension or change of status; currently in Canada with valid status',
     'typical_processing_time', '4–12 weeks'
   )
-WHERE name = 'Visitor Visa — Inside Canada' AND matter_type_config = '{}'::jsonb;
+WHERE name = 'Visitor Visa  -  Inside Canada' AND matter_type_config = '{}'::jsonb;
 
--- Visitor Visa — Outside Canada
+-- Visitor Visa  -  Outside Canada
 UPDATE matter_types SET
   program_category_key = 'temporary_residence',
   matter_type_config = jsonb_build_object(
@@ -83,7 +83,7 @@ UPDATE matter_types SET
     'eligibility_summary', 'Purpose of visit; ties to home country; financial means; no inadmissibility',
     'typical_processing_time', '2–8 weeks (varies by country)'
   )
-WHERE name = 'Visitor Visa — Outside Canada' AND matter_type_config = '{}'::jsonb;
+WHERE name = 'Visitor Visa  -  Outside Canada' AND matter_type_config = '{}'::jsonb;
 
 -- Post-Graduate Work Permit (PGWP)
 UPDATE matter_types SET
@@ -97,7 +97,7 @@ UPDATE matter_types SET
   )
 WHERE name = 'Post-Graduate Work Permit (PGWP)' AND matter_type_config = '{}'::jsonb;
 
--- Spousal Sponsorship — Inside Canada
+-- Spousal Sponsorship  -  Inside Canada
 UPDATE matter_types SET
   program_category_key = 'family_sponsorship',
   matter_type_config = jsonb_build_object(
@@ -107,9 +107,9 @@ UPDATE matter_types SET
     'eligibility_summary', 'Sponsor is citizen/PR; genuine relationship; spouse is in Canada',
     'typical_processing_time', '12–16 months'
   )
-WHERE name = 'Spousal Sponsorship — Inside Canada' AND matter_type_config = '{}'::jsonb;
+WHERE name = 'Spousal Sponsorship  -  Inside Canada' AND matter_type_config = '{}'::jsonb;
 
--- Spousal Sponsorship — Outside Canada
+-- Spousal Sponsorship  -  Outside Canada
 UPDATE matter_types SET
   program_category_key = 'family_sponsorship',
   matter_type_config = jsonb_build_object(
@@ -119,9 +119,9 @@ UPDATE matter_types SET
     'eligibility_summary', 'Sponsor is citizen/PR; genuine relationship; spouse is outside Canada',
     'typical_processing_time', '12–18 months'
   )
-WHERE name = 'Spousal Sponsorship — Outside Canada' AND matter_type_config = '{}'::jsonb;
+WHERE name = 'Spousal Sponsorship  -  Outside Canada' AND matter_type_config = '{}'::jsonb;
 
--- General Matter — no immigration-specific defaults
+-- General Matter  -  no immigration-specific defaults
 UPDATE matter_types SET
   program_category_key = 'general',
   matter_type_config = jsonb_build_object(

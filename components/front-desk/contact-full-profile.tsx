@@ -202,7 +202,7 @@ function NotesTab({ contactId, tenantId }: { contactId: string; tenantId: string
   const [editContent, setEditContent] = useState('')
   const [deleteId, setDeleteId] = useState<string | null>(null)
 
-  // Step 1 — fetch lead IDs for this contact (used to widen note query)
+  // Step 1  -  fetch lead IDs for this contact (used to widen note query)
   const { data: leadIds = [] } = useQuery({
     queryKey: ['full-profile-lead-ids', contactId],
     queryFn: async () => {
@@ -217,7 +217,7 @@ function NotesTab({ contactId, tenantId }: { contactId: string; tenantId: string
     staleTime: 60_000,
   })
 
-  // Step 2 — notes: contact_id = X  OR  lead_id IN (leadIds)
+  // Step 2  -  notes: contact_id = X  OR  lead_id IN (leadIds)
   const notesKey = ['full-profile-notes', contactId, leadIds.join(',')]
   const { data: notes, isLoading } = useQuery({
     queryKey: notesKey,
@@ -257,19 +257,16 @@ function NotesTab({ contactId, tenantId }: { contactId: string; tenantId: string
 
   const createMutation = useMutation({
     mutationFn: async (content: string) => {
-      const supabase = createClient()
-      const { data, error } = await supabase
-        .from('notes')
-        .insert({
-          tenant_id: tenantId,
-          contact_id: contactId,
-          user_id: appUser?.id ?? null,
-          content,
-        })
-        .select()
-        .single()
-      if (error) throw error
-      return data
+      const res = await fetch('/api/actions/front_desk_note', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          source: 'front_desk',
+          payload: { action: 'create', contact_id: contactId, content },
+        }),
+      })
+      if (!res.ok) throw new Error('Failed to add note')
+      return res.json()
     },
     onSuccess: () => {
       invalidate()
@@ -280,12 +277,15 @@ function NotesTab({ contactId, tenantId }: { contactId: string; tenantId: string
 
   const updateMutation = useMutation({
     mutationFn: async ({ id, content }: { id: string; content: string }) => {
-      const supabase = createClient()
-      const { error } = await supabase
-        .from('notes')
-        .update({ content, updated_at: new Date().toISOString() })
-        .eq('id', id)
-      if (error) throw error
+      const res = await fetch('/api/actions/front_desk_note', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          source: 'front_desk',
+          payload: { action: 'update', note_id: id, content },
+        }),
+      })
+      if (!res.ok) throw new Error('Failed to update note')
     },
     onSuccess: () => {
       invalidate()
@@ -297,9 +297,15 @@ function NotesTab({ contactId, tenantId }: { contactId: string; tenantId: string
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      const supabase = createClient()
-      const { error } = await supabase.from('notes').delete().eq('id', id)
-      if (error) throw error
+      const res = await fetch('/api/actions/front_desk_note', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          source: 'front_desk',
+          payload: { action: 'delete', note_id: id },
+        }),
+      })
+      if (!res.ok) throw new Error('Failed to delete note')
     },
     onSuccess: () => {
       invalidate()
@@ -311,12 +317,15 @@ function NotesTab({ contactId, tenantId }: { contactId: string; tenantId: string
 
   const pinMutation = useMutation({
     mutationFn: async ({ id, is_pinned }: { id: string; is_pinned: boolean }) => {
-      const supabase = createClient()
-      const { error } = await supabase
-        .from('notes')
-        .update({ is_pinned: !is_pinned, updated_at: new Date().toISOString() })
-        .eq('id', id)
-      if (error) throw error
+      const res = await fetch('/api/actions/front_desk_note', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          source: 'front_desk',
+          payload: { action: 'pin', note_id: id, is_pinned: !is_pinned },
+        }),
+      })
+      if (!res.ok) throw new Error('Failed to update note')
     },
     onSuccess: () => invalidate(),
     onError: () => toast.error('Failed to update note'),
@@ -512,7 +521,7 @@ function NotesTab({ contactId, tenantId }: { contactId: string; tenantId: string
 }
 
 // ─── Activity Tab ─────────────────────────────────────────────────────────────
-// Shows ALL activities for this contact. Direct query — no ActivityTimeline,
+// Shows ALL activities for this contact. Direct query  -  no ActivityTimeline,
 // no audit-log dependency, no Object.keys(null) crash.
 
 function ActivityTab({ contactId, tenantId }: { contactId: string; tenantId: string }) {
@@ -598,7 +607,7 @@ function ActivityTab({ contactId, tenantId }: { contactId: string; tenantId: str
   return (
     <div className="divide-y divide-border">
       {activities.map((activity) => {
-        // Safe metadata extraction — never crashes on null
+        // Safe metadata extraction  -  never crashes on null
         const meta = activity.metadata != null
           ? (activity.metadata as Record<string, unknown>)
           : {}
@@ -861,7 +870,7 @@ function TasksTab({ contactId, tenantId }: { contactId: string; tenantId: string
                 </div>
               </div>
 
-              {/* Actions dropdown — always visible on touch, visible on hover for desktop */}
+              {/* Actions dropdown  -  always visible on touch, visible on hover for desktop */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <button
@@ -1127,7 +1136,7 @@ export function ContactFullProfile({
             {contactName}
           </SheetTitle>
           <SheetDescription className="text-xs text-muted-foreground">
-            Full history — notes, all activity, tasks &amp; appointments
+            Full history  -  notes, all activity, tasks &amp; appointments
           </SheetDescription>
         </SheetHeader>
 

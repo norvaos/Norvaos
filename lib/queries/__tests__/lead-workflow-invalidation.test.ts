@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Wave 6 — Query & Mutation Consistency Tests
+ * Wave 6  -  Query & Mutation Consistency Tests
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Validates the React Query key factory and that the invalidation patterns
@@ -153,7 +153,7 @@ describe('Invalidation Matrix (documented contract)', () => {
   /**
    * This test documents the expected invalidation patterns for each mutation.
    * If a mutation hook changes its invalidation targets, this test should be
-   * updated to match — it serves as a living contract.
+   * updated to match  -  it serves as a living contract.
    */
 
   const INVALIDATION_MATRIX: Record<string, string[]> = {

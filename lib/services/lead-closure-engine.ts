@@ -47,7 +47,7 @@ export interface CloseLeadResult {
  * 1. Validates the target stage is a closed stage
  * 2. Creates closure record (idempotent)
  * 3. Skips all remaining milestone tasks
- * 4. Advances stage to the closed stage (with skipGuards — closure engine does its own validation)
+ * 4. Advances stage to the closed stage (with skipGuards  -  closure engine does its own validation)
  * 5. Updates lead.closure_record_id and lead.is_closed
  * 6. Logs activity
  * 7. Recalculates summary
@@ -121,7 +121,7 @@ export async function closeLead(params: CloseLeadParams): Promise<CloseLeadResul
         tenant_id: tenantId,
         activity_type: 'lead_closed',
         title: `Lead closed: ${STAGE_LABELS[closedStage] ?? closedStage}`,
-        description: `Reason: ${reasonCode}${reasonText ? ` — ${reasonText}` : ''}`,
+        description: `Reason: ${reasonCode}${reasonText ? `  -  ${reasonText}` : ''}`,
         entity_type: 'lead',
         entity_id: leadId,
         user_id: closedBy,
@@ -141,7 +141,7 @@ export async function closeLead(params: CloseLeadParams): Promise<CloseLeadResul
   })
 
   if (result.skipped) {
-    return { success: true } // Already closed — idempotency
+    return { success: true } // Already closed  -  idempotency
   }
 
   return { success: true, closureRecordId: result.data }
@@ -238,7 +238,7 @@ export async function reopenLead(params: ReopenLeadParams): Promise<ReopenLeadRe
         .eq('id', leadId)
         .eq('tenant_id', tenantId)
 
-      // 4. Advance stage (skipGuards — reopen engine validates independently)
+      // 4. Advance stage (skipGuards  -  reopen engine validates independently)
       await advanceLeadStage({
         supabase,
         leadId,
@@ -352,7 +352,7 @@ async function applyTaskStrategy(
         .not('status', 'eq', 'completed')
 
       // Note: the stage engine will create new milestone groups for the target stage
-      // via createMilestoneGroupsForStage() — but since the idempotency key includes
+      // via createMilestoneGroupsForStage()  -  but since the idempotency key includes
       // the stage name, we need to make the key unique for regeneration.
       // The stage advance call in reopenLead() handles this.
       break

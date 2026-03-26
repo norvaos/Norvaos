@@ -1,7 +1,7 @@
 /**
  * GET /api/analytics/success-reverb
  *
- * Success-Reverb Ledger (Directive 20.3) — Time-to-Approval Report
+ * Success-Reverb Ledger (Directive 20.3)  -  Time-to-Approval Report
  *
  * Compares "Draft-to-Submission" times for matters that used Gold Standard
  * Templates vs. those that did not (legacy Clio workflow).
@@ -108,7 +108,7 @@ export async function GET() {
       ? `Firms using Norva Templates reduced their 'Draft-to-Submission' time by ${improvementPct}% compared to their Clio history.`
       : templateTimings.length === 0
         ? 'No matters have used Gold Standard Templates yet. Approve matters to generate templates.'
-        : `Average Draft-to-Submission: ${avgTemplate ?? '—'} days (template) vs ${avgLegacy ?? '—'} days (legacy).`
+        : `Average Draft-to-Submission: ${avgTemplate ?? ' - '} days (template) vs ${avgLegacy ?? ' - '} days (legacy).`
 
     return NextResponse.json({
       templateMatters: {

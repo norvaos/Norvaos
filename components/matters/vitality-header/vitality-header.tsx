@@ -255,7 +255,7 @@ export function VitalityHeaderSkeleton() {
           gridTemplateRows: 'auto 1fr auto',
         }}
       >
-        {/* Row 1: Readiness — spans 3 cols */}
+        {/* Row 1: Readiness  -  spans 3 cols */}
         <Card className="col-span-3 overflow-hidden">
           <CardContent className="p-3" style={{ minHeight: 80 }}>
             <div className="flex items-center gap-3">
@@ -335,7 +335,7 @@ export function VitalityHeaderSkeleton() {
           </CardContent>
         </Card>
 
-        {/* Row 3: Documents — spans 3 cols */}
+        {/* Row 3: Documents  -  spans 3 cols */}
         <Card className="col-span-3 overflow-hidden">
           <CardContent className="p-3" style={{ minHeight: 60 }}>
             <div className="flex items-center gap-4">
@@ -495,7 +495,7 @@ export function VitalityHeader({
           gridTemplateRows: 'auto 1fr auto',
         }}
       >
-        {/* Row 1: Readiness Zone — spans all 3 columns */}
+        {/* Row 1: Readiness Zone  -  spans all 3 columns */}
         <Card className="col-span-3 overflow-hidden">
           <CardContent className="p-0" style={{ minHeight: 80 }}>
             <ReadinessZone
@@ -557,7 +557,7 @@ export function VitalityHeader({
           </CardContent>
         </Card>
 
-        {/* Row 3: Documents Zone — spans all 3 columns */}
+        {/* Row 3: Documents Zone  -  spans all 3 columns */}
         <Card className="col-span-3 overflow-hidden">
           <CardContent className="p-0" style={{ minHeight: 60 }}>
             <DocumentsZone

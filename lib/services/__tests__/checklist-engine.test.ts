@@ -2,7 +2,7 @@
  * Tests for the Checklist Engine.
  *
  * Covers: calculateCompletionScore()
- * — empty list, all-required, mixed required/optional, status branches
+ *  -  empty list, all-required, mixed required/optional, status branches
  *   (approved, not_applicable, pending, received, rejected),
  *   zero-required-but-items-exist, rounding, missingRequired names.
  */

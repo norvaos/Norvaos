@@ -151,7 +151,7 @@ export async function GET(
 
       stagesData = {
         currentStageName: currentIdx >= 0 ? sortedStages[currentIdx]?.name ?? null : null,
-        timeInStage: stageEnteredAt ? formatDuration(stageEnteredAt) : '—',
+        timeInStage: stageEnteredAt ? formatDuration(stageEnteredAt) : ' - ',
         pipelineProgress,
         stages: sortedStages.map((s, idx) => ({
           name: s.name,
@@ -215,7 +215,7 @@ export async function GET(
         overallScore: readinessScore,
         completionPct: readinessScore,
         intakeStatus: (matterRow.intake_status as string) ?? null,
-        domains: [], // Readiness domains require a separate API call — omitted for lean PDF
+        domains: [], // Readiness domains require a separate API call  -  omitted for lean PDF
       },
 
       relationships: primaryContact,

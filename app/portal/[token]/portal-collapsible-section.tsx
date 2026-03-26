@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * PortalCollapsibleSection — Reusable collapsible container for the portal
+ * PortalCollapsibleSection  -  Reusable collapsible container for the portal
  * guided workspace. Adapted from section-summary-strip.tsx pattern.
  *
  * Features:
@@ -35,7 +35,7 @@ export interface PortalCollapsibleSectionProps {
   badge?: { text: string; color: 'red' | 'amber' | 'blue' | 'green' }
   /** Tenant primary colour for expanded state accent */
   primaryColor?: string
-  /** Visual variant — left-border accent based on section status */
+  /** Visual variant  -  left-border accent based on section status */
   variant?: 'action' | 'info' | 'success' | 'warning' | 'default'
   children: ReactNode
 }
@@ -90,7 +90,7 @@ export function PortalCollapsibleSection({
         VARIANT_BORDERS[variant],
       )}
     >
-      {/* Header — always visible, acts as toggle */}
+      {/* Header  -  always visible, acts as toggle */}
       <button
         type="button"
         onClick={onToggle}
@@ -146,7 +146,7 @@ export function PortalCollapsibleSection({
         />
       </button>
 
-      {/* Content — collapsible */}
+      {/* Content  -  collapsible */}
       {isExpanded && (
         <div ref={contentRef} className="p-4">
           {children}

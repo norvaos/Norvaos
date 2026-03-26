@@ -10,7 +10,7 @@ import { withTiming } from '@/lib/middleware/request-timing'
  * Authorization headers when calling automation-payload and other APIs.
  *
  * Auth: relies on the Supabase session cookie (same-origin or CORS with
- * credentials). No Bearer token required — this is the bootstrap endpoint.
+ * credentials). No Bearer token required  -  this is the bootstrap endpoint.
  *
  * CORS: Allows requests from the Chrome extension origin.
  */
@@ -56,7 +56,7 @@ async function handleGet(request: Request) {
 }
 
 /**
- * OPTIONS — CORS preflight for Chrome extension requests.
+ * OPTIONS  -  CORS preflight for Chrome extension requests.
  */
 async function handleOptions(request: Request) {
   const origin = request.headers.get('origin') || ''

@@ -85,7 +85,7 @@ export async function recordOutcomeEvent(
         break
       }
       case 'refusal': {
-        // Refusal is recorded — next_action is set later via initiateRefusalNextStep
+        // Refusal is recorded  -  next_action is set later via initiateRefusalNextStep
         break
       }
       case 'biometric': {
@@ -180,7 +180,7 @@ export async function initiateRefusalNextStep(
     fresh_application: 'Fresh Application',
   }
 
-  const newTitle = `${originalMatter.title} — ${actionLabels[nextAction]}`
+  const newTitle = `${originalMatter.title}  -  ${actionLabels[nextAction]}`
 
   // 3. Create new matter (carry forward key fields)
   const { data: newMatter, error: newMatterErr } = await supabase
@@ -392,7 +392,7 @@ async function handleApproval(
   await supabase.from('tasks').insert({
     tenant_id: tenantId,
     matter_id: matterId,
-    title: 'Process approval — update client and close matter',
+    title: 'Process approval  -  update client and close matter',
     description: 'Review approval details, notify the client, and update the matter status.',
     priority: 'high',
     due_date: new Date(Date.now() + 3 * 86400000).toISOString().split('T')[0],

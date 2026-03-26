@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-IRCC Forms Engine — PDF Generation Smoke Test
+IRCC Forms Engine  -  PDF Generation Smoke Test
 ==============================================
 Runs against live Supabase + running Python sidecar.
 Validates instance-backed answers flow through XFA filling pipeline.
@@ -351,9 +351,9 @@ def verify_filled_pdf(filled_bytes: bytes, root_element: str):
         ok(f"All {total}/{total} expected values confirmed in filled PDF")
     elif found_count > 0:
         ok(f"{found_count}/{total} expected values found")
-        print(f"  ⚠ {total - found_count} values not found — may be in nested paths")
+        print(f"  ⚠ {total - found_count} values not found  -  may be in nested paths")
     else:
-        print(f"  ⚠ No expected values found — checking if fields were written at all")
+        print(f"  ⚠ No expected values found  -  checking if fields were written at all")
 
     return found_count
 
@@ -362,7 +362,7 @@ def verify_filled_pdf(filled_bytes: bytes, root_element: str):
 
 def main():
     print("=" * 60)
-    print("  IRCC Forms Engine — PDF Generation Smoke Test")
+    print("  IRCC Forms Engine  -  PDF Generation Smoke Test")
     print("=" * 60)
 
     load_env()
@@ -371,7 +371,7 @@ def main():
     root_element, scalar_fields = resolve_to_xfa(form_id, answers)
 
     if not scalar_fields:
-        fail("No scalar fields resolved — nothing to fill")
+        fail("No scalar fields resolved  -  nothing to fill")
 
     filled_bytes = fill_pdf(root_element, scalar_fields)
     found_count = verify_filled_pdf(filled_bytes, root_element)
@@ -380,7 +380,7 @@ def main():
     section("SMOKE TEST RESULT")
     if found_count > 0:
         print("  ╔══════════════════════════════════════════════════════╗")
-        print("  ║  PASS — PDF generation from instance answers works  ║")
+        print("  ║  PASS  -  PDF generation from instance answers works  ║")
         print("  ╚══════════════════════════════════════════════════════╝")
         print()
         print(f"  • Instance answers read from Supabase: ✓")
@@ -390,7 +390,7 @@ def main():
         print(f"  • Output saved: tmp/smoke-test-IMM5257E-filled.pdf")
     else:
         print("  ╔══════════════════════════════════════════════════════╗")
-        print("  ║  PARTIAL — Fill succeeded but values not verified   ║")
+        print("  ║  PARTIAL  -  Fill succeeded but values not verified   ║")
         print("  ╚══════════════════════════════════════════════════════╝")
 
     print()

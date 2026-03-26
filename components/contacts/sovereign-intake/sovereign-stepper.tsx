@@ -1,13 +1,13 @@
 'use client'
 
 /**
- * SovereignStepper — Directive 42.1 Multi-Step Intake Wizard
+ * SovereignStepper  -  Directive 42.1 Multi-Step Intake Wizard
  *
  * Replaces the flat contact creation form with a multi-phase regulatory
  * intake flow:
  *   1. Conflict Search   (LEAD gate)
  *   2. Contact Details / Contact & Lead (creates contact, optionally lead)
- *   3. Compliance Review  (PROSPECT gate — skipped for general contacts)
+ *   3. Compliance Review  (PROSPECT gate  -  skipped for general contacts)
  *
  * "Pure Contact" protocol: when isGeneralContact is true, steps 2→complete
  * directly, bypassing compliance review.

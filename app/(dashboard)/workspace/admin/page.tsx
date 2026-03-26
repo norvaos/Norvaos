@@ -126,7 +126,7 @@ export default function AdminWorkspace() {
         <Card className="p-4">
           <p className="text-xs text-muted-foreground">Onboarding</p>
           <p className="text-2xl font-bold">
-            {onboardingPct !== null ? `${onboardingPct}%` : '—'}
+            {onboardingPct !== null ? `${onboardingPct}%` : ' - '}
           </p>
         </Card>
       </div>

@@ -1,5 +1,5 @@
 /**
- * IRCC Forms Engine — Integration Tests
+ * IRCC Forms Engine  -  Integration Tests
  *
  * Proves core engine flows end-to-end using mock data access (no live database).
  * Covers ADR condition #4: save, resume, stale invalidation, and generation readiness.
@@ -891,7 +891,7 @@ describe('Group 1: Condition Engine', () => {
   const profile = createTestProfile()
 
   describe('14 operators', () => {
-    it('equals — matches string value', () => {
+    it('equals  -  matches string value', () => {
       expect(
         evaluateRule(
           { field_path: 'marital.status', operator: 'equals', value: 'Single' },
@@ -900,7 +900,7 @@ describe('Group 1: Condition Engine', () => {
       ).toBe(true)
     })
 
-    it('equals — rejects non-matching value', () => {
+    it('equals  -  rejects non-matching value', () => {
       expect(
         evaluateRule(
           { field_path: 'marital.status', operator: 'equals', value: 'Married' },
@@ -909,7 +909,7 @@ describe('Group 1: Condition Engine', () => {
       ).toBe(false)
     })
 
-    it('not_equals — rejects matching value', () => {
+    it('not_equals  -  rejects matching value', () => {
       expect(
         evaluateRule(
           { field_path: 'marital.status', operator: 'not_equals', value: 'Single' },
@@ -918,7 +918,7 @@ describe('Group 1: Condition Engine', () => {
       ).toBe(false)
     })
 
-    it('not_equals — accepts non-matching value', () => {
+    it('not_equals  -  accepts non-matching value', () => {
       expect(
         evaluateRule(
           { field_path: 'marital.status', operator: 'not_equals', value: 'Married' },
@@ -927,7 +927,7 @@ describe('Group 1: Condition Engine', () => {
       ).toBe(true)
     })
 
-    it('in — matches when value is in list', () => {
+    it('in  -  matches when value is in list', () => {
       expect(
         evaluateRule(
           { field_path: 'marital.status', operator: 'in', value: ['Single', 'Married'] },
@@ -936,7 +936,7 @@ describe('Group 1: Condition Engine', () => {
       ).toBe(true)
     })
 
-    it('in — rejects when value is not in list', () => {
+    it('in  -  rejects when value is not in list', () => {
       expect(
         evaluateRule(
           { field_path: 'marital.status', operator: 'in', value: ['Married', 'Divorced'] },
@@ -945,7 +945,7 @@ describe('Group 1: Condition Engine', () => {
       ).toBe(false)
     })
 
-    it('not_in — accepts when value is not in list', () => {
+    it('not_in  -  accepts when value is not in list', () => {
       expect(
         evaluateRule(
           { field_path: 'marital.status', operator: 'not_in', value: ['Married', 'Divorced'] },
@@ -954,7 +954,7 @@ describe('Group 1: Condition Engine', () => {
       ).toBe(true)
     })
 
-    it('not_in — rejects when value is in list', () => {
+    it('not_in  -  rejects when value is in list', () => {
       expect(
         evaluateRule(
           { field_path: 'marital.status', operator: 'not_in', value: ['Single', 'Divorced'] },
@@ -963,7 +963,7 @@ describe('Group 1: Condition Engine', () => {
       ).toBe(false)
     })
 
-    it('truthy — returns true for non-empty string', () => {
+    it('truthy  -  returns true for non-empty string', () => {
       expect(
         evaluateRule(
           { field_path: 'personal.family_name', operator: 'truthy' },
@@ -972,7 +972,7 @@ describe('Group 1: Condition Engine', () => {
       ).toBe(true)
     })
 
-    it('truthy — returns false for missing key', () => {
+    it('truthy  -  returns false for missing key', () => {
       expect(
         evaluateRule(
           { field_path: 'nonexistent.field', operator: 'truthy' },
@@ -981,7 +981,7 @@ describe('Group 1: Condition Engine', () => {
       ).toBe(false)
     })
 
-    it('falsy — returns true for missing key', () => {
+    it('falsy  -  returns true for missing key', () => {
       expect(
         evaluateRule(
           { field_path: 'nonexistent.field', operator: 'falsy' },
@@ -990,7 +990,7 @@ describe('Group 1: Condition Engine', () => {
       ).toBe(true)
     })
 
-    it('falsy — returns false for non-empty string', () => {
+    it('falsy  -  returns false for non-empty string', () => {
       expect(
         evaluateRule(
           { field_path: 'personal.family_name', operator: 'falsy' },
@@ -999,7 +999,7 @@ describe('Group 1: Condition Engine', () => {
       ).toBe(false)
     })
 
-    it('has_value — returns true for existing key', () => {
+    it('has_value  -  returns true for existing key', () => {
       expect(
         evaluateRule(
           { field_path: 'personal.family_name', operator: 'has_value' },
@@ -1008,7 +1008,7 @@ describe('Group 1: Condition Engine', () => {
       ).toBe(true)
     })
 
-    it('has_value — returns false for missing key', () => {
+    it('has_value  -  returns false for missing key', () => {
       expect(
         evaluateRule(
           { field_path: 'nonexistent.field', operator: 'has_value' },
@@ -1017,7 +1017,7 @@ describe('Group 1: Condition Engine', () => {
       ).toBe(false)
     })
 
-    it('no_value — returns true for missing key', () => {
+    it('no_value  -  returns true for missing key', () => {
       expect(
         evaluateRule(
           { field_path: 'nonexistent.field', operator: 'no_value' },
@@ -1026,7 +1026,7 @@ describe('Group 1: Condition Engine', () => {
       ).toBe(true)
     })
 
-    it('no_value — returns false for existing key', () => {
+    it('no_value  -  returns false for existing key', () => {
       expect(
         evaluateRule(
           { field_path: 'personal.family_name', operator: 'no_value' },
@@ -1035,31 +1035,31 @@ describe('Group 1: Condition Engine', () => {
       ).toBe(false)
     })
 
-    it('greater_than — numeric comparison', () => {
+    it('greater_than  -  numeric comparison', () => {
       const vals = { 'score': 85 }
       expect(evaluateRule({ field_path: 'score', operator: 'greater_than', value: 80 }, vals)).toBe(true)
       expect(evaluateRule({ field_path: 'score', operator: 'greater_than', value: 85 }, vals)).toBe(false)
     })
 
-    it('less_than — numeric comparison', () => {
+    it('less_than  -  numeric comparison', () => {
       const vals = { 'score': 70 }
       expect(evaluateRule({ field_path: 'score', operator: 'less_than', value: 80 }, vals)).toBe(true)
       expect(evaluateRule({ field_path: 'score', operator: 'less_than', value: 70 }, vals)).toBe(false)
     })
 
-    it('greater_or_equal — boundary', () => {
+    it('greater_or_equal  -  boundary', () => {
       const vals = { 'score': 80 }
       expect(evaluateRule({ field_path: 'score', operator: 'greater_or_equal', value: 80 }, vals)).toBe(true)
       expect(evaluateRule({ field_path: 'score', operator: 'greater_or_equal', value: 81 }, vals)).toBe(false)
     })
 
-    it('less_or_equal — boundary', () => {
+    it('less_or_equal  -  boundary', () => {
       const vals = { 'score': 80 }
       expect(evaluateRule({ field_path: 'score', operator: 'less_or_equal', value: 80 }, vals)).toBe(true)
       expect(evaluateRule({ field_path: 'score', operator: 'less_or_equal', value: 79 }, vals)).toBe(false)
     })
 
-    it('contains — substring match in string', () => {
+    it('contains  -  substring match in string', () => {
       expect(
         evaluateRule(
           { field_path: 'contact_info.email', operator: 'contains', value: '@example' },
@@ -1068,13 +1068,13 @@ describe('Group 1: Condition Engine', () => {
       ).toBe(true)
     })
 
-    it('contains — element in array', () => {
+    it('contains  -  element in array', () => {
       const vals = { 'languages': ['English', 'French'] }
       expect(evaluateRule({ field_path: 'languages', operator: 'contains', value: 'French' }, vals)).toBe(true)
       expect(evaluateRule({ field_path: 'languages', operator: 'contains', value: 'Spanish' }, vals)).toBe(false)
     })
 
-    it('not_contains — rejects when string contains substring', () => {
+    it('not_contains  -  rejects when string contains substring', () => {
       expect(
         evaluateRule(
           { field_path: 'contact_info.email', operator: 'not_contains', value: '@example' },
@@ -1083,7 +1083,7 @@ describe('Group 1: Condition Engine', () => {
       ).toBe(false)
     })
 
-    it('not_contains — accepts when string does not contain substring', () => {
+    it('not_contains  -  accepts when string does not contain substring', () => {
       expect(
         evaluateRule(
           { field_path: 'contact_info.email', operator: 'not_contains', value: '@gmail' },
@@ -1094,7 +1094,7 @@ describe('Group 1: Condition Engine', () => {
   })
 
   describe('grouping logic', () => {
-    it('AND grouping — all must pass', () => {
+    it('AND grouping  -  all must pass', () => {
       const cond: FieldCondition = {
         logic: 'AND',
         rules: [
@@ -1105,7 +1105,7 @@ describe('Group 1: Condition Engine', () => {
       expect(evaluateCondition(cond, profile)).toBe(true)
     })
 
-    it('AND grouping — one fails means all fail', () => {
+    it('AND grouping  -  one fails means all fail', () => {
       const cond: FieldCondition = {
         logic: 'AND',
         rules: [
@@ -1116,7 +1116,7 @@ describe('Group 1: Condition Engine', () => {
       expect(evaluateCondition(cond, profile)).toBe(false)
     })
 
-    it('OR grouping — any must pass', () => {
+    it('OR grouping  -  any must pass', () => {
       const cond: FieldCondition = {
         logic: 'OR',
         rules: [
@@ -1127,7 +1127,7 @@ describe('Group 1: Condition Engine', () => {
       expect(evaluateCondition(cond, profile)).toBe(true)
     })
 
-    it('OR grouping — none pass means fail', () => {
+    it('OR grouping  -  none pass means fail', () => {
       const cond: FieldCondition = {
         logic: 'OR',
         rules: [
@@ -1138,7 +1138,7 @@ describe('Group 1: Condition Engine', () => {
       expect(evaluateCondition(cond, profile)).toBe(false)
     })
 
-    it('nested groups — AND containing OR', () => {
+    it('nested groups  -  AND containing OR', () => {
       const cond: FieldCondition = {
         logic: 'AND',
         rules: [
@@ -1157,7 +1157,7 @@ describe('Group 1: Condition Engine', () => {
       expect(evaluateCondition(cond, profile)).toBe(true)
     })
 
-    it('nested groups — AND containing failing OR', () => {
+    it('nested groups  -  AND containing failing OR', () => {
       const cond: FieldCondition = {
         logic: 'AND',
         rules: [
@@ -1966,7 +1966,7 @@ describe('Group 7: Generation Readiness', () => {
 // ============================================================================
 
 describe('Group 8: Composite Validation Rules', () => {
-  it('form-scope rule: spouse DOB required when married — passes when provided', () => {
+  it('form-scope rule: spouse DOB required when married  -  passes when provided', () => {
     const values = createTestProfile({
       'marital.status': 'Married',
       'marital.spouse_date_of_birth': '1991-06-15',
@@ -1998,7 +1998,7 @@ describe('Group 8: Composite Validation Rules', () => {
     expect(evaluateCondition(rule.condition, values)).toBe(true)
   })
 
-  it('form-scope rule: spouse DOB required when married — fails when missing', () => {
+  it('form-scope rule: spouse DOB required when married  -  fails when missing', () => {
     const values = createTestProfile({ 'marital.status': 'Married' })
     // No spouse DOB in profile
 
@@ -2026,7 +2026,7 @@ describe('Group 8: Composite Validation Rules', () => {
     expect(evaluateCondition(rule.condition, values)).toBe(false)
   })
 
-  it('form-scope rule: spouse DOB not required when single — passes', () => {
+  it('form-scope rule: spouse DOB not required when single  -  passes', () => {
     const values = createTestProfile() // marital.status = 'Single'
 
     const rule: CompositeValidationRule = {
@@ -2053,7 +2053,7 @@ describe('Group 8: Composite Validation Rules', () => {
     expect(evaluateCondition(rule.condition, values)).toBe(true)
   })
 
-  it('matter-scope rule: principal and spouse cannot have same passport number — fails on match', () => {
+  it('matter-scope rule: principal and spouse cannot have same passport number  -  fails on match', () => {
     const values = {
       'passport.number': 'AB123456',
       'marital.spouse_passport_number': 'AB123456',
@@ -2123,7 +2123,7 @@ describe('Group 8: Composite Validation Rules', () => {
     expect(evaluateCondition(simpleRule.condition, values)).toBe(false)
   })
 
-  it('matter-scope rule: different passport numbers — passes', () => {
+  it('matter-scope rule: different passport numbers  -  passes', () => {
     const values = {
       'passport.number': 'AB123456',
       'marital.spouse_passport_number': 'CD789012',
@@ -2164,7 +2164,7 @@ describe('Group 8: Composite Validation Rules', () => {
     expect(evaluateCondition(rule.condition, values)).toBe(true)
   })
 
-  it('entity-scope rule: employment history required if employed — fails when empty', () => {
+  it('entity-scope rule: employment history required if employed  -  fails when empty', () => {
     const values = {
       'employment.is_employed': 'Yes',
       'employment.history': null,
@@ -2197,7 +2197,7 @@ describe('Group 8: Composite Validation Rules', () => {
     expect(evaluateCondition(rule.condition, values)).toBe(false)
   })
 
-  it('entity-scope rule: employment history present when employed — passes', () => {
+  it('entity-scope rule: employment history present when employed  -  passes', () => {
     const values = {
       'employment.is_employed': 'Yes',
       'employment.history': [{ employer: 'Acme Corp', start: '2020-01-01' }],
@@ -2292,7 +2292,7 @@ describe('Completion State', () => {
 
     const stateWithSingle = computeCompletionState(answers, fields)
 
-    // Now change to Married — spouse fields become visible
+    // Now change to Married  -  spouse fields become visible
     const marriedProfile = createTestProfile({
       'marital.status': 'Married',
       'marital.spouse_family_name': 'Jones',

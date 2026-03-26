@@ -1,4 +1,4 @@
-# IRCC Forms Engine — Source of Truth Declaration
+# IRCC Forms Engine  -  Source of Truth Declaration
 
 ## Current State (Transition Period)
 

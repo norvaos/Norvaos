@@ -55,7 +55,7 @@ export const frontDeskLogEmailAction: ActionDefinition<FrontDeskLogEmailInput, F
       },
       activity: {
         activityType: 'front_desk_email_logged',
-        title: `Email — ${directionLabel}: ${input.subject}`,
+        title: `Email  -  ${directionLabel}: ${input.subject}`,
         description: input.notes,
         metadata: {
           direction: input.direction,

@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Genesis Block Service — Directive 015 / 015.1: Sovereign Birth Certificate
+ * Genesis Block Service  -  Directive 015 / 015.1: Sovereign Birth Certificate
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * The "Digital Notary" of NorvaOS. When a Lead becomes a Client, the Genesis
@@ -13,7 +13,7 @@
  *   • Last trust audit hash (chain-link to firm's financial history)
  *
  * 015.1 Enhancements:
- *   • Idempotent — cannot overwrite, only revoke with Partner-level audit trail
+ *   • Idempotent  -  cannot overwrite, only revoke with Partner-level audit trail
  *   • Sequence violation detection (conflict check after retainer = amber)
  *   • Revocation requires Partner/Admin role + documented reason
  */
@@ -61,8 +61,9 @@ export async function generateGenesisBlock(params: {
   tenantId: string
   matterId: string
   userId: string
+  conflictSearchId: string  // Directive 032: mandatory conflict clearance link
 }): Promise<GenesisBlockResult> {
-  const { tenantId, matterId, userId } = params
+  const { tenantId, matterId, userId, conflictSearchId } = params
 
   try {
     const admin = createAdminClient()
@@ -74,6 +75,7 @@ export async function generateGenesisBlock(params: {
         p_matter_id: matterId,
         p_tenant_id: tenantId,
         p_user_id: userId,
+        p_conflict_search_id: conflictSearchId,
       },
     )
 
@@ -95,7 +97,7 @@ export async function generateGenesisBlock(params: {
 
 /**
  * Revokes a genesis block via the PostgreSQL RPC. Requires Partner/Admin role.
- * The block is not deleted — it is marked as revoked with an audit trail.
+ * The block is not deleted  -  it is marked as revoked with an audit trail.
  * After revocation, a new genesis block can be generated.
  */
 export async function revokeGenesisBlock(params: {

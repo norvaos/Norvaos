@@ -11,9 +11,9 @@ import { getRecentSentinelEvents } from '@/lib/services/sentinel-audit'
  * the immutable sentinel_audit_log.
  *
  * Query params:
- *   ?limit=50       — max records (default 50, max 200)
- *   ?severity=critical — filter by severity
- *   ?tenant_id=uuid — filter by tenant
+ *   ?limit=50        -  max records (default 50, max 200)
+ *   ?severity=critical  -  filter by severity
+ *   ?tenant_id=uuid  -  filter by tenant
  */
 async function handleGet(request: Request) {
   try {

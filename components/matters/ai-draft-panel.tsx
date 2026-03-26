@@ -1,17 +1,17 @@
 'use client'
 
 /**
- * Norva Intelligence — Command Centre HUD (Glass-Morphism)
+ * Norva Intelligence  -  Command Centre HUD (Glass-Morphism)
  *
  * Three-section floating panel:
- *   Section 1 — Audit Score: live Audit-Optimizer/IRCC readability meter
- *   Section 2 — Fact-Anchors: scrolling list of verified Norva Ear quotes
- *   Section 3 — Ghost-Draft: real-time AI drafting window
+ *   Section 1  -  Audit Score: live Audit-Optimizer/IRCC readability meter
+ *   Section 2  -  Fact-Anchors: scrolling list of verified Norva Ear quotes
+ *   Section 3  -  Ghost-Draft: real-time AI drafting window
  *
  * Includes:
- *   - Critical Drift Overlay (1.5) — blocks "Approve Draft" when Drift Sentry
+ *   - Critical Drift Overlay (1.5)  -  blocks "Approve Draft" when Drift Sentry
  *     detects unacknowledged Federal Court rulings in the draft's category
- *   - Success-Reverb suggestions (1.6) — Gold Standard Template prompts
+ *   - Success-Reverb suggestions (1.6)  -  Gold Standard Template prompts
  */
 
 import { useState, useCallback, useMemo, useEffect, useRef } from 'react'
@@ -77,7 +77,7 @@ interface DraftResponse {
 interface AiDraftPanelProps {
   matterId: string
   matterTitle: string | null
-  /** Mount context — 'overview' renders compact summary, 'intelligence' renders full three-column deep-work view */
+  /** Mount context  -  'overview' renders compact summary, 'intelligence' renders full three-column deep-work view */
   mountContext?: 'overview' | 'intelligence' | 'modal'
 }
 
@@ -210,13 +210,13 @@ function FactAnchorCard({ anchor }: {
       {/* English translation */}
       <p className="text-xs text-white/80 font-medium">{anchor.fact}</p>
 
-      {/* Original script (Urdu Nastaliq / other) — revealed on toggle */}
+      {/* Original script (Urdu Nastaliq / other)  -  revealed on toggle */}
       {showSource && anchor.originalText && (
         <div
           className="mt-2 rounded-lg border border-violet-500/20 bg-violet-500/5 p-2"
           style={{
             // Directive 36.1: CSS containment isolates Nastaliq paint from
-            // AuraHeader compositor layer — eliminates stutter when header
+            // AuraHeader compositor layer  -  eliminates stutter when header
             // cycles at 500ms while Draft panel renders Hindi/Punjabi/Urdu.
             contain: 'content',
           }}
@@ -250,7 +250,7 @@ function FactAnchorCard({ anchor }: {
         Source: {anchor.sessionTitle}
         {hasOriginal && !showSource && (
           <span className="ml-1 text-violet-400/50">
-            — translated from {langLabels[anchor.sourceLanguage ?? ''] ?? anchor.sourceLanguage}
+             -  translated from {langLabels[anchor.sourceLanguage ?? ''] ?? anchor.sourceLanguage}
           </span>
         )}
       </p>
@@ -343,14 +343,14 @@ export function AiDraftPanel({ matterId, matterTitle, mountContext = 'modal' }: 
     status: 'published',
   })
 
-  // Drift-Blocker (1.5) — poll every 30s when panel is open for live Policy-Pulse
+  // Drift-Blocker (1.5)  -  poll every 30s when panel is open for live Policy-Pulse
   const { data: driftStatus, dataUpdatedAt: driftUpdatedAt } = useDriftBlockCheck(matterId)
   const acknowledgeMutation = useAcknowledgeDrift(matterId)
 
-  // Success-Reverb (1.6) — Gold Standard suggestions
+  // Success-Reverb (1.6)  -  Gold Standard suggestions
   const { data: goldSuggestions = [] } = useGoldStandardSuggestions(matterId)
 
-  // Norva Ear sessions — Fact-to-Draft pipeline (Directive 21.0)
+  // Norva Ear sessions  -  Fact-to-Draft pipeline (Directive 21.0)
   const { data: earSessions = [] } = useNorvaEarSessions(matterId)
 
   // State
@@ -448,7 +448,7 @@ export function AiDraftPanel({ matterId, matterTitle, mountContext = 'modal' }: 
     const completedSessions = earSessions.filter(s => s.status === 'completed')
     if (completedSessions.length === 0) return
 
-    // Build fact anchors from session data — fetch detailed transcripts
+    // Build fact anchors from session data  -  fetch detailed transcripts
     let cancelled = false
     async function loadDetailedAnchors() {
       try {
@@ -609,10 +609,10 @@ export function AiDraftPanel({ matterId, matterTitle, mountContext = 'modal' }: 
   // Is draft approval blocked by drift?
   const isDriftBlocked = driftStatus?.blocked === true && driftStatus.blockingAlerts.length > 0
 
-  // ── Context-aware layout detection (Directive 21.0 — Intelligence Mount) ──
+  // ── Context-aware layout detection (Directive 21.0  -  Intelligence Mount) ──
   const isInline = mountContext === 'overview' || mountContext === 'intelligence'
 
-  // ── Floating Button (collapsed state — only in modal mode) ──────────────
+  // ── Floating Button (collapsed state  -  only in modal mode) ──────────────
 
   if (!isOpen && !isInline) {
     return (
@@ -661,7 +661,7 @@ export function AiDraftPanel({ matterId, matterTitle, mountContext = 'modal' }: 
               <p className="text-[9px] text-white/40">Fact Anchors</p>
             </div>
             <div className="rounded-lg bg-white/5 p-2.5 text-center">
-              <p className="text-lg font-bold text-white">{auditScore?.score ?? '—'}</p>
+              <p className="text-lg font-bold text-white">{auditScore?.score ?? ' - '}</p>
               <p className="text-[9px] text-white/40">Audit Score</p>
             </div>
             <div className={cn('rounded-lg p-2.5 text-center', isDriftBlocked ? 'bg-red-950/30' : 'bg-white/5')}>
@@ -692,7 +692,7 @@ export function AiDraftPanel({ matterId, matterTitle, mountContext = 'modal' }: 
       isInline ? 'max-h-[calc(100vh-8rem)]' : 'max-w-5xl max-h-[92vh] mx-4',
     )}>
 
-        {/* ── Header — Glass bar ─────────────────────────────────────── */}
+        {/* ── Header  -  Glass bar ─────────────────────────────────────── */}
         <div className="flex items-center justify-between border-b border-white/10 bg-gradient-to-r from-violet-900/50 to-blue-900/50 px-6 py-3">
           <div className="flex items-center gap-3">
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-blue-500 text-white shadow-lg shadow-violet-500/30">
@@ -797,7 +797,7 @@ export function AiDraftPanel({ matterId, matterTitle, mountContext = 'modal' }: 
                 <div className="flex flex-col items-center gap-2">
                   <AuditScoreGauge
                     score={auditScore?.score ?? 0}
-                    grade={auditScore?.grade ?? '—'}
+                    grade={auditScore?.grade ?? ' - '}
                   />
                   <p className="text-[10px] text-white/40 text-center">
                     IRCC Readability
@@ -1021,7 +1021,7 @@ export function AiDraftPanel({ matterId, matterTitle, mountContext = 'modal' }: 
                     <div className="flex items-center gap-3 rounded-xl border-2 border-red-500/60 bg-red-950/40 px-4 py-3 animate-pulse">
                       <Radio className="h-5 w-5 text-red-400 shrink-0" />
                       <div className="flex-1">
-                        <p className="text-xs font-bold text-red-300">Drift Alert — Policy Change Detected</p>
+                        <p className="text-xs font-bold text-red-300">Drift Alert  -  Policy Change Detected</p>
                         <p className="text-[10px] text-red-400/70">
                           A regulation has changed while you were drafting. Re-scan your text before finalising.
                         </p>
@@ -1112,7 +1112,7 @@ export function AiDraftPanel({ matterId, matterTitle, mountContext = 'modal' }: 
                     </div>
                   )}
 
-                  {/* Draft Content — scroll-gated container for HITL (Directive 21.0 §2) */}
+                  {/* Draft Content  -  scroll-gated container for HITL (Directive 21.0 §2) */}
                   <div
                     ref={draftContentRef}
                     className="max-h-[50vh] overflow-y-auto rounded-xl border border-white/10"
@@ -1227,7 +1227,7 @@ export function AiDraftPanel({ matterId, matterTitle, mountContext = 'modal' }: 
                       )}
                       <span>
                         {hasScrolledToBottom
-                          ? 'Full draft reviewed — scroll gate passed'
+                          ? 'Full draft reviewed  -  scroll gate passed'
                           : 'Scroll to the bottom of the draft to continue'}
                       </span>
                     </div>

@@ -1,5 +1,5 @@
 /**
- * TanStack Query hooks for Norva Ear — Consultation Co-Pilot.
+ * TanStack Query hooks for Norva Ear  -  Consultation Co-Pilot.
  *
  * Budget: all column fragments < 20 cols per query.
  */

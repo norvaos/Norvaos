@@ -95,6 +95,6 @@ export async function renderWelcomeEmail(props: WelcomeEmailProps): Promise<{
   return {
     html,
     text: `Welcome to NorvaOS! Your account is now verified. Go to your dashboard: ${props.dashboardUrl}`,
-    subject: 'Welcome to NorvaOS — Your Account is Activated',
+    subject: 'Welcome to NorvaOS  -  Your Account is Activated',
   }
 }

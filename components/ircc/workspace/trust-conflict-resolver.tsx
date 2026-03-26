@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * TrustConflictResolver — Resolves trust-level conflicts between
+ * TrustConflictResolver  -  Resolves trust-level conflicts between
  * client-submitted and canonical (verified) answer values.
  *
  * Shows each conflict as a side-by-side card, allowing staff to
@@ -251,7 +251,7 @@ export function TrustConflictResolver({
         <AlertTriangle className="h-4 w-4 text-amber-500" />
         <AlertDescription className="text-xs">
           <span className="font-semibold">{conflicts.length} trust conflict{conflicts.length !== 1 ? 's' : ''}</span>
-          {' '}detected — client-submitted values differ from verified canonical values.
+          {' '}detected  -  client-submitted values differ from verified canonical values.
           {unresolvedCount > 0 && (
             <span className="text-amber-700 font-medium">
               {' '}{unresolvedCount} unresolved.

@@ -1,4 +1,4 @@
--- Migration 156: Command Centre — Live Intake Sessions & Compliance Bypass Log
+-- Migration 156: Command Centre  -  Live Intake Sessions & Compliance Bypass Log
 --
 -- Supports:
 --   1. Live Intake Sessions (AI transcription, entity extraction, stream recommendation)

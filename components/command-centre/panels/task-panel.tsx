@@ -210,7 +210,7 @@ export function TaskPanel() {
     setShowAddRow(true)
   }, [contact])
 
-  // Apply template — create tasks from template items linked to contact
+  // Apply template  -  create tasks from template items linked to contact
   const handleApplyTemplate = useCallback(async (templateId: string, templateName: string) => {
     if (!contactId) return
     setIsApplyingTemplate(true)
@@ -252,7 +252,7 @@ export function TaskPanel() {
 
       await supabase.from('tasks').insert(tasksToCreate)
       queryClient.invalidateQueries({ queryKey: ['tasks'] })
-      toast.success(`Applied "${templateName}" — ${items.length} tasks created`)
+      toast.success(`Applied "${templateName}"  -  ${items.length} tasks created`)
       setTemplatePopoverOpen(false)
     } catch {
       toast.error('Failed to apply template')

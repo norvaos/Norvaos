@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * OCR ID Field Parser Precision Benchmarking — Directive 009
+ * OCR ID Field Parser Precision Benchmarking  -  Directive 009
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Tests extraction accuracy of parseIdFields() against known OCR text outputs
@@ -27,7 +27,7 @@ interface OcrGroundTruth {
 
 const OCR_GROUND_TRUTH: OcrGroundTruth[] = [
   {
-    label: 'Ontario Driver Licence — Standard',
+    label: 'Ontario Driver Licence  -  Standard',
     ocrText: [
       'ONTARIO',
       "DRIVER'S LICENCE",
@@ -103,7 +103,7 @@ const OCR_GROUND_TRUTH: OcrGroundTruth[] = [
     },
   },
   {
-    label: 'Canadian Passport — Standard',
+    label: 'Canadian Passport  -  Standard',
     ocrText: [
       'CANADA',
       'PASSPORT PASSEPORT',
@@ -123,7 +123,7 @@ const OCR_GROUND_TRUTH: OcrGroundTruth[] = [
     },
   },
   {
-    label: 'PR Card — Standard',
+    label: 'PR Card  -  Standard',
     ocrText: [
       'CANADA',
       'PERMANENT RESIDENT CARD',
@@ -142,7 +142,7 @@ const OCR_GROUND_TRUTH: OcrGroundTruth[] = [
     },
   },
   {
-    label: 'Ontario DL — Comma-separated Name',
+    label: 'Ontario DL  -  Comma-separated Name',
     ocrText: [
       'ONTARIO',
       "DRIVER'S LICENCE",
@@ -190,7 +190,7 @@ const OCR_GROUND_TRUTH: OcrGroundTruth[] = [
     },
   },
   {
-    label: 'Passport — MRZ-style name (uppercase all caps)',
+    label: 'Passport  -  MRZ-style name (uppercase all caps)',
     ocrText: [
       'CANADA',
       'PASSPORT',
@@ -212,7 +212,7 @@ const OCR_GROUND_TRUTH: OcrGroundTruth[] = [
     },
   },
   {
-    label: 'Saskatchewan DL — Minimal format',
+    label: 'Saskatchewan DL  -  Minimal format',
     ocrText: [
       'SASKATCHEWAN',
       "DRIVER'S LICENCE",
@@ -264,7 +264,7 @@ function compareFields(
 
 // ─── Tests ──────────────────────────────────────────────────────────────────
 
-describe('Directive 009 — OCR ID Field Parser Precision Benchmark', () => {
+describe('Directive 009  -  OCR ID Field Parser Precision Benchmark', () => {
   describe('Per-Document Extraction Accuracy', () => {
     for (const gt of OCR_GROUND_TRUTH) {
       it(`should extract fields from: ${gt.label}`, () => {
@@ -334,7 +334,7 @@ describe('Directive 009 — OCR ID Field Parser Precision Benchmark', () => {
       const metrics = calculateExtractionMetrics(allResults)
 
       console.log('\n╔══════════════════════════════════════════════════════════╗')
-      console.log('║  OCR ID Parser — Aggregate Extraction Metrics            ║')
+      console.log('║  OCR ID Parser  -  Aggregate Extraction Metrics            ║')
       console.log('╠══════════════════════════════════════════════════════════╣')
       console.log(`║  Total fields:        ${metrics.totalFields}`)
       console.log(`║  Correct:             ${metrics.correctFields}`)

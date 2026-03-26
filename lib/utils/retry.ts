@@ -6,7 +6,7 @@
  * without requiring changes to the underlying service implementations.
  *
  * Design constraints:
- * - Max attempts is always finite — no infinite retry loops
+ * - Max attempts is always finite  -  no infinite retry loops
  * - Non-retryable errors (HTTP 4xx except 429) are surfaced immediately
  * - Every retry attempt is logged with tenant context via the structured logger
  * - Jitter is applied to spread load under mass failure scenarios
@@ -21,7 +21,7 @@ export interface RetryOptions {
   maxAttempts: number
   /** Base delay in milliseconds before applying exponential factor. */
   baseDelayMs: number
-  /** Ceiling on computed delay — prevents unbounded waits. */
+  /** Ceiling on computed delay  -  prevents unbounded waits. */
   maxDelayMs: number
   /** Optional tenant identifier for structured log context. */
   tenantId?: string
@@ -66,7 +66,7 @@ function computeDelayMs(attempt: number, baseDelayMs: number, maxDelayMs: number
  * Determine whether an error should prevent retrying.
  *
  * Checks the error message for HTTP status codes that indicate
- * a non-retryable client error. This is necessarily heuristic —
+ * a non-retryable client error. This is necessarily heuristic  - 
  * individual adapters may override this via the `onRetry` callback
  * by throwing a `NonRetryableError` instead.
  */
@@ -154,9 +154,9 @@ export async function retryWithBackoff<T>(
     } catch (err) {
       lastError = err instanceof Error ? err : new Error(String(err))
 
-      // Non-retryable — surface immediately, no further attempts
+      // Non-retryable  -  surface immediately, no further attempts
       if (isNonRetryable(lastError)) {
-        log.warn('Non-retryable error — aborting retry sequence', {
+        log.warn('Non-retryable error  -  aborting retry sequence', {
           tenant_id: tenantId,
           operation,
           attempt,
@@ -181,7 +181,7 @@ export async function retryWithBackoff<T>(
 
       const delayMs = computeDelayMs(attempt, baseDelayMs, maxDelayMs)
 
-      log.warn('Attempt failed — will retry', {
+      log.warn('Attempt failed  -  will retry', {
         tenant_id: tenantId,
         operation,
         attempt,

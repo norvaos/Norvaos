@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * WorkbenchPanel — Column 3
+ * WorkbenchPanel  -  Column 3
  *
  * IRCC field verification workbench.
  *
@@ -251,7 +251,7 @@ function FieldRow({
         )}
         {isDirty && (
           <p className="text-[10px] text-amber-600 mt-0.5 leading-none">
-            Unsaved — click away to save
+            Unsaved  -  click away to save
           </p>
         )}
       </div>
@@ -281,7 +281,7 @@ function FieldRow({
               </button>
             </TooltipTrigger>
             <TooltipContent side="right" sideOffset={4}>
-              {isVerified && !isDirty ? 'Verified — click to unverify' : isDirty ? 'Save changes first' : !localValue ? 'Enter a value to verify' : 'Mark as verified'}
+              {isVerified && !isDirty ? 'Verified  -  click to unverify' : isDirty ? 'Save changes first' : !localValue ? 'Enter a value to verify' : 'Mark as verified'}
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>

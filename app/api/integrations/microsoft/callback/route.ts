@@ -97,7 +97,7 @@ async function handleGet(request: NextRequest) {
       })
       .eq('id', state.userId)
 
-    // 6b. Create/update email_accounts row — bridges microsoft_connections to the
+    // 6b. Create/update email_accounts row  -  bridges microsoft_connections to the
     //     email sync pipeline (email-sync.ts reads email_accounts for delta state,
     //     then resolves microsoft_connections for Graph API calls via graphFetch).
     const emailAddress = profile.mail || profile.userPrincipalName
@@ -126,14 +126,14 @@ async function handleGet(request: NextRequest) {
         )
 
       if (emailAcctError) {
-        // Log but don't fail — the microsoft_connections row is already saved
+        // Log but don't fail  -  the microsoft_connections row is already saved
         console.error('[microsoft/callback] email_accounts upsert error:', emailAcctError)
       } else {
         console.log('[microsoft/callback] email_accounts row created/updated for:', emailAddress)
       }
     }
 
-    // 7. Create the NorvaOS root folder in OneDrive (awaited — must complete before redirect)
+    // 7. Create the NorvaOS root folder in OneDrive (awaited  -  must complete before redirect)
     const { data: connRow } = await admin
       .from('microsoft_connections')
       .select('id')
@@ -147,7 +147,7 @@ async function handleGet(request: NextRequest) {
         const folderId = await ensureNorvaOSRootFolder(connRow.id, admin)
         console.log('[microsoft/callback] NorvaOS root folder created/found:', folderId)
       } catch (folderErr) {
-        // Log but don't fail the connection — folder can be created on first upload
+        // Log but don't fail the connection  -  folder can be created on first upload
         console.error('[microsoft/callback] Failed to create NorvaOS folder:', folderErr)
       }
     } else {

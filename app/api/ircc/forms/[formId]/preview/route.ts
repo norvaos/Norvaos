@@ -31,7 +31,7 @@ interface RouteParams {
  *   page_count: number
  * }
  *
- * Note: Preview is approximate — verify final output in Adobe Reader.
+ * Note: Preview is approximate  -  verify final output in Adobe Reader.
  * PyMuPDF XFA rendering may differ from Adobe for complex dynamic layouts.
  */
 export async function POST(request: Request, { params }: RouteParams) {

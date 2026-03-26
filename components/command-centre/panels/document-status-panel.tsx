@@ -53,11 +53,11 @@ const SLOT_STATUS: Record<string, { label: string; icon: React.ReactNode; color:
 // ─── Component ──────────────────────────────────────────────────────
 
 /**
- * Document Status Panel — shows document slot completion for the matter.
+ * Document Status Panel  -  shows document slot completion for the matter.
  * Missing required docs are highlighted.
  *
  * Rule #14: Document requests triggered only when retained, with controlled overrides.
- * Rule #19: No N+1 — single consolidated query.
+ * Rule #19: No N+1  -  single consolidated query.
  */
 export function DocumentStatusPanel() {
   const { entityId, tenantId, entityType } = useCommandCentre()
@@ -133,7 +133,7 @@ export function DocumentStatusPanel() {
               <div className="flex items-center gap-2 p-2 bg-red-50 rounded-md border border-red-200">
                 <FileX2 className="h-4 w-4 text-red-600 shrink-0" />
                 <span className="text-xs text-red-700">
-                  {rejected} document{rejected > 1 ? 's' : ''} rejected — needs resubmission
+                  {rejected} document{rejected > 1 ? 's' : ''} rejected  -  needs resubmission
                 </span>
               </div>
             )}

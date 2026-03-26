@@ -1,6 +1,6 @@
 -- Migration 127: matter_deficiencies
 -- Implements full deficiency workflow for legal review cycle.
--- Sprint 6, Week 1 — 2026-03-17
+-- Sprint 6, Week 1  -  2026-03-17
 
 CREATE TABLE IF NOT EXISTS matter_deficiencies (
   id                      UUID        NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,

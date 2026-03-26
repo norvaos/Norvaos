@@ -73,7 +73,7 @@ async function main() {
       .insert({
         tenant_id: tenant.id,
         name: 'Front Desk',
-        description: 'Front desk staff — restricted console access with check-in, scheduling, and task management',
+        description: 'Front desk staff  -  restricted console access with check-in, scheduling, and task management',
         is_system: true,
         permissions: {
           front_desk: { view: true, create: true, edit: true },

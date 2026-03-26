@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * GoldPulseScore — Directive 8.2: Audit-Mirror Gold Pulse
+ * GoldPulseScore  -  Directive 8.2: Audit-Mirror Gold Pulse
  *
  * When a lawyer fixes an error and the readability/completeness score
  * improves, the score "Pulses Gold" with animation and displays:
@@ -89,7 +89,7 @@ export function GoldPulseScore({ score, passed, total, className }: GoldPulseSco
           />
         </div>
 
-        {/* Delta badge — floats above bar on improvement */}
+        {/* Delta badge  -  floats above bar on improvement */}
         {deltaDisplay !== null && (
           <span className="absolute -top-4 right-0 text-[10px] font-bold text-amber-600 gold-pulse-float">
             +{deltaDisplay}%
@@ -128,7 +128,7 @@ export function GoldPulseScore({ score, passed, total, className }: GoldPulseSco
         </div>
       </div>
 
-      {/* Inline CSS keyframes — zero-dependency */}
+      {/* Inline CSS keyframes  -  zero-dependency */}
       <style jsx>{`
         .gold-pulse-bar {
           background: linear-gradient(90deg, #d4a843, #f5d98a, #d4a843);

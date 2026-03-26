@@ -1,5 +1,5 @@
 /**
- * Tests for the Document Engine — Condition Evaluator
+ * Tests for the Document Engine  -  Condition Evaluator
  *
  * Covers:
  *   - evaluateAllConditions(): batch evaluation
@@ -44,8 +44,8 @@ function makeCondition(
 
 // ── Operator Tests ───────────────────────────────────────────────────────────
 
-describe('evaluateAllConditions — operators', () => {
-  it('equals — passes when values match', () => {
+describe('evaluateAllConditions  -  operators', () => {
+  it('equals  -  passes when values match', () => {
     const conditions = [makeCondition()]
     const fields = { billing_type: 'flat_fee' }
     const results = evaluateAllConditions(conditions, fields)
@@ -53,7 +53,7 @@ describe('evaluateAllConditions — operators', () => {
     expect(results.get('show_flat_fee')).toBe(true)
   })
 
-  it('equals — fails when values differ', () => {
+  it('equals  -  fails when values differ', () => {
     const conditions = [makeCondition()]
     const fields = { billing_type: 'hourly' }
     const results = evaluateAllConditions(conditions, fields)
@@ -61,7 +61,7 @@ describe('evaluateAllConditions — operators', () => {
     expect(results.get('show_flat_fee')).toBe(false)
   })
 
-  it('not_equals — passes when values differ', () => {
+  it('not_equals  -  passes when values differ', () => {
     const conditions = [makeCondition({
       condition_key: 'not_hourly',
       rules: { rules: [{ field_key: 'billing_type', operator: 'not_equals', value: 'hourly' }] },
@@ -72,7 +72,7 @@ describe('evaluateAllConditions — operators', () => {
     expect(results.get('not_hourly')).toBe(true)
   })
 
-  it('is_empty — passes when field is null', () => {
+  it('is_empty  -  passes when field is null', () => {
     const conditions = [makeCondition({
       condition_key: 'no_notes',
       rules: { rules: [{ field_key: 'notes', operator: 'is_empty' }] },
@@ -82,7 +82,7 @@ describe('evaluateAllConditions — operators', () => {
     expect(results.get('no_notes')).toBe(true)
   })
 
-  it('is_empty — passes when field is empty string', () => {
+  it('is_empty  -  passes when field is empty string', () => {
     const conditions = [makeCondition({
       condition_key: 'no_notes',
       rules: { rules: [{ field_key: 'notes', operator: 'is_empty' }] },
@@ -92,7 +92,7 @@ describe('evaluateAllConditions — operators', () => {
     expect(results.get('no_notes')).toBe(true)
   })
 
-  it('is_not_empty — passes when field has value', () => {
+  it('is_not_empty  -  passes when field has value', () => {
     const conditions = [makeCondition({
       condition_key: 'has_notes',
       rules: { rules: [{ field_key: 'notes', operator: 'is_not_empty' }] },
@@ -102,7 +102,7 @@ describe('evaluateAllConditions — operators', () => {
     expect(results.get('has_notes')).toBe(true)
   })
 
-  it('greater_than — passes when actual > expected', () => {
+  it('greater_than  -  passes when actual > expected', () => {
     const conditions = [makeCondition({
       condition_key: 'high_value',
       rules: { rules: [{ field_key: 'amount', operator: 'greater_than', value: 1000 }] },
@@ -112,7 +112,7 @@ describe('evaluateAllConditions — operators', () => {
     expect(results.get('high_value')).toBe(true)
   })
 
-  it('greater_than — fails when actual <= expected', () => {
+  it('greater_than  -  fails when actual <= expected', () => {
     const conditions = [makeCondition({
       condition_key: 'high_value',
       rules: { rules: [{ field_key: 'amount', operator: 'greater_than', value: 1000 }] },
@@ -122,7 +122,7 @@ describe('evaluateAllConditions — operators', () => {
     expect(results.get('high_value')).toBe(false)
   })
 
-  it('less_than — passes when actual < expected', () => {
+  it('less_than  -  passes when actual < expected', () => {
     const conditions = [makeCondition({
       condition_key: 'low_value',
       rules: { rules: [{ field_key: 'amount', operator: 'less_than', value: 1000 }] },
@@ -132,7 +132,7 @@ describe('evaluateAllConditions — operators', () => {
     expect(results.get('low_value')).toBe(true)
   })
 
-  it('contains — passes when substring found (case-insensitive)', () => {
+  it('contains  -  passes when substring found (case-insensitive)', () => {
     const conditions = [makeCondition({
       condition_key: 'has_immigration',
       rules: { rules: [{ field_key: 'practice_area', operator: 'contains', value: 'IMMIG' }] },
@@ -142,7 +142,7 @@ describe('evaluateAllConditions — operators', () => {
     expect(results.get('has_immigration')).toBe(true)
   })
 
-  it('in_list — passes when value is in the list', () => {
+  it('in_list  -  passes when value is in the list', () => {
     const conditions = [makeCondition({
       condition_key: 'is_immigration_or_family',
       rules: { rules: [{ field_key: 'practice_area', operator: 'in_list', value: ['immigration', 'family'] }] },
@@ -152,7 +152,7 @@ describe('evaluateAllConditions — operators', () => {
     expect(results.get('is_immigration_or_family')).toBe(true)
   })
 
-  it('in_list — fails when value is not in the list', () => {
+  it('in_list  -  fails when value is not in the list', () => {
     const conditions = [makeCondition({
       condition_key: 'is_immigration_or_family',
       rules: { rules: [{ field_key: 'practice_area', operator: 'in_list', value: ['immigration', 'family'] }] },
@@ -162,7 +162,7 @@ describe('evaluateAllConditions — operators', () => {
     expect(results.get('is_immigration_or_family')).toBe(false)
   })
 
-  it('truthy — passes for non-empty, non-zero, non-false values', () => {
+  it('truthy  -  passes for non-empty, non-zero, non-false values', () => {
     const conditions = [makeCondition({
       condition_key: 'has_retainer',
       rules: { rules: [{ field_key: 'has_retainer', operator: 'truthy' }] },
@@ -172,7 +172,7 @@ describe('evaluateAllConditions — operators', () => {
     expect(results.get('has_retainer')).toBe(true)
   })
 
-  it('truthy — fails for "false" string', () => {
+  it('truthy  -  fails for "false" string', () => {
     const conditions = [makeCondition({
       condition_key: 'has_retainer',
       rules: { rules: [{ field_key: 'has_retainer', operator: 'truthy' }] },
@@ -182,7 +182,7 @@ describe('evaluateAllConditions — operators', () => {
     expect(results.get('has_retainer')).toBe(false)
   })
 
-  it('falsy — passes for null/empty/0/false', () => {
+  it('falsy  -  passes for null/empty/0/false', () => {
     const conditions = [makeCondition({
       condition_key: 'no_retainer',
       rules: { rules: [{ field_key: 'has_retainer', operator: 'falsy' }] },
@@ -201,8 +201,8 @@ describe('evaluateAllConditions — operators', () => {
 
 // ── Logic Operators ──────────────────────────────────────────────────────────
 
-describe('evaluateAllConditions — logic operators', () => {
-  it('AND — passes only when all rules pass', () => {
+describe('evaluateAllConditions  -  logic operators', () => {
+  it('AND  -  passes only when all rules pass', () => {
     const conditions = [makeCondition({
       condition_key: 'flat_fee_and_immigration',
       logic_operator: 'AND',
@@ -227,7 +227,7 @@ describe('evaluateAllConditions — logic operators', () => {
     ).toBe(false)
   })
 
-  it('OR — passes when any rule passes', () => {
+  it('OR  -  passes when any rule passes', () => {
     const conditions = [makeCondition({
       condition_key: 'flat_or_block',
       logic_operator: 'OR',
@@ -255,7 +255,7 @@ describe('evaluateAllConditions — logic operators', () => {
 
 // ── Edge Cases ───────────────────────────────────────────────────────────────
 
-describe('evaluateAllConditions — edge cases', () => {
+describe('evaluateAllConditions  -  edge cases', () => {
   it('handles empty rules array', () => {
     const conditions = [makeCondition({
       condition_key: 'empty_rules',

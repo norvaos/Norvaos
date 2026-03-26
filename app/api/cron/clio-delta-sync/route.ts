@@ -1,5 +1,5 @@
 /**
- * GET /api/cron/clio-delta-sync — Cron-triggered delta-sync polling
+ * GET /api/cron/clio-delta-sync  -  Cron-triggered delta-sync polling
  *
  * Called every 2 minutes by Vercel Cron (or external scheduler).
  * Iterates all active delta-sync sessions and executes a poll cycle for each.

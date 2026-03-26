@@ -1,11 +1,11 @@
 /**
- * @deprecated — LEGACY Questionnaire Engine.
+ * @deprecated  -  LEGACY Questionnaire Engine.
  *
  * Replaced by questionnaire-engine-db.ts which reads form structure from the
  * DB (ircc_forms / ircc_form_sections / ircc_form_fields).
  *
  * This file still imports from the deprecated form-field-registry.ts.
- * Do not add new call-sites — migrate existing consumers to the DB path.
+ * Do not add new call-sites  -  migrate existing consumers to the DB path.
  *
  * Original description:
  * Pure functions for building, merging, and processing IRCC questionnaires.

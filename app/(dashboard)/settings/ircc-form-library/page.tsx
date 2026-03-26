@@ -1423,7 +1423,7 @@ function FolderSyncSection() {
                     <TableCell className="text-xs text-slate-400">
                       {item.fileSizeBytes > 0
                         ? `${(item.fileSizeBytes / 1024).toFixed(0)} KB`
-                        : '—'}
+                        : ' - '}
                     </TableCell>
                     <TableCell className="text-right">
                       {(item.status === 'new' || item.status === 'updated') && (

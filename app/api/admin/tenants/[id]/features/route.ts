@@ -10,7 +10,7 @@ import { withTiming } from '@/lib/middleware/request-timing'
 /**
  * GET /api/admin/tenants/[id]/features
  *
- * Platform-admin ONLY — returns feature flags for a tenant.
+ * Platform-admin ONLY  -  returns feature flags for a tenant.
  *
  * Response: { raw, effective, defaults, updated_at }
  */
@@ -44,7 +44,7 @@ const handleGet = withPlatformAdmin(async (_request, { params }) => {
 /**
  * PATCH /api/admin/tenants/[id]/features
  *
- * Platform-admin ONLY — update feature flag overrides for a tenant.
+ * Platform-admin ONLY  -  update feature flag overrides for a tenant.
  * Rate-limited: 30 req/min per IP.
  *
  * Body: { feature_flags: Record<string, boolean>, reason: string, expected_updated_at: string }

@@ -86,7 +86,7 @@ export function LivePdfPreview({
           <SelectContent>
             {forms?.map((form) => (
               <SelectItem key={form.formId} value={form.formId}>
-                {form.formCode ? `${form.formCode} — ` : ''}
+                {form.formCode ? `${form.formCode}  -  ` : ''}
                 {form.formName}
               </SelectItem>
             ))}

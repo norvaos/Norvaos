@@ -1,14 +1,14 @@
 -- ═══════════════════════════════════════════════════════════════════════════════
--- Migration 204: Global Conflict Engine — Directive 005.2
+-- Migration 204: Global Conflict Engine  -  Directive 005.2
 -- ═══════════════════════════════════════════════════════════════════════════════
 --
 -- Creates:
---   1. search_contacts_fuzzy()      — pg_trgm fuzzy name search on contacts
---   2. search_leads_fuzzy()         — pg_trgm fuzzy name search on leads (via contacts)
---   3. search_matters_by_party()    — fuzzy party search across matter_contacts
---   4. fn_global_conflict_scan()    — comprehensive cross-entity conflict scan
---   5. GIN trigram indexes on leads (via contacts join — indexes on contacts already exist)
---   6. global_conflict_results      — persists scan results
+--   1. search_contacts_fuzzy()       -  pg_trgm fuzzy name search on contacts
+--   2. search_leads_fuzzy()          -  pg_trgm fuzzy name search on leads (via contacts)
+--   3. search_matters_by_party()     -  fuzzy party search across matter_contacts
+--   4. fn_global_conflict_scan()     -  comprehensive cross-entity conflict scan
+--   5. GIN trigram indexes on leads (via contacts join  -  indexes on contacts already exist)
+--   6. global_conflict_results       -  persists scan results
 --
 -- Prereqs: pg_trgm extension enabled (migration 069), GIN indexes on contacts (existing)
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -16,7 +16,7 @@
 BEGIN;
 
 -- ─────────────────────────────────────────────────────────────────────────────
--- 1. search_contacts_fuzzy — the missing RPC that conflict-engine.ts calls
+-- 1. search_contacts_fuzzy  -  the missing RPC that conflict-engine.ts calls
 -- ─────────────────────────────────────────────────────────────────────────────
 
 CREATE OR REPLACE FUNCTION search_contacts_fuzzy(
@@ -58,7 +58,7 @@ $$;
 COMMENT ON FUNCTION search_contacts_fuzzy IS 'Directive 005.2: Fuzzy name search on contacts using pg_trgm similarity. Tenant-isolated. Returns top 20 matches above threshold.';
 
 -- ─────────────────────────────────────────────────────────────────────────────
--- 2. search_leads_fuzzy — fuzzy search leads via their linked contact record
+-- 2. search_leads_fuzzy  -  fuzzy search leads via their linked contact record
 -- ─────────────────────────────────────────────────────────────────────────────
 
 CREATE OR REPLACE FUNCTION search_leads_fuzzy(
@@ -106,7 +106,7 @@ $$;
 COMMENT ON FUNCTION search_leads_fuzzy IS 'Directive 005.2: Fuzzy name search on leads via linked contacts using pg_trgm. Tenant-isolated.';
 
 -- ─────────────────────────────────────────────────────────────────────────────
--- 3. search_matters_by_party — search matters by party name via matter_contacts
+-- 3. search_matters_by_party  -  search matters by party name via matter_contacts
 -- ─────────────────────────────────────────────────────────────────────────────
 
 CREATE OR REPLACE FUNCTION search_matters_by_party(
@@ -157,7 +157,7 @@ $$;
 COMMENT ON FUNCTION search_matters_by_party IS 'Directive 005.2: Fuzzy party name search across matter_contacts joined to contacts and matters. Tenant-isolated.';
 
 -- ─────────────────────────────────────────────────────────────────────────────
--- 4. fn_global_conflict_scan — comprehensive cross-entity conflict check
+-- 4. fn_global_conflict_scan  -  comprehensive cross-entity conflict check
 -- ─────────────────────────────────────────────────────────────────────────────
 
 CREATE OR REPLACE FUNCTION fn_global_conflict_scan(
@@ -437,7 +437,7 @@ $$;
 COMMENT ON FUNCTION fn_global_conflict_scan IS 'Directive 005.2: Comprehensive cross-entity conflict scan. Searches contacts, leads, and matter_contacts by name (fuzzy), email (exact), phone (suffix), DOB (exact), passport (exact). Returns weighted JSONB result with status classification. SECURITY DEFINER with strict tenant isolation.';
 
 -- ─────────────────────────────────────────────────────────────────────────────
--- 5. GIN trigram indexes for leads (via contacts — contacts indexes already exist)
+-- 5. GIN trigram indexes for leads (via contacts  -  contacts indexes already exist)
 --    Adding indexes on leads table columns used in joins for query planner hints
 -- ─────────────────────────────────────────────────────────────────────────────
 
@@ -445,7 +445,7 @@ CREATE INDEX IF NOT EXISTS idx_leads_contact_id_tenant ON leads (contact_id, ten
 CREATE INDEX IF NOT EXISTS idx_leads_is_closed ON leads (is_closed) WHERE is_closed = false;
 
 -- ─────────────────────────────────────────────────────────────────────────────
--- 6. global_conflict_results — persists scan results
+-- 6. global_conflict_results  -  persists scan results
 -- ─────────────────────────────────────────────────────────────────────────────
 
 CREATE TABLE IF NOT EXISTS global_conflict_results (

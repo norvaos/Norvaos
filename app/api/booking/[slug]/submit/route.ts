@@ -3,14 +3,14 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { withTiming } from '@/lib/middleware/request-timing'
 import { createRateLimiter } from '@/lib/middleware/rate-limit'
 
-// In-process sliding-window rate limiter — suitable for single-instance deployments.
+// In-process sliding-window rate limiter  -  suitable for single-instance deployments.
 // For multi-instance production, replace with a Redis-backed implementation.
 const submitLimiter = createRateLimiter({ maxRequests: 10, windowMs: 60_000 })
 
 /**
  * POST /api/booking/[slug]/submit
  *
- * Public endpoint — creates an appointment + contact + lead.
+ * Public endpoint  -  creates an appointment + contact + lead.
  * Follows the same pattern as /api/forms/[slug]/submit.
  */
 async function handlePost(
@@ -143,7 +143,7 @@ async function handlePost(
       )
     }
 
-    // 4. Create or update contact (email dedup — same pattern as intake form)
+    // 4. Create or update contact (email dedup  -  same pattern as intake form)
     let contactId: string | null = null
     const nameParts = name.trim().split(' ')
     const firstName = nameParts[0] || ''
@@ -275,7 +275,7 @@ async function handlePost(
         tenant_id: page.tenant_id,
         user_id: page.user_id,
         activity_type: 'booking_created',
-        title: `Booking: ${name} — ${page.title}`,
+        title: `Booking: ${name}  -  ${page.title}`,
         entity_type: 'contact',
         entity_id: contactId,
         metadata: {

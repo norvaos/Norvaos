@@ -5,7 +5,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { withTiming } from '@/lib/middleware/request-timing'
 
 /**
- * POST /api/documents/persist-scan — Directive 40.0 §2
+ * POST /api/documents/persist-scan  -  Directive 40.0 §2
  *
  * Persists OCR scan results into a document's ai_extracted_data JSONB column.
  * Called after a scan is completed and user confirms the results.

@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════
- * Matter Readiness Notifier — Directive 012 "Zero-Noise" Engine
+ * Matter Readiness Notifier  -  Directive 012 "Zero-Noise" Engine
  * ═══════════════════════════════════════════════════════════════════════════
  *
  * Replaces per-document upload notifications with a single "Matter Ready
@@ -130,7 +130,7 @@ export async function checkAndNotifyReadiness(
       isReady: allRequiredMet,
       categories,
       message: allRequiredMet
-        ? 'All Identity and Financial requirements met — ready for review'
+        ? 'All Identity and Financial requirements met  -  ready for review'
         : buildPendingMessage(categoryMap),
     }
 

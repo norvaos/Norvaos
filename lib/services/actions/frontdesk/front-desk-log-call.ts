@@ -68,7 +68,7 @@ export const frontDeskLogCallAction: ActionDefinition<FrontDeskLogCallInput, Fro
       },
       activity: {
         activityType: 'front_desk_call_logged',
-        title: `Call — ${outcomeLabel[input.outcome] ?? input.outcome}${input.notes ? ': ' + input.notes : ''}`,
+        title: `Call  -  ${outcomeLabel[input.outcome] ?? input.outcome}${input.notes ? ': ' + input.notes : ''}`,
         description: input.notes || undefined,
         metadata: {
           direction: input.direction,

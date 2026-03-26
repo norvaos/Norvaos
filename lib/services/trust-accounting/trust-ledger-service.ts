@@ -1,5 +1,5 @@
 // ============================================================================
-// Trust Ledger Service — Core trust accounting operations (Phase 7)
+// Trust Ledger Service  -  Core trust accounting operations (Phase 7)
 // ============================================================================
 // Handles deposits, disbursements, transfers, reversals, holds, and ledger
 // queries for IOLTA/trust accounts. All amounts are BIGINT (cents).
@@ -175,7 +175,7 @@ const LOG_PREFIX = '[trust-ledger-service]'
  * NOTE (Directive 005): The critical balance-level audit is now handled by
  * the trust_ledger_audit DB trigger (migration 200). Every trust_transactions
  * INSERT automatically creates a trust_ledger_audit row in the same DB
- * transaction — if the audit fails, the transaction rolls back. This
+ * transaction  -  if the audit fails, the transaction rolls back. This
  * writeAuditLog function remains as a secondary operational log for non-
  * balance events (disbursement approvals, hold releases, etc.).
  */
@@ -396,7 +396,7 @@ export async function recordDisbursement(
     if (request.status !== 'approved') {
       return {
         success: false,
-        error: `Disbursement request is "${request.status}" — only approved requests can be disbursed`,
+        error: `Disbursement request is "${request.status}"  -  only approved requests can be disbursed`,
       }
     }
 
@@ -406,7 +406,7 @@ export async function recordDisbursement(
 
     const disbursementAmountCents = -Math.abs(request.amount_cents)
 
-    // C1: Check available balance (service layer — DB trigger is second layer)
+    // C1: Check available balance (service layer  -  DB trigger is second layer)
     const balance = await getAvailableBalanceCents(
       supabase, tenantId, request.matter_id, request.trust_account_id,
     )
@@ -585,7 +585,7 @@ export async function recordTransfer(
         `${LOG_PREFIX} CRITICAL: transfer_out succeeded (${txnOut.id}) but transfer_in failed. ` +
         `Manual reversal required. Error: ${inErr?.message}`,
       )
-      return { success: false, error: 'Transfer partially failed — contact administrator' }
+      return { success: false, error: 'Transfer partially failed  -  contact administrator' }
     }
 
     const txnIn = rawIn as TrustTransactionRow
@@ -968,7 +968,7 @@ export async function approveDisbursementRequest(
     if (request.status !== 'pending_approval') {
       return {
         success: false,
-        error: `Request is "${request.status}" — only pending requests can be approved`,
+        error: `Request is "${request.status}"  -  only pending requests can be approved`,
       }
     }
 
@@ -1010,7 +1010,7 @@ export async function approveDisbursementRequest(
     })
 
     if (!disbursementResult.success || !disbursementResult.data) {
-      // Rollback approval status — the disbursement failed (e.g. insufficient funds)
+      // Rollback approval status  -  the disbursement failed (e.g. insufficient funds)
       const rollback: TrustDisbursementRequestUpdate = {
         status: 'pending_approval',
         approved_by: null,
@@ -1087,7 +1087,7 @@ export async function rejectDisbursementRequest(
     if (request.status !== 'pending_approval') {
       return {
         success: false,
-        error: `Request is "${request.status}" — only pending requests can be rejected`,
+        error: `Request is "${request.status}"  -  only pending requests can be rejected`,
       }
     }
 
@@ -1160,7 +1160,7 @@ export async function releaseHold(
     if (hold.status !== 'held') {
       return {
         success: false,
-        error: `Hold is "${hold.status}" — only active holds can be released`,
+        error: `Hold is "${hold.status}"  -  only active holds can be released`,
       }
     }
 
@@ -1215,7 +1215,7 @@ export async function releaseHold(
 // ─── Exported Utility ───────────────────────────────────────────────────────
 
 /**
- * Public wrapper for balance computation — used by UI components and other services.
+ * Public wrapper for balance computation  -  used by UI components and other services.
  */
 export async function getAvailableBalance(
   supabase: SupabaseClient<Database>,

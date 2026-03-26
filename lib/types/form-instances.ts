@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Form Instance Engine — Type Definitions
+ * Form Instance Engine  -  Type Definitions
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Types for the form assignment template → matter form instance pipeline.

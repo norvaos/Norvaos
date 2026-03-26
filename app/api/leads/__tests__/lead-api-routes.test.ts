@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Wave 6 — API Route Handler Tests
+ * Wave 6  -  API Route Handler Tests
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Validates all lead API route handlers return correct HTTP status codes,
@@ -80,7 +80,7 @@ vi.mock('@/lib/supabase/server', () => ({
 
 // ─── Tests ───────────────────────────────────────────────────────────────────
 
-describe('Lead API Route — Input Validation', () => {
+describe('Lead API Route  -  Input Validation', () => {
   beforeEach(() => {
     vi.clearAllMocks()
   })

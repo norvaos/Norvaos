@@ -107,7 +107,7 @@ const DEFAULT_FRONT_DESK: FrontDeskConfig = {
 // ─── Component ──────────────────────────────────────────────────────
 
 /**
- * Admin Workflow Configuration — controls kiosk and front desk surfaces.
+ * Admin Workflow Configuration  -  controls kiosk and front desk surfaces.
  *
  * Storage: tenants.settings.kiosk_config and tenants.settings.front_desk_config JSONB fields.
  * Rule #18: Feature flags hide surfaces, never bypass server checks.

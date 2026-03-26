@@ -2,14 +2,14 @@
 
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * DocumentChecklistPanel — Lawyer-side document requirements manager
+ * DocumentChecklistPanel  -  Lawyer-side document requirements manager
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Features:
- *   1. N/A Toggle — mark items as not_applicable (hidden from client portal)
- *   2. Custom Requirement — add ad-hoc document requests (blue highlight)
- *   3. Bulk Actions — "Request All" to batch-update pending items
- *   4. Portal Preview — opens client portal in new tab
+ *   1. N/A Toggle  -  mark items as not_applicable (hidden from client portal)
+ *   2. Custom Requirement  -  add ad-hoc document requests (blue highlight)
+ *   3. Bulk Actions  -  "Request All" to batch-update pending items
+ *   4. Portal Preview  -  opens client portal in new tab
  */
 
 import { useState, useCallback, useMemo } from 'react'
@@ -358,7 +358,7 @@ export function DocumentChecklistPanel({
       toast.info(
         isCurrentlyNA
           ? `"${item.document_name}" restored to checklist`
-          : `"${item.document_name}" marked as N/A — hidden from client portal`
+          : `"${item.document_name}" marked as N/A  -  hidden from client portal`
       )
     },
     [updateChecklistItem, tenantId, appUser]

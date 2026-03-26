@@ -37,7 +37,7 @@ async function handleDelete(request: NextRequest) {
     }
 
     // Delete from storage using admin client (storage RLS blocks client-side deletes)
-    // Skip for OneDrive documents (empty storagePath) — we only remove the NorvaOS
+    // Skip for OneDrive documents (empty storagePath)  -  we only remove the NorvaOS
     // record, not the file from OneDrive (it may be shared or modified externally)
     const adminSupabase = createAdminClient()
     if (storagePath && storagePath.length > 0) {
@@ -47,7 +47,7 @@ async function handleDelete(request: NextRequest) {
 
       if (storageError) {
         console.error('Storage delete error:', storageError)
-        // Continue to delete the DB record even if storage fails —
+        // Continue to delete the DB record even if storage fails  - 
         // orphaned storage files are less harmful than orphaned DB records
       }
     }

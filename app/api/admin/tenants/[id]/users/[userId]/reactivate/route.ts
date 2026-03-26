@@ -8,7 +8,7 @@ import { withTiming } from '@/lib/middleware/request-timing'
 /**
  * POST /api/admin/tenants/[id]/users/[userId]/reactivate
  *
- * Platform-admin ONLY — reactivate a deactivated user (sets is_active = true).
+ * Platform-admin ONLY  -  reactivate a deactivated user (sets is_active = true).
  * Pre-checks seat limit before reactivation.
  *
  * Body: { reason: string }

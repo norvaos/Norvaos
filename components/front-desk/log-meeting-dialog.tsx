@@ -182,17 +182,17 @@ export function LogMeetingDialog({
             )}
           </div>
 
-          {/* Primary Attendee — pre-filled, read-only */}
+          {/* Primary Attendee  -  pre-filled, read-only */}
           <div className="space-y-1.5">
             <Label>
               Primary Attendee <span className="text-xs text-muted-foreground">(auto-filled)</span>
             </Label>
             <div className="flex h-9 w-full items-center rounded-md border border-input bg-muted/40 px-3 text-sm text-foreground">
-              {contactName || '—'}
+              {contactName || ' - '}
             </div>
           </div>
 
-          {/* Matter Picker — only if contact has matters */}
+          {/* Matter Picker  -  only if contact has matters */}
           {activeMatters.length > 0 && (
             <div className="space-y-1.5">
               <Label>Related Matter <span className="text-xs text-muted-foreground">(optional)</span></Label>
@@ -227,7 +227,7 @@ export function LogMeetingDialog({
             />
           </div>
 
-          {/* Notes — mandatory */}
+          {/* Notes  -  mandatory */}
           <div className="space-y-1.5">
             <Label htmlFor="meeting-notes">
               Notes <span className="text-red-500">*</span>

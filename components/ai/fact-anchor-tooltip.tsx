@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * FactAnchorTooltip — Directive 8.1: Ghost-Writer Fact-Check
+ * FactAnchorTooltip  -  Directive 8.1: Ghost-Writer Fact-Check
  *
  * Wraps AI-drafted text and highlights sentences that have source attributions.
  * On hover, shows a pop-up with the source quote from Norva Ear sessions.

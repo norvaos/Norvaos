@@ -1,5 +1,5 @@
 /**
- * Translation Bridge — Neural Mirror Mapping (Directive 18.0)
+ * Translation Bridge  -  Neural Mirror Mapping (Directive 18.0)
  *
  * When a client submits a fact in Mandarin (or any non-EN/FR language),
  * the Norva Ear stores the original string but the Lawyer's Intelligence Tab
@@ -113,7 +113,7 @@ export function resolveForLawyerView(
 }
 
 /**
- * Resolve for client view — shows original language.
+ * Resolve for client view  -  shows original language.
  */
 export function resolveForClientView(
   field: DualLanguageField,

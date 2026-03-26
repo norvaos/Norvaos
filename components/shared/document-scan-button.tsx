@@ -34,7 +34,7 @@ interface DocumentScanButtonProps {
   disabled?: boolean
 }
 
-/** Field label formatting — converts snake_case keys to Title Case labels */
+/** Field label formatting  -  converts snake_case keys to Title Case labels */
 function formatFieldLabel(key: string): string {
   return key
     .split('_')

@@ -1027,7 +1027,7 @@ export function useReorderCaseStages() {
 /**
  * Advance an immigration matter's stage via the server-side enforcement engine.
  * This calls the unified API route which validates gating rules, creates auto-tasks,
- * logs activity, and triggers automations — all server-side.
+ * logs activity, and triggers automations  -  all server-side.
  */
 export function useAdvanceStage() {
   const queryClient = useQueryClient()
@@ -1195,7 +1195,7 @@ export function useReorderChecklistTemplates() {
   })
 }
 
-// ─── 22. useStaffWellness — Staff Wellness Meter ────────────────────────────────
+// ─── 22. useStaffWellness  -  Staff Wellness Meter ────────────────────────────────
 
 const RED_MATTER_THRESHOLD = 20
 

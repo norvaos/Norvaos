@@ -1,6 +1,6 @@
 /**
  * Zod schemas for all workflow action inputs.
- * Server-side validation — these enforce Rule #3 and #12.
+ * Server-side validation  -  these enforce Rule #3 and #12.
  */
 
 import { z } from 'zod/v4'
@@ -92,7 +92,7 @@ export const frontDeskLogCallSchema = z.object({
   direction: z.enum(['inbound', 'outbound']),
   outcome: z.enum(['connected', 'no_answer', 'voicemail', 'busy', 'wrong_number']),
   durationMinutes: z.number().min(0).max(480).nullable().optional(),
-  // notes is optional — Quick Call buttons log outcomes in one click with no note
+  // notes is optional  -  Quick Call buttons log outcomes in one click with no note
   notes: z.string().max(1000).optional().or(z.literal('')),
 })
 

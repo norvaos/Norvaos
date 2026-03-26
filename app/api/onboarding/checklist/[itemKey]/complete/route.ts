@@ -6,7 +6,7 @@ import { withTiming } from '@/lib/middleware/request-timing'
 import { logAuditServer } from '@/lib/queries/audit-logs'
 import { log } from '@/lib/utils/logger'
 
-// Only these keys can be manually completed — auto-detected items are read-only
+// Only these keys can be manually completed  -  auto-detected items are read-only
 const MANUAL_ITEM_KEYS = new Set(['billing_configured', 'firm_profile_reviewed'])
 
 /**
@@ -39,7 +39,7 @@ async function handlePost(
       )
     }
 
-    // Upsert — idempotent; UNIQUE(tenant_id, item_key) prevents duplicates
+    // Upsert  -  idempotent; UNIQUE(tenant_id, item_key) prevents duplicates
     const { data, error } = await admin
       .from('tenant_onboarding_checklist')
       .upsert(
@@ -63,7 +63,7 @@ async function handlePost(
       return NextResponse.json({ error: 'Failed to save completion.' }, { status: 500 })
     }
 
-    // Fire-and-forget audit — do not block response
+    // Fire-and-forget audit  -  do not block response
     logAuditServer({
       supabase: admin,
       tenantId: auth.tenantId,

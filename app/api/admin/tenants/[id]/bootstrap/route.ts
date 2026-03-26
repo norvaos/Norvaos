@@ -83,12 +83,12 @@ const bootstrapSchema = z.object({
 /**
  * POST /api/admin/tenants/[id]/bootstrap
  *
- * Platform-admin ONLY — apply a starter pack to a tenant.
+ * Platform-admin ONLY  -  apply a starter pack to a tenant.
  * Idempotent: repeated calls skip already-applied actions (checked via tenant_setup_log).
  *
  * Seeded per run:
- *   - 4 system roles (Admin, Lawyer, Paralegal, Clerk) — skipped if already exist
- *   - Practice areas from the chosen starter pack — skipped if already exist
+ *   - 4 system roles (Admin, Lawyer, Paralegal, Clerk)  -  skipped if already exist
+ *   - Practice areas from the chosen starter pack  -  skipped if already exist
  *
  * Each action is recorded in tenant_setup_log with UNIQUE(tenant_id, action).
  * Audit row written per bootstrap call regardless (to track re-attempts).
@@ -133,7 +133,7 @@ const handlePost = withPlatformAdmin(async (request, ctx) => {
   for (const role of SYSTEM_ROLES) {
     const actionKey = `seed_role_${role.name.toLowerCase()}`
 
-    // Check setup log first — skip if already applied
+    // Check setup log first  -  skip if already applied
     const { data: logEntry } = await admin
       .from('tenant_setup_log')
       .select('id')
@@ -168,7 +168,7 @@ const handlePost = withPlatformAdmin(async (request, ctx) => {
       }
     }
 
-    // Record in setup log — ON CONFLICT DO NOTHING handles the race case
+    // Record in setup log  -  ON CONFLICT DO NOTHING handles the race case
     await admin.from('tenant_setup_log').insert({
       tenant_id:   tenantId,
       action:      actionKey,

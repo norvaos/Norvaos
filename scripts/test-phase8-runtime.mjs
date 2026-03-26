@@ -125,7 +125,7 @@ async function testS1() {
     return
   }
 
-  // THE CRITICAL CHECK — line 458 of collections-service.ts
+  // THE CRITICAL CHECK  -  line 458 of collections-service.ts
   if (action.performed_by === ziaAuth.userId) {
     const errorResponse = {
       success: false,
@@ -153,14 +153,14 @@ async function testS1() {
     .eq('action_type', 'write_off_approved')
 
   console.log('write_off_approved rows for this invoice:', approvals?.length ?? 0)
-  console.log(approvals?.length === 0 ? '✅ Database state clean — no approval created' : '❌ UNEXPECTED approval found')
+  console.log(approvals?.length === 0 ? '✅ Database state clean  -  no approval created' : '❌ UNEXPECTED approval found')
 
   // Step 4: Prove cross-user approval DOES work (Priya approves Zia's request)
   console.log('\n--- Step 4: Cross-user approval (Priya approves Zia\'s request) ---')
   const priyaAuth = await buildAuth(PRIYA_USER_ID)
 
   if (action.performed_by !== priyaAuth.userId) {
-    // Segregation check passes — different users
+    // Segregation check passes  -  different users
     const { data: approval, error: appErr } = await admin
       .from('collection_actions')
       .insert({

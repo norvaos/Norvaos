@@ -18,7 +18,7 @@ type MatterDeadline = Database['public']['Tables']['matter_deadlines']['Row']
  * Auth: Bearer token matching CRON_SECRET env var (or skip for dev).
  */
 async function handlePost(request: Request) {
-  // Auth check — fail-closed: reject if CRON_SECRET is unset
+  // Auth check  -  fail-closed: reject if CRON_SECRET is unset
   const cronSecret = process.env['CRON_SECRET']
   if (!cronSecret) {
     return NextResponse.json({ error: 'Server misconfigured: CRON_SECRET not set' }, { status: 500 })

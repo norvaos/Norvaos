@@ -1,5 +1,5 @@
 -- ─────────────────────────────────────────────────────────────────────────────
--- Migration 112 — Matter Profile System
+-- Migration 112  -  Matter Profile System
 -- ─────────────────────────────────────────────────────────────────────────────
 --
 -- Purpose:
@@ -12,18 +12,18 @@
 --
 --   When a new matter is opened for an existing client, the carry-forward
 --   function copies contacts.immigration_data → matter_people.profile_data.
---   Staff only enter what changed — nothing stable is retyped.
+--   Staff only enter what changed  -  nothing stable is retyped.
 --
 --   The IRCC form fill engine reads matter_people.profile_data instead of
 --   contacts.immigration_data when a matter_id is provided.
 --
 -- Changes:
---   1. ALTER TABLE matter_people  — add profile_data, snapshot_taken_at,
+--   1. ALTER TABLE matter_people   -  add profile_data, snapshot_taken_at,
 --                                    is_locked, profile_version
---   2. CREATE TABLE matter_profile_sync_log — audit trail for all carry-forward
+--   2. CREATE TABLE matter_profile_sync_log  -  audit trail for all carry-forward
 --                                             and sync-back events
---   3. CREATE FUNCTION snapshot_contact_profile_to_matter — carry-forward
---   4. CREATE FUNCTION sync_matter_profile_to_canonical  — sync-back
+--   3. CREATE FUNCTION snapshot_contact_profile_to_matter  -  carry-forward
+--   4. CREATE FUNCTION sync_matter_profile_to_canonical   -  sync-back
 --   5. Indexes
 --   6. RLS policies
 -- ─────────────────────────────────────────────────────────────────────────────
@@ -50,7 +50,7 @@ COMMENT ON COLUMN public.matter_people.snapshot_taken_at IS
 
 COMMENT ON COLUMN public.matter_people.is_locked IS
   'True once a package has been generated for this matter. Locked profiles '
-  'cannot be edited — changes require creating a new package version.';
+  'cannot be edited  -  changes require creating a new package version.';
 
 COMMENT ON COLUMN public.matter_people.profile_version IS
   'Incremented on every profile_data update. Used for optimistic concurrency '
@@ -84,7 +84,7 @@ COMMENT ON TABLE public.matter_profile_sync_log IS
   'sync-back (matter → canonical) event. Never update or delete rows here.';
 
 
--- ── 3. RLS — matter_profile_sync_log ────────────────────────────────────────
+-- ── 3. RLS  -  matter_profile_sync_log ────────────────────────────────────────
 
 ALTER TABLE public.matter_profile_sync_log ENABLE ROW LEVEL SECURITY;
 
@@ -124,12 +124,12 @@ CREATE INDEX IF NOT EXISTS idx_mpsl_contact_id
 -- requests a refresh of stable biographical data.
 --
 -- Parameters:
---   p_matter_person_id  UUID   — the matter_people.id row to populate
---   p_contact_id        UUID   — the contacts.id to snapshot from
---   p_tenant_id         UUID   — tenant guard
---   p_synced_by         UUID   — the users.id performing the action (for audit)
+--   p_matter_person_id  UUID    -  the matter_people.id row to populate
+--   p_contact_id        UUID    -  the contacts.id to snapshot from
+--   p_tenant_id         UUID    -  tenant guard
+--   p_synced_by         UUID    -  the users.id performing the action (for audit)
 --
--- Returns: profile_version INTEGER — the new version number after snapshot
+-- Returns: profile_version INTEGER  -  the new version number after snapshot
 -- ─────────────────────────────────────────────────────────────────────────────
 
 CREATE OR REPLACE FUNCTION public.snapshot_contact_profile_to_matter(
@@ -231,13 +231,13 @@ COMMENT ON FUNCTION public.snapshot_contact_profile_to_matter IS
 -- (e.g. new passport, new address) and should carry forward to future matters.
 --
 -- Parameters:
---   p_matter_person_id  UUID     — the matter_people.id to sync from
---   p_contact_id        UUID     — the contacts.id to update
---   p_tenant_id         UUID     — tenant guard
---   p_fields_to_sync    TEXT[]   — array of top-level profile keys to merge
+--   p_matter_person_id  UUID      -  the matter_people.id to sync from
+--   p_contact_id        UUID      -  the contacts.id to update
+--   p_tenant_id         UUID      -  tenant guard
+--   p_fields_to_sync    TEXT[]    -  array of top-level profile keys to merge
 --                                  e.g. ARRAY['passport', 'contact_info']
 --                                  NULL = merge ALL keys
---   p_synced_by         UUID     — the users.id performing the action
+--   p_synced_by         UUID      -  the users.id performing the action
 -- ─────────────────────────────────────────────────────────────────────────────
 
 CREATE OR REPLACE FUNCTION public.sync_matter_profile_to_canonical(

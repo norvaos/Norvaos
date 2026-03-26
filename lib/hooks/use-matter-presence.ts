@@ -1,11 +1,11 @@
 'use client'
 
 /**
- * useMatterPresence — Supabase Realtime Presence for matter-level viewer tracking.
+ * useMatterPresence  -  Supabase Realtime Presence for matter-level viewer tracking.
  *
  * Tracks which users are currently viewing a specific matter. Each user's
  * presence includes their name, avatar, and tenant_id. The hook filters
- * presence by tenant to enforce SENTINEL boundaries — one tenant never
+ * presence by tenant to enforce SENTINEL boundaries  -  one tenant never
  * sees another's presence.
  *
  * Channel: `matter:{matterId}`

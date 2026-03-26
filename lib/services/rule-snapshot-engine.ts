@@ -5,7 +5,7 @@
  * matter_type at the moment of matter creation. Stored in matter_rule_snapshots
  * for audit, drift detection, and compliance purposes.
  *
- * Called fire-and-forget after matter creation — never blocks the response.
+ * Called fire-and-forget after matter creation  -  never blocks the response.
  */
 
 import { createHash } from 'crypto'
@@ -205,7 +205,7 @@ export async function captureRuleSnapshots(
   const matterTypeId: string | null = matter?.matter_type_id ?? null
 
   if (!matterTypeId) {
-    // No matter type — nothing to snapshot
+    // No matter type  -  nothing to snapshot
     return
   }
 

@@ -64,7 +64,7 @@ export interface UseOfRepResult {
 
 /**
  * Fetch all data needed for the Use of Rep form.
- * Does NOT generate the PDF — that requires the Python filler which runs server-side.
+ * Does NOT generate the PDF  -  that requires the Python filler which runs server-side.
  */
 export async function buildUseOfRepData(
   supabase: SupabaseClient<Database>,
@@ -161,11 +161,11 @@ export async function buildUseOfRepData(
 /**
  * Convert UseOfRepData to a flat XFA field mapping for IMM5476E.
  * Field names correspond to the XFA structure of the IMM5476E PDF.
- * These are approximations — exact field names depend on the specific PDF version.
+ * These are approximations  -  exact field names depend on the specific PDF version.
  */
 export function buildIMM5476EFieldMap(data: UseOfRepData): Record<string, string> {
   return {
-    // Section A — Representative
+    // Section A  -  Representative
     'rep_family_name': data.rep.familyName,
     'rep_given_name': data.rep.givenName,
     'rep_title': data.rep.title,
@@ -174,7 +174,7 @@ export function buildIMM5476EFieldMap(data: UseOfRepData): Record<string, string
     'rep_email': data.rep.email,
     'rep_firm_name': data.rep.firmName,
 
-    // Section A — Rep address
+    // Section A  -  Rep address
     'rep_address_street': [data.address.line1, data.address.line2].filter(Boolean).join(', '),
     'rep_address_city': data.address.city,
     'rep_address_province': data.address.province,
@@ -182,7 +182,7 @@ export function buildIMM5476EFieldMap(data: UseOfRepData): Record<string, string
     'rep_address_country': data.address.country,
     'rep_fax': data.address.fax,
 
-    // Section B — Client/Applicant
+    // Section B  -  Client/Applicant
     'applicant_family_name': data.client.familyName,
     'applicant_given_name': data.client.givenName,
     'applicant_dob': data.client.dateOfBirth ?? '',

@@ -122,7 +122,7 @@ function UrgencyIndicators({ item }: { item: ReviewQueueItem }) {
 // ── Days Ago ─────────────────────────────────────────────────────────────────
 
 function daysAgo(dateStr: string | null): string {
-  if (!dateStr) return '—'
+  if (!dateStr) return ' - '
   const diffMs = Date.now() - new Date(dateStr).getTime()
   const days = Math.floor(diffMs / (24 * 60 * 60 * 1000))
   if (days === 0) return 'Today'
@@ -293,7 +293,7 @@ export default function ImmigrationReviewQueuePage() {
                       onClick={() => handleRowClick(item.matterId)}
                     >
                       <TableCell className="font-mono text-sm">
-                        {item.matterNumber || '—'}
+                        {item.matterNumber || ' - '}
                       </TableCell>
                       <TableCell>
                         <div className="font-medium text-sm">

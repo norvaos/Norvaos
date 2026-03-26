@@ -5,7 +5,7 @@
  *
  * Guardrails:
  * - All free-text fields sanitized: control chars (U+0000-U+001F except \n)
- *   and zero-width chars stripped. NO transliteration — full Unicode via
+ *   and zero-width chars stripped. NO transliteration  -  full Unicode via
  *   embedded Inter font.
  * - Pagination: auto-adds new pages when content overflows
  * - A4 page format (595x842pt)
@@ -26,6 +26,8 @@ import {
 } from 'pdf-lib'
 import fontkit from '@pdf-lib/fontkit'
 import { formatDateWithFormat } from '@/lib/utils/formatters'
+import type { SovereignBranding } from '@/lib/utils/sovereign-header'
+import { drawSovereignHeader, drawSovereignFooter, drawSovereignSignature } from '@/lib/utils/sovereign-header'
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -50,20 +52,23 @@ export interface RetainerPdfData {
   verificationCode?: string | null
   /** Tenant's preferred date format token, e.g. "DD/MM/YYYY". Passed from API route. */
   dateFormat?: string | null
-  /** Matter number (e.g. NRV-2026-10001) — printed on PDF header */
+  /** Matter number (e.g. NRV-2026-10001)  -  printed on PDF header */
   matterNumber?: string | null
-  /** Matter title — printed below matter number */
+  /** Matter title  -  printed below matter number */
   matterTitle?: string | null
-  /** Lawyer name — printed in signature block */
+  /** Lawyer name  -  printed in signature block */
   lawyerName?: string | null
-  /** Risk level — triggers dynamic risk disclosure clause */
+  /** Risk level  -  triggers dynamic risk disclosure clause */
   riskLevel?: string | null // 'low' | 'medium' | 'high' | 'critical'
-  /** Readiness score — included in risk disclosure context */
+  /** Readiness score  -  included in risk disclosure context */
   readinessScore?: number | null
-  /** Fee snapshot date — "frozen on" notice */
+  /** Fee snapshot date  -  "frozen on" notice */
   snapshotDate?: string | null
   /** Practice area name */
   practiceArea?: string | null
+
+  /** Directive 033: Sovereign branding  -  if provided, uses branded letterhead header/footer */
+  branding?: SovereignBranding | null
 }
 
 // ── Constants (exported for template renderer) ──────────────────────────────
@@ -115,7 +120,7 @@ export function getBoldFontBytes(): Buffer {
 /**
  * Sanitize free-text for PDF rendering.
  * Only strips control chars and zero-width chars.
- * NO transliteration — the embedded Inter font handles full Unicode.
+ * NO transliteration  -  the embedded Inter font handles full Unicode.
  */
 export function sanitize(text: string | null | undefined): string {
   if (!text) return ''
@@ -386,7 +391,7 @@ export class PdfPageManager {
     return linesDrawn
   }
 
-  /** Finalize — draw page number on the last page */
+  /** Finalize  -  draw page number on the last page */
   finalize(): void {
     this.drawPageNumber()
   }
@@ -409,7 +414,7 @@ export async function generateRetainerPdf(data: RetainerPdfData): Promise<Uint8A
 
   // Create document
   const doc = await PDFDocument.create()
-  doc.setTitle(`Retainer Agreement — ${sanitize(data.clientName)}`)
+  doc.setTitle(`Retainer Agreement  -  ${sanitize(data.clientName)}`)
   doc.setSubject(`Retainer Agreement for ${sanitize(data.clientName)}`)
   doc.setCreator('NorvaOS')
   doc.setProducer('NorvaOS Retainer Agreement Generator')
@@ -425,26 +430,31 @@ export async function generateRetainerPdf(data: RetainerPdfData): Promise<Uint8A
   const firstPage = doc.addPage([PAGE_WIDTH, PAGE_HEIGHT])
   const pm = new PdfPageManager(doc, firstPage, font, fontBold)
 
-  // ── 1. Firm Header ─────────────────────────────────────────
+  // ── 1. Firm Header (Directive 033: Sovereign Brand Injection) ─────────────
 
-  pm.drawText(sanitize(data.firmName), {
-    font: fontBold,
-    size: FONT_TITLE,
-    color: COLOR_PRIMARY,
-  })
-  pm.moveDown(22)
+  if (data.branding) {
+    const headerY = await drawSovereignHeader(doc, firstPage, data.branding, { regular: font, bold: fontBold })
+    pm.y = headerY
+  } else {
+    pm.drawText(sanitize(data.firmName), {
+      font: fontBold,
+      size: FONT_TITLE,
+      color: COLOR_PRIMARY,
+    })
+    pm.moveDown(22)
 
-  if (data.firmAddress) {
-    const addressLines = sanitize(data.firmAddress).split('\n')
-    for (const line of addressLines) {
-      pm.drawText(line, { size: FONT_BODY, color: COLOR_MID })
-      pm.moveDown(LINE_HEIGHT)
+    if (data.firmAddress) {
+      const addressLines = sanitize(data.firmAddress).split('\n')
+      for (const line of addressLines) {
+        pm.drawText(line, { size: FONT_BODY, color: COLOR_MID })
+        pm.moveDown(LINE_HEIGHT)
+      }
     }
-  }
 
-  pm.moveDown(10)
-  pm.drawLine()
-  pm.moveDown(20)
+    pm.moveDown(10)
+    pm.drawLine()
+    pm.moveDown(20)
+  }
 
   // ── 2. "RETAINER AGREEMENT" Title ──────────────────────────
 
@@ -891,6 +901,16 @@ export async function generateRetainerPdf(data: RetainerPdfData): Promise<Uint8A
     color: COLOR_MID,
   })
 
+  // Directive 033: Overlay digital signature image if available
+  if (data.branding?.signatureBytes) {
+    await drawSovereignSignature(doc, pm.page, data.branding, {
+      x: lawyerSigX,
+      y: clientSigLineY + 35,
+      maxWidth: 150,
+      maxHeight: 35,
+    })
+  }
+
   // Signature line
   pm.drawLine({
     y: clientSigLineY,
@@ -964,13 +984,18 @@ export async function generateRetainerPdf(data: RetainerPdfData): Promise<Uint8A
     pm.moveDown(10)
   }
 
-  const footerText = `Generated by NorvaOS \u2014 ${sanitize(data.firmName)}`
-  const footerWidth = font.widthOfTextAtSize(footerText, FONT_SMALL)
-  pm.drawText(footerText, {
-    size: FONT_SMALL,
-    color: COLOR_LIGHT,
-    x: (PAGE_WIDTH - footerWidth) / 2,
-  })
+  // Directive 033: Sovereign footer (with legal disclaimer) or legacy footer
+  if (data.branding) {
+    drawSovereignFooter(pm.page, data.branding, { regular: font, bold: fontBold })
+  } else {
+    const footerText = `Generated by NorvaOS \u2014 ${sanitize(data.firmName)}`
+    const footerWidth = font.widthOfTextAtSize(footerText, FONT_SMALL)
+    pm.drawText(footerText, {
+      size: FONT_SMALL,
+      color: COLOR_LIGHT,
+      x: (PAGE_WIDTH - footerWidth) / 2,
+    })
+  }
 
   // Finalize (page numbers)
   pm.finalize()

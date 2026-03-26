@@ -1,5 +1,5 @@
 /**
- * Shadow Matter Service — Directive 021 / 023
+ * Shadow Matter Service  -  Directive 021 / 023
  *
  * "Atomic Transfer" logic: clones a client's hardened PII, address history,
  * and personal history from a previous matter into a new "shadow" renewal matter.

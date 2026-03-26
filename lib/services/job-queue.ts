@@ -1,5 +1,5 @@
 /**
- * Job Queue — Core enqueue / dequeue / lifecycle operations.
+ * Job Queue  -  Core enqueue / dequeue / lifecycle operations.
  *
  * Uses the service-role admin client so it bypasses RLS.
  * Dequeue uses SELECT … FOR UPDATE SKIP LOCKED for safe concurrency.
@@ -46,7 +46,7 @@ function admin(): SupabaseClient<Database> {
  * Insert a new job into the queue.
  *
  * Returns the created job ID, or `null` if an idempotency conflict occurred
- * (duplicate key — the job was already enqueued).
+ * (duplicate key  -  the job was already enqueued).
  */
 export async function enqueueJob(
   tenantId: string,
@@ -71,7 +71,7 @@ export async function enqueueJob(
     .single()
 
   if (error) {
-    // Unique constraint on idempotency_key — not an error, job already exists
+    // Unique constraint on idempotency_key  -  not an error, job already exists
     if (error.code === '23505' && idempotencyKey) {
       log.info('Job already enqueued (idempotency hit)', {
         tenant_id: tenantId,
@@ -233,7 +233,7 @@ export async function failJob(
       throw error
     }
 
-    log.warn('Job failed — re-queued with backoff', {
+    log.warn('Job failed  -  re-queued with backoff', {
       job_id: jobId,
       retry_count: nextRetry.toString(),
       scheduled_for: scheduledFor,

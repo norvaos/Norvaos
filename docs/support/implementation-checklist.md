@@ -1,14 +1,14 @@
-# NorvaOS — Implementation Checklist
+# NorvaOS  -  Implementation Checklist
 ## New Tenant Onboarding
 
-**Version:** 1.0 — 2026-03-16
-**Team 3 / Module 4 — Support and Implementation Tooling**
+**Version:** 1.0  -  2026-03-16
+**Team 3 / Module 4  -  Support and Implementation Tooling**
 
 Use this checklist when onboarding a new law firm tenant. Complete each phase in order. Tick each item before moving to the next phase.
 
 ---
 
-## Phase 1 — Account Creation
+## Phase 1  -  Account Creation
 *Estimated time: 30–60 minutes*
 
 ### Supabase Setup
@@ -19,7 +19,7 @@ Use this checklist when onboarding a new law firm tenant. Complete each phase in
 ### Admin User
 - [ ] Create admin user in Supabase Auth (email + temp password)
 - [ ] Insert `users` row with `tenant_id`, `role_id` = admin role, `is_active = true`
-- [ ] Send welcome email with temporary credentials (use off-system email — not via NorvaOS until email integration is set up)
+- [ ] Send welcome email with temporary credentials (use off-system email  -  not via NorvaOS until email integration is set up)
 - [ ] Confirm admin user can log in
 
 ### Domain / Subdomain (if applicable)
@@ -29,7 +29,7 @@ Use this checklist when onboarding a new law firm tenant. Complete each phase in
 
 ---
 
-## Phase 2 — Configuration
+## Phase 2  -  Configuration
 *Estimated time: 1–2 hours*
 
 ### Practice Areas
@@ -59,7 +59,7 @@ Use this checklist when onboarding a new law firm tenant. Complete each phase in
 
 ---
 
-## Phase 3 — User Setup
+## Phase 3  -  User Setup
 *Estimated time: 30–60 minutes per staff group*
 
 ### Roles Confirmation
@@ -74,14 +74,14 @@ Use this checklist when onboarding a new law firm tenant. Complete each phase in
 - [ ] Confirm all users completed password setup
 
 ### Access Verification
-- [ ] Log in as a Lawyer — confirm matter access, billing, documents visible
-- [ ] Log in as a Paralegal — confirm matter access, task management visible
-- [ ] Log in as a Receptionist — confirm booking, kiosk, front desk visible; billing hidden
+- [ ] Log in as a Lawyer  -  confirm matter access, billing, documents visible
+- [ ] Log in as a Paralegal  -  confirm matter access, task management visible
+- [ ] Log in as a Receptionist  -  confirm booking, kiosk, front desk visible; billing hidden
 - [ ] Confirm no user can see another tenant's data (cross-tenant isolation test)
 
 ---
 
-## Phase 4 — Integration Setup
+## Phase 4  -  Integration Setup
 *Estimated time: 1–2 hours*
 
 ### Email Integration (Microsoft 365)
@@ -89,7 +89,7 @@ Use this checklist when onboarding a new law firm tenant. Complete each phase in
 - [ ] Click **Connect Microsoft 365**
 - [ ] Complete OAuth flow with firm's Microsoft admin account
 - [ ] Verify connection status shows **Connected**
-- [ ] Send a test email via NorvaOS — confirm delivery
+- [ ] Send a test email via NorvaOS  -  confirm delivery
 - [ ] Confirm email sync is active (incoming emails appear in matter threads)
 
 ### Calendar (if applicable)
@@ -101,12 +101,12 @@ Use this checklist when onboarding a new law firm tenant. Complete each phase in
 - [ ] Navigate to **Settings → Integrations → OneDrive**
 - [ ] Connect OneDrive with firm's Microsoft account
 - [ ] Set root folder for document storage
-- [ ] Upload a test document — confirm it appears in OneDrive
+- [ ] Upload a test document  -  confirm it appears in OneDrive
 
 ### Third-Party Import (if migrating from Clio / GHL / Officio)
 - [ ] Navigate to **Settings → Data Import**
 - [ ] Select source system (Clio / GHL / Officio)
-- [ ] Run import in preview mode first — review sample data
+- [ ] Run import in preview mode first  -  review sample data
 - [ ] Confirm field mapping is correct
 - [ ] Run full import
 - [ ] Verify imported contacts and matters appear correctly
@@ -114,8 +114,8 @@ Use this checklist when onboarding a new law firm tenant. Complete each phase in
 
 ---
 
-## Phase 5 — Data Migration
-*Estimated time: variable — 2 hours to 2 days depending on data volume*
+## Phase 5  -  Data Migration
+*Estimated time: variable  -  2 hours to 2 days depending on data volume*
 
 ### Pre-Migration
 - [ ] Export data from previous system in supported format
@@ -129,7 +129,7 @@ Use this checklist when onboarding a new law firm tenant. Complete each phase in
 
 ### Matter Import
 - [ ] Map old matter statuses to NorvaOS statuses (open, in_progress, pending, closed)
-- [ ] Import matters — link to imported contacts
+- [ ] Import matters  -  link to imported contacts
 - [ ] Confirm matter reference numbers are preserved or remapped
 
 ### Document Migration (if required)
@@ -139,11 +139,11 @@ Use this checklist when onboarding a new law firm tenant. Complete each phase in
 ### Post-Migration Validation
 - [ ] Contact count in NorvaOS matches source system
 - [ ] Matter count matches
-- [ ] Run conflict check on 5 sample clients — confirm no false positives from import
+- [ ] Run conflict check on 5 sample clients  -  confirm no false positives from import
 
 ---
 
-## Phase 6 — Training
+## Phase 6  -  Training
 *Estimated time: 2–4 hours (group session)*
 
 ### Staff Training Topics
@@ -155,7 +155,7 @@ Use this checklist when onboarding a new law firm tenant. Complete each phase in
 - [ ] Document management and portal
 - [ ] Client portal walkthrough (show from client perspective)
 - [ ] Booking pages and kiosk (if front desk module in use)
-- [ ] Email integration — how to associate emails to matters
+- [ ] Email integration  -  how to associate emails to matters
 
 ### Document Templates
 - [ ] Upload firm letter templates
@@ -169,12 +169,12 @@ Use this checklist when onboarding a new law firm tenant. Complete each phase in
 
 ---
 
-## Phase 7 — Go-Live Verification
+## Phase 7  -  Go-Live Verification
 *Estimated time: 1–2 hours*
 
 ### Health Check
-- [ ] Run `/api/support/health` — confirm all indicators green
-- [ ] Run `scripts/support/verify-environment.ts` — confirm all checks PASS
+- [ ] Run `/api/support/health`  -  confirm all indicators green
+- [ ] Run `scripts/support/verify-environment.ts`  -  confirm all checks PASS
 - [ ] Confirm no stalled jobs in job queue (check **Settings → Support Dashboard**)
 
 ### RLS Verification
@@ -182,19 +182,19 @@ Use this checklist when onboarding a new law firm tenant. Complete each phase in
 - [ ] Confirm staff from this firm cannot access a different test tenant's data
 
 ### Integration Verification
-- [ ] Send a real email from the firm email address — confirm delivery and sync
-- [ ] Create a calendar event — confirm it appears in Microsoft Calendar
-- [ ] Upload a document — confirm it appears in OneDrive
+- [ ] Send a real email from the firm email address  -  confirm delivery and sync
+- [ ] Create a calendar event  -  confirm it appears in Microsoft Calendar
+- [ ] Upload a document  -  confirm it appears in OneDrive
 
 ### Notification Verification
-- [ ] Trigger a task assignment — confirm the assigned user receives an in-app notification
-- [ ] Trigger a client notification — confirm client receives email
+- [ ] Trigger a task assignment  -  confirm the assigned user receives an in-app notification
+- [ ] Trigger a client notification  -  confirm client receives email
 
 ### Sign-Off
 - [ ] Firm admin confirms all modules working as expected
 - [ ] Implementation record created in onboarding tracker (`initOnboardingRecord(tenantId)`)
 - [ ] All phases marked complete in tracker
-- [ ] Implementation team notified — firm is live
+- [ ] Implementation team notified  -  firm is live
 
 ---
 

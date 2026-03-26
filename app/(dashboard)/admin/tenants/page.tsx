@@ -74,7 +74,7 @@ const STATUS_BADGE_VARIANT: Record<string, 'default' | 'secondary' | 'destructiv
 /**
  * Platform-admin tenant management console.
  *
- * This page is gated by the API — GET /api/admin/tenants requires
+ * This page is gated by the API  -  GET /api/admin/tenants requires
  * platform-admin auth (Bearer token or session). Non-admins see a 403 error.
  */
 export default function AdminTenantsPage() {
@@ -424,7 +424,7 @@ export default function AdminTenantsPage() {
             {needsSlugConfirmation && (
               <div className="space-y-2 rounded-md border border-destructive/50 bg-destructive/5 p-3">
                 <p className="text-sm font-medium text-destructive">
-                  Large increase — this is more than 2× the current limit.
+                  Large increase  -  this is more than 2× the current limit.
                 </p>
                 <Label htmlFor="slug-confirm">
                   Type <code className="rounded bg-muted px-1 py-0.5 text-xs font-mono">{selectedTenant?.slug}</code> to confirm

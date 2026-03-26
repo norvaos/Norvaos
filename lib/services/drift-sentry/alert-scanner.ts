@@ -1,5 +1,5 @@
 /**
- * Drift Alert Scanner — Jurisdictional Drift Sentry
+ * Drift Alert Scanner  -  Jurisdictional Drift Sentry
  *
  * Scans recent CanLII decisions for case law developments that may
  * require re-strategy on active immigration matters.
@@ -50,7 +50,7 @@ const ALL_KEYWORDS: string[] = [
 ];
 
 /**
- * Court weight multiplier — higher-authority courts receive a stronger
+ * Court weight multiplier  -  higher-authority courts receive a stronger
  * relevance signal.
  */
 const COURT_WEIGHT: Record<string, number> = {

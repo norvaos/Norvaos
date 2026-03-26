@@ -138,7 +138,7 @@ export async function getValidClioToken(
     return decryptToken(conn.access_token_encrypted)
   }
 
-  // Refresh the token — wrap in try/catch to catch revoked/expired refresh tokens
+  // Refresh the token  -  wrap in try/catch to catch revoked/expired refresh tokens
   try {
     const tokens = await refreshClioToken(conn.refresh_token_encrypted)
     const newExpiresAt = new Date(Date.now() + tokens.expires_in * 1000).toISOString()
@@ -173,7 +173,7 @@ export async function getValidClioToken(
     })
 
     throw new ClioConnectionError(
-      `Clio connection disconnected: token refresh failed — ${message}`,
+      `Clio connection disconnected: token refresh failed  -  ${message}`,
     )
   }
 }

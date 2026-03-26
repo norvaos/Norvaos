@@ -16,7 +16,7 @@ import type { DocumentSlot } from '@/lib/queries/document-slots'
 export interface ReviewBlockersWorkflowSectionProps {
   readinessData: ImmigrationReadinessData | null | undefined
   matterId: string
-  /** Document slots for the matter — used to resolve slot_slug → slot_id for direct upload */
+  /** Document slots for the matter  -  used to resolve slot_slug → slot_id for direct upload */
   slots?: DocumentSlot[]
   /** Controlled expand state (overrides internal state when provided) */
   isExpanded?: boolean
@@ -77,14 +77,14 @@ export function ReviewBlockersWorkflowSection({
     if (!readinessData) return []
     const groups: RankedBlockerGroup[] = []
 
-    // Tier 1: Critical — lawyer review + contradictions
+    // Tier 1: Critical  -  lawyer review + contradictions
     const criticalItems: BlockerItem[] = []
 
     if (readinessData.lawyerReview.required && readinessData.lawyerReview.status !== 'approved' && readinessData.lawyerReview.status !== 'not_required') {
       const reviewReasons = matrix?.lawyerReviewReasons ?? []
       criticalItems.push({
         type: 'lawyer_review',
-        label: `Lawyer review required${reviewReasons.length > 0 ? ` — ${reviewReasons[0]}` : ''}`,
+        label: `Lawyer review required${reviewReasons.length > 0 ? `  -  ${reviewReasons[0]}` : ''}`,
         action: { label: 'Open Lawyer Review', specialAction: 'lawyer_review' },
       })
     }
@@ -157,7 +157,7 @@ export function ReviewBlockersWorkflowSection({
       })
     }
 
-    // Tier 4: Warnings — pending review + stale packs + warning contradictions
+    // Tier 4: Warnings  -  pending review + stale packs + warning contradictions
     const warningItems: BlockerItem[] = []
 
     if (readinessData.documents.pendingReview > 0) {
@@ -172,7 +172,7 @@ export function ReviewBlockersWorkflowSection({
       for (const packType of readinessData.formPacks.stale) {
         warningItems.push({
           type: 'stale_pack',
-          label: `${packType} form pack is outdated — data has changed`,
+          label: `${packType} form pack is outdated  -  data has changed`,
           action: { label: 'Regenerate Form Pack', section: 'formPacks' },
         })
       }
@@ -222,7 +222,7 @@ export function ReviewBlockersWorkflowSection({
 
   if (!readinessData) return null
 
-  // Nothing to show — still render the Recalculate button so stuck matters can be fixed
+  // Nothing to show  -  still render the Recalculate button so stuck matters can be fixed
   if (totalItems === 0 && !readinessData.lawyerReview.required) {
     return (
       <div>
@@ -234,7 +234,7 @@ export function ReviewBlockersWorkflowSection({
           onToggle={() => {}}
           badge={{ text: 'Clear', variant: 'default' }}
         />
-        {/* Always-visible recalculate row — recovers matters with stale completion_pct */}
+        {/* Always-visible recalculate row  -  recovers matters with stale completion_pct */}
         <div className="flex justify-end pt-1 pr-1">
           <Button
             variant="ghost"
@@ -343,7 +343,7 @@ export function ReviewBlockersWorkflowSection({
             </div>
           ))}
 
-          {/* Overridden contradictions — shown outside the active tiers */}
+          {/* Overridden contradictions  -  shown outside the active tiers */}
           {readinessData.contradictions.overridden && readinessData.contradictions.blockingCount > 0 && (
             <div className="rounded-lg border p-3 text-green-700 bg-green-50 border-green-200">
               <div className="flex items-center gap-2 mb-2">
@@ -376,7 +376,7 @@ export function ReviewBlockersWorkflowSection({
         </div>
       )}
 
-      {/* Always-visible recalculate row — recovers matters with stale completion_pct */}
+      {/* Always-visible recalculate row  -  recovers matters with stale completion_pct */}
       <div className="flex justify-end pt-1 pr-1">
         <Button
           variant="ghost"
@@ -440,7 +440,7 @@ function DocumentUploadButton({
 
         if (!targetSlotId) throw new Error('No slot ID available')
         uploadSlot.mutate({ file, slotId: targetSlotId, matterId })
-        // Reset local pending immediately — uploadSlot.isPending tracks the actual upload state
+        // Reset local pending immediately  -  uploadSlot.isPending tracks the actual upload state
         setIsPending(false)
       } catch {
         setIsPending(false)
@@ -465,7 +465,7 @@ function DocumentUploadButton({
     )
   }
 
-  // Document uploaded but awaiting review — show Accept button
+  // Document uploaded but awaiting review  -  show Accept button
   if (slotStatus === 'pending_review' && slotId) {
     return (
       <Button

@@ -35,7 +35,7 @@ interface ComplianceGateModalProps {
   userRole: string
   /** Called when the user chooses to generate & send a retainer now */
   onGenerateRetainer: () => void
-  /** Called when bypass is confirmed — proceeds with conversion */
+  /** Called when bypass is confirmed  -  proceeds with conversion */
   onBypassConfirmed: () => void
   isGeneratingRetainer?: boolean
 }
@@ -162,7 +162,7 @@ export function ComplianceGateModal({
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-red-800">
-                  Bypass — Emergency Case
+                  Bypass  -  Emergency Case
                 </p>
                 <p className="text-xs text-muted-foreground mt-0.5">
                   {isOwner
@@ -178,7 +178,7 @@ export function ComplianceGateModal({
                     onClick={() => setShowBypassForm(true)}
                   >
                     <ShieldAlert className="mr-2 h-4 w-4" />
-                    I understand the risk — Bypass
+                    I understand the risk  -  Bypass
                   </Button>
                 )}
 
@@ -197,7 +197,7 @@ export function ComplianceGateModal({
                     <Textarea
                       value={bypassReason}
                       onChange={(e) => setBypassReason(e.target.value)}
-                      placeholder="e.g. Emergency protective order — client in immediate danger, retainer to follow within 24 hours."
+                      placeholder="e.g. Emergency protective order  -  client in immediate danger, retainer to follow within 24 hours."
                       className="text-sm resize-none border-red-200 focus-visible:ring-red-400"
                       rows={3}
                     />

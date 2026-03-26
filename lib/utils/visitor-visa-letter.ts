@@ -245,7 +245,7 @@ export function generateInvitationLetter(data: VisitorVisaFormValues): string {
       const parts = [`- ${v.name}`]
       if (v.relationship) parts.push(`(${v.relationship})`)
       if (v.country) parts.push(`from ${getCountryName(v.country)}`)
-      if (v.passport_number) parts.push(`— Passport: ${v.passport_number}`)
+      if (v.passport_number) parts.push(` -  Passport: ${v.passport_number}`)
       lines.push(parts.join(' '))
     }
     lines.push('')

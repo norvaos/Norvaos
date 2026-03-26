@@ -177,7 +177,7 @@ function MissingDocsList({
       <div className="flex items-center gap-2 py-4 px-3 rounded-xl bg-green-50 border border-green-200">
         <CheckCircle2 className="h-5 w-5 text-green-600 shrink-0" />
         <p className="text-sm font-medium text-green-700">
-          All documents received — nothing to upload.
+          All documents received  -  nothing to upload.
         </p>
       </div>
     )
@@ -211,7 +211,7 @@ function MissingDocsList({
             </p>
             {doc.needsReUpload && (
               <p className="text-xs text-amber-700 mt-0.5">
-                Please re-upload — the previous version needs correction.
+                Please re-upload  -  the previous version needs correction.
               </p>
             )}
             {doc.description && !doc.needsReUpload && (
@@ -330,7 +330,7 @@ export function ClientProgressTracker({
       }
       setData(json.data)
     } catch {
-      setError('Unable to connect — please try again later.')
+      setError('Unable to connect  -  please try again later.')
     } finally {
       setLoading(false)
     }
@@ -340,7 +340,7 @@ export function ClientProgressTracker({
     fetchProgress()
   }, [fetchProgress])
 
-  // Handle successful upload — refetch data to update stats
+  // Handle successful upload  -  refetch data to update stats
   const handleUploadComplete = useCallback((result: { versionNumber: number }) => {
     const slotName = uploadSlot?.name ?? 'Document'
     setUploadSlot(null)

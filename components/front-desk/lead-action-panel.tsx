@@ -24,7 +24,7 @@ interface ActionConfig {
  *
  * Rule #2: No drag-and-drop. Action-driven only.
  * Rule #11: Front Desk cannot manually move stages.
- * Rule #12: Compliance required fields — enforced in each dialog.
+ * Rule #12: Compliance required fields  -  enforced in each dialog.
  * Rule #1: All state changes go through the Action Executor.
  *
  * Each button opens a structured dialog → validates → submits to

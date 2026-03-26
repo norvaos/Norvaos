@@ -43,7 +43,7 @@ export const ghlCalendarAdapter: EntityAdapter = {
       aliases: ['Calendar Name', 'calendar_name'],
       transform: (val, row) => {
         const notes = row.notes ?? ''
-        return notes ? `${val} — ${notes}` : val
+        return notes ? `${val}  -  ${notes}` : val
       },
     },
     {

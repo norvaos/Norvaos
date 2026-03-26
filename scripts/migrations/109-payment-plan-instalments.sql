@@ -1,18 +1,18 @@
 -- ============================================================================
--- Migration 109 — Payment Plan Instalments
+-- Migration 109  -  Payment Plan Instalments
 -- ============================================================================
 -- Adds:
---   1. payment_plan_instalments table — individual instalment schedule records
---   2. payments.instalment_id — nullable FK linking a payment to an instalment
+--   1. payment_plan_instalments table  -  individual instalment schedule records
+--   2. payments.instalment_id  -  nullable FK linking a payment to an instalment
 --   3. Partial UNIQUE index: one active payment plan per invoice at a time
 --   4. invoice_audit_log event_type CHECK extended with payment plan events
 --
 -- Pre-apply checks (verified 2026-03-16):
---   SELECT COUNT(*) FROM payment_plans;  → 0 rows — partial UNIQUE index safe
---   payments.instalment_id is a new column — no existing data affected
+--   SELECT COUNT(*) FROM payment_plans;  → 0 rows  -  partial UNIQUE index safe
+--   payments.instalment_id is a new column  -  no existing data affected
 --
 -- Overdue state is query-time only: status='pending' AND due_date < CURRENT_DATE
--- No stored 'overdue' status — approved per workstream scope decision.
+-- No stored 'overdue' status  -  approved per workstream scope decision.
 -- ============================================================================
 
 -- ── 1. payment_plan_instalments ──────────────────────────────────────────────
@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS payment_plan_instalments (
   instalment_number   integer     NOT NULL CHECK (instalment_number > 0),
   due_date            date        NOT NULL,
   amount_cents        bigint      NOT NULL CHECK (amount_cents > 0),
-  -- 'overdue' is NOT stored — derived at query time: status='pending' AND due_date < CURRENT_DATE
+  -- 'overdue' is NOT stored  -  derived at query time: status='pending' AND due_date < CURRENT_DATE
   status              text        NOT NULL DEFAULT 'pending'
                                   CHECK (status IN ('pending', 'paid', 'cancelled')),
   payment_id          uuid        REFERENCES payments(id),   -- set when status becomes 'paid'
@@ -74,7 +74,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS payment_plans_one_active_per_invoice
   WHERE (status = 'active');
 
 -- ── 4. Extend invoice_audit_log event_type CHECK ──────────────────────────────
--- Drop and recreate — PostgreSQL does not support ALTER CONSTRAINT on CHECK.
+-- Drop and recreate  -  PostgreSQL does not support ALTER CONSTRAINT on CHECK.
 -- Adds: payment_plan_created, payment_plan_approved, payment_plan_cancelled,
 --       payment_plan_completed, instalment_paid
 

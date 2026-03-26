@@ -205,7 +205,7 @@ function FieldRow({
       <div className="flex-1 min-w-0">
         <p className="text-[10px] text-muted-foreground leading-none mb-0.5">{field.label}</p>
         <p className="text-xs truncate">
-          {field.filled ? field.value : '—'}
+          {field.filled ? field.value : ' - '}
         </p>
       </div>
       {field.filled && (

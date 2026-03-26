@@ -31,7 +31,7 @@ BEGIN
      WHERE tenant_id = rec.tenant_id;
 
     IF v_mt_count > 0 THEN
-      RAISE NOTICE '[136] Tenant % already has % matter type(s) — skipping.', rec.tenant_id, v_mt_count;
+      RAISE NOTICE '[136] Tenant % already has % matter type(s)  -  skipping.', rec.tenant_id, v_mt_count;
       CONTINUE;
     END IF;
 

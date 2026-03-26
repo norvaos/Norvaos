@@ -1,11 +1,11 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Lead Workflow Definition Registry — Authoritative Workflow Layer
+ * Lead Workflow Definition Registry  -  Authoritative Workflow Layer
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Centralized, declarative, testable definitions for the lead intake pipeline.
  * All milestone logic, transition rules, auto-complete behaviour, and task
- * definitions live HERE — not scattered across services.
+ * definitions live HERE  -  not scattered across services.
  *
  * Services read from this registry. They do not define workflow behaviour.
  *
@@ -56,7 +56,7 @@ export function isClosedStage(stage: string): boolean {
   return CLOSED_STAGES.includes(stage as LeadStage)
 }
 
-/** All terminal stages (no forward transitions — includes closed + converted) */
+/** All terminal stages (no forward transitions  -  includes closed + converted) */
 export const TERMINAL_STAGES: LeadStage[] = [
   ...CLOSED_STAGES,
   LEAD_STAGES.CONVERTED,
@@ -824,7 +824,7 @@ export const STAGE_TRANSITION_RULES: Record<LeadStage, TransitionRule[]> = {
     },
   ],
 
-  // Terminal stages — no forward transitions (reopen only via reopen engine)
+  // Terminal stages  -  no forward transitions (reopen only via reopen engine)
   [LEAD_STAGES.CONVERTED]: [],
   [LEAD_STAGES.CLOSED_NO_RESPONSE]: [],
   [LEAD_STAGES.CLOSED_RETAINER_NOT_SIGNED]: [],

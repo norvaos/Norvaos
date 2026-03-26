@@ -2,7 +2,7 @@
 -- Two new tables: portal_events (immutable append-only) and questionnaire_edit_requests
 
 -- ═══════════════════════════════════════════════════════════════════════════════
--- 1. portal_events — Immutable append-only event log for portal usage analytics
+-- 1. portal_events  -  Immutable append-only event log for portal usage analytics
 -- ═══════════════════════════════════════════════════════════════════════════════
 
 CREATE TABLE IF NOT EXISTS portal_events (
@@ -82,7 +82,7 @@ CREATE TRIGGER no_delete_portal_events
 
 
 -- ═══════════════════════════════════════════════════════════════════════════════
--- 2. questionnaire_edit_requests — Client requests to reopen completed questionnaires
+-- 2. questionnaire_edit_requests  -  Client requests to reopen completed questionnaires
 -- ═══════════════════════════════════════════════════════════════════════════════
 
 CREATE TABLE IF NOT EXISTS questionnaire_edit_requests (

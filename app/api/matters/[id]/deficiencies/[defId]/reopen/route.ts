@@ -5,7 +5,7 @@
  * Auth: any authenticated user in same tenant.
  * Increments reopen_count; sets chronic_flag when count reaches 3.
  *
- * Sprint 6, Week 1 — 2026-03-17
+ * Sprint 6, Week 1  -  2026-03-17
  */
 
 import { NextResponse } from 'next/server'
@@ -109,7 +109,7 @@ export async function PUT(
         matter_id: matterId,
         user_id: auth.userId,
         activity_type: 'deficiency_reopened',
-        title: isChronic ? 'Deficiency reopened — marked chronic' : 'Deficiency reopened',
+        title: isChronic ? 'Deficiency reopened  -  marked chronic' : 'Deficiency reopened',
         description: `Reopen #${transition.newReopenCount}${isChronic ? '. This deficiency has been escalated as chronic.' : ''}`,
         metadata: {
           deficiency_id: defId,

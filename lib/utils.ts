@@ -17,6 +17,6 @@ const cadFormatter = new Intl.NumberFormat('en-CA', {
 })
 
 export function formatCents(cents: number | null | undefined): string {
-  if (cents == null) return '—'
+  if (cents == null) return ' - '
   return cadFormatter.format(cents / 100)
 }

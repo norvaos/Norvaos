@@ -98,7 +98,7 @@ export async function assembleAutomationPayload(
     return { error: 'Matter not found', status: 404 }
   }
 
-  // 2. Fetch matter_intake — verify locked and complete
+  // 2. Fetch matter_intake  -  verify locked and complete
   const { data: intake, error: intakeErr } = await supabase
     .from('matter_intake')
     .select(
@@ -152,7 +152,7 @@ export async function assembleAutomationPayload(
     // matter_form_instances engine columns (answers JSONB) were added in
     // migration 145 but aren't in the generated DB types yet.
     // matter_form_instances engine columns (answers JSONB) added in migration 145
-    // aren't in the generated DB types — cast to bypass strict table name checking.
+    // aren't in the generated DB types  -  cast to bypass strict table name checking.
     const adminFallback = createAdminClient() as unknown as {
       from: (table: string) => {
         select: (cols: string) => {
@@ -184,7 +184,7 @@ export async function assembleAutomationPayload(
         profileData = parsed.data
       }
       // If validation fails on fallback, we proceed with empty profile
-      // rather than blocking — the extension will show unmapped fields
+      // rather than blocking  -  the extension will show unmapped fields
     }
   }
 

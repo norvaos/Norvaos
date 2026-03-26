@@ -2,7 +2,7 @@
  * Action: log_form_access
  *
  * Lightweight action that records when a user views, downloads, or
- * initiates a print of a form pack artifact. No PDF generation —
+ * initiates a print of a form pack artifact. No PDF generation  - 
  * just audit trail.
  *
  * For "print", we log "print initiated" because the actual print

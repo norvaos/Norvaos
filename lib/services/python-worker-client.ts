@@ -8,8 +8,8 @@
  * containerised worker, enabling horizontal scaling and process isolation.
  *
  * Environment variables:
- *   PYTHON_WORKER_URL    — Base URL of the sidecar (e.g. http://localhost:8100)
- *   PYTHON_WORKER_SECRET — Shared secret for X-Worker-Key header auth
+ *   PYTHON_WORKER_URL     -  Base URL of the sidecar (e.g. http://localhost:8100)
+ *   PYTHON_WORKER_SECRET  -  Shared secret for X-Worker-Key header auth
  *
  * Features:
  *   - Circuit breaker: 3 failures in 60s opens circuit for 30s
@@ -48,7 +48,7 @@ function isCircuitOpen(): boolean {
   if (Date.now() < circuitState.openUntil) {
     return true
   }
-  // Circuit has recovered — reset if window has expired
+  // Circuit has recovered  -  reset if window has expired
   if (
     circuitState.failures > 0 &&
     Date.now() - circuitState.lastFailureAt > CIRCUIT_FAILURE_WINDOW_MS
@@ -105,7 +105,7 @@ export async function callPythonWorker(
 ): Promise<Response> {
   if (isCircuitOpen()) {
     throw new PythonWorkerError(
-      'Python worker circuit breaker is open — too many recent failures',
+      'Python worker circuit breaker is open  -  too many recent failures',
       503,
       endpoint,
     )

@@ -1,5 +1,5 @@
 /**
- * Document Engine — Public API
+ * Document Engine  -  Public API
  */
 
 // Pure function engines

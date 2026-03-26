@@ -1,5 +1,5 @@
 /**
- * Demo Data Generator — Central Entry Point
+ * Demo Data Generator  -  Central Entry Point
  *
  * ALL DATA IS SYNTHETIC - NOT REAL CLIENT DATA
  *

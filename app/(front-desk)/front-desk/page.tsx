@@ -19,7 +19,7 @@ import { useActivityTracker } from '@/lib/hooks/use-activity-tracker'
 import { ActionDialog, type ActionField } from '@/components/front-desk/action-dialog'
 
 /**
- * Front Desk Console — "One Window" Home Screen
+ * Front Desk Console  -  "One Window" Home Screen
  *
  * ┌─────────────────────────────────────────────────────────────┐
  * │  [Stats Bar]                                                │
@@ -38,8 +38,8 @@ import { ActionDialog, type ActionField } from '@/components/front-desk/action-d
  * Rule #2:  No drag-and-drop. Action-driven only.
  * Rule #10: Separate locked interface, no sidebar.
  * Rule #11: Front Desk cannot manually move stages.
- * Rule #12: Compliance required fields — enforced in each dialog.
- * Rule #19: No N+1 — consolidated queries via front-desk query layer.
+ * Rule #12: Compliance required fields  -  enforced in each dialog.
+ * Rule #19: No N+1  -  consolidated queries via front-desk query layer.
  */
 export default function FrontDeskDashboard() {
   const { tenant } = useTenant()
@@ -49,7 +49,7 @@ export default function FrontDeskDashboard() {
   const userId = appUser?.id ?? ''
   const { data: staffList } = useFrontDeskStaffList(tenantId)
   const { data: fdConfig } = useFrontDeskConfig(tenantId)
-  // Shared with NowStrip — TanStack Query deduplicates, one network request
+  // Shared with NowStrip  -  TanStack Query deduplicates, one network request
   const { data: activeShift } = useFrontDeskActiveShift(userId)
 
   const staffOptions = (staffList ?? []).map((s) => ({ value: s.id, label: s.name }))
@@ -121,7 +121,7 @@ export default function FrontDeskDashboard() {
   }, [])
 
   const handleAcknowledge = useCallback((appointmentId: string) => {
-    // Direct action — no dialog needed, just acknowledge
+    // Direct action  -  no dialog needed, just acknowledge
     actionMutation.mutate({
       actionType: 'lawyer_acknowledge_checkin',
       input: { appointmentId },
@@ -315,7 +315,7 @@ export default function FrontDeskDashboard() {
           body: JSON.stringify({ eventType, eventData }),
         })
       } catch {
-        // Non-fatal — fire and forget
+        // Non-fatal  -  fire and forget
       }
     },
     []
@@ -338,7 +338,7 @@ export default function FrontDeskDashboard() {
     enabled: !!activeShift,
     onLogEvent: logFrontDeskEvent,
     onLongIdle: () => {
-      // 30-min idle — the IdleAlert component handles the modal UI
+      // 30-min idle  -  the IdleAlert component handles the modal UI
     },
   })
 
@@ -365,31 +365,31 @@ export default function FrontDeskDashboard() {
 
   return (
     <div className="max-w-[1600px] mx-auto px-4 py-4 space-y-4">
-      {/* Idle Alert — shown when user is inactive */}
+      {/* Idle Alert  -  shown when user is inactive */}
       <IdleAlert
         idleMinutes={activityState.idleMinutes}
         isIdle={activityState.isIdle}
         isLongIdle={activityState.isLongIdle}
         onDismiss={() => {
-          // Clicking dismiss counts as activity — the tracker auto-resets
+          // Clicking dismiss counts as activity  -  the tracker auto-resets
           // via its event listeners (click event fires markActive)
         }}
       />
 
-      {/* Now Strip — live context bar */}
+      {/* Now Strip  -  live context bar */}
       {userId && <NowStrip userId={userId} />}
 
       {/* Stats Bar */}
       {fdConfig?.show_stats_bar !== false && <StatsBar />}
 
-      {/* Zone 1 — Global Search */}
+      {/* Zone 1  -  Global Search */}
       <GlobalSearch onSelectContact={setSelectedContactId} />
 
       {/* Main Grid: Left + Right columns */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* Left column — Schedule + Tasks */}
+        {/* Left column  -  Schedule + Tasks */}
         <div className="space-y-4">
-          {/* Zone 2 — Today's Schedule */}
+          {/* Zone 2  -  Today's Schedule */}
           {fdConfig?.show_schedule !== false && (
             <TodaySchedule
               onCheckIn={handleCheckIn}
@@ -400,7 +400,7 @@ export default function FrontDeskDashboard() {
             />
           )}
 
-          {/* Zone 3 — Live Tasks Queue */}
+          {/* Zone 3  -  Live Tasks Queue */}
           {fdConfig?.show_tasks !== false && (
             <LiveTasksQueue
               onCompleteTask={handleCompleteTask}
@@ -409,9 +409,9 @@ export default function FrontDeskDashboard() {
           )}
         </div>
 
-        {/* Right column — Check-ins + Quick Create */}
+        {/* Right column  -  Check-ins + Quick Create */}
         <div className="space-y-4">
-          {/* Zone 4 — Check-in Queue */}
+          {/* Zone 4  -  Check-in Queue */}
           {fdConfig?.show_check_ins !== false && (
             <CheckInQueue
               onNotifyStaff={handleCheckInNotify}
@@ -421,7 +421,7 @@ export default function FrontDeskDashboard() {
             />
           )}
 
-          {/* Zone 5 — Quick Create */}
+          {/* Zone 5  -  Quick Create */}
           {fdConfig?.show_quick_create !== false && (
             <div id="quick-create-zone">
               <QuickCreate onCreated={handleCreated} />

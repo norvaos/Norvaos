@@ -1,5 +1,5 @@
 /**
- * Tests for Document Classifier — AI-Powered OCR Auto-Tagging (Directive 5.4)
+ * Tests for Document Classifier  -  AI-Powered OCR Auto-Tagging (Directive 5.4)
  *
  * Covers:
  *   - classifyByFilename (Tier 1): all pattern rules, cleaned vs raw matching, null return

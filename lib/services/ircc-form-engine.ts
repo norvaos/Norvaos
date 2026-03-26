@@ -17,7 +17,7 @@ export async function getFormInstanceStatuses(
   supabase: SupabaseClient<Database>,
   matterId: string
 ): Promise<FormInstanceStatus[]> {
-  // Fetch from matter_form_instances (cast as any — table not yet in DB type)
+  // Fetch from matter_form_instances (cast as any  -  table not yet in DB type)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data } = await (supabase as any)
     .from('matter_form_instances')

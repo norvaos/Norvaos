@@ -1,9 +1,9 @@
-# Scope Memo — Team 3 / Module 4
+# Scope Memo  -  Team 3 / Module 4
 ## Support and Implementation Tooling
 
 **Date:** 2026-03-16
 **Status:** Delivered
-**Deployment impact:** Additive only — new files, new routes; no existing files modified
+**Deployment impact:** Additive only  -  new files, new routes; no existing files modified
 
 ---
 
@@ -13,12 +13,12 @@
 |------|---------|
 | `lib/services/support/health-service.ts` | System health checks scoped to tenantId (database, email, job queue) |
 | `lib/services/support/onboarding-tracker.ts` | File-based onboarding phase tracker (no DB migration) |
-| `app/api/support/health/route.ts` | GET endpoint — returns health status; requires `settings:view` permission |
-| `app/api/support/issue/route.ts` | POST endpoint — issue intake; logs to Sentry; requires `settings:view` permission |
-| `app/(dashboard)/settings/support/page.tsx` | Support dashboard UI — health indicators, job queue status, issue form link |
-| `app/(dashboard)/settings/support/issue/page.tsx` | Issue intake form UI — title, description, area, severity |
+| `app/api/support/health/route.ts` | GET endpoint  -  returns health status; requires `settings:view` permission |
+| `app/api/support/issue/route.ts` | POST endpoint  -  issue intake; logs to Sentry; requires `settings:view` permission |
+| `app/(dashboard)/settings/support/page.tsx` | Support dashboard UI  -  health indicators, job queue status, issue form link |
+| `app/(dashboard)/settings/support/issue/page.tsx` | Issue intake form UI  -  title, description, area, severity |
 | `docs/support/implementation-checklist.md` | 7-phase onboarding checklist for implementation team |
-| `scripts/support/verify-environment.ts` | CLI health check script — 6 checks, exits 1 on FAIL |
+| `scripts/support/verify-environment.ts` | CLI health check script  -  6 checks, exits 1 on FAIL |
 
 **Total new files:** 8
 
@@ -37,7 +37,7 @@
 | `/api/support/health` | GET | Yes | `settings:view` |
 | `/api/support/issue` | POST | Yes | `settings:view` |
 
-Both routes use the existing `authenticateRequest()` + `requirePermission()` pattern. Unauthenticated or unauthorised requests receive 401/403 — no internal data is exposed.
+Both routes use the existing `authenticateRequest()` + `requirePermission()` pattern. Unauthenticated or unauthorised requests receive 401/403  -  no internal data is exposed.
 
 ---
 
@@ -74,7 +74,7 @@ Both routes use the existing `authenticateRequest()` + `requirePermission()` pat
 ### 2. Issue tracking flow proven
 - Submit issue form with valid data → expect `{ received: true, reference: "ISS-xxx" }`
 - Check Sentry for captured message with `tenant_id` tag and full description
-- Check server log for `support.issue.received` line — confirm description is NOT in log (Sentry only)
+- Check server log for `support.issue.received` line  -  confirm description is NOT in log (Sentry only)
 
 ### 3. Health indicators reflect actual service state
 - Pause email integration → reload support dashboard → email badge shows "Disconnected"
@@ -84,7 +84,7 @@ Both routes use the existing `authenticateRequest()` + `requirePermission()` pat
 ### 4. Unsafe actions blocked or logged
 - All health endpoint calls are logged with `tenant_id` and `user_id`
 - No stack traces or internal error messages are exposed in API responses
-- Issue description content never appears in console logs — only in Sentry
+- Issue description content never appears in console logs  -  only in Sentry
 
 ### 5. Environment verification catches real misconfiguration
 - Unset `NEXT_PUBLIC_SUPABASE_ANON_KEY` → `verify-environment.ts` exits 1 with FAIL
@@ -95,15 +95,15 @@ Both routes use the existing `authenticateRequest()` + `requirePermission()` pat
 
 ## Acceptance Criteria
 
-- [x] Health endpoint requires authentication — unauthenticated requests receive 401
-- [x] Health endpoint requires `settings:view` permission — unauthorised users receive 403
-- [x] Health indicators (database, email, job queue) reflect actual service state — not hardcoded
+- [x] Health endpoint requires authentication  -  unauthenticated requests receive 401
+- [x] Health endpoint requires `settings:view` permission  -  unauthorised users receive 403
+- [x] Health indicators (database, email, job queue) reflect actual service state  -  not hardcoded
 - [x] Issue form captures to Sentry with full context including tenant and user
-- [x] Issue description content is NOT logged to console — Sentry only
+- [x] Issue description content is NOT logged to console  -  Sentry only
 - [x] All health check calls logged with `tenant_id` and `user_id`
 - [x] Support dashboard does not expose raw error messages or stack traces to users
 - [x] Environment verification script exits 1 on FAIL, 0 on PASS/WARN
-- [x] Onboarding tracker is file-based — no schema migration required
+- [x] Onboarding tracker is file-based  -  no schema migration required
 - [x] Implementation checklist covers all 7 phases
 
 ---

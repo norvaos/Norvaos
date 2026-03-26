@@ -71,7 +71,7 @@ const STATUS_CONFIG: Record<string, { label: string; className: string }> = {
 export function AppointmentPanel() {
   const { tenantId, contact, users } = useCommandCentre()
 
-  // Fetch appointments filtered to this contact (server-side filter — no longer fetches ALL)
+  // Fetch appointments filtered to this contact (server-side filter  -  no longer fetches ALL)
   const { data: appointments, isLoading: apptLoading } = useAppointments(
     tenantId,
     { contactId: contact?.id }
@@ -84,7 +84,7 @@ export function AppointmentPanel() {
   const [showPast, setShowPast] = useState(false)
   const [actionPending, setActionPending] = useState(false)
 
-  // Appointments now pre-filtered by contact_id — just alias
+  // Appointments now pre-filtered by contact_id  -  just alias
   const contactAppointments = useMemo(() => {
     return appointments ?? []
   }, [appointments])

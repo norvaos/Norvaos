@@ -46,7 +46,7 @@ export const clioTrustBalancesAdapter: EntityAdapter = {
       required: true,
       aliases: ['Amount', 'balance', 'Balance', 'trust_balance', 'Trust Balance'],
       transform: (val) => {
-        // Clio reports amounts in dollars — convert to cents for Norva Ledger
+        // Clio reports amounts in dollars  -  convert to cents for Norva Ledger
         const num = parseFloat(val)
         return isNaN(num) ? null : Math.round(num * 100)
       },
@@ -56,7 +56,7 @@ export const clioTrustBalancesAdapter: EntityAdapter = {
       targetColumn: 'description',
       required: false,
       aliases: ['Description', 'memo', 'Memo', 'notes'],
-      defaultValue: 'Opening balance — migrated from Clio',
+      defaultValue: 'Opening balance  -  migrated from Clio',
     },
     {
       sourceColumn: 'date',
@@ -98,7 +98,7 @@ export const clioTrustBalancesAdapter: EntityAdapter = {
       errors.push('Trust balance amount is required.')
     }
     if (typeof row.amount_cents === 'number' && row.amount_cents < 0) {
-      errors.push('Trust balance cannot be negative — use a disbursement instead.')
+      errors.push('Trust balance cannot be negative  -  use a disbursement instead.')
     }
     return errors
   },

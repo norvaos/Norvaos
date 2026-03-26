@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * ToS Acceptance Modal — Directive 031: "Hard-Gate" Integration
+ * ToS Acceptance Modal  -  Directive 031: "Hard-Gate" Integration
  *
  * Before the Norva Sovereign Ignition can be triggered for a Pilot Firm,
  * this manifesto must be displayed. Requirements:
@@ -55,7 +55,7 @@ const TOS_SECTIONS = [
   },
   {
     title: '3. Trust Accounting Compliance',
-    content: `NorvaOS enforces LSO Rule 3.7 (Trust Accounting) through automated three-way reconciliation, zero-balance closing verification, and immutable audit trails. The platform does NOT constitute legal or accounting advice. The Principal Lawyer retains full responsibility for trust fund management, regulatory filings, and LSO compliance. NorvaOS is a tool — not a substitute for professional judgement.`,
+    content: `NorvaOS enforces LSO Rule 3.7 (Trust Accounting) through automated three-way reconciliation, zero-balance closing verification, and immutable audit trails. The platform does NOT constitute legal or accounting advice. The Principal Lawyer retains full responsibility for trust fund management, regulatory filings, and LSO compliance. NorvaOS is a tool  -  not a substitute for professional judgement.`,
   },
   {
     title: '4. Genesis Block and Compliance Seal',
@@ -63,11 +63,11 @@ const TOS_SECTIONS = [
   },
   {
     title: '5. Mathematical Finality Clause',
-    content: `YOU ACKNOWLEDGE AND AGREE THAT: (a) The SHA-256 hash chains used by NorvaOS provide mathematical certainty of data integrity — any single-bit change to the source data produces a completely different hash, making tampering detectable. (b) The HMAC-SHA256 Global Firm Hash is a cryptographic proof that the entire firm's compliance state is verifiable at any point in time. (c) These cryptographic guarantees are bounded by the correctness of the input data — the platform verifies integrity, not truth. (d) In the event of a regulatory examination, the Forensic Export PDF (password-protected, hash-chained) serves as a prima facie record of the firm's compliance posture at the time of generation. (e) NorvaOS does not guarantee any particular outcome in regulatory proceedings. The platform provides verifiable evidence — interpretation and defence remain the responsibility of legal counsel.`,
+    content: `YOU ACKNOWLEDGE AND AGREE THAT: (a) The SHA-256 hash chains used by NorvaOS provide mathematical certainty of data integrity  -  any single-bit change to the source data produces a completely different hash, making tampering detectable. (b) The HMAC-SHA256 Global Firm Hash is a cryptographic proof that the entire firm's compliance state is verifiable at any point in time. (c) These cryptographic guarantees are bounded by the correctness of the input data  -  the platform verifies integrity, not truth. (d) In the event of a regulatory examination, the Forensic Export PDF (password-protected, hash-chained) serves as a prima facie record of the firm's compliance posture at the time of generation. (e) NorvaOS does not guarantee any particular outcome in regulatory proceedings. The platform provides verifiable evidence  -  interpretation and defence remain the responsibility of legal counsel.`,
   },
   {
     title: '6. Emergency Override Protocol',
-    content: `The Emergency Override system allows a Partner-level user to bypass certain hard-gates (e.g., trust overdraft, deadline override) using a secure PIN. Every override action is: (a) logged to the immutable SENTINEL audit trail with CRITICAL severity, (b) hashed with HMAC-SHA256 as immutable proof, and (c) irreversible — once an override is executed, it cannot be undone. Misuse of the Emergency Override system may constitute a regulatory violation and is the sole responsibility of the authorising Partner.`,
+    content: `The Emergency Override system allows a Partner-level user to bypass certain hard-gates (e.g., trust overdraft, deadline override) using a secure PIN. Every override action is: (a) logged to the immutable SENTINEL audit trail with CRITICAL severity, (b) hashed with HMAC-SHA256 as immutable proof, and (c) irreversible  -  once an override is executed, it cannot be undone. Misuse of the Emergency Override system may constitute a regulatory violation and is the sole responsibility of the authorising Partner.`,
   },
   {
     title: '7. Limitation of Liability',
@@ -254,7 +254,7 @@ export function TosAcceptanceModal({
             {/* Scroll target marker */}
             <div className="pt-4 border-t">
               <p className="text-xs text-center text-muted-foreground italic">
-                — End of Terms of Service —
+                 -  End of Terms of Service  - 
               </p>
             </div>
           </div>

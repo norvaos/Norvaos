@@ -6,7 +6,7 @@ import { dispatchNotification } from '@/lib/services/notification-engine'
 import { withTiming } from '@/lib/middleware/request-timing'
 
 /**
- * GET /api/chat/channels/[channelId]/messages — Paginated messages
+ * GET /api/chat/channels/[channelId]/messages  -  Paginated messages
  * Query params: cursor (ISO date), limit (default 50)
  */
 async function handleGet(
@@ -99,7 +99,7 @@ async function handleGet(
 }
 
 /**
- * POST /api/chat/channels/[channelId]/messages — Send a message
+ * POST /api/chat/channels/[channelId]/messages  -  Send a message
  * Body: { content: string, mentions?: string[], matter_id?: string, document_id?: string, task_id?: string }
  */
 async function handlePost(
@@ -113,7 +113,7 @@ async function handlePost(
     const { channelId } = await params
     const admin = createAdminClient()
 
-    // Verify membership (read — auth client)
+    // Verify membership (read  -  auth client)
     const { data: membership } = await supabase
       .from('chat_channel_members')
       .select('id')
@@ -138,7 +138,7 @@ async function handlePost(
       return NextResponse.json({ error: 'content is required' }, { status: 400 })
     }
 
-    // Insert message (write — admin client)
+    // Insert message (write  -  admin client)
     const { data: message, error: msgError } = await admin
       .from('chat_messages')
       .insert({
@@ -158,14 +158,14 @@ async function handlePost(
       return NextResponse.json({ error: 'Failed to send message' }, { status: 500 })
     }
 
-    // Update sender's last_read_at (write — admin client)
+    // Update sender's last_read_at (write  -  admin client)
     await admin
       .from('chat_channel_members')
       .update({ last_read_at: new Date().toISOString() })
       .eq('channel_id', channelId)
       .eq('user_id', userId)
 
-    // Resolve sender name for response (read — auth client)
+    // Resolve sender name for response (read  -  auth client)
     const { data: sender } = await supabase
       .from('users')
       .select('first_name, last_name, avatar_url')
@@ -176,7 +176,7 @@ async function handlePost(
       ? [sender.first_name, sender.last_name].filter(Boolean).join(' ') || 'Unknown'
       : 'Unknown'
 
-    // Dispatch notification to other channel members (non-blocking, read — auth client)
+    // Dispatch notification to other channel members (non-blocking, read  -  auth client)
     const { data: otherMembers } = await supabase
       .from('chat_channel_members')
       .select('user_id')
@@ -195,7 +195,7 @@ async function handlePost(
         entityType: 'chat',
         entityId: channelId,
       }).catch(() => {
-        // Non-blocking — notification failures don't affect message send
+        // Non-blocking  -  notification failures don't affect message send
       })
     }
 

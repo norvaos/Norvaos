@@ -1,15 +1,15 @@
 /**
- * Structured error reporting abstraction — Directive 008: System-Wide Telemetry
+ * Structured error reporting abstraction  -  Directive 008: System-Wide Telemetry
  *
  * Reports to Sentry when NEXT_PUBLIC_SENTRY_DSN is configured, and
  * always logs to stdout as structured JSON for local observability.
- * Safe to call anywhere — never throws, never blocks the request path.
+ * Safe to call anywhere  -  never throws, never blocks the request path.
  *
  * Directive 008 additions:
- *   - reportRLSViolation() — captures RLS policy failures
- *   - reportConflictFailure() — captures conflict engine errors
- *   - reportTrustError() — captures trust accounting anomalies
- *   - reportComplianceViolation() — captures PIPEDA/region violations
+ *   - reportRLSViolation()  -  captures RLS policy failures
+ *   - reportConflictFailure()  -  captures conflict engine errors
+ *   - reportTrustError()  -  captures trust accounting anomalies
+ *   - reportComplianceViolation()  -  captures PIPEDA/region violations
  */
 
 import * as Sentry from '@sentry/nextjs'
@@ -24,7 +24,7 @@ export interface ErrorContext {
 
 /**
  * Report an error with structured context.
- * Safe to call anywhere — never throws, never blocks the request path.
+ * Safe to call anywhere  -  never throws, never blocks the request path.
  */
 export function reportError(error: unknown, context?: ErrorContext): void {
   try {

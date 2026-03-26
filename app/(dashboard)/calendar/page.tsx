@@ -710,7 +710,7 @@ function AgendaView({
           <div key={dateStr} className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
             <div className="flex items-center gap-2 border-b border-slate-100 px-4 py-2.5">
               <h3 className="text-sm font-semibold text-slate-900">
-                {relativeLabel ? `${relativeLabel} — ` : ''}{formattedDate}
+                {relativeLabel ? `${relativeLabel}  -  ` : ''}{formattedDate}
               </h3>
               <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
                 {dayEvents.length}
@@ -1283,7 +1283,7 @@ export default function CalendarPage() {
   const setViewPreference = useUIStore((s) => s.setViewPreference)
   const currentView = (viewPreferences.calendar ?? 'calendar') as ViewKey
 
-  // State — single `currentDate` drives all views
+  // State  -  single `currentDate` drives all views
   const [currentDate, setCurrentDate] = useState(new Date())
   const [typeFilter, setTypeFilter] = useState<TypeFilterKey>('all')
   const [statusFilter, setStatusFilter] = useState('all')
@@ -1384,7 +1384,7 @@ export default function CalendarPage() {
     return result
   }, [events, typeFilter, statusFilter])
 
-  // Stats — computed from filteredEvents so it respects type/status filters
+  // Stats  -  computed from filteredEvents so it respects type/status filters
   const stats = useMemo(() => {
     const all = filteredEvents
     return {

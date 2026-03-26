@@ -11,7 +11,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
  * Convert a lead to a matter. Enforces all conversion gates before proceeding.
  * Returns structured gate results for UI display when blocked.
  *
- * This route does NOT contain business logic — all gating, matter creation,
+ * This route does NOT contain business logic  -  all gating, matter creation,
  * audit logging, and state management is in the conversion executor service.
  *
  * Body: {

@@ -228,7 +228,7 @@ export const DEFAULT_SCREENING_QUESTIONS: ScreeningQuestion[] = [
     condition: undefined,
   },
 
-  // ── 9. Express Entry / CRS (only relevant for some apps — optional) ────────
+  // ── 9. Express Entry / CRS (only relevant for some apps  -  optional) ────────
   {
     id: 'sq_express_entry',
     label: 'Do you have an active Express Entry profile?',
@@ -462,10 +462,10 @@ export function getAnswerDisplay(
   question: ScreeningQuestion,
   rawAnswer: string | string[] | undefined,
 ): string {
-  if (rawAnswer === undefined || rawAnswer === null || rawAnswer === '') return '—'
+  if (rawAnswer === undefined || rawAnswer === null || rawAnswer === '') return ' - '
 
   if (Array.isArray(rawAnswer)) {
-    if (rawAnswer.length === 0) return '—'
+    if (rawAnswer.length === 0) return ' - '
     return rawAnswer
       .map((v) => question.options.find((o) => o.value === v)?.label ?? v)
       .join(', ')

@@ -7,7 +7,7 @@
  * hardcoded XFA_MAP constants. Produces scalar field data and array data,
  * then fills XFA PDFs via the Python pikepdf/lxml/PyMuPDF pipeline.
  *
- * This is the primary generation path — all form filling goes through here.
+ * This is the primary generation path  -  all form filling goes through here.
  */
 
 import type { IrccFormField, IrccFormArrayMap } from '@/lib/types/ircc-forms'

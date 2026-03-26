@@ -1,5 +1,5 @@
 /**
- * reset-mehta-file.ts — Directive 34.0: "Perfect Amber" Ghost File Reset
+ * reset-mehta-file.ts  -  Directive 34.0: "Perfect Amber" Ghost File Reset
  *
  * Restores the Arjun Mehta ghost matter to its demo-ready state:
  *   - Readiness Score: 60 (Amber)
@@ -28,7 +28,7 @@ const HINDI_SESSION = {
   tenant_id: TENANT_ID,
   matter_id: MEHTA_MATTER_ID,
   user_id: USER_ID,
-  title: 'Consultation — Arjun Mehta (Hindi) — Father\'s Medical History',
+  title: 'Consultation  -  Arjun Mehta (Hindi)  -  Father\'s Medical History',
   status: 'completed' as const,
   consent_granted: true,
   consent_granted_at: new Date().toISOString(),
@@ -57,7 +57,7 @@ const HINDI_SESSION = {
   ],
   anchored_fields: {
     h_and_c_grounds: "Father suffered cardiac arrest (AIIMS Delhi, 2024). Unable to live independently. Only available caregiver is applicant (sister married, relocated). Strong dependency + medical evidence.",
-    medical_condition: 'Cardiac arrest — ongoing care required',
+    medical_condition: 'Cardiac arrest  -  ongoing care required',
     medical_facility: 'AIIMS Delhi',
     family_dependency: "Father dependent on applicant; sister unavailable (married, different city)",
     supporting_documents: ['Cardiologist report (AIIMS Delhi)', 'ECG records', 'Medication list'],
@@ -72,7 +72,7 @@ const PUNJABI_SESSION = {
   tenant_id: TENANT_ID,
   matter_id: MEHTA_MATTER_ID,
   user_id: USER_ID,
-  title: 'Consultation — Arjun Mehta (Punjabi) — Ancestral Property & Establishment',
+  title: 'Consultation  -  Arjun Mehta (Punjabi)  -  Ancestral Property & Establishment',
   status: 'completed' as const,
   consent_granted: true,
   consent_granted_at: new Date().toISOString(),
@@ -106,7 +106,7 @@ const PUNJABI_SESSION = {
     children_enrolled: true,
     community_ties: 'Child on hockey team; tax-filing history',
     ancestral_property: "5 acres in father's name (Punjab village)",
-    return_hardship: 'No viable return — entire family established in Canada',
+    return_hardship: 'No viable return  -  entire family established in Canada',
     source_language: 'pa',
     h_and_c_relevance_score: 0.97,
   },

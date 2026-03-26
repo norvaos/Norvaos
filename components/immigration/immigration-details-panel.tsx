@@ -294,7 +294,7 @@ function LanguageScoreFields({
           fieldKey={band}
           onSave={handleBandSave}
           type="number"
-          placeholder="—"
+          placeholder=" - "
         />
       ))}
     </div>
@@ -730,7 +730,7 @@ export function ImmigrationDetailsPanel({ matterId, tenantId, fieldConfig }: Imm
           <Label className="text-xs text-slate-500">CRS Score</Label>
           <div className="flex items-center gap-2">
             <span className="text-sm font-medium text-slate-900">
-              {immigration.crs_score ?? '—'}
+              {immigration.crs_score ?? ' - '}
             </span>
             <Button
               variant="outline"
@@ -820,7 +820,7 @@ export function ImmigrationDetailsPanel({ matterId, tenantId, fieldConfig }: Imm
 
       <Separator />
 
-      {/* Study Permit Fields — only visible for study cases */}
+      {/* Study Permit Fields  -  only visible for study cases */}
       {(category === 'study' || category === 'other') && (
         <>
           <CollapsibleSection
@@ -870,7 +870,7 @@ export function ImmigrationDetailsPanel({ matterId, tenantId, fieldConfig }: Imm
         </>
       )}
 
-      {/* Work Permit Fields — only visible for work cases */}
+      {/* Work Permit Fields  -  only visible for work cases */}
       {(category === 'work' || category === 'other') && (
         <>
           <CollapsibleSection
@@ -938,7 +938,7 @@ export function ImmigrationDetailsPanel({ matterId, tenantId, fieldConfig }: Imm
         </>
       )}
 
-      {/* Express Entry Fields — only visible for EE cases */}
+      {/* Express Entry Fields  -  only visible for EE cases */}
       {(category === 'express_entry' || category === 'other') && (
         <>
           <CollapsibleSection
@@ -988,7 +988,7 @@ export function ImmigrationDetailsPanel({ matterId, tenantId, fieldConfig }: Imm
         </>
       )}
 
-      {/* Family / Spousal Sponsorship — only visible for family cases */}
+      {/* Family / Spousal Sponsorship  -  only visible for family cases */}
       {(category === 'family' || category === 'other') && (
         <>
           <CollapsibleSection
@@ -1221,7 +1221,7 @@ export function ImmigrationDetailsPanel({ matterId, tenantId, fieldConfig }: Imm
 
       <Separator />
 
-      {/* Employment — show for visitor/general cases that don't have a specific work section */}
+      {/* Employment  -  show for visitor/general cases that don't have a specific work section */}
       {category !== 'work' && category !== 'express_entry' && (
         <>
           <CollapsibleSection icon={Briefcase} title="Employment" columns={3} defaultOpen={false}>
@@ -1252,7 +1252,7 @@ export function ImmigrationDetailsPanel({ matterId, tenantId, fieldConfig }: Imm
         </>
       )}
 
-      {/* Family — show for non-family cases (family cases have the dedicated section above) */}
+      {/* Family  -  show for non-family cases (family cases have the dedicated section above) */}
       {category !== 'family' && (
         <>
           <CollapsibleSection icon={Heart} title="Family" columns={3} defaultOpen={false}>

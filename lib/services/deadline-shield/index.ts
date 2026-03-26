@@ -1,4 +1,4 @@
-// Deadline Shield Service — Directive 004, Pillar 4
+// Deadline Shield Service  -  Directive 004, Pillar 4
 // AI-powered deadline scanning, immutable alert enforcement, and IRCC compliance
 
 import type { SupabaseClient } from '@supabase/supabase-js'
@@ -75,7 +75,7 @@ export interface MultiLayerAlertStats {
 // ── 1. scanMatterDeadlines ───────────────────────────────────────────────────
 /**
  * Invoke the rpc_scan_matter_deadlines database function to auto-generate
- * shielded IRCC deadlines for a given matter. Idempotent — duplicate rules
+ * shielded IRCC deadlines for a given matter. Idempotent  -  duplicate rules
  * are skipped.
  */
 export async function scanMatterDeadlines(

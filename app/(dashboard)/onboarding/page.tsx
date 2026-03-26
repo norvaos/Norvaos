@@ -79,7 +79,7 @@ export default function OnboardingGatePage() {
           <div className="flex items-center gap-2 text-sm text-amber-800">
             <Clock className="h-4 w-4 shrink-0" />
             <span>
-              You have an unfinished custom setup — step {(wizard.current_step ?? 0) + 1} of 15.
+              You have an unfinished custom setup  -  step {(wizard.current_step ?? 0) + 1} of 15.
             </span>
           </div>
           <Button
@@ -101,7 +101,7 @@ export default function OnboardingGatePage() {
           icon={Zap}
           iconClass="text-emerald-600 bg-emerald-50"
           title="Default Setup"
-          badge="Recommended — ready in seconds"
+          badge="Recommended  -  ready in seconds"
           badgeClass="bg-emerald-100 text-emerald-700"
           description="Apply a safe, opinionated baseline configuration immediately. You can customise everything later from Settings."
           includes={DEFAULT_INCLUDES}

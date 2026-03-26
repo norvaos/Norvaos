@@ -12,13 +12,13 @@ import { withTiming } from '@/lib/middleware/request-timing'
  * Uses the same INVITE_EXPIRY_STATUS and INVITE_PENDING_STATUS constants as
  * checkSeatLimit()'s on-read expiration so both code paths produce identical
  * results on the same dataset. After the cron runs, checkSeatLimit() should
- * never "expire more" for the same data — the shared constants guarantee this.
+ * never "expire more" for the same data  -  the shared constants guarantee this.
  *
  * Designed to be called by Vercel Cron (daily at 2 AM) or manually.
  * Auth: Bearer token matching CRON_SECRET env var (or skip for dev).
  */
 async function handlePost(request: Request) {
-  // Auth check — fail-closed: reject if CRON_SECRET is unset
+  // Auth check  -  fail-closed: reject if CRON_SECRET is unset
   const cronSecret = process.env['CRON_SECRET']
   if (!cronSecret) {
     return NextResponse.json({ error: 'Server misconfigured: CRON_SECRET not set' }, { status: 500 })

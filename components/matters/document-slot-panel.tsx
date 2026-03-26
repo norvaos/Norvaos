@@ -74,9 +74,9 @@ interface DocumentSlotPanelProps {
   matterId: string
   tenantId: string
   enforcementEnabled: boolean
-  /** Optional search query — filters visible slots by name (case-insensitive) */
+  /** Optional search query  -  filters visible slots by name (case-insensitive) */
   filterQuery?: string
-  /** Optional status filter — shows only slots matching this status */
+  /** Optional status filter  -  shows only slots matching this status */
   filterStatus?: string
 }
 
@@ -300,7 +300,7 @@ export function SlotCard({
           <span className="truncate max-w-[200px]">{currentDoc.file_name}</span>
           <span className="text-muted-foreground/50">·</span>
           <span>{formatFileSize(currentDoc.file_size)}</span>
-          {/* Directive 016.1: Integrity Overlay — tamper status indicator */}
+          {/* Directive 016.1: Integrity Overlay  -  tamper status indicator */}
           <span className="text-muted-foreground/50">·</span>
           <TamperStatusIndicator
             documentId={currentDoc.id}
@@ -376,7 +376,7 @@ export function SlotCard({
             onClick={handleShareToggle}
             disabled={isSharing}
             className={sharedState ? 'h-7 text-xs bg-emerald-600 hover:bg-emerald-700 border-emerald-600' : 'h-7 text-xs'}
-            title={sharedState ? 'Shared with client — click to unshare' : 'Share with client via portal'}
+            title={sharedState ? 'Shared with client  -  click to unshare' : 'Share with client via portal'}
           >
             {isSharing ? (
               <Loader2 className="mr-1 h-3 w-3 animate-spin" />
@@ -439,7 +439,7 @@ export function SlotCard({
                   }}
                   disabled={uploadMutation.isPending}
                 />
-                <span className="text-xs text-muted-foreground">Optional — extract data before uploading</span>
+                <span className="text-xs text-muted-foreground">Optional  -  extract data before uploading</span>
               </div>
 
               {/* Scan Results */}
@@ -951,7 +951,7 @@ export function DocumentSlotPanel({
                   {stats.accepted}/{stats.required} required accepted
                 </span>
               )}
-              {/* Bundle — View (eye icon only) */}
+              {/* Bundle  -  View (eye icon only) */}
               <Button
                 variant="ghost"
                 size="sm"
@@ -966,7 +966,7 @@ export function DocumentSlotPanel({
                   <Eye className="h-3.5 w-3.5" />
                 )}
               </Button>
-              {/* Bundle — Download */}
+              {/* Bundle  -  Download */}
               <Button
                 variant="outline"
                 size="sm"

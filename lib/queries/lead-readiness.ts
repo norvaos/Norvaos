@@ -47,7 +47,7 @@ export function useLeadReadiness(leadId: string | null | undefined) {
 }
 
 /**
- * Recalculate readiness score (mutation — forces refresh).
+ * Recalculate readiness score (mutation  -  forces refresh).
  */
 export function useRecalculateReadiness() {
   const queryClient = useQueryClient()
@@ -66,9 +66,9 @@ export function useRecalculateReadiness() {
       queryClient.invalidateQueries({ queryKey: ['leads'] })
 
       if (result.score >= 70) {
-        toast.success(`Norva Readiness: ${result.score}% — Lead is conversion-ready`)
+        toast.success(`Norva Readiness: ${result.score}%  -  Lead is conversion-ready`)
       } else {
-        toast.warning(`Norva Readiness: ${result.score}% — ${result.missing?.length ?? 0} field(s) missing`)
+        toast.warning(`Norva Readiness: ${result.score}%  -  ${result.missing?.length ?? 0} field(s) missing`)
       }
     },
     onError: () => {
@@ -110,13 +110,13 @@ export function useRunConflictCheck() {
       queryClient.invalidateQueries({ queryKey: ['leads'] })
 
       if (result.has_conflicts) {
-        toast.warning(`Norva Conflict — ${result.match_count} conflict(s) detected — review required`)
+        toast.warning(`Norva Conflict  -  ${result.match_count} conflict(s) detected  -  review required`)
       } else {
-        toast.success('Norva Conflict — No conflicts detected')
+        toast.success('Norva Conflict  -  No conflicts detected')
       }
     },
     onError: () => {
-      toast.error('Norva Conflict — Failed to run conflict check')
+      toast.error('Norva Conflict  -  Failed to run conflict check')
     },
   })
 }
@@ -174,9 +174,9 @@ export function useMatchJurisdiction() {
       queryClient.invalidateQueries({ queryKey: ['leads'] })
 
       if (result.match_type === 'unresolved') {
-        toast.warning('Could not match jurisdiction — manual selection required')
+        toast.warning('Could not match jurisdiction  -  manual selection required')
       } else if (result.needs_review) {
-        toast.info(`Fuzzy match: "${result.jurisdiction?.name}" (${result.confidence}% confidence) — please confirm`)
+        toast.info(`Fuzzy match: "${result.jurisdiction?.name}" (${result.confidence}% confidence)  -  please confirm`)
       } else {
         toast.success(`Jurisdiction matched: ${result.jurisdiction?.name}`)
       }

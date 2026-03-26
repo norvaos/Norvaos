@@ -126,7 +126,7 @@ export function FinalPackagePanel({ matterId, tenantId }: FinalPackagePanelProps
           <div>
             <div className="px-3 py-1.5 bg-emerald-50/50 dark:bg-emerald-950/10 border-b">
               <span className="text-[10px] font-medium uppercase tracking-wider text-emerald-700 dark:text-emerald-400">
-                Approved — Ready to Submit
+                Approved  -  Ready to Submit
               </span>
             </div>
             {approvedVersions.map((version) => (
@@ -192,7 +192,7 @@ function VersionRow({
             {version.pack_type} v{version.version_number}
           </p>
           <p className="text-[10px] text-muted-foreground">
-            {isApproved ? 'Approved' : 'Draft'} — {new Date(version.created_at).toLocaleDateString()}
+            {isApproved ? 'Approved' : 'Draft'}  -  {new Date(version.created_at).toLocaleDateString()}
           </p>
         </div>
         {hasWarnings && (

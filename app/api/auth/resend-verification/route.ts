@@ -47,7 +47,7 @@ async function handlePost(request: Request) {
     )
 
     if (!user) {
-      // Don't reveal if the email exists — return success either way
+      // Don't reveal if the email exists  -  return success either way
       return NextResponse.json({ success: true })
     }
 

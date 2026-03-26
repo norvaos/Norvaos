@@ -61,7 +61,7 @@ export function TimeEntryTable({ entries, onEdit, onDelete }: TimeEntryTableProp
                 {entry.hourly_rate != null ? (
                   <span className="text-muted-foreground">${entry.hourly_rate}/hr</span>
                 ) : (
-                  <span className="text-muted-foreground/40">—</span>
+                  <span className="text-muted-foreground/40"> - </span>
                 )}
               </td>
               <td className="px-4 py-2.5">

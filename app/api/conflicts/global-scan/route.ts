@@ -1,6 +1,6 @@
 /**
- * POST /api/conflicts/global-scan — Run a global conflict scan
- * GET  /api/conflicts/global-scan — Get scan history for an entity
+ * POST /api/conflicts/global-scan  -  Run a global conflict scan
+ * GET  /api/conflicts/global-scan  -  Get scan history for an entity
  *
  * Directive 005.2: Cross-entity fuzzy-match conflict detection.
  */

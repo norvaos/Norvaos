@@ -1,11 +1,11 @@
 -- =============================================================================
--- Migration 174 — SENTINEL Tamper-Evident Hash Chain
+-- Migration 174  -  SENTINEL Tamper-Evident Hash Chain
 -- =============================================================================
 --
 -- Implements a blockchain-style hash chain on sentinel_audit_log.
 -- Each new row contains:
---   • row_hash   — SHA-256 of the row's own content + prev_hash
---   • prev_hash  — the row_hash of the immediately preceding row
+--   • row_hash    -  SHA-256 of the row's own content + prev_hash
+--   • prev_hash   -  the row_hash of the immediately preceding row
 --
 -- If any row is deleted or modified, the chain breaks. A verification
 -- function (sentinel_verify_chain) can detect tampering by walking the

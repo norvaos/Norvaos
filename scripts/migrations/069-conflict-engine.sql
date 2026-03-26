@@ -1,10 +1,10 @@
--- 069: Conflict Engine — Contact Automation, Conflict Search & Controlled Matter Opening
+-- 069: Conflict Engine  -  Contact Automation, Conflict Search & Controlled Matter Opening
 --
 -- Creates:
 --   1. New columns on contacts (conflict_score, conflict_status, pipeline_stage, milestone, matter_type_id)
---   2. conflict_scans — one row per scan execution
---   3. conflict_matches — individual matches per scan
---   4. conflict_decisions — lawyer review decisions
+--   2. conflict_scans  -  one row per scan execution
+--   3. conflict_matches  -  individual matches per scan
+--   4. conflict_decisions  -  lawyer review decisions
 --   5. Enable pg_trgm extension for fuzzy name matching
 --
 -- All tables follow standard RLS pattern: tenant_id = public.get_current_tenant_id()
@@ -33,7 +33,7 @@ CREATE INDEX IF NOT EXISTS idx_contacts_last_name_trgm ON contacts USING gin (la
 CREATE INDEX IF NOT EXISTS idx_contacts_org_name_trgm ON contacts USING gin (organization_name gin_trgm_ops);
 
 -- ═══════════════════════════════════════════════════════════════════════════════
--- 2. conflict_scans — one row per scan execution
+-- 2. conflict_scans  -  one row per scan execution
 -- ═══════════════════════════════════════════════════════════════════════════════
 
 CREATE TABLE IF NOT EXISTS conflict_scans (
@@ -67,7 +67,7 @@ DO $$ BEGIN
 END $$;
 
 -- ═══════════════════════════════════════════════════════════════════════════════
--- 3. conflict_matches — individual matches per scan
+-- 3. conflict_matches  -  individual matches per scan
 -- ═══════════════════════════════════════════════════════════════════════════════
 
 CREATE TABLE IF NOT EXISTS conflict_matches (
@@ -101,7 +101,7 @@ DO $$ BEGIN
 END $$;
 
 -- ═══════════════════════════════════════════════════════════════════════════════
--- 4. conflict_decisions — lawyer review decisions
+-- 4. conflict_decisions  -  lawyer review decisions
 -- ═══════════════════════════════════════════════════════════════════════════════
 
 CREATE TABLE IF NOT EXISTS conflict_decisions (

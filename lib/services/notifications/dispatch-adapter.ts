@@ -47,9 +47,9 @@ export type DispatchResult =
 // This is intentionally simple: the duplicate window is one minute,
 // matching the `timestamp_minute` component of the key.
 // For cross-process deduplication, a shared cache (Redis/Upstash) would
-// be required — that is a future hardening task outside this scope.
+// be required  -  that is a future hardening task outside this scope.
 
-const DEDUP_TTL_MS = 60_000 // 1 minute — matches timestamp_minute key component
+const DEDUP_TTL_MS = 60_000 // 1 minute  -  matches timestamp_minute key component
 const MAX_DEDUP_MAP_SIZE = 5_000 // upper bound to prevent memory growth
 
 interface DedupEntry {
@@ -102,7 +102,7 @@ function markSeen(key: string): void {
  * fired within the same 60-second window is treated as a duplicate.
  * Events separated by more than 60 seconds are considered distinct.
  *
- * Note: `title` and `message` are intentionally excluded — they may contain PII.
+ * Note: `title` and `message` are intentionally excluded  -  they may contain PII.
  */
 function buildIdempotencyKey(event: NotificationEvent): string {
   const minuteBucket = Math.floor(Date.now() / 60_000)
@@ -137,7 +137,7 @@ export async function dispatchNotification(
 
   // Guard: empty recipient list
   if (event.recipientUserIds.length === 0) {
-    log.debug('Dispatch skipped — no recipients', {
+    log.debug('Dispatch skipped  -  no recipients', {
       tenant_id: tenantId,
       event_type: event.eventType,
       entity_id: event.entityId,
@@ -152,7 +152,7 @@ export async function dispatchNotification(
 
   // Guard: duplicate dispatch within TTL window
   if (isDuplicate(idempotencyKey)) {
-    log.info('Notification deduplicated — already dispatched within window', {
+    log.info('Notification deduplicated  -  already dispatched within window', {
       tenant_id: tenantId,
       event_type: event.eventType,
       entity_id: event.entityId,
@@ -163,7 +163,7 @@ export async function dispatchNotification(
       channel: 'in-app',
       entityType: event.entityType ?? 'unknown',
       entityId: event.entityId ?? 'unknown',
-      status: 'sent', // treated as success — not an error
+      status: 'sent', // treated as success  -  not an error
       attempts: 0,
     })
     return {
@@ -255,7 +255,7 @@ export async function dispatchNotification(
 }
 
 // ─── Test Helpers ─────────────────────────────────────────────────────────────
-// Exported for unit tests only — not part of the public API.
+// Exported for unit tests only  -  not part of the public API.
 
 /** @internal */
 export function _resetDedupMapForTesting(): void {

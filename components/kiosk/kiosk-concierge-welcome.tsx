@@ -1,16 +1,16 @@
 'use client'
 
 /**
- * Front Desk "Concierge" — Directive 31.0
+ * Front Desk "Concierge"  -  Directive 31.0
  *
  * The "Aura" Greeting Architecture:
  *   - Cycling multilingual welcome text (CSS animation cross-fade)
  *   - Globe icon positioned top-right (LTR) or top-left (RTL)
  *
  * The "Quick-Action" Trident:
- *   - New Intake (Gold-Pulse) — start the funnel
- *   - Secure Upload (Emerald Shield) — SHA-256 vault drop
- *   - Biometric Login (Blue Fingerprint) — returning client status
+ *   - New Intake (Gold-Pulse)  -  start the funnel
+ *   - Secure Upload (Emerald Shield)  -  SHA-256 vault drop
+ *   - Biometric Login (Blue Fingerprint)  -  returning client status
  *
  * The "Receptionist" (Norva Ear):
  *   - Microphone icon triggers voice input
@@ -188,7 +188,7 @@ export function KioskConciergeWelcome({
 
         {/* ── The Trident: Quick-Action Matrix ───────────────────────────── */}
         <div className="grid grid-cols-3 gap-5 w-full max-w-2xl">
-          {/* 1. New Intake — Gold-Pulse */}
+          {/* 1. New Intake  -  Gold-Pulse */}
           <button
             type="button"
             onClick={onNewIntake}
@@ -205,7 +205,7 @@ export function KioskConciergeWelcome({
             </div>
           </button>
 
-          {/* 2. Secure Upload — Emerald Shield */}
+          {/* 2. Secure Upload  -  Emerald Shield */}
           <button
             type="button"
             onClick={onSecureUpload}
@@ -220,7 +220,7 @@ export function KioskConciergeWelcome({
             </div>
           </button>
 
-          {/* 3. Biometric Login — Blue Fingerprint */}
+          {/* 3. Biometric Login  -  Blue Fingerprint */}
           <button
             type="button"
             onClick={onReturningClient}
@@ -273,7 +273,7 @@ export function KioskConciergeWelcome({
       {/* ── Footer ─────────────────────────────────────────────────────── */}
       <div className="px-6 pb-4 text-center">
         <p className="text-[10px] text-slate-300">
-          Powered by Norva OS — Professional Safety, by Design
+          Powered by Norva OS  -  Professional Safety, by Design
         </p>
       </div>
     </div>

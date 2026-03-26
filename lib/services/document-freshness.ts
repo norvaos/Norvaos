@@ -1,5 +1,5 @@
 /**
- * Document Freshness Monitor — Directive 018/024 (NorvaOS)
+ * Document Freshness Monitor  -  Directive 018/024 (NorvaOS)
  *
  * Stale-Date Monitor: checks whether documents (e.g., Police Certificates)
  * will still be valid at estimated processing completion. Pure TypeScript,
@@ -30,7 +30,7 @@ export interface FreshnessReport {
 }
 
 // ---------------------------------------------------------------------------
-// Processing time estimates (days) — Canadian immigration streams
+// Processing time estimates (days)  -  Canadian immigration streams
 // ---------------------------------------------------------------------------
 
 export const PROCESSING_TIME_ESTIMATES: Record<string, number> = {
@@ -124,7 +124,7 @@ export function checkDocumentFreshness(
     }
   }
 
-  // 2. Critical stale — issued more than 150 days ago OR will expire during processing
+  // 2. Critical stale  -  issued more than 150 days ago OR will expire during processing
   if (daysSinceIssue > 150 || willExpireDuringProcessing) {
     const reasons: string[] = []
     if (daysSinceIssue > 150) {
@@ -148,7 +148,7 @@ export function checkDocumentFreshness(
     }
   }
 
-  // 3. Warning — expiry within 180 days
+  // 3. Warning  -  expiry within 180 days
   if (daysUntilExpiry <= 180) {
     return {
       document_id: doc.id,

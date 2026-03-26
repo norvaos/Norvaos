@@ -4,10 +4,10 @@
  * TanStack Query hooks for the retainer_agreements table (migration 116).
  *
  * Covers:
- *   - useRetainerAgreementsForMatter — list all agreements for a matter
- *   - useLatestRetainerAgreement    — most recent draft/active agreement
- *   - useCreateRetainerAgreement    — insert a new draft agreement
- *   - useUpdateRetainerAgreement    — patch any column(s)
+ *   - useRetainerAgreementsForMatter  -  list all agreements for a matter
+ *   - useLatestRetainerAgreement     -  most recent draft/active agreement
+ *   - useCreateRetainerAgreement     -  insert a new draft agreement
+ *   - useUpdateRetainerAgreement     -  patch any column(s)
  */
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'

@@ -7,7 +7,7 @@ import { withTiming } from '@/lib/middleware/request-timing'
  * GET /api/auth/me
  *
  * Returns the current user's tenant data for the TenantProvider.
- * Uses the admin client to bypass RLS — the authenticateRequest() call
+ * Uses the admin client to bypass RLS  -  the authenticateRequest() call
  * already validates the session and resolves the tenant.
  */
 async function handleGet() {

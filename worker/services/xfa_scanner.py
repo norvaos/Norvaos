@@ -1,5 +1,5 @@
 """
-XFA Field Scanner — extracts all fillable field paths from an IRCC XFA PDF.
+XFA Field Scanner  -  extracts all fillable field paths from an IRCC XFA PDF.
 
 Ported from scripts/xfa-scanner.py for the FastAPI sidecar worker.
 Accepts PDF bytes (from upload) instead of a file path.
@@ -240,7 +240,7 @@ def scan_pdf(pdf_bytes: bytes) -> dict:
             'is_xfa': False,
             'field_count': 0,
             'fields': [],
-            'error': 'No AcroForm found — this may be a non-fillable PDF',
+            'error': 'No AcroForm found  -  this may be a non-fillable PDF',
         }
 
     xfa = acroform.get('/XFA')
@@ -251,7 +251,7 @@ def scan_pdf(pdf_bytes: bytes) -> dict:
             'is_xfa': False,
             'field_count': 0,
             'fields': [],
-            'note': 'No XFA entry — this is an AcroForm PDF (use pdf-lib, not pikepdf)',
+            'note': 'No XFA entry  -  this is an AcroForm PDF (use pdf-lib, not pikepdf)',
         }
 
     items = list(xfa)

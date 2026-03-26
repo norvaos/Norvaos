@@ -36,7 +36,7 @@ async function handlePost() {
       sort_order: number
     }[] = []
 
-    // Professional services — amounts are stored as whole dollars in constants, convert to cents
+    // Professional services  -  amounts are stored as whole dollars in constants, convert to cents
     IMMIGRATION_SERVICE_PRESETS.forEach((p, i) => {
       rows.push({
         tenant_id: tenantId,
@@ -48,7 +48,7 @@ async function handlePost() {
       })
     })
 
-    // Government fees — amounts are whole dollars
+    // Government fees  -  amounts are whole dollars
     GOVERNMENT_FEE_PRESETS.forEach((p, i) => {
       rows.push({
         tenant_id: tenantId,
@@ -60,7 +60,7 @@ async function handlePost() {
       })
     })
 
-    // Disbursements — amounts are whole dollars
+    // Disbursements  -  amounts are whole dollars
     DISBURSEMENT_PRESETS.forEach((p, i) => {
       rows.push({
         tenant_id: tenantId,

@@ -17,7 +17,7 @@ import { toast } from 'sonner'
 import { frontDeskKeys } from '@/lib/queries/front-desk-queries'
 
 /**
- * Call Outcome Quick Bar — single "Call" button, one dialog to log it.
+ * Call Outcome Quick Bar  -  single "Call" button, one dialog to log it.
  *
  * Flow:
  *  1. Click "Call" → dialog opens
@@ -66,7 +66,7 @@ export function CallOutcomeBar({ contactId }: CallOutcomeBarProps) {
   function toggleTag(id: string) {
     setActionTags((prev) => {
       const next = new Set(prev)
-      if (next.has(id)) next.delete(id)
+      if (next.has(id)) { next['delete'](id) }
       else next.add(id)
       return next
     })
@@ -123,7 +123,7 @@ export function CallOutcomeBar({ contactId }: CallOutcomeBarProps) {
     },
     onSuccess: () => {
       const label = OUTCOMES.find((o) => o.value === outcome)?.label ?? outcome
-      toast.success(`Call logged: ${direction === 'inbound' ? '📲 Inbound' : '📞 Outbound'} — ${label}`)
+      toast.success(`Call logged: ${direction === 'inbound' ? '📲 Inbound' : '📞 Outbound'}  -  ${label}`)
       queryClient.invalidateQueries({ queryKey: frontDeskKeys.all })
       closeDialog()
     },
@@ -200,7 +200,7 @@ export function CallOutcomeBar({ contactId }: CallOutcomeBarProps) {
               </div>
             </div>
 
-            {/* Call Duration — mandatory */}
+            {/* Call Duration  -  mandatory */}
             <div className="space-y-1.5">
               <Label className="text-xs uppercase tracking-wider text-muted-foreground">
                 Duration <span className="text-red-500">*</span>

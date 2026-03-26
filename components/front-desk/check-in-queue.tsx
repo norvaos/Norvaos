@@ -27,7 +27,7 @@ const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   abandoned: { label: 'Abandoned', color: 'bg-slate-50 text-slate-400 border-slate-200' },
 }
 
-/** Derive display status — if appointment is in_meeting, show as acknowledged */
+/** Derive display status  -  if appointment is in_meeting, show as acknowledged */
 function getDisplayStatus(sessionStatus: string, appointmentStatus: string | null): string {
   if (appointmentStatus === 'in_meeting' || appointmentStatus === 'completed') {
     return 'acknowledged'
@@ -233,7 +233,7 @@ export function CheckInQueue({
                   {/* Bottom row: ID status + wait time + actions */}
                   <div className="flex items-center justify-between mt-2 pl-[52px]">
                     <div className="flex items-center gap-3">
-                      {/* ID verification status — only show when ID was actually scanned/uploaded */}
+                      {/* ID verification status  -  only show when ID was actually scanned/uploaded */}
                       {ci.id_scan_path && (
                         <div className="flex items-center gap-1">
                           <Shield className="w-3 h-3 text-slate-400" />

@@ -7,7 +7,7 @@ import { withTiming } from '@/lib/middleware/request-timing'
 /**
  * POST /api/admin/tenants/[id]/users/[userId]/deactivate
  *
- * Platform-admin ONLY — soft-deactivate a user (sets is_active = false).
+ * Platform-admin ONLY  -  soft-deactivate a user (sets is_active = false).
  * Does NOT delete from auth.users.
  *
  * Body: { reason: string }

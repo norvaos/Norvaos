@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Action Registry — Single Source of Truth for All Workflow Actions
+ * Action Registry  -  Single Source of Truth for All Workflow Actions
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Every action that can change state must be registered here.

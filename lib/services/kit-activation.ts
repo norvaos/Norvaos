@@ -37,7 +37,7 @@ interface ImmigrationKitParams {
 export async function activateWorkflowKit(params: WorkflowKitParams): Promise<void> {
   const { supabase, tenantId, matterId, matterTypeId, userId, initialPipelineId, initialStageId } = params
 
-  // 1. Determine pipeline — prefer the user's explicit selection, then workflow default, then matter type default
+  // 1. Determine pipeline  -  prefer the user's explicit selection, then workflow default, then matter type default
   let pipelineId: string | null = initialPipelineId ?? null
   let workflowTemplate: { task_template_id?: string | null; stage_pipeline_id?: string | null } | null = null
 
@@ -71,7 +71,7 @@ export async function activateWorkflowKit(params: WorkflowKitParams): Promise<vo
     pipelineId = defaultPipeline?.id ?? null
   }
 
-  // 2. Determine initial stage — prefer user's explicit selection, then first stage in pipeline
+  // 2. Determine initial stage  -  prefer user's explicit selection, then first stage in pipeline
   if (pipelineId) {
     let stageId: string | null = initialStageId ?? null
 
@@ -257,7 +257,7 @@ export async function activateWorkflowKit(params: WorkflowKitParams): Promise<vo
     })
   }
 
-  // Don't await — let it run after response is sent
+  // Don't await  -  let it run after response is sent
   fireAndForget().catch((err) => console.error('[kit-activation] Background tasks error:', err))
 }
 
@@ -442,6 +442,6 @@ export async function activateImmigrationKit(params: ImmigrationKitParams): Prom
     })
   }
 
-  // Don't await — let it run after response is sent
+  // Don't await  -  let it run after response is sent
   fireAndForget().catch((err) => console.error('[kit-activation] Background tasks error:', err))
 }

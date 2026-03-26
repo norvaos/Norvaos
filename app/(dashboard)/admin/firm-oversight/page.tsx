@@ -71,7 +71,7 @@ export default function FirmOversightPage() {
         <Activity className="h-7 w-7 text-emerald-600" />
         <div>
           <h1 className="text-2xl font-bold tracking-tight">
-            Firm Oversight — Sovereign Health Matrix
+            Firm Oversight  -  Sovereign Health Matrix
           </h1>
           <p className="text-sm text-muted-foreground">
             5-Second Health Check for the Principal Lawyer
@@ -173,7 +173,7 @@ export default function FirmOversightPage() {
         <div className="space-y-3">
           <h2 className="flex items-center gap-2 text-lg font-semibold text-emerald-700 dark:text-emerald-400">
             <ShieldCheck className="h-5 w-5" />
-            Hardened — Genesis Sealed
+            Hardened  -  Genesis Sealed
           </h2>
           {hardenedMatters.length === 0 ? (
             <p className="text-sm text-muted-foreground">No hardened matters.</p>
@@ -190,7 +190,7 @@ export default function FirmOversightPage() {
         <div className="space-y-3">
           <h2 className="flex items-center gap-2 text-lg font-semibold text-amber-700 dark:text-amber-400">
             <Lock className="h-5 w-5" />
-            Soft — In Progress
+            Soft  -  In Progress
           </h2>
           {softMatters.length === 0 ? (
             <p className="text-sm text-muted-foreground">No soft matters.</p>

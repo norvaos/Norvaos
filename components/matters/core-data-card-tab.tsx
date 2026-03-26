@@ -267,7 +267,7 @@ export function CoreDataCardTab({ matterId, tenantId, fieldConfig }: CoreDataCar
                 </div>
               )}
 
-              {/* Processing Stream (Programme Category) — locked by default, inherits from matter type */}
+              {/* Processing Stream (Programme Category)  -  locked by default, inherits from matter type */}
               {isFieldVisible('program_category') && (
                 <div className="space-y-2">
                   <Label className="flex items-center gap-1">
@@ -280,7 +280,7 @@ export function CoreDataCardTab({ matterId, tenantId, fieldConfig }: CoreDataCar
                     const showLocked = !streamEditUnlocked && !!currentValue && !isLocked
 
                     if (isLocked) {
-                      // Full lockdown — show read-only badge
+                      // Full lockdown  -  show read-only badge
                       return (
                         <div className="flex items-center gap-2 rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-sm">
                           <Badge variant="secondary" className="text-xs font-medium">
@@ -294,7 +294,7 @@ export function CoreDataCardTab({ matterId, tenantId, fieldConfig }: CoreDataCar
                     }
 
                     if (showLocked) {
-                      // Default locked state — badge + Change link
+                      // Default locked state  -  badge + Change link
                       return (
                         <div className="space-y-1">
                           <div className="flex items-center gap-2 rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-sm">
@@ -317,7 +317,7 @@ export function CoreDataCardTab({ matterId, tenantId, fieldConfig }: CoreDataCar
                       )
                     }
 
-                    // Unlocked state — full dropdown (new matter with no value, or user clicked Change)
+                    // Unlocked state  -  full dropdown (new matter with no value, or user clicked Change)
                     return (
                       <div className="space-y-1">
                         {streamEditUnlocked && (
@@ -570,7 +570,7 @@ export function CoreDataCardTab({ matterId, tenantId, fieldConfig }: CoreDataCar
             {/* Risk Display */}
             <div className="flex items-center gap-4">
               <div className="text-center">
-                <div className="text-3xl font-bold">{intake.risk_score ?? '—'}</div>
+                <div className="text-3xl font-bold">{intake.risk_score ?? ' - '}</div>
                 <div className="text-xs text-muted-foreground flex items-center gap-1">
                   Risk Score
                   <TooltipProvider>
@@ -1183,7 +1183,7 @@ function NocCodeCombobox({
         <PopoverTrigger asChild>
           <Button variant="outline" role="combobox" aria-expanded={open} className="w-full justify-between font-normal h-9 text-sm">
             {value
-              ? <span className="truncate">{value}{nocTitle ? ` — ${nocTitle}` : ''}</span>
+              ? <span className="truncate">{value}{nocTitle ? `  -  ${nocTitle}` : ''}</span>
               : <span className="text-muted-foreground">Search NOC code...</span>}
             <ChevronsUpDown className="ml-2 h-3.5 w-3.5 shrink-0 opacity-50" />
           </Button>

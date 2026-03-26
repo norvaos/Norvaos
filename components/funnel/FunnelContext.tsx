@@ -2,7 +2,7 @@
 
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * FunnelContext — State-gate controller for the Immigration Verified-Workflow
+ * FunnelContext  -  State-gate controller for the Immigration Verified-Workflow
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * HOW maxUnlockedStep WORKS
@@ -134,7 +134,7 @@ export function FunnelProvider({
     [readinessData],
   )
 
-  // Optimistic override — set by screens after a mutation succeeds but
+  // Optimistic override  -  set by screens after a mutation succeeds but
   // before the readiness query refetches. Cleared whenever derivedMax
   // changes (meaning the DB-driven value has caught up).
   const [optimisticMax, setOptimisticMax] = useState<FunnelStep | null>(null)

@@ -1,10 +1,10 @@
 /**
- * Deficiency Engine — Pure-function business logic for the deficiency workflow.
+ * Deficiency Engine  -  Pure-function business logic for the deficiency workflow.
  *
  * No direct DB calls. Takes typed inputs, returns typed outputs.
  * Called from API routes in app/api/matters/[id]/deficiencies/.
  *
- * Sprint 6, Week 1 — 2026-03-17
+ * Sprint 6, Week 1  -  2026-03-17
  */
 
 import type { MatterDeficiencyRow } from '@/lib/types/database'

@@ -286,7 +286,7 @@ export default function BookingClient({ bookingPage, tenant }: BookingClientProp
                   <ArrowLeft className="h-5 w-5 text-slate-600" />
                 </button>
                 <h2 className="text-lg font-semibold text-slate-900">
-                  Select a Time — {format(selectedDate, 'EEEE, MMMM d')}
+                  Select a Time  -  {format(selectedDate, 'EEEE, MMMM d')}
                 </h2>
               </div>
 

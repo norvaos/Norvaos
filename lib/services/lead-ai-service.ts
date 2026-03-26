@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Lead AI Intake Service — Assistive Only
+ * Lead AI Intake Service  -  Assistive Only
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * AI outputs are SUGGESTIONS. They do not determine final outcomes.
@@ -10,7 +10,7 @@
  * Human acceptance is logged in the activity log with actor_type: 'user'.
  * AI insight generation is logged with actor_type: 'ai'.
  *
- * Feature-flagged via workspace feature flags. Initially stubbed — returns
+ * Feature-flagged via workspace feature flags. Initially stubbed  -  returns
  * reasonable defaults. Interface designed for later provider integration.
  */
 
@@ -46,7 +46,7 @@ interface IntakeContext {
 
 /**
  * Generate AI insights for a lead's intake.
- * Currently stubbed — returns reasonable defaults.
+ * Currently stubbed  -  returns reasonable defaults.
  * TODO: Integrate with Anthropic Claude API for real analysis.
  */
 export async function generateIntakeInsights(
@@ -212,7 +212,7 @@ function produceStubInsight(ctx: IntakeContext): AIInsight {
       ? 'Collect missing intake data before proceeding'
       : 'Make first contact attempt',
     confidenceScores: {
-      practice_area: 0.0, // Stubbed — no real AI analysis
+      practice_area: 0.0, // Stubbed  -  no real AI analysis
       qualification: missingDataFlags.length > 2 ? 0.3 : 0.5,
     },
     modelInfo: 'stubbed',

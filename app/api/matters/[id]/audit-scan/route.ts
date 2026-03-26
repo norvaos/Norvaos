@@ -1,7 +1,7 @@
 /**
  * POST /api/matters/[id]/audit-scan
  *
- * Audit-Optimizer 3.0 — Pre-submission IRCC AI-readability audit.
+ * Audit-Optimizer 3.0  -  Pre-submission IRCC AI-readability audit.
  *
  * Flow:
  * 1. Auth + tenant validation
@@ -62,7 +62,7 @@ export async function POST(
 
     if (insertError) {
       console.error('[Audit-Optimizer] Failed to persist scan:', insertError)
-      // Non-fatal — still return the scan results
+      // Non-fatal  -  still return the scan results
     }
 
     return NextResponse.json({

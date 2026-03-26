@@ -7,7 +7,7 @@ import { withTiming } from '@/lib/middleware/request-timing'
 /**
  * GET /api/admin/tenants/[id]
  *
- * Platform-admin ONLY — returns full tenant detail with counts and audit summary.
+ * Platform-admin ONLY  -  returns full tenant detail with counts and audit summary.
  * Rate-limited: 30 req/min per IP.
  *
  * Response: { data: { ...tenant, active_users, pending_invites, at_limit,

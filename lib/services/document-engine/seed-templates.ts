@@ -1,13 +1,13 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Document Engine — Seed Templates
+ * Document Engine  -  Seed Templates
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Seeds default templates for a new tenant.
  * Called during tenant onboarding or via the seed API endpoint.
  *
  * Phase 1 templates:
- *   1. Retainer Agreement (engagement letter) — comprehensive Ontario retainer
+ *   1. Retainer Agreement (engagement letter)  -  comprehensive Ontario retainer
  *   2. Non-Engagement Letter
  *   3. Disengagement Letter
  */
@@ -65,7 +65,7 @@ export async function seedDefaultTemplates(
         templateId: existingId,
         templateBody: tmpl.body,
         versionLabel: nextVersion,
-        changeSummary: 'Seed update — LawPRO-safe, IRCC fees, payment schedule',
+        changeSummary: 'Seed update  -  LawPRO-safe, IRCC fees, payment schedule',
         mappings: seedMappings(tmpl.family) as never,
         conditions,
         clauseAssignments: [],
@@ -86,7 +86,7 @@ export async function seedDefaultTemplates(
       continue
     }
 
-    // New template — create from scratch
+    // New template  -  create from scratch
     const templateResult = await createTemplate(supabase, {
       tenantId,
       templateKey: tmpl.key,
@@ -332,7 +332,7 @@ function retainerBody(): TemplateBody {
         ],
       },
 
-      // 5. Fees — Flat Fee (conditional)
+      // 5. Fees  -  Flat Fee (conditional)
       {
         id: 'sec-fees-flat',
         title: 'FEES AND DISBURSEMENTS',
@@ -386,7 +386,7 @@ function retainerBody(): TemplateBody {
         ],
       },
 
-      // 5 alt. Fees — Hourly (conditional)
+      // 5 alt. Fees  -  Hourly (conditional)
       {
         id: 'sec-fees-hourly',
         title: 'FEES AND DISBURSEMENTS',
@@ -426,7 +426,7 @@ function retainerBody(): TemplateBody {
         ],
       },
 
-      // 6. Payment Schedule (conditional — shown when payment plan exists)
+      // 6. Payment Schedule (conditional  -  shown when payment plan exists)
       {
         id: 'sec-payment-schedule',
         title: 'PAYMENT SCHEDULE',
@@ -870,7 +870,7 @@ function nonEngagementBody(): TemplateBody {
           { id: 'ne-date', type: 'paragraph', content: '{{current_date}}', style: 'body', order: 0 },
           { id: 'ne-delivery', type: 'paragraph', content: 'SENT VIA EMAIL AND REGULAR MAIL', style: 'bold', order: 1 },
           { id: 'ne-addr', type: 'paragraph', content: '{{client_name}}\n{{client_address}}', style: 'body', order: 2 },
-          { id: 'ne-re', type: 'paragraph', content: 'Re: {{matter_title}} — Non-Engagement', style: 'bold', order: 3 },
+          { id: 'ne-re', type: 'paragraph', content: 'Re: {{matter_title}}  -  Non-Engagement', style: 'bold', order: 3 },
         ],
       },
       // ── Salutation & Decline ───────────────────────────────────────
@@ -910,16 +910,16 @@ function nonEngagementBody(): TemplateBody {
       // ── Limitation Periods (CRITICAL for LawPRO) ──────────────────
       {
         id: 'ne-limitations',
-        title: 'IMPORTANT — LIMITATION PERIODS',
+        title: 'IMPORTANT  -  LIMITATION PERIODS',
         title_style: 'heading2',
         condition_key: null,
         order: 4,
         elements: [
           { id: 'ne-lim-1', type: 'paragraph', content: 'We wish to bring to your attention that your legal rights may be subject to strict time limitations. Under the Limitations Act, 2002 (Ontario), the basic limitation period for most claims is two (2) years from the date on which the claim was discovered or ought to have been discovered. Other limitation periods may apply depending on the nature of your matter, including but not limited to:', style: 'body', order: 0 },
-          { id: 'ne-lim-bullet-1', type: 'paragraph', content: 'Immigration matters — applications, appeals, and judicial review deadlines set by the Immigration and Refugee Protection Act (IRPA) and IRCC processing timelines;', style: 'bullet', order: 1 },
-          { id: 'ne-lim-bullet-2', type: 'paragraph', content: 'Family law matters — deadlines for claims under the Family Law Act, Divorce Act, or Children\'s Law Reform Act;', style: 'bullet', order: 2 },
-          { id: 'ne-lim-bullet-3', type: 'paragraph', content: 'Claims against government entities — shorter notice and limitation periods may apply under the Crown Liability and Proceedings Act, 2019;', style: 'bullet', order: 3 },
-          { id: 'ne-lim-bullet-4', type: 'paragraph', content: 'Appeals — court-imposed deadlines for filing Notices of Appeal or motions for leave to appeal.', style: 'bullet', order: 4 },
+          { id: 'ne-lim-bullet-1', type: 'paragraph', content: 'Immigration matters  -  applications, appeals, and judicial review deadlines set by the Immigration and Refugee Protection Act (IRPA) and IRCC processing timelines;', style: 'bullet', order: 1 },
+          { id: 'ne-lim-bullet-2', type: 'paragraph', content: 'Family law matters  -  deadlines for claims under the Family Law Act, Divorce Act, or Children\'s Law Reform Act;', style: 'bullet', order: 2 },
+          { id: 'ne-lim-bullet-3', type: 'paragraph', content: 'Claims against government entities  -  shorter notice and limitation periods may apply under the Crown Liability and Proceedings Act, 2019;', style: 'bullet', order: 3 },
+          { id: 'ne-lim-bullet-4', type: 'paragraph', content: 'Appeals  -  court-imposed deadlines for filing Notices of Appeal or motions for leave to appeal.', style: 'bullet', order: 4 },
           { id: 'ne-lim-2', type: 'paragraph', content: 'FAILURE TO ACT WITHIN THE APPLICABLE LIMITATION PERIOD MAY RESULT IN THE PERMANENT LOSS OF YOUR LEGAL RIGHTS, regardless of the merits of your claim. We strongly urge you to consult with another lawyer without delay to protect your interests.', style: 'bold', order: 5 },
         ],
       },
@@ -1024,7 +1024,7 @@ function disengagementBody(): TemplateBody {
           { id: 'de-date', type: 'paragraph', content: '{{current_date}}', style: 'body', order: 0 },
           { id: 'de-delivery', type: 'paragraph', content: 'SENT VIA EMAIL AND REGULAR MAIL', style: 'bold', order: 1 },
           { id: 'de-addr', type: 'paragraph', content: '{{client_name}}\n{{client_address}}', style: 'body', order: 2 },
-          { id: 'de-re', type: 'paragraph', content: 'Re: {{matter_title}} — Termination of Retainer and Closing of File', style: 'bold', order: 3 },
+          { id: 'de-re', type: 'paragraph', content: 'Re: {{matter_title}}  -  Termination of Retainer and Closing of File', style: 'bold', order: 3 },
         ],
       },
       // ── Confirmation of Termination ────────────────────────────────
@@ -1065,15 +1065,15 @@ function disengagementBody(): TemplateBody {
       // ── Limitation Periods ─────────────────────────────────────────
       {
         id: 'de-limitations',
-        title: 'IMPORTANT — LIMITATION PERIODS',
+        title: 'IMPORTANT  -  LIMITATION PERIODS',
         title_style: 'heading2',
         condition_key: null,
         order: 4,
         elements: [
           { id: 'de-lim-1', type: 'paragraph', content: 'We wish to remind you that your legal rights may be subject to strict time limitations. Under the Limitations Act, 2002 (Ontario), the basic limitation period for most civil claims is two (2) years. Other limitation periods may apply depending on the nature of your matter, including:', style: 'body', order: 0 },
-          { id: 'de-lim-b1', type: 'paragraph', content: 'Immigration matters — strict deadlines for appeals, judicial review applications, and status restoration under IRPA;', style: 'bullet', order: 1 },
-          { id: 'de-lim-b2', type: 'paragraph', content: 'Family law matters — time-limited claims for equalization, support variations, and custody orders;', style: 'bullet', order: 2 },
-          { id: 'de-lim-b3', type: 'paragraph', content: 'Court-imposed deadlines — filing deadlines, hearing dates, and appeal periods that may be currently running.', style: 'bullet', order: 3 },
+          { id: 'de-lim-b1', type: 'paragraph', content: 'Immigration matters  -  strict deadlines for appeals, judicial review applications, and status restoration under IRPA;', style: 'bullet', order: 1 },
+          { id: 'de-lim-b2', type: 'paragraph', content: 'Family law matters  -  time-limited claims for equalization, support variations, and custody orders;', style: 'bullet', order: 2 },
+          { id: 'de-lim-b3', type: 'paragraph', content: 'Court-imposed deadlines  -  filing deadlines, hearing dates, and appeal periods that may be currently running.', style: 'bullet', order: 3 },
           { id: 'de-lim-2', type: 'paragraph', content: 'FAILURE TO ACT WITHIN THE APPLICABLE LIMITATION PERIOD MAY RESULT IN THE PERMANENT LOSS OF YOUR LEGAL RIGHTS. It is your responsibility to ensure that all deadlines are identified and met by you or your new legal counsel.', style: 'bold', order: 4 },
         ],
       },

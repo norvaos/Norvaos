@@ -1,5 +1,5 @@
 -- =============================================================================
--- Migration 200 — Directive 004 / Pillar 1: Compliance Lockdown Audit
+-- Migration 200  -  Directive 004 / Pillar 1: Compliance Lockdown Audit
 -- =============================================================================
 --
 -- Implements examination-ready immutable audit infrastructure for trust
@@ -8,7 +8,7 @@
 --   1. Hash chain on trust_audit_log (mirrors sentinel pattern from mig 174)
 --   2. Mandatory reason_for_change on trust_transactions
 --   3. compliance_examination_snapshots table (immutable, RLS-protected)
---   4. rpc_generate_compliance_snapshot — one-call exam-ready report
+--   4. rpc_generate_compliance_snapshot  -  one-call exam-ready report
 --
 -- Depends on: 100 (trust tables), 103 (trust_transaction_log),
 --             161/174 (sentinel audit + hash chain), pgcrypto
@@ -335,7 +335,7 @@ COMMENT ON TABLE compliance_examination_snapshots IS
   'UPDATE and DELETE are blocked by the compliance_snapshot_immutable_guard trigger.';
 
 
--- ── 3.1 RLS — tenant isolation, SELECT only for admin role ───────────────
+-- ── 3.1 RLS  -  tenant isolation, SELECT only for admin role ───────────────
 
 ALTER TABLE compliance_examination_snapshots ENABLE ROW LEVEL SECURITY;
 
@@ -358,12 +358,12 @@ COMMENT ON POLICY compliance_snapshots_tenant_admin_select
   'Inserts go through the rpc_generate_compliance_snapshot SECURITY DEFINER function.';
 
 
--- ── 3.2 Immutability guard — prevent UPDATE and DELETE ────────────────────
+-- ── 3.2 Immutability guard  -  prevent UPDATE and DELETE ────────────────────
 
 CREATE OR REPLACE FUNCTION compliance_snapshot_immutable_guard()
 RETURNS TRIGGER AS $$
 BEGIN
-  RAISE EXCEPTION 'Compliance examination snapshots are immutable — cannot modify or delete records.';
+  RAISE EXCEPTION 'Compliance examination snapshots are immutable  -  cannot modify or delete records.';
   RETURN NULL;
 END;
 $$ LANGUAGE plpgsql;

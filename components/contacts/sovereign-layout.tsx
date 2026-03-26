@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * SovereignLayout — Directive 32.0 Contact-Level Wrapper
+ * SovereignLayout  -  Directive 32.0 Contact-Level Wrapper
  *
  * Wraps the contact detail page with:
  *   1. AuraHeader (5000ms polyglot cycle + UniversalGlobeSelector)
@@ -64,7 +64,7 @@ const NASTALIQ_LOCALES = new Set<LocaleCode>(['ur', 'fa'])
 interface SovereignLayoutProps {
   /** Contact's preferred_language custom field value */
   preferredLanguage?: string | null
-  /** Called when user selects a language via the globe — persist to contact */
+  /** Called when user selects a language via the globe  -  persist to contact */
   onLanguageChange?: (localeCode: string) => void
   children: ReactNode
 }
@@ -98,7 +98,7 @@ export function SovereignLayout({ preferredLanguage, onLanguageChange, children 
       )}
       style={nastaliq ? { lineHeight: 1.8 } : undefined}
     >
-      {/* AuraHeader — Polyglot Pulse with 5000ms cycle */}
+      {/* AuraHeader  -  Polyglot Pulse with 5000ms cycle */}
       <AuraHeader className="mx-0" onLanguageChange={onLanguageChange} />
 
       {/* Page content */}

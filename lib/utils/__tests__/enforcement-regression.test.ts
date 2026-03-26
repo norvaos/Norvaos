@@ -6,8 +6,8 @@
  * invariants. This suite is NON-OPTIONAL and must pass before any release.
  *
  * Two types of assertions:
- *   1. Behavioural — imports actual functions and verifies enforcement logic
- *   2. Structural  — reads source files and verifies critical patterns exist
+ *   1. Behavioural  -  imports actual functions and verifies enforcement logic
+ *   2. Structural   -  reads source files and verifies critical patterns exist
  *
  * The suite consumes docs/enforcement/sensitive-surfaces.json as the single
  * source of truth for the sensitive surfaces registry.
@@ -18,7 +18,7 @@ import { describe, it, expect } from 'vitest'
 import { readFileSync, existsSync, readdirSync, statSync } from 'fs'
 import { resolve, relative } from 'path'
 
-// ── Behavioural imports — actual enforcement functions ───────────────────────
+// ── Behavioural imports  -  actual enforcement functions ───────────────────────
 
 import { hasPermission, canView, canCreate, canEdit, canDelete } from '@/lib/utils/permissions'
 import { evaluateSlotCondition } from '@/lib/services/document-slot-engine'
@@ -89,7 +89,7 @@ const BILLING_CLERK_ROLE = {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 1. Registry Consumption — JSON is valid, complete, and all paths exist
+// 1. Registry Consumption  -  JSON is valid, complete, and all paths exist
 // ═══════════════════════════════════════════════════════════════════════════
 
 describe('Enforcement Spec – Registry Consumption', () => {
@@ -144,22 +144,22 @@ describe('Enforcement Spec – Registry Consumption', () => {
     expect(categories.has('audit')).toBe(true)
   })
 
-  it('registry contains exactly 73 surfaces (frozen count — spec review required to change)', () => {
+  it('registry contains exactly 75 surfaces (frozen count  -  spec review required to change)', () => {
     const registry = loadRegistry()
-    if (registry.surfaces.length !== 73) {
-      const message = registry.surfaces.length < 73
-        ? `Registry has ${registry.surfaces.length} surfaces (expected 73). ` +
+    if (registry.surfaces.length !== 75) {
+      const message = registry.surfaces.length < 75
+        ? `Registry has ${registry.surfaces.length} surfaces (expected 75). ` +
           `A surface may have been removed without spec review. ` +
           `To fix: restore the missing surface or bump CORE_ENFORCEMENT_SPEC_VERSION ` +
           `and update docs/core-enforcement-spec-v1.md Section 10.`
-        : `Registry has ${registry.surfaces.length} surfaces (expected 73). ` +
+        : `Registry has ${registry.surfaces.length} surfaces (expected 75). ` +
           `A new surface was added without updating the frozen count. ` +
           `To fix: bump CORE_ENFORCEMENT_SPEC_VERSION, update the exact count ` +
           `in this test AND docs/core-enforcement-spec-v1.md Section 10, ` +
           `and get CODEOWNERS approval.`
       throw new Error(message)
     }
-    expect(registry.surfaces.length).toBe(73)
+    expect(registry.surfaces.length).toBe(75)
   })
 
   it('no duplicate paths in registry', () => {
@@ -171,7 +171,7 @@ describe('Enforcement Spec – Registry Consumption', () => {
 })
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 2. Version Consistency — all three sources agree
+// 2. Version Consistency  -  all three sources agree
 // ═══════════════════════════════════════════════════════════════════════════
 
 describe('Enforcement Spec – Version Consistency', () => {
@@ -205,11 +205,11 @@ describe('Enforcement Spec – Version Consistency', () => {
 })
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 3. Billing Visibility — Behavioural Tests
+// 3. Billing Visibility  -  Behavioural Tests
 // ═══════════════════════════════════════════════════════════════════════════
 
 describe('Enforcement Spec – Billing Visibility (behavioural)', () => {
-  // Direct function calls — no mocking, no rendering, real logic
+  // Direct function calls  -  no mocking, no rendering, real logic
 
   it('Admin hasPermission("billing", "view") returns true', () => {
     expect(hasPermission(ADMIN_ROLE, 'billing', 'view')).toBe(true)
@@ -250,7 +250,7 @@ describe('Enforcement Spec – Billing Visibility (behavioural)', () => {
 })
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 4. Billing Visibility — Structural (wiring scan)
+// 4. Billing Visibility  -  Structural (wiring scan)
 // ═══════════════════════════════════════════════════════════════════════════
 
 describe('Enforcement Spec – Billing Visibility (structural)', () => {
@@ -297,7 +297,7 @@ describe('Enforcement Spec – Billing Visibility (structural)', () => {
     expect(source).toContain('payments')
   })
 
-  // Gate wiring — check surfaces from registry that require RequirePermission
+  // Gate wiring  -  check surfaces from registry that require RequirePermission
   const registry = loadRegistry()
   const billingGatedSurfaces = registry.surfaces.filter(
     (s) => s.gate_entity === 'billing' && s.required_controls.includes('RequirePermission')
@@ -322,7 +322,7 @@ describe('Enforcement Spec – Billing Visibility (structural)', () => {
 })
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 5. Conditions Evaluation — Behavioural (fail-closed)
+// 5. Conditions Evaluation  -  Behavioural (fail-closed)
 // ═══════════════════════════════════════════════════════════════════════════
 
 describe('Enforcement Spec – Conditions Evaluation (behavioural)', () => {
@@ -395,7 +395,7 @@ describe('Enforcement Spec – Conditions Evaluation (behavioural)', () => {
 })
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 6. Stage Gating — Structural
+// 6. Stage Gating  -  Structural
 // ═══════════════════════════════════════════════════════════════════════════
 
 describe('Enforcement Spec – Stage Gating', () => {
@@ -435,7 +435,7 @@ describe('Enforcement Spec – Stage Gating', () => {
 })
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 7. Document Slots — Structural
+// 7. Document Slots  -  Structural
 // ═══════════════════════════════════════════════════════════════════════════
 
 describe('Enforcement Spec – Document Slots', () => {
@@ -472,7 +472,7 @@ describe('Enforcement Spec – Document Slots', () => {
 })
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 8. Audit Immutability — Structural
+// 8. Audit Immutability  -  Structural
 // ═══════════════════════════════════════════════════════════════════════════
 
 describe('Enforcement Spec – Audit Immutability', () => {
@@ -500,7 +500,7 @@ describe('Enforcement Spec – Audit Immutability', () => {
 })
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 9. CI Gate — Structural
+// 9. CI Gate  -  Structural
 // ═══════════════════════════════════════════════════════════════════════════
 
 describe('Enforcement Spec – CI Gate & Governance', () => {
@@ -607,7 +607,7 @@ describe('Enforcement Spec – CI Gate & Governance', () => {
 })
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 10. Registry Completeness — no unregistered sensitive files
+// 10. Registry Completeness  -  no unregistered sensitive files
 // ═══════════════════════════════════════════════════════════════════════════
 
 describe('Enforcement Spec – Registry Completeness', () => {
@@ -703,7 +703,7 @@ describe('Enforcement Spec – Registry Completeness', () => {
 })
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 11. RLS Cannot Be Bypassed — Structural (deep assertions on migration 033)
+// 11. RLS Cannot Be Bypassed  -  Structural (deep assertions on migration 033)
 // ═══════════════════════════════════════════════════════════════════════════
 
 describe('Enforcement Spec – RLS Cannot Be Bypassed', () => {

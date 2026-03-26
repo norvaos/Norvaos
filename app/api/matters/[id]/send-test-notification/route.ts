@@ -119,7 +119,7 @@ async function handlePost(
       contactId: contactRow.contact_id,
       notificationType: 'general',
       templateData: {
-        subject: subject || `Test Notification — ${matterRef}`,
+        subject: subject || `Test Notification  -  ${matterRef}`,
         body: emailBody || `This is a test notification for ${matterRef}. If you received this email, the notification system is working correctly.`,
         cta_label: 'View Your Case',
       },

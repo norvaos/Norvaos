@@ -16,7 +16,7 @@ import { withTiming } from '@/lib/middleware/request-timing'
  *
  * Returns: { processed: N, retried: N, timed_out: N }
  *
- * Sprint 6, Week 3 — 2026-03-17
+ * Sprint 6, Week 3  -  2026-03-17
  */
 async function handleGet(request: Request) {
   // Auth: X-Worker-Key must match WORKER_SECRET
@@ -86,7 +86,7 @@ async function handleGet(request: Request) {
 
   if (retryErr) {
     console.error('[job-worker] Retry-job query error:', retryErr.message)
-    // Non-fatal — return what we have so far
+    // Non-fatal  -  return what we have so far
     return NextResponse.json({ processed: timedOut, retried, timed_out: timedOut }, { status: 200 })
   }
 
@@ -155,7 +155,7 @@ async function handleGet(request: Request) {
           console.error('[job-worker] Sidecar promise chain error:', e)
         })
       } else {
-        console.warn(`[job-worker] PYTHON_SIDECAR_URL not configured — job ${job.id} retry skipped`)
+        console.warn(`[job-worker] PYTHON_SIDECAR_URL not configured  -  job ${job.id} retry skipped`)
       }
 
       retried++

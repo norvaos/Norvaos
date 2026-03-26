@@ -114,7 +114,7 @@ function RecordPaymentDialog({
         <DialogHeader>
           <DialogTitle>Record Payment</DialogTitle>
           <DialogDescription>
-            Invoice #{invoice.invoice_number} — Balance: {fmtCents(remaining)}
+            Invoice #{invoice.invoice_number}  -  Balance: {fmtCents(remaining)}
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
@@ -213,7 +213,7 @@ function QuickTimeEntry({ tenantId, userId }: { tenantId: string; userId: string
             <SelectContent>
               {matters.map((m) => (
                 <SelectItem key={m.id} value={m.id}>
-                  {m.matter_number ? `${m.matter_number} — ` : ''}{m.title}
+                  {m.matter_number ? `${m.matter_number}  -  ` : ''}{m.title}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -426,7 +426,7 @@ function BillingPageContent() {
                   >
                     <span className="font-mono text-xs">{inv.invoice_number || 'Draft'}</span>
                     <span className="truncate text-xs">
-                      {inv.matter_number ? `${inv.matter_number} — ` : ''}{inv.matter_title}
+                      {inv.matter_number ? `${inv.matter_number}  -  ` : ''}{inv.matter_title}
                     </span>
                     <span className="text-right font-medium text-xs">{fmtCents(inv.total_amount)}</span>
                     <span className="text-right text-xs text-muted-foreground">{fmtCents(inv.amount_paid ?? 0)}</span>

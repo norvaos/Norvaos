@@ -1,5 +1,5 @@
 /**
- * GET /api/portal/[token]/statement — Client portal consolidated statement
+ * GET /api/portal/[token]/statement  -  Client portal consolidated statement
  *
  * Validates the portal token and returns a consolidated client statement
  * for the contact linked to the portal.

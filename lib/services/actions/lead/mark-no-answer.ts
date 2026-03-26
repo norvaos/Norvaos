@@ -103,8 +103,8 @@ export const markNoAnswerAction: ActionDefinition<MarkNoAnswerInput, MarkNoAnswe
       },
       activity: {
         activityType: 'call_no_answer',
-        title: `No answer — attempt #${newCount}`,
-        description: input.notes ?? `Call attempt #${newCount} — no answer`,
+        title: `No answer  -  attempt #${newCount}`,
+        description: input.notes ?? `Call attempt #${newCount}  -  no answer`,
         metadata: {
           attempt_count: newCount,
           auto_follow_up_triggered: autoFollowUpTriggered,

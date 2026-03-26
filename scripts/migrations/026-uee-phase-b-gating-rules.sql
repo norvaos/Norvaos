@@ -1,5 +1,5 @@
 -- ============================================================================
--- Migration 026: UEE Phase B — Seed Gating Rules (Enforcement-Enabled Only)
+-- Migration 026: UEE Phase B  -  Seed Gating Rules (Enforcement-Enabled Only)
 -- ============================================================================
 -- Seeds progressive gating rules on matter_stages that belong to pipelines
 -- associated with enforcement_enabled matter types.

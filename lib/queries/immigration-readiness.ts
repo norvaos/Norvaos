@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Immigration Readiness — TanStack Query Hooks
+ * Immigration Readiness  -  TanStack Query Hooks
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Single hook that aggregates all immigration readiness data for the hub.
@@ -229,7 +229,7 @@ export function useImmigrationReadiness(matterId: string | null | undefined) {
         overrideAt: intake.contradiction_override_at,
       }
 
-      // Readiness matrix — compute before blocked reasons so we can pass it
+      // Readiness matrix  -  compute before blocked reasons so we can pass it
       let readinessMatrix: ReadinessMatrix | null = null
       if (playbook?.questionnaireFieldRules && playbook.questionnaireFieldRules.length > 0) {
         // Fetch profile data: try matter_contacts (CRM link) first,
@@ -300,7 +300,7 @@ export function useImmigrationReadiness(matterId: string | null | undefined) {
         })
       }
 
-      // Blocked reasons — compute with matrix awareness
+      // Blocked reasons  -  compute with matrix awareness
       const blockedReasons = computeBlockedReasons(
         intake,
         documents,
@@ -310,7 +310,7 @@ export function useImmigrationReadiness(matterId: string | null | undefined) {
         readinessMatrix,
       )
 
-      // Next action — matrix-aware guidance
+      // Next action  -  matrix-aware guidance
       const nextAction = computeNextAction(
         intake.immigration_intake_status ?? 'not_issued',
         documents,
@@ -323,7 +323,7 @@ export function useImmigrationReadiness(matterId: string | null | undefined) {
       // ── Portal per-form completion status ───────────────────────────────
       // Always derives from ircc_stream_forms (configured forms for this matter
       // type), overlaid with session.progress.forms for per-form status. This
-      // means portalForms is non-null even before the client starts — the admin
+      // means portalForms is non-null even before the client starts  -  the admin
       // sees all forms as 'not_started' rather than a blank FormPacksGate.
       let portalForms: ImmigrationReadinessData['portalForms'] = null
 
@@ -427,7 +427,7 @@ export function useImmigrationReadiness(matterId: string | null | undefined) {
             }
           }
         } catch {
-          // Non-fatal: return stale result — user can click Recalculate Status to fix
+          // Non-fatal: return stale result  -  user can click Recalculate Status to fix
         }
       }
 
@@ -463,7 +463,7 @@ export function useImmigrationReadiness(matterId: string | null | undefined) {
             }
           }
         } catch {
-          // Non-fatal: return stale result — user can click Recalculate Status to fix
+          // Non-fatal: return stale result  -  user can click Recalculate Status to fix
         }
       }
 
@@ -513,11 +513,11 @@ export function useVerifyEligibility() {
           user_id: params.userId,
           activity_type: 'eligibility_verification',
           title: params.outcome === 'pass'
-            ? 'Eligibility verified — passed'
-            : 'Eligibility verified — failed',
+            ? 'Eligibility verified  -  passed'
+            : 'Eligibility verified  -  failed',
           description: params.outcome === 'pass'
-            ? 'Client passed eligibility verification — workspace unlocked'
-            : 'Client failed eligibility verification — matter blocked',
+            ? 'Client passed eligibility verification  -  workspace unlocked'
+            : 'Client failed eligibility verification  -  matter blocked',
         })
       }
     },
@@ -525,8 +525,8 @@ export function useVerifyEligibility() {
       qc.invalidateQueries({ queryKey: readinessKeys.detail(vars.matterId) })
       toast.success(
         vars.outcome === 'pass'
-          ? 'Eligibility verified — workspace unlocked'
-          : 'Eligibility failed — matter flagged',
+          ? 'Eligibility verified  -  workspace unlocked'
+          : 'Eligibility failed  -  matter flagged',
       )
     },
     onError: (error: Error) => {
@@ -580,7 +580,7 @@ export function useSubmitLawyerReview() {
             ? 'Lawyer review approved'
             : 'Lawyer review: changes requested',
           description: params.action === 'approved'
-            ? 'Lawyer review approved — matter is ready for filing'
+            ? 'Lawyer review approved  -  matter is ready for filing'
             : 'Lawyer review requested changes',
         })
       }
@@ -654,7 +654,7 @@ export function useOverrideContradictions() {
  * Trigger the server-side status engine with retry logic.
  *
  * Retries up to 3 times with exponential backoff (200ms, 800ms, 3200ms).
- * On final failure, logs error but does NOT throw — the primary mutation
+ * On final failure, logs error but does NOT throw  -  the primary mutation
  * (lawyer review / contradiction override) has already succeeded. The
  * status will self-correct on the next page load or readiness cache refresh.
  */
@@ -662,7 +662,7 @@ async function syncIntakeStatusWithRetry(matterId: string, maxRetries = 3): Prom
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
       const res = await fetch(`/api/matters/${matterId}/validate-intake`, { method: 'POST' })
-      if (res.ok) return // Success — done
+      if (res.ok) return // Success  -  done
       // Non-OK response: retry if attempts remain
       if (attempt === maxRetries) {
         console.error(`[syncIntakeStatus] Failed after ${maxRetries} attempts for matter ${matterId} (status ${res.status})`)
@@ -738,7 +738,7 @@ function computeBlockedReasons(
     if (docs.needsReUpload > 0) reasons.push(`${docs.needsReUpload} document(s) flagged for re-upload`)
     if (docs.rejected > 0) reasons.push(`${docs.rejected} document(s) rejected`)
     if (contradictions.blockingCount > 0 && !contradictions.overridden) {
-      reasons.push(`${contradictions.blockingCount} blocking contradiction(s) — resolve or override`)
+      reasons.push(`${contradictions.blockingCount} blocking contradiction(s)  -  resolve or override`)
     }
     // Surface specific document names from matrix
     if (matrix && (docs.needsReUpload > 0 || docs.rejected > 0)) {
@@ -757,7 +757,7 @@ function computeBlockedReasons(
   if (status === 'intake_complete') {
     // Matter has cleared review but is blocked from drafting
     if (intake.completion_pct < (playbook.formGenerationRules.minQuestionnairePct ?? 80)) {
-      reasons.push(`Questionnaire at ${intake.completion_pct}% — need ${playbook.formGenerationRules.minQuestionnairePct ?? 80}% to enable drafting`)
+      reasons.push(`Questionnaire at ${intake.completion_pct}%  -  need ${playbook.formGenerationRules.minQuestionnairePct ?? 80}% to enable drafting`)
     }
     // Check if required generation docs are accepted
     const genSlugs = playbook.formGenerationRules.requiredDocumentSlugs ?? []
@@ -772,7 +772,7 @@ function computeBlockedReasons(
     if (packs.stale.length > 0) reasons.push(`Outdated form packs: ${packs.stale.join(', ')}`)
   }
 
-  // Matrix-derived blockers — specific items with person names
+  // Matrix-derived blockers  -  specific items with person names
   if (matrix) {
     if (status === 'drafting_enabled' && matrix.draftingBlockers.length > 0) {
       for (const b of matrix.draftingBlockers.slice(0, 5)) {
@@ -812,7 +812,7 @@ function computeNextAction(
     case 'not_issued':
       return 'Send document request to client to open intake portal'
     case 'issued':
-      return 'Follow up with client — intake has not been started yet'
+      return 'Follow up with client  -  intake has not been started yet'
     case 'client_in_progress': {
       const missingQCount = matrix?.allBlockers.filter((b) => b.type === 'question').length ?? 0
       const missingDCount = matrix?.allBlockers.filter((b) => b.type === 'document').length ?? 0
@@ -820,8 +820,8 @@ function computeNextAction(
       if (missingQCount > 0) parts.push(`${missingQCount} questionnaire field${missingQCount > 1 ? 's' : ''}`)
       if (missingDCount > 0) parts.push(`${missingDCount} document${missingDCount > 1 ? 's' : ''}`)
       return parts.length > 0
-        ? `Client intake in progress — still needs ${parts.join(' and ')}`
-        : 'Client intake in progress — follow up if no recent activity'
+        ? `Client intake in progress  -  still needs ${parts.join(' and ')}`
+        : 'Client intake in progress  -  follow up if no recent activity'
     }
     case 'review_required':
       if (docs.pendingReview > 0) return `Accept or reject ${docs.pendingReview} pending document${docs.pendingReview > 1 ? 's' : ''}`
@@ -830,7 +830,7 @@ function computeNextAction(
       if (contradictions.blockingCount > 0) return 'Resolve blocking contradictions or override with business reason'
       return 'Request client to re-upload deficient documents'
     case 'intake_complete':
-      return 'All mandatory documents accepted — drafting will auto-enable when readiness threshold is met'
+      return 'All mandatory documents accepted  -  drafting will auto-enable when readiness threshold is met'
     case 'drafting_enabled': {
       // Matrix-aware: surface specific blockers first
       if (matrix && matrix.draftingBlockers.length > 0) {
@@ -845,24 +845,24 @@ function computeNextAction(
           .sort((a, b) => a.completionPct - b.completionPct)[0]
         if (weakest) {
           const weakestMissing = weakest.blockers.length
-          return `Increase readiness to ${playbook.readinessThreshold ?? 85}% (currently ${matrix.overallPct}%) — start with ${weakest.label} (${weakestMissing} item${weakestMissing !== 1 ? 's' : ''} missing)`
+          return `Increase readiness to ${playbook.readinessThreshold ?? 85}% (currently ${matrix.overallPct}%)  -  start with ${weakest.label} (${weakestMissing} item${weakestMissing !== 1 ? 's' : ''} missing)`
         }
         return `Increase readiness to ${playbook.readinessThreshold ?? 85}% (currently ${matrix.overallPct}%)`
       }
       const missingPacks = packs.required.filter((pt) => !packs.generated.includes(pt))
       if (missingPacks.length > 0) return `Generate immigration form pack${missingPacks.length > 1 ? 's' : ''}: ${missingPacks.join(', ')}`
       if (packs.stale.length > 0) return `Regenerate outdated form pack${packs.stale.length > 1 ? 's' : ''}: ${packs.stale.join(', ')}`
-      return 'All form packs generated — route to lawyer for review'
+      return 'All form packs generated  -  route to lawyer for review'
     }
     case 'lawyer_review': {
       if (matrix && matrix.filingBlockers.length > 0) {
         const first = matrix.filingBlockers[0]
         return `Resolve filing blocker before approval: ${first.label}${first.person_name ? ` (${first.person_name})` : ''}`
       }
-      return 'Lawyer review required — approve or request changes'
+      return 'Lawyer review required  -  approve or request changes'
     }
     case 'ready_for_filing':
-      return 'All checks passed — file the application with IRCC'
+      return 'All checks passed  -  file the application with IRCC'
     case 'filed':
       return null
     default:

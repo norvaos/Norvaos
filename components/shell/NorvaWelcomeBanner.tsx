@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * Norva Whisper Welcome Banner — Migration Audit Summary
+ * Norva Whisper Welcome Banner  -  Migration Audit Summary
  *
  * Greets newly onboarded lawyers with a personalised migration summary:
  * "Welcome, [Name]. We've successfully imported 42 matters.

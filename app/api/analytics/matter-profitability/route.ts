@@ -1,5 +1,5 @@
 /**
- * GET /api/analytics/matter-profitability — Matter profitability report
+ * GET /api/analytics/matter-profitability  -  Matter profitability report
  */
 
 import { NextRequest, NextResponse } from 'next/server'

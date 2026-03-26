@@ -1,10 +1,10 @@
-# Open Risk #7 Closure — Migration 107 Live Reconciliation
+# Open Risk #7 Closure  -  Migration 107 Live Reconciliation
 
 **Date:** 2026-03-16
 **Team:** Team 1
 **Scope:** Send guard reconciliation + lifecycle verification after Migration 107
 **Target environment:** Local dev (localhost:3000) against Supabase project `ztsjvsutlrfisnrwdwfl`
-**Migration 107 present:** YES — verified via `pg_get_constraintdef` on `invoices_status_check`. Live constraint includes all 10 statuses: draft, finalized, sent, viewed, partially_paid, paid, overdue, cancelled, void, written_off.
+**Migration 107 present:** YES  -  verified via `pg_get_constraintdef` on `invoices_status_check`. Live constraint includes all 10 statuses: draft, finalized, sent, viewed, partially_paid, paid, overdue, cancelled, void, written_off.
 
 ---
 
@@ -18,12 +18,12 @@
 
 | # | File | Result |
 |---|------|--------|
-| 2 | `app/api/invoices/[id]/send/route.ts` | No change — delegates to `sendInvoiceEmail()` |
-| 3 | `app/api/invoices/batch-send/route.ts` | No change — delegates to `sendInvoiceEmail()` |
-| 4 | `app/api/cron/invoice-reminders/route.ts` | No change — queries `status === 'overdue'`, delegates to `sendReminderEmail()` |
-| 5 | `app/api/cron/overdue-detection/route.ts` | No change — checks `['sent', 'viewed', 'partially_paid']`, does not include finalized (correct) |
-| 6 | `app/api/cron/aging-recalculation/route.ts` | No change — checks `['sent', 'viewed', 'partially_paid', 'overdue']`, does not include finalized (correct) |
-| 7 | `app/api/contacts/[id]/statement/route.ts` | No change — already excludes draft and finalized via `NON_CLIENT_VISIBLE_STATUSES` from Phase 10 10.1 |
+| 2 | `app/api/invoices/[id]/send/route.ts` | No change  -  delegates to `sendInvoiceEmail()` |
+| 3 | `app/api/invoices/batch-send/route.ts` | No change  -  delegates to `sendInvoiceEmail()` |
+| 4 | `app/api/cron/invoice-reminders/route.ts` | No change  -  queries `status === 'overdue'`, delegates to `sendReminderEmail()` |
+| 5 | `app/api/cron/overdue-detection/route.ts` | No change  -  checks `['sent', 'viewed', 'partially_paid']`, does not include finalized (correct) |
+| 6 | `app/api/cron/aging-recalculation/route.ts` | No change  -  checks `['sent', 'viewed', 'partially_paid', 'overdue']`, does not include finalized (correct) |
+| 7 | `app/api/contacts/[id]/statement/route.ts` | No change  -  already excludes draft and finalized via `NON_CLIENT_VISIBLE_STATUSES` from Phase 10 10.1 |
 
 ---
 
@@ -41,7 +41,7 @@ SELECT pg_get_constraintdef(oid) FROM pg_constraint WHERE conname = 'invoices_st
 
 ---
 
-## 3. Send Guard — Runtime Proof
+## 3. Send Guard  -  Runtime Proof
 
 ### Test Invoices Seeded
 
@@ -51,30 +51,30 @@ SELECT pg_get_constraintdef(oid) FROM pg_constraint WHERE conname = 'invoices_st
 | OR7-FINAL-001 | finalized | $226.00 |
 | OR7-PAID-001 | paid | $169.50 |
 
-### S1 — Draft Invoice Rejected
+### S1  -  Draft Invoice Rejected
 
 **Request:** `POST /api/invoices/[OR7-DRAFT-001]/send`
 **HTTP Status:** 400
 **Response:** `{"error":"Only finalized invoices can be sent. This invoice has status 'draft'."}`
-**Result: PASS** — draft is no longer sendable.
+**Result: PASS**  -  draft is no longer sendable.
 
-### S2 — Finalized Invoice Accepted
+### S2  -  Finalized Invoice Accepted
 
 **Request:** `POST /api/invoices/[OR7-FINAL-001]/send`
 **HTTP Status:** 200
 **Response:** `{"success":true,"sent_to":"alice@example.com","sent_at":"2026-03-16T14:19:57.864Z"}`
-**Result: PASS** — finalized invoice accepted, email sent, status transitioned to `sent`.
+**Result: PASS**  -  finalized invoice accepted, email sent, status transitioned to `sent`.
 
-### S3 — Paid Invoice Rejected
+### S3  -  Paid Invoice Rejected
 
 **Request:** `POST /api/invoices/[OR7-PAID-001]/send`
 **HTTP Status:** 400
 **Response:** `{"error":"Only finalized invoices can be sent. This invoice has status 'paid'."}`
-**Result: PASS** — paid invoice correctly rejected.
+**Result: PASS**  -  paid invoice correctly rejected.
 
 ---
 
-## 4. Obsolete Draft-Send Behaviour — Elimination Proof
+## 4. Obsolete Draft-Send Behaviour  -  Elimination Proof
 
 The old guard (`!== 'draft'`) allowed sending from any non-draft status (sent, viewed, paid, overdue, void, etc.). This was the root cause of DEF-P9-002.
 
@@ -82,16 +82,16 @@ The new guard (`!== 'finalized'`) rejects ALL statuses except `finalized`:
 
 | Status | Old Guard (`!== 'draft'`) | New Guard (`!== 'finalized'`) | Correct? |
 |--------|--------------------------|-------------------------------|----------|
-| draft | Rejected | Rejected | Yes — must finalize first |
-| finalized | Accepted (wrong) | Accepted | Yes — only sendable status |
-| sent | Accepted (wrong) | Rejected | Yes — already sent |
-| viewed | Accepted (wrong) | Rejected | Yes — already delivered |
-| partially_paid | Accepted (wrong) | Rejected | Yes — payment in progress |
-| paid | Accepted (wrong) | Rejected | Yes — terminal |
-| overdue | Accepted (wrong) | Rejected | Yes — already sent, past due |
-| void | Accepted (wrong) | Rejected | Yes — terminal |
-| written_off | Accepted (wrong) | Rejected | Yes — terminal |
-| cancelled | Accepted (wrong) | Rejected | Yes — terminal |
+| draft | Rejected | Rejected | Yes  -  must finalize first |
+| finalized | Accepted (wrong) | Accepted | Yes  -  only sendable status |
+| sent | Accepted (wrong) | Rejected | Yes  -  already sent |
+| viewed | Accepted (wrong) | Rejected | Yes  -  already delivered |
+| partially_paid | Accepted (wrong) | Rejected | Yes  -  payment in progress |
+| paid | Accepted (wrong) | Rejected | Yes  -  terminal |
+| overdue | Accepted (wrong) | Rejected | Yes  -  already sent, past due |
+| void | Accepted (wrong) | Rejected | Yes  -  terminal |
+| written_off | Accepted (wrong) | Rejected | Yes  -  terminal |
+| cancelled | Accepted (wrong) | Rejected | Yes  -  terminal |
 
 S1 (draft rejected) and S3 (paid rejected) prove the guard works. S2 (finalized accepted) proves the correct status passes.
 
@@ -99,48 +99,48 @@ S1 (draft rejected) and S3 (paid rejected) prove the guard works. S2 (finalized 
 
 ## 5. Reminder / Overdue / Aging Compatibility Proof
 
-### C1 — Overdue Detection Cron
+### C1  -  Overdue Detection Cron
 
 **Execution:** `POST /api/cron/overdue-detection`
 **HTTP Status:** 200
 **Response:** `{"success":true,"stats":{"tenantsProcessed":6,"overdueUpdated":0}}`
 **Analysis:** No new overdue invoices (OR7-SENT-001 is not past due; OR7-OVERDUE-001 is already overdue). Cron ran successfully without errors. `finalized` is correctly excluded from the overdue-eligible set `['sent', 'viewed', 'partially_paid']`.
 
-### C2 — Invoice Reminders Cron
+### C2  -  Invoice Reminders Cron
 
 **Execution:** `POST /api/cron/invoice-reminders`
 **HTTP Status:** 200
 **Response:** `{"success":true,"stats":{"remindersChecked":1,"remindersSent":1,"skippedRecent":0}}`
 **Analysis:** OR7-OVERDUE-001 received a reminder. The reminder whitelist `['sent', 'viewed', 'overdue', 'partially_paid']` is compatible with Migration 107. `finalized` is correctly excluded (not yet sent to client, no reminder needed).
 
-### C3 — Aging Recalculation Cron
+### C3  -  Aging Recalculation Cron
 
 **Execution:** `POST /api/cron/aging-recalculation`
 **HTTP Status:** 200
 **Response:** `{"success":true,"stats":{"totalChecked":4,"bucketsUpdated":0,"bucketBreakdown":{"current":3,"1-30":1}}}`
-**Analysis:** 4 invoices checked (sent, overdue, finalized excluded correctly). Aging set `['sent', 'viewed', 'partially_paid', 'overdue']` does not include `finalized` — correct, because finalized invoices are pre-send and not yet receivables.
+**Analysis:** 4 invoices checked (sent, overdue, finalized excluded correctly). Aging set `['sent', 'viewed', 'partially_paid', 'overdue']` does not include `finalized`  -  correct, because finalized invoices are pre-send and not yet receivables.
 
 ---
 
 ## 6. Statement Visibility Compatibility Proof
 
-### V1 — Statement After Send Guard Change
+### V1  -  Statement After Send Guard Change
 
 **Request:** `GET /api/contacts/[Alice]/statement` (as Alex Admin)
 **HTTP Status:** 200
 
 **Invoices in statement response:**
-- OR7-FINAL-001 — appears as `sent` (transitioned by S2 proof)
-- OR7-SENT-001 — `sent`
-- OR7-PAID-001 — `paid`
-- OR7-OVERDUE-001 — `overdue`
+- OR7-FINAL-001  -  appears as `sent` (transitioned by S2 proof)
+- OR7-SENT-001  -  `sent`
+- OR7-PAID-001  -  `paid`
+- OR7-OVERDUE-001  -  `overdue`
 
 **NOT in statement:**
-- OR7-DRAFT-001 — `draft` → excluded by `NON_CLIENT_VISIBLE_STATUSES`
+- OR7-DRAFT-001  -  `draft` → excluded by `NON_CLIENT_VISIBLE_STATUSES`
 
-**Statuses in response:** `sent`, `paid`, `overdue` — no `draft`, no `finalized`.
+**Statuses in response:** `sent`, `paid`, `overdue`  -  no `draft`, no `finalized`.
 
-**Result: PASS** — statement route correctly hides draft and finalized. Client-visible statuses are: sent, viewed, partially_paid, paid, overdue, written_off.
+**Result: PASS**  -  statement route correctly hides draft and finalized. Client-visible statuses are: sent, viewed, partially_paid, paid, overdue, written_off.
 
 ---
 

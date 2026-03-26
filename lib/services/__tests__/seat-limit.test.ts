@@ -1,5 +1,5 @@
 /**
- * seat-limit.test.ts — 100% coverage for seat-limit.ts
+ * seat-limit.test.ts  -  100% coverage for seat-limit.ts
  *
  * Tests every exported function:
  *   - checkSeatLimit()
@@ -267,7 +267,7 @@ describe('checkSeatLimit', () => {
   })
 
   it('seat limit check takes priority over pending invite cap', async () => {
-    // Both seat limit and pending cap exceeded — seat limit check runs first
+    // Both seat limit and pending cap exceeded  -  seat limit check runs first
     setupFrom({
       users: chainable({ count: 10 }),
       user_invites: chainable({ count: 30 }),

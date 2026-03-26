@@ -1,5 +1,5 @@
 /**
- * POST /api/collections/write-offs — Request a write-off
+ * POST /api/collections/write-offs  -  Request a write-off
  */
 
 import { NextRequest, NextResponse } from 'next/server'

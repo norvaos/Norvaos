@@ -36,7 +36,7 @@ export default function ClientWorkspace() {
 
   const contactId = linkedContact?.id ?? ''
 
-  // Client's active matters — scoped to matters where this contact appears in matter_contacts.
+  // Client's active matters  -  scoped to matters where this contact appears in matter_contacts.
   // This enforces that authenticated clients only see their own matters.
   const { data: clientMatters = [] } = useQuery({
     queryKey: ['workspace-cl-matters', tenantId, contactId],
@@ -337,7 +337,7 @@ export default function ClientWorkspace() {
                     <div className="min-w-0">
                       <p className="font-medium">{inv.invoice_number ?? inv.id.slice(0, 8)}</p>
                       <p className="text-xs text-muted-foreground">
-                        Due {inv.due_date ? formatDate(inv.due_date) : '—'}
+                        Due {inv.due_date ? formatDate(inv.due_date) : ' - '}
                       </p>
                     </div>
                     <div className="ml-2 flex items-center gap-2 shrink-0">

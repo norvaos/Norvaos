@@ -6,7 +6,7 @@ import { getShieldedDeadlines } from '@/lib/services/deadline-shield'
  * GET /api/deadline-shield/shielded
  *
  * List all shielded deadlines for the authenticated tenant.
- * Query params: matterId (optional — scope to a single matter)
+ * Query params: matterId (optional  -  scope to a single matter)
  */
 export async function GET(request: Request) {
   try {

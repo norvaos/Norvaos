@@ -1,5 +1,5 @@
 /**
- * IRCC Forms Engine — Repeated Group / Array Field Tests
+ * IRCC Forms Engine  -  Repeated Group / Array Field Tests
  *
  * Covers:
  *   1. Array field save and resume (persist and retrieve indexed entries)

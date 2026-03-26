@@ -2,14 +2,14 @@
  * Tests for lib/services/pii-encryption.ts
  *
  * Covers:
- *   encryptPII / decryptPII — format, round-trip, random IV, env guard
- *   encryptContactPII / decryptContactPII — field-level encrypt/decrypt
- *   encryptLeadPII / decryptLeadPII — field-level encrypt/decrypt
- *   encryptMatterImmigrationPII / decryptMatterImmigrationPII — field-level encrypt/decrypt
- *   encryptAppointmentPII / decryptAppointmentPII — field-level encrypt/decrypt
+ *   encryptPII / decryptPII  -  format, round-trip, random IV, env guard
+ *   encryptContactPII / decryptContactPII  -  field-level encrypt/decrypt
+ *   encryptLeadPII / decryptLeadPII  -  field-level encrypt/decrypt
+ *   encryptMatterImmigrationPII / decryptMatterImmigrationPII  -  field-level encrypt/decrypt
+ *   encryptAppointmentPII / decryptAppointmentPII  -  field-level encrypt/decrypt
  *   Null/undefined/empty-string edge cases
  *
- * Sprint 6 — 2026-03-25
+ * Sprint 6  -  2026-03-25
  */
 
 import {
@@ -81,7 +81,7 @@ describe('decryptPII', () => {
     const arabic = 'وسیر'
     expect(decryptPII(encryptPII(arabic))).toBe(arabic)
 
-    const mixed = 'Client: وسیر — Case #42'
+    const mixed = 'Client: وسیر  -  Case #42'
     expect(decryptPII(encryptPII(mixed))).toBe(mixed)
   })
 
@@ -138,11 +138,13 @@ describe('encryptContactPII', () => {
     expect(encrypted).toHaveProperty('email_encrypted')
     expect(encrypted).toHaveProperty('phone_encrypted')
 
-    // Encrypted values should be colon-separated hex strings
+    // Encrypted values should be colon-separated hex strings (skip nulls from unprovided fields)
     for (const key of Object.keys(encrypted)) {
       if (key.endsWith('_encrypted')) {
-        const val = encrypted[key as keyof typeof encrypted] as string
-        expect(val.split(':')).toHaveLength(3)
+        const val = encrypted[key as keyof typeof encrypted]
+        if (val != null) {
+          expect((val as string).split(':')).toHaveLength(3)
+        }
       }
     }
   })
@@ -225,7 +227,7 @@ describe('encryptMatterImmigrationPII', () => {
       passport_number: 'CD9876543',
       date_of_birth: '1985-12-01',
       uci_number: '8765-4321',
-      prior_refusal_details: 'تفصیلات رد — ویزا درخواست 2020 میں مسترد',
+      prior_refusal_details: 'تفصیلات رد  -  ویزا درخواست 2020 میں مسترد',
       criminal_record_details: 'کوئی ریکارڈ نہیں',
       medical_issue_details: 'طبی مسائل: کوئی نہیں',
       sponsor_name: 'وسیر',

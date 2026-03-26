@@ -43,7 +43,7 @@ CREATE INDEX IF NOT EXISTS idx_matters_source
 --   - lead_intake_profiles.custom_intake_data (practice-area-specific intake)
 --   - lead_intake_profiles metadata (jurisdiction, urgency, flags, etc.)
 --
--- This is a read-only snapshot — the matter's own intake forms should pre-fill
+-- This is a read-only snapshot  -  the matter's own intake forms should pre-fill
 -- from this data to avoid asking the client the same questions twice.
 
 ALTER TABLE matter_intake
@@ -58,4 +58,4 @@ CREATE INDEX IF NOT EXISTS idx_matter_intake_lead_snapshot
   ON matter_intake USING gin (lead_intake_snapshot)
   WHERE lead_intake_snapshot IS NOT NULL;
 
--- No RLS changes needed — matters and matter_intake already have tenant-scoped RLS.
+-- No RLS changes needed  -  matters and matter_intake already have tenant-scoped RLS.

@@ -5,7 +5,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { withTiming } from '@/lib/middleware/request-timing'
 
 /**
- * POST /api/chat/channels/[channelId]/read — Mark channel as read
+ * POST /api/chat/channels/[channelId]/read  -  Mark channel as read
  * Updates the user's last_read_at timestamp.
  */
 async function handlePost(

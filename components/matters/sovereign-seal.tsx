@@ -1,15 +1,15 @@
 'use client'
 
 /**
- * Sovereign Seal — Directive 015 / 015.1
+ * Sovereign Seal  -  Directive 015 / 015.1
  *
  * Emerald Green: All compliance pillars met, no sequence violations.
  * Amber:         Genesis sealed but has compliance issues or sequence violation.
- * Red (Revoked): Genesis was revoked by a Partner — needs re-sealing.
- * Grey:          No genesis block — click to seal.
+ * Red (Revoked): Genesis was revoked by a Partner  -  needs re-sealing.
+ * Grey:          No genesis block  -  click to seal.
  */
 
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { ShieldCheck, ShieldAlert, ShieldX, Loader2, Lock, AlertTriangle, Link2 } from 'lucide-react'
 import {
   Popover,
@@ -21,6 +21,7 @@ import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import { useGenesisBlock, useGenerateGenesisBlock } from '@/lib/queries/genesis'
 import { cn } from '@/lib/utils'
+import { createClient } from '@/lib/supabase/client'
 
 interface SovereignSealProps {
   matterId: string
@@ -52,6 +53,36 @@ export function SovereignSeal({ matterId, className }: SovereignSealProps) {
   const { data: status, isLoading } = useGenesisBlock(matterId)
   const generateMutation = useGenerateGenesisBlock()
   const [open, setOpen] = useState(false)
+
+  // Directive 032: Resolve cleared conflict search before re-sealing
+  const handleReseal = useCallback(async () => {
+    const supabase = createClient()
+    // Fetch the matter's primary contact
+    const { data: mc } = await supabase
+      .from('matter_contacts')
+      .select('contact_id')
+      .eq('matter_id', matterId)
+      .eq('role', 'client')
+      .order('created_at', { ascending: true })
+      .limit(1)
+      .maybeSingle()
+
+    if (!mc?.contact_id) return
+
+    // Find the latest cleared global conflict result for this contact
+    const { data: search } = await (supabase as any)
+      .from('global_conflict_results')
+      .select('id')
+      .eq('source_entity_id', mc.contact_id)
+      .eq('status', 'clear')
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle()
+
+    if (!search?.id) return
+
+    generateMutation.mutate({ matterId, conflictSearchId: search.id })
+  }, [matterId, generateMutation])
 
   if (isLoading) {
     return (
@@ -99,14 +130,14 @@ export function SovereignSeal({ matterId, className }: SovereignSealProps) {
           )}
           title={
             isRevoked
-              ? 'Genesis Revoked — Re-seal required'
+              ? 'Genesis Revoked  -  Re-seal required'
               : exists && isCompliant && !hasSeqViolation
-                ? 'Genesis Verified — All compliance standards met'
+                ? 'Genesis Verified  -  All compliance standards met'
                 : exists && hasSeqViolation
                   ? 'Compliance Warning: Sequence Violation'
                   : exists
-                    ? 'Genesis Sealed — Compliance issues noted'
-                    : 'No Genesis Block — Click to seal'
+                    ? 'Genesis Sealed  -  Compliance issues noted'
+                    : 'No Genesis Block  -  Click to seal'
           }
         >
           <SealIcon className={cn('h-4 w-4', iconColour)} />
@@ -132,12 +163,12 @@ export function SovereignSeal({ matterId, className }: SovereignSealProps) {
                 </p>
                 <p className="text-xs text-muted-foreground">
                   {isRevoked
-                    ? 'Revoked by Partner — re-seal available'
+                    ? 'Revoked by Partner  -  re-seal available'
                     : isCompliant && !hasSeqViolation
                       ? 'This file met all Law Society Compliance standards'
                       : hasSeqViolation
                         ? 'Compliance Warning: Sequence Violation detected'
-                        : 'Compliance issues noted — review required'}
+                        : 'Compliance issues noted  -  review required'}
                 </p>
               </div>
             </div>
@@ -275,7 +306,7 @@ export function SovereignSeal({ matterId, className }: SovereignSealProps) {
                   size="sm"
                   className="w-full bg-emerald-600 hover:bg-emerald-700 text-white"
                   disabled={generateMutation.isPending}
-                  onClick={() => generateMutation.mutate(matterId)}
+                  onClick={handleReseal}
                 >
                   {generateMutation.isPending ? (
                     <>
@@ -315,7 +346,7 @@ export function SovereignSeal({ matterId, className }: SovereignSealProps) {
               size="sm"
               className="w-full bg-emerald-600 hover:bg-emerald-700 text-white"
               disabled={generateMutation.isPending}
-              onClick={() => generateMutation.mutate(matterId)}
+              onClick={handleReseal}
             >
               {generateMutation.isPending ? (
                 <>

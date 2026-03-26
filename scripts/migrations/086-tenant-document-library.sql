@@ -1,14 +1,14 @@
 -- Migration 086: Tenant Document Library
 -- Two-layer document slot architecture:
---   Layer 1: tenant_document_library  — master catalog, deduplicated, tenant-owned
---   Layer 2: document_slot_templates  — per-matter-type template rows (unchanged engine)
+--   Layer 1: tenant_document_library   -  master catalog, deduplicated, tenant-owned
+--   Layer 2: document_slot_templates   -  per-matter-type template rows (unchanged engine)
 -- Replaces hardcoded document-slot-presets.ts with a DB-driven library.
--- The document engine (document-slot-engine.ts) is NOT changed — it still reads
+-- The document engine (document-slot-engine.ts) is NOT changed  -  it still reads
 -- document_slot_templates as before. The library is purely the source of truth
 -- for definitions; "Add from Library" stamps template rows with library_slot_id set.
 
 -- ============================================================
--- 1. tenant_document_library — master catalog
+-- 1. tenant_document_library  -  master catalog
 -- ============================================================
 CREATE TABLE IF NOT EXISTS tenant_document_library (
   id                   UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS tenant_document_library (
   -- Used for bulk-select in "Add from Library" UI
   tags                 TEXT[] DEFAULT '{}',
 
-  -- Future SaaS hooks (nullable stubs — do not use yet)
+  -- Future SaaS hooks (nullable stubs  -  do not use yet)
   jurisdiction_code    TEXT NOT NULL DEFAULT 'CA',
   platform_slot_id     UUID DEFAULT NULL,   -- future: FK to platform_document_library
 

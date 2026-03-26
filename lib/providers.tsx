@@ -18,7 +18,7 @@ function CrossTabSync() {
 }
 
 /**
- * I18nDbBridge — Connects I18nProvider to the user's DB locale_preference.
+ * I18nDbBridge  -  Connects I18nProvider to the user's DB locale_preference.
  *
  * NUCLEAR FIX: UserProvider is now OUTSIDE I18nProvider so that:
  *   1. User data loads first (including locale_preference)
@@ -65,7 +65,7 @@ export function Providers({ children }: { children: ReactNode }) {
       new QueryClient({
         defaultOptions: {
           queries: {
-            staleTime: 2 * 60 * 1000,   // 2 minutes (was 1min — reduces refetches on tab switch)
+            staleTime: 2 * 60 * 1000,   // 2 minutes (was 1min  -  reduces refetches on tab switch)
             gcTime: 10 * 60 * 1000,      // 10 minutes garbage collection
             retry: 1,
             refetchOnWindowFocus: false,

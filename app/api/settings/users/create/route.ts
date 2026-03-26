@@ -133,7 +133,7 @@ async function handlePost(request: Request) {
     const { data: authUser, error: authErr } = await admin.auth.admin.createUser({
       email,
       password: tempPassword,
-      email_confirm: true, // skip email confirmation — admin-created accounts are pre-confirmed
+      email_confirm: true, // skip email confirmation  -  admin-created accounts are pre-confirmed
       user_metadata: {
         first_name,
         last_name,
@@ -152,7 +152,7 @@ async function handlePost(request: Request) {
       )
     }
 
-    // Insert user row — must_change_password = true so they're forced to reset on first login
+    // Insert user row  -  must_change_password = true so they're forced to reset on first login
     const { data: userRow, error: userErr } = await admin
       .from('users')
       .insert({

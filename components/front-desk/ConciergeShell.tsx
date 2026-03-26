@@ -1,19 +1,19 @@
 'use client'
 
 /**
- * ConciergeShell — Directive 32.0: The Front Desk WorkplaceShell
+ * ConciergeShell  -  Directive 32.0: The Front Desk WorkplaceShell
  *
  * Replaces the legacy FrontDeskHeader layout with a structured concierge experience:
  *
  *   ┌──────────────────────────────────────────────────────────┐
- *   │  Operations Bar — shift, kiosk, notifications, avatar    │
+ *   │  Operations Bar  -  shift, kiosk, notifications, avatar    │
  *   ├──────────────────────────────────────────────────────────┤
- *   │  AuraHeader — Polyglot Pulse + UniversalGlobeSelector    │
+ *   │  AuraHeader  -  Polyglot Pulse + UniversalGlobeSelector    │
  *   ├──────────────────────────────────────────────────────────┤
- *   │  ActionTrident — 3-card intake funnel (Intake/Vault/     │
+ *   │  ActionTrident  -  3-card intake funnel (Intake/Vault/     │
  *   │                  Portal)                                  │
  *   ├──────────────────────────────────────────────────────────┤
- *   │  {children} — operational console (schedule, tasks, etc) │
+ *   │  {children}  -  operational console (schedule, tasks, etc) │
  *   └──────────────────────────────────────────────────────────┘
  *
  * The UniversalGlobeSelector lives inside AuraHeader and is always visible.
@@ -47,7 +47,7 @@ export function ConciergeShell({
 }: ConciergeShellProps) {
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
-      {/* Operations Bar — shift controls, kiosk, notifications, avatar */}
+      {/* Operations Bar  -  shift controls, kiosk, notifications, avatar */}
       <FrontDeskHeader
         userId={userId}
         userName={userName}
@@ -55,12 +55,12 @@ export function ConciergeShell({
         firmName={firmName}
       />
 
-      {/* AuraHeader — Polyglot Pulse with UniversalGlobeSelector (Directive 32.0 §1) */}
+      {/* AuraHeader  -  Polyglot Pulse with UniversalGlobeSelector (Directive 32.0 §1) */}
       <div className="px-4 pt-4 max-w-[1600px] mx-auto w-full">
         <AuraHeader />
       </div>
 
-      {/* ActionTrident — 3-card intake funnel (Directive 32.0 §2) */}
+      {/* ActionTrident  -  3-card intake funnel (Directive 32.0 §2) */}
       <div className="px-4 pt-4 max-w-[1600px] mx-auto w-full">
         <ActionTrident
           intakeHref="/intake/start"
@@ -69,7 +69,7 @@ export function ConciergeShell({
         />
       </div>
 
-      {/* Main content — operational console */}
+      {/* Main content  -  operational console */}
       <main className="flex-1">
         {children}
       </main>

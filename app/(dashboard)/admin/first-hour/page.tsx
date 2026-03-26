@@ -23,7 +23,7 @@ import { cn } from '@/lib/utils'
 import { useFirstHourMetrics, type FirstHourMetrics } from '@/lib/queries/first-hour-metrics'
 
 /**
- * Directive 26.1 — "First-Hour" Command Centre
+ * Directive 26.1  -  "First-Hour" Command Centre
  *
  * Real-time dashboard tracking the first 60 minutes of firm onboarding:
  *   Panel 1: Clio-to-Norva Sync Velocity (matters + contacts imported/min)
@@ -339,7 +339,7 @@ export default function FirstHourPage() {
           <div>
             <h1 className="text-xl font-bold tracking-tight">First-Hour Command Centre</h1>
             <p className="text-sm text-muted-foreground">
-              Real-time onboarding metrics — Directive 26.1
+              Real-time onboarding metrics  -  Directive 26.1
             </p>
           </div>
         </div>
@@ -383,7 +383,7 @@ export default function FirstHourPage() {
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
           <span className="relative inline-flex size-2.5 rounded-full bg-emerald-500" />
         </span>
-        <span className="text-xs font-medium text-emerald-700">Live — polling every 15 seconds</span>
+        <span className="text-xs font-medium text-emerald-700">Live  -  polling every 15 seconds</span>
       </div>
 
       {/* Error state */}

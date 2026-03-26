@@ -2,7 +2,7 @@
 
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * useScanPrefill — Scan-to-Autofill React Hook (Directive 40.0 §3)
+ * useScanPrefill  -  Scan-to-Autofill React Hook (Directive 40.0 §3)
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Fetches all documents for a matter (or vault session) that have

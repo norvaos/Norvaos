@@ -13,7 +13,7 @@ interface AdvanceStageResult {
  * and adds workflow_actions + audit_logs + activities triple-write.
  *
  * Rule #2: No drag-and-drop. All stage movement via this action.
- * Rule #3: Server-side enforcement — gating rules validated by stage engine.
+ * Rule #3: Server-side enforcement  -  gating rules validated by stage engine.
  * Rule #11: Front desk cannot manually move stages (enforced by allowedSources).
  */
 export const advanceStageAction: ActionDefinition<AdvanceMatterStageInput, AdvanceStageResult> = {
@@ -21,7 +21,7 @@ export const advanceStageAction: ActionDefinition<AdvanceMatterStageInput, Advan
   label: 'Advance Matter Stage',
   inputSchema: advanceMatterStageSchema,
   permission: { entity: 'matters', action: 'edit' },
-  // Rule #11: Front desk excluded — stage changes only as side effects of other actions
+  // Rule #11: Front desk excluded  -  stage changes only as side effects of other actions
   allowedSources: ['command_centre', 'dashboard', 'api'],
   entityType: 'matter',
   getEntityId: (input) => input.matterId,
@@ -65,7 +65,7 @@ export const advanceStageAction: ActionDefinition<AdvanceMatterStageInput, Advan
     // Import and call the appropriate stage engine
     const { advanceGenericStage, advanceImmigrationStage } = await import('@/lib/services/stage-engine')
 
-    // skipActivityLog: true — the action executor handles the activity record
+    // skipActivityLog: true  -  the action executor handles the activity record
     // via the atomic triple-write (Rule #5). Without this flag, the stage engine
     // writes its own activity AND the executor writes another = duplicate.
     // Phase 7 Fix 5a.

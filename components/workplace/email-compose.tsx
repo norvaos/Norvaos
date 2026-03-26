@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * EmailCompose — Compose/reply email form.
+ * EmailCompose  -  Compose/reply email form.
  *
  * Features sender selection, To/CC/BCC fields, subject (pre-filled for replies),
  * rich text body, and send button.

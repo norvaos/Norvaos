@@ -11,7 +11,7 @@ interface Props {
  * Preview route for intake forms.
  *
  * Allows form builders to preview unpublished forms using a time-limited token.
- * Token format: base64(formId:timestamp) — valid for 1 hour.
+ * Token format: base64(formId:timestamp)  -  valid for 1 hour.
  */
 export default async function PreviewFormPage({ params, searchParams }: Props) {
   const { slug } = await params

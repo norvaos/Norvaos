@@ -1,6 +1,6 @@
 /**
- * GET  /api/collections/actions — List collection actions for an invoice
- * POST /api/collections/actions — Log a new collection action
+ * GET  /api/collections/actions  -  List collection actions for an invoice
+ * POST /api/collections/actions  -  Log a new collection action
  */
 
 import { NextRequest, NextResponse } from 'next/server'

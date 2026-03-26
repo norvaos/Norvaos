@@ -1,5 +1,5 @@
 -- ============================================================================
--- Migration 184 — Polyglot Bridge (Directive 14.0)
+-- Migration 184  -  Polyglot Bridge (Directive 14.0)
 -- ============================================================================
 -- Adds multilingual support columns for:
 --   1. Norva Ear Neural Translation Layer (dual-language transcripts)

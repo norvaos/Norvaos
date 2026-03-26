@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Lead Summary Recalculator — Single Source-of-Truth Boundary
+ * Lead Summary Recalculator  -  Single Source-of-Truth Boundary
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * This is the ONLY service permitted to UPDATE derived summary fields on the

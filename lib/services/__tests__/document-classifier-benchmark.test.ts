@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Smart Document Precision Benchmarking — Directive 009
+ * Smart Document Precision Benchmarking  -  Directive 009
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Tests classification accuracy against a ground-truth dataset.
@@ -85,7 +85,7 @@ const GROUND_TRUTH: GroundTruthEntry[] = [
   { filename: 'medical-exam-results.pdf', expectedCategory: 'medical', expectedType: 'medical_report' },
   { filename: 'upfront-medical-report.pdf', expectedCategory: 'medical', expectedType: 'medical_report' },
 
-  // ── Edge cases — ambiguous filenames ────────────────────────────────────
+  // ── Edge cases  -  ambiguous filenames ────────────────────────────────────
   { filename: 'document1.pdf', expectedCategory: null, expectedType: null },
   { filename: 'scan_001.jpg', expectedCategory: null, expectedType: null },
   { filename: 'IMG_20240315.png', expectedCategory: null, expectedType: null },
@@ -95,7 +95,7 @@ const GROUND_TRUTH: GroundTruthEntry[] = [
 
 // ─── Tier 1: Filename Heuristics Benchmark ──────────────────────────────────
 
-describe('Directive 009 — Document Classifier Precision Benchmark', () => {
+describe('Directive 009  -  Document Classifier Precision Benchmark', () => {
   describe('Tier 1: Filename Heuristics Accuracy', () => {
     // Separate ground truth into classifiable (has expected values) and ambiguous
     const classifiableEntries = GROUND_TRUTH.filter(
@@ -119,7 +119,7 @@ describe('Directive 009 — Document Classifier Precision Benchmark', () => {
       const metrics = calculatePrecisionMetrics(categoryResults)
 
       console.log('\n╔══════════════════════════════════════════════════════════╗')
-      console.log('║  Tier 1 — Filename Category Classification Metrics      ║')
+      console.log('║  Tier 1  -  Filename Category Classification Metrics      ║')
       console.log('╠══════════════════════════════════════════════════════════╣')
       console.log(`║  Total samples:       ${metrics.totalSamples}`)
       console.log(`║  Correct:             ${metrics.correctPredictions}`)
@@ -202,7 +202,7 @@ describe('Directive 009 — Document Classifier Precision Benchmark', () => {
       const metrics = calculatePrecisionMetrics(typeResults)
 
       console.log('\n╔══════════════════════════════════════════════════════════╗')
-      console.log('║  Tier 1 — Filename Type Classification Metrics           ║')
+      console.log('║  Tier 1  -  Filename Type Classification Metrics           ║')
       console.log('╠══════════════════════════════════════════════════════════╣')
       console.log(`║  Type accuracy:       ${(metrics.accuracy * 100).toFixed(1)}%`)
       console.log('╚══════════════════════════════════════════════════════════╝\n')
@@ -355,7 +355,7 @@ describe('Directive 009 — Document Classifier Precision Benchmark', () => {
       console.log('└──────────────────────────────────┴───────────────┴───────────────┴───────────┘')
       console.log(`  Score: ${matches}/${classifiableEntries.length} full matches\n`)
 
-      // This is informational — the threshold assertions are in the tests above
+      // This is informational  -  the threshold assertions are in the tests above
       expect(matches).toBeGreaterThan(0)
     })
   })

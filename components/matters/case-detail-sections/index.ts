@@ -1,5 +1,5 @@
 /**
- * Section Registry — Maps section_key to React component definitions
+ * Section Registry  -  Maps section_key to React component definitions
  *
  * Each entry defines:
  *   - key: matches the section_key in matter_type_section_config

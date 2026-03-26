@@ -1,5 +1,5 @@
 // ============================================================================
-// Trust Reconciliation Service — LSO By-Law 9 Compliant 8-Step Workflow
+// Trust Reconciliation Service  -  LSO By-Law 9 Compliant 8-Step Workflow
 // ============================================================================
 // Implements the compliance-grade reconciliation workflow:
 //   Step 1: Set bank statement balance
@@ -87,7 +87,7 @@ async function writeAuditLog(
     metadata: metadata as Json,
     matter_id: matterId ?? null,
   }
-  // Fire-and-forget is intentional for audit logs — we log errors but
+  // Fire-and-forget is intentional for audit logs  -  we log errors but
   // never let an audit write failure block the primary operation.
   const { error } = await (admin as any).from('trust_audit_log').insert(entry)
   if (error) {
@@ -133,7 +133,7 @@ async function fetchMutableReconciliation(
     return { success: false, error: 'Reconciliation is reviewed and immutable' }
   }
   if (rec.status === 'completed') {
-    return { success: false, error: 'Reconciliation is completed — reopen or flag before modifying' }
+    return { success: false, error: 'Reconciliation is completed  -  reopen or flag before modifying' }
   }
   return { success: true, data: rec }
 }
@@ -218,7 +218,7 @@ export async function createReconciliation(
 // ── Step 1: Set Bank Statement Balance ──────────────────────────────────────
 
 /**
- * Step 1 — User enters the bank statement closing balance.
+ * Step 1  -  User enters the bank statement closing balance.
  */
 export async function setStatementBalance(
   supabase: SupabaseClient<Database>,
@@ -251,7 +251,7 @@ export async function setStatementBalance(
 // ── Step 2: Compute Book Balance ────────────────────────────────────────────
 
 /**
- * Step 2 — Sum all trust_transactions for the account in the period.
+ * Step 2  -  Sum all trust_transactions for the account in the period.
  * Deposits are positive, disbursements are negative (net sum = book balance).
  *
  * We use the running_balance of the LAST transaction in the period as the
@@ -308,7 +308,7 @@ export async function computeBookBalance(
 // ── Step 3: Identify Outstanding Items ──────────────────────────────────────
 
 /**
- * Step 3 — Find uncleared cheques and deposits in transit.
+ * Step 3  -  Find uncleared cheques and deposits in transit.
  * Auto-creates trust_reconciliation_items for each.
  */
 export async function identifyOutstandingItems(
@@ -322,7 +322,7 @@ export async function identifyOutstandingItems(
   const rec = guard.data!
 
   // Clear any previously auto-generated items for this reconciliation
-  // (manual items are preserved — they have types like bank_error, book_error, other)
+  // (manual items are preserved  -  they have types like bank_error, book_error, other)
   const { error: deleteError } = await (supabase as any)
     .from('trust_reconciliation_items')
     .delete()
@@ -437,7 +437,7 @@ export async function identifyOutstandingItems(
 // ── Step 4: Compute Adjusted Bank Balance ───────────────────────────────────
 
 /**
- * Step 4 — adjusted = bank_statement_balance - outstanding_cheques + deposits_in_transit
+ * Step 4  -  adjusted = bank_statement_balance - outstanding_cheques + deposits_in_transit
  */
 export async function computeAdjustedBankBalance(
   supabase: SupabaseClient<Database>,
@@ -487,8 +487,8 @@ export async function computeAdjustedBankBalance(
 // ── Step 5: Compute Client Listing ──────────────────────────────────────────
 
 /**
- * Step 5 — Sum of running balances across all matters for this trust account.
- * The "client trust listing" total — what the firm owes all clients combined.
+ * Step 5  -  Sum of running balances across all matters for this trust account.
+ * The "client trust listing" total  -  what the firm owes all clients combined.
  *
  * For each matter, we take the running_balance_cents of the latest transaction
  * on or before the period_end.
@@ -565,7 +565,7 @@ export async function computeClientListing(
 // ── Step 6: Three-Way Balance Check ─────────────────────────────────────────
 
 /**
- * Step 6 — Compare: adjusted_bank_balance == book_balance == client_listing_total
+ * Step 6  -  Compare: adjusted_bank_balance == book_balance == client_listing_total
  * Sets is_balanced = true/false.
  */
 export async function checkThreeWayBalance(
@@ -620,8 +620,8 @@ export async function checkThreeWayBalance(
 // ── Step 7: Complete Reconciliation ─────────────────────────────────────────
 
 /**
- * Step 7 — Mark reconciliation as completed.
- * All steps must have been computed (not necessarily balanced — can complete with flags).
+ * Step 7  -  Mark reconciliation as completed.
+ * All steps must have been computed (not necessarily balanced  -  can complete with flags).
  */
 export async function completeReconciliation(
   supabase: SupabaseClient<Database>,
@@ -687,7 +687,7 @@ export async function completeReconciliation(
 // ── Step 8: Review Reconciliation ───────────────────────────────────────────
 
 /**
- * Step 8 — Mark reconciliation as reviewed.
+ * Step 8  -  Mark reconciliation as reviewed.
  * Reviewer must be different from completer (segregation of duties).
  * Once reviewed, the reconciliation is IMMUTABLE (DB trigger protects).
  */
@@ -759,7 +759,7 @@ export async function flagReconciliation(
     return { success: false, error: 'Reconciliation not found' }
   }
   if (rec.status === 'reviewed') {
-    return { success: false, error: 'Reconciliation is reviewed and immutable — cannot flag' }
+    return { success: false, error: 'Reconciliation is reviewed and immutable  -  cannot flag' }
   }
 
   const result = await updateReconciliation(supabase, reconciliationId, tenantId, {

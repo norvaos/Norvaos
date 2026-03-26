@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * Language Selector — Polyglot Bridge (Directive 18.0 Bifurcated)
+ * Language Selector  -  Polyglot Bridge (Directive 18.0 Bifurcated)
  *
  * Client-facing language picker for the Intake Portal.
  * Shows language in both English and native script.
@@ -16,9 +16,9 @@ import { Globe } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface LanguageSelectorProps {
-  /** Compact mode — dropdown only, no label */
+  /** Compact mode  -  dropdown only, no label */
   compact?: boolean
-  /** Audience context — defaults to 'client' (Global 15) */
+  /** Audience context  -  defaults to 'client' (Global 15) */
   audience?: LocaleAudience
   /** Additional className */
   className?: string

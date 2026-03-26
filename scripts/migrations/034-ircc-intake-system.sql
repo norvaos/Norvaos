@@ -5,7 +5,7 @@
 BEGIN;
 
 -- ═══════════════════════════════════════════════════════════════════════════
--- 1. IRCC Form Templates — defines which profile fields each IRCC form needs
+-- 1. IRCC Form Templates  -  defines which profile fields each IRCC form needs
 -- ═══════════════════════════════════════════════════════════════════════════
 
 CREATE TABLE IF NOT EXISTS ircc_form_templates (
@@ -44,7 +44,7 @@ CREATE POLICY ircc_form_templates_anon_read
   USING (is_active = true);
 
 -- ═══════════════════════════════════════════════════════════════════════════
--- 2. IRCC Questionnaire Sessions — tracks data collection for a contact
+-- 2. IRCC Questionnaire Sessions  -  tracks data collection for a contact
 -- ═══════════════════════════════════════════════════════════════════════════
 
 CREATE TABLE IF NOT EXISTS ircc_questionnaire_sessions (

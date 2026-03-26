@@ -1,5 +1,5 @@
 -- ============================================================================
--- Migration 183 — Success-Reverb Gold Standard Templates
+-- Migration 183  -  Success-Reverb Gold Standard Templates
 -- ============================================================================
 -- Stores reverse-engineered metadata from approved matters as Gold Standard
 -- Templates. When a new matter with the same case type is created, the system

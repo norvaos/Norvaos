@@ -1,4 +1,4 @@
-# Proof Plan — Team 3 / Module 1: Integration Contracts
+# Proof Plan  -  Team 3 / Module 1: Integration Contracts
 
 **Module:** Team 3 / Module 1
 **Date:** 2026-03-15
@@ -70,7 +70,7 @@ Proof artefacts are stored in a separate `proof/` directory (to be created) and 
 **Test procedure:**
 1. Manually update `token_expires_at` to 1 minute in the past in the database
 2. Trigger a sync immediately
-3. Query `token_expires_at` — it must now be a future timestamp (proving refresh occurred)
+3. Query `token_expires_at`  -  it must now be a future timestamp (proving refresh occurred)
 4. Verify sync completed without error
 
 **Pass criteria:** `token_expires_at` advances to a new future time; sync succeeds.
@@ -115,7 +115,7 @@ Proof artefacts are stored in a separate `proof/` directory (to be created) and 
 
 ### 2.1 Successful Connection Proof
 
-Same as Microsoft 365 Email 1.1 — shared `microsoft_connections` table.
+Same as Microsoft 365 Email 1.1  -  shared `microsoft_connections` table.
 
 ---
 
@@ -442,7 +442,7 @@ Same procedure as GHL 3.6.
 
 ### 6.5 All-Channels-Disabled Skip Proof
 
-**Artefact:** `log.debug('Notification skipped — all channels disabled')` in log output when all channels are configured as `false` for an event type.
+**Artefact:** `log.debug('Notification skipped  -  all channels disabled')` in log output when all channels are configured as `false` for an event type.
 
 **Test procedure:**
 1. Set `notification_triggers.test_event: { in_app: false, email: false, push: false }` in `tenants.settings`

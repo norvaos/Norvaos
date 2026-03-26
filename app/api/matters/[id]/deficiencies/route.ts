@@ -1,11 +1,11 @@
 /**
- * GET  /api/matters/[id]/deficiencies  — list all deficiencies for the matter
- * POST /api/matters/[id]/deficiencies  — create a new deficiency
+ * GET  /api/matters/[id]/deficiencies   -  list all deficiencies for the matter
+ * POST /api/matters/[id]/deficiencies   -  create a new deficiency
  *
  * Auth: any authenticated user in same tenant.
  * POST critical severity: also logs to activities table.
  *
- * Sprint 6, Week 1 — 2026-03-17
+ * Sprint 6, Week 1  -  2026-03-17
  */
 
 import { NextResponse } from 'next/server'
@@ -142,7 +142,7 @@ export async function POST(
     }
 
     // For critical severity: log to activities, then attempt auto-rollback.
-    // Both operations are fire-and-forget — they must not delay the 201 response.
+    // Both operations are fire-and-forget  -  they must not delay the 201 response.
     if (validationInput.severity === 'critical') {
       // 1. Log deficiency creation activity
       admin
@@ -167,7 +167,7 @@ export async function POST(
         })
 
       // 2. Fire-and-forget auto-rollback: fetch stage state, then call returnMatterToStage
-      //    skipCriticalDeficiencyCheck = true to bypass the circular guard — the deficiency
+      //    skipCriticalDeficiencyCheck = true to bypass the circular guard  -  the deficiency
       //    we just created IS the open critical one, so we must skip that check.
       Promise.resolve().then(async () => {
         try {
@@ -186,7 +186,7 @@ export async function POST(
           const { current_stage_id, previous_stage_id } = stageState
 
           if (!previous_stage_id || previous_stage_id === current_stage_id) {
-            // Matter is at first stage — no earlier stage to return to.
+            // Matter is at first stage  -  no earlier stage to return to.
             await admin
               .from('activities')
               .insert({
@@ -194,13 +194,13 @@ export async function POST(
                 matter_id: matterId,
                 user_id: auth.userId,
                 activity_type: 'auto_rollback_skipped',
-                title: 'Auto-rollback skipped — no previous stage',
+                title: 'Auto-rollback skipped  -  no previous stage',
                 metadata: { deficiency_id: created.id },
               })
             return
           }
 
-          const returnReason = `Auto-rollback: critical deficiency created — ${validationInput.category}: ${validationInput.description.slice(0, 100)}`
+          const returnReason = `Auto-rollback: critical deficiency created  -  ${validationInput.category}: ${validationInput.description.slice(0, 100)}`
 
           await returnMatterToStage(admin, {
             matterId,

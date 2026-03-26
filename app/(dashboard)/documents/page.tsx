@@ -122,7 +122,7 @@ function getFileExtension(fileName: string): string {
 }
 
 function getEntityLabel(doc: DocumentWithEntity): string | null {
-  if (doc.matter_title) return doc.matter_number ? `${doc.matter_number} — ${doc.matter_title}` : doc.matter_title
+  if (doc.matter_title) return doc.matter_number ? `${doc.matter_number}  -  ${doc.matter_title}` : doc.matter_title
   if (doc.contact_id) return 'Contact'
   if (doc.lead_id) return 'Lead'
   if (doc.task_id) return 'Task'

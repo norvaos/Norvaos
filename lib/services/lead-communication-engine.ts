@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Lead Communication Event Engine — First-Class Workflow Driver
+ * Lead Communication Event Engine  -  First-Class Workflow Driver
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Communication events are operational drivers, not mere log entries. They
@@ -165,7 +165,7 @@ export async function logCommunicationEvent(
     },
   })
 
-  // Recalculate summary (regardless of idempotency — event was still inserted)
+  // Recalculate summary (regardless of idempotency  -  event was still inserted)
   const fieldsToRecalc: Array<'last_inbound_at' | 'last_outbound_at' | 'last_automated_action_at' | 'overdue_task_count' | 'next_required_action'> = []
   if (direction === 'inbound') fieldsToRecalc.push('last_inbound_at')
   if (direction === 'outbound') fieldsToRecalc.push('last_outbound_at')

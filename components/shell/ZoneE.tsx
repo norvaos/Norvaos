@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * ZoneE — Audit Rail (Right Rail)
+ * ZoneE  -  Audit Rail (Right Rail)
  *
  * Collapsible right sidebar (250px expanded, 28px collapsed).
  * Section 1: Stage transition log (last 20 entries) with expandable gate snapshots.
@@ -9,7 +9,7 @@
  *
  * Collapse state is persisted to the norvaos-ui Zustand store.
  *
- * Spec ref: Section 3 — Zone E: Audit Rail
+ * Spec ref: Section 3  -  Zone E: Audit Rail
  */
 
 import { useState } from 'react'
@@ -131,7 +131,7 @@ function relativeTime(ts: string | null | undefined): string | null {
 function parseGateSnapshot(raw: unknown): GateSnapshot | null {
   if (!raw || typeof raw !== 'object') return null
   const obj = raw as Record<string, unknown>
-  // Empty object — legacy entry
+  // Empty object  -  legacy entry
   if (Object.keys(obj).length === 0) return null
   if (!Array.isArray(obj.conditions)) return null
   return obj as unknown as GateSnapshot
@@ -222,7 +222,7 @@ function TransitionEntry({ entry }: { entry: StageTransitionWithUser }) {
               {entry.from_stage_name}
             </span>
           ) : (
-            <span className="text-muted-foreground italic">—</span>
+            <span className="text-muted-foreground italic"> - </span>
           )}
           <ArrowRight className="h-2.5 w-2.5 text-muted-foreground shrink-0" />
           {entry.to_stage_name ? (
@@ -230,7 +230,7 @@ function TransitionEntry({ entry }: { entry: StageTransitionWithUser }) {
               {entry.to_stage_name}
             </span>
           ) : (
-            <span className="text-muted-foreground italic">—</span>
+            <span className="text-muted-foreground italic"> - </span>
           )}
         </div>
       )}
@@ -379,7 +379,7 @@ export function ZoneE({ matterId, tenantId: _tenantId }: ZoneEProps) {
           <div className="px-3 py-1.5 bg-muted/40 flex items-center gap-1.5">
             <History className="h-2.5 w-2.5 text-muted-foreground" />
             <span className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">
-              Norva Vault — Stage History
+              Norva Vault  -  Stage History
             </span>
           </div>
 

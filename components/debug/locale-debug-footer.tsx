@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * LocaleDebugFooter — Nuclear Fix #3: Visual Debug Mode
+ * LocaleDebugFooter  -  Nuclear Fix #3: Visual Debug Mode
  *
  * Displays current locale state vs DB preference in a fixed footer.
  * Shows where the "handshake" is breaking.

@@ -305,7 +305,7 @@ export const AUDIT_KEYWORDS = {
 export type AuditCategory = keyof typeof AUDIT_KEYWORDS;
 
 // ---------------------------------------------------------------------------
-// Metadata Zones — where keyword placement has highest regulator impact
+// Metadata Zones  -  where keyword placement has highest regulator impact
 // ---------------------------------------------------------------------------
 
 export interface MetadataZone {
@@ -340,7 +340,7 @@ export const METADATA_ZONES = {
 export type MetadataZoneName = keyof typeof METADATA_ZONES;
 
 // ---------------------------------------------------------------------------
-// Structural Rules — IRCC pre-screen checks
+// Structural Rules  -  IRCC pre-screen checks
 // ---------------------------------------------------------------------------
 
 export interface StructureRule {

@@ -4,19 +4,19 @@
 -- and an immutable cross-tenant audit log for all platform-admin actions.
 --
 -- Tables:
---   platform_admins           — admin allowlist keyed by auth.users(id)
---   platform_admin_audit_logs — append-only log for every admin action
+--   platform_admins            -  admin allowlist keyed by auth.users(id)
+--   platform_admin_audit_logs  -  append-only log for every admin action
 --
 -- Columns:
---   tenants.status            — lifecycle: active / suspended / closed
+--   tenants.status             -  lifecycle: active / suspended / closed
 --
 -- All tables are service-role only (no RLS policies for app users).
--- platform_admin_audit_logs is INSERT-only — no UPDATE or DELETE.
+-- platform_admin_audit_logs is INSERT-only  -  no UPDATE or DELETE.
 
 BEGIN;
 
 -- ═══════════════════════════════════════════════════════════════════════════
--- 1. platform_admins — DB-backed admin allowlist
+-- 1. platform_admins  -  DB-backed admin allowlist
 -- ═══════════════════════════════════════════════════════════════════════════
 
 CREATE TABLE IF NOT EXISTS platform_admins (
@@ -41,7 +41,7 @@ COMMENT ON TABLE platform_admins IS
   'DB-backed platform admin allowlist. Soft-revoke via revoked_at. Service-role only.';
 
 -- ═══════════════════════════════════════════════════════════════════════════
--- 2. tenants.status — lifecycle column
+-- 2. tenants.status  -  lifecycle column
 -- ═══════════════════════════════════════════════════════════════════════════
 
 -- Add status column if it does not exist (safe to re-run)
@@ -61,7 +61,7 @@ COMMENT ON COLUMN tenants.status IS
   'Tenant lifecycle: active (default), suspended (admin action), closed (permanent).';
 
 -- ═══════════════════════════════════════════════════════════════════════════
--- 3. platform_admin_audit_logs — immutable, append-only
+-- 3. platform_admin_audit_logs  -  immutable, append-only
 -- ═══════════════════════════════════════════════════════════════════════════
 
 CREATE TABLE IF NOT EXISTS platform_admin_audit_logs (

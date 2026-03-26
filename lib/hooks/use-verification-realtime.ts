@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * useVerificationRealtime — Listens for verification_update broadcasts
+ * useVerificationRealtime  -  Listens for verification_update broadcasts
  * on the intake:{matterId} Supabase Realtime channel.
  *
  * When a lawyer verifies or rejects a field/document, the verify API endpoint

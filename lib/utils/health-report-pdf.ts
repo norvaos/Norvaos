@@ -302,7 +302,7 @@ function drawReadinessRing(
     color: rgb(1, 1, 1),
   })
 
-  // Score arc — draw as a thick arc using small line segments
+  // Score arc  -  draw as a thick arc using small line segments
   const arcColour = score >= 85 ? COLOR_GREEN : score >= 60 ? COLOR_AMBER : COLOR_RED
   const sweepAngle = (score / 100) * 360
   const steps = Math.max(2, Math.ceil(sweepAngle / 3))
@@ -460,7 +460,7 @@ export async function generateHealthReportPdf(data: HealthReportData): Promise<U
   if (data.readiness) {
     drawSectionHeader(pm, 'Status Overview', fontBold)
 
-    // Readiness ring — draw to the left, text to the right
+    // Readiness ring  -  draw to the left, text to the right
     const ringCx = MARGIN_LEFT + 30
     const ringCy = pm.y - 30
     drawReadinessRing(pm.page, ringCx, ringCy, 25, data.readiness.overallScore, font, fontBold)
@@ -542,7 +542,7 @@ export async function generateHealthReportPdf(data: HealthReportData): Promise<U
 
       if (pc.passportExpiring) {
         pm.ensureSpace(LINE_HEIGHT + 2)
-        pm.drawText('Note: Travel document expiring within 90 days — renewal recommended', {
+        pm.drawText('Note: Travel document expiring within 90 days  -  renewal recommended', {
           font: fontBold,
           size: FONT_BODY,
           color: COLOR_AMBER,
@@ -675,7 +675,7 @@ export async function generateHealthReportPdf(data: HealthReportData): Promise<U
   )
   pm.y -= 10
   pm.drawText(
-    `Confidential — ${sanitize(data.firmName)}`,
+    `Confidential  -  ${sanitize(data.firmName)}`,
     { font: fontBold, size: FONT_SMALL, color: COLOR_LIGHT },
   )
 

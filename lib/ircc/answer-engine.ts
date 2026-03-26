@@ -1,8 +1,8 @@
 /**
- * IRCC Forms Engine — Answer Engine
+ * IRCC Forms Engine  -  Answer Engine
  *
  * Handles answer read/write with source tracking, cross-form propagation,
- * and stale dependency invalidation. Pure logic module — all database
+ * and stale dependency invalidation. Pure logic module  -  all database
  * operations are injected via the DataAccess interface.
  */
 
@@ -104,7 +104,7 @@ export interface AnswerEngineDataAccess {
 }
 
 /* ------------------------------------------------------------------ */
-/*  Locked statuses — instances in these statuses are not writable     */
+/*  Locked statuses  -  instances in these statuses are not writable     */
 /* ------------------------------------------------------------------ */
 
 const LOCKED_STATUSES = new Set(['approved', 'generated', 'submitted'])
@@ -207,7 +207,7 @@ function hasBlockingError(
       const regex = new RegExp(field.validation_pattern)
       if (!regex.test(str)) return true
     } catch {
-      // Invalid regex pattern — don't block
+      // Invalid regex pattern  -  don't block
     }
   }
 
@@ -409,7 +409,7 @@ export function computeCompletionState(
   // Mark sections as complete if not already disqualified
   for (const section of Object.values(sections)) {
     if (section.complete !== false) {
-      // No required field was unfilled — mark complete if there's no stale/blocked
+      // No required field was unfilled  -  mark complete if there's no stale/blocked
       section.complete = section.stale === 0 && section.blocked === 0
     }
   }
@@ -469,7 +469,7 @@ export async function saveAnswers(
     const conflict = checkTrustConflict(existingRecord, newValue, source)
     if (conflict.hasConflict) {
       conflicts.push({ path: profilePath, reason: conflict.reason! })
-      // Skip this field — don't overwrite verified higher-trust data
+      // Skip this field  -  don't overwrite verified higher-trust data
       continue
     }
 

@@ -1,18 +1,18 @@
 'use client'
 
 /**
- * 7-Step Onboarding Wizard — NorvaOS
+ * 7-Step Onboarding Wizard  -  NorvaOS
  *
- * Step 1 — Firm Setup         (firm_name, logo, practice_areas)
- * Step 2 — First Lawyer       (first_name, last_name, email, bar_number)
- * Step 3 — First Matter Type  (3 immigration defaults or skip)
- * Step 4 — Billing Defaults   (currency, flat_fee_default, hourly_rate_default)
- * Step 5 — Branding           (primary_colour, email_footer)
- * Step 6 — Invite Team        (email + role pairs)
- * Step 7 — Done               (success + mark complete)
+ * Step 1  -  Firm Setup         (firm_name, logo, practice_areas)
+ * Step 2  -  First Lawyer       (first_name, last_name, email, bar_number)
+ * Step 3  -  First Matter Type  (3 immigration defaults or skip)
+ * Step 4  -  Billing Defaults   (currency, flat_fee_default, hourly_rate_default)
+ * Step 5  -  Branding           (primary_colour, email_footer)
+ * Step 6  -  Invite Team        (email + role pairs)
+ * Step 7  -  Done               (success + mark complete)
  *
  * Skip is available from Step 3 onward.
- * State is held in useState — no cross-refresh persistence needed.
+ * State is held in useState  -  no cross-refresh persistence needed.
  */
 
 import React, { useState, useCallback, useRef, useEffect } from 'react'
@@ -115,7 +115,7 @@ const DEFAULT_STATE: WizardState = {
   firmName: '',
   logoUrl: null,
   logoFile: null,
-  // Immigration is the only active practice area — pre-selected and locked
+  // Immigration is the only active practice area  -  pre-selected and locked
   selectedPracticeAreas: ['Immigration'],
   officeAddress: '',
   officePhone: '',
@@ -276,16 +276,16 @@ function StepFirmSetup({
             }}
           />
         </div>
-        <p className="text-xs text-slate-400">PNG, JPG or SVG — max 2 MB</p>
+        <p className="text-xs text-slate-400">PNG, JPG or SVG  -  max 2 MB</p>
       </div>
 
-      {/* Practice areas — Immigration is locked as the primary area */}
+      {/* Practice areas  -  Immigration is locked as the primary area */}
       <div className="space-y-2">
         <Label>Practice Areas</Label>
         <div className="rounded-lg border border-indigo-200 bg-indigo-50 px-4 py-3 flex items-center justify-between">
           <div>
             <p className="text-sm font-semibold text-indigo-800">Immigration</p>
-            <p className="text-xs text-indigo-600 mt-0.5">Primary practice area — automation and workflows are fully configured for Immigration.</p>
+            <p className="text-xs text-indigo-600 mt-0.5">Primary practice area  -  automation and workflows are fully configured for Immigration.</p>
           </div>
           <CheckCircle2 className="h-5 w-5 text-indigo-600 shrink-0" />
         </div>
@@ -357,7 +357,7 @@ function StepFirstLawyer({
       </div>
 
       <div className="rounded-md border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
-        <strong>Role:</strong> Lawyer — will be set automatically.
+        <strong>Role:</strong> Lawyer  -  will be set automatically.
       </div>
     </div>
   )
@@ -379,7 +379,7 @@ function StepMatterTypes({
         <p className="text-sm text-slate-500 mt-1">We can seed three common Immigration matter types to get you started, or you can configure them yourself later.</p>
       </div>
 
-      {/* Option A — Accept defaults */}
+      {/* Option A  -  Accept defaults */}
       <button
         type="button"
         onClick={() => onChange({ seedMatterTypes: true })}
@@ -407,7 +407,7 @@ function StepMatterTypes({
         </div>
       </button>
 
-      {/* Option B — Skip */}
+      {/* Option B  -  Skip */}
       <button
         type="button"
         onClick={() => onChange({ seedMatterTypes: false })}
@@ -453,8 +453,8 @@ function StepBillingDefaults({
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="CAD">CAD — Canadian Dollar</SelectItem>
-            <SelectItem value="USD">USD — US Dollar</SelectItem>
+            <SelectItem value="CAD">CAD  -  Canadian Dollar</SelectItem>
+            <SelectItem value="USD">USD  -  US Dollar</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -892,7 +892,7 @@ export default function SimpleOnboardingWizard() {
       }
 
       if (step === TOTAL_STEPS - 2) {
-        // Last content step (Step 6 — Invite Team) → apply everything then go to Done
+        // Last content step (Step 6  -  Invite Team) → apply everything then go to Done
         await applyFirmSetup()
 
         const results = await sendInvites()
@@ -1003,7 +1003,7 @@ export default function SimpleOnboardingWizard() {
                 <p className="font-medium mb-1">Some invitations could not be sent:</p>
                 <ul className="text-xs space-y-0.5">
                   {inviteResults.filter((r) => !r.ok).map((r) => (
-                    <li key={r.email}>{r.email} — {r.error}</li>
+                    <li key={r.email}>{r.email}  -  {r.error}</li>
                   ))}
                 </ul>
                 <p className="mt-2 text-xs">Retry from <strong>Settings → Team</strong>.</p>

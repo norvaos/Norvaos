@@ -65,7 +65,7 @@ export async function POST(
       .limit(1)
 
     if (existingPending && existingPending.length > 0) {
-      // Already marked — return success without creating duplicate
+      // Already marked  -  return success without creating duplicate
       return NextResponse.json({ success: true, alreadyMarked: true })
     }
 

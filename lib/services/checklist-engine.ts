@@ -13,7 +13,7 @@ export interface ChecklistScore {
 
 /**
  * Calculate checklist completion score for a matter.
- * Pure function — works both client-side and server-side.
+ * Pure function  -  works both client-side and server-side.
  *
  * @param items - All checklist items for a matter
  * @returns ChecklistScore with completion % and blocking info

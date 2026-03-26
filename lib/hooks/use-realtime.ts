@@ -17,7 +17,7 @@ interface UseRealtimeOptions<T extends Record<string, unknown>> {
 }
 
 /**
- * useRealtime — Supabase Realtime subscription hook.
+ * useRealtime  -  Supabase Realtime subscription hook.
  *
  * Key design choices:
  *  1. Callbacks (onInsert/onUpdate/onDelete/onChange) are stored in refs so
@@ -50,7 +50,7 @@ export function useRealtime<T extends Record<string, unknown>>({
   const onDeleteRef  = useRef(onDelete)
   const onChangeRef  = useRef(onChange)
 
-  // Keep refs up-to-date on every render — this is safe because the effect
+  // Keep refs up-to-date on every render  -  this is safe because the effect
   // only reads from them inside the callback (not during subscription setup).
   onInsertRef.current  = onInsert
   onUpdateRef.current  = onUpdate
@@ -84,7 +84,7 @@ export function useRealtime<T extends Record<string, unknown>>({
           'postgres_changes' as never,
           channelConfig,
           (payload: RealtimePostgresChangesPayload<T>) => {
-            // Read from refs — always latest callback, no stale closures
+            // Read from refs  -  always latest callback, no stale closures
             onChangeRef.current?.(payload)
 
             if (payload.eventType === 'INSERT' && onInsertRef.current) {
@@ -100,7 +100,7 @@ export function useRealtime<T extends Record<string, unknown>>({
         )
         .subscribe((status) => {
           if (status === 'SUBSCRIBED') {
-            // Channel is live — any INSERT events will now fire
+            // Channel is live  -  any INSERT events will now fire
           } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
             console.warn(`[useRealtime] Channel ${channelName} error: ${status}`)
           }
@@ -119,7 +119,7 @@ export function useRealtime<T extends Record<string, unknown>>({
         channelRef.current = null
       }
     }
-    // Callbacks intentionally excluded — stored in refs above.
+    // Callbacks intentionally excluded  -  stored in refs above.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [table, schema, event, filter, enabled])
 

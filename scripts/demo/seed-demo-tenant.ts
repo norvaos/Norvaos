@@ -3,7 +3,7 @@
  *
  * Seeds a demo tenant with synthetic data for sales demonstrations.
  *
- * ALL DATA IS SYNTHETIC — NOT REAL CLIENT DATA
+ * ALL DATA IS SYNTHETIC  -  NOT REAL CLIENT DATA
  *
  * Usage:
  *   DEMO_TENANT_ID=<uuid> SUPABASE_URL=<url> SUPABASE_SERVICE_ROLE_KEY=<key> \
@@ -88,7 +88,7 @@ async function seed(): Promise<void> {
   }
 
   console.log(`\nSeeding demo tenant: ${DEMO_TENANT_ID}`)
-  console.log('ALL DATA IS SYNTHETIC — NOT REAL CLIENT DATA\n')
+  console.log('ALL DATA IS SYNTHETIC  -  NOT REAL CLIENT DATA\n')
 
   const dataset = await generateFullDemoDataset(DEMO_TENANT_ID!)
 
@@ -152,7 +152,7 @@ async function seed(): Promise<void> {
     console.log(`  ✓ ${dataset.timeEntries.length} time entries inserted`)
   }
 
-  // Validation — query back row counts
+  // Validation  -  query back row counts
   console.log('\nValidating row counts...')
   for (const [table, expectedCount] of Object.entries(manifest.counts)) {
     const { count, error } = await supabase
@@ -171,13 +171,13 @@ async function seed(): Promise<void> {
   writeManifest(manifest)
 
   if (manifest.status === 'failed') {
-    console.error('\nSeed FAILED — see errors above')
+    console.error('\nSeed FAILED  -  see errors above')
     process.exit(1)
   } else if (manifest.status === 'partial') {
-    console.warn('\nSeed PARTIAL — some tables had errors')
+    console.warn('\nSeed PARTIAL  -  some tables had errors')
     process.exit(0)
   } else {
-    console.log('\nSeed COMPLETE — demo tenant ready')
+    console.log('\nSeed COMPLETE  -  demo tenant ready')
     process.exit(0)
   }
 }

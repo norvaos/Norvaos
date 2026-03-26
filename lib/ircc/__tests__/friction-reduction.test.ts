@@ -1,5 +1,5 @@
 /**
- * IRCC Forms Engine — Friction Reduction Test Pack
+ * IRCC Forms Engine  -  Friction Reduction Test Pack
  *
  * Instruments and reports, for each scenario, the following metrics:
  *   - total_mapped_fields:   fields with profile_path in form definition
@@ -243,7 +243,7 @@ function buildIMM5257EFields(): FormField[] {
   return fields
 }
 
-// ── IMM5406 (Additional Family Info) — 26 fields ─────────────────────────
+// ── IMM5406 (Additional Family Info)  -  26 fields ─────────────────────────
 
 function buildIMM5406Fields(): FormField[] {
   const fields: FormField[] = []
@@ -255,7 +255,7 @@ function buildIMM5406Fields(): FormField[] {
   ]
   for (const p of sharedPaths) fields.push(makeField(p, 'personal'))
 
-  // Children (repeater) — 12 fields for 2 children slots
+  // Children (repeater)  -  12 fields for 2 children slots
   for (let i = 0; i < 2; i++) {
     fields.push(makeField(`children[${i}].given_name`, 'children', { is_required: i === 0 }))
     fields.push(makeField(`children[${i}].family_name`, 'children', { is_required: i === 0 }))
@@ -265,7 +265,7 @@ function buildIMM5406Fields(): FormField[] {
     fields.push(makeField(`children[${i}].relationship`, 'children', { is_required: i === 0 }))
   }
 
-  // Siblings (repeater) — 6 fields for 1 sibling slot
+  // Siblings (repeater)  -  6 fields for 1 sibling slot
   fields.push(makeField('siblings[0].given_name', 'siblings', { is_required: false }))
   fields.push(makeField('siblings[0].family_name', 'siblings', { is_required: false }))
   fields.push(makeField('siblings[0].date_of_birth', 'siblings', { is_required: false }))
@@ -273,7 +273,7 @@ function buildIMM5406Fields(): FormField[] {
   return fields
 }
 
-// ── IMM5476E (Representative) — 13 fields ────────────────────────────────
+// ── IMM5476E (Representative)  -  13 fields ────────────────────────────────
 
 function buildIMM5476EFields(): FormField[] {
   const fields: FormField[] = []
@@ -298,7 +298,7 @@ function buildIMM5476EFields(): FormField[] {
 
 function buildCanonicalProfile(): CanonicalField[] {
   return [
-    // Stable (13) — auto-accept, no review
+    // Stable (13)  -  auto-accept, no review
     makeCanonical('personal', 'family_name', 'Ayyaz'),
     makeCanonical('personal', 'given_name', 'Khansa'),
     makeCanonical('personal', 'date_of_birth', '1992-07-15'),
@@ -313,7 +313,7 @@ function buildCanonicalProfile(): CanonicalField[] {
     makeCanonical('family', 'father_full_name', 'Ahmed Ayyaz'),
     makeCanonical('language', 'native_language', 'Urdu'),
 
-    // Semi-stable (16+) — import but flag for review
+    // Semi-stable (16+)  -  import but flag for review
     makeCanonical('marital', 'status', 'Married'),
     makeCanonical('marital', 'spouse_family_name', 'Khan'),
     makeCanonical('marital', 'spouse_given_name', 'Imran'),
@@ -436,7 +436,7 @@ function createFrictionDataAccess(config: FrictionMockConfig) {
     async getSiblingInstances(instanceId) {
       const self = config.instances.get(instanceId)
       if (!self) return []
-      // Include self — prefillFromSiblings expects self in the list to read person_id
+      // Include self  -  prefillFromSiblings expects self in the list to read person_id
       return Array.from(config.instances.entries())
         .filter(([_id, inst]) => inst.person_id === self.person_id)
         .map(([id, inst]) => ({
@@ -548,7 +548,7 @@ function marriedApplicantExtras(): Record<string, unknown> {
   }
 }
 
-// Representative fields (IMM5476E) — mostly firm constant data
+// Representative fields (IMM5476E)  -  mostly firm constant data
 function representativeAnswers(): Record<string, unknown> {
   return {
     'representative.has_representative': true,
@@ -861,7 +861,7 @@ describe('Friction Reduction Test Pack', () => {
       const allTrvPaths = Object.keys(singleApplicantAnswers())
       const importedPaths = new Set(Object.keys(config.instances.get('inst-5257-m2')!.answers))
       const notImported = allTrvPaths.filter((p) => !importedPaths.has(p))
-      console.log(`\nGap analysis — ${notImported.length} fields not imported (matter_specific classification):`)
+      console.log(`\nGap analysis  -  ${notImported.length} fields not imported (matter_specific classification):`)
       for (const p of notImported) console.log(`  - ${p}`)
 
       // After REUSE_CATEGORY_MAP expansion (29 → 43 paths):

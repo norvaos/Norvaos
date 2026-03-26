@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * Compliance Diagnostic Modal — Directive 41.2
+ * Compliance Diagnostic Modal  -  Directive 41.2
  *
  * The "Regulatory Watchdog" of NorvaOS. When the user clicks the
  * compliance badge in the header, this modal opens showing:
@@ -247,7 +247,7 @@ const COMPLIANCE_CHECKS: ComplianceCheck[] = [
     id: 'office_fax',
     label: 'Office Fax',
     severity: 'optimisation',
-    weight: 0, // Fax is optional — zero impact on compliance score
+    weight: 0, // Fax is optional  -  zero impact on compliance score
     byLaw: 'By-Law 7.1, Part II',
     byLawUrl: 'https://lso.ca/about-lso/legislation-rules/by-laws/by-law-7-1',
     guidance: 'While optional, a fax number is still used by courts and regulatory bodies for service of documents. Not required for compliance.',
@@ -455,7 +455,7 @@ export function ComplianceDiagnosticModal({
           {score === 100 ? (
             <div className="flex items-center justify-center gap-2 text-sm text-emerald-700 font-semibold">
               <ShieldCheck className="size-4" />
-              Audit-Ready — All Directives Satisfied
+              Audit-Ready  -  All Directives Satisfied
             </div>
           ) : showBypass ? (
             <div className="space-y-2">
@@ -497,7 +497,7 @@ export function ComplianceDiagnosticModal({
                 className="w-full text-xs"
                 onClick={() => { setShowBypass(false); setBypassInput('') }}
               >
-                Cancel — Return to Diagnostic
+                Cancel  -  Return to Diagnostic
               </Button>
             </div>
           ) : (

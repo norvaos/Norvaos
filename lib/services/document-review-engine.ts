@@ -1,11 +1,11 @@
 // ============================================================================
-// Document Review Engine — Acceptance Workflow + Client Notifications
+// Document Review Engine  -  Acceptance Workflow + Client Notifications
 // ============================================================================
 // Manages the document acceptance workflow: accept / needs_re_upload / reject.
 // Uses the review_document_version() RPC for atomic state transitions.
 //
 // Public API:
-//   reviewDocumentSlot() — atomic review via RPC + optional client notification
+//   reviewDocumentSlot()  -  atomic review via RPC + optional client notification
 // ============================================================================
 
 import type { SupabaseClient } from '@supabase/supabase-js'
@@ -45,7 +45,7 @@ export interface ReviewResult {
  * - Updates document_versions.review_status, reviewed_by, reviewed_at, review_reason
  * - Updates document_slots.status
  * - Inserts audit_logs entry
- * All in a single transaction — no partial state possible.
+ * All in a single transaction  -  no partial state possible.
  *
  * Client notification (if requested) happens AFTER the RPC succeeds.
  * Email failure never rolls back the review.
@@ -137,7 +137,7 @@ export async function reviewDocumentSlot(params: ReviewParams): Promise<ReviewRe
         }
       }
     } catch (err) {
-      // Non-blocking — email failure should not affect the review result
+      // Non-blocking  -  email failure should not affect the review result
       console.error('[document-review-engine] Notification error:', err)
     }
   }
@@ -159,7 +159,7 @@ export async function reviewDocumentSlot(params: ReviewParams): Promise<ReviewRe
       await syncImmigrationIntakeStatus(supabase, slotRow.matter_id, userId)
     }
   } catch (err) {
-    // Non-blocking — sequence control failure should not affect the review result
+    // Non-blocking  -  sequence control failure should not affect the review result
     console.error('[document-review-engine] Immigration sequence control error:', err)
   }
 

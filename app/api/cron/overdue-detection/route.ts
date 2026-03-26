@@ -14,7 +14,7 @@ import { dispatchNotification } from '@/lib/services/notification-engine'
  * Uses admin client (service role) to operate across all tenants.
  */
 async function handlePost(request: Request) {
-  // Auth check — fail-closed: reject if CRON_SECRET is unset
+  // Auth check  -  fail-closed: reject if CRON_SECRET is unset
   const cronSecret = process.env['CRON_SECRET']
   if (!cronSecret) {
     return NextResponse.json({ error: 'Server misconfigured: CRON_SECRET not set' }, { status: 500 })

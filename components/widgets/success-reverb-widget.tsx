@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * SuccessReverbWidget — Embeddable approval-stats widget.
+ * SuccessReverbWidget  -  Embeddable approval-stats widget.
  *
  * Fetches anonymised firm stats from /api/public/success-reverb and displays
  * them as a compact card with animated counters. Designed for embedding on
@@ -32,7 +32,7 @@ interface ReverbPayload {
 }
 
 interface SuccessReverbWidgetProps {
-  /** Tenant slug — identifies the firm */
+  /** Tenant slug  -  identifies the firm */
   tenantSlug: string
   /** Override API base URL (defaults to current origin) */
   apiBaseUrl?: string
@@ -96,7 +96,7 @@ export function SuccessReverbWidget({ tenantSlug, apiBaseUrl, compact = false }:
   const approvalRate = useAnimatedNumber(data?.stats.approval_rate_pct ?? 0)
 
   if (error || !data) {
-    // Graceful degradation — show nothing if the API is unreachable
+    // Graceful degradation  -  show nothing if the API is unreachable
     return null
   }
 
@@ -140,7 +140,7 @@ export function SuccessReverbWidget({ tenantSlug, apiBaseUrl, compact = false }:
 
       {/* Footer */}
       <p className="text-[9px] text-muted-foreground text-center">
-        Powered by NorvaOS — Updated {new Date(data.computed_at).toLocaleDateString()}
+        Powered by NorvaOS  -  Updated {new Date(data.computed_at).toLocaleDateString()}
       </p>
     </div>
   )

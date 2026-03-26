@@ -1,7 +1,7 @@
 #!/usr/bin/env npx tsx
 
 /**
- * provision-pilot-firm.ts — Directive 030: "Norva Sovereign Ignition"
+ * provision-pilot-firm.ts  -  Directive 030: "Norva Sovereign Ignition"
  *
  * Provisions a new pilot firm tenant with:
  *   1. Norva Sovereign Academy video URLs (Guidde links)
@@ -42,11 +42,11 @@ const ACADEMY_VIDEOS = {
     url: 'https://app.guidde.com/share/playbooks/norva-fortress-foundations',
   },
   'intake-to-genesis': {
-    title: 'Module 2: Intake to Genesis — The Breeze',
+    title: 'Module 2: Intake to Genesis  -  The Breeze',
     url: 'https://app.guidde.com/share/playbooks/norva-intake-to-genesis',
   },
   'sovereign-oversight': {
-    title: 'Module 3: Sovereign Oversight — The Shield',
+    title: 'Module 3: Sovereign Oversight  -  The Shield',
     url: 'https://app.guidde.com/share/playbooks/norva-sovereign-oversight',
   },
 }
@@ -154,7 +154,7 @@ async function main() {
   if ((ruleCount ?? 0) > 0) {
     console.log(`  ✅ ${ruleCount} IRCC deadline rules already seeded`)
   } else {
-    console.log('  ⚠️  No IRCC deadline rules found — run seed-immigration-pipelines.ts first')
+    console.log('  ⚠️  No IRCC deadline rules found  -  run seed-immigration-pipelines.ts first')
   }
 
   // 5. Create SENTINEL log entry

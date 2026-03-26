@@ -1,5 +1,5 @@
 /**
- * PIPEDA Data Sovereignty Enforcer — Directive 004, Pillar 3
+ * PIPEDA Data Sovereignty Enforcer  -  Directive 004, Pillar 3
  *
  * Validates geolocation of requests and enforces Canadian data residency.
  * Canadian region enforcement is also handled at infrastructure level (Netlify),
@@ -149,7 +149,7 @@ function extractIp(headers: Headers): string | null {
  * requirements. Non-Canadian requests to PII routes are blocked.
  *
  * Requests with unknown/missing country headers (e.g. localhost in dev)
- * are permitted — infrastructure-level enforcement handles production.
+ * are permitted  -  infrastructure-level enforcement handles production.
  */
 export function checkDataSovereignty(request: Request): SovereigntyCheckResult {
   const headers = new Headers(request.headers)
@@ -191,7 +191,7 @@ export function checkDataSovereignty(request: Request): SovereigntyCheckResult {
 
 /**
  * Logs a sovereignty check event to the `data_sovereignty_log` table.
- * Fire-and-forget — errors are caught and logged to console.
+ * Fire-and-forget  -  errors are caught and logged to console.
  */
 export async function logSovereigntyEvent(
   params: SovereigntyLogParams,

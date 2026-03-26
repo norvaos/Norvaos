@@ -12,8 +12,8 @@ import { createAdminClient } from '@/lib/supabase/admin'
  * Restricted to Lawyer and Admin roles only.
  *
  * Body: {
- *   target_stage_id: string  — the stage to return to (must be earlier than current)
- *   return_reason:   string  — mandatory justification (min 50 chars)
+ *   target_stage_id: string   -  the stage to return to (must be earlier than current)
+ *   return_reason:   string   -  mandatory justification (min 50 chars)
  * }
  *
  * Responses:
@@ -21,7 +21,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
  *   401 { error: 'Authentication required' }
  *   403 { error: 'Only Lawyers and Admins can return a matter to a previous stage' }
  *   404 { error: 'Matter not found or access denied' }
- *   422 { error: string, field?: string }   — validation or business rule failure
+ *   422 { error: string, field?: string }    -  validation or business rule failure
  *   500 { error: 'Internal server error' }
  */
 async function handlePost(

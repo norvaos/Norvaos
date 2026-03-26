@@ -69,7 +69,7 @@ export const completeCheckInAction: ActionDefinition<CompleteCheckInInput, Compl
     // 4. Notification dispatch
     // Phase 7 Fix 5b: Notification is NOT inserted here inside execute() because
     // this runs OUTSIDE the atomic transaction. If the triple-write (Step 7) fails,
-    // the notification would persist but the audit trail wouldn't — creating an
+    // the notification would persist but the audit trail wouldn't  -  creating an
     // orphaned notification. Instead, the kiosk complete route handles notification
     // dispatch as a non-blocking post-commit step. The durable activity record
     // (written atomically in Step 7) serves as the authoritative record.

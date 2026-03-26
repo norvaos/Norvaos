@@ -1,12 +1,12 @@
 // ============================================================================
-// Form Instance Engine — Template → Instance Pipeline
+// Form Instance Engine  -  Template → Instance Pipeline
 // ============================================================================
 // Core engine for IRCC form automation. Manages the lifecycle of form instances
 // from published assignment templates, mirroring the Document Slot Engine.
 //
 // Public API:
-//   generateFormInstances()      — initial instance creation for a matter
-//   regenerateFormInstances()    — deterministic recomputation with change logging
+//   generateFormInstances()       -  initial instance creation for a matter
+//   regenerateFormInstances()     -  deterministic recomputation with change logging
 // ============================================================================
 
 import type { SupabaseClient } from '@supabase/supabase-js'
@@ -23,7 +23,7 @@ import type {
 
 // ─── Types ──────────────────────────────────────────────────────────────────────
 
-// Tables not yet deployed to production DB — typed as any until migration lands
+// Tables not yet deployed to production DB  -  typed as any until migration lands
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AssignmentTemplateRow = any
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -78,7 +78,7 @@ function computeExpectedInstances(
     }
 
     if (template.person_role_scope === null) {
-      // Matter-level form — one per matter, no person association
+      // Matter-level form  -  one per matter, no person association
       if (!evaluateSlotCondition(template.conditions, {}, intakeData, errCtx)) continue
 
       result.push({
@@ -113,7 +113,7 @@ function computeExpectedInstances(
         })
       }
     } else {
-      // Specific role scope — one instance per person with that role
+      // Specific role scope  -  one instance per person with that role
       const matchingPeople = people.filter(
         (p) => p.person_role === template.person_role_scope
       )
@@ -142,7 +142,7 @@ function computeExpectedInstances(
 }
 
 /**
- * Unique key for an instance identity — used for diffing.
+ * Unique key for an instance identity  -  used for diffing.
  */
 function instanceKey(templateId: string, personId: string | null): string {
   return `${templateId}::${personId ?? 'NULL'}`
@@ -152,7 +152,7 @@ function instanceKey(templateId: string, personId: string | null): string {
 
 /**
  * Log condition evaluation errors to the activity trail.
- * Non-blocking — callers wrap this in try/catch.
+ * Non-blocking  -  callers wrap this in try/catch.
  */
 async function logConditionErrors(
   supabase: SupabaseClient<Database>,
@@ -286,7 +286,7 @@ async function fetchEngineData(
 
 /**
  * Generate form instances for a matter based on published assignment templates.
- * Idempotent — uses ON CONFLICT DO NOTHING so safe to call multiple times.
+ * Idempotent  -  uses ON CONFLICT DO NOTHING so safe to call multiple times.
  *
  * Called from kit activation (workflow and immigration kits).
  */
@@ -318,7 +318,7 @@ export async function generateFormInstances(params: GenerateFormInstancesParams)
 
   if (expectedInstances.length === 0) return
 
-  // Insert with ON CONFLICT DO NOTHING — idempotent
+  // Insert with ON CONFLICT DO NOTHING  -  idempotent
   const inserts: FormInstanceInsert[] = expectedInstances.map((inst) => ({
     tenant_id: tenantId,
     matter_id: matterId,
@@ -449,7 +449,7 @@ export async function regenerateFormInstances(
     if (currentActiveMap.has(key)) {
       result.unchanged++
     } else if (currentInactiveMap.has(key)) {
-      // Exists but inactive — reactivate
+      // Exists but inactive  -  reactivate
       const existing = currentInactiveMap.get(key)!
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await (supabase as any)
@@ -462,7 +462,7 @@ export async function regenerateFormInstances(
         personRole: expected.personRole,
       })
     } else {
-      // New — insert
+      // New  -  insert
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await (supabase as any).from('matter_form_instances').insert({
         tenant_id: tenantId,

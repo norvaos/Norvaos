@@ -51,7 +51,7 @@ export function useCheckGating(matterId: string, enabled = true) {
       return res.json() as Promise<{ gatingErrors: Record<string, string[]> }>
     },
     enabled: !!matterId && enabled,
-    staleTime: 1000 * 30, // 30s — re-check frequently
+    staleTime: 1000 * 30, // 30s  -  re-check frequently
   })
 }
 
@@ -1041,7 +1041,7 @@ export function useMatterStageState(matterId: string | null | undefined) {
       return data as MatterStageState | null
     },
     enabled: !!matterId,
-    staleTime: 1000 * 60 * 2, // 2 min — avoid refetch on every mount when navigating matter pages
+    staleTime: 1000 * 60 * 2, // 2 min  -  avoid refetch on every mount when navigating matter pages
   })
 }
 
@@ -1269,7 +1269,7 @@ export function useMatterTypeSchema(matterTypeId: string | null | undefined) {
       return data as MatterTypeSchema | null
     },
     enabled: !!matterTypeId,
-    staleTime: 1000 * 60 * 10, // 10 min — schema rarely changes
+    staleTime: 1000 * 60 * 10, // 10 min  -  schema rarely changes
   })
 }
 
@@ -1537,7 +1537,7 @@ export function useArchiveMatterType() {
   })
 }
 
-// ─── Document Slot Templates (Tab 2 — Document Checklist) ────────────────────
+// ─── Document Slot Templates (Tab 2  -  Document Checklist) ────────────────────
 
 type DocumentSlotTemplate = Database['public']['Tables']['document_slot_templates']['Row']
 

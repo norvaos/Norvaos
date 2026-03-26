@@ -1,10 +1,10 @@
 'use client'
 
 /**
- * ClientReviewPanel — Manages the IRCC client review flow.
+ * ClientReviewPanel  -  Manages the IRCC client review flow.
  *
  * Flow:
- *  1. Staff initiates review — creates ircc_client_reviews record
+ *  1. Staff initiates review  -  creates ircc_client_reviews record
  *  2. Staff sends the plain-English summary PDF to client for review
  *  3. Staff marks it as sent + records signing request ID (if using e-sign)
  *  4. On client signature → staff marks as signed → final form pack unlocks
@@ -184,7 +184,7 @@ export function ClientReviewPanel({ matterId }: ClientReviewPanelProps) {
         <div className="flex items-center gap-2 rounded-md border border-emerald-200 bg-emerald-50 px-4 py-3">
           <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
           <p className="text-sm text-emerald-800 font-medium">
-            File is unlocked — you can now generate the final form pack.
+            File is unlocked  -  you can now generate the final form pack.
           </p>
         </div>
       )}

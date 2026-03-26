@@ -1,4 +1,4 @@
--- Migration 206: Continuity Engine — Shadow Matter
+-- Migration 206: Continuity Engine  -  Shadow Matter
 -- Directives 018, 021, 023 of NorvaOS
 -- Tables: address_history, personal_history, prospect_triggers
 -- RPC: fn_initialize_shadow_matter
@@ -183,7 +183,7 @@ BEGIN
     created_by, assigned_to, source, is_active
   ) VALUES (
     gen_random_uuid(), p_tenant_id,
-    'Renewal — ' || COALESCE(_contact.first_name, '') || ' ' || COALESCE(_contact.last_name, ''),
+    'Renewal  -  ' || COALESCE(_contact.first_name, '') || ' ' || COALESCE(_contact.last_name, ''),
     _matter_number, 'shadow', p_matter_type_id,
     p_user_id, p_user_id, 'shadow_clone', true
   ) RETURNING id INTO _new_matter_id;

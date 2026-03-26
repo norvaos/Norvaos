@@ -30,7 +30,7 @@ export const frontDeskCheckInAction: ActionDefinition<FrontDeskCheckInInput, Fro
   async execute({ input, tenantId, userId, supabase }) {
     if (!userId) throw new Error('User authentication required')
 
-    // 1. Get the appointment details — try with tenant_id first, fallback without
+    // 1. Get the appointment details  -  try with tenant_id first, fallback without
     let appointment: { id: string; status: string; user_id: string | null; contact_id: string | null } | null = null
 
     const { data: apptByTenant } = await supabase
@@ -69,7 +69,7 @@ export const frontDeskCheckInAction: ActionDefinition<FrontDeskCheckInInput, Fro
 
     if (updateErr) {
       if (updateErr.message?.includes('check constraint') || updateErr.message?.includes('appointments_status_check')) {
-        // Fallback: constraint doesn't include 'checked_in' yet — use 'confirmed' and track via check_in_sessions
+        // Fallback: constraint doesn't include 'checked_in' yet  -  use 'confirmed' and track via check_in_sessions
         await supabase
           .from('appointments')
           .update({ status: 'confirmed' })

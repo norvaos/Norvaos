@@ -7,7 +7,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 
 /**
  * GET /api/admin/supervision
- * Admin-only — requirePermission throws 403 if unauthorised.
+ * Admin-only  -  requirePermission throws 403 if unauthorised.
  *
  * Returns supervision relationships. By default returns supervisees
  * of the authenticated user. Pass ?userId=X for admin view.

@@ -1,11 +1,11 @@
 /**
- * IRCC Forms Engine — Validation Rules Engine
+ * IRCC Forms Engine  -  Validation Rules Engine
  *
  * Replaces the hardcoded form-validator.ts with a metadata-driven approach.
  * All validation rules are derived from ircc_form_fields metadata and
  * composite_validation_rules table rows.
  *
- * Pure logic module — database access is injected via the ValidationDataAccess
+ * Pure logic module  -  database access is injected via the ValidationDataAccess
  * interface, making this testable without a real database.
  */
 
@@ -227,11 +227,11 @@ function buildResult(issues: ValidationIssue[]): ValidationResult {
  * Validates a single field value against its metadata definition.
  *
  * Checks (in order):
- * 1. Required — is_required and value is empty
- * 2. Min length — value exists but is shorter than min_length
- * 3. Max length — value exists but exceeds max_length
- * 4. Pattern — explicit validation_pattern on the field, or default by field_type
- * 5. Enum — value must be one of the defined options
+ * 1. Required  -  is_required and value is empty
+ * 2. Min length  -  value exists but is shorter than min_length
+ * 3. Max length  -  value exists but exceeds max_length
+ * 4. Pattern  -  explicit validation_pattern on the field, or default by field_type
+ * 5. Enum  -  value must be one of the defined options
  *
  * Pure function with no database access.
  *
@@ -270,11 +270,11 @@ export function validateFieldValue(
       message_client: `Please fill in ${label}`,
       blocking,
     })
-    // If required and empty, skip further checks — they are meaningless
+    // If required and empty, skip further checks  -  they are meaningless
     return issues
   }
 
-  // No value — nothing further to validate
+  // No value  -  nothing further to validate
   if (isEmpty(value)) return issues
 
   const strVal = toStr(value)
@@ -303,7 +303,7 @@ export function validateFieldValue(
     })
   }
 
-  // 4. Pattern — explicit or default by field type
+  // 4. Pattern  -  explicit or default by field type
   if (field.validation_pattern) {
     try {
       const regex = new RegExp(field.validation_pattern)
@@ -319,7 +319,7 @@ export function validateFieldValue(
         })
       }
     } catch {
-      // Invalid regex in field metadata — skip pattern check silently
+      // Invalid regex in field metadata  -  skip pattern check silently
     }
   } else if (field.field_type && field.field_type in DEFAULT_PATTERNS) {
     const { pattern, message } = DEFAULT_PATTERNS[field.field_type]
@@ -335,7 +335,7 @@ export function validateFieldValue(
     }
   }
 
-  // 5. Enum validation — value must be in the options list
+  // 5. Enum validation  -  value must be in the options list
   if (field.options && field.options.length > 0) {
     const allowedValues = field.options.map((o) => o.value)
     const checkValue = typeof value === 'string' ? value : String(value)
@@ -434,7 +434,7 @@ export async function evaluateCompositeRules(
       case 'entity': {
         // Merge all instances for the same person_id
         if (!personId) {
-          // No person context — cannot evaluate entity-scope rule, skip
+          // No person context  -  cannot evaluate entity-scope rule, skip
           results.push({ rule, passed: true })
           continue
         }
@@ -454,7 +454,7 @@ export async function evaluateCompositeRules(
       }
 
       default: {
-        // Unknown scope — skip
+        // Unknown scope  -  skip
         results.push({ rule, passed: true })
         continue
       }
@@ -536,13 +536,13 @@ export async function validateFormInstance(
 
   // 3. Validate each field
   for (const field of fields) {
-    // Skip meta fields — they are not user-fillable
+    // Skip meta fields  -  they are not user-fillable
     if (field.is_meta_field) continue
 
-    // Skip fields without a profile_path — cannot validate
+    // Skip fields without a profile_path  -  cannot validate
     if (!field.profile_path) continue
 
-    // 3a. Evaluate show_when — skip hidden fields entirely
+    // 3a. Evaluate show_when  -  skip hidden fields entirely
     const showCondition = normalizeLegacyCondition(
       field.show_when as Parameters<typeof normalizeLegacyCondition>[0]
     )
@@ -562,7 +562,7 @@ export async function validateFormInstance(
       if (reqCondition) {
         const conditionMet = evaluateCondition(reqCondition, flatValues)
         if (conditionMet) {
-          // Condition is met — field is conditionally required
+          // Condition is met  -  field is conditionally required
           effectiveRequired = true
         }
         // If condition is NOT met and field is not inherently required, skip required check
@@ -630,7 +630,7 @@ export async function validateFormInstance(
         field_id: field?.id,
         label,
         message: `${label} is stale${record.stale_reason ? `: ${record.stale_reason}` : ''} and needs review`,
-        message_client: `${label} may be outdated — please review`,
+        message_client: `${label} may be outdated  -  please review`,
         blocking: mode === 'final',
       })
     }
@@ -797,7 +797,7 @@ export async function checkGenerationReadiness(
         profile_path: conflictPath,
         field_id: field?.id,
         label: field?.label ?? conflictPath,
-        message: `${field?.label ?? conflictPath} has conflicting values across forms — please verify the correct value`,
+        message: `${field?.label ?? conflictPath} has conflicting values across forms  -  please verify the correct value`,
         message_client: `${field?.label ?? conflictPath} has conflicting information`,
         blocking: true,
       })

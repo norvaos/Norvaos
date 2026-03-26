@@ -1,5 +1,5 @@
 -- =============================================================================
--- Migration 158 — Bi-Directional Contact <> Matter People Sync Triggers
+-- Migration 158  -  Bi-Directional Contact <> Matter People Sync Triggers
 -- =============================================================================
 --
 -- When UCI, Passport #, or Passport Expiry is updated in matter_people,

@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
   try {
     const auth = await authenticateRequest()
     requirePermission(auth, 'leads', 'edit')
-    // All reads and writes use adminClient — user-scoped RLS must never block
+    // All reads and writes use adminClient  -  user-scoped RLS must never block
     // a legitimate conversion triggered by an authenticated, authorised user.
     const adminForReads = createAdminClient()
 
@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (lead.converted_matter_id) {
-      // Already converted — return success
+      // Already converted  -  return success
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { data: matter } = await (adminForReads as any)
         .from('matters')
@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    // Verify retainer package — use adminClient so RLS on lead_retainer_packages
+    // Verify retainer package  -  use adminClient so RLS on lead_retainer_packages
     // never causes a false 404 that silently aborts the conversion.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: retainerPkg } = await (adminForReads as any)
@@ -98,7 +98,7 @@ export async function POST(request: NextRequest) {
         .eq('id', lead.matter_type_id)
         .single()
       if (mt?.name) {
-        matterTitle = `${matterTitle} — ${mt.name}`
+        matterTitle = `${matterTitle}  -  ${mt.name}`
       }
     }
 
@@ -138,7 +138,7 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    // Conversion failed — return structured error with all blocked reasons
+    // Conversion failed  -  return structured error with all blocked reasons
     const blockedReasons: string[] = conversionResult.gateResults
       ? conversionResult.gateResults.blockedReasons
       : conversionResult.error

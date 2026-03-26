@@ -1,5 +1,5 @@
 -- ============================================================================
--- 152 — Multi-Context Identity: Allow one auth user across multiple tenants
+-- 152  -  Multi-Context Identity: Allow one auth user across multiple tenants
 -- ============================================================================
 -- Problem: users.auth_user_id has a UNIQUE constraint, blocking an email
 --          that's already a "Client" in tenant A from signing up as an
@@ -11,7 +11,7 @@
 BEGIN;
 
 -- ── 1. Drop the old single-column unique constraint ─────────────────────────
--- The constraint name may vary — try both auto-generated names.
+-- The constraint name may vary  -  try both auto-generated names.
 DO $$
 BEGIN
   -- Try the most common auto-generated name
@@ -26,7 +26,7 @@ DROP INDEX IF EXISTS users_auth_user_id_key;
 DROP INDEX IF EXISTS idx_users_auth_user_id;
 
 -- ── 2. Add composite unique constraint ──────────────────────────────────────
--- One users row per (auth_user_id, tenant_id) — allows multi-tenant membership.
+-- One users row per (auth_user_id, tenant_id)  -  allows multi-tenant membership.
 -- NULLs in auth_user_id are exempt (Postgres treats each NULL as distinct).
 DO $$
 BEGIN

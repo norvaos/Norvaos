@@ -13,7 +13,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
  * GET /api/matters/[id]/check-gating
  *
  * Pre-evaluates gating rules for ALL stages in the matter's pipeline.
- * Returns which stages are blocked and why — powers the lock indicators
+ * Returns which stages are blocked and why  -  powers the lock indicators
  * on the StagePipelineBar.
  *
  * CRITICAL: This route imports and calls the exact same evaluateGatingRules()
@@ -57,7 +57,7 @@ async function handleGet(
       .maybeSingle()
 
     if (!stageState?.pipeline_id) {
-      // No pipeline assigned — no gating to evaluate
+      // No pipeline assigned  -  no gating to evaluate
       return NextResponse.json({ gatingErrors: {} })
     }
 
@@ -76,12 +76,12 @@ async function handleGet(
     const gatingErrors: Record<string, string[]> = {}
 
     for (const stage of stages) {
-      // Cast gating_rules — same pattern as advanceGenericStage
+      // Cast gating_rules  -  same pattern as advanceGenericStage
       const rawRules = (Array.isArray(stage.gating_rules)
         ? stage.gating_rules
         : []) as unknown as GatingRule[]
 
-      // Resolve effective rules — applies default baseline for enforcement-enabled types
+      // Resolve effective rules  -  applies default baseline for enforcement-enabled types
       // Passes sort_order so early stages (0–1) are not blocked by default baseline
       const effectiveRules = await getEffectiveGatingRules(
         admin,

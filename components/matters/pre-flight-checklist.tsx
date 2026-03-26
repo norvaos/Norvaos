@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * PreFlightChecklist — Directive 019: "Un-Rejectable" Logic Flow
+ * PreFlightChecklist  -  Directive 019: "Un-Rejectable" Logic Flow
  *
  * Before the "Sovereign Sparkle" can trigger, this modal displays a
  * summary of three hard-gate checks:
@@ -100,7 +100,7 @@ function usePreFlightChecks(matterId: string, enabled: boolean) {
           status: isVerified && confidence >= 80 ? 'pass' : 'fail',
           detail: isVerified
             ? `Verified via ${verification.document_type ?? 'document'} (${confidence}% confidence)`
-            : 'No verified identity on record — KYC required',
+            : 'No verified identity on record  -  KYC required',
         })
       } else {
         checks.push({
@@ -114,7 +114,7 @@ function usePreFlightChecks(matterId: string, enabled: boolean) {
 
       // ── 2. History: 0 Days Unaccounted For ─────────────────────────
 
-      // Check questionnaire completion — specifically immigration history fields
+      // Check questionnaire completion  -  specifically immigration history fields
       const { data: intake } = await (supabase as any)
         .from('matter_immigration')
         .select('questionnaire_pct')
@@ -141,8 +141,8 @@ function usePreFlightChecks(matterId: string, enabled: boolean) {
         detail: historyGaps > 0
           ? `${historyGaps} unverified history field${historyGaps > 1 ? 's' : ''} remaining`
           : qPct < 100
-            ? `Questionnaire ${qPct}% complete — must reach 100%`
-            : 'Full immigration history verified — 0 gaps',
+            ? `Questionnaire ${qPct}% complete  -  must reach 100%`
+            : 'Full immigration history verified  -  0 gaps',
       })
 
       // ── 3. Trust: Hash Chain Intact ────────────────────────────────
@@ -170,7 +170,7 @@ function usePreFlightChecks(matterId: string, enabled: boolean) {
         description: 'Immutable ledger parity',
         status: isParity ? 'pass' : 'fail',
         detail: isParity
-          ? `${txns} transaction${txns !== 1 ? 's' : ''} = ${audits} audit entr${audits !== 1 ? 'ies' : 'y'} — perfect parity`
+          ? `${txns} transaction${txns !== 1 ? 's' : ''} = ${audits} audit entr${audits !== 1 ? 'ies' : 'y'}  -  perfect parity`
           : `MISMATCH: ${txns} transactions vs ${audits} audit entries (delta: ${txns - audits})`,
       })
 
@@ -240,13 +240,13 @@ export function PreFlightChecklist({
             {allPassed ? (
               <div className="flex items-center justify-center gap-2 text-emerald-700 dark:text-emerald-400">
                 <CheckCircle2 className="h-5 w-5" />
-                <span className="font-semibold">All checks passed — ready to seal</span>
+                <span className="font-semibold">All checks passed  -  ready to seal</span>
               </div>
             ) : (
               <div className="flex items-center justify-center gap-2 text-red-700 dark:text-red-400">
                 <XCircle className="h-5 w-5" />
                 <span className="font-semibold">
-                  {failCount} check{failCount > 1 ? 's' : ''} failed — cannot proceed
+                  {failCount} check{failCount > 1 ? 's' : ''} failed  -  cannot proceed
                 </span>
               </div>
             )}

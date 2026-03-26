@@ -15,7 +15,7 @@ BEGIN
 END $$;
 
 -- =========================================================================
--- Subscriptions table — one-per-tenant subscription tracking
+-- Subscriptions table  -  one-per-tenant subscription tracking
 -- =========================================================================
 CREATE TABLE IF NOT EXISTS subscriptions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -48,7 +48,7 @@ CREATE POLICY "subscriptions_tenant_isolation" ON subscriptions
   FOR ALL USING (tenant_id = get_user_tenant_id());
 
 -- =========================================================================
--- Billing invoices table — payment history
+-- Billing invoices table  -  payment history
 -- =========================================================================
 CREATE TABLE IF NOT EXISTS billing_invoices (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -78,7 +78,7 @@ CREATE POLICY "billing_invoices_tenant_isolation" ON billing_invoices
   FOR ALL USING (tenant_id = get_user_tenant_id());
 
 -- =========================================================================
--- Plan features table — global config for feature gating per plan
+-- Plan features table  -  global config for feature gating per plan
 -- =========================================================================
 CREATE TABLE IF NOT EXISTS plan_features (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -91,7 +91,7 @@ CREATE TABLE IF NOT EXISTS plan_features (
 
 COMMENT ON TABLE plan_features IS 'Global config table (no tenant_id, no RLS). Controls which features each plan tier gets. limit_value NULL or -1 means unlimited.';
 
--- No RLS — public read config table
+-- No RLS  -  public read config table
 
 -- =========================================================================
 -- Seed plan_features with default limits

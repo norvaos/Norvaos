@@ -1,5 +1,5 @@
 /**
- * Auto-Reconciliation Service — Directive 004, Pillar 2
+ * Auto-Reconciliation Service  -  Directive 004, Pillar 2
  *
  * Automated three-way reconciliation with disbursement lockdown.
  * Runs reconciliation via RPC, manages disbursement locks based on
@@ -232,7 +232,7 @@ export async function resolveDiscrepancy(
       .eq('status', 'open')
 
     if (count === 0) {
-      // No more open discrepancies — release the lock
+      // No more open discrepancies  -  release the lock
       await from
         .disbursementLocks(admin)
         .update({ is_active: false })

@@ -106,7 +106,7 @@ export function NextStepWizard({
       const result = await res.json()
 
       if (selectedAction === 'no_action') {
-        toast.success('Matter marked — no further action')
+        toast.success('Matter marked  -  no further action')
         onOpenChange(false)
       } else {
         const actionLabel = NEXT_STEP_OPTIONS.find((o) => o.action === selectedAction)?.label

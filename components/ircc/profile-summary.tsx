@@ -230,7 +230,7 @@ function formatValue(value: unknown, field: IRCCFieldMapping): string {
 
     case 'repeater':
       if (!Array.isArray(value) || value.length === 0) return ''
-      return `${value.length} entries` // placeholder — rendered by RepeaterDisplay
+      return `${value.length} entries` // placeholder  -  rendered by RepeaterDisplay
 
     case 'date':
       if (typeof value === 'string' && value) {

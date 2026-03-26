@@ -136,13 +136,13 @@ export function ClientNotificationsTab({ matterId, tenantId }: ClientNotificatio
                       {notif.subject}
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground">
-                      {notif.recipient_email ?? '—'}
+                      {notif.recipient_email ?? ' - '}
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground whitespace-nowrap">
                       {notif.sent_at ? formatDate(notif.sent_at) : formatDate(notif.created_at)}
                     </TableCell>
                     <TableCell className="text-sm text-destructive max-w-[200px] truncate">
-                      {notif.error_message ?? '—'}
+                      {notif.error_message ?? ' - '}
                     </TableCell>
                   </TableRow>
                 )

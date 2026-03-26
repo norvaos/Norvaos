@@ -6,7 +6,7 @@ import { withTiming } from '@/lib/middleware/request-timing'
 /**
  * GET /api/admin/tenants/[id]/invites
  *
- * Platform-admin ONLY — list active invites for a tenant.
+ * Platform-admin ONLY  -  list active invites for a tenant.
  * Rate-limited: 30 req/min per IP.
  */
 const handleGet = withPlatformAdmin(async (_request, { params }) => {

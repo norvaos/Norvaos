@@ -141,7 +141,7 @@ async function handlePost(
     try {
       const supabase = await createServerSupabaseClient()
 
-      // Step 1: Authorize (reserve funds) — skips if already reserved or readiness < 95
+      // Step 1: Authorize (reserve funds)  -  skips if already reserved or readiness < 95
       const { data: authData, error: authErr } = await supabase.rpc(
         'fn_authorize_government_disbursement' as any,
         { p_matter_id: matterId } as any,

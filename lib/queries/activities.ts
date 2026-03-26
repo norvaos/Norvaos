@@ -92,7 +92,7 @@ export function useTaskActivities(taskId: string, tenantId: string) {
 /**
  * Fetch any unresolved template_condition_error activities for a matter.
  * Used to display a warning banner on the matter detail page so the
- * responsible lawyer sees the issue inline — not only via notifications.
+ * responsible lawyer sees the issue inline  -  not only via notifications.
  *
  * Returns the most recent error activity (within the last 7 days) or null.
  */
@@ -118,7 +118,7 @@ export function useConditionErrors(matterId: string | undefined) {
       return data
     },
     enabled: !!matterId,
-    staleTime: 2 * 60 * 1000, // 2 minutes — don't re-poll too aggressively
+    staleTime: 2 * 60 * 1000, // 2 minutes  -  don't re-poll too aggressively
   })
 }
 

@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * DraftWithAIPanel — Smart Component (Directive 21.0)
+ * DraftWithAIPanel  -  Smart Component (Directive 21.0)
  *
  * Context-aware Intelligence Panel that detects its mount location:
  *   - "overview"     → Compact summary card (Audit Score, Fact count, Drift status)
@@ -19,7 +19,7 @@ import { AiDraftPanel } from '@/components/matters/ai-draft-panel'
 interface DraftWithAIPanelProps {
   matterId: string
   matterTitle: string | null
-  /** Mount context — auto-detected from parent or explicitly set */
+  /** Mount context  -  auto-detected from parent or explicitly set */
   mountContext?: 'overview' | 'intelligence' | 'modal'
 }
 

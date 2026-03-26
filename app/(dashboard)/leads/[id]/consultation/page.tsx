@@ -88,11 +88,11 @@ interface MatterCountRow {
 // ── Constants ─────────────────────────────────────────────────────────────────
 
 const NOT_QUALIFIED_REASONS = [
-  { value: 'Income', label: 'Income — Does not meet financial threshold' },
-  { value: 'Criminal', label: 'Criminal — Inadmissibility concerns' },
-  { value: 'Status', label: 'Status — Immigration status issue' },
-  { value: 'Age', label: 'Age — Age requirement not met' },
-  { value: 'Policy', label: 'Policy — Firm policy conflict' },
+  { value: 'Income', label: 'Income  -  Does not meet financial threshold' },
+  { value: 'Criminal', label: 'Criminal  -  Inadmissibility concerns' },
+  { value: 'Status', label: 'Status  -  Immigration status issue' },
+  { value: 'Age', label: 'Age  -  Age requirement not met' },
+  { value: 'Policy', label: 'Policy  -  Firm policy conflict' },
   { value: 'Other', label: 'Other' },
 ]
 
@@ -108,7 +108,7 @@ const OUTCOME_BUTTONS: {
     label: 'Retain',
     icon: CheckCircle2,
     className: 'border-emerald-200 text-emerald-700 hover:bg-emerald-50 hover:border-emerald-400',
-    description: 'Client retained — generate retainer agreement',
+    description: 'Client retained  -  generate retainer agreement',
   },
   {
     outcome: 'FOLLOW_UP',
@@ -371,7 +371,7 @@ export default function ConsultationPage() {
         outcome: 'RETAIN',
         newStatus: 'converted',
       })
-      toast.success('Lead retained — redirecting to new matter')
+      toast.success('Lead retained  -  redirecting to new matter')
       router.push(`/matters/new?lead=${leadId}`)
     } finally {
       setSubmitting(false)
@@ -429,7 +429,7 @@ export default function ConsultationPage() {
         notes: nqReason,
         newStatus: 'closed_lost',
       })
-      toast.success('Lead closed — not qualified')
+      toast.success('Lead closed  -  not qualified')
       closeDialog()
       router.push('/leads')
     } finally {
@@ -513,7 +513,7 @@ export default function ConsultationPage() {
 
   const contactName = contact
     ? [contact.first_name, contact.last_name].filter(Boolean).join(' ') || 'Unknown'
-    : '—'
+    : ' - '
 
   const initials = contact
     ? [contact.first_name?.[0], contact.last_name?.[0]].filter(Boolean).join('').toUpperCase()
@@ -539,11 +539,11 @@ export default function ConsultationPage() {
         <Separator orientation="vertical" className="h-5" />
         <span className="text-sm font-medium text-slate-700">Consultation Workspace</span>
         <Badge variant="outline" className="ml-auto text-[10px]">
-          {format(new Date(), 'MMMM d, yyyy — h:mm a')}
+          {format(new Date(), 'MMMM d, yyyy  -  h:mm a')}
         </Badge>
       </div>
 
-      {/* Body — 3-column layout */}
+      {/* Body  -  3-column layout */}
       <div className="flex flex-1 overflow-hidden">
         {/* ── Left Rail ── */}
         <aside className="w-[250px] shrink-0 border-r bg-slate-50/60 overflow-y-auto p-4 space-y-5">
@@ -652,7 +652,7 @@ export default function ConsultationPage() {
             />
           </section>
 
-          {/* Immigration Assessment panel — shown if lead has intake data */}
+          {/* Immigration Assessment panel  -  shown if lead has intake data */}
           {lead?.practice_area_id && (
             <section className="bg-blue-50/60 border border-blue-100 rounded-lg p-4">
               <h3 className="text-sm font-semibold text-blue-800 mb-2">Immigration Assessment</h3>
@@ -663,7 +663,7 @@ export default function ConsultationPage() {
           )}
         </main>
 
-        {/* ── Right Panel — 7 Outcome Buttons ── */}
+        {/* ── Right Panel  -  7 Outcome Buttons ── */}
         <aside className="w-[230px] shrink-0 border-l bg-white overflow-y-auto p-4">
           <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">
             Consultation Outcome
@@ -915,7 +915,7 @@ export default function ConsultationPage() {
             {contactSearchResults && contactSearchResults.length > 0 && (
               <div className="border rounded-lg divide-y max-h-48 overflow-y-auto">
                 {contactSearchResults.map((c) => {
-                  const name = ([c.first_name, c.last_name].filter(Boolean).join(' ') || c.email_primary) ?? '—'
+                  const name = ([c.first_name, c.last_name].filter(Boolean).join(' ') || c.email_primary) ?? ' - '
                   const isSelected = canonicalContactId === c.id
                   return (
                     <button

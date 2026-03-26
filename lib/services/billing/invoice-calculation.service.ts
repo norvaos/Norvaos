@@ -1,5 +1,5 @@
 // ============================================================================
-// Invoice Calculation Service — the ONLY authorised path to recalculate
+// Invoice Calculation Service  -  the ONLY authorised path to recalculate
 // invoice financial fields (Billing Module)
 // ============================================================================
 // The DB function calculate_invoice_totals(UUID) is the sole authorised
@@ -26,7 +26,7 @@ export interface ServiceResult<T = void> {
  *
  * This is the ONLY authorised path to update invoice totals.  Direct
  * UPDATE statements against financial columns are blocked by a DB trigger
- * unless the GUC guard is set — and only this DB function sets that guard.
+ * unless the GUC guard is set  -  and only this DB function sets that guard.
  */
 export async function recalculateInvoice(
   supabase: SupabaseClient<Database>,
@@ -43,7 +43,7 @@ export async function recalculateInvoice(
     return { success: false, error: error.message }
   }
 
-  // The function returns JSONB — cast to our typed result
+  // The function returns JSONB  -  cast to our typed result
   const result = data as InvoiceTotalsResult
   return { success: true, data: result }
 }

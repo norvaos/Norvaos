@@ -182,7 +182,7 @@ export default function SentinelRecoveryPage() {
             SENTINEL Recovery Console
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Emergency lockdown management — Managing Partner access only
+            Emergency lockdown management  -  Managing Partner access only
           </p>
         </div>
         <Badge
@@ -255,7 +255,7 @@ export default function SentinelRecoveryPage() {
                       {lockdown.user_id.slice(0, 8)}...
                     </TableCell>
                     <TableCell className="font-mono text-xs">
-                      {lockdown.matter_id ? `${lockdown.matter_id.slice(0, 8)}...` : '—'}
+                      {lockdown.matter_id ? `${lockdown.matter_id.slice(0, 8)}...` : ' - '}
                     </TableCell>
                     <TableCell>
                       <span className="font-bold text-red-600">{lockdown.trigger_count}</span>
@@ -322,7 +322,7 @@ export default function SentinelRecoveryPage() {
                     <TableCell className="text-xs text-muted-foreground">
                       {lockdown.unlocked_at
                         ? format(new Date(lockdown.unlocked_at), 'MMM d, HH:mm')
-                        : '—'}
+                        : ' - '}
                     </TableCell>
                     <TableCell>
                       <Badge variant="secondary" className="text-xs">
@@ -334,7 +334,7 @@ export default function SentinelRecoveryPage() {
                       </Badge>
                     </TableCell>
                     <TableCell className="text-xs max-w-[200px] truncate">
-                      {lockdown.details?.unlock_reason ?? '—'}
+                      {lockdown.details?.unlock_reason ?? ' - '}
                     </TableCell>
                   </TableRow>
                 ))}
@@ -350,7 +350,7 @@ export default function SentinelRecoveryPage() {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <KeyRound className="h-5 w-5 text-amber-600" />
-              Master Recovery — Biometric Handshake
+              Master Recovery  -  Biometric Handshake
             </DialogTitle>
             <DialogDescription>
               You are about to lift an emergency lockdown. This action requires
@@ -415,7 +415,7 @@ export default function SentinelRecoveryPage() {
               {/* Identity */}
               <p className="text-xs text-muted-foreground flex items-center gap-1">
                 <FileText className="h-3 w-3" />
-                Authenticated as: {appUser?.email ?? 'Unknown'} — This action is
+                Authenticated as: {appUser?.email ?? 'Unknown'}  -  This action is
                 immutably logged to SENTINEL.
               </p>
 

@@ -11,7 +11,7 @@ const SYNC_TIMEOUT_MS = 4000
 /**
  * GET /api/booking/[slug]?date=YYYY-MM-DD
  *
- * Public endpoint — returns booking page config + available time slots
+ * Public endpoint  -  returns booking page config + available time slots
  * for the requested date. If no date is provided, returns just the config.
  *
  * The response includes a `calendarSync` object describing whether the
@@ -71,7 +71,7 @@ async function handleGet(
 
     // Check if it's a working day
     if (!workingHours.days.includes(dayOfWeek)) {
-      // Check overrides — maybe this day is available
+      // Check overrides  -  maybe this day is available
       const { data: override } = await admin
         .from('booking_page_overrides')
         .select('*')
@@ -434,7 +434,7 @@ async function ensureCalendarFresh(
       }
     }
 
-    // Data is stale — await sync with timeout so this response uses fresh data
+    // Data is stale  -  await sync with timeout so this response uses fresh data
     try {
       const { syncCalendarPull } = await import('@/lib/services/microsoft-sync')
       const syncPromise = syncCalendarPull(conn.id, admin)
@@ -453,7 +453,7 @@ async function ensureCalendarFresh(
         }
       }
 
-      // Sync timed out — data may still be stale but we proceed anyway
+      // Sync timed out  -  data may still be stale but we proceed anyway
       console.warn('[booking/slots] Calendar sync timed out, using potentially stale data')
       return {
         enabled: true,
@@ -469,7 +469,7 @@ async function ensureCalendarFresh(
       }
     }
   } catch {
-    // No Microsoft connection — graceful fallback
+    // No Microsoft connection  -  graceful fallback
     return { enabled: false, lastSyncAt: null, stale: false }
   }
 }

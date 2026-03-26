@@ -14,7 +14,7 @@
  *      (covers the case where a matter was created manually but linked to a lead)
  *
  * The conversion skips conflict_cleared and intake_complete gates (the firm
- * has accepted funds — same logic as record-retainer-payment).
+ * has accepted funds  -  same logic as record-retainer-payment).
  */
 
 import type { SupabaseClient } from '@supabase/supabase-js'
@@ -29,7 +29,7 @@ export interface TrustDepositConversionParams {
   userId: string
   /** The matter that received the trust deposit */
   matterId?: string
-  /** Explicit lead ID — if provided, takes priority over matter lookup */
+  /** Explicit lead ID  -  if provided, takes priority over matter lookup */
   leadId?: string
   /** Deposit amount in cents (for activity logging) */
   amountCents: number
@@ -40,7 +40,7 @@ export interface TrustDepositConversionResult {
   matterId?: string
   matterNumber?: string
   error?: string
-  /** Why conversion was skipped (not an error — just informational) */
+  /** Why conversion was skipped (not an error  -  just informational) */
   skippedReason?: string
 }
 
@@ -48,7 +48,7 @@ export interface TrustDepositConversionResult {
  * Attempt to auto-convert a lead to a matter after a trust deposit.
  *
  * This is a best-effort, non-blocking operation. Failures are logged but
- * never propagated to the caller — the deposit itself always succeeds.
+ * never propagated to the caller  -  the deposit itself always succeeds.
  */
 export async function convertLeadOnTrustDeposit(
   params: TrustDepositConversionParams,
@@ -106,7 +106,7 @@ export async function convertLeadOnTrustDeposit(
     if (lead.status === 'lost' || lead.status === 'disqualified') {
       return {
         converted: false,
-        skippedReason: `Lead status is "${lead.status}" — cannot auto-convert.`,
+        skippedReason: `Lead status is "${lead.status}"  -  cannot auto-convert.`,
       }
     }
 
@@ -128,7 +128,7 @@ export async function convertLeadOnTrustDeposit(
 
         return {
           converted: false,
-          error: `Conflict detected: ${conflictResult.match_count} match(es) found — ${matchSummary}. A lawyer must review and clear the conflict before this lead can become a matter.`,
+          error: `Conflict detected: ${conflictResult.match_count} match(es) found  -  ${matchSummary}. A lawyer must review and clear the conflict before this lead can become a matter.`,
         }
       }
 
@@ -137,10 +137,10 @@ export async function convertLeadOnTrustDeposit(
           lead_id: leadId,
           match_count: conflictResult.match_count,
         })
-        // Name-only matches don't block — proceed with conversion but log for audit
+        // Name-only matches don't block  -  proceed with conversion but log for audit
       }
     } catch (conflictErr) {
-      // Conflict check failure is non-blocking — log and proceed
+      // Conflict check failure is non-blocking  -  log and proceed
       log.warn('trust_deposit_conversion.conflict_check_failed', {
         lead_id: leadId,
         error: conflictErr instanceof Error ? conflictErr.message : 'Unknown',
@@ -168,7 +168,7 @@ export async function convertLeadOnTrustDeposit(
         .select('name')
         .eq('id', lead.matter_type_id)
         .single()
-      if (mt?.name) matterTitle = `${matterTitle} — ${mt.name}`
+      if (mt?.name) matterTitle = `${matterTitle}  -  ${mt.name}`
     }
 
     // ── Execute conversion ────────────────────────────────────────────────
@@ -185,7 +185,7 @@ export async function convertLeadOnTrustDeposit(
         billingType: 'flat_fee',
       },
       gateOverrides: {
-        // Trust deposit received — skip non-essential gates
+        // Trust deposit received  -  skip non-essential gates
         conflict_cleared: false,
         intake_complete: false,
       },

@@ -10,7 +10,7 @@
  *
  * Design rules:
  *   - Every function either succeeds or throws (no silent null returns)
- *   - Checksum validation returns a result object — caller decides behavior
+ *   - Checksum validation returns a result object  -  caller decides behavior
  *   - Watermark uses pdf-lib (JavaScript), not pikepdf (Python)
  *     because watermarking doesn't touch XFA streams
  */
@@ -62,9 +62,9 @@ export function validateTemplateBytesChecksum(
  *   - Red text, 15% opacity
  *   - Rotated 45 degrees
  *   - Large font (80pt) centered on each page
- *   - Text: "DRAFT — NOT FOR SUBMISSION"
+ *   - Text: "DRAFT  -  NOT FOR SUBMISSION"
  *
- * This uses pdf-lib which does NOT modify XFA streams — it only adds
+ * This uses pdf-lib which does NOT modify XFA streams  -  it only adds
  * content stream operators on top of each page, so the XFA data remains
  * intact and renderable in Adobe Reader.
  *
@@ -73,7 +73,7 @@ export function validateTemplateBytesChecksum(
  */
 export async function applyDraftWatermark(pdfBytes: Uint8Array): Promise<Uint8Array> {
   const pdfDoc = await PDFDocument.load(pdfBytes, {
-    // Don't throw on encrypted or problematic PDFs — XFA PDFs can be finicky
+    // Don't throw on encrypted or problematic PDFs  -  XFA PDFs can be finicky
     ignoreEncryption: true,
   })
 
@@ -90,7 +90,7 @@ export async function applyDraftWatermark(pdfBytes: Uint8Array): Promise<Uint8Ar
   for (const page of pages) {
     const { width, height } = page.getSize()
 
-    // Main "DRAFT" text — centered and rotated
+    // Main "DRAFT" text  -  centered and rotated
     const textWidth = font.widthOfTextAtSize(watermarkText, fontSize)
     const textHeight = fontSize
     page.drawText(watermarkText, {
@@ -103,7 +103,7 @@ export async function applyDraftWatermark(pdfBytes: Uint8Array): Promise<Uint8Ar
       rotate: degrees(45),
     })
 
-    // Sub text — below the main watermark
+    // Sub text  -  below the main watermark
     const subWidth = font.widthOfTextAtSize(subText, subFontSize)
     page.drawText(subText, {
       x: (width - subWidth) / 2,
@@ -123,7 +123,7 @@ export async function applyDraftWatermark(pdfBytes: Uint8Array): Promise<Uint8Ar
 
 /**
  * Thrown when the template PDF checksum doesn't match the expected value.
- * This is a hard failure — generation must stop.
+ * This is a hard failure  -  generation must stop.
  */
 export class TemplateIntegrityError extends Error {
   readonly formCode: string
@@ -156,7 +156,7 @@ export class XFAFillError extends Error {
     super(
       `XFA fill engine failed for ${formCode}. ` +
       `No PDF output was produced. ` +
-      `This is a hard failure — no fallback PDF will be generated.`
+      `This is a hard failure  -  no fallback PDF will be generated.`
     )
     this.name = 'XFAFillError'
     this.formCode = formCode

@@ -280,7 +280,7 @@ export function ContactWorkPanel({ contactId, onClose, onCreateIntake }: Contact
   const { data: config } = useFrontDeskConfig(tenantId)
   const { data: interactions } = useFrontDeskInteractionBreakdown(contactId)
 
-  // Screening answers — fetch the most recent lead for this contact
+  // Screening answers  -  fetch the most recent lead for this contact
   const { data: screeningLead } = useQuery({
     queryKey: ['front-desk', 'panel-screening', contactId ?? ''],
     queryFn: async () => {
@@ -651,7 +651,7 @@ export function ContactWorkPanel({ contactId, onClose, onCreateIntake }: Contact
                 </div>
               )}
 
-              {/* ── Interaction Summary — compact horizontal strip ── */}
+              {/* ── Interaction Summary  -  compact horizontal strip ── */}
               {interactions && interactions.total > 0 && (
                 <div className="rounded-md border border-slate-200 bg-slate-50 px-3 py-2">
                   <div className="flex items-center justify-between mb-1.5">

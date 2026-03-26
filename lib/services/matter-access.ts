@@ -57,7 +57,7 @@ export async function checkMatterAccess(
 }
 
 /**
- * Get detailed access info — which path grants access to this matter.
+ * Get detailed access info  -  which path grants access to this matter.
  *
  * This mirrors the 9-path logic from check_matter_access() but returns
  * the specific path. Used for UI hints (e.g. "You have access via delegation").

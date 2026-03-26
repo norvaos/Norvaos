@@ -91,7 +91,7 @@ async function handlePost(
 
     const supabase = createAdminClient()
 
-    // Hash the document number — never store raw PII
+    // Hash the document number  -  never store raw PII
     const documentNumberHash = documentNumber
       ? createHash('sha256').update(documentNumber).digest('hex')
       : null
@@ -145,7 +145,7 @@ async function handlePost(
       verification: verificationRecord,
       message: method === 'manual_review'
         ? 'Identity verified via manual review'
-        : 'Verification initiated — awaiting provider response',
+        : 'Verification initiated  -  awaiting provider response',
     })
   } catch (error) {
     if (error instanceof AuthError) {

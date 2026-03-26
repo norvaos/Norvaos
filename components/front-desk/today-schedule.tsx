@@ -110,7 +110,7 @@ function AppointmentRow({
           <span className="font-medium">{formatTime(appointment.start_time)}</span>
         </div>
 
-        {/* Guest Name — clickable to open contact panel */}
+        {/* Guest Name  -  clickable to open contact panel */}
         {appointment.contact_id && onSelectContact ? (
           <button
             type="button"
@@ -158,7 +158,7 @@ function AppointmentRow({
       {/* Right: Action Buttons */}
       <div className="flex items-center gap-1 shrink-0">
         <TooltipProvider>
-          {/* Accept/Acknowledge — only shown when client is checked in */}
+          {/* Accept/Acknowledge  -  only shown when client is checked in */}
           {isCheckedIn && onAcknowledge && (
             <Tooltip>
               <TooltipTrigger asChild>
@@ -245,7 +245,7 @@ export function TodaySchedule({ onCheckIn, onNotifyStaff, onAddNote, onAcknowled
   const { data: staffGroups, isLoading } = useTodaySchedule(tenantId, selectedDate)
   const { data: staffList } = useFrontDeskStaffList(tenantId)
 
-  // Apply staff filter — show all or just one staff member
+  // Apply staff filter  -  show all or just one staff member
   const filteredGroups = useMemo(() => {
     if (!staffGroups) return []
     if (staffFilter === '__all') return staffGroups

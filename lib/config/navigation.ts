@@ -30,14 +30,14 @@ import {
 
 export interface NavItem {
   title: string
-  /** i18n dictionary key — resolved at render time; `title` is the English fallback */
+  /** i18n dictionary key  -  resolved at render time; `title` is the English fallback */
   labelKey?: string
   href: string
   icon: LucideIcon
   featureFlag?: string
   comingSoon?: boolean
   badge?: string
-  /** Mark as deprecated — still shown but with a visual indicator */
+  /** Mark as deprecated  -  still shown but with a visual indicator */
   deprecated?: boolean
   /** Sub-items rendered as a collapsible dropdown in the sidebar */
   children?: NavItem[]

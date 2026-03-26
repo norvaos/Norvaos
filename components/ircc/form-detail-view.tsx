@@ -184,7 +184,7 @@ export function FormDetailView({
             </div>
             <div>
               <p className="text-xs text-slate-500">XFA Root</p>
-              <p className="font-mono text-xs">{form.xfa_root_element ?? '—'}</p>
+              <p className="font-mono text-xs">{form.xfa_root_element ?? ' - '}</p>
             </div>
             <div>
               <p className="text-xs text-slate-500">Fields</p>

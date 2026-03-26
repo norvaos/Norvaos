@@ -6,9 +6,9 @@
  * and returns a reference ID.
  *
  * Requires: settings:view permission.
- * Sensitive content is sent to Sentry only — never logged to console.
+ * Sensitive content is sent to Sentry only  -  never logged to console.
  *
- * Team 3 / Module 4 — Support and Implementation Tooling
+ * Team 3 / Module 4  -  Support and Implementation Tooling
  */
 
 import { NextResponse } from 'next/server'
@@ -49,7 +49,7 @@ export async function POST(request: Request) {
     const payload: IssuePayload = parsed.data
     const reference = `ISS-${Date.now()}`
 
-    // Structured log: metadata only — no description content in console logs
+    // Structured log: metadata only  -  no description content in console logs
     log.info('support.issue.received', {
       tenant_id: auth.tenantId,
       user_id: auth.userId,
@@ -68,7 +68,7 @@ export async function POST(request: Request) {
       scope.setExtra('title', payload.title)
       scope.setExtra('description', payload.description)
       Sentry.captureMessage(
-        `Support Issue [${payload.severity.toUpperCase()}] — ${payload.area}: ${payload.title}`,
+        `Support Issue [${payload.severity.toUpperCase()}]  -  ${payload.area}: ${payload.title}`,
         payload.severity === 'critical' ? 'fatal' : payload.severity === 'high' ? 'error' : 'warning',
       )
     })
@@ -84,7 +84,7 @@ export async function POST(request: Request) {
     })
 
     return NextResponse.json(
-      { error: 'Could not submit issue — please try again.' },
+      { error: 'Could not submit issue  -  please try again.' },
       { status: 500 },
     )
   }

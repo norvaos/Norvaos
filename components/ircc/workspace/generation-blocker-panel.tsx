@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * GenerationBlockerPanel — Shows all blockers preventing form pack generation
+ * GenerationBlockerPanel  -  Shows all blockers preventing form pack generation
  *
  * Fetches generation readiness via useGenerationReadiness and displays blockers
  * grouped by type: missing required, validation errors, stale fields, trust
@@ -269,7 +269,7 @@ export function GenerationBlockerPanel({
           <Alert className="border-green-200 bg-green-50">
             <CheckCircle2 className="h-4 w-4 text-green-600" />
             <AlertDescription className="text-green-800 text-xs font-medium">
-              Ready to Generate — all requirements met.
+              Ready to Generate  -  all requirements met.
             </AlertDescription>
           </Alert>
         ) : (

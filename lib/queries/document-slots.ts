@@ -63,7 +63,7 @@ export function useDocumentSlotVersions(slotId: string | undefined) {
     queryFn: async () => {
       const supabase = createClient()
 
-      // Fetch versions (flat — no FK joins due to multiple FK refs to users)
+      // Fetch versions (flat  -  no FK joins due to multiple FK refs to users)
       const { data: versions, error } = await supabase
         .from('document_versions')
         .select('*')
@@ -399,7 +399,7 @@ export function useDocumentTemplatesCatalogue(matterId: string | undefined) {
       if (!templates?.length) return []
 
       // 3. Return ALL templates, annotated with isInstantiated
-      // Inactive templates show as greyed out (disabled) — they're already added or deprecated
+      // Inactive templates show as greyed out (disabled)  -  they're already added or deprecated
       return (templates as Omit<CataloguedTemplate, 'isInstantiated'>[]).map((t) => ({
         ...t,
         // Treat inactive templates as "already instantiated" so they're disabled in the picker

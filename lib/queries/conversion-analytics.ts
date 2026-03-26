@@ -79,6 +79,6 @@ export function useConversionAnalytics(params?: {
       return (json.data ?? json) as ConversionAnalyticsData
     },
     enabled: params?.enabled !== false,
-    staleTime: 1000 * 60 * 5, // 5 min — analytics data doesn't change rapidly
+    staleTime: 1000 * 60 * 5, // 5 min  -  analytics data doesn't change rapidly
   })
 }

@@ -76,7 +76,7 @@ export const frontDeskBookAppointmentAction: ActionDefinition<FrontDeskBookAppoi
       : 'Walk-in'
 
     // 4. Insert into appointments table
-    // Build insert payload — only include matter_id if provided (column may not exist pre-migration 048)
+    // Build insert payload  -  only include matter_id if provided (column may not exist pre-migration 048)
     const insertPayload: Record<string, unknown> = {
       tenant_id: tenantId,
       booking_page_id: resolvedPageId,

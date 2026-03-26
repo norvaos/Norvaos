@@ -73,7 +73,7 @@ export interface BlockerDetail {
 
 export interface ReadinessMatrixContext {
   playbook: ImmigrationPlaybook
-  /** contacts.immigration_data — questionnaire profile JSONB */
+  /** contacts.immigration_data  -  questionnaire profile JSONB */
   profile: Record<string, unknown> | null
   people: ReadinessPersonRow[]
   documentSlots: ReadinessSlotRow[]
@@ -134,7 +134,7 @@ const ALL_DOMAINS: ReadinessDomain[] = [
  * Compute the readiness matrix for a matter based on its playbook rules.
  * Returns null if the playbook has no matrix rules defined.
  *
- * Pure function — no side effects. Caller is responsible for fetching data.
+ * Pure function  -  no side effects. Caller is responsible for fetching data.
  */
 export function computeReadinessMatrix(
   ctx: ReadinessMatrixContext
@@ -204,7 +204,7 @@ export function computeReadinessMatrix(
         // Scope 'all': every active person must have an accepted slot
         const activePeople = ctx.people.filter((p) => p.is_active)
         if (activePeople.length === 0) {
-          // No people — fall back to matter-level (person_id null)
+          // No people  -  fall back to matter-level (person_id null)
           domain.total++
           const slot = documentSlots.find(
             (s) => s.slot_slug === rule.slot_slug && s.is_active && s.person_id === null
@@ -260,7 +260,7 @@ export function computeReadinessMatrix(
         const hasPersonWithRole = ctx.people.some(
           (p) => p.person_role === rule.person_role_scope && p.is_active
         )
-        if (!hasPersonWithRole) continue // No person of this role — skip rule entirely
+        if (!hasPersonWithRole) continue // No person of this role  -  skip rule entirely
 
         domain.total++
         const matchingSlots = documentSlots.filter(
@@ -352,7 +352,7 @@ export function computeReadinessMatrix(
 
 /**
  * Evaluate lawyer review triggers against people and immigration data.
- * Pure function — no side effects.
+ * Pure function  -  no side effects.
  */
 export function evaluateLawyerReviewTriggers(
   triggers: LawyerReviewTrigger[],

@@ -1,5 +1,5 @@
 /**
- * Copy text to clipboard — works on HTTP localhost and unfocused windows.
+ * Copy text to clipboard  -  works on HTTP localhost and unfocused windows.
  * Uses execCommand fallback, then window.prompt as last resort.
  */
 export function copyToClipboard(text: string): boolean {

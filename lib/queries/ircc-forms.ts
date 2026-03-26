@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * IRCC Form Management — React Query Hooks
+ * IRCC Form Management  -  React Query Hooks
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Client-side hooks for the DB-driven form management platform.
@@ -770,7 +770,7 @@ export function useUpdateSectionFieldConfig() {
   })
 }
 
-// ── Forms Vault — Folder Scan & Sync ────────────────────────────────────────
+// ── Forms Vault  -  Folder Scan & Sync ────────────────────────────────────────
 
 /** Scan the local IRCC forms folder and compare against DB */
 export function useScanFolder() {
@@ -1073,7 +1073,7 @@ export function useIrccFormPreview() {
  *   1. If caseTypeId provided: fetch ircc_stream_forms for that case type (ordered)
  *   2. Fallback: all active ircc_forms for the tenant (alphabetical by form_code)
  *
- * Returns `{ formCode, label }[]` — empty array while loading.
+ * Returns `{ formCode, label }[]`  -  empty array while loading.
  */
 export function useAvailableFormsForMatter(
   caseTypeId: string | null | undefined,

@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Command Centre — React Query Hooks
+ * Command Centre  -  React Query Hooks
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Query and mutation hooks for:
@@ -153,7 +153,7 @@ export function useUpdateIntakeSession() {
   })
 }
 
-/** Finalise an intake session — applies extracted entities to lead_metadata */
+/** Finalise an intake session  -  applies extracted entities to lead_metadata */
 export function useFinaliseIntakeSession() {
   const queryClient = useQueryClient()
 
@@ -210,7 +210,7 @@ export function useFinaliseIntakeSession() {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: commandCentreKeys.intakeSessions(data.leadId) })
       queryClient.invalidateQueries({ queryKey: ['leads'] })
-      toast.success('Intake session finalised — lead data updated')
+      toast.success('Intake session finalised  -  lead data updated')
     },
     onError: () => {
       toast.error('Failed to finalise intake session')

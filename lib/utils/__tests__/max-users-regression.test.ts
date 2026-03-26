@@ -37,7 +37,7 @@ function readSource(relPath: string): string {
 // 1. No Hardcoded Fallback Constants
 // ═══════════════════════════════════════════════════════════════════════════
 
-describe('max_users — No hardcoded fallback constants', () => {
+describe('max_users  -  No hardcoded fallback constants', () => {
   it('invite route does NOT use ?? 5 or COALESCE with 5 for max_users', () => {
     const source = readSource('app/api/settings/users/invite/route.ts')
     // Must NOT contain "?? 5" (the old fallback)
@@ -66,10 +66,10 @@ describe('max_users — No hardcoded fallback constants', () => {
 })
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 2. DB Trigger — Structural Assertions
+// 2. DB Trigger  -  Structural Assertions
 // ═══════════════════════════════════════════════════════════════════════════
 
-describe('max_users — DB trigger structural assertions', () => {
+describe('max_users  -  DB trigger structural assertions', () => {
   it('migration 039 exists and replaces enforce_max_users()', () => {
     const source = readSource('scripts/migrations/039-max-users-strict-enforcement.sql')
     expect(source).toContain('CREATE OR REPLACE FUNCTION enforce_max_users()')
@@ -112,10 +112,10 @@ describe('max_users — DB trigger structural assertions', () => {
 })
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 3. Admin Route — Structural Assertions
+// 3. Admin Route  -  Structural Assertions
 // ═══════════════════════════════════════════════════════════════════════════
 
-describe('max_users — Admin route structural assertions', () => {
+describe('max_users  -  Admin route structural assertions', () => {
   it('admin max-users route exists', () => {
     expect(existsSync(resolve(ROOT, 'app/api/admin/tenants/[id]/max-users/route.ts'))).toBe(true)
   })
@@ -167,7 +167,7 @@ describe('max_users — Admin route structural assertions', () => {
 // 4. UI Shows Dynamic max_users
 // ═══════════════════════════════════════════════════════════════════════════
 
-describe('max_users — UI displays dynamic limit', () => {
+describe('max_users  -  UI displays dynamic limit', () => {
   it('users settings page shows tenant.max_users in description', () => {
     const source = readSource('app/(dashboard)/settings/users/page.tsx')
     expect(source).toContain('tenant.max_users')
@@ -189,12 +189,12 @@ describe('max_users — UI displays dynamic limit', () => {
 })
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 5. Concurrency Specification — Structural Proof
+// 5. Concurrency Specification  -  Structural Proof
 //    (The actual concurrency test requires a live DB; this verifies the
 //    trigger structure guarantees serialised enforcement.)
 // ═══════════════════════════════════════════════════════════════════════════
 
-describe('max_users — Concurrency enforcement proof', () => {
+describe('max_users  -  Concurrency enforcement proof', () => {
   it('trigger fires BEFORE INSERT (serialises under row-level lock)', () => {
     // The original trigger definition in migration 038
     const source = readSource('scripts/migrations/038-jurisdiction-and-enforcement.sql')
@@ -242,7 +242,7 @@ describe('max_users — Concurrency enforcement proof', () => {
 // Run: Manually via Supabase SQL Editor or psql.
 // ═══════════════════════════════════════════════════════════════════════════
 
-describe('max_users — E2E concurrency spec (documented)', () => {
+describe('max_users  -  E2E concurrency spec (documented)', () => {
   it('concurrency scenario is documented in migration 039', () => {
     const source = readSource('scripts/migrations/039-max-users-strict-enforcement.sql')
     expect(source).toContain('sole source of truth')

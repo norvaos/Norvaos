@@ -30,7 +30,7 @@ export const financialClearanceKeys = {
 
 /**
  * Fetches financial clearance status for a matter.
- * Calls the Postgres RPC via the API route — all math is DB-side.
+ * Calls the Postgres RPC via the API route  -  all math is DB-side.
  */
 export function useFinancialClearance(matterId: string) {
   return useQuery({
@@ -46,6 +46,6 @@ export function useFinancialClearance(matterId: string) {
       return res.json()
     },
     enabled: !!matterId,
-    staleTime: 1000 * 30, // 30 sec — money data stays fresh
+    staleTime: 1000 * 30, // 30 sec  -  money data stays fresh
   })
 }

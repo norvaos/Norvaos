@@ -6,14 +6,14 @@ import { withTiming } from '@/lib/middleware/request-timing'
 /**
  * GET /api/admin/tenants/[id]/audit
  *
- * Platform-admin ONLY — paginated audit feed for a tenant.
+ * Platform-admin ONLY  -  paginated audit feed for a tenant.
  * Merges tenant-scoped audit_logs + platform_admin_audit_logs.
  * Rate-limited: 30 req/min per IP.
  *
  * Query params:
- *   ?cursor=<iso-date>   — cursor for pagination (created_at of last item)
- *   &limit=50            — results per page (default: 50, max: 100)
- *   &action=<type>       — filter by action type
+ *   ?cursor=<iso-date>    -  cursor for pagination (created_at of last item)
+ *   &limit=50             -  results per page (default: 50, max: 100)
+ *   &action=<type>        -  filter by action type
  */
 const handleGet = withPlatformAdmin(async (request, { params }) => {
   const tenantId = params.id

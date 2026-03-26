@@ -1,14 +1,14 @@
 'use client'
 
 /**
- * CompliancePulse — Directive 41.3 (LSO/CICC Standards)
+ * CompliancePulse  -  Directive 41.3 (LSO/CICC Standards)
  *
  * A persistent, compact compliance matrix visible on every Lead/Matter page.
  * Shows the 4-item File Compliance Matrix at a glance:
- *   1. KYC Status     — Verified / Pending / Not Started
- *   2. Conflict Status — Passed / Flagged / Not Started
- *   3. Retainer Status — Hash-Verified / Signed / Unsigned / None
- *   4. AML Pulse       — Match / Mismatch / Pending
+ *   1. KYC Status      -  Verified / Pending / Not Started
+ *   2. Conflict Status  -  Passed / Flagged / Not Started
+ *   3. Retainer Status  -  Hash-Verified / Signed / Unsigned / None
+ *   4. AML Pulse        -  Match / Mismatch / Pending
  *
  * Also displays a composite compliance score (0-100%) as a progress bar.
  */
@@ -163,7 +163,7 @@ export function CompliancePulse() {
             label="KYC"
             status={kycCfg.label}
             colour={kycCfg.colour}
-            tooltip="Know Your Client — Government ID verified against original."
+            tooltip="Know Your Client  -  Government ID verified against original."
           />
           {/* Conflict */}
           <PulseItem
@@ -187,7 +187,7 @@ export function CompliancePulse() {
             label="AML"
             status={amlCfg.label}
             colour={amlCfg.colour}
-            tooltip="Anti-Money Laundering scan — Identity hash vs document hash."
+            tooltip="Anti-Money Laundering scan  -  Identity hash vs document hash."
           />
         </div>
       </CardContent>

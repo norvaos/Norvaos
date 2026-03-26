@@ -4,7 +4,7 @@
  * Deletes all demo data for a tenant and optionally reseeds it.
  * Safe to run multiple times (idempotent delete + reseed).
  *
- * ALL DATA DELETED IS SCOPED TO DEMO_TENANT_ID — no other tenants are affected.
+ * ALL DATA DELETED IS SCOPED TO DEMO_TENANT_ID  -  no other tenants are affected.
  *
  * Usage:
  *   DEMO_TENANT_ID=<uuid> SUPABASE_URL=<url> SUPABASE_SERVICE_ROLE_KEY=<key> \
@@ -41,7 +41,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
   auth: { persistSession: false },
 })
 
-// Tables to clear (order matters for FK constraints — child tables first)
+// Tables to clear (order matters for FK constraints  -  child tables first)
 const TABLES_TO_CLEAR = [
   'time_entries',
   'calendar_events',
@@ -95,7 +95,7 @@ async function reset(): Promise<void> {
   }
 
   if (DELETE_ONLY) {
-    console.log('\nDelete-only mode — skipping reseed')
+    console.log('\nDelete-only mode  -  skipping reseed')
     console.log('Reset COMPLETE')
     process.exit(0)
   }

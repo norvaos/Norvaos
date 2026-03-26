@@ -42,7 +42,7 @@ import {
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 function fmtCents(cents: number | null | undefined, currency = 'CAD'): string {
-  if (cents == null) return '—'
+  if (cents == null) return ' - '
   return new Intl.NumberFormat('en-CA', {
     style: 'currency',
     currency,
@@ -118,7 +118,7 @@ function PaymentsTable({ payments }: { payments: Array<{ payment_date: string; p
           <tr key={i} className="border-b last:border-0">
             <td className="py-2">{formatDate(p.payment_date)}</td>
             <td className="py-2 capitalize">{p.payment_method.replace(/_/g, ' ')}</td>
-            <td className="py-2 text-muted-foreground">{p.reference ?? '—'}</td>
+            <td className="py-2 text-muted-foreground">{p.reference ?? ' - '}</td>
             <td className="py-2 text-right">{fmtCents(p.amount)}</td>
             <td className="py-2 text-right">
               {p.voided_at ? (
@@ -183,7 +183,7 @@ function TrustAllocationsPanel({ invoiceId }: { invoiceId: string }) {
           return (
             <tr key={a.id} className="border-b last:border-0">
               <td className="py-2">{formatDate(a.created_at)}</td>
-              <td className="py-2 text-muted-foreground">{a.notes ?? '—'}</td>
+              <td className="py-2 text-muted-foreground">{a.notes ?? ' - '}</td>
               <td className="py-2 text-right">{fmtCents(a.amount_cents)}</td>
               <td className="py-2 text-right">
                 <Badge variant={badge.variant}>{badge.label}</Badge>
@@ -260,7 +260,7 @@ function PaymentPlanPanel({ invoiceId, tenantId }: { invoiceId: string; tenantId
       {!isPlanApproved && (
         <div className="flex items-center gap-2 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
           <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
-          Plan not yet approved — instalment payments are blocked until approved.
+          Plan not yet approved  -  instalment payments are blocked until approved.
         </div>
       )}
 
@@ -499,7 +499,7 @@ function InvoiceDetailContent() {
           <CardContent className="pt-4">
             <p className="text-xs text-muted-foreground">Due Date</p>
             <p className="text-xl font-bold">
-              {invoice.due_date ? formatDate(invoice.due_date) : '—'}
+              {invoice.due_date ? formatDate(invoice.due_date) : ' - '}
             </p>
           </CardContent>
         </Card>

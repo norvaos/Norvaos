@@ -123,7 +123,7 @@ export function useCreateTimeEntry() {
       return data as TimeEntry
     },
     onSuccess: () => {
-      // Targeted invalidation — only bust time-entry and billing-stats caches
+      // Targeted invalidation  -  only bust time-entry and billing-stats caches
       queryClient.invalidateQueries({ queryKey: ['invoicing', 'time-entries'] })
       queryClient.invalidateQueries({ queryKey: ['invoicing', 'unbilled-time'] })
       queryClient.invalidateQueries({ queryKey: ['invoicing', 'billing-stats'] })
@@ -708,7 +708,7 @@ export function useVoidInvoice() {
   })
 }
 
-// ── Invoice Line Items (v2 — category-aware) ──────────────────────────────────
+// ── Invoice Line Items (v2  -  category-aware) ──────────────────────────────────
 
 export function useInvoiceLineItems(invoiceId: string | null) {
   return useQuery({
@@ -925,7 +925,7 @@ export function useRequestTrustAllocation() {
     onSuccess: (_data, { invoiceId }) => {
       qc.invalidateQueries({ queryKey: billingKeys.trustAllocations(invoiceId) })
       qc.invalidateQueries({ queryKey: invoicingKeys.invoiceDetail(invoiceId) })
-      toast.success('Norva Trust Ledger — Allocation requested')
+      toast.success('Norva Trust Ledger  -  Allocation requested')
     },
     onError: (err: Error) => toast.error(err.message),
   })

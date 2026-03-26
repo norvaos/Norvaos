@@ -93,7 +93,7 @@ export function ClientProfilePanel() {
   const [form, setForm] = useState<ProfileForm>(EMPTY_FORM)
   const [saveState, setSaveState] = useState<SaveState>('idle')
   const savedTimerRef = useRef<NodeJS.Timeout | null>(null)
-  // Tracks whether the form has been initialised from the contact — prevents
+  // Tracks whether the form has been initialised from the contact  -  prevents
   // the initial hydration from triggering an immediate save.
   const initialisedRef = useRef(false)
 
@@ -279,7 +279,7 @@ export function ClientProfilePanel() {
     }
     if (saveState === 'error') {
       return (
-        <span className="text-xs text-red-500">Save failed — please retry</span>
+        <span className="text-xs text-red-500">Save failed  -  please retry</span>
       )
     }
     return null
@@ -309,12 +309,12 @@ export function ClientProfilePanel() {
         <p className="text-[11px] text-slate-400 leading-relaxed">
           {entityType === 'matter'
             ? 'Saves to the contact record and syncs to People on File for this matter.'
-            : 'Collected at intake — flows into the matter file on conversion.'}
+            : 'Collected at intake  -  flows into the matter file on conversion.'}
         </p>
 
         {isLocked && (
           <p className="text-[11px] text-amber-600 bg-amber-50 border border-amber-200 rounded-md px-3 py-2">
-            Data locked after conversion — edit in the matter.
+            Data locked after conversion  -  edit in the matter.
           </p>
         )}
 
@@ -343,7 +343,7 @@ export function ClientProfilePanel() {
                 <SelectValue placeholder="Select…" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="__none__">— Not specified —</SelectItem>
+                <SelectItem value="__none__"> -  Not specified  - </SelectItem>
                 {GENDERS.map((g) => (
                   <SelectItem key={g.value} value={g.value}>
                     {g.label}
@@ -364,7 +364,7 @@ export function ClientProfilePanel() {
                 <SelectValue placeholder="Select…" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="__none__">— Not specified —</SelectItem>
+                <SelectItem value="__none__"> -  Not specified  - </SelectItem>
                 {MARITAL_STATUSES.map((m) => (
                   <SelectItem key={m.value} value={m.value}>
                     {m.label}
@@ -388,7 +388,7 @@ export function ClientProfilePanel() {
                 <SelectValue placeholder="Select country…" />
               </SelectTrigger>
               <SelectContent className="max-h-60">
-                <SelectItem value="__none__">— Not specified —</SelectItem>
+                <SelectItem value="__none__"> -  Not specified  - </SelectItem>
                 {FULL_COUNTRY_LIST.map((c) => (
                   <SelectItem key={c.value} value={c.value}>
                     {c.label}
@@ -409,7 +409,7 @@ export function ClientProfilePanel() {
                 <SelectValue placeholder="Select country…" />
               </SelectTrigger>
               <SelectContent className="max-h-60">
-                <SelectItem value="__none__">— Not specified —</SelectItem>
+                <SelectItem value="__none__"> -  Not specified  - </SelectItem>
                 {FULL_COUNTRY_LIST.map((c) => (
                   <SelectItem key={c.value} value={c.value}>
                     {c.label}
@@ -430,7 +430,7 @@ export function ClientProfilePanel() {
                 <SelectValue placeholder="Select country…" />
               </SelectTrigger>
               <SelectContent className="max-h-60">
-                <SelectItem value="__none__">— Not specified —</SelectItem>
+                <SelectItem value="__none__"> -  Not specified  - </SelectItem>
                 {FULL_COUNTRY_LIST.map((c) => (
                   <SelectItem key={c.value} value={c.value}>
                     {c.label}
@@ -454,7 +454,7 @@ export function ClientProfilePanel() {
                 <SelectValue placeholder="Select…" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="__none__">— Not specified —</SelectItem>
+                <SelectItem value="__none__"> -  Not specified  - </SelectItem>
                 {IMMIGRATION_STATUSES.map((s) => (
                   <SelectItem key={s.value} value={s.value}>
                     {s.label}

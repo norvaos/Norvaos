@@ -1,5 +1,5 @@
 """
-PDF Preview Renderer — renders PDF page(s) to PNG images using PyMuPDF (fitz).
+PDF Preview Renderer  -  renders PDF page(s) to PNG images using PyMuPDF (fitz).
 
 Ported from scripts/pdf-preview.py for the FastAPI sidecar worker.
 Accepts PDF bytes + rendering options, returns base64-encoded PNG image data.

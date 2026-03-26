@@ -1,5 +1,5 @@
 /**
- * TrustReconciler — Clio-to-Norva Balance Reconciliation (Directive 20.1)
+ * TrustReconciler  -  Clio-to-Norva Balance Reconciliation (Directive 20.1)
  *
  * Compares trust balances between imported Clio data (stored as import metadata)
  * and the live Norva Ledger running balances. Any discrepancy > 0 cents triggers
@@ -126,7 +126,7 @@ export async function reconcileClioMigration(
         if (openingTxn) {
           clioBalanceCents = Number(openingTxn.amount_cents)
         } else {
-          // No Clio reference — assume match (matter created natively in Norva)
+          // No Clio reference  -  assume match (matter created natively in Norva)
           clioBalanceCents = norvaBalanceCents
         }
       }

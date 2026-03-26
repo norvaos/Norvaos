@@ -1,4 +1,4 @@
-// ALL DATA IS SYNTHETIC — NOT REAL CLIENT DATA
+// ALL DATA IS SYNTHETIC  -  NOT REAL CLIENT DATA
 
 const TASK_TEMPLATES = [
   { title: 'Prepare client questionnaire', category: 'preparation' },
@@ -71,7 +71,7 @@ export function generateFakeTasks(
       tenant_id: tenantId,
       matter_id: matterIds[i % matterIds.length],
       title: template.title,
-      description: `Demo task ${i + 1} — synthetic data for demonstration purposes only.`,
+      description: `Demo task ${i + 1}  -  synthetic data for demonstration purposes only.`,
       priority: PRIORITIES[i % PRIORITIES.length],
       status: isCompleted ? 'completed' : isInProgress ? 'in_progress' : 'pending',
       due_date: dueDate,

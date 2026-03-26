@@ -42,7 +42,7 @@ export function PortalIRCCQuestionnaire({
   const [error, setError] = useState<string | null>(null)
   const [isCompleted, setIsCompleted] = useState(false)
 
-  // DB questionnaire state — single source of truth from Settings → ircc_stream_forms
+  // DB questionnaire state  -  single source of truth from Settings → ircc_stream_forms
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [dbQuestionnaire, setDbQuestionnaire] = useState<any>(null)
 
@@ -72,7 +72,7 @@ export function PortalIRCCQuestionnaire({
         }
 
         // Always try to fetch DB sections when the API signals DB questionnaire is available.
-        // This is the ONLY path — no fallback to hardcoded form registry.
+        // This is the ONLY path  -  no fallback to hardcoded form registry.
         if (json.use_db_questionnaire && json.form_ids && json.form_ids.length > 0) {
           await fetchDbSections()
         }

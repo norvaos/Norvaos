@@ -1,5 +1,5 @@
 /**
- * Continuity Engine — Directive 018, NorvaOS
+ * Continuity Engine  -  Directive 018, NorvaOS
  *
  * Detects chronological gaps and overlaps in personal, address, and
  * employment history timelines. Used by IRCC form workflows to ensure
@@ -164,7 +164,7 @@ export function checkOverlaps(entries: DateRange[]): {
       // If b starts after a ends, no overlap (and no further j will overlap either)
       if (bStart.getTime() > aEnd.getTime()) break;
 
-      // Overlap exists — calculate days
+      // Overlap exists  -  calculate days
       const overlapEnd = aEnd.getTime() < bEnd.getTime() ? aEnd : bEnd;
       const overlapDays = daysBetween(bStart, overlapEnd) + 1; // inclusive
 

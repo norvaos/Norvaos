@@ -2,8 +2,8 @@
 -- Migration 052: IRCC Form Pack Versioning
 -- ============================================================================
 -- Creates tables and infrastructure for the IRCC form generation system:
---   form_pack_versions  — one row per generated draft/approved version
---   form_pack_artifacts — one row per PDF file in a version (INSERT-only)
+--   form_pack_versions   -  one row per generated draft/approved version
+--   form_pack_artifacts  -  one row per PDF file in a version (INSERT-only)
 --
 -- Includes: immutability triggers, RLS policies, version-allocation RPC,
 --           approval RPC, and permission seeding for default roles.

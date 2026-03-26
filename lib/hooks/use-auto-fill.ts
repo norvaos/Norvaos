@@ -21,9 +21,9 @@ export interface AutoFillResult {
 
 /**
  * Auto-fill hook implementing the Low-Keyboard spec's three-layer lookup:
- *   1. Matter-level override (snapshot) — highest priority
- *   2. Canonical profile field — contact-level shared truth
- *   3. Empty — no value found
+ *   1. Matter-level override (snapshot)  -  highest priority
+ *   2. Canonical profile field  -  contact-level shared truth
+ *   3. Empty  -  no value found
  *
  * Usage:
  *   const { value, source, confidence, isOverridden } = useAutoFill('family_name', contactId, matterId)
@@ -49,7 +49,7 @@ export function useAutoFill(
         return { value: null, source: null, confidence: null, isOverridden: false }
       }
 
-      // Step 2: Check matter snapshot (Layer 2 — matter override)
+      // Step 2: Check matter snapshot (Layer 2  -  matter override)
       const { data: snapshot } = await supabase
         .from('canonical_profile_snapshots')
         .select('snapshot_data')

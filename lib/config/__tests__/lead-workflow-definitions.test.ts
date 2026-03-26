@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Wave 6 — Structural Integrity Tests: Lead Workflow Definitions
+ * Wave 6  -  Structural Integrity Tests: Lead Workflow Definitions
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Validates the workflow definition registry is structurally sound:
@@ -191,7 +191,7 @@ describe('Stage Transition Rules', () => {
   // Design note: retainer_signed_payment_pending and retained_active_matter have
   // NO closure transitions in STAGE_TRANSITION_RULES. Closure at these late stages
   // is handled via the closure engine which calls advanceLeadStage with skipGuards=true.
-  // This is intentional — at these stages, closure is an administrative action, not
+  // This is intentional  -  at these stages, closure is an administrative action, not
   // a workflow transition.
   const STAGES_WITH_DIRECT_CLOSURE = ACTIVE_STAGES.filter(
     (s) =>

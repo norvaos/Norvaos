@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Scan-to-Intake Field Mapper — Directive 40.0 §1
+ * Scan-to-Intake Field Mapper  -  Directive 40.0 §1
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Maps OCR-extracted field keys from /api/documents/scan to the canonical
@@ -56,12 +56,12 @@ export interface ScanPrefillResult {
  * Format: scanKey → profilePath
  *
  * The profile_path namespace follows the pattern:
- *   personal.*    — Personal identity fields
- *   contact.*     — Contact/address fields
- *   immigration.* — Immigration-specific fields
- *   financial.*   — Financial fields
- *   family.*      — Family relationship fields
- *   employment.*  — Employment fields
+ *   personal.*     -  Personal identity fields
+ *   contact.*      -  Contact/address fields
+ *   immigration.*  -  Immigration-specific fields
+ *   financial.*    -  Financial fields
+ *   family.*       -  Family relationship fields
+ *   employment.*   -  Employment fields
  */
 const GLOBAL_FIELD_MAP: Record<string, string> = {
   // ── Personal Identity ──

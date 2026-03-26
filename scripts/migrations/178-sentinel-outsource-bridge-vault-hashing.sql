@@ -213,7 +213,7 @@ BEGIN
   END IF;
 
   IF _doc.content_hash IS NULL THEN
-    -- Legacy document without hash — mark as unchecked
+    -- Legacy document without hash  -  mark as unchecked
     RETURN jsonb_build_object(
       'status', 'unchecked',
       'message', 'No content hash recorded for this document (uploaded before hashing was enabled)'

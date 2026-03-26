@@ -201,7 +201,7 @@ export function PortalDocuments({
   }
 
   const canUpload = (slot: PortalSlot) => {
-    // Verified documents are locked — no re-upload allowed
+    // Verified documents are locked  -  no re-upload allowed
     if (slot.verification_status === 'verified') return false
     const status = slot.status
     return status === 'empty' || status === 'needs_re_upload' || status === 'rejected' || status === 'pending_review'
@@ -471,7 +471,7 @@ export function PortalDocuments({
           </div>
         </div>
 
-        {/* Re-upload reason — structured (with code) or plain text fallback */}
+        {/* Re-upload reason  -  structured (with code) or plain text fallback */}
         {needsReUpload && (() => {
           const code = slot.rejection_reason_code as RejectionReasonCode | null
           const info = getRejectionInfo(code, currentLang)
@@ -543,7 +543,7 @@ export function PortalDocuments({
                 {slot.verification_rejection_reason}
               </p>
             </div>
-            {/* "Fixed It" button — signals lawyer the client has corrected the issue */}
+            {/* "Fixed It" button  -  signals lawyer the client has corrected the issue */}
             <div className="mt-2 flex justify-end">
               <Button
                 size="sm"
@@ -568,18 +568,18 @@ export function PortalDocuments({
                       )
                     }
                   } catch {
-                    // Silent failure — the document upload already saved
+                    // Silent failure  -  the document upload already saved
                   }
                 }}
               >
                 <CheckCircle2 className="h-3 w-3 mr-1" />
-                Fixed It — Ready for Review
+                Fixed It  -  Ready for Review
               </Button>
             </div>
           </div>
         )}
 
-        {/* In-context upload guidance — shown near upload button for empty/re-upload slots */}
+        {/* In-context upload guidance  -  shown near upload button for empty/re-upload slots */}
         {canUpload(slot) && !isAccepted && !isPending && (
           <p className="mt-1.5 text-[11px] text-slate-400">
             {tr.upload_guidance ?? 'Upload a clear colour scan (PDF or image). Photos of documents may be rejected.'}

@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Wave 6 — UI State Rules & Permissions Boundary Tests
+ * Wave 6  -  UI State Rules & Permissions Boundary Tests
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Validates:

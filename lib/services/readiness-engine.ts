@@ -1,5 +1,5 @@
 /**
- * Readiness Engine — Composite Matter Readiness Score
+ * Readiness Engine  -  Composite Matter Readiness Score
  *
  * Computes a 0–100 score from 7 weighted domains:
  *   Documents      22%
@@ -96,7 +96,7 @@ async function computeDocuments(
     : (mandatorySlots ?? [])
 
   if (slots.length === 0) {
-    // No mandatory slots configured — count as satisfied
+    // No mandatory slots configured  -  count as satisfied
     return buildDomain('Documents', 100, weight, '0/0 mandatory documents (none required)')
   }
 
@@ -258,29 +258,29 @@ async function computeBilling(
   const status = retainer?.status ?? null
 
   let score = 0
-  let label = 'missing — retainer agreement required'
+  let label = 'missing  -  retainer agreement required'
 
   if (status === 'signed') {
     score = 100
     label = 'signed'
   } else if (status === 'sent_for_signing') {
     score = 50
-    label = 'sent for signing — awaiting client signature'
+    label = 'sent for signing  -  awaiting client signature'
   } else if (status === 'draft') {
     score = 20
-    label = 'draft — awaiting completion'
+    label = 'draft  -  awaiting completion'
   } else if (status === 'voided') {
     score = 0
-    label = 'voided — new retainer required'
+    label = 'voided  -  new retainer required'
   } else {
     score = 0
-    label = 'missing — retainer agreement required'
+    label = 'missing  -  retainer agreement required'
   }
 
   return buildDomain('Billing', score, weight, `Retainer Agreement: ${label}`)
 }
 
-// ── Compliance (11%) — Document Expiry & Status Validity (Directive 20.2) ────
+// ── Compliance (11%)  -  Document Expiry & Status Validity (Directive 20.2) ────
 // Checks contact_status_records for passport/permit expiries linked to this matter.
 // Scoring:
 //   - All documents valid (> 180 days to expiry): 100
@@ -307,7 +307,7 @@ async function computeCompliance(
   }>
 
   if (statusRecords.length === 0) {
-    // No status records linked — no penalty (not all matters have them)
+    // No status records linked  -  no penalty (not all matters have them)
     return buildDomain('Compliance', 100, weight, 'No document expiry records linked')
   }
 
@@ -323,7 +323,7 @@ async function computeCompliance(
     const typeLabel = rec.status_type.replace(/_/g, ' ')
 
     if (daysUntilExpiry <= 0) {
-      // Already expired — score 0 for this record
+      // Already expired  -  score 0 for this record
       worstScore = Math.min(worstScore, 0)
       issues.push(`${typeLabel} EXPIRED (${Math.abs(daysUntilExpiry)}d ago)`)
     } else if (daysUntilExpiry <= 90) {
@@ -373,7 +373,7 @@ async function computeSubmission(
   // ── Financial Kill-Switch ─────────────────────────────────────────────
   // Server-side: query trust balance + total billed directly (admin client
   // has no auth.uid(), so the RPC's Sentinel check would fail).
-  // All amounts are DB-stored BIGINT cents — zero frontend calculations.
+  // All amounts are DB-stored BIGINT cents  -  zero frontend calculations.
   let financiallyCleared = true
   const blockers: string[] = []
 
@@ -397,7 +397,7 @@ async function computeSubmission(
 
     const trustBalanceCents = trustRow?.running_balance_cents ?? 0
 
-    // 3. Resolve total billed — fee_snapshot is canonical, fallback to total_amount_cents
+    // 3. Resolve total billed  -  fee_snapshot is canonical, fallback to total_amount_cents
     let totalBilledCents = fin?.total_amount_cents ?? 0
     const feeSnap = fin?.fee_snapshot as Record<string, unknown> | null
     if (feeSnap && typeof feeSnap === 'object') {
@@ -423,17 +423,17 @@ async function computeSubmission(
     if (outstandingCents > 0) {
       financiallyCleared = false
       const dollars = (outstandingCents / 100).toFixed(2)
-      blockers.push(`Client owes $${dollars} — outstanding balance must be cleared before submission.`)
+      blockers.push(`Client owes $${dollars}  -  outstanding balance must be cleared before submission.`)
     }
 
     if (unallocatedCents > 0) {
       financiallyCleared = false
       const dollars = (unallocatedCents / 100).toFixed(2)
-      blockers.push(`$${dollars} in unallocated trust funds — apply or refund before submission.`)
+      blockers.push(`$${dollars} in unallocated trust funds  -  apply or refund before submission.`)
     }
   } catch (err) {
     console.warn('[readiness] Financial clearance check failed:', (err as Error).message)
-    // Graceful fallback — don't block submission if the check itself fails
+    // Graceful fallback  -  don't block submission if the check itself fails
     financiallyCleared = true
   }
 
@@ -460,7 +460,7 @@ async function computeSubmission(
     return buildDomain('Submission', 0, weight, 'Filing ready: no')
   }
 
-  return buildDomain('Submission', 100, weight, 'Filing ready: yes — financial clearance passed')
+  return buildDomain('Submission', 100, weight, 'Filing ready: yes  -  financial clearance passed')
 }
 
 // ── Stale-Date Blocker (Directive 024) ────────────────────────────────────────
@@ -612,7 +612,7 @@ export async function computeReadiness(
     domains.push(buildDomain(
       'Freshness',
       0,
-      0, // no weight — it's a hard cap
+      0, // no weight  -  it's a hard cap
       `BLOCKER: ${staleCheck.staleDocuments.length} stale document(s): ${staleCheck.staleDocuments.join('; ')}`,
     ))
   }

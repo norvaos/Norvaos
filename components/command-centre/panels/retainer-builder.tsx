@@ -345,13 +345,13 @@ function RetainerBuilderContent() {
       seededRef.current = true
       fetch('/api/settings/retainer-presets/seed-defaults', { method: 'POST' })
         .then(() => queryClient.invalidateQueries({ queryKey: retainerPresetKeys.all }))
-        .catch(() => {}) // silent — user can always add manually
+        .catch(() => {}) // silent  -  user can always add manually
     }
   }, [presetsLoading, dbPresets.length, tenantId, queryClient])
 
   // ── Fetch existing retainer package ──────────────────────────────
   const { data: retainerPackages } = useLeadRetainerPackages(lead?.id ?? '')
-  // Skip cancelled packages — after cancel + recreate, the newest active package should be used
+  // Skip cancelled packages  -  after cancel + recreate, the newest active package should be used
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const existingPackage = (retainerPackages as any[])?.find((p: any) => p.status !== 'cancelled') ?? null
 
@@ -685,7 +685,7 @@ function RetainerBuilderContent() {
           />
         )}
 
-        {/* ─── Action Row (fee editing only — lifecycle actions are in the Retainer Action Hub above) ── */}
+        {/* ─── Action Row (fee editing only  -  lifecycle actions are in the Retainer Action Hub above) ── */}
         <div className="flex items-center gap-2 flex-wrap">
           {/* Save Retainer - available in draft/saved states */}
           {(retainerState === 'draft' || retainerState === 'saved') && (
@@ -715,8 +715,8 @@ function RetainerBuilderContent() {
           {isReadOnly && (
             <Badge variant="secondary" className="text-[10px] h-7 gap-1">
               <CheckCircle2 className="h-3 w-3" />
-              {retainerState === 'sent' || retainerState === 'viewed' ? 'Sent — fees locked' : ''}
-              {retainerState === 'signed' ? 'Signed — fees locked' : ''}
+              {retainerState === 'sent' || retainerState === 'viewed' ? 'Sent  -  fees locked' : ''}
+              {retainerState === 'signed' ? 'Signed  -  fees locked' : ''}
               {retainerState === 'paid' ? 'Fully retained' : ''}
             </Badge>
           )}
@@ -768,7 +768,7 @@ function RetainerBuilderContent() {
               Professional Fees
               {feesSubtotal > 0 && (
                 <span className="text-slate-400 font-normal">
-                  — ${feesSubtotal.toLocaleString()}
+                   -  ${feesSubtotal.toLocaleString()}
                 </span>
               )}
             </p>
@@ -845,7 +845,7 @@ function RetainerBuilderContent() {
                                 <Bookmark className="h-3 w-3" />
                               </Button>
                             </TooltipTrigger>
-                            <TooltipContent>Save as preset — will appear in Quick Add</TooltipContent>
+                            <TooltipContent>Save as preset  -  will appear in Quick Add</TooltipContent>
                           </Tooltip>
                         </TooltipProvider>
                       )}
@@ -879,7 +879,7 @@ function RetainerBuilderContent() {
               Government Fees
               {govFeesTotal > 0 && (
                 <span className="text-slate-400 font-normal">
-                  — ${govFeesTotal.toLocaleString()}
+                   -  ${govFeesTotal.toLocaleString()}
                 </span>
               )}
             </p>
@@ -951,7 +951,7 @@ function RetainerBuilderContent() {
                                 <Bookmark className="h-3 w-3" />
                               </Button>
                             </TooltipTrigger>
-                            <TooltipContent>Save as preset — will appear in Quick Add</TooltipContent>
+                            <TooltipContent>Save as preset  -  will appear in Quick Add</TooltipContent>
                           </Tooltip>
                         </TooltipProvider>
                       )}
@@ -985,7 +985,7 @@ function RetainerBuilderContent() {
               Disbursements
               {disbursementsTotal > 0 && (
                 <span className="text-slate-400 font-normal">
-                  — ${disbursementsTotal.toLocaleString()}
+                   -  ${disbursementsTotal.toLocaleString()}
                 </span>
               )}
             </p>
@@ -1055,7 +1055,7 @@ function RetainerBuilderContent() {
                             <Bookmark className="h-3 w-3" />
                           </Button>
                         </TooltipTrigger>
-                        <TooltipContent>Save as preset — will appear in Quick Add</TooltipContent>
+                        <TooltipContent>Save as preset  -  will appear in Quick Add</TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
                   )}
@@ -1090,7 +1090,7 @@ function RetainerBuilderContent() {
             disabled={isReadOnly}
           />
           <Label htmlFor="hst-toggle" className="text-xs text-slate-600 cursor-pointer">
-            HST Applicable (13%) — applied to all fees
+            HST Applicable (13%)  -  applied to all fees
           </Label>
         </div>
 

@@ -11,7 +11,7 @@ export interface PiiRevealState {
   isRevealed: boolean
   /** The reason selected when revealing */
   reason: string | null
-  /** Request reveal — will prompt for reason via callback */
+  /** Request reveal  -  will prompt for reason via callback */
   reveal: (reason: string) => void
   /** Manually re-mask the field */
   mask: () => void

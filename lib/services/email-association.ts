@@ -26,11 +26,11 @@ export interface AssociationSuggestion {
  * Attempts to auto-associate an email thread to a matter.
  *
  * Priority:
- *   1. Thread lock — if thread is already associated via 'manual' or 'thread_lock', keep it
- *   2. Crypto token — match NRV- tokens embedded in email body/subject (Smart-Threader)
- *   3. Contact match — match participant_emails against contact email addresses
- *   4. Subject match — look for matter number pattern in subject line
- *   5. If ambiguous — create unmatched_email_queue entry
+ *   1. Thread lock  -  if thread is already associated via 'manual' or 'thread_lock', keep it
+ *   2. Crypto token  -  match NRV- tokens embedded in email body/subject (Smart-Threader)
+ *   3. Contact match  -  match participant_emails against contact email addresses
+ *   4. Subject match  -  look for matter number pattern in subject line
+ *   5. If ambiguous  -  create unmatched_email_queue entry
  */
 export async function associateEmailToMatter(
   supabase: SupabaseClient<Database>,
@@ -47,7 +47,7 @@ export async function associateEmailToMatter(
     return { success: false, matterId: null, contactId: null, method: null, confidence: 0 }
   }
 
-  // 1. Thread lock — already associated with high confidence
+  // 1. Thread lock  -  already associated with high confidence
   if (
     thread.matter_id &&
     (thread.association_method === 'manual' || thread.association_method === 'thread_lock')
@@ -61,7 +61,7 @@ export async function associateEmailToMatter(
     }
   }
 
-  // 2. Crypto token match (Smart-Threader) — look for NRV- tokens in body/subject
+  // 2. Crypto token match (Smart-Threader)  -  look for NRV- tokens in body/subject
   {
     // Fetch the latest message body from email_messages (not stored on thread)
     const { data: latestMsg } = await supabase
@@ -102,7 +102,7 @@ export async function associateEmailToMatter(
     }
   }
 
-  // 3. Contact match — find contacts whose email matches a participant
+  // 3. Contact match  -  find contacts whose email matches a participant
   const participantEmails = thread.participant_emails ?? []
   if (participantEmails.length > 0) {
     const { data: contacts } = await supabase
@@ -123,7 +123,7 @@ export async function associateEmailToMatter(
         .limit(10)
 
       if (matterContacts && matterContacts.length === 1) {
-        // Single match — high confidence
+        // Single match  -  high confidence
         const match = matterContacts[0]
         await supabase
           .from('email_threads')
@@ -146,7 +146,7 @@ export async function associateEmailToMatter(
       }
 
       if (matterContacts && matterContacts.length > 1) {
-        // Ambiguous — multiple matters for the same contact(s)
+        // Ambiguous  -  multiple matters for the same contact(s)
         const suggestedMatterIds = [...new Set(matterContacts.map((mc) => mc.matter_id).filter((id): id is string => id != null))]
         const suggestedContactIds = [...new Set(matterContacts.map((mc) => mc.contact_id).filter((id): id is string => id != null))]
 
@@ -166,7 +166,7 @@ export async function associateEmailToMatter(
           thread_id: threadId,
           suggested_matter_ids: suggestedMatterIds,
           suggested_contact_ids: suggestedContactIds,
-          reason: `Contact matched to ${suggestedMatterIds.length} matters — manual selection required`,
+          reason: `Contact matched to ${suggestedMatterIds.length} matters  -  manual selection required`,
           status: 'pending',
         })
 
@@ -181,7 +181,7 @@ export async function associateEmailToMatter(
     }
   }
 
-  // 4. Subject match — look for matter number in subject line
+  // 4. Subject match  -  look for matter number in subject line
   if (thread.subject) {
     // Match patterns like "MAT-2024-001" or "[MAT-2024-001]"
     const matterNumberMatch = thread.subject.match(/\b(MAT-\d{4}-\d+)\b/i)
@@ -216,7 +216,7 @@ export async function associateEmailToMatter(
     }
   }
 
-  // 5. No match — add to unmatched queue
+  // 5. No match  -  add to unmatched queue
   await supabase.from('unmatched_email_queue').insert({
     tenant_id: thread.tenant_id,
     thread_id: threadId,

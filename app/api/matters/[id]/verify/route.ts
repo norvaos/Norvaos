@@ -69,7 +69,7 @@ async function handlePost(
       )
     }
 
-    // Use admin client to bypass RLS — auth already verified above
+    // Use admin client to bypass RLS  -  auth already verified above
     const admin = createAdminClient()
 
     // Verify matter belongs to tenant
@@ -148,7 +148,7 @@ async function handlePost(
           timestamp: now,
         },
       })
-      // Unsubscribe immediately — this is a one-shot broadcast
+      // Unsubscribe immediately  -  this is a one-shot broadcast
       admin.removeChannel(channel)
     } catch (broadcastErr) {
       // Non-fatal: realtime broadcast failure shouldn't fail the request

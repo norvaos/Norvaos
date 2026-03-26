@@ -161,7 +161,7 @@ export function ExpiryTracker({ contactId }: ExpiryTrackerProps) {
                       : 'text-muted-foreground'
                 )}>
                   Issued: {new Date(record.issue_date).toLocaleDateString('en-CA')}
-                  {' — '}
+                  {'  -  '}
                   Expires: {new Date(record.expiry_date).toLocaleDateString('en-CA')}
                 </div>
                 {record.document_reference && (

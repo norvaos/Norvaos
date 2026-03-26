@@ -133,7 +133,7 @@ export function useMarkIrccReviewSigned() {
       queryClient.invalidateQueries({ queryKey: clientReviewKeys.byMatter(vars.matterId) })
       // Also invalidate form packs so the gate updates
       queryClient.invalidateQueries({ queryKey: ['immigration_readiness', vars.matterId] })
-      toast.success('Client review signed — file unlocked for final form pack generation')
+      toast.success('Client review signed  -  file unlocked for final form pack generation')
     },
     onError: () => {
       toast.error('Failed to mark review as signed')
@@ -161,7 +161,7 @@ export function useMarkIrccReviewDeclined() {
     },
     onSuccess: (_, vars) => {
       queryClient.invalidateQueries({ queryKey: clientReviewKeys.byMatter(vars.matterId) })
-      toast.success('Review marked as declined — please follow up with client')
+      toast.success('Review marked as declined  -  please follow up with client')
     },
     onError: () => {
       toast.error('Failed to mark as declined')

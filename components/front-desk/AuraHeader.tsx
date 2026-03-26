@@ -1,16 +1,16 @@
 'use client'
 
 /**
- * AuraHeader — Directive 32.0 §1: The Polyglot Pulse
+ * AuraHeader  -  Directive 32.0 §1: The Polyglot Pulse
  *
  * Cycles through welcome greetings in all Global 15 languages with a
  * smooth cross-fade animation. The UniversalGlobeSelector is the master
- * controller — manual language selection pauses the cycle for 15 seconds.
+ * controller  -  manual language selection pauses the cycle for 15 seconds.
  *
  * RTL Enforcement: Container auto-reverses via Iron Canvas flex rules.
- * Zero framer-motion dependency — pure CSS keyframe animations.
+ * Zero framer-motion dependency  -  pure CSS keyframe animations.
  *
- * Directive 36.1: Liquid-Layout hardened — will-change demoted to 'auto'
+ * Directive 36.1: Liquid-Layout hardened  -  will-change demoted to 'auto'
  * between transitions to prevent permanent GPU layer reservation that
  * starves sidebar Nastaliq rendering. content-visibility: auto enables
  * browser skip when off-viewport during snap-resize.
@@ -29,7 +29,7 @@ import { loadDictionary } from '@/lib/i18n/dictionaries'
 interface AuraHeaderProps {
   /** Additional class names */
   className?: string
-  /** Called when user manually selects a language — persist to contact record */
+  /** Called when user manually selects a language  -  persist to contact record */
   onLanguageChange?: (localeCode: string) => void
 }
 
@@ -42,7 +42,7 @@ interface GreetingEntry {
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
-/** Cycle interval — set to 500 for Directive 34 Script-Pressure test, production: 5000 */
+/** Cycle interval  -  set to 500 for Directive 34 Script-Pressure test, production: 5000 */
 const CYCLE_INTERVAL = 5000    // 5s between greetings (production)
 const PAUSE_DURATION = 15000   // 15s pause on manual selection
 const FADE_DURATION = 600      // Cross-fade duration (ms)
@@ -172,17 +172,17 @@ export function AuraHeader({ className, onLanguageChange }: AuraHeaderProps) {
         containIntrinsicSize: 'auto 5rem',
       }}
     >
-      {/* Background shimmer — overflow-hidden scoped to shimmer only, not the header */}
+      {/* Background shimmer  -  overflow-hidden scoped to shimmer only, not the header */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-xl">
         <div className="absolute -top-1/2 -left-1/4 w-[200%] h-[200%] bg-gradient-to-br from-white/5 via-transparent to-accent/10 animate-pulse" />
       </div>
 
-      {/* Content row — auto-reverses in RTL via Iron Canvas */}
+      {/* Content row  -  auto-reverses in RTL via Iron Canvas */}
       <div className={cn(
         'relative z-10 flex items-center gap-4',
         rtl ? 'flex-row-reverse' : 'flex-row'
       )}>
-        {/* Greeting text with cross-fade — height-locked for zero layout drift */}
+        {/* Greeting text with cross-fade  -  height-locked for zero layout drift */}
         <div className="flex-1 min-w-0" style={{ minHeight: '3.5rem', contain: 'layout style' }}>
           {current && (
             <div
@@ -194,7 +194,7 @@ export function AuraHeader({ className, onLanguageChange }: AuraHeaderProps) {
                 transitionDuration: `${FADE_DURATION}ms`,
                 // Directive 36.1: Only promote to compositor layer during active fade.
                 // Between cycles, 'auto' releases the GPU layer so sidebar Nastaliq
-                // rendering gets full budget — eliminates stutter on Draft panel.
+                // rendering gets full budget  -  eliminates stutter on Draft panel.
                 willChange: isTransitioning ? 'opacity, transform' : 'auto',
               }}
             >
@@ -224,7 +224,7 @@ export function AuraHeader({ className, onLanguageChange }: AuraHeaderProps) {
             </div>
           )}
 
-          {/* Pulse dots — show cycle position */}
+          {/* Pulse dots  -  show cycle position */}
           {greetings.length > 0 && (
             <div className={cn(
               'flex gap-0.5 mt-2',
@@ -245,7 +245,7 @@ export function AuraHeader({ className, onLanguageChange }: AuraHeaderProps) {
           )}
         </div>
 
-        {/* Globe Selector — master controller */}
+        {/* Globe Selector  -  master controller */}
         <div className="shrink-0">
           <UniversalGlobeSelector
             value={locale}

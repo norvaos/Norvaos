@@ -42,7 +42,7 @@ async function handlePost(
     // Compute readiness
     const result = await computeReadiness(matterId, admin)
 
-    // Persist to matters table — fire-and-forget is intentional; the
+    // Persist to matters table  -  fire-and-forget is intentional; the
     // computed result is the source of truth returned to the caller.
     admin
       .from('matters')

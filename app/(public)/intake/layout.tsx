@@ -1,5 +1,5 @@
 /**
- * Public Intake Layout — Minimal branded layout for external client intake.
+ * Public Intake Layout  -  Minimal branded layout for external client intake.
  * No dashboard sidebar, no internal navigation. Just firm branding + form.
  */
 

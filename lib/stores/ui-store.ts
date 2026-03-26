@@ -51,9 +51,14 @@ interface UIState {
   setActiveDrawerPanel: (panel: DrawerPanel) => void
   toggleCommunicationPanel: () => void
 
-  // Zone E — Audit Rail collapse state (persisted)
+  // Zone E  -  Audit Rail collapse state (persisted)
   zoneECollapsed: boolean
   setZoneECollapsed: (v: boolean) => void
+
+  // Session B: Sovereign Ignition UI_REFRESH event
+  // When fired, forces CSS re-render for liquid-fill synchronisation with hash generation
+  sovereignIgnitionSeq: number
+  fireSovereignIgnition: () => void
 }
 
 export const useUIStore = create<UIState>()(
@@ -89,7 +94,7 @@ export const useUIStore = create<UIState>()(
       openModal: (modal, data) => set({ activeModal: modal, modalData: data ?? null }),
       closeModal: () => set({ activeModal: null, modalData: null }),
 
-      // Practice filter — 'all' or a practice_area UUID
+      // Practice filter  -  'all' or a practice_area UUID
       // Color and name are stored alongside so the header can render the accent
       // instantly from localStorage without waiting for the practice areas query.
       activePracticeFilter: 'all',
@@ -114,9 +119,15 @@ export const useUIStore = create<UIState>()(
           communicationPanelCollapsed: !state.communicationPanelCollapsed,
         })),
 
-      // Zone E — Audit Rail collapse state
+      // Zone E  -  Audit Rail collapse state
       zoneECollapsed: false,
       setZoneECollapsed: (v) => set({ zoneECollapsed: v }),
+
+      // Session B: Sovereign Ignition UI_REFRESH event
+      sovereignIgnitionSeq: 0,
+      fireSovereignIgnition: () => set((state) => ({
+        sovereignIgnitionSeq: state.sovereignIgnitionSeq + 1,
+      })),
     }),
     {
       name: 'norvaos-ui',

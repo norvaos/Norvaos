@@ -1,5 +1,5 @@
 /**
- * Sovereign Intake Service — Directive 42.0
+ * Sovereign Intake Service  -  Directive 42.0
  *
  * Atomic operations for the compliance-first intake flow.
  * Creates contact + lead + logs conflict clearance in one flow.
@@ -124,7 +124,7 @@ export async function createSovereignIntake(params: CreateIntakeParams): Promise
       leadId: lead.id,
     }),
   }).catch(() => {
-    // Non-blocking — scan failure doesn't prevent intake completion
+    // Non-blocking  -  scan failure doesn't prevent intake completion
     console.warn('[sovereign-intake] Auto conflict scan failed (non-blocking)')
   })
 

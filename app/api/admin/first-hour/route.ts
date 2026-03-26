@@ -8,7 +8,7 @@ import { withTiming } from '@/lib/middleware/request-timing'
 /**
  * GET /api/admin/first-hour
  *
- * Directive 26.1 — "First-Hour" Command Centre.
+ * Directive 26.1  -  "First-Hour" Command Centre.
  * Returns real-time metrics for the first 60 minutes of firm onboarding:
  *   1. Clio-to-Norva sync velocity (matters migrated per minute)
  *   2. Ghost-Writer usage (AI drafts generated)

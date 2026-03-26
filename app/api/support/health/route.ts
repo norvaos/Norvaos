@@ -7,7 +7,7 @@
  * Response includes database, email, and job queue health.
  * No internal diagnostic data (stack traces, raw errors) is returned to clients.
  *
- * Team 3 / Module 4 — Support and Implementation Tooling
+ * Team 3 / Module 4  -  Support and Implementation Tooling
  */
 
 import { NextResponse } from 'next/server'
@@ -40,7 +40,7 @@ export async function GET() {
 
     // Never expose internal error details to clients
     return NextResponse.json(
-      { error: 'Health check unavailable — check server logs.' },
+      { error: 'Health check unavailable  -  check server logs.' },
       { status: 500 },
     )
   }

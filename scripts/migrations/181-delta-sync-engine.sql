@@ -1,4 +1,4 @@
--- Migration 181: Delta-Sync Engine — Background Clio polling for 7-day post-migration sync
+-- Migration 181: Delta-Sync Engine  -  Background Clio polling for 7-day post-migration sync
 -- Tracks sync sessions and individual sync runs for auditing/debugging
 
 -- ─── Sync Sessions ─────────────────────────────────────────────────────────

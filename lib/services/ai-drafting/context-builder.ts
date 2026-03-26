@@ -3,7 +3,7 @@
  * context payload for AI drafting.
  *
  * All fields are tagged with a `source` for Source Attribution highlighting.
- * Missing fields produce [MISSING DATA] placeholders — never hallucinated.
+ * Missing fields produce [MISSING DATA] placeholders  -  never hallucinated.
  *
  * Budget: All queries use explicit column fragments (< 20 cols each).
  */
@@ -106,13 +106,13 @@ export interface DraftContext {
   /** Fact-Anchors from Norva Ear sessions (Voice Calibration) */
   factAnchors: FactAnchor[]
 
-  /** Snippet chain-of-custody — SHA-256 hashes of wiki snippets used in this draft */
+  /** Snippet chain-of-custody  -  SHA-256 hashes of wiki snippets used in this draft */
   snippetSources: SnippetSource[]
 
   /** All source tags for attribution highlighting */
   sources: SourceTag[]
 
-  /** Fields that are missing — used for [MISSING DATA] placeholders */
+  /** Fields that are missing  -  used for [MISSING DATA] placeholders */
   missingFields: string[]
 }
 
@@ -176,7 +176,7 @@ export async function buildDraftContext(
           .single()
       : Promise.resolve({ data: null, error: null }),
 
-    // Norva Ear sessions — Voice Calibration fact anchors
+    // Norva Ear sessions  -  Voice Calibration fact anchors
     supabase
       .from('norva_ear_sessions')
       .select('id, title, extracted_facts, status')
@@ -436,12 +436,12 @@ export function buildSystemPrompt(ctx: DraftContext): string {
 
   // Voice Calibration: inject Norva Ear fact anchors
   const factAnchorSection = ctx.factAnchors.length > 0
-    ? `\n\n## CLIENT'S OWN WORDS (Norva Ear — Voice Calibration)
+    ? `\n\n## CLIENT'S OWN WORDS (Norva Ear  -  Voice Calibration)
 These are direct quotes from the client during consultation. Weave these personal details naturally into the letter to ground the narrative in the client's authentic voice. Attribute each to the consultation session.
 
 ${ctx.factAnchors
       .filter(a => a.confidence !== 'low')
-      .map(a => `- **${a.fact}** — Client said: "${a.sourceQuote}" (Session: ${a.sessionTitle})`)
+      .map(a => `- **${a.fact}**  -  Client said: "${a.sourceQuote}" (Session: ${a.sessionTitle})`)
       .join('\n')}`
     : ''
 

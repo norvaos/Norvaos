@@ -14,7 +14,7 @@ ON matters (tenant_id, title text_pattern_ops);
 CREATE INDEX IF NOT EXISTS idx_matters_tenant_number_search
 ON matters (tenant_id, matter_number text_pattern_ops);
 
--- 3. Index for global_search RPC — ILIKE '%pattern%' needs trigram
+-- 3. Index for global_search RPC  -  ILIKE '%pattern%' needs trigram
 -- Only create if pg_trgm extension exists (should already be enabled)
 DO $$
 BEGIN

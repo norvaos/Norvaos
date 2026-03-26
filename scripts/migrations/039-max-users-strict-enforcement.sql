@@ -3,7 +3,7 @@
 -- Removes the old COALESCE fallback. If max_users IS NULL the trigger
 -- rejects the INSERT rather than silently defaulting.
 --
--- This is a DROP-and-REPLACE of the function body only — the trigger
+-- This is a DROP-and-REPLACE of the function body only  -  the trigger
 -- (trg_users_max_enforcement) remains unchanged and does not need re-creation.
 
 BEGIN;
@@ -21,7 +21,7 @@ BEGIN
 
   -- Guard: every tenant MUST have an explicit max_users value
   IF max_allowed IS NULL THEN
-    RAISE EXCEPTION 'Tenant % has no max_users configured — cannot enforce user limit', NEW.tenant_id;
+    RAISE EXCEPTION 'Tenant % has no max_users configured  -  cannot enforce user limit', NEW.tenant_id;
   END IF;
 
   -- Count active users (excluding the row being inserted, which is not yet committed)

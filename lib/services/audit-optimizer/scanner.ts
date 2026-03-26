@@ -186,7 +186,7 @@ export function getRelevantCategories(caseType?: string): AuditCategory[] {
     }
   }
 
-  // No match — scan against all categories
+  // No match  -  scan against all categories
   return Object.keys(AUDIT_KEYWORDS) as AuditCategory[];
 }
 

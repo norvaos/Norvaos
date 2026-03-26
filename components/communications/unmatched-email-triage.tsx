@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * UnmatchedEmailTriage — Triage panel for emails that could not be
+ * UnmatchedEmailTriage  -  Triage panel for emails that could not be
  * auto-associated to a matter. Shows pending queue entries, fetches
  * AI-ranked association suggestions, and lets the user resolve or dismiss.
  */

@@ -1,5 +1,5 @@
 -- ═══════════════════════════════════════════════════════════════════════════════
--- Migration 145: IRCC Forms Engine — Core Infrastructure
+-- Migration 145: IRCC Forms Engine  -  Core Infrastructure
 -- ═══════════════════════════════════════════════════════════════════════════════
 --
 -- Implements ADR-1 through ADR-7 schema requirements:

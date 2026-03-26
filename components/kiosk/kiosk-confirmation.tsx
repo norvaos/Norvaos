@@ -14,10 +14,10 @@ interface KioskConfirmationProps {
 }
 
 /**
- * Kiosk confirmation screen — shown after check-in is complete.
+ * Kiosk confirmation screen  -  shown after check-in is complete.
  *
  * Auto-resets after inactivity timeout (handled by parent).
- * Shows returning client/lead staff info when available (Rule #8 safe —
+ * Shows returning client/lead staff info when available (Rule #8 safe  - 
  * only shown after successful check-in completion).
  */
 export function KioskConfirmation({
@@ -57,7 +57,7 @@ export function KioskConfirmation({
         </p>
       </div>
 
-      {/* Returning info — staff avatar + message */}
+      {/* Returning info  -  staff avatar + message */}
       {returningInfo && (
         <div className="flex flex-col items-center gap-3">
           <div

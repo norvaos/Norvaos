@@ -1,5 +1,5 @@
 /**
- * Tests for the Document Engine — Field Resolver
+ * Tests for the Document Engine  -  Field Resolver
  *
  * Covers:
  *   - resolveFields(): full resolution pipeline
@@ -129,7 +129,7 @@ describe('applyTransform', () => {
 
   it('formats currency', () => {
     const result = applyTransform('5000', 'currency')
-    // Intl.NumberFormat for CAD — format varies by locale, check key parts
+    // Intl.NumberFormat for CAD  -  format varies by locale, check key parts
     expect(result).toContain('5,000.00')
   })
 

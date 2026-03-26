@@ -217,7 +217,7 @@ export interface IRCCProfile {
     history?: IRCCEducationEntry[]
   }
 
-  /** Section: Employment (IMM 5257 §10 — past 10 years) */
+  /** Section: Employment (IMM 5257 §10  -  past 10 years) */
   employment: {
     current_occupation?: string
     history?: IRCCEmploymentEntry[]

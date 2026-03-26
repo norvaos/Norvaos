@@ -9,7 +9,7 @@ import { withTiming } from '@/lib/middleware/request-timing'
  * PATCH /api/settings/firm
  *
  * Update firm name, branding colours, and regional settings.
- * Uses admin client to bypass RLS — requires settings:edit permission.
+ * Uses admin client to bypass RLS  -  requires settings:edit permission.
  */
 async function handlePatch(request: Request) {
   try {

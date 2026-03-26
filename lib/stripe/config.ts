@@ -1,7 +1,7 @@
 import Stripe from 'stripe'
 
 /**
- * Server-side Stripe instance — lazily initialised so that
+ * Server-side Stripe instance  -  lazily initialised so that
  * the SDK is never constructed at Next.js build time (when
  * STRIPE_SECRET_KEY is not available in the build environment).
  */

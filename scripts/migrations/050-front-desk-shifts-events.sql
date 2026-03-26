@@ -52,7 +52,7 @@ CREATE POLICY fd_shifts_tenant ON front_desk_shifts
 -- ─── 2. Front Desk Events (Non-Action Events) ───────────────────────────────
 -- Lightweight event log for non-action events used in KPI computation.
 -- Examples: search_submitted, queue_viewed, idle_gap, heartbeat.
--- Immutable like workflow_actions — no UPDATE or DELETE permitted.
+-- Immutable like workflow_actions  -  no UPDATE or DELETE permitted.
 
 CREATE TABLE IF NOT EXISTS front_desk_events (
   id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),

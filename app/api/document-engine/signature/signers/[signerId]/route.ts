@@ -1,5 +1,5 @@
 /**
- * PATCH /api/document-engine/signature/signers/[signerId] — Update signer status
+ * PATCH /api/document-engine/signature/signers/[signerId]  -  Update signer status
  */
 
 import { NextRequest, NextResponse } from 'next/server'

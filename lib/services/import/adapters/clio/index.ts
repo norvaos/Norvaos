@@ -32,7 +32,7 @@ export const clioAdapter: PlatformAdapter = {
     clioDocumentsAdapter,
     clioTimeEntriesAdapter,
     clioBillsAdapter,
-    // Norva Signature additions — 5.1
+    // Norva Signature additions  -  5.1
     clioTrustBalancesAdapter,
     clioCustomFieldValuesAdapter,
   ],

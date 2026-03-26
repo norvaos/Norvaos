@@ -3,8 +3,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════════
 --
 -- Two new tables for workspace-level automation configuration:
---   1. lead_automation_settings — per-trigger enable/disable, channel control, practice area scoping
---   2. lead_message_templates — workspace template overrides with merge field placeholders
+--   1. lead_automation_settings  -  per-trigger enable/disable, channel control, practice area scoping
+--   2. lead_message_templates  -  workspace template overrides with merge field placeholders
 --
 -- Also extends workspace_workflow_config with automation_message_settings JSONB.
 --

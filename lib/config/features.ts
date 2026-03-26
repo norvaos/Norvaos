@@ -1,5 +1,5 @@
 // ============================================================================
-// Feature Registry — Platform defaults + per-tenant overrides
+// Feature Registry  -  Platform defaults + per-tenant overrides
 // ============================================================================
 // Effective features = PLATFORM_FEATURE_DEFAULTS merged with tenant.feature_flags.
 // Central control without an admin panel: change defaults here to affect all tenants.
@@ -14,7 +14,7 @@ export const PLATFORM_FEATURE_DEFAULTS: Record<string, boolean> = {
   notifications_email: true,
   notifications_push: false,
   billing: false,
-  // Front Desk is on by default for all tenants — no per-tenant DB flag needed.
+  // Front Desk is on by default for all tenants  -  no per-tenant DB flag needed.
   front_desk_mode: true,
 }
 

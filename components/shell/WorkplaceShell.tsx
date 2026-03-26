@@ -1,15 +1,15 @@
 'use client'
 
 /**
- * WorkplaceShell — 5-Zone Matter Layout
+ * WorkplaceShell  -  5-Zone Matter Layout
  *
  * The container that wraps every matter view in NorvaOS.
  * Composes Zones A–E per spec Section 3:
  *
  *   ┌───────────────────────────────────────────────────┐
- *   │  Zone A — Control Header (full width)             │
+ *   │  Zone A  -  Control Header (full width)             │
  *   ├───────────────────────────────────────────────────┤
- *   │  Zone B — Stage Rail (full width)                 │
+ *   │  Zone B  -  Stage Rail (full width)                 │
  *   ├──────────┬───────────────────────────┬────────────┤
  *   │  Zone C  │  Zone D                   │  Zone E    │
  *   │  Left    │  Main Workspace (tabs)    │  Audit     │
@@ -19,7 +19,7 @@
  * Zone C (left rail) and Zone E (audit rail) are independently collapsible.
  * Zone D (main workspace) expands to fill remaining width.
  *
- * Spec ref: Section 3 — Navigation & WorkplaceShell
+ * Spec ref: Section 3  -  Navigation & WorkplaceShell
  */
 
 import { ZoneA } from './ZoneA'
@@ -47,22 +47,22 @@ export function WorkplaceShell({ matter, tenantId, initialTab }: WorkplaceShellP
   return (
     <div className="flex flex-col h-full overflow-hidden bg-background">
 
-      {/* Zone A — Control Header */}
+      {/* Zone A  -  Control Header */}
       <ZoneA matter={matter} tenantId={tenantId} />
 
-      {/* Zone B — Stage Rail */}
+      {/* Zone B  -  Stage Rail */}
       <ZoneB matterId={matter.id} tenantId={tenantId} matter={matter} />
 
-      {/* Zones C / D / E — three-column content row */}
+      {/* Zones C / D / E  -  three-column content row */}
       <div className="flex-1 flex min-h-0 overflow-hidden">
 
-        {/* Zone C — Left Rail */}
+        {/* Zone C  -  Left Rail */}
         <ZoneC matter={matter} tenantId={tenantId} />
 
-        {/* Zone D — Main Workspace */}
+        {/* Zone D  -  Main Workspace */}
         <ZoneD matter={matter} tenantId={tenantId} initialTab={initialTab} />
 
-        {/* Zone E — Audit Rail */}
+        {/* Zone E  -  Audit Rail */}
         <ZoneE matterId={matter.id} tenantId={tenantId} />
 
       </div>

@@ -44,7 +44,7 @@ export function RejectedItemNudgeEmail({
     ? `Hi ${clientFirstName}`
     : 'Hello'
 
-  const subject = `Action Required — Correction needed for ${matterReference}`
+  const subject = `Action Required  -  Correction needed for ${matterReference}`
   const itemCount = rejectedItems.length
   const itemWord = itemCount === 1 ? 'item' : 'items'
 
@@ -146,7 +146,7 @@ export async function renderRejectedItemNudgeEmail(props: RejectedItemNudgeProps
   subject: string
 }> {
   const html = await render(<RejectedItemNudgeEmail {...props} />)
-  const subject = `Action Required — Correction needed for ${props.matterReference}`
+  const subject = `Action Required  -  Correction needed for ${props.matterReference}`
 
   const greeting = props.clientFirstName
     ? `Hi ${props.clientFirstName},`

@@ -157,7 +157,7 @@ export async function checkExpiryReminders(
         }
 
         case 'email': {
-          // Log email intent — actual sending handled by the email service
+          // Log email intent  -  actual sending handled by the email service
           if (record.matter_id) {
             await supabase.from('activities').insert({
               tenant_id: tenantId,
@@ -303,7 +303,7 @@ async function processDeadlineReminder(
     tenant_id: tenantId,
     user_id: recipientId,
     title: `Deadline in ${offsetDay} days`,
-    message: `Deadline approaching: ${deadline.title} — due in ${daysUntilDue} days (${deadline.due_date})`,
+    message: `Deadline approaching: ${deadline.title}  -  due in ${daysUntilDue} days (${deadline.due_date})`,
     notification_type: 'expiry_reminder',
     entity_type: 'matter',
     entity_id: deadline.matter_id,

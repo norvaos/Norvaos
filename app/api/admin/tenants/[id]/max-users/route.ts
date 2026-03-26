@@ -20,8 +20,8 @@ import { withTiming } from '@/lib/middleware/request-timing'
  * Rate-limited: 30 req/min per IP.
  *
  * Two auth paths:
- *   1. Platform-admin: Bearer token via PLATFORM_ADMIN_SECRET — can update any tenant.
- *   2. Tenant-admin: authenticateRequest() + settings:edit — own tenant only.
+ *   1. Platform-admin: Bearer token via PLATFORM_ADMIN_SECRET  -  can update any tenant.
+ *   2. Tenant-admin: authenticateRequest() + settings:edit  -  own tenant only.
  *
  * Body: { max_users: number, reason: string }
  *   - max_users: integer 1–1000

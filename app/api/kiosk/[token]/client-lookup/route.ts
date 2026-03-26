@@ -150,7 +150,7 @@ async function handlePost(
       })
     }
 
-    // ── Fetch matters (no aggressive status filter — show all non-archived) ───
+    // ── Fetch matters (no aggressive status filter  -  show all non-archived) ───
     const { data: matters } = await admin
       .from('matters')
       .select('id, matter_number, title, status, matter_type_id, responsible_lawyer_id')

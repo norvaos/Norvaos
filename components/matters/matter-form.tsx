@@ -216,7 +216,7 @@ export function MatterForm({ mode, defaultValues, onSubmit, isLoading }: MatterF
   const { data: staff, isLoading: staffLoading } = useStaff(tenantId)
 
   // ── Reset dependent fields when matter type changes ─────────────────────────
-  // This ONLY fires on matter type change — not on pipeline/template data arrival.
+  // This ONLY fires on matter type change  -  not on pipeline/template data arrival.
   // Separating this from the pipeline auto-select prevents a race condition where
   // late-arriving matterStagePipelines would re-fire this effect and wipe out a
   // fee_template_id that the auto-select effect had already set.
@@ -253,9 +253,9 @@ export function MatterForm({ mode, defaultValues, onSubmit, isLoading }: MatterF
   const [userPickedTemplate, setUserPickedTemplate] = useState(false)
 
   // ── SINGLE EFFECT: Auto-select default fee template AND apply its values ──
-  // ONLY depends on feeTemplates — when matter type changes, the query key changes,
+  // ONLY depends on feeTemplates  -  when matter type changes, the query key changes,
   // React Query refetches, and feeTemplates updates. That's when this fires.
-  // Do NOT add watchedMatterTypeId here — it causes premature firing before data arrives.
+  // Do NOT add watchedMatterTypeId here  -  it causes premature firing before data arrives.
   useEffect(() => {
     if (mode !== 'create') return
 
@@ -393,7 +393,7 @@ export function MatterForm({ mode, defaultValues, onSubmit, isLoading }: MatterF
               )}
             />
 
-            {/* Primary Contact — always linked from contacts (command centre) */}
+            {/* Primary Contact  -  always linked from contacts (command centre) */}
             <FormField
               control={form.control}
               name="contact_id"
@@ -479,7 +479,7 @@ export function MatterForm({ mode, defaultValues, onSubmit, isLoading }: MatterF
               )}
             />
 
-            {/* Matter Type — searchable combobox, shown after practice area is selected */}
+            {/* Matter Type  -  searchable combobox, shown after practice area is selected */}
             {watchedPracticeAreaId && (
               <FormField
                 control={form.control}
@@ -610,7 +610,7 @@ export function MatterForm({ mode, defaultValues, onSubmit, isLoading }: MatterF
                 )}
               />
 
-              {/* Client Province — shown when applicant is inside Canada */}
+              {/* Client Province  -  shown when applicant is inside Canada */}
               {watchedApplicantLocation === 'inside_canada' && (
                 <FormField
                   control={form.control}
@@ -721,7 +721,7 @@ export function MatterForm({ mode, defaultValues, onSubmit, isLoading }: MatterF
               />
             )}
 
-            {/* ── Fee Summary Breakdown — only shown when a template is applied ── */}
+            {/* ── Fee Summary Breakdown  -  only shown when a template is applied ── */}
             {hasTemplateApplied && feeBreakdown && (
               <div className="rounded-lg border border-emerald-200 bg-emerald-50/50 p-4 space-y-3">
                 <div className="flex items-center justify-between">
@@ -879,7 +879,7 @@ export function MatterForm({ mode, defaultValues, onSubmit, isLoading }: MatterF
                     </p>
                   </div>
                 )}
-                {/* ── Tax line — calculated from applicant location + province ── */}
+                {/* ── Tax line  -  calculated from applicant location + province ── */}
                 {(() => {
                   const taxableAmountCents = feeBreakdown.professional + feeBreakdown.disbursements
                   const isOutsideCanada = watchedApplicantLocation === 'outside_canada'
@@ -917,7 +917,7 @@ export function MatterForm({ mode, defaultValues, onSubmit, isLoading }: MatterF
                             ? `$0.00`
                             : provinceConfig
                               ? formatCents(taxAmountCents)
-                              : '—'}
+                              : ' - '}
                           {' '}
                           <span className="font-normal text-muted-foreground text-[10px]">
                             {taxLabel}
@@ -1060,7 +1060,7 @@ export function MatterForm({ mode, defaultValues, onSubmit, isLoading }: MatterF
               </div>
             )}
 
-            {/* Estimated Value — hidden until a matter type is selected */}
+            {/* Estimated Value  -  hidden until a matter type is selected */}
             {(watchedMatterTypeId || form.getValues('estimated_value')) && (
               <FormField
                 control={form.control}
@@ -1113,7 +1113,7 @@ export function MatterForm({ mode, defaultValues, onSubmit, isLoading }: MatterF
                         <div className="flex items-start gap-1.5 mt-1">
                           <AlertTriangle className="h-3.5 w-3.5 text-amber-600 mt-0.5 shrink-0" />
                           <span className="text-xs text-amber-600">
-                            Manual price entered — template defaults will be ignored for this matter.
+                            Manual price entered  -  template defaults will be ignored for this matter.
                           </span>
                         </div>
                         {templateDefaultValue && (
@@ -1159,7 +1159,7 @@ export function MatterForm({ mode, defaultValues, onSubmit, isLoading }: MatterF
               />
             )}
 
-            {/* Billing Type — read-only when controlled by a template, editable otherwise */}
+            {/* Billing Type  -  read-only when controlled by a template, editable otherwise */}
             <FormField
               control={form.control}
               name="billing_type"

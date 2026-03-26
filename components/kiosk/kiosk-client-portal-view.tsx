@@ -391,7 +391,7 @@ function DocumentsTab({ slots }: { slots: KioskDocumentSlot[] }) {
 // ── Main component ──────────────────────────────────────────────────────────
 
 /**
- * Kiosk client portal view — shown after a returning client is found.
+ * Kiosk client portal view  -  shown after a returning client is found.
  *
  * Displays their active matter(s) and presents:
  *   - Full matter summary (status, lawyer, action items)

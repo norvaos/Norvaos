@@ -1,5 +1,5 @@
 /**
- * OCR Identity Comparator — Directive 41.3, Item 3
+ * OCR Identity Comparator  -  Directive 41.3, Item 3
  *
  * Compares OCR-extracted passport/ID fields against the contact profile.
  * Used to auto-detect identity mismatches after document scanning.
@@ -43,7 +43,7 @@ export interface IdentityComparisonResult {
 }
 
 /**
- * Levenshtein distance — edit distance between two strings.
+ * Levenshtein distance  -  edit distance between two strings.
  * Used to tolerate minor OCR misreads (e.g., "INAAYA" vs "INAAVA").
  */
 function levenshtein(a: string, b: string): number {
@@ -115,7 +115,7 @@ export function compareIdentity(
     )
   }
 
-  // DOB comparison — exact match
+  // DOB comparison  -  exact match
   const extractedDob = normaliseDate(extracted.date_of_birth)
   const profileDob = normaliseDate(profile.date_of_birth)
   const dobMatch = !!extractedDob && !!profileDob && extractedDob === profileDob
@@ -125,7 +125,7 @@ export function compareIdentity(
     )
   }
 
-  // If either is missing, we can't verify — not a mismatch but not a match
+  // If either is missing, we can't verify  -  not a mismatch but not a match
   if (!extractedFullName) mismatches.push('OCR could not extract a name from the document')
   if (!extractedDob) mismatches.push('OCR could not extract a date of birth from the document')
 

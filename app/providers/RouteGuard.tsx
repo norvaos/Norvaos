@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * RouteGuard — Sovereign Cutover (Team COMMAND)
+ * RouteGuard  -  Sovereign Cutover (Team COMMAND)
  *
  * Intercepts legacy LeadView routes when a matter_id is detected on the lead.
  * If the lead has been converted (converted_matter_id exists), redirects to
@@ -67,6 +67,6 @@ export function RouteGuard({ leadId, children }: RouteGuardProps) {
     )
   }
 
-  // Lead is not converted — render the normal LeadView
+  // Lead is not converted  -  render the normal LeadView
   return <>{children}</>
 }

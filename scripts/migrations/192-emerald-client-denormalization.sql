@@ -1,10 +1,10 @@
--- Migration 192: Emerald Client Badge — Denormalized Client Status
+-- Migration 192: Emerald Client Badge  -  Denormalized Client Status
 --
 -- Problem: "Client" status lives only in the matter_contacts join table (role = 'client').
--- The sidebar, global search, and profile badges all hit the contacts table — which has
+-- The sidebar, global search, and profile badges all hit the contacts table  -  which has
 -- no knowledge of whether a contact has ever been retained. This migration adds:
---   1. contacts.client_status  — 'lead' | 'client' | 'former_client'
---   2. contacts.active_matter_count — integer for the Emerald Badge sub-label
+--   1. contacts.client_status   -  'lead' | 'client' | 'former_client'
+--   2. contacts.active_matter_count  -  integer for the Emerald Badge sub-label
 --   3. A trigger on matter_contacts that keeps both columns in sync automatically.
 --   4. Backfill of existing data.
 --   5. Updated global_search RPC to use the new columns.
@@ -320,7 +320,7 @@ DECLARE
   _leads     jsonb;
   _tasks     jsonb;
 BEGIN
-  -- Resolve tenant from auth.uid() — enforced at DB level
+  -- Resolve tenant from auth.uid()  -  enforced at DB level
   SELECT tenant_id INTO _tenant_id
   FROM users
   WHERE auth_user_id = auth.uid();

@@ -25,7 +25,7 @@ export function scannerTypeToFieldType(scannerType: string | null | undefined): 
     case 'signature':
     case 'barcode':
     case 'image':
-      // These are system/non-fillable types — don't set a field_type
+      // These are system/non-fillable types  -  don't set a field_type
       return null
     case 'text':
     default:

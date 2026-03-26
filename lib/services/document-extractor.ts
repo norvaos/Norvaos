@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Document Extractor — Shared OCR field extraction logic (Directive 40.0)
+ * Document Extractor  -  Shared OCR field extraction logic (Directive 40.0)
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Extracted from /api/documents/scan so both the authenticated scan endpoint
@@ -339,7 +339,7 @@ const EXTRACTORS: Record<DocumentType, (text: string) => Record<string, string |
   },
 
   general: (text) => ({
-    document_type: 'Unknown — please review',
+    document_type: 'Unknown  -  please review',
     names: extractAfterLabel(text, 'name', 'applicant', 'client', 'recipient', 'to', 'attention'),
     dates: extractDate(text, 'date', 'dated', 'issued', 'effective'),
     reference_numbers: extractAfterLabel(text, 'reference', 'ref no', 'file no', 'case no', 'number'),

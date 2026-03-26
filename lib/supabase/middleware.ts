@@ -110,7 +110,7 @@ export async function updateSession(request: NextRequest) {
       }
 
       if (!cachedRole) {
-        // No cache — resolve role from DB (one query, cached for 5 min)
+        // No cache  -  resolve role from DB (one query, cached for 5 min)
         try {
           const { data: userData } = await supabase
             .from('users')

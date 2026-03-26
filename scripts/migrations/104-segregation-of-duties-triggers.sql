@@ -1,4 +1,4 @@
--- Migration 104: Segregation of Duties — DB-Level Enforcement
+-- Migration 104: Segregation of Duties  -  DB-Level Enforcement
 --
 -- Moves three segregation checks from app-only to dual-enforced (app + DB).
 -- These controls were previously enforced only in TypeScript:

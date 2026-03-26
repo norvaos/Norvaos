@@ -181,7 +181,7 @@ export async function classifyPostSubmissionDocument(
         tenant_id: tenantId,
         matter_id: matterId,
         deadline_type: 'post_submission',
-        title: `${config.label} — Deadline`,
+        title: `${config.label}  -  Deadline`,
         due_date: dueDate.toISOString().split('T')[0],
         status: 'upcoming',
         priority: config.deadline_days <= 14 ? 'high' : 'medium',

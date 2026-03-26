@@ -36,7 +36,7 @@ ALTER TABLE tasks
   ADD COLUMN IF NOT EXISTS source_template_item_id UUID;
 
 COMMENT ON COLUMN tasks.source_template_item_id IS
-  'FK to task_template_items.id — used for idempotent template-based task creation. '
+  'FK to task_template_items.id  -  used for idempotent template-based task creation. '
   'If a task was auto-created from a workflow template, this links back to the source item.';
 
 -- Idempotency index: one auto-created task per template item per matter

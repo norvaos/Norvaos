@@ -1,5 +1,5 @@
 /**
- * PII Scrub Service — Directive 026
+ * PII Scrub Service  -  Directive 026
  *
  * "Data Minimisation" compliance: when a Lead converts to a Matter (Atomic Transfer),
  * the original Lead record is scrubbed of raw PII and replaced with a pointer
@@ -23,7 +23,7 @@ export interface PiiScrubResult {
 }
 
 // The sentinel value indicating PII was scrubbed
-const REDACTED = '[REDACTED — See Matter Record]'
+const REDACTED = '[REDACTED  -  See Matter Record]'
 
 // Fields to scrub from the leads table
 const LEAD_PII_FIELDS = [
@@ -69,7 +69,7 @@ export async function scrubLeadPii(
     return { success: false, leadId, matterId, fieldsRedacted: [], error: 'Lead not found' }
   }
 
-  // 2. Build the scrub update — replace PII with redaction marker
+  // 2. Build the scrub update  -  replace PII with redaction marker
   const scrubUpdate: Record<string, unknown> = {
     converted_matter_id: matterId,
     updated_at: new Date().toISOString(),

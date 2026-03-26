@@ -1,5 +1,5 @@
 /**
- * 中文 (zh) — Simplified Chinese / Mandarin dictionary.
+ * 中文 (zh)  -  Simplified Chinese / Mandarin dictionary.
  * For Mandarin-speaking clients (mainland China, Taiwan, Singapore).
  */
 
@@ -69,7 +69,7 @@ export const zh: Partial<Record<DictionaryKey, string>> = {
   'dashboard.deadline_today': 'Today',
   'dashboard.deadline_1_day': '1 day',
   'dashboard.deadline_days': '{days} days',
-  'dashboard.deadlines_14_days': 'Deadlines — Next 14 Days',
+  'dashboard.deadlines_14_days': 'Deadlines  -  Next 14 Days',
   'dashboard.no_deadlines_14': 'No deadlines in the next 14 days',
   'dashboard.no_deadlines_14_desc': 'Typed deadlines on matters will appear here.',
   'dashboard.unknown_matter': 'Unknown matter',
@@ -98,12 +98,12 @@ export const zh: Partial<Record<DictionaryKey, string>> = {
   'common.save': '保存',
   'common.view': '查看',
 
-  // ── 指令 41.0 — 联系人与保险库 ───────────────────────────────────────────
+  // ── 指令 41.0  -  联系人与保险库 ───────────────────────────────────────────
   'contact.badge.retained_client': '签约客户',
   'contact.badge.prospective_lead': '潜在客户',
   'contact.badge.contact': '联系人',
   'contact.command_centre': '指挥中心',
-  'contact.command_centre_red_alert': '准备分数严重偏低——需要立即关注',
+  'contact.command_centre_red_alert': '准备分数严重偏低 -  - 需要立即关注',
   'contact.intake_funnel': '接案漏斗',
   'contact.intake_progress': '接案进度',
   'contact.matter_readiness': '案件准备情况',
@@ -116,13 +116,13 @@ export const zh: Partial<Record<DictionaryKey, string>> = {
   'vault.title': 'Norva Vault',
   'vault.empty': 'Norva Vault 为空',
   'vault.empty_description': '此联系人没有已上传的文档。',
-  'vault.sentinel_eye': 'Sentinel Eye — 查看并验证',
+  'vault.sentinel_eye': 'Sentinel Eye  -  查看并验证',
   'vault.file_tampered': '警告：文件已被篡改',
   'vault.sha256_verified': 'SHA-256 已验证',
   'vault.hash_pending': '哈希待处理',
   'vault.integrity_alert': '完整性警报',
   'vault.untracked': '未追踪',
-  'vault.no_preview': '无法预览——文件 URL 缺失',
+  'vault.no_preview': '无法预览 -  - 文件 URL 缺失',
 
   'legal.retainer_title': '委托代理协议',
   'legal.retainer_intro': '本协议规定了所提供法律服务的条款。',
@@ -205,12 +205,12 @@ export const zh: Partial<Record<DictionaryKey, string>> = {
   'status.days_remaining': '剩余{days}天',
   'status.verified': '已验证',
   'status.expiry_label': '到期日',
-  'status.sentinel_tamper_title': '哨兵警报 — 检测到篡改',
+  'status.sentinel_tamper_title': '哨兵警报  -  检测到篡改',
   'status.sentinel_tamper_body': '文件哈希不匹配。此文件在NorvaOS外部被修改。',
-  'status.vault_verified_title': 'Norva保险库 — 完整性已验证',
+  'status.vault_verified_title': 'Norva保险库  -  完整性已验证',
   'status.vault_verified_body': '此文件已在Norva保险库中哈希锁定。任何篡改将被检测到。',
 
-  // ── Leads Command Centre (Directive 40.0 — Sovereign Layer) ─────────────
+  // ── Leads Command Centre (Directive 40.0  -  Sovereign Layer) ─────────────
   'leads.title': '潜在客户',
   'leads.add_lead': '添加潜在客户',
   'leads.import': '导入',
@@ -333,7 +333,7 @@ export const zh: Partial<Record<DictionaryKey, string>> = {
   'form.notes_placeholder': 'Add any additional notes about this contact...',
   'form.create_contact': 'Create Contact',
   'form.save_changes': 'Save Changes',
-  'form.review_required_ocr': 'Review Required — OCR could not extract',
+  'form.review_required_ocr': 'Review Required  -  OCR could not extract',
   'form.section_basic_info': 'Basic Information',
   'form.section_contact_details': 'Contact Details',
   'form.section_address': 'Address',

@@ -1,5 +1,5 @@
 /**
- * IRCC Intake Validation Schemas — Zod v4
+ * IRCC Intake Validation Schemas  -  Zod v4
  *
  * Validates client-submitted intake data to prevent:
  * - XSS injection via HTML tags in text fields

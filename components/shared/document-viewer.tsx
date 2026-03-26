@@ -28,7 +28,7 @@ interface DocumentViewerProps {
 /**
  * Document viewer that streams files through the server-side API endpoint.
  * Uses /api/documents/view which bypasses storage RLS via admin client
- * and serves files from the same origin — no X-Frame-Options blocking.
+ * and serves files from the same origin  -  no X-Frame-Options blocking.
  *
  * For externally-stored documents (OneDrive etc.) with no local storage_path,
  * pass externalUrl to show an "Open in browser" button instead of a dead fallback.
@@ -95,7 +95,7 @@ export function DocumentViewer({
               />
             </div>
           ) : isExternal ? (
-            /* OneDrive / external storage — can't embed, offer open-in-browser */
+            /* OneDrive / external storage  -  can't embed, offer open-in-browser */
             <div className="flex flex-col items-center justify-center h-full gap-4">
               <ExternalLink className="h-16 w-16 text-slate-300" />
               <div className="text-center">

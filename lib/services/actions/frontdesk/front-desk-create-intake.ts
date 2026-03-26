@@ -24,7 +24,7 @@ export const frontDeskCreateIntakeAction: ActionDefinition<FrontDeskCreateIntake
   async execute({ input, tenantId, userId, supabase }) {
     if (!userId) throw new Error('User authentication required')
 
-    // 0. Deduplication check — prevent creating duplicate contacts
+    // 0. Deduplication check  -  prevent creating duplicate contacts
     const phone = input.phone.trim()
     const email = input.email?.trim() || null
     let existingContactId: string | null = null
@@ -64,7 +64,7 @@ export const frontDeskCreateIntakeAction: ActionDefinition<FrontDeskCreateIntake
     const dob = input.dateOfBirth?.trim() || null
 
     if (existingContactId) {
-      // Use existing contact — update fields if provided
+      // Use existing contact  -  update fields if provided
       contactId = existingContactId
       const contactUpdatePayload = {
         first_name: input.firstName,
@@ -178,7 +178,7 @@ export const frontDeskCreateIntakeAction: ActionDefinition<FrontDeskCreateIntake
             if (screeningError) {
               console.error('[front_desk_create_intake] Failed to save screening answers:', screeningError.message, screeningError.code)
             } else {
-              console.log('[front_desk_create_intake] Screening answers saved for lead', leadId, '— keys:', Object.keys(input.screeningAnswers))
+              console.log('[front_desk_create_intake] Screening answers saved for lead', leadId, ' -  keys:', Object.keys(input.screeningAnswers))
             }
           } catch (err) {
             console.error('[front_desk_create_intake] Unexpected error saving screening answers:', err)

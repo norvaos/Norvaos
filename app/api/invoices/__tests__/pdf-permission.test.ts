@@ -61,6 +61,45 @@ function makeMockSupabase() {
   return { from: (table: string) => mockQueryBuilder(table) }
 }
 
+// ── Infrastructure mocks (prevent region guard + transitive import failures) ──
+
+vi.mock('@/lib/supabase/region-guard', () => ({
+  enforceRegionCompliance: vi.fn(),
+  CriticalComplianceError: class CriticalComplianceError extends Error {
+    constructor(msg: string) { super(msg); this.name = 'CriticalComplianceError' }
+  },
+}))
+
+vi.mock('@/lib/supabase/admin', () => ({
+  createAdminClient: vi.fn().mockReturnValue({
+    from: () => ({
+      select: () => ({ eq: () => ({ single: () => ({ data: null, error: null }) }) }),
+      insert: () => ({ select: () => ({ single: () => ({ data: null, error: null }) }) }),
+    }),
+  }),
+}))
+
+vi.mock('@/lib/middleware/tenant-limiter', () => ({
+  checkTenantLimit: vi.fn().mockResolvedValue({ allowed: true }),
+  rateLimitResponse: vi.fn(),
+}))
+
+vi.mock('@/lib/middleware/request-timing', () => ({
+  incrementDbCalls: vi.fn(),
+  withTiming: vi.fn((handler: Function) => handler),
+}))
+
+vi.mock('@/lib/supabase/server', () => ({
+  createServerSupabaseClient: vi.fn(),
+  createClient: vi.fn(),
+}))
+
+vi.mock('@/lib/services/cache', () => ({
+  getJson: vi.fn().mockResolvedValue(null),
+  setJson: vi.fn().mockResolvedValue(undefined),
+  cacheKey: vi.fn((...args: string[]) => args.join(':')),
+}))
+
 // ── Module mocks ─────────────────────────────────────────────────────────────
 
 vi.mock('@/lib/services/auth', () => ({

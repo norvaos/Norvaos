@@ -226,7 +226,7 @@ export async function checkMatterClosureCompliance(
         .eq('status', 'held'),
     ])
 
-    // 1. Evaluate trust balance — find the latest transaction per trust account
+    // 1. Evaluate trust balance  -  find the latest transaction per trust account
     if (balanceResult.error) {
       return { success: false, error: `Failed to check trust balance: ${balanceResult.error.message}` }
     }

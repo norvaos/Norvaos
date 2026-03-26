@@ -49,7 +49,7 @@ async function handlePost(request: Request) {
     }
 
     const admin = createAdminClient()
-    // RPC not yet in generated types — cast through unknown
+    // RPC not yet in generated types  -  cast through unknown
     const { data: rateCheck } = await (admin.rpc as any)('sentinel_pii_rate_check', {
       p_auth_user_id: auth.authUserId,
       p_ip_address: clientIp,

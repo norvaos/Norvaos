@@ -1,5 +1,5 @@
 /**
- * Dictionary index — lazy-loads locale dictionaries to keep bundle size small.
+ * Dictionary index  -  lazy-loads locale dictionaries to keep bundle size small.
  */
 
 import type { LocaleCode } from '../config'
@@ -8,7 +8,7 @@ import { en } from './en'
 
 export type { DictionaryKey }
 
-/** All dictionaries keyed by locale code — Global 15 (Directive 16.1). */
+/** All dictionaries keyed by locale code  -  Global 15 (Directive 16.1). */
 type Dict = Record<DictionaryKey, string>
 
 const dictionaries: Record<LocaleCode, () => Promise<Dict>> = {

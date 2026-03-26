@@ -1,8 +1,8 @@
 /**
- * PII Column-Level Encryption Service — Directive 004, Pillar 3
+ * PII Column-Level Encryption Service  -  Directive 004, Pillar 3
  *
  * Wraps norva_encrypt/norva_decrypt at the application layer using
- * AES-256-GCM. Decryption happens ONLY in memory — never in DB.
+ * AES-256-GCM. Decryption happens ONLY in memory  -  never in DB.
  *
  * Encryption key: NORVA_VAULT_ENCRYPTION_KEY environment variable (64-char hex = 32 bytes).
  * Storage format: `iv:authTag:ciphertext` (all hex-encoded).
@@ -65,7 +65,7 @@ export function encryptPII(plaintext: string | null | undefined): string | null 
 
 /**
  * Decrypts a value previously encrypted by {@link encryptPII}.
- * Decryption happens strictly in memory — the plaintext is never persisted.
+ * Decryption happens strictly in memory  -  the plaintext is never persisted.
  *
  * @param encrypted - The `iv:authTag:ciphertext` string (hex-encoded).
  * @returns The original plaintext, or `null` if `encrypted` is null/undefined.
@@ -131,7 +131,7 @@ export function encryptContactPII(contact: NorvaContactPII): NorvaContactPIIEncr
 
 /**
  * Decrypts all PII fields on an encrypted contact object.
- * All decryption is in-memory only — plaintext is never written to storage.
+ * All decryption is in-memory only  -  plaintext is never written to storage.
  *
  * @param encrypted - Object with encrypted field values.
  * @returns Object with plaintext PII fields.

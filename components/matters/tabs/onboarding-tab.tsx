@@ -1,14 +1,14 @@
 'use client'
 
 /**
- * OnboardingTab — Persistent matter onboarding checklist.
+ * OnboardingTab  -  Persistent matter onboarding checklist.
  *
  * Sections:
- *  1. Assignment & Ownership — responsible lawyer, staff, priority
- *  2. Key Dates — statute of limitations, next deadline, opened date
- *  3. Contact Verification — primary and secondary contacts
- *  4. Case Configuration — matter-type-driven dynamic questions (placeholder)
- *  5. Notifications — confirm assignment emails sent to lawyer/staff
+ *  1. Assignment & Ownership  -  responsible lawyer, staff, priority
+ *  2. Key Dates  -  statute of limitations, next deadline, opened date
+ *  3. Contact Verification  -  primary and secondary contacts
+ *  4. Case Configuration  -  matter-type-driven dynamic questions (placeholder)
+ *  5. Notifications  -  confirm assignment emails sent to lawyer/staff
  *
  * Each section shows a "Confirm" button that marks it as verified.
  * The tab header shows an orange badge with the count of unconfirmed sections.
@@ -279,7 +279,7 @@ function InlineEditSelect({
         </div>
       ) : (
         <div className="flex items-center gap-2">
-          <span className="text-sm font-medium">{currentLabel || '—'}</span>
+          <span className="text-sm font-medium">{currentLabel || ' - '}</span>
           <Button
             variant="ghost"
             size="icon"
@@ -492,7 +492,7 @@ function DynamicIntakeSection({
               <AlertCircle className={cn('h-3.5 w-3.5 shrink-0 mt-0.5', flag.severity === 'critical' ? 'text-red-600' : 'text-amber-500')} />
               <div className="flex-1 min-w-0">
                 <span className="font-medium capitalize">{flag.field_key.replace(/_/g, ' ')}</span>
-                {flag.intake_value && <span className="text-muted-foreground"> — Intake: {flag.intake_value}</span>}
+                {flag.intake_value && <span className="text-muted-foreground">  -  Intake: {flag.intake_value}</span>}
                 {flag.ircc_value && <span className="text-muted-foreground"> / IRCC: {flag.ircc_value}</span>}
               </div>
               <Badge variant="outline" className={cn('text-[10px] shrink-0', flag.severity === 'critical' ? 'border-red-300 text-red-700 bg-red-50' : 'border-amber-300 text-amber-700 bg-amber-50')}>
@@ -703,7 +703,7 @@ export function OnboardingTab({ matter, users, matterId, tenantId }: OnboardingT
         <div className="flex-1">
           <p className={cn('text-sm font-medium', allComplete ? 'text-emerald-800' : 'text-amber-800')}>
             {allComplete
-              ? 'Onboarding complete — matter is ready for active work'
+              ? 'Onboarding complete  -  matter is ready for active work'
               : `${incompleteCount} of ${ONBOARDING_STEPS.length} onboarding steps remaining`}
           </p>
           {!allComplete && (
@@ -742,7 +742,7 @@ export function OnboardingTab({ matter, users, matterId, tenantId }: OnboardingT
           <InlineEditSelect
             label="Follow-up Staff"
             value={(matter as { followup_lawyer_id?: string }).followup_lawyer_id ?? '__none__'}
-            options={[{ value: '__none__', label: '— None —' }, ...lawyerOptions]}
+            options={[{ value: '__none__', label: ' -  None  - ' }, ...lawyerOptions]}
             onSave={async (val) => {
               await updateMatter.mutateAsync({ followup_lawyer_id: val === '__none__' ? null : val } as never)
             }}
@@ -772,7 +772,7 @@ export function OnboardingTab({ matter, users, matterId, tenantId }: OnboardingT
           <div className="flex items-center gap-2">
             <span className="text-xs text-muted-foreground w-28 shrink-0">Matter Opened</span>
             <span className="text-sm font-medium">
-              {matter.created_at ? format(new Date(matter.created_at), 'MMM d, yyyy') : '—'}
+              {matter.created_at ? format(new Date(matter.created_at), 'MMM d, yyyy') : ' - '}
             </span>
           </div>
           <InlineEditDate
@@ -792,7 +792,7 @@ export function OnboardingTab({ matter, users, matterId, tenantId }: OnboardingT
           {matter.next_deadline && new Date(matter.next_deadline) < new Date() && (
             <div className="flex items-center gap-2 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
               <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
-              Next deadline has passed — please update
+              Next deadline has passed  -  please update
             </div>
           )}
         </div>
@@ -818,7 +818,7 @@ export function OnboardingTab({ matter, users, matterId, tenantId }: OnboardingT
             {contacts.map((mc) => {
               const c = mc.contact
               if (!c) return null
-              const name = [c.first_name, c.last_name].filter(Boolean).join(' ') || c.organization_name || '—'
+              const name = [c.first_name, c.last_name].filter(Boolean).join(' ') || c.organization_name || ' - '
               return (
                 <div
                   key={mc.id}
@@ -861,7 +861,7 @@ export function OnboardingTab({ matter, users, matterId, tenantId }: OnboardingT
         ) : (
           <div className="flex items-center gap-2 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-700">
             <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
-            No matter type assigned — please assign one to unlock case configuration
+            No matter type assigned  -  please assign one to unlock case configuration
           </div>
         )}
       </StepCard>
@@ -893,7 +893,7 @@ export function OnboardingTab({ matter, users, matterId, tenantId }: OnboardingT
               return lawyer ? (
                 <div className="flex items-center gap-2 text-xs text-slate-600">
                   <Mail className="h-3.5 w-3.5 text-slate-400" />
-                  <span>{formatUserName(lawyer)} — {lawyer.email}</span>
+                  <span>{formatUserName(lawyer)}  -  {lawyer.email}</span>
                   <Badge variant="secondary" className="text-[10px]">Lawyer</Badge>
                 </div>
               ) : null
@@ -903,7 +903,7 @@ export function OnboardingTab({ matter, users, matterId, tenantId }: OnboardingT
               return staff ? (
                 <div className="flex items-center gap-2 text-xs text-slate-600">
                   <Mail className="h-3.5 w-3.5 text-slate-400" />
-                  <span>{formatUserName(staff)} — {staff.email}</span>
+                  <span>{formatUserName(staff)}  -  {staff.email}</span>
                   <Badge variant="secondary" className="text-[10px]">Staff</Badge>
                 </div>
               ) : null

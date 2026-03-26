@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * PortalFormQuestionnaire — Single-form questionnaire wrapper.
+ * PortalFormQuestionnaire  -  Single-form questionnaire wrapper.
  *
  * Fetches sections for ONE form from the DB engine, then renders the
  * existing IRCCQuestionnaire component with prebuiltQuestionnaire.
@@ -29,7 +29,7 @@ interface PortalFormQuestionnaireProps {
   language?: PortalLocale
   readOnly?: boolean
   onBack: () => void
-  /** Matter ID — enables verification-aware rendering and realtime updates */
+  /** Matter ID  -  enables verification-aware rendering and realtime updates */
   matterId?: string | null
 }
 
@@ -257,7 +257,7 @@ export function PortalFormQuestionnaire({
               }),
             })
           } catch {
-            // Silent — the field data is already saved
+            // Silent  -  the field data is already saved
           }
         } : undefined}
       />

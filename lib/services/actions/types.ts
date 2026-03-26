@@ -1,12 +1,12 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Action-Driven Workflow — Core Type Definitions
+ * Action-Driven Workflow  -  Core Type Definitions
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Every state-changing operation in the controlled workflow system is defined
  * as an ActionDefinition. The Action Executor uses these definitions to:
- *   1. Validate inputs (Zod, server-side — Rule #3)
- *   2. Check permissions (server-side — Rule #3)
+ *   1. Validate inputs (Zod, server-side  -  Rule #3)
+ *   2. Check permissions (server-side  -  Rule #3)
  *   3. Execute the state change within a transaction (Rule #6)
  *   4. Write triple records: workflow_actions + audit_logs + activities (Rule #5)
  *   5. Trigger automations and notifications (non-blocking)
@@ -31,7 +31,7 @@ export interface ActionContext<TInput = unknown> {
   tenantId: string
   /** User ID from users table (null for kiosk/anonymous) */
   userId: string | null
-  /** Admin Supabase client — bypasses RLS for controlled writes */
+  /** Admin Supabase client  -  bypasses RLS for controlled writes */
   supabase: SupabaseClient<Database>
   /** Which surface initiated this action */
   source: ActionSource

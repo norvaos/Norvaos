@@ -1,5 +1,5 @@
 -- =============================================================================
--- Migration 205 — Directive 015 / 015.1: Sovereign Birth Certificate & Genesis Block
+-- Migration 205  -  Directive 015 / 015.1: Sovereign Birth Certificate & Genesis Block
 -- =============================================================================
 --
 -- The "Digital Notary" of NorvaOS. When a Lead becomes a Client, the Genesis
@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS matter_genesis_metadata (
   conflict_decision   TEXT,                     -- no_conflict | cleared_by_lawyer | waiver_obtained
   conflict_justification TEXT,                  -- lawyer's notes
   conflict_score      INT,                      -- final weighted score
-  conflict_decided_at TIMESTAMPTZ,              -- when the decision was made (015.1 — for sequence check)
+  conflict_decided_at TIMESTAMPTZ,              -- when the decision was made (015.1  -  for sequence check)
 
   -- ── KYC / Identity Verification Snapshot ────────────────────────────
   kyc_verification_id UUID,                     -- FK to identity_verifications
@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS matter_genesis_metadata (
   retainer_hash       TEXT,                      -- 015.1: SHA-256 of the signed PDF in vault
 
   -- ── Trust Ledger Anchor ─────────────────────────────────────────────
-  initial_trust_balance BIGINT NOT NULL DEFAULT 0,  -- 015.1: cents — confirm $0.00 or deposit parity
+  initial_trust_balance BIGINT NOT NULL DEFAULT 0,  -- 015.1: cents  -  confirm $0.00 or deposit parity
   last_trust_audit_hash TEXT,                        -- 015.1: last row_hash from trust_audit_log
 
   -- ── Immutable Seal ────────────────────────────────────────────────────
@@ -67,7 +67,7 @@ CREATE TABLE IF NOT EXISTS matter_genesis_metadata (
   has_sequence_violation BOOLEAN NOT NULL DEFAULT false, -- 015.1: conflict after retainer = amber
   compliance_notes    TEXT,
 
-  -- ── Revocation (015.1 — Partner-Level Audit Trail) ────────────────
+  -- ── Revocation (015.1  -  Partner-Level Audit Trail) ────────────────
   is_revoked          BOOLEAN NOT NULL DEFAULT false,
   revoked_at          TIMESTAMPTZ,
   revoked_by          UUID REFERENCES users(id),
@@ -86,7 +86,7 @@ COMMENT ON TABLE matter_genesis_metadata IS
   'One genesis block per matter. Can be revoked (not deleted) by Partner-level users.';
 
 
--- ── 1.1 RLS — tenant isolation ──────────────────────────────────────────
+-- ── 1.1 RLS  -  tenant isolation ──────────────────────────────────────────
 
 ALTER TABLE matter_genesis_metadata ENABLE ROW LEVEL SECURITY;
 
@@ -101,7 +101,7 @@ COMMENT ON POLICY genesis_metadata_tenant_select ON matter_genesis_metadata IS
   'Tenant-scoped read access. Inserts/revocations go through SECURITY DEFINER RPCs.';
 
 
--- ── 1.2 Immutability guard — prevent UPDATE (except revocation) and DELETE ──
+-- ── 1.2 Immutability guard  -  prevent UPDATE (except revocation) and DELETE ──
 
 CREATE OR REPLACE FUNCTION genesis_metadata_immutable_guard()
 RETURNS TRIGGER AS $$
@@ -118,7 +118,7 @@ BEGIN
     THEN
       RETURN NEW;  -- Allow revocation
     END IF;
-    RAISE EXCEPTION 'Matter genesis metadata is immutable — only Partner-level revocation is permitted.';
+    RAISE EXCEPTION 'Matter genesis metadata is immutable  -  only Partner-level revocation is permitted.';
   END IF;
 
   -- DELETE is always blocked
@@ -185,9 +185,9 @@ BEGIN
     RAISE EXCEPTION 'Matter % not found for tenant %', p_matter_id, p_tenant_id;
   END IF;
 
-  -- ── 0.1 Idempotency — cannot overwrite an existing genesis block ──────
+  -- ── 0.1 Idempotency  -  cannot overwrite an existing genesis block ──────
   IF EXISTS (SELECT 1 FROM matter_genesis_metadata WHERE matter_id = p_matter_id AND is_revoked = false) THEN
-    RAISE EXCEPTION 'Genesis block already exists for matter %. Cannot regenerate — use revocation.', p_matter_id;
+    RAISE EXCEPTION 'Genesis block already exists for matter %. Cannot regenerate  -  use revocation.', p_matter_id;
   END IF;
 
   -- ── 1. Resolve the primary contact for this matter ────────────────────
@@ -587,7 +587,7 @@ $$;
 
 COMMENT ON FUNCTION fn_revoke_genesis_block(UUID, UUID, UUID, TEXT) IS
   'Directive 015.1: Partner-level genesis block revocation. Cannot delete or '
-  'overwrite — only marks as revoked with full audit trail. Requires admin/partner '
+  'overwrite  -  only marks as revoked with full audit trail. Requires admin/partner '
   'role and a documented reason (min 10 chars). After revocation, a new genesis '
   'block can be generated.';
 

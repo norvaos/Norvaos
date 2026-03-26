@@ -9,7 +9,7 @@ import { withTiming } from '@/lib/middleware/request-timing'
 /**
  * GET /api/admin/front-desk-kpis?date=YYYY-MM-DD&userId=X (optional)
  *
- * Admin endpoint — returns KPI summaries for all front desk users on a given date.
+ * Admin endpoint  -  returns KPI summaries for all front desk users on a given date.
  * If userId is provided, returns only that user's KPIs.
  * Requires Admin role.
  */

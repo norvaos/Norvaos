@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * Regulatory Status Sidebar — Directive 41.2 (LSO/CICC Standards)
+ * Regulatory Status Sidebar  -  Directive 41.2 (LSO/CICC Standards)
  *
  * Displays "License to Practice" integrity for the Command Centre:
  *   1. Conflict Check Badge: [Status] | [Timestamp] | [Officer_ID]
@@ -85,7 +85,7 @@ export function RegulatorySidebar() {
                   variant="outline"
                   className="text-[9px] border-blue-200 text-blue-600"
                 >
-                  {regBody ? `${regBody.scope === 'federal' ? 'Federal' : regBody.provinceCode} — Compliance Active` : 'Configure in Settings → Firm'}
+                  {regBody ? `${regBody.scope === 'federal' ? 'Federal' : regBody.provinceCode}  -  Compliance Active` : 'Configure in Settings → Firm'}
                 </Badge>
               </div>
             </TooltipTrigger>

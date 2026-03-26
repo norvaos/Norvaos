@@ -1,14 +1,14 @@
 'use client'
 
 /**
- * AuditorSidebar — Column 4
+ * AuditorSidebar  -  Column 4
  *
  * Live IRCC compliance and completeness engine.
  *
  * Three zones:
- *   TOP    — Case status (days since opened, expiry countdown, next action)
- *   MIDDLE — Completeness checklist (grouped, pass/warn/fail/N/A per item)
- *   BOTTOM — Biometrics & medical tracking
+ *   TOP     -  Case status (days since opened, expiry countdown, next action)
+ *   MIDDLE  -  Completeness checklist (grouped, pass/warn/fail/N/A per item)
+ *   BOTTOM  -  Biometrics & medical tracking
  *
  * Uses existing useImmigrationReadiness data as the data source.
  * The Generate Package button is gated until all mandatory items pass.
@@ -102,22 +102,22 @@ function buildCheckGroups(
     },
     {
       id: 'family_name',
-      label: 'Family name — verified',
+      label: 'Family name  -  verified',
       status: ver['personal.family_name']?.v ? 'pass' : profile['personal'] ? 'warn' : 'fail',
     },
     {
       id: 'dob',
-      label: 'Date of birth — verified',
+      label: 'Date of birth  -  verified',
       status: ver['personal.date_of_birth']?.v ? 'pass' : 'warn',
     },
     {
       id: 'passport_number',
-      label: 'Passport number — verified',
+      label: 'Passport number  -  verified',
       status: ver['passport.number']?.v ? 'pass' : 'warn',
     },
     {
       id: 'passport_expiry',
-      label: 'Passport expiry — verified',
+      label: 'Passport expiry  -  verified',
       status: ver['passport.expiry_date']?.v ? 'pass' : 'warn',
     },
   ]
@@ -356,11 +356,11 @@ export function AuditorSidebar({
         </div>
       </div>
 
-      {/* TOP — Case status strip */}
+      {/* TOP  -  Case status strip */}
       <div className="grid grid-cols-2 gap-2 px-3 py-2 border-b bg-card shrink-0">
         <div>
           <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Days Open</p>
-          <p className="text-sm font-bold">{daysOpen ?? '—'}</p>
+          <p className="text-sm font-bold">{daysOpen ?? ' - '}</p>
         </div>
         <div>
           <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Completeness</p>
@@ -386,7 +386,7 @@ export function AuditorSidebar({
         total={totalItems}
       />
 
-      {/* MIDDLE — Checklist */}
+      {/* MIDDLE  -  Checklist */}
       <ScrollArea className="flex-1">
         <div className="p-3">
           {groups.map(group => (
@@ -395,7 +395,7 @@ export function AuditorSidebar({
         </div>
       </ScrollArea>
 
-      {/* BOTTOM — Biometrics / Medical */}
+      {/* BOTTOM  -  Biometrics / Medical */}
       <div className="border-t px-3 py-2 bg-card shrink-0">
         <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground mb-1.5">
           Biometrics & Medical

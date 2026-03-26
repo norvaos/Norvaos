@@ -80,7 +80,7 @@ export default function LegalAssistantWorkspace() {
     enabled: !!tenantId && !!userId,
   })
 
-  // SLA warnings — matters in current stage approaching breach
+  // SLA warnings  -  matters in current stage approaching breach
   const { data: slaWarnings = [] } = useQuery({
     queryKey: ['workspace-la-sla', tenantId],
     queryFn: async () => {

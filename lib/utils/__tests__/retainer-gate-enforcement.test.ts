@@ -1,5 +1,5 @@
 /**
- * Retainer Agreement Gate — Enforcement Tests
+ * Retainer Agreement Gate  -  Enforcement Tests
  *
  * Tests that the gating rule engine correctly blocks stage advancement
  * when a Retainer Agreement is missing or insufficient.
@@ -8,8 +8,8 @@
  * and block stage progression.
  *
  * Two sections:
- *   A. Stage Engine — require_retainer_agreement gating rule evaluation
- *   B. Readiness Engine — Billing domain score computation
+ *   A. Stage Engine  -  require_retainer_agreement gating rule evaluation
+ *   B. Readiness Engine  -  Billing domain score computation
  *
  * Strategy: mock the Supabase `.from().select().eq().order().limit().maybeSingle()`
  * chain to return controlled test data, then call the real engine functions.
@@ -34,7 +34,7 @@ function makeMockSupabase(opts: {
   function mockQueryBuilder(table: string) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const self: Record<string, (...args: unknown[]) => any> = {}
-    const chainMethods = ['select', 'eq', 'neq', 'order', 'limit', 'is', 'in', 'gte', 'lte']
+    const chainMethods = ['select', 'eq', 'neq', 'order', 'limit', 'is', 'in', 'gte', 'lte', 'not']
 
     for (const m of chainMethods) {
       self[m] = () => self
@@ -103,7 +103,7 @@ function evaluateRetainerGate(
     }
   }
 
-  // Voided retainers are not in the status order — always fail
+  // Voided retainers are not in the status order  -  always fail
   const currentIdx = statusOrder.indexOf(retainer.status)
   const requiredIdx = statusOrder.indexOf(minimumStatus)
 
@@ -131,7 +131,7 @@ function evaluateRetainerGate(
 const { computeReadiness } = await import('@/lib/services/readiness-engine')
 
 // ═══════════════════════════════════════════════════════════════════════════
-// Section A: Stage Gating — require_retainer_agreement rule evaluation
+// Section A: Stage Gating  -  require_retainer_agreement rule evaluation
 // ═══════════════════════════════════════════════════════════════════════════
 
 describe('Retainer Gate – Stage Advancement Blocking', () => {
@@ -228,7 +228,7 @@ describe('Retainer Gate – Stage Advancement Blocking', () => {
 })
 
 // ═══════════════════════════════════════════════════════════════════════════
-// Section B: Readiness Engine — Billing domain score
+// Section B: Readiness Engine  -  Billing domain score
 // ═══════════════════════════════════════════════════════════════════════════
 
 describe('Retainer Gate – Readiness Score (Billing Domain)', () => {
@@ -298,7 +298,7 @@ describe('Retainer Gate – Readiness Score (Billing Domain)', () => {
 
     const billing = result.domains.find((d) => d.name === 'Billing')
     expect(billing).toBeDefined()
-    expect(billing!.weight).toBe(0.15)
+    expect(billing!.weight).toBe(0.13)
   })
 
   it('missing retainer contributes 0 weighted points to total', async () => {
@@ -316,7 +316,7 @@ describe('Retainer Gate – Readiness Score (Billing Domain)', () => {
 
     const billing = result.domains.find((d) => d.name === 'Billing')
     expect(billing).toBeDefined()
-    expect(billing!.weighted).toBe(15) // 100 * 0.15
+    expect(billing!.weighted).toBe(13) // 100 * 0.13
   })
 
   it('Billing domain is included in focus_area when it has the lowest score', async () => {

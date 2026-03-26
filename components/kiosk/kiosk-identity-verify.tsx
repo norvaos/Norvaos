@@ -96,7 +96,7 @@ export function KioskIdentityVerify({
         </p>
       </div>
 
-      {/* DOB Input — three separate fields for touch-friendliness */}
+      {/* DOB Input  -  three separate fields for touch-friendliness */}
       <div className="w-full space-y-4">
         <div className="flex gap-3">
           <div className="flex-1">

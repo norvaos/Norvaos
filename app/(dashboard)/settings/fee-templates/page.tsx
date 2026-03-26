@@ -284,7 +284,7 @@ function FeeLineEditor({
           <Textarea
             value={item.description}
             onChange={(e) => updateItem(i, 'description', e.target.value)}
-            placeholder="Description (optional) — detailed explanation of this fee..."
+            placeholder="Description (optional)  -  detailed explanation of this fee..."
             rows={1}
             className="text-xs text-slate-600 resize-none min-h-[28px]"
           />
@@ -395,7 +395,7 @@ export default function FeeTemplatesPage() {
     setFormHstApplicable(template.hst_applicable ?? false)
     setFormIsDefault(template.is_default ?? false)
 
-    // Parse JSONB fee arrays — convert cents to dollars for the form inputs
+    // Parse JSONB fee arrays  -  convert cents to dollars for the form inputs
     const pf: ProfessionalFeeItem[] = Array.isArray(template.professional_fees) ? template.professional_fees as unknown as ProfessionalFeeItem[] : []
     setFormProfFees(
       pf.map((f) => ({
@@ -426,7 +426,7 @@ export default function FeeTemplatesPage() {
     }
   }
 
-  // Toggle default — ensure only one template per matter_type_id + person_scope is default
+  // Toggle default  -  ensure only one template per matter_type_id + person_scope is default
   const handleToggleDefault = async (template: RetainerFeeTemplate) => {
     const newDefault = !template.is_default
 
@@ -475,7 +475,7 @@ export default function FeeTemplatesPage() {
       return
     }
 
-    // Build JSONB arrays — convert dollars (form input) to cents for storage
+    // Build JSONB arrays  -  convert dollars (form input) to cents for storage
     const professionalFees = formProfFees
       .filter((f) => f.name.trim() || f.description.trim())
       .map((f) => ({

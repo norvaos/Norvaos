@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * FormPacksGateSection — Gated wrapper for IRCC form generation.
+ * FormPacksGateSection  -  Gated wrapper for IRCC form generation.
  *
  * Before drafting_enabled: shows a locked card with readiness progress.
  * After drafting_enabled: renders IRCCFormsTab directly.
@@ -63,7 +63,7 @@ export function FormPacksGateSection({
   const blockersRemaining = (matrix?.draftingBlockers.length ?? 0)
   const statusBlockers = readinessData.blockedReasons ?? []
 
-  // Portal form status summary — visible in both locked and unlocked states
+  // Portal form status summary  -  visible in both locked and unlocked states
   const portalFormsSummary = readinessData.portalForms ? (
     <div className="rounded-lg border border-slate-200 bg-white p-3 mb-3">
       <div className="flex items-center justify-between mb-2">
@@ -189,7 +189,7 @@ export function FormPacksGateSection({
     )
   }
 
-  // Unlocked — render the forms tab
+  // Unlocked  -  render the forms tab
   return (
     <div>
       {portalFormsSummary}

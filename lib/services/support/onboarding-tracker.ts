@@ -4,11 +4,11 @@
  * Tracks implementation progress per tenant using the `tenant_onboarding` DB table.
  * Replaces the previous file-based storage at /data/onboarding/{tenantId}.json.
  *
- * All functions require a service-role Supabase client — the table's RLS policy
+ * All functions require a service-role Supabase client  -  the table's RLS policy
  * restricts user-context reads to same-tenant rows; writes are performed via the
  * service-role client which bypasses RLS.
  *
- * Team 3 / Priority 2 — DB-backed onboarding tracker
+ * Team 3 / Priority 2  -  DB-backed onboarding tracker
  * Migration: scripts/migrations/110-tenant-onboarding.sql
  */
 
@@ -91,7 +91,7 @@ function defaultPhasesForTenant(): OnboardingPhaseRecord[] {
 /**
  * Initialise onboarding rows for a new tenant.
  * Inserts all 7 phases with status 'pending'. Safe to call if rows already exist
- * (upsert with ignoreDuplicates — existing rows are not overwritten).
+ * (upsert with ignoreDuplicates  -  existing rows are not overwritten).
  */
 export async function initOnboardingRecord(
   tenantId: string,
@@ -149,7 +149,7 @@ export async function getOnboardingStatus(
   const phases = ORDERED_PHASES.map((phase) => {
     const row = rowMap.get(phase)
     if (row) return rowToPhaseRecord(row)
-    // Phase row missing — treat as pending
+    // Phase row missing  -  treat as pending
     return {
       phase,
       status: 'pending' as OnboardingStatus,

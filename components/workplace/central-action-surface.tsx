@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * CentralActionSurface (Zone 2) — The main working area.
+ * CentralActionSurface (Zone 2)  -  The main working area.
  *
  * Shows blocker cards, suggested actions, document/form status summaries,
  * and the submission readiness checklist. For immigration matters, also

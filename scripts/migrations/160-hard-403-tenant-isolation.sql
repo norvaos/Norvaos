@@ -1,5 +1,5 @@
 -- =============================================================================
--- Migration 160 — Hard 403 Tenant Isolation (Team SENTINEL)
+-- Migration 160  -  Hard 403 Tenant Isolation (Team SENTINEL)
 -- =============================================================================
 --
 -- Previously, RLS policies silently returned empty result sets on cross-tenant
@@ -7,9 +7,9 @@
 -- cross-tenant attempts are loud, logged, and unmistakable.
 --
 -- Components:
---   1. assert_tenant_access(target_tenant_id)  — callable guard function
---   2. get_current_tenant_id()                 — idempotent re-create (already exists from 152)
---   3. enforce_tenant_isolation_trigger()       — BEFORE INSERT/UPDATE trigger fn
+--   1. assert_tenant_access(target_tenant_id)   -  callable guard function
+--   2. get_current_tenant_id()                  -  idempotent re-create (already exists from 152)
+--   3. enforce_tenant_isolation_trigger()        -  BEFORE INSERT/UPDATE trigger fn
 --   4. Triggers on 8 critical tables
 --   5. tenant_violation_log table + RLS
 -- =============================================================================
@@ -74,7 +74,7 @@ COMMENT ON FUNCTION public.assert_tenant_access(UUID) IS
   'enforce cross-tenant isolation with a loud error instead of silent empty sets.';
 
 
--- ─── 2. get_current_tenant_id() — idempotent ────────────────────────────────
+-- ─── 2. get_current_tenant_id()  -  idempotent ────────────────────────────────
 -- Already created in migration 152, but we re-declare with CREATE OR REPLACE
 -- so this migration is self-contained. Behaviour is unchanged.
 
@@ -106,7 +106,7 @@ $$;
 COMMENT ON FUNCTION public.get_current_tenant_id() IS
   'Returns the authenticated user''s tenant_id. Checks session variable first '
   '(app.current_tenant_id), then falls back to users table lookup. '
-  'STABLE SECURITY DEFINER — safe to use in RLS policies.';
+  'STABLE SECURITY DEFINER  -  safe to use in RLS policies.';
 
 
 -- ─── 3. enforce_tenant_isolation_trigger() ───────────────────────────────────

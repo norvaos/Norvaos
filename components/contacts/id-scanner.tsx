@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * ID Scanner — Upload a government ID and auto-populate contact fields.
+ * ID Scanner  -  Upload a government ID and auto-populate contact fields.
  *
  * Uses POST /api/ocr/scan-id to extract structured data from the image.
  * Returns extracted fields via the onScanComplete callback for the
@@ -92,7 +92,7 @@ export function IdScanner({ onScanComplete, compact, className }: IdScannerProps
       onScanComplete(fields)
     } catch (err) {
       console.error('[IdScanner] Error:', err)
-      setError('Network error — please try again.')
+      setError('Network error  -  please try again.')
       setState('error')
     }
   }, [onScanComplete])
@@ -278,12 +278,12 @@ export function IdScanner({ onScanComplete, compact, className }: IdScannerProps
 /**
  * Compress and resize image client-side before sending to OCR.
  * Targets max 1200px on longest edge and JPEG quality 0.8.
- * This reduces a 5MB phone photo to ~150-300KB — dramatically
+ * This reduces a 5MB phone photo to ~150-300KB  -  dramatically
  * faster upload and OCR processing.
  */
 function compressImage(file: File, maxDim = 1200, quality = 0.8): Promise<string> {
   return new Promise((resolve, reject) => {
-    // PDFs can't be compressed client-side — send raw
+    // PDFs can't be compressed client-side  -  send raw
     if (file.type === 'application/pdf') {
       const reader = new FileReader()
       reader.onload = () => resolve(reader.result as string)

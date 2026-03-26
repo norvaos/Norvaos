@@ -235,7 +235,7 @@ export async function GET(
         if (formInfos) {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           for (const fi of formInfos as any[]) {
-            incompleteFormNames.push(`${fi.form_code} — ${fi.form_name}`)
+            incompleteFormNames.push(`${fi.form_code}  -  ${fi.form_name}`)
           }
         }
       }

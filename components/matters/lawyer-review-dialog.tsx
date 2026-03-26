@@ -43,8 +43,8 @@ export function LawyerReviewDialog({
         onSuccess: () => {
           toast.success(
             action === 'approved'
-              ? 'Review approved — matter is ready for filing'
-              : 'Changes requested — matter moved to deficiency'
+              ? 'Review approved  -  matter is ready for filing'
+              : 'Changes requested  -  matter moved to deficiency'
           )
           setNotes('')
           onOpenChange(false)

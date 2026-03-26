@@ -1,5 +1,5 @@
 -- ============================================================================
--- Migration 100: Trust Accounting & IOLTA Compliance — Phase 7
+-- Migration 100: Trust Accounting & IOLTA Compliance  -  Phase 7
 -- ============================================================================
 -- Creates 12 new tables + amends 2 existing tables for the trust accounting
 -- subsystem. Compliant with LSO By-Law 9 (Ontario baseline).
@@ -406,7 +406,7 @@ CREATE POLICY "qbo_sync_log_tenant_isolation" ON qbo_sync_log
 -- TRIGGERS
 -- ═══════════════════════════════════════════════════════════════════════════
 
--- ─── Trigger: trust_transactions — compute running balance + overdraft check
+-- ─── Trigger: trust_transactions  -  compute running balance + overdraft check
 
 CREATE OR REPLACE FUNCTION trust_transactions_before_insert()
 RETURNS TRIGGER AS $$
@@ -451,7 +451,7 @@ CREATE TRIGGER trust_transactions_compute_balance
   BEFORE INSERT ON trust_transactions
   FOR EACH ROW EXECUTE FUNCTION trust_transactions_before_insert();
 
--- ─── Trigger: trust_transactions — immutability (no UPDATE or DELETE)
+-- ─── Trigger: trust_transactions  -  immutability (no UPDATE or DELETE)
 
 CREATE OR REPLACE FUNCTION trust_transactions_immutable()
 RETURNS TRIGGER AS $$
@@ -469,7 +469,7 @@ CREATE TRIGGER trust_transactions_no_delete
   BEFORE DELETE ON trust_transactions
   FOR EACH ROW EXECUTE FUNCTION trust_transactions_immutable();
 
--- ─── Trigger: trust_transactions — sync matters.trust_balance
+-- ─── Trigger: trust_transactions  -  sync matters.trust_balance
 
 CREATE OR REPLACE FUNCTION trust_transactions_sync_matter_balance()
 RETURNS TRIGGER AS $$
@@ -485,7 +485,7 @@ CREATE TRIGGER trust_transactions_after_insert_sync
   AFTER INSERT ON trust_transactions
   FOR EACH ROW EXECUTE FUNCTION trust_transactions_sync_matter_balance();
 
--- ─── Trigger: trust_audit_log — immutability
+-- ─── Trigger: trust_audit_log  -  immutability
 
 CREATE OR REPLACE FUNCTION trust_audit_log_immutable()
 RETURNS TRIGGER AS $$
@@ -503,7 +503,7 @@ CREATE TRIGGER trust_audit_log_no_delete
   BEFORE DELETE ON trust_audit_log
   FOR EACH ROW EXECUTE FUNCTION trust_audit_log_immutable();
 
--- ─── Trigger: trust_reconciliations — reviewed reconciliations are immutable
+-- ─── Trigger: trust_reconciliations  -  reviewed reconciliations are immutable
 
 CREATE OR REPLACE FUNCTION trust_reconciliations_protect_reviewed()
 RETURNS TRIGGER AS $$
@@ -522,7 +522,7 @@ CREATE TRIGGER trust_reconciliations_protect
   BEFORE UPDATE OR DELETE ON trust_reconciliations
   FOR EACH ROW EXECUTE FUNCTION trust_reconciliations_protect_reviewed();
 
--- ─── Trigger: trust_bank_accounts — auto-create admin matter
+-- ─── Trigger: trust_bank_accounts  -  auto-create admin matter
 
 CREATE OR REPLACE FUNCTION trust_bank_accounts_create_admin_matter()
 RETURNS TRIGGER AS $$
@@ -533,7 +533,7 @@ BEGIN
     tenant_id, title, status, is_trust_admin, billing_type
   ) VALUES (
     NEW.tenant_id,
-    'Trust Admin — ' || NEW.account_name,
+    'Trust Admin  -  ' || NEW.account_name,
     'active',
     true,
     'flat_fee'

@@ -5,10 +5,10 @@
  * Used by the dispatch adapter and email delivery adapter to record attempts
  * and by the failure dashboard to surface health signals.
  *
- * Design: no database writes — structured log lines are the audit trail.
+ * Design: no database writes  -  structured log lines are the audit trail.
  * The in-memory store serves as a fast read surface for alert threshold checks.
  *
- * Team 3 / Module 2 — Notification & Communications Adapters
+ * Team 3 / Module 2  -  Notification & Communications Adapters
  */
 
 import { log } from '@/lib/utils/logger'
@@ -65,7 +65,7 @@ function getAll(): DeliveryRecord[] {
   if (count === 0) return []
   if (count < RING_BUFFER_SIZE) return buffer.slice(0, count).filter(Boolean)
 
-  // Ring is full — return in chronological order
+  // Ring is full  -  return in chronological order
   const start = head % RING_BUFFER_SIZE
   return [
     ...buffer.slice(start).filter(Boolean),
@@ -156,7 +156,7 @@ export function checkAlertThreshold(tenantId: string): boolean {
   return exceeded
 }
 
-/** @internal — for testing only */
+/** @internal  -  for testing only */
 export function _resetBufferForTesting(): void {
   buffer.fill(undefined as unknown as DeliveryRecord)
   head = 0

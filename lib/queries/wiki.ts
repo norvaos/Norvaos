@@ -1,5 +1,5 @@
 /**
- * Wiki Knowledge Base — TanStack Query hooks.
+ * Wiki Knowledge Base  -  TanStack Query hooks.
  *
  * Domain: wiki_playbooks, wiki_snippets, wiki_categories, wiki_playbook_versions
  * Budget: All queries use explicit column fragments (< 20 cols each).

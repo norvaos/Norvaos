@@ -7,7 +7,7 @@
  * and stores IRCC form pack PDFs.
  *
  * Design rules:
- *   - ZERO silent fallbacks — every failure throws a typed error
+ *   - ZERO silent fallbacks  -  every failure throws a typed error
  *   - Template checksum validated before every fill (hard fail on mismatch)
  *   - Input snapshot frozen at generation time (structuredClone)
  *   - Draft PDFs get DRAFT watermark; final PDFs are regenerated clean
@@ -15,12 +15,12 @@
  *   - Version records created via SECURITY DEFINER RPC for atomic numbering
  *
  * Flow (draft):
- *   1. Resolve profile — prefer matter_form_instances.answers via resolveForGeneration(),
+ *   1. Resolve profile  -  prefer matter_form_instances.answers via resolveForGeneration(),
  *      fall back to contacts.immigration_data for legacy instances
- *   2. Compute readiness — hard fail if can_generate === false
- *   3. Validate template checksum — hard fail on mismatch
+ *   2. Compute readiness  -  hard fail if can_generate === false
+ *   3. Validate template checksum  -  hard fail on mismatch
  *   4. Snapshot profile + resolve XFA fields
- *   5. Fill XFA via Python/pikepdf — hard fail on null return
+ *   5. Fill XFA via Python/pikepdf  -  hard fail on null return
  *   6. Apply DRAFT watermark
  *   7. Compute checksum of final PDF
  *   8. Upload to Supabase Storage
@@ -90,7 +90,7 @@ export async function generateFormPack(
 ): Promise<GenerationResult> {
   const { tenantId, matterId, userId, packType, idempotencyKey } = params
 
-  // ── 0. SENTINEL Readiness Gate — block if score < 90% ─────────────────
+  // ── 0. SENTINEL Readiness Gate  -  block if score < 90% ─────────────────
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data: gateResult } = await (supabase as any).rpc('sentinel_check_readiness_gate', {
@@ -122,7 +122,7 @@ export async function generateFormPack(
 
   const { formId, formCode, expectedChecksum, storagePath: templateStoragePath } = await resolveFormId(supabase, tenantId, packType)
 
-  // ── 2. Resolve profile — prefer instance answers, fall back to contact ──
+  // ── 2. Resolve profile  -  prefer instance answers, fall back to contact ──
 
   // Try to find a form instance for this matter + form (new engine path)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -193,7 +193,7 @@ export async function generateFormPack(
   // ── 2c. Playbook-level generation guard ────────────────────────────────
   await enforcePlaybookGenerationRules(supabase, matterId, packType)
 
-  // ── 3. Compute readiness — skip for instance path (already checked) ────
+  // ── 3. Compute readiness  -  skip for instance path (already checked) ────
   if (!useInstanceResolver) {
     const readiness = await computePackReadinessFromDB(profile, [formId], supabase)
     if (!readiness.isReady) {
@@ -323,7 +323,7 @@ export async function generateFormPack(
       })
       .eq('id', result.version_id)
 
-    // Check for idempotent hit — return early without re-uploading
+    // Check for idempotent hit  -  return early without re-uploading
     if (result.idempotent_hit) {
       const { data: existingArtifact } = await supabase
         .from('form_pack_artifacts')
@@ -353,7 +353,7 @@ export async function generateFormPack(
     const fileName = `${clientPart}${matterPart}${formCode}_${today}_v${result.version_number}_DRAFT.pdf`
     const outputStoragePath = `${tenantId}/ircc-packs/${matterId}/${result.version_id}/${fileName}`
 
-    // ── 12b. SENTINEL Encrypted PDF Vault — encrypt before upload ──────────
+    // ── 12b. SENTINEL Encrypted PDF Vault  -  encrypt before upload ──────────
 
     let uploadBytes: Uint8Array = outputBytes
     let encryptionIv: string | null = null
@@ -435,8 +435,8 @@ export async function generateFormPack(
  * Generate the final (non-watermarked) PDF from a frozen snapshot
  * and approve the version.
  *
- * This re-fills the XFA from the version's frozen input_snapshot —
- * NOT from the current profile — ensuring the approved PDF matches
+ * This re-fills the XFA from the version's frozen input_snapshot  - 
+ * NOT from the current profile  -  ensuring the approved PDF matches
  * exactly what the lawyer reviewed.
  *
  * @throws TemplateIntegrityError if template checksum doesn't match
@@ -476,7 +476,7 @@ export async function generateFinalPack(
   const formId = (version as Record<string, unknown>).form_id as string | null
     ?? resolved.formId
 
-  // Frozen snapshot — re-fill from this, not the current profile
+  // Frozen snapshot  -  re-fill from this, not the current profile
   const frozenProfile = version.input_snapshot as Record<string, unknown>
 
   // ── 1b. Fetch matter metadata for representative name + PDF filename ────
@@ -512,7 +512,7 @@ export async function generateFinalPack(
   // ── 1c. Playbook-level generation guard (same as draft) ────────────────
   await enforcePlaybookGenerationRules(supabase, version.matter_id, packType)
 
-  // ── 1d. Field verification gate — all required fields must be verified ──
+  // ── 1d. Field verification gate  -  all required fields must be verified ──
   if (formId) {
     await enforceFieldVerificationGate(supabase, tenantId, version.matter_id, formId, frozenProfile)
   }
@@ -532,7 +532,7 @@ export async function generateFinalPack(
       )
     }
 
-    // ── 3. Validate from frozen snapshot — final pack mode (blocking) ───────
+    // ── 3. Validate from frozen snapshot  -  final pack mode (blocking) ───────
 
     const frozenScalarFields = (frozenProfile.scalar_fields ?? frozenProfile) as Record<string, string>
     const { blockingErrors: finalBlockingErrors, allErrors: finalAllErrors } = validateFormData(
@@ -589,7 +589,7 @@ export async function generateFinalPack(
     const fileName = `${finalClientPart}${finalMatterPart}${formCode}_${finalToday}_v${version.version_number}_FINAL.pdf`
     const storagePath = `${tenantId}/ircc-packs/${version.matter_id}/${packVersionId}/${fileName}`
 
-    // ── 6b. SENTINEL Encrypted PDF Vault — encrypt final PDF ────────────────
+    // ── 6b. SENTINEL Encrypted PDF Vault  -  encrypt final PDF ────────────────
 
     let finalUploadBytes: Uint8Array = filledBytes
     let finalEncryptionIv: string | null = null
@@ -722,10 +722,10 @@ async function enforcePlaybookGenerationRules(
     .eq('matter_id', matterId)
     .maybeSingle()
 
-  if (!intake) return // No intake record — let downstream checks handle
+  if (!intake) return // No intake record  -  let downstream checks handle
 
   const playbook = getPlaybook(intake.program_category)
-  if (!playbook) return // Not an immigration matter type — skip playbook guard
+  if (!playbook) return // Not an immigration matter type  -  skip playbook guard
 
   const blocks: string[] = []
   const genRules = playbook.formGenerationRules
@@ -736,7 +736,7 @@ async function enforcePlaybookGenerationRules(
     const statusLabel = IMMIGRATION_INTAKE_STATUSES.find((s) => s.value === currentStatus)?.label ?? currentStatus
     const targetLabel = IMMIGRATION_INTAKE_STATUSES.find((s) => s.value === 'drafting_enabled')?.label ?? 'Drafting Enabled'
     blocks.push(
-      `Immigration intake status is "${statusLabel}" — must reach "${targetLabel}" before form generation is allowed.`
+      `Immigration intake status is "${statusLabel}"  -  must reach "${targetLabel}" before form generation is allowed.`
     )
   }
 
@@ -749,7 +749,7 @@ async function enforcePlaybookGenerationRules(
 
   // Check 3: Required documents must be accepted
   if (genRules.requiredDocumentSlugs.length > 0) {
-    // Also select slot_slug directly — on-demand PUT slots have slot_template_id = null,
+    // Also select slot_slug directly  -  on-demand PUT slots have slot_template_id = null,
     // so the template-lookup gives '' for them. Fall back to the direct column.
     const { data: slots } = await supabase
       .from('document_slots')
@@ -884,7 +884,7 @@ async function enforcePlaybookGenerationRules(
 
       if (!matrix.meetsThreshold) {
         blocks.push(
-          `Overall readiness is ${matrix.overallPct}% — minimum threshold is ${playbook.readinessThreshold ?? 85}%. Complete missing fields and documents before generating form packs.`
+          `Overall readiness is ${matrix.overallPct}%  -  minimum threshold is ${playbook.readinessThreshold ?? 85}%. Complete missing fields and documents before generating form packs.`
         )
       }
     }
@@ -923,7 +923,7 @@ async function enforcePlaybookGenerationRules(
         if (formInfos) {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           for (const fi of formInfos as any[]) {
-            nameMap.set(fi.id, `${fi.form_code} — ${fi.form_name}`)
+            nameMap.set(fi.id, `${fi.form_code}  -  ${fi.form_name}`)
           }
         }
 
@@ -1003,7 +1003,7 @@ async function enforceFieldVerificationGate(
     const label = (field.label as string | null) ?? path
     const profileValue = getProfileValue(frozenProfile, path)
 
-    // Skip fields with no value — they're either optional in practice or
+    // Skip fields with no value  -  they're either optional in practice or
     // will be caught by the readiness matrix
     if (profileValue === null || profileValue === undefined || profileValue === '') continue
 
@@ -1013,7 +1013,7 @@ async function enforceFieldVerificationGate(
       unverified.push(label)
     } else if (JSON.stringify(verifiedValue) !== JSON.stringify(profileValue)) {
       // Verification exists but is stale (profile changed after verification)
-      unverified.push(`${label} (stale — re-verify after recent changes)`)
+      unverified.push(`${label} (stale  -  re-verify after recent changes)`)
     }
   }
 
@@ -1082,7 +1082,7 @@ async function fetchImmigrationProfile(
 
 /**
  * Resolve the DB form record for a given pack type (form_code).
- * Throws if no DB form is found — there is no legacy fallback.
+ * Throws if no DB form is found  -  there is no legacy fallback.
  */
 async function resolveFormId(
   supabase: SupabaseClient<Database>,
@@ -1115,7 +1115,7 @@ async function resolveFormId(
 /** Download a form template PDF from Supabase Storage to a temp file. Returns cleanup fn. */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function downloadFormTemplate(storagePath: string, supabase: any) {
-  // storagePath is like "ircc-forms/IMM5257E.pdf" — extract the form code for local lookup
+  // storagePath is like "ircc-forms/IMM5257E.pdf"  -  extract the form code for local lookup
   const formCode = storagePath.split('/').pop()?.replace('.pdf', '') ?? ''
   const localPath = join(process.cwd(), 'public', 'ircc-forms', `${formCode}.pdf`)
 
@@ -1123,7 +1123,7 @@ async function downloadFormTemplate(storagePath: string, supabase: any) {
   try {
     bytes = await readFile(localPath)
   } catch {
-    // Local file missing — fall back to Supabase Storage
+    // Local file missing  -  fall back to Supabase Storage
     const { data, error } = await supabase.storage.from('documents').download(storagePath)
     if (error || !data) {
       throw new Error(`[generation-service] Failed to download template from storage: ${storagePath}`)

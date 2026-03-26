@@ -1,5 +1,5 @@
 /**
- * Drift-Blocker — Cross-Squad Neural Link (Directive 1.5)
+ * Drift-Blocker  -  Cross-Squad Neural Link (Directive 1.5)
  *
  * Checks if there are unacknowledged case law alerts that should block
  * AI draft approval. When the Drift Sentry detects a Federal Court ruling
@@ -159,7 +159,7 @@ export async function checkDriftBlock(
 }
 
 /**
- * Acknowledge a drift alert — marks it as 'acknowledged' so it no longer
+ * Acknowledge a drift alert  -  marks it as 'acknowledged' so it no longer
  * blocks draft approval.
  */
 export async function acknowledgeDriftAlert(

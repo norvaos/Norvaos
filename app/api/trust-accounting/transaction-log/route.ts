@@ -1,8 +1,8 @@
 /**
- * GET  /api/trust-accounting/transaction-log — Query the trust transaction log (read-only)
+ * GET  /api/trust-accounting/transaction-log  -  Query the trust transaction log (read-only)
  *
  * The transaction log is append-only. Entries are written internally by
- * services — API consumers may only read.
+ * services  -  API consumers may only read.
  */
 
 import { NextRequest, NextResponse } from 'next/server'

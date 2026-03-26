@@ -1,5 +1,5 @@
 -- ═══════════════════════════════════════════════════════════════════════════════
--- Migration 171 — Bulk Lead Import Pipeline: Staging, Attribution & Batch Ops
+-- Migration 171  -  Bulk Lead Import Pipeline: Staging, Attribution & Batch Ops
 -- ═══════════════════════════════════════════════════════════════════════════════
 -- Deliverables:
 --   1. lead_import_staging table (the "sandbox")

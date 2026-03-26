@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Wave 6 — Stage Engine Tests: Guarded Transitions, Terminal Blocking, E2E Path
+ * Wave 6  -  Stage Engine Tests: Guarded Transitions, Terminal Blocking, E2E Path
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Proves:
@@ -47,7 +47,7 @@ vi.mock('../workspace-config-service', () => ({
   getWorkspaceWorkflowConfig: vi.fn().mockResolvedValue({}),
 }))
 
-// ─── getAvailableTransitions (pure — no Supabase) ──────────────────────────
+// ─── getAvailableTransitions (pure  -  no Supabase) ──────────────────────────
 
 describe('getAvailableTransitions (pure)', () => {
   it('returns transitions for every active stage', () => {
@@ -84,7 +84,7 @@ describe('getAvailableTransitions (pure)', () => {
     }
   })
 
-  // ─── Full Intake Path — Forward Transitions ─────────────────────────────
+  // ─── Full Intake Path  -  Forward Transitions ─────────────────────────────
 
   it('NEW_INQUIRY can transition to CONTACT_ATTEMPTED', () => {
     const transitions = getAvailableTransitions(LEAD_STAGES.NEW_INQUIRY)
@@ -138,7 +138,7 @@ describe('getAvailableTransitions (pure)', () => {
 
   // Design: Early/mid stages have direct closure transitions in rules.
   // Late stages (retainer_signed_payment_pending, retained_active_matter) have
-  // NO direct closure transitions — closure is handled by the closure engine
+  // NO direct closure transitions  -  closure is handled by the closure engine
   // which calls advanceLeadStage with skipGuards=true.
   const STAGES_WITH_DIRECT_CLOSURE = ACTIVE_STAGES.filter(
     (s) =>
@@ -165,7 +165,7 @@ describe('getAvailableTransitions (pure)', () => {
     expect(retainedClosures).toHaveLength(0)
   })
 
-  // ─── Terminal Locking — No Escape ──────────────────────────────────────
+  // ─── Terminal Locking  -  No Escape ──────────────────────────────────────
 
   it('CONVERTED has zero transitions', () => {
     expect(getAvailableTransitions(LEAD_STAGES.CONVERTED)).toHaveLength(0)
@@ -219,7 +219,7 @@ describe('Terminal Stage Enforcement', () => {
     }
   })
 
-  it('pipeline cannot loop — no stage transitions to itself or an earlier stage', () => {
+  it('pipeline cannot loop  -  no stage transitions to itself or an earlier stage', () => {
     for (let i = 0; i < ACTIVE_STAGES.length; i++) {
       const stage = ACTIVE_STAGES[i]
       const transitions = getAvailableTransitions(stage)

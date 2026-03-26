@@ -1,5 +1,5 @@
 /**
- * Español (es) — Spanish dictionary.
+ * Español (es)  -  Spanish dictionary.
  * Legal terminology for Latin American / Canadian Spanish-speaking clients.
  */
 
@@ -69,7 +69,7 @@ export const es: Partial<Record<DictionaryKey, string>> = {
   'dashboard.deadline_today': 'Today',
   'dashboard.deadline_1_day': '1 day',
   'dashboard.deadline_days': '{days} days',
-  'dashboard.deadlines_14_days': 'Deadlines — Next 14 Days',
+  'dashboard.deadlines_14_days': 'Deadlines  -  Next 14 Days',
   'dashboard.no_deadlines_14': 'No deadlines in the next 14 days',
   'dashboard.no_deadlines_14_desc': 'Typed deadlines on matters will appear here.',
   'dashboard.unknown_matter': 'Unknown matter',
@@ -98,12 +98,12 @@ export const es: Partial<Record<DictionaryKey, string>> = {
   'common.save': 'Guardar',
   'common.view': 'Ver',
 
-  // ── Directiva 41.0 — Contactos y Vault ───────────────────────────────────
+  // ── Directiva 41.0  -  Contactos y Vault ───────────────────────────────────
   'contact.badge.retained_client': 'Cliente retenido',
   'contact.badge.prospective_lead': 'Prospecto potencial',
   'contact.badge.contact': 'Contacto',
   'contact.command_centre': 'Centro de mando',
-  'contact.command_centre_red_alert': 'La puntuación de preparación es críticamente baja — se requiere atención inmediata',
+  'contact.command_centre_red_alert': 'La puntuación de preparación es críticamente baja  -  se requiere atención inmediata',
   'contact.intake_funnel': 'Embudo de admisión',
   'contact.intake_progress': 'Progreso de admisión',
   'contact.matter_readiness': 'Preparación del caso',
@@ -116,13 +116,13 @@ export const es: Partial<Record<DictionaryKey, string>> = {
   'vault.title': 'Norva Vault',
   'vault.empty': 'Norva Vault vacío',
   'vault.empty_description': 'No se han subido documentos para este contacto.',
-  'vault.sentinel_eye': 'Sentinel Eye — Ver y verificar',
+  'vault.sentinel_eye': 'Sentinel Eye  -  Ver y verificar',
   'vault.file_tampered': 'Precaución: Archivo alterado',
   'vault.sha256_verified': 'SHA-256 verificado',
   'vault.hash_pending': 'Hash pendiente',
   'vault.integrity_alert': 'Alerta de integridad',
   'vault.untracked': 'Sin seguimiento',
-  'vault.no_preview': 'Vista previa no disponible — URL del archivo faltante',
+  'vault.no_preview': 'Vista previa no disponible  -  URL del archivo faltante',
 
   'legal.retainer_title': 'Contrato de prestación de servicios jurídicos',
   'legal.retainer_intro': 'Este contrato establece los términos de los servicios legales a prestar.',
@@ -205,12 +205,12 @@ export const es: Partial<Record<DictionaryKey, string>> = {
   'status.days_remaining': '{days}d restantes',
   'status.verified': 'Verificado',
   'status.expiry_label': 'Vencimiento',
-  'status.sentinel_tamper_title': 'ALERTA CENTINELA — Manipulación detectada',
+  'status.sentinel_tamper_title': 'ALERTA CENTINELA  -  Manipulación detectada',
   'status.sentinel_tamper_body': 'Discrepancia de hash del documento. Este documento fue modificado fuera de NorvaOS.',
-  'status.vault_verified_title': 'Bóveda Norva — Integridad verificada',
+  'status.vault_verified_title': 'Bóveda Norva  -  Integridad verificada',
   'status.vault_verified_body': 'Este documento está bloqueado por hash en la Bóveda Norva. Cualquier manipulación será detectada.',
 
-  // ── Leads Command Centre (Directive 40.0 — Sovereign Layer) ─────────────
+  // ── Leads Command Centre (Directive 40.0  -  Sovereign Layer) ─────────────
   'leads.title': 'Prospectos',
   'leads.add_lead': 'Agregar prospecto',
   'leads.import': 'Importar',
@@ -333,7 +333,7 @@ export const es: Partial<Record<DictionaryKey, string>> = {
   'form.notes_placeholder': 'Add any additional notes about this contact...',
   'form.create_contact': 'Create Contact',
   'form.save_changes': 'Save Changes',
-  'form.review_required_ocr': 'Review Required — OCR could not extract',
+  'form.review_required_ocr': 'Review Required  -  OCR could not extract',
   'form.section_basic_info': 'Basic Information',
   'form.section_contact_details': 'Contact Details',
   'form.section_address': 'Address',

@@ -1,7 +1,7 @@
 -- ============================================================
 -- 124-next-action-columns.sql
 -- Adds next_action_* columns to the matters table.
--- Agent 6 of 6 — Next Action Engine
+-- Agent 6 of 6  -  Next Action Engine
 -- ============================================================
 
 ALTER TABLE matters

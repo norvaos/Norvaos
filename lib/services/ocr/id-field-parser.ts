@@ -1,5 +1,5 @@
 /**
- * ID Field Parser — Canadian Government ID Heuristics
+ * ID Field Parser  -  Canadian Government ID Heuristics
  *
  * Extracts structured contact fields from raw OCR text of:
  *   - Provincial driver's licences (ON, AB, BC, QC, etc.)
@@ -25,7 +25,7 @@ export interface IdScanFields {
   expiry_date: string | null      // YYYY-MM-DD
   sex: string | null              // M / F / X
   document_type: 'drivers_licence' | 'passport' | 'pr_card' | 'photo_id' | 'unknown'
-  /** Fields the parser couldn't confidently extract — UI should show amber "Review Required" border */
+  /** Fields the parser couldn't confidently extract  -  UI should show amber "Review Required" border */
   review_required: string[]
 }
 
@@ -50,7 +50,7 @@ const PROVINCE_NAME_MAP: Record<string, string> = {
   'yukon': 'YT',
 }
 
-/** Valid 2-letter province codes — used ONLY in structured patterns, never loose */
+/** Valid 2-letter province codes  -  used ONLY in structured patterns, never loose */
 const VALID_PROVINCE_CODES = new Set([
   'ON', 'AB', 'BC', 'MB', 'SK', 'QC', 'NB', 'NS', 'PE', 'NL', 'NT', 'NU', 'YT',
 ])
@@ -82,11 +82,11 @@ export function parseIdFields(rawText: string): IdScanFields {
   }
 
   // ── Step 1: Province from header (e.g., "Ontario" at top of DL) ────────
-  // This is the most reliable signal — DLs always have the province name
+  // This is the most reliable signal  -  DLs always have the province name
   result.province_state = extractProvinceFromHeader(lines)
 
   // ── Step 2: City + Province + Postal (extracted together) ──────────────
-  // Pattern: "TORONTO ON M5V 2T6" — single line with all three fields.
+  // Pattern: "TORONTO ON M5V 2T6"  -  single line with all three fields.
   // This is the ONLY place we extract city/postal/province-from-address.
   extractCityProvincePostal(lines, result)
 
@@ -156,7 +156,7 @@ function extractProvinceFromHeader(lines: string[]): string | null {
 
   const headerLines = lines.slice(0, 6)
 
-  // Pass 1: Exact line match (most reliable — "Ontario" on its own line)
+  // Pass 1: Exact line match (most reliable  -  "Ontario" on its own line)
   for (const line of headerLines) {
     const lower = line.toLowerCase().trim()
     for (const [name, code] of sortedEntries) {
@@ -219,7 +219,7 @@ function extractCityProvincePostal(lines: string[], result: IdScanFields) {
     return
   }
 
-  // Pattern 2: Postal code glued to province — "TORONTO ON M5V2T6" (no space in postal)
+  // Pattern 2: Postal code glued to province  -  "TORONTO ON M5V2T6" (no space in postal)
   for (const line of lines) {
     const match = line.match(
       /^(.+?)[\s,]+([A-Z]{2})[\s,]+([A-Z]\d[A-Z]\d[A-Z]\d)\s*$/i
@@ -332,7 +332,7 @@ function extractName(lines: string[], upper: string, result: IdScanFields) {
     }
   }
 
-  // Pattern 3: For passports — "MEHTA" on one line, "ARJUN" on next
+  // Pattern 3: For passports  -  "MEHTA" on one line, "ARJUN" on next
   if (!result.last_name && result.document_type === 'passport') {
     const nameLines = lines.filter(l =>
       /^[A-Z'-\s]{2,30}$/.test(l) &&

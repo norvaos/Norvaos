@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * PortalDashboardCards — Responsive summary card grid.
+ * PortalDashboardCards  -  Responsive summary card grid.
  * Mounted between NextAction and collapsible sections.
  * Each card shows a key metric and is clickable to navigate to its section.
  */
@@ -198,7 +198,7 @@ function buildCards(
     ? (tr.section_questions_completed ?? 'Done')
     : s.questions.exists
       ? `${s.questions.progress}%`
-      : '—'
+      : ' - '
 
   // Payment
   const outstanding = p.totalDue - p.totalPaid
@@ -208,7 +208,7 @@ function buildCards(
     ? `$${(outstanding / 100).toLocaleString()}`
     : p.invoiceCount > 0
       ? (tr.section_payment_paid ?? 'Paid')
-      : '—'
+      : ' - '
 
   // Tasks
   const tColor: DashboardCard['color'] =

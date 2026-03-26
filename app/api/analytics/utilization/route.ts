@@ -1,5 +1,5 @@
 /**
- * GET /api/analytics/utilization — Lawyer utilisation report
+ * GET /api/analytics/utilization  -  Lawyer utilisation report
  */
 
 import { NextRequest, NextResponse } from 'next/server'

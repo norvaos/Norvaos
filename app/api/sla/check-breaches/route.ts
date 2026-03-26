@@ -4,7 +4,7 @@ import { checkBreaches } from '@/lib/services/sla-engine'
 import { computeNextAction } from '@/lib/services/next-action-engine'
 
 export async function POST(request: Request) {
-  // Auth check — fail-closed: reject if CRON_SECRET is unset
+  // Auth check  -  fail-closed: reject if CRON_SECRET is unset
   const CRON_SECRET = process.env['CRON_SECRET']
   if (!CRON_SECRET) {
     return NextResponse.json({ error: 'Server misconfigured: CRON_SECRET not set' }, { status: 500 })

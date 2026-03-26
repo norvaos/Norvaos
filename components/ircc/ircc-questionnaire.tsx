@@ -157,7 +157,7 @@ interface IRCCQuestionnaireProps {
    */
   prebuiltQuestionnaire?: Questionnaire | null
   /**
-   * Matter ID — enables field-level verification badges and actions.
+   * Matter ID  -  enables field-level verification badges and actions.
    * When provided, verifications are loaded and shown next to each field.
    */
   matterId?: string | null
@@ -301,7 +301,7 @@ export function IRCCQuestionnaire({
         return // Done
       }
 
-      // Element not in DOM yet — retry
+      // Element not in DOM yet  -  retry
       if (attempts < MAX_ATTEMPTS) {
         setTimeout(tryScrollToField, 100)
       }
@@ -440,7 +440,7 @@ export function IRCCQuestionnaire({
         <Progress value={overallProgress} className="h-1.5" />
       </div>
 
-      {/* Step progress — segmented bar with labels */}
+      {/* Step progress  -  segmented bar with labels */}
       <div className="space-y-2">
         <div
           className="flex gap-1"
@@ -550,7 +550,7 @@ export function IRCCQuestionnaire({
         </div>
       )}
 
-      {/* Fields — grouped by XFA subsection */}
+      {/* Fields  -  grouped by XFA subsection */}
       {currentSection && (
         <div className="space-y-4">
           {groupFieldsBySubsection(currentSection.fields).map((group, groupIdx) => (
@@ -661,7 +661,7 @@ export function IRCCQuestionnaire({
                                     onClick={() => onFieldResubmit(field.profile_path)}
                                   >
                                     <Check className="h-3 w-3" />
-                                    Fixed It — Ready for Review
+                                    Fixed It  -  Ready for Review
                                   </button>
                                 )}
                               </div>
@@ -833,7 +833,7 @@ export function IRCCQuestionnaire({
         )}
       </div>
 
-      {/* Rejection dialog — opened from per-field Reject button */}
+      {/* Rejection dialog  -  opened from per-field Reject button */}
       {canVerify && matterId && rejectTarget && (
         <VerificationRejectDialog
           matterId={matterId}
@@ -1336,7 +1336,7 @@ function isSectionComplete(
     )
   }
 
-  // No required fields — section is "complete" only if at least one field is filled
+  // No required fields  -  section is "complete" only if at least one field is filled
   if (visibleFields.length === 0) return true // empty section edge case
   return visibleFields.some((f) =>
     isValueFilled(values[f.profile_path], f.field_type),

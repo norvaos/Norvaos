@@ -10,7 +10,7 @@
  *   - DB trigger backstop is preserved with the correct entry_point tag
  *   - Dedupe guard exists in logSeatLimitDenial
  *
- * Tests are structural (source scanning) — they read source files and assert on
+ * Tests are structural (source scanning)  -  they read source files and assert on
  * content patterns, following the max-users-regression.test.ts pattern.
  */
 
@@ -32,7 +32,7 @@ function readSource(relPath: string): string {
 // 1. Precheck at Every Entry Point
 // ═══════════════════════════════════════════════════════════════════════════
 
-describe('seat-limit — precheck at every entry point', () => {
+describe('seat-limit  -  precheck at every entry point', () => {
   it('seat-limit.ts exists and exports checkSeatLimit', () => {
     const source = readSource('lib/services/seat-limit.ts')
     expect(source).toContain('export async function checkSeatLimit')
@@ -99,7 +99,7 @@ describe('seat-limit — precheck at every entry point', () => {
 // 2. Standardised 409 Response
 // ═══════════════════════════════════════════════════════════════════════════
 
-describe('seat-limit — standardised 409 response', () => {
+describe('seat-limit  -  standardised 409 response', () => {
   it('invite route uses seatLimitResponse on denial', () => {
     const source = readSource('app/api/settings/users/invite/route.ts')
     expect(source).toContain('seatLimitResponse(seatCheck)')
@@ -149,7 +149,7 @@ describe('seat-limit — standardised 409 response', () => {
 // 3. Denial Instrumentation + Dedupe
 // ═══════════════════════════════════════════════════════════════════════════
 
-describe('seat-limit — denial instrumentation', () => {
+describe('seat-limit  -  denial instrumentation', () => {
   it('logSeatLimitDenial writes to audit_logs', () => {
     const source = readSource('lib/services/seat-limit.ts')
     expect(source).toContain("from('audit_logs')")
@@ -205,7 +205,7 @@ describe('seat-limit — denial instrumentation', () => {
 // 4. Platform-Admin
 // ═══════════════════════════════════════════════════════════════════════════
 
-describe('seat-limit — platform-admin', () => {
+describe('seat-limit  -  platform-admin', () => {
   it('platform-admin.ts exists and exports checkPlatformAdmin', () => {
     const source = readSource('lib/services/platform-admin.ts')
     expect(source).toContain('export function checkPlatformAdmin')
@@ -275,7 +275,7 @@ describe('seat-limit — platform-admin', () => {
 // 5. DB Trigger Backstop Preserved
 // ═══════════════════════════════════════════════════════════════════════════
 
-describe('seat-limit — DB trigger backstop preserved', () => {
+describe('seat-limit  -  DB trigger backstop preserved', () => {
   it('accept-invite still handles User limit reached trigger error', () => {
     const source = readSource('app/api/auth/accept-invite/route.ts')
     expect(source).toContain("userErr.message?.includes('User limit reached')")
@@ -306,7 +306,7 @@ describe('seat-limit — DB trigger backstop preserved', () => {
 // 6. Policy v1 Contract
 // ═══════════════════════════════════════════════════════════════════════════
 
-describe('seat-limit — policy v1 contract', () => {
+describe('seat-limit  -  policy v1 contract', () => {
   it('seat-limit.ts documents the policy as active users only', () => {
     const source = readSource('lib/services/seat-limit.ts')
     expect(source).toContain('Policy v1: seats = active users only')
@@ -327,7 +327,7 @@ describe('seat-limit — policy v1 contract', () => {
 // 7. Admin Console UI
 // ═══════════════════════════════════════════════════════════════════════════
 
-describe('seat-limit — admin console UI', () => {
+describe('seat-limit  -  admin console UI', () => {
   it('admin tenants page exists', () => {
     expect(existsSync(resolve(ROOT, 'app/(dashboard)/admin/tenants/page.tsx'))).toBe(true)
   })

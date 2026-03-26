@@ -7,7 +7,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 /**
  * GET /api/matters/[id]/chain-of-custody
  *
- * Chain of Custody Report — Directive 2.5
+ * Chain of Custody Report  -  Directive 2.5
  *
  * Invokes sentinel_chain_of_custody() RPC which aggregates all security events
  * for a matter into a single JSONB report for Law Society audit compliance.
@@ -21,8 +21,8 @@ import { createAdminClient } from '@/lib/supabase/admin'
  *   - Emergency lockdowns
  *
  * Query params:
- *   ?format=json (default) — raw JSONB
- *   ?format=pdf — generates PDF via pdf-lib (future)
+ *   ?format=json (default)  -  raw JSONB
+ *   ?format=pdf  -  generates PDF via pdf-lib (future)
  */
 async function handleGet(
   request: Request,
@@ -68,7 +68,7 @@ async function handleGet(
     }
 
     if (format === 'pdf') {
-      // PDF generation — build a structured document from the report data
+      // PDF generation  -  build a structured document from the report data
       const pdfBytes = await generateCustodyPdf(report)
 
       return new NextResponse(Buffer.from(pdfBytes), {
@@ -148,7 +148,7 @@ async function generateCustodyPdf(report: CustodyReport): Promise<Uint8Array> {
   }
 
   // ── Header ──
-  addText('SENTINEL — Chain of Custody Report', 18, true)
+  addText('SENTINEL  -  Chain of Custody Report', 18, true)
   addText(`Generated: ${new Date(report.generated_at).toLocaleString('en-CA')}`, 10)
   addLine()
 
@@ -175,7 +175,7 @@ async function generateCustodyPdf(report: CustodyReport): Promise<Uint8Array> {
     addText(`PII Reveals (${report.pii_reveals.length})`, 12, true)
     for (const ev of report.pii_reveals) {
       addText(
-        `  ${ev.timestamp ? new Date(ev.timestamp).toLocaleString('en-CA') : '—'}  |  Field: ${ev.field_name ?? '—'}  |  Reason: ${ev.reason ?? '—'}  |  Severity: ${ev.severity}`,
+        `  ${ev.timestamp ? new Date(ev.timestamp).toLocaleString('en-CA') : ' - '}  |  Field: ${ev.field_name ?? ' - '}  |  Reason: ${ev.reason ?? ' - '}  |  Severity: ${ev.severity}`,
         9,
       )
     }
@@ -206,7 +206,7 @@ async function generateCustodyPdf(report: CustodyReport): Promise<Uint8Array> {
     addText(`Identity Verifications (${report.identity_verifications.length})`, 12, true)
     for (const iv of report.identity_verifications) {
       addText(
-        `  Provider: ${iv.provider}  |  Method: ${iv.method}  |  Status: ${iv.status}  |  Confidence: ${iv.confidence_score ?? '—'}%`,
+        `  Provider: ${iv.provider}  |  Method: ${iv.method}  |  Status: ${iv.status}  |  Confidence: ${iv.confidence_score ?? ' - '}%`,
         9,
       )
     }
@@ -219,7 +219,7 @@ async function generateCustodyPdf(report: CustodyReport): Promise<Uint8Array> {
     addText(`Form Generations (${report.form_generations.length})`, 12, true)
     for (const fg of report.form_generations) {
       addText(
-        `  ${fg.timestamp ? new Date(fg.timestamp).toLocaleString('en-CA') : '—'}  |  Form: ${fg.form_code ?? '—'}  |  v${fg.version ?? '?'}  |  ${fg.status}`,
+        `  ${fg.timestamp ? new Date(fg.timestamp).toLocaleString('en-CA') : ' - '}  |  Form: ${fg.form_code ?? ' - '}  |  v${fg.version ?? '?'}  |  ${fg.status}`,
         9,
       )
     }
@@ -232,7 +232,7 @@ async function generateCustodyPdf(report: CustodyReport): Promise<Uint8Array> {
     addText(`Tamper Alerts (${report.tamper_alerts.length})`, 12, true, rgb(0.8, 0, 0))
     for (const ta of report.tamper_alerts) {
       addText(
-        `  ${ta.timestamp ? new Date(ta.timestamp).toLocaleString('en-CA') : '—'}  |  ${ta.file_name}  |  Expected: ${ta.expected_hash}  |  Actual: ${ta.actual_hash}`,
+        `  ${ta.timestamp ? new Date(ta.timestamp).toLocaleString('en-CA') : ' - '}  |  ${ta.file_name}  |  Expected: ${ta.expected_hash}  |  Actual: ${ta.actual_hash}`,
         9,
         false,
         rgb(0.8, 0, 0),

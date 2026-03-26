@@ -3,13 +3,13 @@
 -- ============================================================================
 --
 -- New tables:
---   1. collection_actions     — follow-up actions on overdue invoices
---   2. payment_plans          — instalment plans for overdue invoices
---   3. revenue_snapshots      — daily materialized metric snapshots
+--   1. collection_actions      -  follow-up actions on overdue invoices
+--   2. payment_plans           -  instalment plans for overdue invoices
+--   3. revenue_snapshots       -  daily materialized metric snapshots
 --
 -- Amended tables:
---   users — add cost_rate_cents, utilization_target_hours
---   invoices — add aging_bucket, aging_updated_at
+--   users  -  add cost_rate_cents, utilization_target_hours
+--   invoices  -  add aging_bucket, aging_updated_at
 --
 -- ============================================================================
 
@@ -123,12 +123,12 @@ CREATE TRIGGER trg_revenue_snapshots_no_delete
   BEFORE DELETE ON revenue_snapshots
   FOR EACH ROW EXECUTE FUNCTION revenue_snapshots_immutable();
 
--- ─── 4. Amend users — cost rate + utilization target ───────────────────────
+-- ─── 4. Amend users  -  cost rate + utilization target ───────────────────────
 
 ALTER TABLE users ADD COLUMN IF NOT EXISTS cost_rate_cents BIGINT DEFAULT 0;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS utilization_target_hours NUMERIC(5,1) DEFAULT 0;
 
--- ─── 5. Amend invoices — aging classification ──────────────────────────────
+-- ─── 5. Amend invoices  -  aging classification ──────────────────────────────
 
 ALTER TABLE invoices ADD COLUMN IF NOT EXISTS aging_bucket VARCHAR(20) DEFAULT 'current'
   CHECK (aging_bucket IN ('current','31_60','61_90','91_120','120_plus'));
@@ -141,7 +141,7 @@ CREATE INDEX IF NOT EXISTS idx_invoices_aging ON invoices(tenant_id, aging_bucke
 -- ─── 6. Write-off approval trigger ─────────────────────────────────────────
 -- Write-offs require partner approval (preparer != approver pattern)
 -- This is enforced at the service/API layer (same as trust disbursements)
--- No DB trigger needed — the collection_actions table logs both
+-- No DB trigger needed  -  the collection_actions table logs both
 -- write_off_requested and write_off_approved as separate entries
 
 -- ============================================================================

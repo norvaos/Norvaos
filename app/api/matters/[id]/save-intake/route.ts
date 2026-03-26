@@ -104,7 +104,7 @@ async function handlePost(
       metadata: { matter_id: matterId },
     })
 
-    // 7. Invalidate caches — parallel
+    // 7. Invalidate caches  -  parallel
     await Promise.all([
       invalidateGating(auth.tenantId, matterId),
       invalidateMattersList(auth.tenantId),

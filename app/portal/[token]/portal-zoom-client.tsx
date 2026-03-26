@@ -52,7 +52,7 @@ export function PortalZoomWrapper({ children }: { children: React.ReactNode }) {
   }, [zoom, mounted])
 
   // Add portal-force-light to <body> so Radix portals (rendered at body level)
-  // also get light-mode styling — they'd otherwise inherit dark theme from <html>.
+  // also get light-mode styling  -  they'd otherwise inherit dark theme from <html>.
   useEffect(() => {
     document.body.classList.add('portal-force-light')
     return () => {
@@ -72,7 +72,7 @@ export function PortalZoomWrapper({ children }: { children: React.ReactNode }) {
     <>
       {children}
 
-      {/* Floating zoom controls — bottom-right corner */}
+      {/* Floating zoom controls  -  bottom-right corner */}
       <div className="fixed bottom-4 right-4 z-50 flex items-center gap-1 rounded-full border border-slate-200 bg-white/95 px-1.5 py-1 shadow-lg backdrop-blur-sm">
         <button
           type="button"

@@ -1,5 +1,5 @@
 /**
- * IRCC Forms Engine — Format Normalizer
+ * IRCC Forms Engine  -  Format Normalizer
  *
  * Pure function module (no I/O, no database, no side effects).
  * Handles value normalization between human-readable answer format,
@@ -203,7 +203,7 @@ export function formatForXfa(
       if (field.date_split === 'year') return parts[1]
       if (field.date_split === 'month') return parts[2]
       if (field.date_split === 'day') return parts[3]
-      // No split — IRCC format YYYY/MM/DD
+      // No split  -  IRCC format YYYY/MM/DD
       return `${parts[1]}/${parts[2]}/${parts[3]}`
     }
     return value

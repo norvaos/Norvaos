@@ -35,7 +35,7 @@ async function handlePost(
       if (body.triggerType) triggerType = body.triggerType
       if (body.leadId) leadId = body.leadId
     } catch {
-      // No body or invalid JSON — use defaults
+      // No body or invalid JSON  -  use defaults
     }
 
     // 3. Verify the contact belongs to this tenant

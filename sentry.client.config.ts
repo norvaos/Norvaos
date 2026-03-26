@@ -18,7 +18,7 @@ if (dsn) {
     // Performance: 10% of transactions in production
     tracesSampleRate: 0.1,
 
-    // Session Replay — disabled by default, capture 100% of errored sessions
+    // Session Replay  -  disabled by default, capture 100% of errored sessions
     replaysSessionSampleRate: 0,
     replaysOnErrorSampleRate: 1.0,
 

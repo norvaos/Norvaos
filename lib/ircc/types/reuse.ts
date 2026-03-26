@@ -1,5 +1,5 @@
 /**
- * IRCC Forms Engine — Reuse Types
+ * IRCC Forms Engine  -  Reuse Types
  *
  * Cross-form and cross-matter reuse event tracking and categorization.
  */
@@ -31,7 +31,7 @@ export interface ReuseEvent {
 
 /** Classification of canonical fields for cross-matter reuse */
 export const REUSE_CATEGORY_MAP: Record<string, ReuseCategory> = {
-  // Stable — auto-accept unless unverified (17 paths)
+  // Stable  -  auto-accept unless unverified (17 paths)
   'personal.family_name': 'stable',
   'personal.given_name': 'stable',
   'personal.date_of_birth': 'stable',
@@ -50,7 +50,7 @@ export const REUSE_CATEGORY_MAP: Record<string, ReuseCategory> = {
   'family.father_place_of_birth': 'stable',
   'language.native_language': 'stable',
 
-  // Semi-stable — require confirmation (26 paths)
+  // Semi-stable  -  require confirmation (26 paths)
   'marital.status': 'semi_stable',
   'marital.spouse_family_name': 'semi_stable',
   'marital.spouse_given_name': 'semi_stable',

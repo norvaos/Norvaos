@@ -20,7 +20,7 @@ import { completeCheckInAction } from '@/lib/services/actions/checkin/complete-c
  *
  * Rule #5: Triple-write via execute_action_atomic().
  * Rule #15: Idempotency key prevents double-submit.
- * Rule #16: Realtime is additive — durable activity + notification.
+ * Rule #16: Realtime is additive  -  durable activity + notification.
  *
  * Enhanced: Accepts `answers` from dynamic questions, returns `returningInfo`
  * with staff name/avatar for returning clients/leads. Also notifies the
@@ -171,7 +171,7 @@ async function handlePost(
           })
         }
       } catch (matchErr) {
-        // Non-blocking — contact matching failure should NOT break check-in
+        // Non-blocking  -  contact matching failure should NOT break check-in
         log.error('[kiosk-complete] Contact matching failed (non-blocking)', {
           error_message: matchErr instanceof Error ? matchErr.message : 'Unknown',
           session_id: finalSessionId,
@@ -191,7 +191,7 @@ async function handlePost(
         dataSafetyAcknowledged: dataSafetyAcknowledged ?? true,
       },
       tenantId,
-      userId: null, // Kiosk — no user session
+      userId: null, // Kiosk  -  no user session
       supabase: admin,
       source: 'kiosk',
       idempotencyKey,
@@ -253,7 +253,7 @@ async function handlePost(
         }
       }
     } catch (docErr) {
-      // Non-blocking — document linkage failure should NOT break check-in
+      // Non-blocking  -  document linkage failure should NOT break check-in
       log.error('[kiosk-complete] ID scan document linkage failed (non-blocking)', {
         error_message: docErr instanceof Error ? docErr.message : 'Unknown',
         session_id: finalSessionId,
@@ -322,7 +322,7 @@ async function handlePost(
         }
       }
     } catch (leadErr) {
-      // Non-blocking — lead creation failure should NOT break check-in
+      // Non-blocking  -  lead creation failure should NOT break check-in
       log.error('[kiosk-complete] Lead creation failed (non-blocking)', {
         error_message: leadErr instanceof Error ? leadErr.message : 'Unknown',
         session_id: finalSessionId,
@@ -360,7 +360,7 @@ async function handlePost(
         }
       }
     } catch {
-      // Non-blocking — document-lead linkage failure doesn't break check-in
+      // Non-blocking  -  document-lead linkage failure doesn't break check-in
     }
 
     // 6. Query returning client/lead info + dispatch notifications
@@ -489,13 +489,13 @@ async function handlePost(
           }
         }
       } catch {
-        // Non-blocking — returning info failure doesn't break check-in
+        // Non-blocking  -  returning info failure doesn't break check-in
       }
     }
 
     // 7. Dispatch notifications to all relevant staff (non-blocking, post-commit)
     //    Rule #16: The durable activity record was created by the atomic triple-write.
-    //    This notification dispatch is additive — failure does not affect check-in.
+    //    This notification dispatch is additive  -  failure does not affect check-in.
     if (notifyUserIds.length > 0) {
       try {
         const { dispatchNotification } = await import('@/lib/services/notification-engine')
@@ -513,7 +513,7 @@ async function handlePost(
           eventType: 'client_checked_in',
           recipientUserIds: notifyUserIds,
           title: isQuickCheckin
-            ? `${guestName} — quick check-in`
+            ? `${guestName}  -  quick check-in`
             : `${guestName} has checked in`,
           message: notificationMessage,
           entityType: 'check_in_session',
@@ -531,7 +531,7 @@ async function handlePost(
           })
         })
       } catch {
-        // Non-blocking — notification failure doesn't break check-in
+        // Non-blocking  -  notification failure doesn't break check-in
       }
     }
 

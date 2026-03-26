@@ -1,10 +1,10 @@
 /**
- * Government Fee Disbursement Engine — Norva Ledger
+ * Government Fee Disbursement Engine  -  Norva Ledger
  *
- * GET    — Check disbursement status for a matter
- * POST   — Authorize government fee disbursement (reserve funds)
- * PATCH  — Confirm disbursement (after IRCC payment)
- * DELETE — Cancel a pending disbursement reservation
+ * GET     -  Check disbursement status for a matter
+ * POST    -  Authorize government fee disbursement (reserve funds)
+ * PATCH   -  Confirm disbursement (after IRCC payment)
+ * DELETE  -  Cancel a pending disbursement reservation
  */
 
 import { NextRequest, NextResponse } from 'next/server'

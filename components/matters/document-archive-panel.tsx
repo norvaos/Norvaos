@@ -1,21 +1,21 @@
 'use client'
 
 /**
- * DocumentArchivePanel — Classifier-Categorised File Archive (Directive 22.2 + 28.0)
+ * DocumentArchivePanel  -  Classifier-Categorised File Archive (Directive 22.2 + 28.0)
  *
  * Displays all uploaded/migrated documents for a matter, grouped by the
  * AI Classifier categories (identity, financial, legal, correspondence,
  * medical, immigration, other).
  *
  * This panel complements the slot-based DocumentsTab by showing the raw
- * file inventory — especially useful for Clio-migrated matters where
+ * file inventory  -  especially useful for Clio-migrated matters where
  * documents arrive pre-tagged by the Directive 5.4 classifier.
  *
- * Directive 28.1 — Polyglot-Tag: Source language badge on cards when OCR/Norva
+ * Directive 28.1  -  Polyglot-Tag: Source language badge on cards when OCR/Norva
  *   Ear detects non-English script (e.g., "Urdu | اردو"). Helps lawyers
  *   identify which documents require certified translation.
  *
- * Directive 28.2 — Migration-Pulse: SHA-256 vault shield icon confirms
+ * Directive 28.2  -  Migration-Pulse: SHA-256 vault shield icon confirms
  *   document integrity. Green ShieldCheck + NorvaWhisper tooltip shows
  *   truncated hash. Clio migration badge for external-origin files.
  *
@@ -125,7 +125,7 @@ function getCategoryMeta(category: string) {
 // ── File size formatter ──────────────────────────────────────────────────────
 
 function formatFileSize(bytes: number | null): string {
-  if (!bytes) return '—'
+  if (!bytes) return ' - '
   if (bytes < 1024) return `${bytes} B`
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
@@ -149,7 +149,7 @@ export function DocumentArchivePanel({ matterId, tenantId }: DocumentArchivePane
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
 
-  // Directive 36.2: Cross-locale search — resolves "Passport" in any of the
+  // Directive 36.2: Cross-locale search  -  resolves "Passport" in any of the
   // Global 15 languages to its English canonical equivalents so document
   // filtering works regardless of the active Globe locale.
   const { crossMatch } = useCrossLocaleSearch(searchQuery)
@@ -179,7 +179,7 @@ export function DocumentArchivePanel({ matterId, tenantId }: DocumentArchivePane
     })
   }, [grouped])
 
-  // Filter documents — uses cross-locale matching (Directive 36.2)
+  // Filter documents  -  uses cross-locale matching (Directive 36.2)
   const filteredDocs = useMemo(() => {
     let docs = selectedCategory ? (grouped[selectedCategory] ?? []) : documents
     if (searchQuery.trim()) {
@@ -398,7 +398,7 @@ function DocumentArchiveCard({
     : null
   const { sourceLanguage, languageLabel, languageNative, checksumSha256, isMigrated } = extractDocMeta(doc)
 
-  // Sentinel Shield state — polled every 2s via useVaultIntegrityPolling
+  // Sentinel Shield state  -  polled every 2s via useVaultIntegrityPolling
   const tamperStatus = integrity?.tamper_status ?? doc.tamper_status ?? null
   const isTampered = tamperStatus === 'tampered'
   const isVerified = tamperStatus === 'verified'
@@ -434,10 +434,10 @@ function DocumentArchiveCard({
               {doc.file_name}
             </p>
 
-            {/* Sentinel Shield — tamper-aware (Directive 28.2) */}
+            {/* Sentinel Shield  -  tamper-aware (Directive 28.2) */}
             {isTampered && (
               <>
-                <NorvaWhisper title={t('status.sentinel_tamper_title', 'SENTINEL ALERT — Tamper Detected')} side="top">
+                <NorvaWhisper title={t('status.sentinel_tamper_title', 'SENTINEL ALERT  -  Tamper Detected')} side="top">
                   {`${t('status.sentinel_tamper_body', 'Document hash mismatch detected. This document has been modified outside NorvaOS.')}\n\nExpected: ${(checksumSha256 || doc.content_hash || '').slice(0, 16)}...\nStored:   ${(integrity?.content_hash || '').slice(0, 16)}...`}
                 </NorvaWhisper>
                 <Badge
@@ -452,7 +452,7 @@ function DocumentArchiveCard({
             )}
             {!isTampered && hasHash && isVerified && (
               <>
-                <NorvaWhisper title={t('status.vault_verified_title', 'Norva Vault — Integrity Verified')} side="top">
+                <NorvaWhisper title={t('status.vault_verified_title', 'Norva Vault  -  Integrity Verified')} side="top">
                   SHA-256: {(checksumSha256 || doc.content_hash || '').slice(0, 16)}...{(checksumSha256 || doc.content_hash || '').slice(-8)}
                   {'\n'}{t('status.vault_verified_body', 'This document is hash-locked in the Norva Vault. Any tampering will be detected.')}
                 </NorvaWhisper>
@@ -461,7 +461,7 @@ function DocumentArchiveCard({
             )}
             {!isTampered && hasHash && !isVerified && (
               <>
-                <NorvaWhisper title="Norva Vault — Awaiting Verification" side="top">
+                <NorvaWhisper title="Norva Vault  -  Awaiting Verification" side="top">
                   SHA-256: {(checksumSha256 || doc.content_hash || '').slice(0, 16)}...
                   {'\n'}Hash recorded but not yet verified against storage. Click to verify.
                 </NorvaWhisper>

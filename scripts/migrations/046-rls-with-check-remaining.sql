@@ -1,5 +1,5 @@
 -- ============================================================================
--- Migration 046: RLS WITH CHECK — Remaining Tenant-Scoped Tables
+-- Migration 046: RLS WITH CHECK  -  Remaining Tenant-Scoped Tables
 -- ============================================================================
 -- Go/No-Go audit revealed 14 tenant-scoped tables that were not covered by
 -- migration 045. These tables exist, have tenant_id, but were missing from
@@ -34,7 +34,7 @@ BEGIN
       SELECT 1 FROM information_schema.tables
       WHERE table_schema = 'public' AND table_name = t
     ) THEN
-      RAISE NOTICE 'Skipping % — table does not exist', t;
+      RAISE NOTICE 'Skipping %  -  table does not exist', t;
       CONTINUE;
     END IF;
 
@@ -43,7 +43,7 @@ BEGIN
       SELECT 1 FROM information_schema.columns
       WHERE table_schema = 'public' AND table_name = t AND column_name = 'tenant_id'
     ) THEN
-      RAISE NOTICE 'Skipping % — no tenant_id column', t;
+      RAISE NOTICE 'Skipping %  -  no tenant_id column', t;
       CONTINUE;
     END IF;
 

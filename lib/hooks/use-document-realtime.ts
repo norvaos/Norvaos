@@ -7,7 +7,7 @@ import { createClient } from '@/lib/supabase/client'
 /**
  * Subscribes to real-time document status changes for a specific matter.
  *
- * Directive 012: "Single Tab" Persistence — when a client uploads via
+ * Directive 012: "Single Tab" Persistence  -  when a client uploads via
  * Kiosk or Portal, the lawyer's dashboard updates instantly without refresh.
  *
  * Invalidates:
@@ -53,7 +53,7 @@ export function useDocumentRealtime(matterId: string | undefined) {
 }
 
 /**
- * Dashboard-level realtime hook — listens for document changes across
+ * Dashboard-level realtime hook  -  listens for document changes across
  * ALL matters. Used on the main dashboard to update stats/widgets
  * when any document is uploaded tenant-wide.
  *

@@ -1,10 +1,10 @@
 'use client'
 
 /**
- * RightDrawer (Zone 5) — Slide-over drawer panel.
+ * RightDrawer (Zone 5)  -  Slide-over drawer panel.
  *
  * Renders sub-panels based on the selected Zone 4 rail item.
- * Content is lazy-loaded — only mounted when first opened.
+ * Content is lazy-loaded  -  only mounted when first opened.
  * Previously-opened panels stay mounted for state preservation.
  */
 

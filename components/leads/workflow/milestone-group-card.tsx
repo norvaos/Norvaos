@@ -39,7 +39,7 @@ export function MilestoneGroupCard({
 
   return (
     <div className="rounded-lg border">
-      {/* Group Header — always visible, clickable to expand/collapse */}
+      {/* Group Header  -  always visible, clickable to expand/collapse */}
       <button
         type="button"
         onClick={() => setExpanded(!expanded)}
@@ -81,7 +81,7 @@ export function MilestoneGroupCard({
         </div>
       </div>
 
-      {/* Tasks list — collapsible */}
+      {/* Tasks list  -  collapsible */}
       {expanded && (
         <div className="px-2 pb-2 space-y-0.5">
           {group.tasks.map((task) => (

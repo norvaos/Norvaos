@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * MatterCommandCenter — unified matter workspace layout.
+ * MatterCommandCenter  -  unified matter workspace layout.
  *
  * Replaces the legacy tabbed layout and augments the immigration workspace
  * with a persistent left sidebar and always-visible action toolbar.

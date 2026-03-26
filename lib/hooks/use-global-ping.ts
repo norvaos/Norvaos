@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * useGlobalPing — Notification toasts for system-wide events.
+ * useGlobalPing  -  Notification toasts for system-wide events.
  *
  * Subscribes to a tenant-scoped Supabase Realtime channel and fires
  * toast notifications when COMMAND or TITAN events occur:
@@ -14,11 +14,11 @@
  *
  * TITAN events (system-generated):
  *  - auto_fee          → "Auto-fee generated: ${amount} on {matter}"
- *  - deadline_warning  → "Deadline approaching: {matter} — {deadline}"
+ *  - deadline_warning  → "Deadline approaching: {matter}  -  {deadline}"
  *  - stage_advanced    → "{matter} advanced to {stage}"
  *
  * Channel: `tenant:{tenantId}:pings`
- * SENTINEL: channel is scoped to tenant_id — no cross-tenant leaks.
+ * SENTINEL: channel is scoped to tenant_id  -  no cross-tenant leaks.
  */
 
 import { useEffect, useRef } from 'react'
@@ -51,7 +51,7 @@ export interface PingPayload {
 
 interface UseGlobalPingOptions {
   tenantId: string | null
-  /** Current user's DB id — used to suppress self-triggered pings */
+  /** Current user's DB id  -  used to suppress self-triggered pings */
   userId: string | null
   enabled?: boolean
 }
@@ -142,7 +142,7 @@ export function broadcastPing(tenantId: string, payload: PingPayload) {
     channel.subscribe((status) => {
       if (status === 'SUBSCRIBED') {
         channel.send({ type: 'broadcast', event: 'ping', payload })
-        // Unsubscribe after sending — this is a fire-and-forget
+        // Unsubscribe after sending  -  this is a fire-and-forget
         setTimeout(() => channel.unsubscribe(), 500)
       }
     })

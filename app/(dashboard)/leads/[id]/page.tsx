@@ -140,7 +140,7 @@ function usePracticeAreas(tenantId: string) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// LEAD DETAIL PAGE — 3-PANEL WORKFLOW VIEW
+// LEAD DETAIL PAGE  -  3-PANEL WORKFLOW VIEW
 // ═══════════════════════════════════════════════════════════════════════════════
 
 export default function LeadDetailPage() {
@@ -255,7 +255,7 @@ export default function LeadDetailPage() {
   }
 
   /**
-   * handleConvertAttempt — Intercepts the "Convert to Matter" action.
+   * handleConvertAttempt  -  Intercepts the "Convert to Matter" action.
    * Checks the retainer_signed gate FIRST. If no signed retainer is found,
    * opens the Compliance Gate modal instead of proceeding directly.
    */
@@ -269,7 +269,7 @@ export default function LeadDetailPage() {
       // Open compliance gate modal instead
       setShowComplianceGate(true)
     } else {
-      // Retainer gate passes — open normal convert dialog
+      // Retainer gate passes  -  open normal convert dialog
       setShowConvertDialog(true)
     }
   }
@@ -305,7 +305,7 @@ export default function LeadDetailPage() {
           }
         },
         onError: (error: Error) => {
-          // Gracefully handle 403 Sentinel violations — show inline banner, don't crash
+          // Gracefully handle 403 Sentinel violations  -  show inline banner, don't crash
           const msg = error.message || 'An unexpected error occurred'
           if (
             msg.includes('Permission denied') ||
@@ -321,7 +321,7 @@ export default function LeadDetailPage() {
     )
   }
 
-  /** Handle compliance gate bypass — proceed to convert dialog */
+  /** Handle compliance gate bypass  -  proceed to convert dialog */
   function handleComplianceBypassConfirmed() {
     setShowComplianceGate(false)
     setShowConvertDialog(true)
@@ -439,7 +439,7 @@ export default function LeadDetailPage() {
 
       {/* 3-Panel Grid */}
       <div className="grid flex-1 overflow-hidden lg:grid-cols-[320px_1fr_360px] md:grid-cols-[1fr_360px] grid-cols-1 gap-0">
-        {/* Left Panel — Communication (desktop only) */}
+        {/* Left Panel  -  Communication (desktop only) */}
         <div className="hidden lg:flex flex-col border-r overflow-hidden">
           <CommunicationPanel
             events={communicationEvents}
@@ -451,7 +451,7 @@ export default function LeadDetailPage() {
           />
         </div>
 
-        {/* Centre Panel — Summary & Activity */}
+        {/* Centre Panel  -  Summary & Activity */}
         <div className="flex flex-col overflow-y-auto">
           <CentrePanel
             lead={lead}
@@ -476,7 +476,7 @@ export default function LeadDetailPage() {
           />
         </div>
 
-        {/* Right Panel — Milestones & Tasks */}
+        {/* Right Panel  -  Milestones & Tasks */}
         <div className="hidden md:flex flex-col border-l overflow-hidden">
           <RightPanel
             currentStage={currentStage}

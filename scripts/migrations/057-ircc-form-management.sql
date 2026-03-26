@@ -1,19 +1,19 @@
 -- ═══════════════════════════════════════════════════════════════════════════════
--- 057 — IRCC Form Management Platform
+-- 057  -  IRCC Form Management Platform
 -- ═══════════════════════════════════════════════════════════════════════════════
 --
 -- Creates the database-driven form management system that replaces the
 -- hardcoded form-field-registry.ts / pack-constants.ts / xfa-filler maps.
 --
 -- Tables:
---   ircc_forms           — Uploaded form templates (PDFs)
---   ircc_form_sections   — Questionnaire sections per form
---   ircc_form_fields     — Extracted XFA fields + admin field mappings
---   ircc_form_array_maps — Array/repeater field configurations
---   ircc_stream_forms    — Junction: case type ↔ forms
+--   ircc_forms            -  Uploaded form templates (PDFs)
+--   ircc_form_sections    -  Questionnaire sections per form
+--   ircc_form_fields      -  Extracted XFA fields + admin field mappings
+--   ircc_form_array_maps  -  Array/repeater field configurations
+--   ircc_stream_forms     -  Junction: case type ↔ forms
 -- ═══════════════════════════════════════════════════════════════════════════════
 
--- ── 1. ircc_forms — Form Library ─────────────────────────────────────────────
+-- ── 1. ircc_forms  -  Form Library ─────────────────────────────────────────────
 
 CREATE TABLE IF NOT EXISTS ircc_forms (
   id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -60,7 +60,7 @@ CREATE POLICY ircc_forms_delete ON ircc_forms
   USING (tenant_id = public.get_current_tenant_id());
 
 
--- ── 2. ircc_form_sections — Questionnaire Sections ──────────────────────────
+-- ── 2. ircc_form_sections  -  Questionnaire Sections ──────────────────────────
 
 CREATE TABLE IF NOT EXISTS ircc_form_sections (
   id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -97,7 +97,7 @@ CREATE POLICY ircc_form_sections_delete ON ircc_form_sections
   USING (tenant_id = public.get_current_tenant_id());
 
 
--- ── 3. ircc_form_fields — Extracted + Mapped Fields ─────────────────────────
+-- ── 3. ircc_form_fields  -  Extracted + Mapped Fields ─────────────────────────
 
 CREATE TABLE IF NOT EXISTS ircc_form_fields (
   id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -172,7 +172,7 @@ CREATE POLICY ircc_form_fields_delete ON ircc_form_fields
   USING (tenant_id = public.get_current_tenant_id());
 
 
--- ── 4. ircc_form_array_maps — Array Field Configurations ────────────────────
+-- ── 4. ircc_form_array_maps  -  Array Field Configurations ────────────────────
 
 CREATE TABLE IF NOT EXISTS ircc_form_array_maps (
   id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -209,7 +209,7 @@ CREATE POLICY ircc_form_array_maps_delete ON ircc_form_array_maps
   USING (tenant_id = public.get_current_tenant_id());
 
 
--- ── 5. ircc_stream_forms — Case Type ↔ Forms Junction ───────────────────────
+-- ── 5. ircc_stream_forms  -  Case Type ↔ Forms Junction ───────────────────────
 
 CREATE TABLE IF NOT EXISTS ircc_stream_forms (
   id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),

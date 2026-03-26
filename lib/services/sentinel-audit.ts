@@ -47,7 +47,7 @@ export interface SentinelLogInput {
 /**
  * Log a security event to the immutable sentinel_audit_log.
  * Uses admin client (service_role) to bypass RLS.
- * Fire-and-forget safe — errors are caught and logged to console.
+ * Fire-and-forget safe  -  errors are caught and logged to console.
  */
 export async function logSentinelEvent(input: SentinelLogInput): Promise<void> {
   try {

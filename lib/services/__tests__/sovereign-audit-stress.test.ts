@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Directive 017 — "Sovereign Audit" Stress Test (Final Beta Gate)
+ * Directive 017  -  "Sovereign Audit" Stress Test (Final Beta Gate)
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Worst-case scenario tests for the Sovereign Fortress:
@@ -15,7 +15,7 @@
  *     Violation" and turn the Shield icon amber.
  *
  *   TEST 3: Immutability Fortress
- *     Genesis blocks cannot be overwritten — only revoked by Partner.
+ *     Genesis blocks cannot be overwritten  -  only revoked by Partner.
  *
  *   TEST 4: Revocation requires Partner-level + documented reason.
  *
@@ -210,10 +210,10 @@ function evaluateCompliancePillars(payload: GenesisPayload): {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// TEST 1: GHOST TRANSACTION — Direct INSERT Breaks Hash Chain
+// TEST 1: GHOST TRANSACTION  -  Direct INSERT Breaks Hash Chain
 // ═══════════════════════════════════════════════════════════════════════════════
 
-describe('Directive 017 — TEST 1: Ghost Transaction (Hash Chain Break)', () => {
+describe('Directive 017  -  TEST 1: Ghost Transaction (Hash Chain Break)', () => {
   it('a properly built chain of 5 entries validates successfully', () => {
     const chain = buildAuditChain(5)
     const result = verifyChain(chain)
@@ -224,7 +224,7 @@ describe('Directive 017 — TEST 1: Ghost Transaction (Hash Chain Break)', () =>
   it('a ghost transaction injected at position 3 breaks the chain', () => {
     const chain = buildAuditChain(5)
 
-    // GHOST: Direct INSERT at position 3 — no prev_hash linking
+    // GHOST: Direct INSERT at position 3  -  no prev_hash linking
     const ghost: AuditLogEntry = {
       chain_seq: 3,
       id: 'ghost-txn-9999',
@@ -235,7 +235,7 @@ describe('Directive 017 — TEST 1: Ghost Transaction (Hash Chain Break)', () =>
       matter_id: 'matter-001',
       user_id: 'attacker-001',
       metadata: JSON.stringify({ amount_cents: 100000, note: 'Ghost $1,000.00 deposit' }),
-      reason_for_change: 'Ghost transaction — bypassed service layer',
+      reason_for_change: 'Ghost transaction  -  bypassed service layer',
       created_at: new Date(2026, 2, 23, 10, 0, 0).toISOString(),
       prev_hash: 'FAKE_HASH_NOT_IN_CHAIN',
       row_hash: 'FAKE_ROW_HASH_NOT_COMPUTED',
@@ -320,17 +320,17 @@ describe('Directive 017 — TEST 1: Ghost Transaction (Hash Chain Break)', () =>
 })
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// TEST 2: TIME-TRAVEL CONFLICT — Sequence Violation Detection
+// TEST 2: TIME-TRAVEL CONFLICT  -  Sequence Violation Detection
 // ═══════════════════════════════════════════════════════════════════════════════
 
-describe('Directive 017 — TEST 2: Time-Travel Conflict (Sequence Violation)', () => {
+describe('Directive 017  -  TEST 2: Time-Travel Conflict (Sequence Violation)', () => {
   it('CORRECT order: conflict cleared BEFORE retainer signed → compliant', () => {
     const payload: GenesisPayload = {
       matter_id: 'matter-001',
       conflict_check: {
         scan_id: 'scan-001',
         decision: 'no_conflict',
-        decided_at: '2026-03-20T10:00:00Z',  // March 20 — BEFORE retainer
+        decided_at: '2026-03-20T10:00:00Z',  // March 20  -  BEFORE retainer
       },
       kyc_verification: {
         verification_id: 'kyc-001',
@@ -340,7 +340,7 @@ describe('Directive 017 — TEST 2: Time-Travel Conflict (Sequence Violation)', 
       retainer_agreement: {
         agreement_id: 'ret-001',
         status: 'signed',
-        signed_at: '2026-03-22T10:00:00Z',   // March 22 — AFTER conflict check
+        signed_at: '2026-03-22T10:00:00Z',   // March 22  -  AFTER conflict check
         retainer_hash: createHash('sha256').update('retainer-pdf-content').digest('hex'),
       },
       trust_ledger_anchor: {
@@ -354,7 +354,7 @@ describe('Directive 017 — TEST 2: Time-Travel Conflict (Sequence Violation)', 
     expect(result.isCompliant).toBe(true)
     expect(result.hasSequenceViolation).toBe(false)
     expect(result.notes).toHaveLength(0)
-    console.log(`\n  TIME-TRAVEL TEST — CORRECT ORDER:`)
+    console.log(`\n  TIME-TRAVEL TEST  -  CORRECT ORDER:`)
     console.log(`    Conflict decided: 2026-03-20`)
     console.log(`    Retainer signed:  2026-03-22`)
     console.log(`    Sequence: ✓ (conflict BEFORE retainer)`)
@@ -367,7 +367,7 @@ describe('Directive 017 — TEST 2: Time-Travel Conflict (Sequence Violation)', 
       conflict_check: {
         scan_id: 'scan-002',
         decision: 'no_conflict',
-        decided_at: '2026-03-25T10:00:00Z',  // March 25 — AFTER retainer!
+        decided_at: '2026-03-25T10:00:00Z',  // March 25  -  AFTER retainer!
       },
       kyc_verification: {
         verification_id: 'kyc-002',
@@ -377,7 +377,7 @@ describe('Directive 017 — TEST 2: Time-Travel Conflict (Sequence Violation)', 
       retainer_agreement: {
         agreement_id: 'ret-002',
         status: 'signed',
-        signed_at: '2026-03-22T10:00:00Z',   // March 22 — BEFORE conflict check!
+        signed_at: '2026-03-22T10:00:00Z',   // March 22  -  BEFORE conflict check!
         retainer_hash: createHash('sha256').update('retainer-pdf-v2').digest('hex'),
       },
       trust_ledger_anchor: {
@@ -393,10 +393,10 @@ describe('Directive 017 — TEST 2: Time-Travel Conflict (Sequence Violation)', 
     expect(result.notes.some((n) => n.includes('SEQUENCE VIOLATION'))).toBe(true)
     expect(result.notes.some((n) => n.includes('AFTER retainer signing'))).toBe(true)
 
-    console.log(`\n  TIME-TRAVEL TEST — SEQUENCE VIOLATION:`)
+    console.log(`\n  TIME-TRAVEL TEST  -  SEQUENCE VIOLATION:`)
     console.log(`    Conflict decided: 2026-03-25`)
     console.log(`    Retainer signed:  2026-03-22`)
-    console.log(`    Sequence: ✗ (conflict AFTER retainer — 3 day gap!)`)
+    console.log(`    Sequence: ✗ (conflict AFTER retainer  -  3 day gap!)`)
     console.log(`    Shield colour: AMBER ⚠`)
     console.log(`    Note: "${result.notes.find((n) => n.includes('SEQUENCE'))?.slice(0, 80)}..."`)
   })
@@ -467,7 +467,7 @@ describe('Directive 017 — TEST 2: Time-Travel Conflict (Sequence Violation)', 
 // TEST 3: IDEMPOTENCY & IMMUTABILITY FORTRESS
 // ═══════════════════════════════════════════════════════════════════════════════
 
-describe('Directive 017 — TEST 3: Idempotency & Immutability', () => {
+describe('Directive 017  -  TEST 3: Idempotency & Immutability', () => {
   // Simulated genesis block store
   const genesisStore = new Map<string, {
     genesis_hash: string
@@ -479,7 +479,7 @@ describe('Directive 017 — TEST 3: Idempotency & Immutability', () => {
   function simulateGenerate(matterId: string): { success: boolean; error?: string } {
     const existing = genesisStore.get(matterId)
     if (existing && !existing.is_revoked) {
-      return { success: false, error: `Genesis block already exists for matter ${matterId}. Cannot regenerate — use revocation.` }
+      return { success: false, error: `Genesis block already exists for matter ${matterId}. Cannot regenerate  -  use revocation.` }
     }
     genesisStore.set(matterId, {
       genesis_hash: createHash('sha256').update(matterId + Date.now()).digest('hex'),
@@ -535,7 +535,7 @@ describe('Directive 017 — TEST 3: Idempotency & Immutability', () => {
       'matter-immutability-001',
       'user-partner',
       'partner',
-      'Client information was entered incorrectly during intake — requires correction and re-sealing.',
+      'Client information was entered incorrectly during intake  -  requires correction and re-sealing.',
     )
     expect(result.success).toBe(true)
     console.log(`\n  REVOCATION TEST:`)
@@ -551,10 +551,10 @@ describe('Directive 017 — TEST 3: Idempotency & Immutability', () => {
 })
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// TEST 4: TRUST LEDGER ANCHOR — Balance Parity
+// TEST 4: TRUST LEDGER ANCHOR  -  Balance Parity
 // ═══════════════════════════════════════════════════════════════════════════════
 
-describe('Directive 017 — TEST 4: Trust Ledger Anchor', () => {
+describe('Directive 017  -  TEST 4: Trust Ledger Anchor', () => {
   it('genesis payload includes last_trust_audit_hash from chain', () => {
     const chain = buildAuditChain(5)
     const lastHash = chain[chain.length - 1].row_hash
@@ -598,10 +598,10 @@ describe('Directive 017 — TEST 4: Trust Ledger Anchor', () => {
 // COMBINED REPORT
 // ═══════════════════════════════════════════════════════════════════════════════
 
-describe('Directive 017 — Final Beta Gate Report', () => {
+describe('Directive 017  -  Final Beta Gate Report', () => {
   it('generates sovereign audit summary', () => {
     console.log(`\n  ══════════════════════════════════════════════`)
-    console.log(`  DIRECTIVE 017 — SOVEREIGN AUDIT STRESS TEST`)
+    console.log(`  DIRECTIVE 017  -  SOVEREIGN AUDIT STRESS TEST`)
     console.log(`  ══════════════════════════════════════════════`)
     console.log(`  TEST 1: Ghost Transaction         → REJECTED`)
     console.log(`    Hash chain breaks on injected row.`)

@@ -87,7 +87,7 @@ VALUES (v_tenant_id, 'Clerk', 'View-only access with limited editing', '{"contac
 RETURNING id INTO v_clerk_role_id;
 
 -- ============================================================================
--- 3. USERS (linked to fake auth UUIDs for demo — these won't have real auth)
+-- 3. USERS (linked to fake auth UUIDs for demo  -  these won't have real auth)
 -- ============================================================================
 INSERT INTO users (tenant_id, auth_user_id, email, first_name, last_name, role_id, settings)
 VALUES (v_tenant_id, gen_random_uuid(), 'zia@zia.ca', 'Zia', 'Waseer', v_admin_role_id, '{}'::jsonb)
@@ -230,19 +230,19 @@ VALUES (v_tenant_id, 'Sharma Family PR Application', v_pa_immigration, v_user_la
 RETURNING id INTO v_matter1;
 
 INSERT INTO matters (tenant_id, title, practice_area_id, responsible_lawyer_id, billing_type, hourly_rate, estimated_value, priority, status, date_opened, next_deadline, created_by)
-VALUES (v_tenant_id, 'Rodriguez v. Rodriguez — Divorce', v_pa_family, v_user_lawyer2, 'hourly', 350.00, 15000.00, 'medium', 'active', CURRENT_DATE - INTERVAL '30 days', CURRENT_DATE + INTERVAL '14 days', v_user_lawyer2)
+VALUES (v_tenant_id, 'Rodriguez v. Rodriguez  -  Divorce', v_pa_family, v_user_lawyer2, 'hourly', 350.00, 15000.00, 'medium', 'active', CURRENT_DATE - INTERVAL '30 days', CURRENT_DATE + INTERVAL '14 days', v_user_lawyer2)
 RETURNING id INTO v_matter2;
 
 INSERT INTO matters (tenant_id, title, practice_area_id, responsible_lawyer_id, billing_type, estimated_value, priority, status, date_opened, created_by)
-VALUES (v_tenant_id, 'Wilson Technologies — Share Purchase', v_pa_corporate, v_user_admin, 'flat_fee', 25000.00, 'high', 'active', CURRENT_DATE - INTERVAL '20 days', v_user_admin)
+VALUES (v_tenant_id, 'Wilson Technologies  -  Share Purchase', v_pa_corporate, v_user_admin, 'flat_fee', 25000.00, 'high', 'active', CURRENT_DATE - INTERVAL '20 days', v_user_admin)
 RETURNING id INTO v_matter3;
 
 INSERT INTO matters (tenant_id, title, practice_area_id, responsible_lawyer_id, billing_type, hourly_rate, estimated_value, priority, status, date_opened, next_deadline, created_by)
-VALUES (v_tenant_id, 'Kim Property Purchase — 45 Lakeshore Rd', v_pa_real_estate, v_user_lawyer1, 'flat_fee', NULL, 3500.00, 'medium', 'active', CURRENT_DATE - INTERVAL '10 days', CURRENT_DATE + INTERVAL '45 days', v_user_lawyer1)
+VALUES (v_tenant_id, 'Kim Property Purchase  -  45 Lakeshore Rd', v_pa_real_estate, v_user_lawyer1, 'flat_fee', NULL, 3500.00, 'medium', 'active', CURRENT_DATE - INTERVAL '10 days', CURRENT_DATE + INTERVAL '45 days', v_user_lawyer1)
 RETURNING id INTO v_matter4;
 
 INSERT INTO matters (tenant_id, title, practice_area_id, responsible_lawyer_id, billing_type, hourly_rate, estimated_value, priority, status, date_opened, statute_of_limitations, created_by)
-VALUES (v_tenant_id, 'O''Brien v. GreenCorp — Personal Injury', v_pa_litigation, v_user_lawyer2, 'contingency', NULL, 75000.00, 'urgent', 'active', CURRENT_DATE - INTERVAL '60 days', (CURRENT_DATE + INTERVAL '18 months')::DATE, v_user_lawyer2)
+VALUES (v_tenant_id, 'O''Brien v. GreenCorp  -  Personal Injury', v_pa_litigation, v_user_lawyer2, 'contingency', NULL, 75000.00, 'urgent', 'active', CURRENT_DATE - INTERVAL '60 days', (CURRENT_DATE + INTERVAL '18 months')::DATE, v_user_lawyer2)
 RETURNING id INTO v_matter5;
 
 INSERT INTO matters (tenant_id, title, practice_area_id, responsible_lawyer_id, billing_type, estimated_value, priority, status, date_opened, date_closed, created_by)
@@ -273,10 +273,10 @@ INSERT INTO leads (tenant_id, contact_id, pipeline_id, stage_id, source, estimat
 VALUES (v_tenant_id, v_contact9, v_pipeline_lead, v_stage_qualified, 'Phone Inquiry', 12000.00, v_user_admin, 'hot', 'Business incorporation and commercial lease review', CURRENT_DATE + INTERVAL '1 day', v_user_admin);
 
 INSERT INTO leads (tenant_id, contact_id, pipeline_id, stage_id, source, estimated_value, assigned_to, temperature, notes, created_by)
-VALUES (v_tenant_id, v_contact10, v_pipeline_lead, v_stage_proposal, 'Website', 3500.00, v_user_lawyer1, 'warm', 'Property purchase in Mississauga — awaiting signed retainer', v_user_lawyer1);
+VALUES (v_tenant_id, v_contact10, v_pipeline_lead, v_stage_proposal, 'Website', 3500.00, v_user_lawyer1, 'warm', 'Property purchase in Mississauga  -  awaiting signed retainer', v_user_lawyer1);
 
 INSERT INTO leads (tenant_id, contact_id, pipeline_id, stage_id, source, estimated_value, assigned_to, temperature, notes, created_by)
-VALUES (v_tenant_id, v_contact_org2, v_pipeline_lead, v_stage_contacted, 'Event', 20000.00, v_user_admin, 'cold', 'Met at Ontario Bar networking event — commercial lease portfolio', v_user_admin);
+VALUES (v_tenant_id, v_contact_org2, v_pipeline_lead, v_stage_contacted, 'Event', 20000.00, v_user_admin, 'cold', 'Met at Ontario Bar networking event  -  commercial lease portfolio', v_user_admin);
 
 -- ============================================================================
 -- 10. TASKS
@@ -308,7 +308,7 @@ VALUES (v_tenant_id, 'Complete due diligence checklist', v_matter3, v_user_paral
 
 -- Tasks for Kim Property Purchase
 INSERT INTO tasks (tenant_id, title, matter_id, assigned_to, status, priority, due_date, created_by)
-VALUES (v_tenant_id, 'Order title search — 45 Lakeshore Rd', v_matter4, v_user_clerk, 'completed', 'medium', CURRENT_DATE - INTERVAL '3 days', v_user_lawyer1);
+VALUES (v_tenant_id, 'Order title search  -  45 Lakeshore Rd', v_matter4, v_user_clerk, 'completed', 'medium', CURRENT_DATE - INTERVAL '3 days', v_user_lawyer1);
 
 INSERT INTO tasks (tenant_id, title, matter_id, assigned_to, status, priority, due_date, created_by)
 VALUES (v_tenant_id, 'Review title insurance options', v_matter4, v_user_lawyer1, 'pending', 'medium', CURRENT_DATE + INTERVAL '7 days', v_user_lawyer1);
@@ -341,7 +341,7 @@ INSERT INTO activities (tenant_id, activity_type, entity_type, entity_id, user_i
 VALUES (v_tenant_id, 'note_added', 'matter', v_matter1, v_user_lawyer1, 'Case assessment completed', 'Reviewed eligibility criteria. Client qualifies under CEC stream.');
 
 INSERT INTO activities (tenant_id, activity_type, entity_type, entity_id, user_id, title, description)
-VALUES (v_tenant_id, 'status_changed', 'matter', v_matter6, v_user_lawyer1, 'Matter closed — won', 'Work permit approved. Client notified.');
+VALUES (v_tenant_id, 'status_changed', 'matter', v_matter6, v_user_lawyer1, 'Matter closed  -  won', 'Work permit approved. Client notified.');
 
 INSERT INTO activities (tenant_id, activity_type, entity_type, entity_id, user_id, title, description)
 VALUES (v_tenant_id, 'email_sent', 'contact', v_contact2, v_user_lawyer2, 'Sent intake questionnaire', 'Emailed family law intake form to Maria Rodriguez.');

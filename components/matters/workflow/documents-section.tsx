@@ -95,7 +95,7 @@ const REJECTION_REASON_OPTIONS: { code: RejectionReasonCode; label: string; defa
   },
   {
     code: 'incomplete',
-    label: 'Incomplete — missing pages',
+    label: 'Incomplete  -  missing pages',
     defaultText: 'The document appears to be missing pages or required sections. Please upload the complete document.',
   },
   {
@@ -879,7 +879,7 @@ function InlineSlotRow({
         {/* Status badge */}
         <StatusBadge status={status} />
 
-        {/* View button — shown whenever a document has been uploaded */}
+        {/* View button  -  shown whenever a document has been uploaded */}
         {hasDocument && (
           <Button
             variant="ghost"
@@ -966,7 +966,7 @@ function InlineSlotRow({
         </Button>
       </div>
 
-      {/* Document Viewer — lazy-fetches latest version on open */}
+      {/* Document Viewer  -  lazy-fetches latest version on open */}
       <ViewDocumentDialog
         slotId={slot.id}
         slotName={slot.slot_name}

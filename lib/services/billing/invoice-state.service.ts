@@ -1,5 +1,5 @@
 // ============================================================================
-// Invoice State Service — status transition enforcement (Billing Module)
+// Invoice State Service  -  status transition enforcement (Billing Module)
 // ============================================================================
 // Manages all invoice lifecycle transitions.  The allowed graph is:
 //
@@ -14,7 +14,7 @@
 //   • Only finalized invoices may be sent (batch-send targets finalized only).
 //   • viewed is client-driven only (portal token view event).
 //   • void and cancelled are only allowed before payment is received.
-//   • paid and written_off are terminal — no further transitions.
+//   • paid and written_off are terminal  -  no further transitions.
 //   • Paid invoices are immutable (DB trigger backs this up).
 // ============================================================================
 
@@ -260,10 +260,10 @@ export async function markInvoiceViewed(input: MarkViewedInput): Promise<Service
 
   if (fetchErr || !invoice) return { success: false, error: 'Invoice not found' }
 
-  // Viewed is only set once — idempotent if already viewed, sent, or later
+  // Viewed is only set once  -  idempotent if already viewed, sent, or later
   const currentStatus = invoice.status as InvoiceStatus
   if (!canTransition(currentStatus, 'viewed')) {
-    // If already past 'viewed' (e.g. partially_paid), this is a no-op — not an error
+    // If already past 'viewed' (e.g. partially_paid), this is a no-op  -  not an error
     return { success: true }
   }
 
@@ -275,7 +275,7 @@ export async function markInvoiceViewed(input: MarkViewedInput): Promise<Service
 
   if (error) return { success: false, error: error.message }
 
-  // performedBy may be null for unauthenticated portal views —
+  // performedBy may be null for unauthenticated portal views  - 
   // appendAuditEvent skips the insert when performedBy is null
   await appendAuditEvent({
     supabase,
@@ -326,7 +326,7 @@ export async function voidInvoice(input: VoidInvoiceInput): Promise<ServiceResul
     }
   }
 
-  // Block void if an active payment plan exists — cancel the plan first
+  // Block void if an active payment plan exists  -  cancel the plan first
   const { data: activePlan } = await fromPaymentPlans(supabase)
     .select('id')
     .eq('invoice_id', invoiceId)

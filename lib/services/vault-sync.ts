@@ -1,5 +1,5 @@
 /**
- * Vault Sync Service — Bi-Directional Contact ↔ Matter Data Sync
+ * Vault Sync Service  -  Bi-Directional Contact ↔ Matter Data Sync
  *
  * Ensures contacts.immigration_data and matter_custom_data act as a
  * single source of truth. Data entered once is accessible across all
@@ -180,7 +180,7 @@ export async function syncMatterToContact(
     : 0
 
   // If the contact was modified MORE RECENTLY than the matter data,
-  // skip the write — the contact record is the authoritative source.
+  // skip the write  -  the contact record is the authoritative source.
   if (contactLastModified > matterLastModified && matterLastModified > 0) {
     return {
       synced: false,

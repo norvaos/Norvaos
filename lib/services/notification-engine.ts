@@ -1,7 +1,7 @@
 /**
  * Unified notification dispatch engine.
  *
- * Provides a single entry point — `dispatchNotification(event)` — that:
+ * Provides a single entry point  -  `dispatchNotification(event)`  -  that:
  *   1. Reads tenant-level notification triggers from `tenants.settings`
  *   2. Checks each recipient's `users.notification_prefs` for opt-out
  *   3. Fans out to enabled channels: in_app, email, push
@@ -46,7 +46,7 @@ const DEFAULT_TRIGGERS: Record<string, ChannelConfig> = {
   stage_change:              { in_app: true, email: true,  push: false },
   task_assigned:             { in_app: true, email: true,  push: true  },
   task_completed:            { in_app: true, email: false, push: false },
-  document_uploaded:         { in_app: false, email: false, push: false }, // Directive 012: suppressed — replaced by matter_ready_for_review
+  document_uploaded:         { in_app: false, email: false, push: false }, // Directive 012: suppressed  -  replaced by matter_ready_for_review
   new_message:               { in_app: true, email: true,  push: true  },
   deadline_approaching:      { in_app: true, email: true,  push: true  },
   matter_updated:            { in_app: true, email: false, push: false },
@@ -78,7 +78,7 @@ export async function dispatchNotification(
 
     // If all channels disabled for this event type, skip
     if (!channelConfig.in_app && !channelConfig.email && !channelConfig.push) {
-      log.debug('Notification skipped — all channels disabled for event', {
+      log.debug('Notification skipped  -  all channels disabled for event', {
         tenant_id: event.tenantId,
         event_type: event.eventType,
       })

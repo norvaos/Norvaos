@@ -11,7 +11,7 @@ import { withTiming } from '@/lib/middleware/request-timing'
 import { z } from 'zod'
 
 // ── Global 15 Invite Content (Directive 40.0 §3) ──────────────────────────
-// Localised invite messages — same pattern as WELCOME_CONTENT in sentinel-handshake
+// Localised invite messages  -  same pattern as WELCOME_CONTENT in sentinel-handshake
 // but tailored for staff/team invitations rather than client portal handshakes.
 
 interface InviteContent {
@@ -214,7 +214,7 @@ async function handlePost(request: Request) {
       return seatLimitResponse(seatCheck)
     }
 
-    // Check for duplicate email — parallel (existing user + pending invite)
+    // Check for duplicate email  -  parallel (existing user + pending invite)
     const [{ data: existingUser }, { data: existingInvite }] = await Promise.all([
       admin
         .from('users')
@@ -305,7 +305,7 @@ async function handlePost(request: Request) {
         localCta: content.cta,
         englishBody: enContent.body(firmName, role.name),
         safeLink: acceptUrl,
-        languageLabel: `${localeInfo.nativeLabel} — ${localeInfo.label}`,
+        languageLabel: `${localeInfo.nativeLabel}  -  ${localeInfo.label}`,
         dir: localeInfo.dir as 'ltr' | 'rtl',
       })
         .then((emailData) => {
@@ -331,7 +331,7 @@ async function handlePost(request: Request) {
           })
         })
     } else {
-      // English-only fallback — original sendInternalEmail path
+      // English-only fallback  -  original sendInternalEmail path
       sendInternalEmail({
         supabase: admin,
         tenantId: auth.tenantId,

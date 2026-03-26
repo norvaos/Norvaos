@@ -1,5 +1,5 @@
 /**
- * Emergency Override Service — Directive 026
+ * Emergency Override Service  -  Directive 026
  *
  * Handles operations that are legally dangerous but may be logically necessary.
  * Every override requires:
@@ -145,7 +145,7 @@ export async function executeEmergencyOverride(
       override_hash: overrideHash,
     })
   } catch {
-    // Table may not exist yet — SENTINEL log is the primary audit trail
+    // Table may not exist yet  -  SENTINEL log is the primary audit trail
   }
 
   return { success: true, overrideHash }

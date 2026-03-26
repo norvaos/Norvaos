@@ -1,21 +1,21 @@
--- 095: Canonical Profile System — Three-Layer IRCC Data Model
+-- 095: Canonical Profile System  -  Three-Layer IRCC Data Model
 --
 -- Creates:
---   1. canonical_profiles — one per contact, owns all canonical fields
---   2. canonical_profile_fields — EAV-style field storage with provenance
---   3. canonical_profile_snapshots — per-matter point-in-time snapshots
---   4. canonical_profile_conflicts — conflict detection when values diverge
---   5. common_field_registry — catalogue of all canonical field keys
+--   1. canonical_profiles  -  one per contact, owns all canonical fields
+--   2. canonical_profile_fields  -  EAV-style field storage with provenance
+--   3. canonical_profile_snapshots  -  per-matter point-in-time snapshots
+--   4. canonical_profile_conflicts  -  conflict detection when values diverge
+--   5. common_field_registry  -  catalogue of all canonical field keys
 --
 -- Three-layer model:
---   Layer 1: canonical_profile_fields — contact-level shared truth
---   Layer 2: canonical_profile_snapshots — matter-level working data
+--   Layer 1: canonical_profile_fields  -  contact-level shared truth
+--   Layer 2: canonical_profile_snapshots  -  matter-level working data
 --   Layer 3: Application form rendering (read-only, assembled at query time)
 --
 -- All tables follow standard RLS pattern: tenant_id via canonical_profiles
 
 -- ═══════════════════════════════════════════════════════════════════════════════
--- 1. canonical_profiles — one per contact
+-- 1. canonical_profiles  -  one per contact
 -- ═══════════════════════════════════════════════════════════════════════════════
 
 CREATE TABLE IF NOT EXISTS canonical_profiles (
@@ -44,7 +44,7 @@ DO $$ BEGIN
 END $$;
 
 -- ═══════════════════════════════════════════════════════════════════════════════
--- 2. canonical_profile_fields — EAV field storage with provenance
+-- 2. canonical_profile_fields  -  EAV field storage with provenance
 -- ═══════════════════════════════════════════════════════════════════════════════
 
 CREATE TABLE IF NOT EXISTS canonical_profile_fields (
@@ -100,7 +100,7 @@ DO $$ BEGIN
 END $$;
 
 -- ═══════════════════════════════════════════════════════════════════════════════
--- 3. canonical_profile_snapshots — per-matter point-in-time snapshots
+-- 3. canonical_profile_snapshots  -  per-matter point-in-time snapshots
 -- ═══════════════════════════════════════════════════════════════════════════════
 
 CREATE TABLE IF NOT EXISTS canonical_profile_snapshots (
@@ -139,7 +139,7 @@ DO $$ BEGIN
 END $$;
 
 -- ═══════════════════════════════════════════════════════════════════════════════
--- 4. canonical_profile_conflicts — conflict detection records
+-- 4. canonical_profile_conflicts  -  conflict detection records
 -- ═══════════════════════════════════════════════════════════════════════════════
 
 CREATE TABLE IF NOT EXISTS canonical_profile_conflicts (
@@ -185,7 +185,7 @@ DO $$ BEGIN
 END $$;
 
 -- ═══════════════════════════════════════════════════════════════════════════════
--- 5. common_field_registry — catalogue of canonical field keys
+-- 5. common_field_registry  -  catalogue of canonical field keys
 -- ═══════════════════════════════════════════════════════════════════════════════
 
 CREATE TABLE IF NOT EXISTS common_field_registry (
@@ -206,7 +206,7 @@ CREATE TABLE IF NOT EXISTS common_field_registry (
 CREATE INDEX IF NOT EXISTS idx_cfr_domain ON common_field_registry(domain);
 CREATE INDEX IF NOT EXISTS idx_cfr_canonical ON common_field_registry(is_canonical) WHERE is_canonical = true;
 
--- common_field_registry is a global catalogue — no RLS needed (no tenant data).
+-- common_field_registry is a global catalogue  -  no RLS needed (no tenant data).
 -- Read-only for app users; only migrations/admin seed data.
 
 -- ═══════════════════════════════════════════════════════════════════════════════

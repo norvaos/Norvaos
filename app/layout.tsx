@@ -58,7 +58,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        {/* Nastaliq CDN Failover — Directive 0.0 Nastaliq Script Audit */}
+        {/* Nastaliq CDN Failover  -  Directive 0.0 Nastaliq Script Audit */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         {/* eslint-disable-next-line @next/next/no-page-custom-font */}
@@ -78,7 +78,7 @@ export default function RootLayout({
             __html: `try{var d=JSON.parse(localStorage.getItem('norvaos-ui')||'{}').state;if(d){if(d.sidebarCollapsed)document.documentElement.setAttribute('data-sidebar-collapsed','');if(d.activePracticeFilter&&d.activePracticeFilter!=='all'){document.documentElement.setAttribute('data-pa-filtered','');if(d.activePracticeColor)document.documentElement.style.setProperty('--pa-color',d.activePracticeColor);if(d.activePracticeName)document.documentElement.setAttribute('data-pa-name',d.activePracticeName)}}}catch(e){}`,
           }}
         />
-        {/* Structured data — helps Google understand the product type and pricing */}
+        {/* Structured data  -  helps Google understand the product type and pricing */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

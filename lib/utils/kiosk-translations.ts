@@ -1,7 +1,7 @@
 import type { PortalLocale } from './portal-translations'
 
 // ============================================================================
-// Kiosk Translations — Multi-Language Support for Lobby Check-In Kiosk
+// Kiosk Translations  -  Multi-Language Support for Lobby Check-In Kiosk
 // ============================================================================
 // Covers all client-facing strings in the kiosk flow.
 // Initial release: English, French, Spanish, Arabic.
@@ -192,7 +192,7 @@ const en: KioskTranslations = {
   step_id_scan: 'ID Scan',
   step_done: 'Done',
 
-  returning_client_button: 'Return Client — No Appointment',
+  returning_client_button: 'Return Client  -  No Appointment',
   returning_client_title: 'Welcome Back',
   returning_client_subtitle: 'Search by your email or phone number to view your file.',
   returning_client_by_email: 'Email',
@@ -204,7 +204,7 @@ const en: KioskTranslations = {
   returning_client_portal_title: 'Your File',
   returning_client_book_apt: 'Book an Appointment',
   returning_client_quick_checkin: 'Quick Check-In (5 min)',
-  returning_client_quick_checkin_desc: "Let us know you're here — a team member will be with you shortly.",
+  returning_client_quick_checkin_desc: "Let us know you're here  -  a team member will be with you shortly.",
   returning_client_pending_docs: '{count} document(s) pending upload',
   returning_client_pending_tasks: '{count} action(s) to complete',
   returning_client_no_matters: 'No active matter on file.',
@@ -289,7 +289,7 @@ const fr: KioskTranslations = {
   step_id_scan: 'Identité',
   step_done: 'Terminé',
 
-  returning_client_button: 'Client de retour — Sans rendez-vous',
+  returning_client_button: 'Client de retour  -  Sans rendez-vous',
   returning_client_title: 'Bon retour',
   returning_client_subtitle: 'Recherchez par courriel ou téléphone pour consulter votre dossier.',
   returning_client_by_email: 'Courriel',
@@ -301,7 +301,7 @@ const fr: KioskTranslations = {
   returning_client_portal_title: 'Votre dossier',
   returning_client_book_apt: 'Prendre un rendez-vous',
   returning_client_quick_checkin: 'Enregistrement rapide (5 min)',
-  returning_client_quick_checkin_desc: "Faites-nous savoir que vous êtes là — un membre de l'équipe sera avec vous sous peu.",
+  returning_client_quick_checkin_desc: "Faites-nous savoir que vous êtes là  -  un membre de l'équipe sera avec vous sous peu.",
   returning_client_pending_docs: '{count} document(s) en attente de téléversement',
   returning_client_pending_tasks: '{count} action(s) à compléter',
   returning_client_no_matters: 'Aucun dossier actif au registre.',
@@ -386,7 +386,7 @@ const es: KioskTranslations = {
   step_id_scan: 'Identidad',
   step_done: 'Listo',
 
-  returning_client_button: 'Cliente anterior — Sin cita',
+  returning_client_button: 'Cliente anterior  -  Sin cita',
   returning_client_title: 'Bienvenido de nuevo',
   returning_client_subtitle: 'Busque por correo o teléfono para ver su expediente.',
   returning_client_by_email: 'Correo',
@@ -398,7 +398,7 @@ const es: KioskTranslations = {
   returning_client_portal_title: 'Su expediente',
   returning_client_book_apt: 'Reservar una cita',
   returning_client_quick_checkin: 'Registro rápido (5 min)',
-  returning_client_quick_checkin_desc: 'Háganos saber que está aquí — un miembro del equipo le atenderá en breve.',
+  returning_client_quick_checkin_desc: 'Háganos saber que está aquí  -  un miembro del equipo le atenderá en breve.',
   returning_client_pending_docs: '{count} documento(s) pendiente(s) de carga',
   returning_client_pending_tasks: '{count} acción(es) por completar',
   returning_client_no_matters: 'No hay expediente activo en el sistema.',
@@ -483,7 +483,7 @@ const ar: KioskTranslations = {
   step_id_scan: 'الهوية',
   step_done: 'تم',
 
-  returning_client_button: 'عميل عائد — بدون موعد',
+  returning_client_button: 'عميل عائد  -  بدون موعد',
   returning_client_title: 'أهلاً بعودتك',
   returning_client_subtitle: 'ابحث بالبريد الإلكتروني أو الهاتف للوصول إلى ملفك.',
   returning_client_by_email: 'البريد',
@@ -495,7 +495,7 @@ const ar: KioskTranslations = {
   returning_client_portal_title: 'ملفك',
   returning_client_book_apt: 'حجز موعد',
   returning_client_quick_checkin: 'تسجيل سريع (5 دقائق)',
-  returning_client_quick_checkin_desc: 'أعلمنا بوصولك — سيكون أحد أعضاء الفريق معك قريباً.',
+  returning_client_quick_checkin_desc: 'أعلمنا بوصولك  -  سيكون أحد أعضاء الفريق معك قريباً.',
   returning_client_pending_docs: '{count} وثيقة/وثائق بانتظار الرفع',
   returning_client_pending_tasks: '{count} إجراء/إجراءات للإكمال',
   returning_client_no_matters: 'لا يوجد ملف نشط في النظام.',

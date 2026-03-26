@@ -367,7 +367,7 @@ export function CollectionActionsPanel({
                       </div>
                       <div className="flex items-center justify-between text-xs text-muted-foreground">
                         <span>Total: {fmtCents(plan.total_amount_cents)}</span>
-                        <span>Next due: {plan.next_due_date ? new Date(plan.next_due_date).toLocaleDateString('en-CA') : '—'}</span>
+                        <span>Next due: {plan.next_due_date ? new Date(plan.next_due_date).toLocaleDateString('en-CA') : ' - '}</span>
                       </div>
                       {/* Progress bar */}
                       <div className="mt-2 h-2 bg-muted rounded-full overflow-hidden">

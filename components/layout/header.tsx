@@ -30,8 +30,10 @@ import {
   Layers,
   ChevronDown,
   X,
+  BookOpen,
 } from 'lucide-react'
 import { useState } from 'react'
+import { useTour } from '@/components/onboarding/compliance-onboarding-tour'
 import { NotificationBell } from '@/components/layout/notification-bell'
 import { UniversalGlobeSelector } from '@/components/i18n/UniversalGlobeSelector'
 import { useI18n } from '@/lib/i18n/i18n-provider'
@@ -126,8 +128,9 @@ export function Header() {
   const { locale, setLocale, t } = useI18n()
 
   const [diagnosticOpen, setDiagnosticOpen] = useState(false)
+  const { startTour } = useTour()
 
-  // ── Firm Compliance Score — 5-tier Risk Spectrum (Directive 41.2) ────
+  // ── Firm Compliance Score  -  5-tier Risk Spectrum (Directive 41.2) ────
   const regBody = resolveRegulatoryBody(tenant?.home_province ?? null)
   const { score: firmScore } = calculateComplianceScore({
     home_province: tenant?.home_province ?? null,
@@ -190,7 +193,7 @@ export function Header() {
 
   return (
     <header
-      className="sticky top-0 z-30 flex h-16 shrink-0 items-center gap-4 bg-white px-4 lg:px-6 border-b"
+      className="sticky top-0 z-30 flex h-16 shrink-0 items-center gap-4 bg-background px-4 lg:px-6 border-b"
     >
       {/* Mobile hamburger */}
       <Button
@@ -377,7 +380,7 @@ export function Header() {
         <Search className="size-5" />
       </Button>
 
-      {/* Universal Globe — admin en/fr, client Global 15 (Directive 0.0) */}
+      {/* Universal Globe  -  admin en/fr, client Global 15 (Directive 0.0) */}
       <UniversalGlobeSelector
         value={locale}
         onChange={(code) => setLocale(code as import('@/lib/i18n/config').LocaleCode)}
@@ -389,7 +392,25 @@ export function Header() {
       {/* Notification bell */}
       <NotificationBell />
 
-      {/* Firm Compliance Badge — 5-tier Risk Spectrum (Directive 41.2) */}
+      {/* Compliance Tour replay */}
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="size-9 text-muted-foreground hover:text-emerald-600"
+            onClick={startTour}
+            aria-label="Replay compliance tour"
+          >
+            <BookOpen className="size-4" />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent side="bottom" className="text-xs">
+          Compliance Tour
+        </TooltipContent>
+      </Tooltip>
+
+      {/* Firm Compliance Badge  -  5-tier Risk Spectrum (Directive 41.2) */}
       <Tooltip>
         <TooltipTrigger asChild>
           <button
@@ -404,7 +425,7 @@ export function Header() {
           </button>
         </TooltipTrigger>
         <TooltipContent side="bottom" className="text-xs max-w-xs">
-          <p className="font-semibold">{firmTier.label} — {firmTier.description}</p>
+          <p className="font-semibold">{firmTier.label}  -  {firmTier.description}</p>
           <p className="text-[9px] text-muted-foreground mt-0.5">{t('header.compliance_diagnostic' as any)}</p>
         </TooltipContent>
       </Tooltip>

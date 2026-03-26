@@ -1,5 +1,5 @@
 -- ============================================================================
--- Migration 999: DEV RESET — Delete all matters (bypass immutable triggers)
+-- Migration 999: DEV RESET  -  Delete all matters (bypass immutable triggers)
 --
 -- This function uses TRUNCATE (which bypasses row-level BEFORE DELETE triggers)
 -- to clear tables that have immutable DELETE protection, then deletes matters.
@@ -36,7 +36,7 @@ BEGIN
   -- Step 2: Null out leads.converted_matter_id (restrictive FK, no CASCADE)
   UPDATE leads SET converted_matter_id = NULL WHERE converted_matter_id IS NOT NULL;
 
-  -- Step 3: Delete all matters — ON DELETE CASCADE handles all remaining child tables
+  -- Step 3: Delete all matters  -  ON DELETE CASCADE handles all remaining child tables
   -- (ircc_profiles, form_packs, matter_deadlines, matter_stage_state, portal_links,
   --  booking_appointments, check_in_sessions, calendar_events, communications,
   --  matter_invoices, compliance_snapshots, case_folders, etc.)

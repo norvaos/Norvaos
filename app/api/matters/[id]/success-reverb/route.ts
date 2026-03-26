@@ -1,7 +1,7 @@
 /**
  * POST /api/matters/[id]/success-reverb
  *
- * Success-Reverb — Reverse-engineer an approved matter into a
+ * Success-Reverb  -  Reverse-engineer an approved matter into a
  * Gold Standard Template for future reference.
  *
  * GET /api/matters/[id]/success-reverb
@@ -53,7 +53,7 @@ export async function POST(
 
     if (insertError) {
       console.error('[Success-Reverb] Failed to persist template:', insertError)
-      // Non-fatal — still return the template data
+      // Non-fatal  -  still return the template data
     }
 
     return NextResponse.json({

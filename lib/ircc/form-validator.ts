@@ -1,21 +1,21 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Form Validator — per-form validation rules for IRCC XFA field data
+ * Form Validator  -  per-form validation rules for IRCC XFA field data
  * ═══════════════════════════════════════════════════════════════════════════════
  *
- * Pure synchronous module — no I/O, no DB access.
+ * Pure synchronous module  -  no I/O, no DB access.
  *
  * Usage:
  *   const result = validateFormData('IMM5257E', scalarFields, { forFinalPack: true })
  *   if (result.blockingErrors.length > 0) { ... block generation ... }
  *
  * Rule types:
- *   required     — field must have a non-empty value
- *   min_length   — value must be at least N characters
- *   max_length   — value must not exceed N characters
- *   date_range   — date string must fall within [min, max]
- *   pattern      — value must match a regex
- *   cross_field  — one field's value constrains another
+ *   required      -  field must have a non-empty value
+ *   min_length    -  value must be at least N characters
+ *   max_length    -  value must not exceed N characters
+ *   date_range    -  date string must fall within [min, max]
+ *   pattern       -  value must match a regex
+ *   cross_field   -  one field's value constrains another
  *
  * Draft vs Final:
  *   - Draft packs: all errors collected but none are blocking
@@ -52,9 +52,9 @@ interface MaxLengthRule extends BaseRule {
 
 interface DateRangeRule extends BaseRule {
   type: 'date_range'
-  /** ISO date string — field value must be on or after this date */
+  /** ISO date string  -  field value must be on or after this date */
   min?: string
-  /** ISO date string — field value must be on or before this date */
+  /** ISO date string  -  field value must be on or before this date */
   max?: string
 }
 
@@ -165,7 +165,7 @@ const BASE_RULES: ValidationRule[] = [
   },
 ]
 
-/** IMM5257E — Application for Temporary Resident Visa */
+/** IMM5257E  -  Application for Temporary Resident Visa */
 const IMM5257E_RULES: ValidationRule[] = [
   ...BASE_RULES,
   {
@@ -202,7 +202,7 @@ const IMM5257E_RULES: ValidationRule[] = [
   },
 ]
 
-/** IMM5406 — Additional Family Information */
+/** IMM5406  -  Additional Family Information */
 const IMM5406_RULES: ValidationRule[] = [
   {
     type: 'required',
@@ -227,7 +227,7 @@ const IMM5406_RULES: ValidationRule[] = [
   },
 ]
 
-/** IMM5476E — Use of a Representative */
+/** IMM5476E  -  Use of a Representative */
 const IMM5476E_RULES: ValidationRule[] = [
   {
     type: 'required',
@@ -335,7 +335,7 @@ function evalRule(
     case 'cross_field': {
       const triggerVal = (scalarFields[rule.depends_on_xfa_path] ?? '').trim()
       if (!rule.trigger_values.includes(triggerVal)) return null
-      // Trigger fired — evaluate inner rule
+      // Trigger fired  -  evaluate inner rule
       const innerVal = val
       const innerRule = rule.inner_rule
       if (innerRule.type === 'required' && !innerVal) {

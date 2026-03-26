@@ -1,5 +1,5 @@
 /**
- * IRCC Forms Engine — Cross-Form Reuse Service
+ * IRCC Forms Engine  -  Cross-Form Reuse Service
  *
  * Coordinates the reuse of answers across form instances within the same matter.
  * When a user triggers "Pre-fill from Other Forms", this module scans all sibling
@@ -7,7 +7,7 @@
  * propagation_mode constraints, and applies non-conflicting values as
  * 'cross_form_reuse' source.
  *
- * Pure logic module — all database operations are injected via AnswerEngineDataAccess.
+ * Pure logic module  -  all database operations are injected via AnswerEngineDataAccess.
  */
 
 import type { AnswerMap, AnswerRecord, PropagationMode } from './types/answers'
@@ -82,7 +82,7 @@ function pickBestSiblingAnswer(
 }
 
 // ---------------------------------------------------------------------------
-// Locked statuses — instances in these statuses are not writable
+// Locked statuses  -  instances in these statuses are not writable
 // ---------------------------------------------------------------------------
 
 const LOCKED_STATUSES = new Set(['approved', 'generated', 'submitted'])
@@ -168,7 +168,7 @@ export async function prefillFromSiblings(
     )
 
     if (!candidate) {
-      // No sibling has a value for this path — skip silently
+      // No sibling has a value for this path  -  skip silently
       continue
     }
 

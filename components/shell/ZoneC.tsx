@@ -1,19 +1,19 @@
 'use client'
 
 /**
- * ZoneC — Left Rail
+ * ZoneC  -  Left Rail
  *
  * Collapsible left sidebar (240px expanded, 40px collapsed).
  * Contains file context at a glance:
  *   - Matter type label
  *   - Responsible lawyer
  *   - Date opened + next deadline
- *   - Next action (most urgent open task) — wired to real tasks table
- *   - Risk flags panel  — wired to matter_risk_flags with override flow
- *   - People panel      — wired to matter_people + contacts join, with Sheet slide-over
+ *   - Next action (most urgent open task)  -  wired to real tasks table
+ *   - Risk flags panel   -  wired to matter_risk_flags with override flow
+ *   - People panel       -  wired to matter_people + contacts join, with Sheet slide-over
  *   - Billing snapshot (billed / paid / trust)
  *
- * Spec ref: Section 3 — Zone C: Left Rail
+ * Spec ref: Section 3  -  Zone C: Left Rail
  */
 
 import { useState } from 'react'
@@ -169,7 +169,7 @@ export function ZoneC({ matter, tenantId }: ZoneCProps) {
   const supabase = createClient()
   const qc = useQueryClient()
 
-  // Retainer status — used to label the action button
+  // Retainer status  -  used to label the action button
   const { data: latestRetainer } = useLatestRetainerAgreement(matter.id)
 
   // ── Responsible lawyer ──────────────────────────────────────────────────
@@ -192,7 +192,7 @@ export function ZoneC({ matter, tenantId }: ZoneCProps) {
     staleTime: 10 * 60 * 1000,
   })
 
-  // ── Next action — reads from matter.next_action_* columns ──────────────
+  // ── Next action  -  reads from matter.next_action_* columns ──────────────
   // Values are pre-computed by the Next Action Engine and stored on the matter row.
   // The "Refresh" button calls POST /api/matters/[id]/next-action to recompute.
   const [isRefreshingNextAction, setIsRefreshingNextAction] = useState(false)
@@ -671,7 +671,7 @@ function RiskFlagsPanel({
             </span>
           </div>
 
-          {/* Override flow — only for open/acknowledged flags */}
+          {/* Override flow  -  only for open/acknowledged flags */}
           {(flag.status === 'open' || flag.status === 'acknowledged') && (
             <div className="pl-3">
               {overrideId === flag.id ? (

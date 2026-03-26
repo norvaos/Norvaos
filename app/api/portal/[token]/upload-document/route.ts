@@ -16,9 +16,9 @@ import { broadcastDocumentStatus } from '@/lib/services/document-realtime'
  * is namespaced by matter_id so cross-matter access is structurally impossible.
  *
  * FormData fields:
- *   file       — the File to upload (required)
- *   slot_id    — optional document_slot UUID to link the upload (falls back to generic upload)
- *   label      — optional human-readable label stored in the activity log
+ *   file        -  the File to upload (required)
+ *   slot_id     -  optional document_slot UUID to link the upload (falls back to generic upload)
+ *   label       -  optional human-readable label stored in the activity log
  */
 
 // 30 requests per minute per IP

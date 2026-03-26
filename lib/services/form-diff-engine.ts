@@ -127,7 +127,7 @@ export async function computeFormDataDiff(
   const { data: versions, error: versionError } = await query
 
   if (versionError || !versions || versions.length === 0) {
-    return null // No previous form — nothing to diff
+    return null // No previous form  -  nothing to diff
   }
 
   const lastVersion = versions[0]

@@ -1,5 +1,5 @@
 /**
- * Українська (uk) — Ukrainian dictionary.
+ * Українська (uk)  -  Ukrainian dictionary.
  * For Ukrainian-speaking clients (Ukraine, diaspora, CUAET holders).
  */
 
@@ -69,7 +69,7 @@ export const uk: Partial<Record<DictionaryKey, string>> = {
   'dashboard.deadline_today': 'Today',
   'dashboard.deadline_1_day': '1 day',
   'dashboard.deadline_days': '{days} days',
-  'dashboard.deadlines_14_days': 'Deadlines — Next 14 Days',
+  'dashboard.deadlines_14_days': 'Deadlines  -  Next 14 Days',
   'dashboard.no_deadlines_14': 'No deadlines in the next 14 days',
   'dashboard.no_deadlines_14_desc': 'Typed deadlines on matters will appear here.',
   'dashboard.unknown_matter': 'Unknown matter',
@@ -98,12 +98,12 @@ export const uk: Partial<Record<DictionaryKey, string>> = {
   'common.save': 'Зберегти',
   'common.view': 'Переглянути',
 
-  // ── Директива 41.0 — Контакти та сховище ─────────────────────────────────
+  // ── Директива 41.0  -  Контакти та сховище ─────────────────────────────────
   'contact.badge.retained_client': 'Утриманий клієнт',
   'contact.badge.prospective_lead': 'Потенційний клієнт',
   'contact.badge.contact': 'Контакт',
   'contact.command_centre': 'Командний центр',
-  'contact.command_centre_red_alert': 'Оцінка готовності критично низька — потрібна негайна увага',
+  'contact.command_centre_red_alert': 'Оцінка готовності критично низька  -  потрібна негайна увага',
   'contact.intake_funnel': 'Воронка прийому',
   'contact.intake_progress': 'Прогрес прийому',
   'contact.matter_readiness': 'Готовність справи',
@@ -116,13 +116,13 @@ export const uk: Partial<Record<DictionaryKey, string>> = {
   'vault.title': 'Norva Vault',
   'vault.empty': 'Norva Vault порожній',
   'vault.empty_description': 'Для цього контакту не завантажено жодного документа.',
-  'vault.sentinel_eye': 'Sentinel Eye — Переглянути та підтвердити',
+  'vault.sentinel_eye': 'Sentinel Eye  -  Переглянути та підтвердити',
   'vault.file_tampered': 'Обережно: Файл підроблено',
   'vault.sha256_verified': 'SHA-256 підтверджено',
   'vault.hash_pending': 'Хеш очікується',
   'vault.integrity_alert': 'Попередження цілісності',
   'vault.untracked': 'Не відстежується',
-  'vault.no_preview': 'Попередній перегляд недоступний — URL файлу відсутній',
+  'vault.no_preview': 'Попередній перегляд недоступний  -  URL файлу відсутній',
 
   'legal.retainer_title': 'Договір про надання юридичних послуг',
   'legal.retainer_intro': 'Цей договір визначає умови юридичних послуг, що будуть надані.',
@@ -203,12 +203,12 @@ export const uk: Partial<Record<DictionaryKey, string>> = {
   'status.days_remaining': '{days}д залишилось',
   'status.verified': 'Перевірено',
   'status.expiry_label': 'Термін дії',
-  'status.sentinel_tamper_title': 'СПОВІЩЕННЯ SENTINEL — Виявлено підробку',
+  'status.sentinel_tamper_title': 'СПОВІЩЕННЯ SENTINEL  -  Виявлено підробку',
   'status.sentinel_tamper_body': 'Невідповідність хешу документа. Цей документ було змінено за межами NorvaOS.',
-  'status.vault_verified_title': 'Сховище Norva — Цілісність підтверджена',
+  'status.vault_verified_title': 'Сховище Norva  -  Цілісність підтверджена',
   'status.vault_verified_body': 'Цей документ захищений хешем у Сховищі Norva. Будь-яка підробка буде виявлена.',
 
-  // ── Leads Command Centre (Directive 40.0 — Sovereign Layer) ─────────────
+  // ── Leads Command Centre (Directive 40.0  -  Sovereign Layer) ─────────────
   'leads.title': 'Ліди',
   'leads.add_lead': 'Додати лід',
   'leads.import': 'Імпортувати',
@@ -331,7 +331,7 @@ export const uk: Partial<Record<DictionaryKey, string>> = {
   'form.notes_placeholder': 'Add any additional notes about this contact...',
   'form.create_contact': 'Create Contact',
   'form.save_changes': 'Save Changes',
-  'form.review_required_ocr': 'Review Required — OCR could not extract',
+  'form.review_required_ocr': 'Review Required  -  OCR could not extract',
   'form.section_basic_info': 'Basic Information',
   'form.section_contact_details': 'Contact Details',
   'form.section_address': 'Address',

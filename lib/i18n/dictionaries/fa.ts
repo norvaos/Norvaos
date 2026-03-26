@@ -1,5 +1,5 @@
 /**
- * فارسی (fa) — Farsi / Persian dictionary.
+ * فارسی (fa)  -  Farsi / Persian dictionary.
  * RTL-aware. For Farsi-speaking clients (Iran, Afghanistan, diaspora).
  */
 
@@ -69,7 +69,7 @@ export const fa: Partial<Record<DictionaryKey, string>> = {
   'dashboard.deadline_today': 'Today',
   'dashboard.deadline_1_day': '1 day',
   'dashboard.deadline_days': '{days} days',
-  'dashboard.deadlines_14_days': 'Deadlines — Next 14 Days',
+  'dashboard.deadlines_14_days': 'Deadlines  -  Next 14 Days',
   'dashboard.no_deadlines_14': 'No deadlines in the next 14 days',
   'dashboard.no_deadlines_14_desc': 'Typed deadlines on matters will appear here.',
   'dashboard.unknown_matter': 'Unknown matter',
@@ -98,12 +98,12 @@ export const fa: Partial<Record<DictionaryKey, string>> = {
   'common.save': 'ذخیره',
   'common.view': 'مشاهده',
 
-  // ── دستورالعمل 41.0 — برچسب‌های هویت و صندوق ─────────────────────────
+  // ── دستورالعمل 41.0  -  برچسب‌های هویت و صندوق ─────────────────────────
   'contact.badge.retained_client': 'موکل فعال',
   'contact.badge.prospective_lead': 'مشتری بالقوه',
   'contact.badge.contact': 'مخاطب',
   'contact.command_centre': 'مرکز فرماندهی',
-  'contact.command_centre_red_alert': 'امتیاز آمادگی به شدت پایین است — توجه فوری لازم است',
+  'contact.command_centre_red_alert': 'امتیاز آمادگی به شدت پایین است  -  توجه فوری لازم است',
   'contact.intake_funnel': 'قیف پذیرش',
   'contact.intake_progress': 'پیشرفت پذیرش',
   'contact.matter_readiness': 'آمادگی پرونده',
@@ -116,13 +116,13 @@ export const fa: Partial<Record<DictionaryKey, string>> = {
   'vault.title': 'صندوق نورفا',
   'vault.empty': 'صندوق نورفا خالی است',
   'vault.empty_description': 'هیچ سندی برای این مخاطب آپلود نشده است.',
-  'vault.sentinel_eye': 'چشم نگهبان — مشاهده و تأیید',
+  'vault.sentinel_eye': 'چشم نگهبان  -  مشاهده و تأیید',
   'vault.file_tampered': 'هشدار: فایل دستکاری شده',
   'vault.sha256_verified': 'تأیید SHA-256',
   'vault.hash_pending': 'هش در انتظار',
   'vault.integrity_alert': 'هشدار یکپارچگی',
   'vault.untracked': 'پیگیری نشده',
-  'vault.no_preview': 'پیش‌نمایش در دسترس نیست — آدرس فایل موجود نیست',
+  'vault.no_preview': 'پیش‌نمایش در دسترس نیست  -  آدرس فایل موجود نیست',
 
   'legal.retainer_title': 'قرارداد وکالت',
   'legal.retainer_intro': 'این قرارداد شرایط خدمات حقوقی ارائه شده را تعیین می‌کند.',
@@ -205,12 +205,12 @@ export const fa: Partial<Record<DictionaryKey, string>> = {
   'status.days_remaining': '{days} روز باقیمانده',
   'status.verified': 'تأیید شده',
   'status.expiry_label': 'انقضا',
-  'status.sentinel_tamper_title': 'هشدار نگهبان — دستکاری شناسایی شد',
+  'status.sentinel_tamper_title': 'هشدار نگهبان  -  دستکاری شناسایی شد',
   'status.sentinel_tamper_body': 'عدم تطابق هش سند. این سند خارج از نوروا تغییر یافته است.',
-  'status.vault_verified_title': 'صندوق نوروا — یکپارچگی تأیید شد',
+  'status.vault_verified_title': 'صندوق نوروا  -  یکپارچگی تأیید شد',
   'status.vault_verified_body': 'این سند در صندوق نوروا قفل هش شده است. هرگونه دستکاری شناسایی خواهد شد.',
 
-  // ── Leads Command Centre (Directive 40.0 — Sovereign Layer) ─────────────
+  // ── Leads Command Centre (Directive 40.0  -  Sovereign Layer) ─────────────
   'leads.title': 'سرنخ‌ها',
   'leads.add_lead': 'افزودن سرنخ',
   'leads.import': 'وارد کردن',
@@ -333,7 +333,7 @@ export const fa: Partial<Record<DictionaryKey, string>> = {
   'form.notes_placeholder': 'Add any additional notes about this contact...',
   'form.create_contact': 'Create Contact',
   'form.save_changes': 'Save Changes',
-  'form.review_required_ocr': 'Review Required — OCR could not extract',
+  'form.review_required_ocr': 'Review Required  -  OCR could not extract',
   'form.section_basic_info': 'Basic Information',
   'form.section_contact_details': 'Contact Details',
   'form.section_address': 'Address',

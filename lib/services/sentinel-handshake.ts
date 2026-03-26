@@ -1,5 +1,5 @@
 /**
- * Directive 26.2 — Sentinel-Handshake Broadcast Service
+ * Directive 26.2  -  Sentinel-Handshake Broadcast Service
  *
  * Sends a Global 15 localised welcome email with a Safe-Link that
  * initiates the Biometric Handshake (identity verification + intake portal).
@@ -7,7 +7,7 @@
  * Trigger: Called when a client contact is first linked to a matter,
  * or when a portal link is generated for a new client.
  *
- * SMS is intentionally stubbed — no SMS provider exists yet. When one is
+ * SMS is intentionally stubbed  -  no SMS provider exists yet. When one is
  * added, implement sendSentinelSms() in this file.
  */
 
@@ -28,13 +28,13 @@ export interface SentinelHandshakeParams {
   matterId: string
   /** Client's preferred locale (from contact.preferred_language or matter intake) */
   locale: LocaleCode
-  /** Pre-generated portal link token — the Safe-Link */
+  /** Pre-generated portal link token  -  the Safe-Link */
   portalToken: string
 }
 
 // ── Global 15 Welcome Content ──────────────────────────────────────────────
 // Each locale provides: greeting, body, and CTA button text.
-// These are static templates — not pulled from dictionaries — because
+// These are static templates  -  not pulled from dictionaries  -  because
 // email content must be self-contained (no JS runtime).
 
 interface WelcomeContent {
@@ -126,7 +126,7 @@ const WELCOME_CONTENT: Record<string, WelcomeContent> = {
 function getResend(): Resend | null {
   const apiKey = process.env.RESEND_API_KEY
   if (!apiKey) {
-    log.warn('[sentinel-handshake] RESEND_API_KEY not configured — emails will be skipped')
+    log.warn('[sentinel-handshake] RESEND_API_KEY not configured  -  emails will be skipped')
     return null
   }
   return new Resend(apiKey)
@@ -153,7 +153,7 @@ function getLocaleInfo(code: string) {
 /**
  * Send the Global 15 localised Sentinel-Handshake welcome email.
  *
- * Non-blocking: all errors caught internally — never throws.
+ * Non-blocking: all errors caught internally  -  never throws.
  */
 export async function sendSentinelHandshake(params: SentinelHandshakeParams): Promise<void> {
   const { supabase, tenantId, contactId, matterId, locale, portalToken } = params
@@ -177,12 +177,12 @@ export async function sendSentinelHandshake(params: SentinelHandshakeParams): Pr
     const tenant = tenantResult.data ?? { name: 'Your Law Firm', logo_url: null, primary_color: '#3b82f6' }
 
     if (!contact?.email_primary) {
-      log.warn('[sentinel-handshake] Contact has no email — skipping', { contactId })
+      log.warn('[sentinel-handshake] Contact has no email  -  skipping', { contactId })
       return
     }
 
     if (contact.email_notifications_enabled === false) {
-      log.info('[sentinel-handshake] Email notifications disabled — skipping', { contactId })
+      log.info('[sentinel-handshake] Email notifications disabled  -  skipping', { contactId })
       return
     }
 
@@ -203,7 +203,7 @@ export async function sendSentinelHandshake(params: SentinelHandshakeParams): Pr
       localCta: content.cta,
       englishBody: enContent.body(tenant.name),
       safeLink,
-      languageLabel: `${localeInfo.nativeLabel} — ${localeInfo.label}`,
+      languageLabel: `${localeInfo.nativeLabel}  -  ${localeInfo.label}`,
       dir: localeInfo.dir as 'ltr' | 'rtl',
     })
 
@@ -262,9 +262,9 @@ export async function sendSentinelHandshake(params: SentinelHandshakeParams): Pr
 // ── SMS Stub ───────────────────────────────────────────────────────────────
 
 /**
- * SMS stub — no SMS provider is configured yet.
+ * SMS stub  -  no SMS provider is configured yet.
  * When an SMS service is added (e.g. Twilio), implement this function.
  */
 export async function sendSentinelSms(_params: SentinelHandshakeParams): Promise<void> {
-  log.info('[sentinel-handshake] SMS not yet implemented — skipping')
+  log.info('[sentinel-handshake] SMS not yet implemented  -  skipping')
 }

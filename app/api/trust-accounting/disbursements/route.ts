@@ -1,6 +1,6 @@
 /**
- * GET  /api/trust-accounting/disbursements — List disbursement requests
- * POST /api/trust-accounting/disbursements — Create (prepare) a disbursement request
+ * GET  /api/trust-accounting/disbursements  -  List disbursement requests
+ * POST /api/trust-accounting/disbursements  -  Create (prepare) a disbursement request
  */
 
 import { NextRequest, NextResponse } from 'next/server'

@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Lead Workflow — Shared TypeScript Interfaces
+ * Lead Workflow  -  Shared TypeScript Interfaces
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Re-exports database row types and defines shaped interfaces used across

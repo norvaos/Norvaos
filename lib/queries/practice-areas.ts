@@ -32,6 +32,6 @@ export function useEnabledPracticeAreas(tenantId: string | undefined) {
       return data as EnabledPracticeArea[]
     },
     enabled: !!tenantId,
-    staleTime: 5 * 60 * 1000, // 5 min — practice areas rarely change
+    staleTime: 5 * 60 * 1000, // 5 min  -  practice areas rarely change
   })
 }

@@ -16,8 +16,8 @@ const MAX_BREAK_GLASS_HOURS = 72
 /**
  * Grant break-glass access to a user for a specific matter or all matters.
  *
- * @param matterId — if null, grants access to all matters of the target user
- * @param expiresAt — must be within 72 hours of now
+ * @param matterId  -  if null, grants access to all matters of the target user
+ * @param expiresAt  -  must be within 72 hours of now
  * @throws Error if expiresAt exceeds 72 hours
  */
 export async function grantBreakGlass(

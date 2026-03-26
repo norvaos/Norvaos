@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * DocumentTamperOverlay — Directive 016.1: Integrity Overlay
+ * DocumentTamperOverlay  -  Directive 016.1: Integrity Overlay
  *
  * If a document's SHA-256 does not match the Genesis record (or the stored
  * content_hash), applies a backdrop-blur and a red "Tamper Warning" icon
@@ -161,7 +161,7 @@ export function TamperStatusIndicator({
     )
   }
 
-  // Unchecked — show verify button
+  // Unchecked  -  show verify button
   return (
     <Button
       variant="ghost"

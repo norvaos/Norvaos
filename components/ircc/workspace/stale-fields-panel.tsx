@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * StaleFieldsPanel — Lists all stale fields for a form instance
+ * StaleFieldsPanel  -  Lists all stale fields for a form instance
  *
  * Shows each stale field with its profile path, current value, and the
  * reason it was marked stale. Provides per-field "Re-confirm" and bulk

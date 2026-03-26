@@ -173,7 +173,7 @@ export type IRCCProfileSchema = z.infer<typeof irccProfileSchema>
 // ── Partial schema for incremental saves ────────────────────────────────────
 // Zod v4 removed deepPartial(). Use top-level partial + each section is already
 // tolerant via optional() fields. For incremental saves we just make every
-// top-level section optional — the individual fields within each section can
+// top-level section optional  -  the individual fields within each section can
 // still validate whatever the user has provided so far.
 
 export const irccProfilePartialSchema = irccProfileSchema.partial()

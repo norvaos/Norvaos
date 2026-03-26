@@ -1,5 +1,5 @@
 """
-XFA Form Filler — fills XFA form fields in a PDF using pikepdf + lxml + PyMuPDF.
+XFA Form Filler  -  fills XFA form fields in a PDF using pikepdf + lxml + PyMuPDF.
 
 Ported from scripts/xfa-filler.py for the FastAPI sidecar worker.
 Accepts PDF bytes + field data dict, returns filled PDF bytes.
@@ -85,7 +85,7 @@ def fill_pdf(
     barcode_data = field_data.get('barcodeData')
 
     if not scalar_fields and not array_data:
-        # Nothing to fill — return original bytes
+        # Nothing to fill  -  return original bytes
         return pdf_bytes
 
     # ── Phase 1: Read XFA datasets with pikepdf ──────────────────────────
@@ -230,12 +230,12 @@ def fill_pdf(
             pdf2.close()
             logger.info('Filled PDF (%d fields) [pikepdf fallback]', filled_count)
         else:
-            # Existing datasets — incremental save preserves UR3/DocMDP signatures
+            # Existing datasets  -  incremental save preserves UR3/DocMDP signatures
             try:
                 import fitz  # PyMuPDF
             except ImportError:
                 # Pikepdf full-save fallback
-                logger.warning('PyMuPDF not available — falling back to pikepdf full save')
+                logger.warning('PyMuPDF not available  -  falling back to pikepdf full save')
                 pdf3 = pikepdf.open(tmp_input_path)
                 acroform3 = pdf3.Root.get('/AcroForm')
                 xfa3 = acroform3.get('/XFA')
@@ -326,7 +326,7 @@ def fill_pdf(
             logger.info('Barcode embedded on page 1')
 
         except ImportError as e:
-            logger.warning('Barcode skipped — missing dependency: %s', e)
+            logger.warning('Barcode skipped  -  missing dependency: %s', e)
         except Exception as e:
             logger.warning('Barcode embedding failed (non-fatal): %s', e)
 

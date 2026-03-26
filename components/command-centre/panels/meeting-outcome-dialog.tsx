@@ -58,7 +58,7 @@ interface MeetingOutcomeDialogProps {
  * Structured dialog for recording meeting outcomes.
  *
  * Rule #15: Command Centre outcomes drive everything.
- * Rule #12: Compliance required fields — enforced in each dialog.
+ * Rule #12: Compliance required fields  -  enforced in each dialog.
  * Rule #1: All state changes go through the Action Executor.
  */
 export function MeetingOutcomeDialog({

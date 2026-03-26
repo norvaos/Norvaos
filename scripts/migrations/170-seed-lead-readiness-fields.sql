@@ -1,5 +1,5 @@
 -- ═══════════════════════════════════════════════════════════════════════════════
--- Migration 170 — Seed Lead Readiness Fields for Immigration Matter Types
+-- Migration 170  -  Seed Lead Readiness Fields for Immigration Matter Types
 -- ═══════════════════════════════════════════════════════════════════════════════
 -- Seeds the required fields that fn_calculate_lead_readiness uses to score
 -- each lead before conversion. Fields are grouped by source:

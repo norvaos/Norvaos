@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Sprint 6, Week 1 — Exception Workflow Tests
+ * Sprint 6, Week 1  -  Exception Workflow Tests
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Covers:
@@ -54,7 +54,7 @@ const stageStateRow = {
   stage_history:     [],
 }
 
-/** Target stage — sort_order 1 (earlier than current at sort_order 3) */
+/** Target stage  -  sort_order 1 (earlier than current at sort_order 3) */
 const targetStageRow = {
   id:          TARGET_STAGE,
   name:        'Document Review',
@@ -62,14 +62,14 @@ const targetStageRow = {
   sort_order:  1,
 }
 
-/** Current stage — sort_order 3 */
+/** Current stage  -  sort_order 3 */
 const currentStageRow = {
   id:         CURRENT_STAGE,
   name:       'Filing Submission',
   sort_order: 3,
 }
 
-/** Same-stage target — identical sort_order to current */
+/** Same-stage target  -  identical sort_order to current */
 const sameOrderStageRow = {
   id:          'stage-same-order',
   name:        'Filing Submission',
@@ -77,7 +77,7 @@ const sameOrderStageRow = {
   sort_order:  3,
 }
 
-/** Later stage — sort_order higher than current */
+/** Later stage  -  sort_order higher than current */
 const laterStageRow = {
   id:          'stage-later-0003',
   name:        'Post Filing Review',
@@ -208,7 +208,7 @@ describe('exception-workflow', () => {
     })
 
     it('passes validation when return_reason is exactly 50 characters', async () => {
-      // This test only validates the reason check — the DB mock will throw on the
+      // This test only validates the reason check  -  the DB mock will throw on the
       // next step (no stage state), so we confirm the reason check itself passed
       // by checking that the error is NOT the reason-length error.
       const fiftyChars = 'A'.repeat(50)
@@ -335,7 +335,7 @@ describe('exception-workflow', () => {
 
     it('throws when a critical deficiency is in_progress', async () => {
       // The query filters by status IN ('open','in_progress','reopened').
-      // The mock returns matching rows — the service checks array length.
+      // The mock returns matching rows  -  the service checks array length.
       const supabase = buildStageCheckSupabase([{ id: 'def-002' }])
       await expect(
         returnMatterToStage(supabase, baseInput())
@@ -343,7 +343,7 @@ describe('exception-workflow', () => {
     })
 
     it('allows return when only minor deficiencies are open', async () => {
-      // Minor deficiencies do not appear in the critical query — empty array returned.
+      // Minor deficiencies do not appear in the critical query  -  empty array returned.
       const supabase = buildStageCheckSupabase([])
       // Will proceed past deficiency check and attempt the log insert.
       // Since stage_transition_log insert returns null id, it will throw a different error.

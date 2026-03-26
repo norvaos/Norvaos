@@ -1,5 +1,5 @@
 /**
- * PATCH /api/collections/write-offs/[id] — Approve or reject a write-off
+ * PATCH /api/collections/write-offs/[id]  -  Approve or reject a write-off
  */
 
 import { NextRequest, NextResponse } from 'next/server'

@@ -28,7 +28,7 @@ export function FieldMappingRow({
       <TableCell className="font-mono text-xs max-w-[200px] truncate" title={field.xfa_path}>
         {field.xfa_path}
       </TableCell>
-      <TableCell className="text-xs">{field.suggested_label ?? '—'}</TableCell>
+      <TableCell className="text-xs">{field.suggested_label ?? ' - '}</TableCell>
       <TableCell>
         <Badge variant="outline" className="text-xs">
           {field.xfa_field_type ?? 'text'}
@@ -81,7 +81,7 @@ export function FieldMappingRow({
         {field.is_mapped ? (
           <CheckCircle2 className="h-4 w-4 text-green-500" />
         ) : (
-          <span className="text-xs text-slate-400">—</span>
+          <span className="text-xs text-slate-400"> - </span>
         )}
       </TableCell>
     </TableRow>

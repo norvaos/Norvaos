@@ -9,7 +9,7 @@ import { useQueryClient } from '@tanstack/react-query'
  * When a mutation (matter update, stage change, etc.) succeeds in one tab,
  * it broadcasts a lightweight message to all other tabs. Those tabs then
  * invalidate the relevant TanStack Query caches, causing an automatic
- * refetch — no manual refresh needed.
+ * refetch  -  no manual refresh needed.
  *
  * Usage: call `useCrossTabSync()` once in the root provider.
  * Call `broadcastMutation(type, payload)` from any mutation's onSuccess.
@@ -32,7 +32,7 @@ interface SyncMessage {
   matterId?: string
   contactId?: string
   timestamp: number
-  /** Tab ID that sent the message — used to skip self-echo */
+  /** Tab ID that sent the message  -  used to skip self-echo */
   senderId: string
 }
 
@@ -71,7 +71,7 @@ export function broadcastMutation(
   try {
     ch.postMessage(msg)
   } catch {
-    // Channel may be closed — ignore
+    // Channel may be closed  -  ignore
   }
 }
 

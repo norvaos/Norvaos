@@ -2,13 +2,13 @@
 
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * VerificationScreen — Step 1: Eligibility & Setup (Master Control)
+ * VerificationScreen  -  Step 1: Eligibility & Setup (Master Control)
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Three sections:
- *   A. Case Identification  — UCI, passport, citizenship, residence
- *   B. Legal Stream         — processing stream, target date, province
- *   C. Eligibility Gatekeep — boolean questions that drive form/doc lists
+ *   A. Case Identification   -  UCI, passport, citizenship, residence
+ *   B. Legal Stream          -  processing stream, target date, province
+ *   C. Eligibility Gatekeep  -  boolean questions that drive form/doc lists
  *
  * "Confirm Eligibility" locks the data and advances to Workspace.
  * Once confirmed, fields are read-only unless the lawyer resets eligibility.
@@ -297,7 +297,7 @@ export default function VerificationScreen() {
       })
       setHasHydrated(true)
     } else if (!immLoading) {
-      // No immigration record yet — use intake program_category if available
+      // No immigration record yet  -  use intake program_category if available
       setForm((prev) => ({
         ...prev,
         program_category: intakeData?.program_category ?? '',
@@ -322,7 +322,7 @@ export default function VerificationScreen() {
     (c) => c.value === form.program_category,
   )?.label
 
-  // Validation — passport is mandatory, program_category is mandatory
+  // Validation  -  passport is mandatory, program_category is mandatory
   const validationErrors = useMemo(() => {
     const errors: string[] = []
     if (!form.passport_number.trim()) errors.push('Passport number is required')
@@ -384,7 +384,7 @@ export default function VerificationScreen() {
           programCategory: form.program_category,
         })
 
-        // 3. Quebec CAQ — manually inject if destination is Quebec
+        // 3. Quebec CAQ  -  manually inject if destination is Quebec
         if (form.intended_destination === 'QC') {
           try {
             await createChecklistItem.mutateAsync({
@@ -399,7 +399,7 @@ export default function VerificationScreen() {
               status: 'missing',
             })
           } catch {
-            // Ignore duplicate — may already exist from a previous confirmation
+            // Ignore duplicate  -  may already exist from a previous confirmation
           }
         }
 
@@ -409,7 +409,7 @@ export default function VerificationScreen() {
             await createChecklistItem.mutateAsync({
               matter_id: matterId,
               tenant_id: tenantId,
-              document_name: 'IMM 5476 — Use of a Representative',
+              document_name: 'IMM 5476  -  Use of a Representative',
               description:
                 'This form authorises a representative (consultant or lawyer) to act on the client\'s behalf with IRCC.',
               category: 'forms',
@@ -428,7 +428,7 @@ export default function VerificationScreen() {
             await createChecklistItem.mutateAsync({
               matter_id: matterId,
               tenant_id: tenantId,
-              document_name: 'IMM 5645 — Family Information',
+              document_name: 'IMM 5645  -  Family Information',
               description:
                 'Required when a spouse, common-law partner, or co-signer accompanies the application. Captures family member details.',
               category: 'forms',
@@ -451,7 +451,7 @@ export default function VerificationScreen() {
         { matterId, outcome: 'pass', userId },
         {
           onSuccess: () => {
-            toast.success('Eligibility confirmed — workspace unlocked')
+            toast.success('Eligibility confirmed  -  workspace unlocked')
             forceAdvanceTo('workspace')
           },
         },
@@ -483,7 +483,7 @@ export default function VerificationScreen() {
       { matterId, outcome: 'fail', userId },
       {
         onSuccess: () => {
-          toast.info('Eligibility reset — you may edit the fields again')
+          toast.info('Eligibility reset  -  you may edit the fields again')
         },
       },
     )
@@ -530,14 +530,14 @@ export default function VerificationScreen() {
 
         {/* Summary cards */}
         <div className="grid gap-4 sm:grid-cols-2">
-          <SummaryCard label="Passport" value={form.passport_number || '—'} />
+          <SummaryCard label="Passport" value={form.passport_number || ' - '} />
           <SummaryCard label="UCI Number" value={form.uci_number || 'Not provided'} />
           <SummaryCard
             label="Citizenship"
             value={
               FULL_COUNTRY_LIST.find(
                 (c) => c.value === form.country_of_citizenship,
-              )?.label ?? '—'
+              )?.label ?? ' - '
             }
           />
           <SummaryCard
@@ -545,15 +545,15 @@ export default function VerificationScreen() {
             value={
               FULL_COUNTRY_LIST.find(
                 (c) => c.value === form.country_of_residence,
-              )?.label ?? '—'
+              )?.label ?? ' - '
             }
           />
-          <SummaryCard label="Stream" value={streamLabel ?? '—'} />
+          <SummaryCard label="Stream" value={streamLabel ?? ' - '} />
           <SummaryCard
             label="Destination"
             value={
               PROVINCES.find((p) => p.value === form.intended_destination)
-                ?.label ?? '—'
+                ?.label ?? ' - '
             }
           />
           {form.target_entry_date && (
@@ -577,7 +577,7 @@ export default function VerificationScreen() {
           )}
           {isQuebec && (
             <Badge variant="secondary" className="border-amber-300 bg-amber-50 text-amber-700">
-              Quebec — CAQ Required
+              Quebec  -  CAQ Required
             </Badge>
           )}
         </div>
@@ -633,7 +633,7 @@ export default function VerificationScreen() {
               onChange={(e) => setField('uci_number', e.target.value)}
             />
             <p className="text-xs text-muted-foreground">
-              Optional — only if the client has applied before.
+              Optional  -  only if the client has applied before.
             </p>
           </div>
 
@@ -705,7 +705,7 @@ export default function VerificationScreen() {
         <SectionHeader
           icon={Scale}
           title="B. Legal Stream Selection"
-          description="This dropdown dictates the entire workflow — forms, documents, and questionnaire sections."
+          description="This dropdown dictates the entire workflow  -  forms, documents, and questionnaire sections."
         />
 
         <div className="grid gap-4 sm:grid-cols-2">
@@ -778,7 +778,7 @@ export default function VerificationScreen() {
           <div className="mt-3 flex items-center gap-2 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 dark:border-amber-800 dark:bg-amber-950/40">
             <AlertTriangle className="h-4 w-4 shrink-0 text-amber-600" />
             <p className="text-sm text-amber-800 dark:text-amber-300">
-              Quebec destination selected — a{' '}
+              Quebec destination selected  -  a{' '}
               <strong>Certificat d'acceptation du Québec (CAQ)</strong> will be
               added to the document requirements.
             </p>
@@ -790,7 +790,7 @@ export default function VerificationScreen() {
           <div className="mt-3 flex items-center gap-2 rounded-lg border border-blue-300 bg-blue-50 px-4 py-3 dark:border-blue-800 dark:bg-blue-950/40">
             <Users className="h-4 w-4 shrink-0 text-blue-600" />
             <p className="text-sm text-blue-800 dark:text-blue-300">
-              Spousal Sponsorship selected — the{' '}
+              Spousal Sponsorship selected  -  the{' '}
               <strong>Sponsor Details</strong> section will be shown in the
               workspace questionnaire.
             </p>
@@ -828,7 +828,7 @@ export default function VerificationScreen() {
           <GateRow
             label="Is the client currently in Canada with valid status?"
             description="The client holds a valid visa, permit, or status document that has not expired."
-            consequence="Extension workflow applied — extension-specific forms will be used instead of initial application forms."
+            consequence="Extension workflow applied  -  extension-specific forms will be used instead of initial application forms."
             checked={form.current_valid_status}
             onChange={(val) => setField('current_valid_status', val)}
             disabled={false}

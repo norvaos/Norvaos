@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * CommandSidebar — always-visible left panel in the matter command centre.
+ * CommandSidebar  -  always-visible left panel in the matter command centre.
  *
  * Shows: primary client, matter identity, quick stats, retainer, portal, recent activity.
  * Supports quick-add task inline and direct tab/sheet navigation from stat tiles.
@@ -247,7 +247,7 @@ export function CommandSidebar({
     ? (typeof window !== 'undefined' ? `${window.location.origin}/portal/${activePortalLink.token}` : `/portal/${activePortalLink.token}`)
     : null
 
-  // Document stats — use passed-in values (from readiness data) or compute from slots
+  // Document stats  -  use passed-in values (from readiness data) or compute from slots
   const computedDocAccepted = docAccepted ?? slots?.filter((s) => s.status === 'accepted').length ?? 0
   const computedDocTotal = docTotal ?? slots?.length ?? 0
 
@@ -423,7 +423,7 @@ export function CommandSidebar({
           <StatTile
             icon={ListTodo}
             label="Tasks"
-            value={`${taskCount?.open ?? '—'} open`}
+            value={`${taskCount?.open ?? ' - '} open`}
             color={(taskCount?.open ?? 0) === 0 ? 'text-emerald-600' : 'text-slate-700'}
             onClick={() => onOpenSheet('tasks')}
             onAdd={() => setIsAddingTask(true)}

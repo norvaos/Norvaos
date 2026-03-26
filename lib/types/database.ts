@@ -2986,6 +2986,8 @@ export type Database = {
           conflict_justification: string | null
           conflict_score: number | null
           conflict_decided_at: string | null
+          conflict_cleared_at: string | null
+          identity_latch_hash: string | null
           kyc_verification_id: string | null
           kyc_status: string | null
           kyc_document_type: string | null
@@ -3022,6 +3024,8 @@ export type Database = {
           conflict_justification?: string | null
           conflict_score?: number | null
           conflict_decided_at?: string | null
+          conflict_cleared_at?: string | null
+          identity_latch_hash?: string | null
           kyc_verification_id?: string | null
           kyc_status?: string | null
           kyc_document_type?: string | null
@@ -3058,6 +3062,8 @@ export type Database = {
           conflict_justification?: string | null
           conflict_score?: number | null
           conflict_decided_at?: string | null
+          conflict_cleared_at?: string | null
+          identity_latch_hash?: string | null
           kyc_verification_id?: string | null
           kyc_status?: string | null
           kyc_document_type?: string | null
@@ -15777,7 +15783,7 @@ export type Database = {
           created_at?: string
         }
         Update: {
-          // Immutable — no updates allowed
+          // Immutable  -  no updates allowed
           id?: never
           event_type?: never
           severity?: never
@@ -17248,6 +17254,8 @@ export type Database = {
           home_province: string | null
           id: string
           jurisdiction_code: string
+          letterhead_layout: string | null
+          legal_disclaimer: string | null
           logo_url: string | null
           matter_number_include_year: boolean | null
           matter_number_padding: number | null
@@ -17266,6 +17274,7 @@ export type Database = {
           province: string | null
           secondary_color: string | null
           settings: Json | null
+          signature_url: string | null
           slug: string
           status: string
           stripe_customer_id: string | null
@@ -17273,6 +17282,7 @@ export type Database = {
           subscription_tier: string | null
           timezone: string | null
           trial_ends_at: string | null
+          brand_activated_at: string | null
           updated_at: string | null
         }
         Insert: {
@@ -17291,6 +17301,8 @@ export type Database = {
           home_province?: string | null
           id?: string
           jurisdiction_code?: string
+          letterhead_layout?: string | null
+          legal_disclaimer?: string | null
           logo_url?: string | null
           matter_number_include_year?: boolean | null
           matter_number_padding?: number | null
@@ -17309,6 +17321,7 @@ export type Database = {
           province?: string | null
           secondary_color?: string | null
           settings?: Json | null
+          signature_url?: string | null
           slug: string
           status?: string
           stripe_customer_id?: string | null
@@ -17316,6 +17329,7 @@ export type Database = {
           subscription_tier?: string | null
           timezone?: string | null
           trial_ends_at?: string | null
+          brand_activated_at?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -17334,6 +17348,8 @@ export type Database = {
           home_province?: string | null
           id?: string
           jurisdiction_code?: string
+          letterhead_layout?: string | null
+          legal_disclaimer?: string | null
           logo_url?: string | null
           matter_number_include_year?: boolean | null
           matter_number_padding?: number | null
@@ -17352,6 +17368,7 @@ export type Database = {
           province?: string | null
           secondary_color?: string | null
           settings?: Json | null
+          signature_url?: string | null
           slug?: string
           status?: string
           stripe_customer_id?: string | null
@@ -17359,6 +17376,7 @@ export type Database = {
           subscription_tier?: string | null
           timezone?: string | null
           trial_ends_at?: string | null
+          brand_activated_at?: string | null
           updated_at?: string | null
         }
         Relationships: []
@@ -18886,7 +18904,7 @@ export type Database = {
           },
         ]
       }
-      // ── matter_deficiencies — Migration 127, Sprint 6 Week 1 ─────────────
+      // ── matter_deficiencies  -  Migration 127, Sprint 6 Week 1 ─────────────
       matter_deficiencies: {
         Row: {
           id: string
@@ -20074,6 +20092,57 @@ export type Database = {
           },
         ]
       }
+      firm_branding_metadata: {
+        Row: {
+          id: string
+          tenant_id: string
+          logo_dominant_color: string | null
+          logo_width_px: number | null
+          logo_height_px: number | null
+          letterhead_version: number
+          activated_by: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          tenant_id: string
+          logo_dominant_color?: string | null
+          logo_width_px?: number | null
+          logo_height_px?: number | null
+          letterhead_version?: number
+          activated_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          tenant_id?: string
+          logo_dominant_color?: string | null
+          logo_width_px?: number | null
+          logo_height_px?: number | null
+          letterhead_version?: number
+          activated_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "firm_branding_metadata_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: true
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "firm_branding_metadata_activated_by_fkey"
+            columns: ["activated_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       mv_lead_metrics: {
@@ -20637,6 +20706,7 @@ export type Database = {
           p_matter_id: string
           p_tenant_id: string
           p_user_id: string
+          p_conflict_search_id: string
         }
         Returns: Record<string, unknown>
       }
@@ -20677,6 +20747,18 @@ export type Database = {
           p_original_status: string
           p_justification: string
           p_partner_pin: string
+        }
+        Returns: Json
+      }
+      fn_atomic_lead_to_matter: {
+        Args: {
+          p_lead_id: string
+          p_tenant_id: string
+          p_user_id: string
+          p_title?: string | null
+          p_practice_area_id?: string | null
+          p_matter_type_id?: string | null
+          p_description?: string | null
         }
         Returns: Json
       }
@@ -21458,7 +21540,7 @@ export type InvoiceAdjustmentRow = {
   calculation_type: AdjustmentCalculationType
   percentage_value: number | null     // decimal e.g. 0.10 = 10%
   fixed_amount_cents: number | null   // cents
-  calculated_amount_cents: number     // cents — always populated
+  calculated_amount_cents: number     // cents  -  always populated
   is_pre_tax: boolean
   reason_code: string
   reason_note: string | null
@@ -21693,7 +21775,7 @@ export type PaymentPlanInstalmentRow = {
   paid_at: string | null
   created_at: string
   updated_at: string
-  /** Derived at query time — not stored in DB */
+  /** Derived at query time  -  not stored in DB */
   is_overdue?: boolean
 }
 
@@ -22109,7 +22191,7 @@ export type TrustReconciliationItemType   = string
 export type TrustAuditLogRow    = Database['public']['Tables']['trust_audit_log']['Row']
 export type TrustAuditLogInsert = Database['public']['Tables']['trust_audit_log']['Insert']
 
-// ── trust_ledger_audit (Directive 005 — immutable balance audit trail) ──────
+// ── trust_ledger_audit (Directive 005  -  immutable balance audit trail) ──────
 
 export interface TrustLedgerAuditRow {
   id: string
@@ -22264,7 +22346,7 @@ export interface GateSnapshot {
 export type AgingBucket = string
 
 // ── Retainer Agreements (migration 116) ────────────────────────────────────
-// Manual types — not yet in the generated Database union.
+// Manual types  -  not yet in the generated Database union.
 // Added here until next type-gen pass after migration 116 is applied.
 
 export interface RetainerAgreementRow {
@@ -22529,7 +22611,7 @@ export interface LeadOutcomeInsert {
   created_at?: string
 }
 
-// ── contact_relationships — convenience aliases ─────────────────────────────
+// ── contact_relationships  -  convenience aliases ─────────────────────────────
 // The table uses contact_id_a / contact_id_b (original schema from migration 001).
 // These aliases expose the Database row/insert types under predictable names.
 export type ContactRelationshipRow    = Database['public']['Tables']['contact_relationships']['Row']
@@ -22559,7 +22641,7 @@ export interface MatterRuleSnapshotInsert {
   captured_at?: string
 }
 
-// ── Onboarding Wizard — 7-step simplified wizard types (Agent 2 additions) ────
+// ── Onboarding Wizard  -  7-step simplified wizard types (Agent 2 additions) ────
 // Lines 19914–19963 added 2026-03-17 by the onboarding wizard agent.
 // These supplement the existing WizardAnswers / TenantOnboardingWizardRow types
 // and add types specific to the simplified 7-step onboarding flow.
@@ -22648,7 +22730,7 @@ export interface NextAction {
 }
 
 // ── matter_deficiencies ───────────────────────────────────────────────────────
-// Migration 127 — Sprint 6, Week 1 — 2026-03-17
+// Migration 127  -  Sprint 6, Week 1  -  2026-03-17
 // Full deficiency workflow for legal review cycle.
 
 export interface MatterDeficiencyRow {
@@ -22762,7 +22844,7 @@ export interface RefusalActionUpdate {
 // IrccCorrespondenceRow above is maintained manually and reflects prior state.
 
 export interface IrccCorrespondenceRefusalFields {
-  jr_deadline: string | null           // DATE — computed JR deadline
+  jr_deadline: string | null           // DATE  -  computed JR deadline
   jr_basis: 'inland' | 'outside_canada' | null
   jr_matter_id: string | null          // UUID → matters.id
   reapplication_matter_id: string | null // UUID → matters.id
@@ -22855,7 +22937,7 @@ export interface FormGenerationLogUpdate {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// Migration 145: IRCC Forms Engine — Core Infrastructure
+// Migration 145: IRCC Forms Engine  -  Core Infrastructure
 // ═══════════════════════════════════════════════════════════════════════════════
 
 // ── matter_form_instances: new forms-engine columns ─────────────────────────
@@ -22928,7 +23010,7 @@ export interface FormInstanceAnswerHistoryInsert {
   stale_triggered?: boolean
 }
 
-// No Update type — table is append-only (no UPDATE/DELETE allowed by RLS)
+// No Update type  -  table is append-only (no UPDATE/DELETE allowed by RLS)
 
 // ── reuse_log ───────────────────────────────────────────────────────────────
 
@@ -22966,7 +23048,7 @@ export interface ReuseLogInsert {
   created_at?: string
 }
 
-// No Update type — table is append-only (no UPDATE/DELETE allowed by RLS)
+// No Update type  -  table is append-only (no UPDATE/DELETE allowed by RLS)
 
 // ── composite_validation_rules ──────────────────────────────────────────────
 

@@ -1,5 +1,5 @@
 /**
- * TanStack Query hooks for Audit-Optimizer 3.0 — Pre-submission scans.
+ * TanStack Query hooks for Audit-Optimizer 3.0  -  Pre-submission scans.
  *
  * Budget: all column fragments < 20 cols per query.
  */

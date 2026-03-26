@@ -1,7 +1,7 @@
-# IRCC Forms Engine — Architecture Decision Record
+# IRCC Forms Engine  -  Architecture Decision Record
 
 **Date:** 2026-03-19
-**Status:** Gate — requires approval before any module build proceeds
+**Status:** Gate  -  requires approval before any module build proceeds
 **Prerequisite:** Module A audit complete (see MODULE-A-AUDIT.md)
 
 This document resolves 10 architectural decisions. Each states: chosen approach, rejected alternatives, rationale, migration impact, risk, and dependency order. No implementation detail. No vague prose.
@@ -43,7 +43,7 @@ Also add: `completion_state` JSONB (per-section counts), `blocker_count` INT, `s
 | **Normalized answer table** (one row per answer per instance) | Over-normalized for the access pattern. Form load requires fetching all answers at once; JSONB column is one read. Row-per-answer adds O(N) inserts per save and join overhead. |
 | **Keep single JSONB blob, add metadata columns alongside** | Fails the fundamental requirement: per-form-instance isolation. Two forms in the same matter sharing one blob cannot have independent source tracking or stale detection. |
 | **EAV on `canonical_profile_fields` only** | Too slow for form rendering (requires per-field joins). Canonical is the truth layer; form instances need their own working copy. |
-| **Separate `form_instance_answers` table with instance_id FK** | Viable but unnecessary indirection. JSONB on the instance row avoids the join and keeps the instance self-contained. If JSONB exceeds practical size (unlikely — typical form has <200 fields × ~100 bytes = ~20KB), this becomes the fallback. |
+| **Separate `form_instance_answers` table with instance_id FK** | Viable but unnecessary indirection. JSONB on the instance row avoids the join and keeps the instance self-contained. If JSONB exceeds practical size (unlikely  -  typical form has <200 fields × ~100 bytes = ~20KB), this becomes the fallback. |
 
 ### Rationale
 - One JSONB column per form instance bounds answer data to exactly the right scope: one form, one person, one matter.
@@ -54,7 +54,7 @@ Also add: `completion_state` JSONB (per-section counts), `blocker_count` INT, `s
 
 ### Migration Impact
 - **Schema:** ALTER TABLE `matter_form_instances` ADD COLUMN `answers` JSONB DEFAULT '{}', ADD COLUMN `completion_state` JSONB DEFAULT '{}', ADD COLUMN `blocker_count` INT DEFAULT 0, ADD COLUMN `stale_count` INT DEFAULT 0, ADD COLUMN `missing_required_count` INT DEFAULT 0.
-- **Data backfill:** Existing `contacts.immigration_data` values for active matters can be backfilled into their form instances' `answers` with `source: 'migration'`. This is optional and non-blocking — the prefill resolver (ADR-3) handles the fallback.
+- **Data backfill:** Existing `contacts.immigration_data` values for active matters can be backfilled into their form instances' `answers` with `source: 'migration'`. This is optional and non-blocking  -  the prefill resolver (ADR-3) handles the fallback.
 - **API changes:** All portal save endpoints switch from writing to `contacts.immigration_data` directly to writing to `matter_form_instances.answers` first, then cascading to `contacts.immigration_data` as cache.
 - **Breaking change scope:** Portal API response shape changes (adds source metadata). Frontend must handle new response format.
 
@@ -78,16 +78,16 @@ The canonical profile system (migration 095) exists with EAV temporal storage, b
 ### Chosen Approach
 **Extend and integrate the existing three-layer canonical model. Do not replace it.**
 
-**Layer 1 — Contact-level canonical** (`canonical_profiles` + `canonical_profile_fields`)
+**Layer 1  -  Contact-level canonical** (`canonical_profiles` + `canonical_profile_fields`)
 - Remains the single contact-level truth store.
 - Extend domain coverage: add domains for all 16 IRCC profile sections (identity, biographical, contact, citizenship, passport, marital, spouse, dependants, parents, address_history, travel_history, education_history, employment_history, prior_refusals, immigration_history, military_security).
 - Add a **form → canonical write-back path**: when a verified answer is saved to a form instance, and that profile_path maps to a canonical domain, upsert to `canonical_profile_fields` with source = 'ircc_form' and verification_status = 'client_submitted' or 'verified'.
 
-**Layer 2 — Matter-level working copy** (`matter_form_instances.answers`)
+**Layer 2  -  Matter-level working copy** (`matter_form_instances.answers`)
 - Per ADR-1. This is where form answers live during a matter's lifecycle.
 - Not synced back to canonical until explicitly triggered (verification, matter closure, or staff action).
 
-**Layer 3 — Form rendering** (read-only assembly)
+**Layer 3  -  Form rendering** (read-only assembly)
 - The questionnaire engine reads Layer 2 answers for the current instance.
 - For empty fields, the prefill resolver (ADR-3) assembles from Layer 1 + prior instances.
 
@@ -137,12 +137,12 @@ No defined precedence exists for resolving which value to use when multiple sour
 **Explicit six-level precedence hierarchy, evaluated top-down. First non-null match wins.**
 
 ```
-1. Verified matter override     — staff verified this value for this specific matter
-2. Current matter answer        — answer saved in this form instance (source: staff_entry or client_portal)
-3. Cross-form reuse             — answer propagated from another form in the same matter
-4. Verified canonical value     — canonical_profile_fields with verification_status = 'verified'
-5. Unverified canonical value   — canonical_profile_fields with verification_status != 'verified'
-6. Contact field fallback       — raw contacts table fields (name, email, phone, DOB, etc.)
+1. Verified matter override      -  staff verified this value for this specific matter
+2. Current matter answer         -  answer saved in this form instance (source: staff_entry or client_portal)
+3. Cross-form reuse              -  answer propagated from another form in the same matter
+4. Verified canonical value      -  canonical_profile_fields with verification_status = 'verified'
+5. Unverified canonical value    -  canonical_profile_fields with verification_status != 'verified'
+6. Contact field fallback        -  raw contacts table fields (name, email, phone, DOB, etc.)
 ```
 
 **Override rules:**
@@ -320,7 +320,7 @@ Cross-matter reuse NEVER reads directly from another matter's form instances. Th
    | **Semi-stable** | Marital status, address, phone, email, passport, employment, education, refusal history | Present for review. Show `effective_from` date. Require confirmation for fields older than configurable threshold (default: 6 months). |
    | **Matter-specific** | Trip dates, employer-specific data, program details, purpose declarations | Never auto-import. These are per-matter by definition. |
 
-   Category assignment is by `canonical_domain` + `field_key`, stored as a static classification in the codebase (not per-tenant configurable — the IRCC data model is standard).
+   Category assignment is by `canonical_domain` + `field_key`, stored as a static classification in the codebase (not per-tenant configurable  -  the IRCC data model is standard).
 
 3. **Review gate UI:** Staff sees a "Prior Data Found" panel at first form access in a new matter:
    - Reusable field count and percentage
@@ -371,7 +371,7 @@ Canonical-mediated reuse respects matter isolation while enabling dramatic time 
 | Reuse_log grows large over time | Low | Append-only, indexed on target_instance_id. Archival policy after matter closure. |
 
 ### Dependency Order
-ADR-6 depends on ADR-1 (per-instance answers), ADR-2 (canonical integration), ADR-3 (precedence — imported values enter at appropriate level). ADR-6 can be built after core infrastructure (Modules B, D, E) and is independent of ADR-5 (cross-form reuse).
+ADR-6 depends on ADR-1 (per-instance answers), ADR-2 (canonical integration), ADR-3 (precedence  -  imported values enter at appropriate level). ADR-6 can be built after core infrastructure (Modules B, D, E) and is independent of ADR-5 (cross-form reuse).
 
 ---
 
@@ -402,7 +402,7 @@ The audit revealed that `ircc_form_fields` already has: `is_required`, `required
 **Validation engine** reads `ircc_form_fields` for the form, applies rules based on field metadata, returns structured `ValidationResult[]`. No form-code switch/case. No hardcoded rule registry.
 
 **Validation timing:**
-- **Client-side (real-time):** Required, pattern, enum, max_length — evaluated on blur/change.
+- **Client-side (real-time):** Required, pattern, enum, max_length  -  evaluated on blur/change.
 - **Server-side (on save):** Same rules + cross-field required_condition.
 - **Server-side (on generation):** All rules + stale_count = 0 + blocker_count = 0.
 
@@ -421,7 +421,7 @@ The metadata already exists on `ircc_form_fields`. The hardcoded rules are just 
 - **Schema:** ALTER TABLE `ircc_form_fields` ADD COLUMN `min_length` INT, ADD COLUMN `validation_pattern` TEXT, ADD COLUMN `validation_message` TEXT, ADD COLUMN `is_blocking` BOOLEAN DEFAULT true.
 - **Data:** Backfill `is_blocking = true` for all currently-required fields. Backfill `validation_pattern` for any fields that need custom regex beyond their field_type default.
 - **Code:** New `validation-rules-engine.ts` replaces `form-validator.ts`. Old file is deleted after migration. Existing hardcoded rules are verified against DB metadata during migration (run `verify-ircc-migration.ts` equivalent).
-- **Breaking:** `validateFormData(formCode, ...)` signature changes to `validateFormInstance(instanceId, ...)` — reads rules from DB, not from code.
+- **Breaking:** `validateFormData(formCode, ...)` signature changes to `validateFormInstance(instanceId, ...)`  -  reads rules from DB, not from code.
 
 ### Risk
 | Risk | Severity | Mitigation |
@@ -449,13 +449,13 @@ The generation pipeline currently reads from `contacts.immigration_data` (flat J
 3. Validate via ADR-7 rules engine. Hard fail if blocking errors exist.
 4. Check `stale_count = 0`. Hard fail if stale answers exist (or require explicit staff acknowledgment flag).
 5. Check all source conflicts resolved. Hard fail if unresolved conflicts exist.
-6. Produce `resolved_fields: Record<string, unknown>` — the final profile_path → value map.
+6. Produce `resolved_fields: Record<string, unknown>`  -  the final profile_path → value map.
 7. Freeze `resolved_fields` as `input_snapshot` on `form_pack_versions` (replaces `structuredClone(contacts.immigration_data)`).
 8. Pass `resolved_fields` to `buildXfaFieldDataFromDB()` (replaces raw profile).
 9. Continue existing pipeline: Python fill → checksum → atomic version → storage upload.
 
 **What does NOT change:**
-- `form_pack_versions` schema (input_snapshot is already JSONB — content changes but column type doesn't)
+- `form_pack_versions` schema (input_snapshot is already JSONB  -  content changes but column type doesn't)
 - `form_pack_artifacts` schema
 - `create_form_pack_version()` RPC
 - `approve_form_pack_version()` RPC
@@ -487,7 +487,7 @@ Minimal change to a production-grade pipeline. The resolution step is the only n
 | Performance of resolution step | Low | Single DB query for instance answers + one for canonical fallback. In-memory merge. |
 
 ### Dependency Order
-ADR-8 depends on ADR-1, ADR-3, ADR-4 (stale checks), ADR-7 (validation). ADR-8 is a late-phase integration — build after all core engines are working.
+ADR-8 depends on ADR-1, ADR-3, ADR-4 (stale checks), ADR-7 (validation). ADR-8 is a late-phase integration  -  build after all core engines are working.
 
 ---
 
@@ -544,7 +544,7 @@ ADR-9 depends on all core engines (ADR-1 through ADR-8) being functional. It is 
 Zero test coverage across 6,800+ LOC of IRCC form logic. The CTO spec requires tests that prove end-to-end flows, not isolated utility functions.
 
 ### Chosen Approach
-**Three test layers, organized by module. Vitest (existing framework). No E2E browser tests in initial delivery — integration tests at the engine level are sufficient to prove correctness.**
+**Three test layers, organized by module. Vitest (existing framework). No E2E browser tests in initial delivery  -  integration tests at the engine level are sufficient to prove correctness.**
 
 ### Layer 1: Unit Tests (Pure Functions)
 
@@ -581,9 +581,9 @@ These tests use fixture profiles with known values and assert the exact resolved
 
 ### Test Infrastructure
 
-- **Fixture factory:** `createTestProfile(overrides)` — produces a valid IRCCProfile with sensible defaults.
-- **Fixture form:** `createTestFormDefinition(fields)` — produces a valid form definition with sections and fields.
-- **Fixture instance:** `createTestFormInstance(answers)` — produces a matter_form_instances row with typed answers.
+- **Fixture factory:** `createTestProfile(overrides)`  -  produces a valid IRCCProfile with sensible defaults.
+- **Fixture form:** `createTestFormDefinition(fields)`  -  produces a valid form definition with sections and fields.
+- **Fixture instance:** `createTestFormInstance(answers)`  -  produces a matter_form_instances row with typed answers.
 - **Mock DB layer:** For integration tests, use in-memory representations of DB queries. No live Supabase dependency in tests.
 
 ### Rejected Alternatives
@@ -631,17 +631,17 @@ ADR-8 (Generation Integration) ←←←←←
   ↓
 ADR-9 (Staff Inspection)
   ↓
-ADR-10 (Testing) — parallel with all modules
+ADR-10 (Testing)  -  parallel with all modules
 ```
 
 **Build order:**
 1. ADR-1 → ADR-2 → ADR-3 (data foundation)
-2. ADR-4 → ADR-7 (rules foundation) — can parallel with #1 after ADR-1
-3. ADR-5 (cross-form reuse) — after #1
-4. ADR-6 (cross-matter reuse) — after #1 and #2
-5. ADR-8 (generation) — after #1, #2, #3, #4
-6. ADR-9 (inspection) — after all engines
-7. ADR-10 (testing) — continuous, alongside each module
+2. ADR-4 → ADR-7 (rules foundation)  -  can parallel with #1 after ADR-1
+3. ADR-5 (cross-form reuse)  -  after #1
+4. ADR-6 (cross-matter reuse)  -  after #1 and #2
+5. ADR-8 (generation)  -  after #1, #2, #3, #4
+6. ADR-9 (inspection)  -  after all engines
+7. ADR-10 (testing)  -  continuous, alongside each module
 
 ---
 
@@ -661,4 +661,4 @@ ADR-10 (Testing) — parallel with all modules
 
 ---
 
-*End of Architecture Decision Record — Gate Document*
+*End of Architecture Decision Record  -  Gate Document*

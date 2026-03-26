@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * useLocale — Bifurcated i18n hook (Directive 18.0)
+ * useLocale  -  Bifurcated i18n hook (Directive 18.0)
  *
  * Provides:
  *   - `locale`: current locale code
@@ -50,7 +50,7 @@ export function useLocale(options?: UseLocaleOptions) {
   useEffect(() => {
     const persisted = getPersistedLocale()
     if (persisted) {
-      // Clamp to audience — admin user with 'es' stored gets 'en'
+      // Clamp to audience  -  admin user with 'es' stored gets 'en'
       setLocaleState(clampLocaleForAudience(persisted, audience))
     } else {
       const detected = detectBrowserLocale(audience)

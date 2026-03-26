@@ -112,7 +112,7 @@ export function useUploadDocument() {
       }
       return result.document as Document
     },
-    // Directive 012: Optimistic UI — show the document instantly before server confirms
+    // Directive 012: Optimistic UI  -  show the document instantly before server confirms
     onMutate: async (variables) => {
       // Cancel in-flight refetches to prevent overwrite
       await queryClient.cancelQueries({ queryKey: documentKeys.all })
@@ -352,7 +352,7 @@ export function useAllDocuments(params: AllDocumentsParams) {
   })
 }
 
-// ── Vault Integrity Polling (Sentinel Shield — 2s interval) ─────────────────
+// ── Vault Integrity Polling (Sentinel Shield  -  2s interval) ─────────────────
 
 export interface VaultIntegrityRecord {
   id: string
@@ -523,7 +523,7 @@ export function usePersistScanData() {
     },
     onError: (error: Error) => {
       console.error('[persist-scan] Failed:', error.message)
-      // Silent failure — scan data persistence is non-critical
+      // Silent failure  -  scan data persistence is non-critical
     },
   })
 }
@@ -559,7 +559,7 @@ export function useGenerateRetainerPdf() {
     onSuccess: (data, matterId) => {
       qc.invalidateQueries({ queryKey: documentKeys.all })
       toast.success(
-        `Retainer generated in ${data.elapsed_ms}ms — ${data.context_summary.matter_number}`
+        `Retainer generated in ${data.elapsed_ms}ms  -  ${data.context_summary.matter_number}`
       )
     },
     onError: (error: Error) => {

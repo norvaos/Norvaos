@@ -16,7 +16,7 @@
  *     // ... handle request
  *   }
  *
- * Note: In-memory — resets on deploy. For multi-instance deployments,
+ * Note: In-memory  -  resets on deploy. For multi-instance deployments,
  * swap with Redis-backed implementation.
  */
 

@@ -393,7 +393,7 @@ export function CrsCalculatorSheet({
         <SheetHeader className="px-6 pt-6 pb-4">
           <SheetTitle>CRS Score Calculator</SheetTitle>
           <SheetDescription>
-            Comprehensive Ranking System — Express Entry
+            Comprehensive Ranking System  -  Express Entry
           </SheetDescription>
         </SheetHeader>
 
@@ -481,7 +481,7 @@ export function CrsCalculatorSheet({
                       update('firstLanguageTestType', testType)
                       // Re-convert raw scores with new test type
                       if (!testType) {
-                        // Direct CLB — raw scores ARE the CLB
+                        // Direct CLB  -  raw scores ARE the CLB
                         setInput((prev) => ({ ...prev, firstLanguageTestType: '', firstLanguage: rawTestScores }))
                       }
                     }}
@@ -633,7 +633,7 @@ export function CrsCalculatorSheet({
 
               {!input.hasSpouse && (
                 <p className="text-xs text-slate-400 italic">
-                  No spouse — core factor maximums are higher (500 vs 460).
+                  No spouse  -  core factor maximums are higher (500 vs 460).
                 </p>
               )}
             </CalcSection>

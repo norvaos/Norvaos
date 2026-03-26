@@ -40,7 +40,7 @@ import { useUser } from '@/lib/hooks/use-user'
 import { useMatterPresence } from '@/lib/hooks/use-matter-presence'
 import { useFieldLock } from '@/lib/hooks/use-field-lock'
 
-// Valid ZoneD tab IDs — keep in sync with ZoneD's TabId union.
+// Valid ZoneD tab IDs  -  keep in sync with ZoneD's TabId union.
 const VALID_TABS = new Set<ZoneDProps['initialTab']>([
   'details',
   'documents',
@@ -100,7 +100,7 @@ export default function MatterShellPage() {
     [appUser],
   )
 
-  // ── Polyglot Bridge — Global 15 Language Selector (Directive 16.2) ──────
+  // ── Polyglot Bridge  -  Global 15 Language Selector (Directive 16.2) ──────
   const { locale, setLocale } = useLocale({ audience: 'client' })
 
   const { lockedFields, lockField, unlockField, isFieldLocked, getFieldLock } = useFieldLock({
@@ -141,7 +141,7 @@ export default function MatterShellPage() {
     },
   })
 
-  // ── Immigration detection (must be before early returns — Rules of Hooks)
+  // ── Immigration detection (must be before early returns  -  Rules of Hooks)
   const { data: matterTypeData } = useQuery({
     queryKey: ['matter_types', 'single', matter?.matter_type_id],
     queryFn: () => fetchMatterTypeEnforcement(matter!.matter_type_id!),
@@ -221,11 +221,11 @@ export default function MatterShellPage() {
     )
   }
 
-  // ── Matter still loading (no list-cache hit) — show toggle bar + content skeleton
+  // ── Matter still loading (no list-cache hit)  -  show toggle bar + content skeleton
   if (!matter) {
     return (
       <div className="flex h-full flex-col overflow-hidden">
-        {/* View toggle bar — render immediately so layout doesn't shift */}
+        {/* View toggle bar  -  render immediately so layout doesn't shift */}
         <div className="flex items-center gap-1 border-b px-4 py-1.5 bg-muted/30">
           <Button
             variant={activeView === 'summary' ? 'secondary' : 'ghost'}
@@ -246,7 +246,7 @@ export default function MatterShellPage() {
             Workspace
           </Button>
         </div>
-        {/* Content-area skeleton — lighter than full-page skeleton */}
+        {/* Content-area skeleton  -  lighter than full-page skeleton */}
         <div className="flex flex-1 gap-4 p-6">
           <div className="flex-1 space-y-4">
             <Skeleton className="h-10 w-full rounded-lg" />
@@ -265,7 +265,7 @@ export default function MatterShellPage() {
   if (isImmigrationFunnel) {
     return (
       <div className="h-full overflow-hidden">
-        {/* Active users bar + language — visible above the funnel */}
+        {/* Active users bar + language  -  visible above the funnel */}
         <div className="flex items-center justify-end gap-2 border-b px-4 py-1 bg-muted/20">
           <SovereignSeal matterId={matterId} />
           <UniversalGlobeSelector
@@ -290,7 +290,7 @@ export default function MatterShellPage() {
   // ── Standard Shell with Executive Summary toggle ─────────────────────
   return (
     <div className="flex h-full flex-col overflow-hidden">
-      {/* AuraHeader — Polyglot Pulse with Globe Selector (Team TITAN) */}
+      {/* AuraHeader  -  Polyglot Pulse with Globe Selector (Team TITAN) */}
       <AuraHeader className="rounded-none" />
 
       {/* View toggle bar + active users */}
@@ -343,12 +343,12 @@ export default function MatterShellPage() {
         )}
       </div>
 
-      {/* Norva Intelligence — floating AI Draft button */}
+      {/* Norva Intelligence  -  floating AI Draft button */}
       {matter && (
         <AiDraftPanel matterId={matterId} matterTitle={matter.title} />
       )}
 
-      {/* Norva Ear — floating consultation recorder */}
+      {/* Norva Ear  -  floating consultation recorder */}
       {matter && (
         <NorvaEarPanel matterId={matterId} matterTitle={matter.title} />
       )}

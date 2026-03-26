@@ -1,14 +1,14 @@
 'use client'
 
 /**
- * DeficiencyPanel — Displays and manages deficiencies for a matter.
+ * DeficiencyPanel  -  Displays and manages deficiencies for a matter.
  *
  * Shows a table of deficiencies with severity/status badges.
  * Allows creating, resolving, and reopening deficiencies.
  * Resolve action is restricted to Lawyer / Admin roles (enforced client-side
  * for UX; the server enforces this independently).
  *
- * Sprint 6, Week 1 — 2026-03-17
+ * Sprint 6, Week 1  -  2026-03-17
  */
 
 import { useState } from 'react'
@@ -424,7 +424,7 @@ export function DeficiencyPanel({ matterId }: DeficiencyPanelProps) {
                   </TableCell>
 
                   <TableCell className="text-sm text-muted-foreground">
-                    {def.assigned_to_user_id ?? '—'}
+                    {def.assigned_to_user_id ?? ' - '}
                   </TableCell>
 
                   <TableCell className="text-xs text-muted-foreground whitespace-nowrap">
@@ -437,7 +437,7 @@ export function DeficiencyPanel({ matterId }: DeficiencyPanelProps) {
 
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
-                      {/* Resolve button — only Lawyer/Admin, only on blocking statuses */}
+                      {/* Resolve button  -  only Lawyer/Admin, only on blocking statuses */}
                       {canResolve && BLOCKING_STATUSES.has(def.status) && (
                         <Button
                           size="sm"
@@ -448,7 +448,7 @@ export function DeficiencyPanel({ matterId }: DeficiencyPanelProps) {
                         </Button>
                       )}
 
-                      {/* Reopen button — any user, only on resolved/closed */}
+                      {/* Reopen button  -  any user, only on resolved/closed */}
                       {(def.status === 'resolved' || def.status === 'closed') && (
                         <Button
                           size="sm"

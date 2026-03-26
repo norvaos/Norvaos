@@ -7,20 +7,20 @@ import { createAdminClient } from '@/lib/supabase/admin'
 /**
  * GET /api/admin/sentinel-command
  *
- * Security Command Centre — admin-only access to the immutable
+ * Security Command Centre  -  admin-only access to the immutable
  * sentinel_audit_log. Returns events with severity highlighting
  * and violation forensics.
  *
  * Query params:
- *   ?limit=50         — max records (default 50, max 200)
- *   ?severity=critical — filter by severity
- *   ?event_type=TENANT_VIOLATION — filter by event type
+ *   ?limit=50          -  max records (default 50, max 200)
+ *   ?severity=critical  -  filter by severity
+ *   ?event_type=TENANT_VIOLATION  -  filter by event type
  */
 async function handleGet(request: Request) {
   try {
     const auth = await authenticateRequest()
 
-    // Enforce super_admin / admin role — settings:edit is the admin gate
+    // Enforce super_admin / admin role  -  settings:edit is the admin gate
     const role = requirePermission(auth, 'settings', 'edit')
 
     // Double-check: must be admin or super_admin role by name

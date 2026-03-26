@@ -1,4 +1,4 @@
-# NorvaOS — Production Runbook
+# NorvaOS  -  Production Runbook
 
 **Version:** 1.0
 **Date:** 2026-03-15
@@ -158,7 +158,7 @@ Request arrives
 
 ## 3. Environment Configuration
 
-### 3.1 Required Environment Variables — Production
+### 3.1 Required Environment Variables  -  Production
 
 #### Public (safe to commit, embedded in client bundle)
 
@@ -170,7 +170,7 @@ Request arrives
 | `NEXT_PUBLIC_APP_NAME` | Display name | `NorvaOS` |
 | `NEXT_PUBLIC_VAPID_PUBLIC_KEY` | Web push VAPID public key | Base64 string |
 
-#### Secrets (Vercel environment variables only — never commit)
+#### Secrets (Vercel environment variables only  -  never commit)
 
 | Variable | Description | Required | Source |
 |---|---|---|---|
@@ -361,7 +361,7 @@ curl http://localhost:3000/api/health
 **Current count:** 104 migrations (000 through 104)
 **Tracking table:** `_migrations` (name, applied_at, checksum)
 
-**Method 1 — Supabase Dashboard (recommended for production):**
+**Method 1  -  Supabase Dashboard (recommended for production):**
 
 1. Navigate to Supabase Dashboard → SQL Editor
 2. Open the migration file (e.g., `scripts/migrations/104-segregation-of-duties-triggers.sql`)
@@ -370,7 +370,7 @@ curl http://localhost:3000/api/health
 5. Verify no errors in output
 6. Confirm in `_migrations` table that the migration is recorded
 
-**Method 2 — Migration script (automated):**
+**Method 2  -  Migration script (automated):**
 
 ```bash
 # Requires direct database connection (not pooler)
@@ -393,7 +393,7 @@ pnpm db:migrate:status
 3. **Always include RLS policies** for new tables.
 4. **Never modify or renumber** an existing migration that has been applied.
 5. **Test on staging first.** The CI pipeline applies migrations to staging before production deployment.
-6. **Use direct connection** (not pooler) for migrations — long transactions may timeout on pooled connections.
+6. **Use direct connection** (not pooler) for migrations  -  long transactions may timeout on pooled connections.
 
 ### 5.3 Common Database Queries
 
@@ -437,7 +437,7 @@ WHERE schemaname = 'public'
 ORDER BY pg_total_relation_size(relid) DESC;
 ```
 
-### 5.4 Dangerous Operations — Require Approval
+### 5.4 Dangerous Operations  -  Require Approval
 
 The following operations require explicit approval from the platform owner before execution:
 
@@ -449,7 +449,7 @@ The following operations require explicit approval from the platform owner befor
 | `DELETE FROM` without WHERE | Bulk deletion | Written approval |
 | Disabling RLS on any table | Security bypass | Never in production |
 | Modifying `_migrations` table | Migration tracking corruption | Never |
-| Direct `UPDATE` on `invoices` where `status = 'paid'` | Immutability violation | Blocked by trigger — requires trigger bypass |
+| Direct `UPDATE` on `invoices` where `status = 'paid'` | Immutability violation | Blocked by trigger  -  requires trigger bypass |
 
 ---
 
@@ -501,10 +501,10 @@ git push origin main
 
 | Severity | Detection | Action | Timeline |
 |---|---|---|---|
-| P0 — System down | Health check fails | Vercel instant rollback | < 5 minutes |
-| P1 — Data at risk | Error spike in logs | Vercel rollback + investigate | < 15 minutes |
-| P2 — Feature broken | User report / monitoring | Hotfix branch + deploy | < 2 hours |
-| P3 — Minor issue | User report | Normal fix cycle | Next business day |
+| P0  -  System down | Health check fails | Vercel instant rollback | < 5 minutes |
+| P1  -  Data at risk | Error spike in logs | Vercel rollback + investigate | < 15 minutes |
+| P2  -  Feature broken | User report / monitoring | Hotfix branch + deploy | < 2 hours |
+| P3  -  Minor issue | User report | Normal fix cycle | Next business day |
 
 ---
 
@@ -613,11 +613,11 @@ All application logs are structured JSON to stdout (consumed by Vercel):
 
 | Pattern | Meaning | Action |
 |---|---|---|
-| `AuthError: Account deactivated` | Deactivated user attempting access | Expected — verify user is actually deactivated |
+| `AuthError: Account deactivated` | Deactivated user attempting access | Expected  -  verify user is actually deactivated |
 | `AuthError: Unauthorized` | Missing or invalid session | Check for session expiry or token issues |
 | `RBAC: Permission denied` | User lacks required permission | Verify role assignments are correct |
-| `RLS violation` | Tenant isolation enforcement | Investigate — should not occur in normal operation |
-| `Immutability trigger blocked` | Paid invoice or cleared cheque modification attempt | Expected — verify it is not a legitimate update path |
+| `RLS violation` | Tenant isolation enforcement | Investigate  -  should not occur in normal operation |
+| `Immutability trigger blocked` | Paid invoice or cleared cheque modification attempt | Expected  -  verify it is not a legitimate update path |
 | `Segregation of duties violation` | Same user attempting prepare + approve | Expected enforcement |
 | `Circuit breaker open: python-worker` | Python sidecar unavailable | Check sidecar health, restart if needed |
 
@@ -629,34 +629,34 @@ All application logs are structured JSON to stdout (consumed by Vercel):
 
 | Severity | Definition | Response Time | Examples |
 |---|---|---|---|
-| **P0 — Critical** | System completely down or data integrity at risk | Immediate (< 15 min) | Health check failing, DB unreachable, RLS disabled, data breach |
-| **P1 — High** | Major feature broken, significant user impact | < 1 hour | Auth failing, trust accounting errors, billing broken |
-| **P2 — Medium** | Feature degraded, workaround exists | < 4 hours | Portal links failing, cron job errors, email delivery issues |
-| **P3 — Low** | Minor issue, cosmetic, no data impact | Next business day | UI alignment, non-critical feature bug |
+| **P0  -  Critical** | System completely down or data integrity at risk | Immediate (< 15 min) | Health check failing, DB unreachable, RLS disabled, data breach |
+| **P1  -  High** | Major feature broken, significant user impact | < 1 hour | Auth failing, trust accounting errors, billing broken |
+| **P2  -  Medium** | Feature degraded, workaround exists | < 4 hours | Portal links failing, cron job errors, email delivery issues |
+| **P3  -  Low** | Minor issue, cosmetic, no data impact | Next business day | UI alignment, non-critical feature bug |
 
 ### 9.2 Incident Response Steps
 
-#### P0 — System Down
+#### P0  -  System Down
 
 ```
-1. VERIFY     — Confirm the issue (health check, logs, user reports)
-2. MITIGATE   — Vercel instant rollback to last known-good deployment
-3. NOTIFY     — Inform platform owner (Zia Waseer) immediately
-4. DIAGNOSE   — Review Vercel logs, Supabase logs, recent deployments
-5. FIX        — Hotfix branch → test on staging → deploy
-6. VERIFY     — Confirm fix in production
-7. POSTMORTEM — Document root cause, timeline, and prevention measures
+1. VERIFY      -  Confirm the issue (health check, logs, user reports)
+2. MITIGATE    -  Vercel instant rollback to last known-good deployment
+3. NOTIFY      -  Inform platform owner (Zia Waseer) immediately
+4. DIAGNOSE    -  Review Vercel logs, Supabase logs, recent deployments
+5. FIX         -  Hotfix branch → test on staging → deploy
+6. VERIFY      -  Confirm fix in production
+7. POSTMORTEM  -  Document root cause, timeline, and prevention measures
 ```
 
-#### P1 — Major Feature Broken
+#### P1  -  Major Feature Broken
 
 ```
-1. VERIFY     — Reproduce the issue, check logs
-2. ASSESS     — Determine if rollback is needed or if a hotfix is sufficient
-3. NOTIFY     — Inform platform owner within 1 hour
-4. FIX        — Hotfix branch → test on staging → deploy
-5. VERIFY     — Confirm fix in production
-6. DOCUMENT   — Update known issues if relevant
+1. VERIFY      -  Reproduce the issue, check logs
+2. ASSESS      -  Determine if rollback is needed or if a hotfix is sufficient
+3. NOTIFY      -  Inform platform owner within 1 hour
+4. FIX         -  Hotfix branch → test on staging → deploy
+5. VERIFY      -  Confirm fix in production
+6. DOCUMENT    -  Update known issues if relevant
 ```
 
 ### 9.3 Data Integrity Incidents
@@ -664,16 +664,16 @@ All application logs are structured JSON to stdout (consumed by Vercel):
 If a data integrity issue is suspected:
 
 ```
-1. STOP       — Do NOT attempt to fix data directly
-2. SNAPSHOT   — Capture current state:
+1. STOP        -  Do NOT attempt to fix data directly
+2. SNAPSHOT    -  Capture current state:
                 SELECT * FROM affected_table WHERE <conditions>;
-3. ASSESS     — Determine scope of corruption
-4. NOTIFY     — Inform platform owner immediately
-5. PLAN       — Determine correction approach:
+3. ASSESS      -  Determine scope of corruption
+4. NOTIFY      -  Inform platform owner immediately
+5. PLAN        -  Determine correction approach:
                 a) Corrective SQL migration (preferred)
                 b) Point-in-time restore (if widespread)
-6. EXECUTE    — Apply correction with full audit trail
-7. VERIFY     — Confirm data integrity restored
+6. EXECUTE     -  Apply correction with full audit trail
+7. VERIFY      -  Confirm data integrity restored
 ```
 
 ### 9.4 Trust Accounting Incidents
@@ -692,11 +692,11 @@ Trust accounting issues are always P0 due to regulatory requirements:
 
 If a trust accounting discrepancy is detected:
 
-1. **Freeze** — Do not process any trust transactions
-2. **Reconcile** — Run trust reconciliation report via the application
-3. **Document** — Record the discrepancy with timestamps and amounts
-4. **Escalate** — Notify platform owner and legal counsel
-5. **Correct** — Create corrective entries through the application (never direct SQL)
+1. **Freeze**  -  Do not process any trust transactions
+2. **Reconcile**  -  Run trust reconciliation report via the application
+3. **Document**  -  Record the discrepancy with timestamps and amounts
+4. **Escalate**  -  Notify platform owner and legal counsel
+5. **Correct**  -  Create corrective entries through the application (never direct SQL)
 
 ---
 
@@ -782,29 +782,29 @@ pg_restore -d "$SUPABASE_DB_URL" \
 
 The restore test will validate:
 
-1. **Backup capture** — pg_dump of full production database
-2. **Restore to isolated instance** — pg_restore to a temporary Supabase project
-3. **Data integrity verification** — Row counts, referential integrity, trigger functionality
-4. **Application connectivity** — Point staging app at restored DB, verify functionality
-5. **Recovery time measurement** — Wall-clock time from backup to operational state
-6. **Cleanup** — Destroy temporary project
+1. **Backup capture**  -  pg_dump of full production database
+2. **Restore to isolated instance**  -  pg_restore to a temporary Supabase project
+3. **Data integrity verification**  -  Row counts, referential integrity, trigger functionality
+4. **Application connectivity**  -  Point staging app at restored DB, verify functionality
+5. **Recovery time measurement**  -  Wall-clock time from backup to operational state
+6. **Cleanup**  -  Destroy temporary project
 
 ---
 
 ## 11. Security Controls Reference
 
-### 11.1 Enforced Controls (Phase 8 — Accepted)
+### 11.1 Enforced Controls (Phase 8  -  Accepted)
 
 | Control | Enforcement Layer | Trigger/Mechanism |
 |---|---|---|
 | Tenant isolation | Database (RLS) | `USING (tenant_id = get_current_tenant_id())` on all tables |
 | User deactivation | Middleware + API | `is_active` check in `middleware.ts` and `authenticateRequest()` |
 | RBAC | API | `requirePermission(auth, entity, action)` on all 235 routes |
-| Invoice paid immutability | Database (trigger) | `prevent_paid_invoice_mutation()` — locks core fields when `status = 'paid'` |
-| Cheque post-issuance immutability | Database (trigger) | `prevent_issued_cheque_mutation()` — cleared/voided fully immutable |
-| Segregation of duties (disbursements) | Database (trigger) | `enforce_disbursement_segregation()` — `prepared_by ≠ approved_by` |
-| Segregation of duties (payment plans) | Database (trigger) | `enforce_payment_plan_segregation()` — `created_by ≠ approved_by` |
-| Segregation of duties (write-offs) | Database (trigger) | `enforce_write_off_segregation()` — requester ≠ approver |
+| Invoice paid immutability | Database (trigger) | `prevent_paid_invoice_mutation()`  -  locks core fields when `status = 'paid'` |
+| Cheque post-issuance immutability | Database (trigger) | `prevent_issued_cheque_mutation()`  -  cleared/voided fully immutable |
+| Segregation of duties (disbursements) | Database (trigger) | `enforce_disbursement_segregation()`  -  `prepared_by ≠ approved_by` |
+| Segregation of duties (payment plans) | Database (trigger) | `enforce_payment_plan_segregation()`  -  `created_by ≠ approved_by` |
+| Segregation of duties (write-offs) | Database (trigger) | `enforce_write_off_segregation()`  -  requester ≠ approver |
 | Portal token hashing | Database + Application | SHA-256 hashed tokens, plaintext redacted, `validatePortalToken()` |
 | Trust overdraft prevention | Database (trigger) | Balance check before debit |
 | Trust append-only log | Database (trigger) | `trust_transactions` immutability trigger |
@@ -879,7 +879,7 @@ The Python sidecar (`PYTHON_WORKER_URL`) handles XFA PDF processing:
 
 | Service | Health Check | Fallback Behaviour |
 |---|---|---|
-| Supabase | `/api/health` (DB connectivity) | Application down — no fallback |
+| Supabase | `/api/health` (DB connectivity) | Application down  -  no fallback |
 | Resend | Email send returns 200 | Logs warning, continues without email |
 | Stripe | Webhook delivery status | Billing features unavailable |
 | Upstash Redis | Connection test on startup | Auth works without cache (direct DB) |
@@ -988,7 +988,7 @@ P3: Log in issue tracker → fix in next release cycle
    - Middleware level (redirect to `/login?error=account_deactivated`)
    - API level (`AuthError: Account deactivated, 403`)
 4. Existing sessions are invalidated on next request
-5. **Do NOT delete the user record** — soft delete preserves audit trail
+5. **Do NOT delete the user record**  -  soft delete preserves audit trail
 
 ---
 
@@ -1000,8 +1000,8 @@ P3: Log in issue tracker → fix in next release cycle
 |---|---|---|---|---|
 | 1 | Schema types are manual (`lib/types/database.ts`), not generated from DB | Type drift risk if migration and types diverge | CI schema drift check (`check-schema-drift.mjs`) catches most drift; static analysis, not runtime generated types | Future: implement `supabase gen types` in CI |
 | 2 | Email live-validation carve-out | 3 email scenarios not production-tested: inbound association, ambiguous resolution, reply with sender identity | Code-side work done; blocked on Azure App Registration + admin consent | Pending Microsoft Graph OAuth setup |
-| 3 | Migrations are forward-only | No automatic rollback for failed migrations | Manual corrective migrations; test on staging first | By design — forward-only is safer for production |
-| 4 | Python sidecar required for XFA PDFs | XFA PDF processing unavailable if sidecar is down | Circuit breaker with 30s recovery; all non-XFA features unaffected | Acceptable — XFA is niche use case |
+| 3 | Migrations are forward-only | No automatic rollback for failed migrations | Manual corrective migrations; test on staging first | By design  -  forward-only is safer for production |
+| 4 | Python sidecar required for XFA PDFs | XFA PDF processing unavailable if sidecar is down | Circuit breaker with 30s recovery; all non-XFA features unaffected | Acceptable  -  XFA is niche use case |
 | 5 | Bank feed integration not implemented | No automatic bank transaction import | Manual reconciliation via trust accounting UI | Future phase |
 | 6 | QuickBooks integration not implemented | No automatic accounting sync | Manual export/import | Future phase |
 | 7 | Redis cache is optional | Without Redis, every API call hits DB for auth | Supabase connection pool handles typical load; Redis recommended for scale | Deploy Upstash Redis for production |
@@ -1017,7 +1017,7 @@ P3: Log in issue tracker → fix in next release cycle
 | SHA-256 for portal tokens (not bcrypt) | Tokens are looked up by hash (must be indexable); bcrypt not suitable for lookup |
 | Forward-only migrations | Safer for production; prevents accidental data loss from down migrations |
 | Soft deletes (is_active flag) | Preserves audit trail; required for legal compliance |
-| Admin role bypasses RBAC | Single firm context — admin is the managing partner; simplifies permission model |
+| Admin role bypasses RBAC | Single firm context  -  admin is the managing partner; simplifies permission model |
 
 ---
 

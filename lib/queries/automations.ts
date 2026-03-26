@@ -66,7 +66,7 @@ export function useAutomationExecutionLog(tenantId: string, ruleId: string | nul
     queryKey: ['automation-execution-log', tenantId, ruleId],
     queryFn: async () => {
       const supabase = createClient()
-      // No FK from automation_execution_log to matters — use 2-query pattern
+      // No FK from automation_execution_log to matters  -  use 2-query pattern
       const { data: logs, error } = await supabase
         .from('automation_execution_log')
         .select('*')

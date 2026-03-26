@@ -578,7 +578,7 @@ export default function DocumentTemplatesPage() {
             <div>
               <h2 className="text-sm font-medium text-slate-700">
                 {selectedCaseType
-                  ? `${selectedCaseType.name} — Document Templates`
+                  ? `${selectedCaseType.name}  -  Document Templates`
                   : 'Select a case type'}
               </h2>
               {templates && (

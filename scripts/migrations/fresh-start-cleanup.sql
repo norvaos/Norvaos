@@ -1,6 +1,6 @@
 -- ============================================================================
 -- FRESH START CLEANUP
--- Run in Supabase SQL Editor (3 steps — run each block separately)
+-- Run in Supabase SQL Editor (3 steps  -  run each block separately)
 -- ============================================================================
 
 -- ════════════════════════════════════════════════════════════════════════════

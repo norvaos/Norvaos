@@ -5,7 +5,7 @@ import type { IntakeField, IntakeFormSettings, FieldCondition } from '@/lib/type
 import { withTiming } from '@/lib/middleware/request-timing'
 import { createRateLimiter } from '@/lib/middleware/rate-limit'
 
-// In-process sliding-window rate limiter — suitable for single-instance deployments.
+// In-process sliding-window rate limiter  -  suitable for single-instance deployments.
 // For multi-instance production, replace with a Redis-backed implementation.
 const submitLimiter = createRateLimiter({ maxRequests: 10, windowMs: 60_000 })
 
@@ -181,7 +181,7 @@ async function handlePost(
       }
     }
 
-    // 6. Smart contact creation — detect duplicates by email
+    // 6. Smart contact creation  -  detect duplicates by email
     let contactId: string
     let isReturningClient = false
     const submittedEmail = contactData.email_primary?.trim().toLowerCase()
@@ -198,7 +198,7 @@ async function handlePost(
         .maybeSingle()
 
       if (existingContact) {
-        // Returning client — link to existing contact and enrich with new data
+        // Returning client  -  link to existing contact and enrich with new data
         contactId = existingContact.id
         isReturningClient = true
 
@@ -221,7 +221,7 @@ async function handlePost(
             .eq('id', contactId)
         }
       } else {
-        // New client — create contact
+        // New client  -  create contact
         const { data: newContact, error: contactError } = await admin
           .from('contacts')
           .insert({
@@ -247,7 +247,7 @@ async function handlePost(
         contactId = newContact.id
       }
     } else {
-      // No email provided — always create a new contact
+      // No email provided  -  always create a new contact
       const { data: newContact, error: contactError } = await admin
         .from('contacts')
         .insert({
@@ -303,7 +303,7 @@ async function handlePost(
     let leadId: string | null = null
 
     if (form.pipeline_id) {
-      // Get the stage — use configured stage or first stage in pipeline
+      // Get the stage  -  use configured stage or first stage in pipeline
       let stageId = form.stage_id as string | null
 
       if (!stageId) {
@@ -414,7 +414,7 @@ async function handlePost(
         } as any,
       })
       if (notifyError) {
-        // Non-fatal — don't fail the submission if notification fails
+        // Non-fatal  -  don't fail the submission if notification fails
         console.error('Failed to create notification activity:', notifyError)
       }
     }

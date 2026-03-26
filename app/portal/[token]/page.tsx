@@ -1,9 +1,9 @@
 // SECURITY AUDIT PASSED [2026-03-17]: all data access scoped to matter_id from portal_links token lookup.
 // Token is validated via `is_active = true` and `expires_at` check before any data is fetched.
 // Every subsequent query uses `link.matter_id` and `link.tenant_id` derived exclusively from the
-// portal_links row — no user-supplied matter_id or tenant_id is accepted from the request.
+// portal_links row  -  no user-supplied matter_id or tenant_id is accepted from the request.
 // Admin client (service role) is used server-side only; no RLS bypass is exposed to the client.
-// FIX [2026-03-17]: corrected null-expiry bug — `new Date(null)` resolves to epoch, causing links
+// FIX [2026-03-17]: corrected null-expiry bug  -  `new Date(null)` resolves to epoch, causing links
 // with no expiry to appear expired. Guard now checks `expires_at !== null` before date comparison.
 
 import { createAdminClient } from '@/lib/supabase/admin'
@@ -54,7 +54,7 @@ export default async function PortalPage({ params }: Props) {
     notFound()
   }
 
-  // 2. Check expiry — extract language early for expired page
+  // 2. Check expiry  -  extract language early for expired page
   const rawMetadata = (link.metadata && typeof link.metadata === 'object' && !Array.isArray(link.metadata))
     ? link.metadata as Record<string, string>
     : {}
@@ -68,7 +68,7 @@ export default async function PortalPage({ params }: Props) {
     return <PortalExpired language={expiredLanguage} />
   }
 
-  // 3. Fetch matter (just matter_number for privacy — not full title)
+  // 3. Fetch matter (just matter_number for privacy  -  not full title)
   const { data: matter } = await admin
     .from('matters')
     .select('id, matter_number, title, matter_type_id, status, responsible_lawyer_id')
@@ -161,7 +161,7 @@ export default async function PortalPage({ params }: Props) {
 
   const matterRef = matter.matter_number || `Case #${matter.id.slice(0, 8)}`
 
-  // 8. Check for IRCC questionnaire session — auto-create if matter type has forms
+  // 8. Check for IRCC questionnaire session  -  auto-create if matter type has forms
   //
   // Single source of truth: ircc_stream_forms (Settings → Matter Type → Forms).
   // Legacy fallback: ircc_question_set_codes on matter_types table.
@@ -204,7 +204,7 @@ export default async function PortalPage({ params }: Props) {
 
   // Auto-create session if none exists and forms are currently configured
   if (!irccSession && currentFormCodes.length > 0) {
-    // Find the contact for this matter — try 'client' first, then immigration roles
+    // Find the contact for this matter  -  try 'client' first, then immigration roles
     let contactId: string | null = null
     for (const role of ['client', 'principal_applicant', 'sponsor']) {
       const { data: person } = await admin
@@ -242,7 +242,7 @@ export default async function PortalPage({ params }: Props) {
   }
 
   // Show Questions section only if forms are currently configured for this matter type.
-  // A stale session alone is not enough — the matter type must have active form configuration.
+  // A stale session alone is not enough  -  the matter type must have active form configuration.
   const hasIRCC = currentFormCodes.length > 0 || (!!irccSession && irccSession.status === 'completed')
 
   // 9. Check for client-visible tasks
@@ -361,11 +361,11 @@ export default async function PortalPage({ params }: Props) {
         (s) => requestedIds.has(s.id) || s.status !== 'empty'
       )
     } else {
-      // No requests sent yet — show all active slots
+      // No requests sent yet  -  show all active slots
       enrichedSlots = allEnriched
     }
   } else {
-    // Non-enforcement: fetch legacy checklist items (exclude N/A — hidden from client)
+    // Non-enforcement: fetch legacy checklist items (exclude N/A  -  hidden from client)
     const { data: items } = await admin
       .from('matter_checklist_items')
       .select('*')
@@ -399,7 +399,7 @@ export default async function PortalPage({ params }: Props) {
 
   const hasSharedDocuments = (sharedDocCount ?? 0) > 0
 
-  // 14. Timeline always shown — API has fallback to matter.status
+  // 14. Timeline always shown  -  API has fallback to matter.status
   const hasTimeline = true
 
   // 15. Render with single-page guided workspace

@@ -165,7 +165,7 @@ export function useSyncMatterOneDrive(matterId: string) {
       return data as { folderPath: string }
     },
     onSuccess: (data) => {
-      toast.success(`OneDrive folders synced — ${data.folderPath}`)
+      toast.success(`OneDrive folders synced  -  ${data.folderPath}`)
     },
     onError: (error: Error) => {
       toast.error(error.message || 'Failed to sync OneDrive folders')

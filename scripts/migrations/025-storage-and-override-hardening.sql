@@ -7,12 +7,12 @@
 --    Authenticated clients can still download files scoped to their tenant.
 -- B. Transactional Risk Override RPC: Single atomic function that updates
 --    matter_intake, inserts risk_override_history, and writes an audit log.
---    If any step fails the entire transaction rolls back — no partial writes.
+--    If any step fails the entire transaction rolls back  -  no partial writes.
 -- ============================================================================
 
 -- ─── A. Storage RLS Policies ────────────────────────────────────────────────
 
--- Enable RLS on storage.objects (idempotent — Supabase may already have it on)
+-- Enable RLS on storage.objects (idempotent  -  Supabase may already have it on)
 ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY;
 
 -- Allow authenticated users to SELECT (download) files in their tenant folder
@@ -60,7 +60,7 @@ BEGIN
     RAISE EXCEPTION 'Intake record not found or tenant mismatch';
   END IF;
 
-  -- 2. Insert override history (mandatory — failure rolls back everything)
+  -- 2. Insert override history (mandatory  -  failure rolls back everything)
   INSERT INTO risk_override_history (
     tenant_id, matter_id, intake_id,
     previous_level, new_level, reason, overridden_by
@@ -69,7 +69,7 @@ BEGIN
     p_previous_level, p_override_level, p_override_reason, p_user_id
   ) RETURNING id INTO v_history_id;
 
-  -- 3. Insert audit log (mandatory — failure rolls back everything)
+  -- 3. Insert audit log (mandatory  -  failure rolls back everything)
   INSERT INTO audit_logs (
     tenant_id, user_id, entity_type, entity_id, action, changes, metadata
   ) VALUES (

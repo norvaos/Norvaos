@@ -1,4 +1,4 @@
--- 083: Fix ircc_form_fields — set is_client_visible for all non-meta fields
+-- 083: Fix ircc_form_fields  -  set is_client_visible for all non-meta fields
 --
 -- The seed script was inserting fields without setting is_client_visible,
 -- which defaults to false. This caused the portal to show zero questions

@@ -60,9 +60,9 @@ interface KioskFlowProps {
  * Manages the multi-step check-in wizard:
  *   1. Welcome (touch to begin + language selector)
  *   2. Search (find appointment)
- *   3. Verify identity (DOB check — Rule #8)
+ *   3. Verify identity (DOB check  -  Rule #8)
  *   4. Questions (dynamic configurable questions)
- *   5. Data safety notice (before ID scan — Rule #9)
+ *   5. Data safety notice (before ID scan  -  Rule #9)
  *   6. ID scan (camera/upload)
  *   7. Completion
  *   8. Confirmation (auto-resets after timeout, shows returning info)
@@ -91,7 +91,7 @@ export function KioskFlow({ token, tenantId, branding }: KioskFlowProps) {
   const hasQuestions = branding.kioskQuestions.length > 0
   const showLanguageSelector = branding.enabledLanguages.length > 1
 
-  // ── Inactivity timeout — auto-reset to welcome ──────────────────────────
+  // ── Inactivity timeout  -  auto-reset to welcome ──────────────────────────
 
   const resetInactivityTimer = useCallback(() => {
     if (inactivityTimerRef.current) {
@@ -299,7 +299,7 @@ export function KioskFlow({ token, tenantId, branding }: KioskFlowProps) {
           dataSafetyAcknowledged: true,
           answers: Object.keys(answers).length > 0 ? answers : undefined,
           locale,
-          // Returning client fields — use overrides when provided (avoid stale state)
+          // Returning client fields  -  use overrides when provided (avoid stale state)
           contactId: overrides?.contactId ?? returningContactId ?? undefined,
           matterId: overrides?.matterId ?? returningMatterId ?? undefined,
           notifyLawyerId: overrides?.notifyLawyerId ?? returningLawyerId ?? undefined,
@@ -313,7 +313,7 @@ export function KioskFlow({ token, tenantId, branding }: KioskFlowProps) {
         if (data.returningInfo) setReturningInfo(data.returningInfo)
       }
     } catch {
-      // Non-blocking — show confirmation anyway
+      // Non-blocking  -  show confirmation anyway
     }
 
     setIsCompleting(false)
@@ -347,7 +347,7 @@ export function KioskFlow({ token, tenantId, branding }: KioskFlowProps) {
 
   // ── Render ──────────────────────────────────────────────────────────────
 
-  // Welcome screen — Directive 31.0 "Concierge"
+  // Welcome screen  -  Directive 31.0 "Concierge"
   if (step === 'welcome') {
     return (
       <KioskConciergeWelcome

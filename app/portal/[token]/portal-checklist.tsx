@@ -236,7 +236,7 @@ export function PortalChecklist({
 
   return (
     <div className={embedded ? '' : 'min-h-screen bg-slate-50'} dir={isRtl(currentLang) ? 'rtl' : 'ltr'}>
-      {/* Header — hidden in embedded mode (parent provides it) */}
+      {/* Header  -  hidden in embedded mode (parent provides it) */}
       {!embedded && (
         <header className="bg-white border-b border-slate-200 px-4 py-4">
           <div className="max-w-2xl mx-auto flex items-center gap-3">

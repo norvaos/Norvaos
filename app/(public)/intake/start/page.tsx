@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * Intake Start — Journey Initializer (Directive 33.0 §A)
+ * Intake Start  -  Journey Initializer (Directive 33.0 §A)
  *
  * Public entry point for new client intake. Creates a ClientSession with
  * the preferred_language pre-set from the concierge globe selection,

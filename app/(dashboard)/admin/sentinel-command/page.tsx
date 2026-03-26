@@ -117,7 +117,7 @@ function ExpandableDetails({ details }: { details: Record<string, unknown> }) {
   const [expanded, setExpanded] = useState(false)
 
   if (!details || Object.keys(details).length === 0) {
-    return <span className="text-muted-foreground text-xs">—</span>
+    return <span className="text-muted-foreground text-xs"> - </span>
   }
 
   return (
@@ -202,7 +202,7 @@ function ChainVerificationBanner() {
       <div className="flex items-center justify-between rounded-lg border border-muted p-3">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Link2 className="h-4 w-4" />
-          <span>Hash chain integrity — tamper-evident SHA-256 ledger</span>
+          <span>Hash chain integrity  -  tamper-evident SHA-256 ledger</span>
         </div>
         <Button variant="outline" size="sm" onClick={verify} className="text-xs">
           Verify Chain
@@ -227,7 +227,7 @@ function ChainVerificationBanner() {
           <Link2 className="h-4 w-4" />
           <span className="font-medium">Chain INTACT</span>
           <span className="text-green-600/70 dark:text-green-500/70">
-            — {result?.total_checked} links verified, zero tampering detected
+             -  {result?.total_checked} links verified, zero tampering detected
           </span>
         </div>
         <Button variant="ghost" size="sm" onClick={verify} className="text-xs text-green-600">
@@ -243,7 +243,7 @@ function ChainVerificationBanner() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 text-sm text-red-700 dark:text-red-400 font-semibold">
           <Link2Off className="h-4 w-4" />
-          CHAIN BROKEN — Tampering Detected
+          CHAIN BROKEN  -  Tampering Detected
         </div>
         <Button variant="ghost" size="sm" onClick={verify} className="text-xs text-red-600">
           Re-verify
@@ -332,7 +332,7 @@ export default function SentinelCommandPage() {
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Security Command Centre</h1>
           <p className="text-sm text-muted-foreground">
-            SENTINEL immutable audit log — all security events across the platform
+            SENTINEL immutable audit log  -  all security events across the platform
           </p>
         </div>
       </div>
@@ -459,32 +459,32 @@ export default function SentinelCommandPage() {
 
                     {/* Table */}
                     <TableCell className="text-xs font-mono text-muted-foreground">
-                      {event.table_name ?? '—'}
+                      {event.table_name ?? ' - '}
                     </TableCell>
 
-                    {/* User ID — highlighted for violations */}
+                    {/* User ID  -  highlighted for violations */}
                     <TableCell
                       className={`text-xs font-mono max-w-[120px] truncate ${
                         isCriticalOrBreach ? config.text + ' font-semibold' : 'text-muted-foreground'
                       }`}
                       title={event.user_id ?? event.auth_user_id ?? ''}
                     >
-                      {event.user_id ?? event.auth_user_id ?? '—'}
+                      {event.user_id ?? event.auth_user_id ?? ' - '}
                     </TableCell>
 
-                    {/* Tenant ID — highlighted for violations */}
+                    {/* Tenant ID  -  highlighted for violations */}
                     <TableCell
                       className={`text-xs font-mono max-w-[120px] truncate ${
                         isCriticalOrBreach ? config.text + ' font-semibold' : 'text-muted-foreground'
                       }`}
                       title={event.tenant_id ?? ''}
                     >
-                      {event.tenant_id ?? '—'}
+                      {event.tenant_id ?? ' - '}
                     </TableCell>
 
                     {/* IP */}
                     <TableCell className="text-xs text-muted-foreground">
-                      {event.ip_address ?? '—'}
+                      {event.ip_address ?? ' - '}
                     </TableCell>
 
                     {/* Details */}
@@ -514,7 +514,7 @@ export default function SentinelCommandPage() {
         </span>
         <span className="flex items-center gap-1.5">
           <Shield className="h-3 w-3" />
-          Immutable audit log — records cannot be modified or deleted
+          Immutable audit log  -  records cannot be modified or deleted
         </span>
       </div>
     </div>

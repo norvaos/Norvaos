@@ -286,7 +286,7 @@ function TypeMode({
       return
     }
 
-    // Valid — render to canvas and emit
+    // Valid  -  render to canvas and emit
     setError(null)
     const dataUrl = renderToCanvas(typedValue.trim())
     if (dataUrl) {

@@ -27,13 +27,13 @@ The JSON input file must contain:
 }
 
 barcodeData is optional. When provided, a PDF417 reference barcode is embedded
-at the bottom-right of the first page. Barcode failure is non-fatal — the fill
+at the bottom-right of the first page. Barcode failure is non-fatal  -  the fill
 succeeds regardless.
 
 Strategy:
   1. pikepdf reads the XFA datasets XML stream (locates the datasets object number)
   2. lxml parses and modifies the XML with form field values
-  3. PyMuPDF (fitz) does an incremental save — appending only the modified
+  3. PyMuPDF (fitz) does an incremental save  -  appending only the modified
      datasets stream to the original file.  This preserves the UR3 / DocMDP
      digital-rights signatures so Adobe Acrobat's JavaScript engine, Validate
      button, and barcode generation keep working.
@@ -126,16 +126,16 @@ def main():
     root_element = field_data.get('rootElement', 'form1')
     scalar_fields = field_data.get('scalarFields', {})
     array_data    = field_data.get('arrayData', [])
-    barcode_data  = field_data.get('barcodeData')  # Optional — may be None
+    barcode_data  = field_data.get('barcodeData')  # Optional  -  may be None
 
     if not input_path or not output_path:
         print("field_data.json must contain 'pdfPath' and 'outputPath'", file=sys.stderr)
         sys.exit(4)
 
     if not scalar_fields and not array_data:
-        # Nothing to fill — copy blank template as output
+        # Nothing to fill  -  copy blank template as output
         shutil.copy2(input_path, output_path)
-        print(f"No fields to fill — copied blank template to {output_path}")
+        print(f"No fields to fill  -  copied blank template to {output_path}")
         return
 
     # ── Phase 1: Read XFA datasets with pikepdf ────────────────────────────
@@ -175,7 +175,7 @@ def main():
     needs_pikepdf_fallback = False
 
     if datasets_stream is None:
-        # No existing datasets stream — create fresh XML structure
+        # No existing datasets stream  -  create fresh XML structure
         needs_pikepdf_fallback = True
         XFA_NS = 'http://www.xfa.org/schema/xfa-data/1.0/'
         tree_root = etree.Element('{%s}datasets' % XFA_NS, nsmap={'xfa': XFA_NS})
@@ -262,7 +262,7 @@ def main():
 
     try:
         if needs_pikepdf_fallback:
-            # No existing datasets stream — inject it via pikepdf
+            # No existing datasets stream  -  inject it via pikepdf
             pdf2 = pikepdf.open(input_path)
             acroform2 = pdf2.Root.get('/AcroForm')
             xfa2 = acroform2.get('/XFA')
@@ -284,11 +284,11 @@ def main():
             pdf2.close()
             print(f"Filled {output_path} ({filled_count} fields) [pikepdf fallback]")
         else:
-            # Existing datasets — incremental save preserves UR3/DocMDP signatures
+            # Existing datasets  -  incremental save preserves UR3/DocMDP signatures
             try:
                 import fitz  # PyMuPDF
             except ImportError:
-                print("PyMuPDF (fitz) not available — falling back to pikepdf full save", file=sys.stderr)
+                print("PyMuPDF (fitz) not available  -  falling back to pikepdf full save", file=sys.stderr)
                 # Pikepdf full-save fallback (loses UR3/DocMDP but produces valid PDF)
                 pdf3 = pikepdf.open(input_path)
                 acroform3 = pdf3.Root.get('/AcroForm')
@@ -322,7 +322,7 @@ def main():
     if barcode_data:
         try:
             import io
-            import fitz  # PyMuPDF — already imported above if incremental path was taken
+            import fitz  # PyMuPDF  -  already imported above if incremental path was taken
             import pdf417gen  # pip install pdf417gen
 
             # Build barcode payload string (pipe-delimited for compactness)
@@ -366,11 +366,11 @@ def main():
             print(f"Barcode embedded on page 1", file=sys.stderr)
 
         except ImportError as e:
-            print(f"Barcode skipped — missing dependency: {e}", file=sys.stderr)
+            print(f"Barcode skipped  -  missing dependency: {e}", file=sys.stderr)
         except Exception as e:
             print(f"Barcode embedding failed (non-fatal): {e}", file=sys.stderr)
 
-    # ── Done — emit JSON result to stdout ──────────────────────────────────
+    # ── Done  -  emit JSON result to stdout ──────────────────────────────────
     print(json.dumps({'barcode_embedded': barcode_embedded}))
 
 

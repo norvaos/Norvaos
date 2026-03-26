@@ -1,17 +1,17 @@
 /**
- * IRCC Forms Engine — Prefill Resolver
+ * IRCC Forms Engine  -  Prefill Resolver
  *
  * Resolves field values using the six-level precedence hierarchy defined in ADR-3.
- * This is a PURE LOGIC module — all database operations are injected via the
+ * This is a PURE LOGIC module  -  all database operations are injected via the
  * PrefillDataAccess interface.
  *
  * Precedence levels (highest to lowest):
- *   1. VERIFIED_MATTER_OVERRIDE — verified=true AND source='staff_entry' in this instance
- *   2. CURRENT_MATTER_ANSWER — source='staff_entry' or 'client_portal' in this instance
- *   3. CROSS_FORM_REUSE — answer from another form in the same matter
- *   4. VERIFIED_CANONICAL — canonical_profile_fields with verification_status='verified'
- *   5. UNVERIFIED_CANONICAL — canonical_profile_fields with verification_status != 'verified'
- *   6. CONTACT_FALLBACK — raw contact table fields
+ *   1. VERIFIED_MATTER_OVERRIDE  -  verified=true AND source='staff_entry' in this instance
+ *   2. CURRENT_MATTER_ANSWER  -  source='staff_entry' or 'client_portal' in this instance
+ *   3. CROSS_FORM_REUSE  -  answer from another form in the same matter
+ *   4. VERIFIED_CANONICAL  -  canonical_profile_fields with verification_status='verified'
+ *   5. UNVERIFIED_CANONICAL  -  canonical_profile_fields with verification_status != 'verified'
+ *   6. CONTACT_FALLBACK  -  raw contact table fields
  *
  * ADR condition #1: When an unverified client_portal answer at level 2 would win
  * over a verified canonical value at level 4, the resolver sets has_conflict=true.
@@ -30,7 +30,7 @@ import type {
 import { PrecedenceLevel, SOURCE_TRUST_LEVEL } from './types/answers'
 
 // ---------------------------------------------------------------------------
-// DataAccess interface — injected by callers, no DB coupling here
+// DataAccess interface  -  injected by callers, no DB coupling here
 // ---------------------------------------------------------------------------
 
 /** Data access contract for the prefill resolver. Callers provide an implementation. */
@@ -292,7 +292,7 @@ function resolveFromData(
     level2UnverifiedClientPortal !== null &&
     level4VerifiedCanonical !== null
   ) {
-    // Values differ — genuine conflict
+    // Values differ  -  genuine conflict
     if (level2UnverifiedClientPortal.value !== level4VerifiedCanonical.value) {
       hasConflict = true
     }

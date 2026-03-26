@@ -68,15 +68,15 @@ const IMMIGRATION_PIPELINES: Record<string, { pipelineName: string; stages: Stag
       { slot_name: 'Applicant Passport', slot_slug: 'applicant_passport', category: 'identity', person_role_scope: 'any', is_required: true, accepted_file_types: ['application/pdf','image/jpeg','image/png'], sort_order: 2 },
       { slot_name: 'Marriage Certificate', slot_slug: 'marriage_certificate', category: 'identity', person_role_scope: 'any', is_required: true, accepted_file_types: ['application/pdf','image/jpeg','image/png'], sort_order: 3 },
       { slot_name: 'Sponsor PR Card / Citizenship', slot_slug: 'sponsor_pr_card_citizenship', category: 'identity', person_role_scope: 'any', is_required: true, accepted_file_types: ['application/pdf','image/jpeg','image/png'], sort_order: 4 },
-      { slot_name: 'Digital Photos — IRCC Specs', slot_slug: 'digital_photos_ircc_specs', category: 'identity', person_role_scope: 'any', is_required: true, accepted_file_types: ['image/jpeg','image/png'], sort_order: 5 },
+      { slot_name: 'Digital Photos  -  IRCC Specs', slot_slug: 'digital_photos_ircc_specs', category: 'identity', person_role_scope: 'any', is_required: true, accepted_file_types: ['image/jpeg','image/png'], sort_order: 5 },
       { slot_name: 'Relationship Photos (timeline)', slot_slug: 'relationship_photos_timeline', category: 'relationship', person_role_scope: 'any', is_required: true, accepted_file_types: ['image/jpeg','image/png'], sort_order: 6 },
       { slot_name: 'Chat / Communication History', slot_slug: 'chat_communication_history', category: 'relationship', person_role_scope: 'any', is_required: true, accepted_file_types: ['application/pdf','image/jpeg','image/png'], sort_order: 7 },
       { slot_name: 'Joint Financial Documents', slot_slug: 'joint_financial_documents', category: 'relationship', person_role_scope: 'any', is_required: false, accepted_file_types: ['application/pdf','image/jpeg','image/png'], sort_order: 8 },
       { slot_name: 'Statutory Declarations from Third Parties', slot_slug: 'statutory_declarations_from_third_parties', category: 'relationship', person_role_scope: 'any', is_required: true, accepted_file_types: ['application/pdf'], sort_order: 9 },
       { slot_name: 'Sponsor Tax Returns / NOA (3 years)', slot_slug: 'sponsor_tax_returns_noa_3_years', category: 'financial', person_role_scope: 'any', is_required: true, accepted_file_types: ['application/pdf','image/jpeg','image/png'], sort_order: 10 },
       { slot_name: 'Sponsor Employment Letter', slot_slug: 'sponsor_employment_letter', category: 'financial', person_role_scope: 'any', is_required: true, accepted_file_types: ['application/pdf'], sort_order: 11 },
-      { slot_name: 'Police Clearance — Sponsor', slot_slug: 'police_clearance_sponsor', category: 'background', person_role_scope: 'any', is_required: true, accepted_file_types: ['application/pdf','image/jpeg','image/png'], sort_order: 12 },
-      { slot_name: 'Police Clearance — Applicant', slot_slug: 'police_clearance_applicant', category: 'background', person_role_scope: 'any', is_required: true, accepted_file_types: ['application/pdf','image/jpeg','image/png'], sort_order: 13 },
+      { slot_name: 'Police Clearance  -  Sponsor', slot_slug: 'police_clearance_sponsor', category: 'background', person_role_scope: 'any', is_required: true, accepted_file_types: ['application/pdf','image/jpeg','image/png'], sort_order: 12 },
+      { slot_name: 'Police Clearance  -  Applicant', slot_slug: 'police_clearance_applicant', category: 'background', person_role_scope: 'any', is_required: true, accepted_file_types: ['application/pdf','image/jpeg','image/png'], sort_order: 13 },
       { slot_name: 'Medical Exam Results (IME)', slot_slug: 'medical_exam_results_ime', category: 'medical', person_role_scope: 'any', is_required: true, accepted_file_types: ['application/pdf'], sort_order: 14 },
     ],
   },
@@ -96,7 +96,7 @@ const IMMIGRATION_PIPELINES: Record<string, { pipelineName: string; stages: Stag
     ],
     docs: [
       { slot_name: 'Passport (all pages)', slot_slug: 'passport_all_pages', category: 'identity', person_role_scope: 'any', is_required: true, accepted_file_types: ['application/pdf','image/jpeg','image/png'], sort_order: 1 },
-      { slot_name: 'Digital Photos — IRCC Specs', slot_slug: 'digital_photos_ircc_specs', category: 'identity', person_role_scope: 'any', is_required: true, accepted_file_types: ['image/jpeg','image/png'], sort_order: 2 },
+      { slot_name: 'Digital Photos  -  IRCC Specs', slot_slug: 'digital_photos_ircc_specs', category: 'identity', person_role_scope: 'any', is_required: true, accepted_file_types: ['image/jpeg','image/png'], sort_order: 2 },
       { slot_name: 'Job Offer Letter', slot_slug: 'job_offer_letter', category: 'employment', person_role_scope: 'any', is_required: true, accepted_file_types: ['application/pdf'], sort_order: 3 },
       { slot_name: 'LMIA Approval Letter', slot_slug: 'lmia_approval_letter', category: 'employment', person_role_scope: 'any', is_required: false, accepted_file_types: ['application/pdf'], sort_order: 4 },
       { slot_name: 'Employment Contract', slot_slug: 'employment_contract', category: 'employment', person_role_scope: 'any', is_required: true, accepted_file_types: ['application/pdf'], sort_order: 5 },
@@ -122,7 +122,7 @@ const IMMIGRATION_PIPELINES: Record<string, { pipelineName: string; stages: Stag
     ],
     docs: [
       { slot_name: 'Passport (all pages)', slot_slug: 'passport_all_pages', category: 'identity', person_role_scope: 'any', is_required: true, accepted_file_types: ['application/pdf','image/jpeg','image/png'], sort_order: 1 },
-      { slot_name: 'Digital Photos — IRCC Specs', slot_slug: 'digital_photos_ircc_specs', category: 'identity', person_role_scope: 'any', is_required: true, accepted_file_types: ['image/jpeg','image/png'], sort_order: 2 },
+      { slot_name: 'Digital Photos  -  IRCC Specs', slot_slug: 'digital_photos_ircc_specs', category: 'identity', person_role_scope: 'any', is_required: true, accepted_file_types: ['image/jpeg','image/png'], sort_order: 2 },
       { slot_name: 'Letter of Acceptance (DLI)', slot_slug: 'letter_of_acceptance_dli', category: 'education', person_role_scope: 'any', is_required: true, accepted_file_types: ['application/pdf'], sort_order: 3 },
       { slot_name: 'Transcripts & Diplomas', slot_slug: 'transcripts_diplomas', category: 'education', person_role_scope: 'any', is_required: true, accepted_file_types: ['application/pdf','image/jpeg','image/png'], sort_order: 4 },
       { slot_name: 'Proof of Funds (tuition + living)', slot_slug: 'proof_of_funds_tuition_living', category: 'financial', person_role_scope: 'any', is_required: true, accepted_file_types: ['application/pdf','image/jpeg','image/png'], sort_order: 5 },
@@ -150,7 +150,7 @@ const IMMIGRATION_PIPELINES: Record<string, { pipelineName: string; stages: Stag
     docs: [
       { slot_name: 'Passport (all pages)', slot_slug: 'passport_all_pages', category: 'identity', person_role_scope: 'any', is_required: true, accepted_file_types: ['application/pdf','image/jpeg','image/png'], sort_order: 1 },
       { slot_name: 'Birth Certificate', slot_slug: 'birth_certificate', category: 'identity', person_role_scope: 'any', is_required: true, accepted_file_types: ['application/pdf','image/jpeg','image/png'], sort_order: 2 },
-      { slot_name: 'Digital Photos — IRCC Specs', slot_slug: 'digital_photos_ircc_specs', category: 'identity', person_role_scope: 'any', is_required: true, accepted_file_types: ['image/jpeg','image/png'], sort_order: 3 },
+      { slot_name: 'Digital Photos  -  IRCC Specs', slot_slug: 'digital_photos_ircc_specs', category: 'identity', person_role_scope: 'any', is_required: true, accepted_file_types: ['image/jpeg','image/png'], sort_order: 3 },
       { slot_name: 'IELTS / CELPIP Results', slot_slug: 'ielts_celpip_results', category: 'language', person_role_scope: 'any', is_required: true, accepted_file_types: ['application/pdf','image/jpeg','image/png'], sort_order: 4 },
       { slot_name: 'ECA Report (WES/IQAS)', slot_slug: 'eca_report_wes_iqas', category: 'education', person_role_scope: 'any', is_required: true, accepted_file_types: ['application/pdf'], sort_order: 5 },
       { slot_name: 'University Transcripts', slot_slug: 'university_transcripts', category: 'education', person_role_scope: 'any', is_required: true, accepted_file_types: ['application/pdf','image/jpeg','image/png'], sort_order: 6 },
@@ -176,7 +176,7 @@ const IMMIGRATION_PIPELINES: Record<string, { pipelineName: string; stages: Stag
     ],
     docs: [
       { slot_name: 'Passport / Travel Documents', slot_slug: 'passport_travel_documents', category: 'identity', person_role_scope: 'any', is_required: true, accepted_file_types: ['application/pdf','image/jpeg','image/png'], sort_order: 1 },
-      { slot_name: 'Digital Photos — IRCC Specs', slot_slug: 'digital_photos_ircc_specs', category: 'identity', person_role_scope: 'any', is_required: true, accepted_file_types: ['image/jpeg','image/png'], sort_order: 2 },
+      { slot_name: 'Digital Photos  -  IRCC Specs', slot_slug: 'digital_photos_ircc_specs', category: 'identity', person_role_scope: 'any', is_required: true, accepted_file_types: ['image/jpeg','image/png'], sort_order: 2 },
       { slot_name: 'Basis of Claim (BOC) Form', slot_slug: 'basis_of_claim_boc_form', category: 'legal', person_role_scope: 'any', is_required: true, accepted_file_types: ['application/pdf'], sort_order: 3 },
       { slot_name: 'Personal Narrative / Declaration', slot_slug: 'personal_narrative_declaration', category: 'legal', person_role_scope: 'any', is_required: true, accepted_file_types: ['application/pdf'], sort_order: 4 },
       { slot_name: 'Country Condition Evidence', slot_slug: 'country_condition_evidence', category: 'legal', person_role_scope: 'any', is_required: true, accepted_file_types: ['application/pdf'], sort_order: 5 },
@@ -199,7 +199,7 @@ const IMMIGRATION_PIPELINES: Record<string, { pipelineName: string; stages: Stag
     ],
     docs: [
       { slot_name: 'Passport (bio page + stamps)', slot_slug: 'passport_bio_page_stamps', category: 'identity', person_role_scope: 'any', is_required: true, accepted_file_types: ['application/pdf','image/jpeg','image/png'], sort_order: 1 },
-      { slot_name: 'Digital Photos — IRCC Specs', slot_slug: 'digital_photos_ircc_specs', category: 'identity', person_role_scope: 'any', is_required: true, accepted_file_types: ['image/jpeg','image/png'], sort_order: 2 },
+      { slot_name: 'Digital Photos  -  IRCC Specs', slot_slug: 'digital_photos_ircc_specs', category: 'identity', person_role_scope: 'any', is_required: true, accepted_file_types: ['image/jpeg','image/png'], sort_order: 2 },
       { slot_name: 'Invitation Letter', slot_slug: 'invitation_letter', category: 'travel', person_role_scope: 'any', is_required: false, accepted_file_types: ['application/pdf'], sort_order: 3 },
       { slot_name: 'Travel Itinerary', slot_slug: 'travel_itinerary', category: 'travel', person_role_scope: 'any', is_required: false, accepted_file_types: ['application/pdf'], sort_order: 4 },
       { slot_name: 'Proof of Funds', slot_slug: 'proof_of_funds', category: 'financial', person_role_scope: 'any', is_required: true, accepted_file_types: ['application/pdf','image/jpeg','image/png'], sort_order: 5 },
@@ -223,7 +223,7 @@ const IMMIGRATION_PIPELINES: Record<string, { pipelineName: string; stages: Stag
     docs: [
       { slot_name: 'PR Card (front and back)', slot_slug: 'pr_card_front_and_back', category: 'identity', person_role_scope: 'any', is_required: true, accepted_file_types: ['application/pdf','image/jpeg','image/png'], sort_order: 1 },
       { slot_name: 'Passport (all pages)', slot_slug: 'passport_all_pages', category: 'identity', person_role_scope: 'any', is_required: true, accepted_file_types: ['application/pdf','image/jpeg','image/png'], sort_order: 2 },
-      { slot_name: 'Digital Photos — IRCC Specs', slot_slug: 'digital_photos_ircc_specs', category: 'identity', person_role_scope: 'any', is_required: true, accepted_file_types: ['image/jpeg','image/png'], sort_order: 3 },
+      { slot_name: 'Digital Photos  -  IRCC Specs', slot_slug: 'digital_photos_ircc_specs', category: 'identity', person_role_scope: 'any', is_required: true, accepted_file_types: ['image/jpeg','image/png'], sort_order: 3 },
       { slot_name: 'Tax Returns / NOA (5 years)', slot_slug: 'tax_returns_noa_5_years', category: 'financial', person_role_scope: 'any', is_required: true, accepted_file_types: ['application/pdf'], sort_order: 4 },
       { slot_name: 'Physical Presence Calculator', slot_slug: 'physical_presence_calculator', category: 'other', person_role_scope: 'any', is_required: true, accepted_file_types: ['application/pdf','image/jpeg','image/png'], sort_order: 5 },
       { slot_name: 'Travel History (5 years)', slot_slug: 'travel_history_5_years', category: 'travel', person_role_scope: 'any', is_required: true, accepted_file_types: ['application/pdf','image/jpeg','image/png'], sort_order: 6 },
@@ -279,7 +279,7 @@ async function main() {
   for (const mt of matterTypes) {
     const config = IMMIGRATION_PIPELINES[mt.name]
     if (!config) {
-      console.log(`  ⏭ ${mt.name} — no pipeline config, skipping`)
+      console.log(`  ⏭ ${mt.name}  -  no pipeline config, skipping`)
       continue
     }
 

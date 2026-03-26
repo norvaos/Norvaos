@@ -4,10 +4,10 @@ Tracked defects found during Team 2 delivery. Each entry requires explicit appro
 
 ---
 
-## DEF-001 — collections-service.ts: balance_due / total column mismatch
+## DEF-001  -  collections-service.ts: balance_due / total column mismatch
 
-**Status:** Open — awaiting approval
-**Severity:** High — incorrect financial figures returned
+**Status:** Open  -  awaiting approval
+**Severity:** High  -  incorrect financial figures returned
 **File:** `lib/services/analytics/collections-service.ts`
 **Lines:** ~601–672
 
@@ -15,7 +15,7 @@ Tracked defects found during Team 2 delivery. Each entry requires explicit appro
 Same column mismatch as was present in `analytics-service.ts` (fixed in Module 2).
 The service queries `invoices.total` and `invoices.balance_due`, neither of which exists:
 - Correct column name: `total_amount`
-- `balance_due` does not exist as a stored column — must be computed as `total_amount - amount_paid`
+- `balance_due` does not exist as a stored column  -  must be computed as `total_amount - amount_paid`
 
 **Impact:**
 Client account statement totals (`total_cents`, `amount_paid_cents`, `balance_cents`) all compute from wrong source fields. `balance_due` returns `null` → `0` silently. Client statements show incorrect outstanding balances.

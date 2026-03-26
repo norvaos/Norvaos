@@ -3,7 +3,7 @@
 import { Scale } from 'lucide-react'
 
 /**
- * Onboarding Layout — Minimal, distraction-free.
+ * Onboarding Layout  -  Minimal, distraction-free.
  * No sidebar, no header, no navigation. Just the setup flow.
  */
 export default function OnboardingLayout({
@@ -13,7 +13,7 @@ export default function OnboardingLayout({
 }) {
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/30">
-      {/* Minimal top bar — brand only */}
+      {/* Minimal top bar  -  brand only */}
       <div className="flex items-center gap-2 px-6 py-4">
         <Scale className="size-5 text-primary" />
         <span className="text-base font-bold tracking-tight">NorvaOS</span>

@@ -179,7 +179,7 @@ export function LiveIntakeSidebar({
     return `${m}:${s}`
   }
 
-  // Process transcript chunk — extract entities and recommend stream
+  // Process transcript chunk  -  extract entities and recommend stream
   const processTranscript = useCallback((text: string) => {
     const newEntities = extractEntities(text)
     if (newEntities.length > 0) {
@@ -251,8 +251,8 @@ export function LiveIntakeSidebar({
         mediaRecorderRef.current = recorder
         recorder.start()
       } catch {
-        // Microphone access denied — rely on Web Speech API only
-        console.warn('Microphone access denied — using Web Speech API only')
+        // Microphone access denied  -  rely on Web Speech API only
+        console.warn('Microphone access denied  -  using Web Speech API only')
       }
 
       setIsRecording(true)
@@ -409,7 +409,7 @@ export function LiveIntakeSidebar({
                 {streamRec.stream}
               </button>
               <p className="text-[10px] text-violet-500 mt-0.5">
-                {Math.round(streamRec.confidence * 100)}% confidence — Click to apply
+                {Math.round(streamRec.confidence * 100)}% confidence  -  Click to apply
               </p>
             </div>
           )}

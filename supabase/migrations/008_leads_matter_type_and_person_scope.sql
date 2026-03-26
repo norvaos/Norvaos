@@ -18,7 +18,7 @@ ALTER TABLE leads
 CREATE INDEX IF NOT EXISTS idx_leads_matter_type
   ON leads (matter_type_id) WHERE matter_type_id IS NOT NULL;
 
--- 4. Fix RLS policy on leads — add WITH CHECK for UPDATE/INSERT support
+-- 4. Fix RLS policy on leads  -  add WITH CHECK for UPDATE/INSERT support
 -- Drop the old USING-only policy and recreate with both clauses
 DO $$
 BEGIN

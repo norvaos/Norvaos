@@ -1,12 +1,12 @@
 /**
- * IRCC Forms Engine — Cross-Matter Reuse Tests
+ * IRCC Forms Engine  -  Cross-Matter Reuse Tests
  *
  * Proves all 5 required properties of importFromCanonical():
- *   1. Prior matter detection — canonical fields found and processed
+ *   1. Prior matter detection  -  canonical fields found and processed
  *   2. Stable/semi-stable/matter-specific categorization
- *   3. Review gate — semi_stable in fieldsNeedingReview, matter_specific listed as skipped
- *   4. Provenance logging — logAnswerChange() called with correct source/source_origin
- *   5. Second-matter acceleration — completion state updated after import
+ *   3. Review gate  -  semi_stable in fieldsNeedingReview, matter_specific listed as skipped
+ *   4. Provenance logging  -  logAnswerChange() called with correct source/source_origin
+ *   5. Second-matter acceleration  -  completion state updated after import
  */
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 
@@ -248,7 +248,7 @@ describe('importFromCanonical', () => {
   // --------------------------------------------------------------------------
   // PROOF 1: Prior matter detection
   // --------------------------------------------------------------------------
-  describe('Proof 1 — Prior matter detection', () => {
+  describe('Proof 1  -  Prior matter detection', () => {
     it('detects and processes canonical fields from a prior matter', async () => {
       const canonicalFields = [
         makeCanonicalField('personal', 'family_name', 'Doe'),
@@ -317,7 +317,7 @@ describe('importFromCanonical', () => {
   // --------------------------------------------------------------------------
   // PROOF 2: Stable / semi-stable / matter-specific categorization
   // --------------------------------------------------------------------------
-  describe('Proof 2 — Categorization by reuse category', () => {
+  describe('Proof 2  -  Categorization by reuse category', () => {
     it('auto-imports stable fields without review flag', async () => {
       const canonicalFields = STABLE_FIELDS.map(([d, k, v]) =>
         makeCanonicalField(d, k, v),
@@ -390,7 +390,7 @@ describe('importFromCanonical', () => {
   // --------------------------------------------------------------------------
   // PROOF 3: Review gate
   // --------------------------------------------------------------------------
-  describe('Proof 3 — Review gate', () => {
+  describe('Proof 3  -  Review gate', () => {
     it('semi-stable fields appear in fieldsNeedingReview with correct values', async () => {
       const canonicalFields = [
         makeCanonicalField('marital', 'status', 'Married'),
@@ -490,7 +490,7 @@ describe('importFromCanonical', () => {
   // --------------------------------------------------------------------------
   // PROOF 4: Provenance logging
   // --------------------------------------------------------------------------
-  describe('Proof 4 — Provenance logging', () => {
+  describe('Proof 4  -  Provenance logging', () => {
     it('calls logAnswerChange with source=cross_matter_import and source_origin=contactId', async () => {
       const canonicalFields = [
         makeCanonicalField('personal', 'family_name', 'Doe'),
@@ -590,7 +590,7 @@ describe('importFromCanonical', () => {
   // --------------------------------------------------------------------------
   // PROOF 5: Second-matter acceleration
   // --------------------------------------------------------------------------
-  describe('Proof 5 — Second-matter acceleration', () => {
+  describe('Proof 5  -  Second-matter acceleration', () => {
     it('calls updateInstanceAnswers with merged answers and completion state', async () => {
       const canonicalFields = [
         makeCanonicalField('personal', 'family_name', 'Doe'),

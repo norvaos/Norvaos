@@ -48,7 +48,7 @@ export async function fetchClioTrustBalances(
     )
 
     if (response.data && response.data.length > 0) {
-      // Aggregate by matter — sum deposits to get net trust balance per matter
+      // Aggregate by matter  -  sum deposits to get net trust balance per matter
       const matterBalances = new Map<number, {
         matterId: number
         contactId?: number
@@ -86,7 +86,7 @@ export async function fetchClioTrustBalances(
           matterId: String(m.matterId),
           contactId: m.contactId ? String(m.contactId) : '',
           amount: String(m.totalAmount),
-          description: 'Opening balance — migrated from Clio',
+          description: 'Opening balance  -  migrated from Clio',
           date: m.latestDate,
           currency: m.currency,
           referenceNumber: `CLIO-TRUST-${m.matterId}`,
@@ -94,7 +94,7 @@ export async function fetchClioTrustBalances(
         }))
     }
   } catch {
-    // trust_line_items not available — fall back to matter-level balances
+    // trust_line_items not available  -  fall back to matter-level balances
   }
 
   // Fallback: if trust_line_items failed or returned nothing, try matter-level trust_balance
@@ -118,7 +118,7 @@ export async function fetchClioTrustBalances(
             matterId: String(m.id),
             contactId: m.client ? String(m.client.id) : '',
             amount: String(m.trust_balance!),
-            description: `Opening balance — migrated from Clio (${m.display_number ?? ''})`,
+            description: `Opening balance  -  migrated from Clio (${m.display_number ?? ''})`,
             date: new Date().toISOString().split('T')[0],
             currency: m.currency?.code ?? 'CAD',
             referenceNumber: `CLIO-TRUST-${m.id}`,
@@ -126,7 +126,7 @@ export async function fetchClioTrustBalances(
           }))
       }
     } catch {
-      // If both approaches fail, return empty — the adapter will show 0 rows
+      // If both approaches fail, return empty  -  the adapter will show 0 rows
     }
   }
 

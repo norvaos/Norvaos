@@ -1,7 +1,7 @@
 /**
  * POST /api/drift-sentry/scan
  *
- * Jurisdictional Drift Sentry — Scan CanLII for recent case law changes
+ * Jurisdictional Drift Sentry  -  Scan CanLII for recent case law changes
  * and generate alerts for affected matters.
  *
  * Flow:

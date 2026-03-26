@@ -7,7 +7,7 @@
 --   1. ALL rows in the `form_generation_log` table are permanently deleted.
 --      This includes every pending, processing, completed, and failed job record.
 --      The `output_path` values pointing to generated PDFs in Supabase Storage
---      will be lost — the actual PDF files in Storage are NOT deleted by this
+--      will be lost  -  the actual PDF files in Storage are NOT deleted by this
 --      rollback, but their metadata records will be gone permanently.
 --   2. The `set_fgl_updated_at` trigger function is dropped. If migration 131
 --      (form-generation-retry) or any later migration references this function,

@@ -1,6 +1,6 @@
 /**
  * ===========================================================================
- * Validation Engine — Comprehensive Tests
+ * Validation Engine  -  Comprehensive Tests
  * ===========================================================================
  *
  * Covers every exported function and branch:
@@ -111,7 +111,7 @@ describe('getRedFlagRules', () => {
   })
 })
 
-// ─── validateIntake — clean input ───────────────────────────────────────────
+// ─── validateIntake  -  clean input ───────────────────────────────────────────
 
 describe('validateIntake', () => {
   describe('clean input', () => {
@@ -163,7 +163,7 @@ describe('validateIntake', () => {
       expect(result.isValid).toBe(false)
     })
 
-    it('short-circuits — no other hard stops are checked', () => {
+    it('short-circuits  -  no other hard stops are checked', () => {
       // Add data that would trigger other hard stops if jurisdiction passed
       const input = makeInput({
         people: [
@@ -407,7 +407,7 @@ describe('validateIntake', () => {
       expect(codes).not.toContain('DEPENDENTS_COUNT_MISMATCH')
     })
 
-    it('fires when declared 0 dependents but actually 0 — no issue (guard: > 0)', () => {
+    it('fires when declared 0 dependents but actually 0  -  no issue (guard: > 0)', () => {
       // Confirms the > 0 guard: if PA says 0 dependents but there are 2 dependents,
       // no hard stop fires because the check only runs when number_of_dependents > 0
       const input = makeInput({
@@ -942,7 +942,7 @@ describe('validateIntake', () => {
       vi.useFakeTimers()
       vi.setSystemTime(new Date('2026-06-15T12:00:00Z'))
 
-      // Date string parsed as midnight UTC — which is <= now
+      // Date string parsed as midnight UTC  -  which is <= now
       const input = makeInput({
         people: [
           makePerson({ status_expiry_date: '2026-06-15' }),

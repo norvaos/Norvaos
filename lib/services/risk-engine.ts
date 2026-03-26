@@ -1,5 +1,5 @@
 // ============================================================================
-// Universal Enforcement Engine — Risk Scoring Engine
+// Universal Enforcement Engine  -  Risk Scoring Engine
 // Pure TypeScript module. No database dependency.
 // Takes intake data + validation result, returns numeric risk score + level.
 // ============================================================================
@@ -44,7 +44,7 @@ export function mapScoreToLevel(score: number): 'low' | 'medium' | 'high' | 'cri
 // ─── Scoring Algorithm ───────────────────────────────────────────────────────
 
 export function calculateRisk(input: RiskInput): RiskOutput {
-  // Fail loud for unsupported jurisdictions — return max risk
+  // Fail loud for unsupported jurisdictions  -  return max risk
   if (input.intake.jurisdiction && !ENABLED_JURISDICTIONS.includes(input.intake.jurisdiction)) {
     return {
       score: 100,

@@ -131,7 +131,7 @@ export default function GlobalExpiryDashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-red-600 dark:text-red-400">
-              {isLoading ? '—' : counts.red}
+              {isLoading ? ' - ' : counts.red}
             </div>
           </CardContent>
         </Card>
@@ -145,7 +145,7 @@ export default function GlobalExpiryDashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-amber-600 dark:text-amber-400">
-              {isLoading ? '—' : counts.amber}
+              {isLoading ? ' - ' : counts.amber}
             </div>
           </CardContent>
         </Card>
@@ -159,7 +159,7 @@ export default function GlobalExpiryDashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-muted-foreground">
-              {isLoading ? '—' : counts.grey}
+              {isLoading ? ' - ' : counts.grey}
             </div>
           </CardContent>
         </Card>

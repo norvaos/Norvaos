@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * InstanceProgress — Section-level and overall completion progress
+ * InstanceProgress  -  Section-level and overall completion progress
  *
  * Displays per-section progress bars, stale/blocked badges, and an overall
  * completion bar for a form instance. Supports compact mode (sidebar) and

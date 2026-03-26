@@ -12,11 +12,11 @@ import '@/lib/services/job-registry'
  * Designed to be called by Vercel Cron or an external scheduler.
  *
  * Query params:
- *   batchSize — max jobs per run (default 10, max 50)
- *   jobTypes  — comma-separated list of job types to process (optional)
+ *   batchSize  -  max jobs per run (default 10, max 50)
+ *   jobTypes   -  comma-separated list of job types to process (optional)
  */
 async function handlePost(request: Request) {
-  // Auth check — fail-closed: reject if CRON_SECRET is unset
+  // Auth check  -  fail-closed: reject if CRON_SECRET is unset
   const cronSecret = process.env['CRON_SECRET']
   if (!cronSecret) {
     return NextResponse.json({ error: 'Server misconfigured: CRON_SECRET not set' }, { status: 500 })

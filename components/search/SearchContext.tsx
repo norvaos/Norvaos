@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * SearchContext — Directive 36.2: Cross-Locale Search
+ * SearchContext  -  Directive 36.2: Cross-Locale Search
  *
  * Provides a `useCrossLocaleSearch(query)` hook that resolves any search
  * term (in any of the Global 15 languages) to its English canonical

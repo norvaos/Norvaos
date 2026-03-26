@@ -27,9 +27,9 @@ import { createAdminClient } from '@/lib/supabase/admin'
  * display what automations are active and how they're configured.
  *
  * Query params:
- *   ?triggerKey=consultation_reminder_24h  — filter to specific trigger
- *   ?category=reminder                     — filter by category
- *   ?includeTemplates=true                 — include resolved template previews
+ *   ?triggerKey=consultation_reminder_24h   -  filter to specific trigger
+ *   ?category=reminder                      -  filter by category
+ *   ?includeTemplates=true                  -  include resolved template previews
  */
 async function handleGet(
   request: Request,
@@ -111,7 +111,7 @@ async function handleGet(
               auth.tenantId,
               triggerKey,
               ch,
-              // Use empty context — templates will show {{merge.fields}} unresolved
+              // Use empty context  -  templates will show {{merge.fields}} unresolved
               {}
             )
             if (template) {

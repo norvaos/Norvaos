@@ -2,7 +2,7 @@
 
 **Integration ID:** `clio`
 **Module:** Team 3 / Module 1
-**Status:** Draft — Pending Proof Validation
+**Status:** Draft  -  Pending Proof Validation
 **Last Updated:** 2026-03-15
 **Source Files Audited:**
 - `app/api/integrations/clio/connect/route.ts`
@@ -52,16 +52,16 @@ The profile fetch (`getClioProfile`) is unique to Clio and is absent in the GHL 
 ### Token Storage
 
 Tokens are stored in `platform_connections` with `platform: 'clio'`:
-- `access_token_encrypted` — AES-encrypted access token
-- `refresh_token_encrypted` — AES-encrypted refresh token
-- `token_expires_at` — ISO timestamp
-- `platform_user_id` — Clio user ID (string-coerced from integer)
-- `platform_user_name` — Clio user display name
+- `access_token_encrypted`  -  AES-encrypted access token
+- `refresh_token_encrypted`  -  AES-encrypted refresh token
+- `token_expires_at`  -  ISO timestamp
+- `platform_user_id`  -  Clio user ID (string-coerced from integer)
+- `platform_user_name`  -  Clio user display name
 - Upserted on `tenant_id, platform` conflict key
 
-Encryption uses `encryptToken()` from `lib/services/clio/oauth.ts` — not directly audited but assumed to follow the same AES-256-GCM pattern as the Microsoft implementation.
+Encryption uses `encryptToken()` from `lib/services/clio/oauth.ts`  -  not directly audited but assumed to follow the same AES-256-GCM pattern as the Microsoft implementation.
 
-**IDENTIFIED GAP — Clio OAuth service not audited:** `lib/services/clio/oauth.ts` was not in the initial file scope. The encryption implementation and state signing details are assumed from the pattern but unverified.
+**IDENTIFIED GAP  -  Clio OAuth service not audited:** `lib/services/clio/oauth.ts` was not in the initial file scope. The encryption implementation and state signing details are assumed from the pattern but unverified.
 
 ### Required Environment Variables
 
@@ -83,11 +83,11 @@ No retry on OAuth code exchange or profile fetch. If either fails, the callback 
 
 ### Import Execution
 
-**IDENTIFIED GAP — Import runs not using job queue:** Identical gap to GHL. The import adapter files define field mappings and transform functions only. No execution layer that enqueues import runs via `lib/services/job-queue.ts` was identified in the audited scope.
+**IDENTIFIED GAP  -  Import runs not using job queue:** Identical gap to GHL. The import adapter files define field mappings and transform functions only. No execution layer that enqueues import runs via `lib/services/job-queue.ts` was identified in the audited scope.
 
 ### Token Refresh
 
-**IDENTIFIED GAP — No token refresh path visible:** Same gap as GHL. Clio access tokens expire (typically after a short window). No auto-refresh was observed. Import runs initiated after token expiry will fail with authentication errors from the Clio API.
+**IDENTIFIED GAP  -  No token refresh path visible:** Same gap as GHL. Clio access tokens expire (typically after a short window). No auto-refresh was observed. Import runs initiated after token expiry will fail with authentication errors from the Clio API.
 
 ---
 
@@ -99,7 +99,7 @@ Callback uses `upsert` with `onConflict: 'tenant_id,platform'`. Re-running OAuth
 
 ### Import Records
 
-**IDENTIFIED GAP — No import deduplication key:** The Clio contacts adapter maps Clio's `Id` field to `__source_id`, but no upsert logic using `__source_id` as a conflict key was found in the audited adapter files. Re-running an import may create duplicate contact, matter, or task records.
+**IDENTIFIED GAP  -  No import deduplication key:** The Clio contacts adapter maps Clio's `Id` field to `__source_id`, but no upsert logic using `__source_id` as a conflict key was found in the audited adapter files. Re-running an import may create duplicate contact, matter, or task records.
 
 The Clio contacts adapter's `validate()` function requires at least one of: first_name, last_name, email_primary, or organization_name. Empty-record rejection is enforced.
 
@@ -114,7 +114,7 @@ The Clio contacts adapter's `validate()` function requires at least one of: firs
 | Code exchange failure | Error caught; callback redirects to `data-import?error=clio_callback_failed` |
 | Profile fetch failure (`getClioProfile`) | Error thrown from `try` block; callback redirects to `data-import?error=clio_callback_failed` |
 | Upsert to `platform_connections` fails | Error thrown; callback redirects to `data-import?error=clio_callback_failed` |
-| Access token expired during import | **IDENTIFIED GAP** — No refresh path; import fails with authentication error |
+| Access token expired during import | **IDENTIFIED GAP**  -  No refresh path; import fails with authentication error |
 | Adapter validation failure | `validate()` returns error strings; enforcement depends on import execution layer |
 
 ---
@@ -125,13 +125,13 @@ The Clio contacts adapter's `validate()` function requires at least one of: firs
 
 The connect and callback routes use `console.error` with prefixes `[clio/connect]` and `[clio/callback]`.
 
-**IDENTIFIED GAP — Unstructured logging:** Same gap as GHL. No structured `log.*` calls. No `tenant_id` in log context.
+**IDENTIFIED GAP  -  Unstructured logging:** Same gap as GHL. No structured `log.*` calls. No `tenant_id` in log context.
 
-**IDENTIFIED GAP — No import run audit:** No import run table or job queue integration for Clio import runs was identified.
+**IDENTIFIED GAP  -  No import run audit:** No import run table or job queue integration for Clio import runs was identified.
 
 ### Database Audit Trail
 
-- `platform_connections` — one row per tenant per platform; tracks `connected_by`, `platform_user_id`, `platform_user_name`, `updated_at`, `error_count`, `last_error`, `last_error_at`
+- `platform_connections`  -  one row per tenant per platform; tracks `connected_by`, `platform_user_id`, `platform_user_name`, `updated_at`, `error_count`, `last_error`, `last_error_at`
 
 The Clio record is richer than GHL's because it also stores `platform_user_name` (the Clio user's display name).
 
@@ -149,7 +149,7 @@ The Clio record is richer than GHL's because it also stores `platform_user_name`
 | Bills / financial records | Confidential / financial PII | `bills` table after import |
 | Clio source IDs | Low sensitivity | Mapped to `__source_id` |
 
-**Note:** The Clio contacts adapter maps `Date of Birth` to `date_of_birth` — this is biometric/identity-sensitive PII. Extra care must be taken to ensure this field is stored only in the `contacts` table with appropriate RLS and is not exposed in log output during import.
+**Note:** The Clio contacts adapter maps `Date of Birth` to `date_of_birth`  -  this is biometric/identity-sensitive PII. Extra care must be taken to ensure this field is stored only in the `contacts` table with appropriate RLS and is not exposed in log output during import.
 
 ---
 
@@ -159,7 +159,7 @@ The Clio record is richer than GHL's because it also stores `platform_user_name`
 - OAuth state carries signed `tenantId` to bind the callback
 - Import data must be tagged with `tenant_id` at insert time (assumed, not verified in execution layer)
 
-**IDENTIFIED GAP — Import tenant scoping unverified:** Same gap as GHL. Tenant scoping during record insertion cannot be confirmed without auditing the import execution layer.
+**IDENTIFIED GAP  -  Import tenant scoping unverified:** Same gap as GHL. Tenant scoping during record insertion cannot be confirmed without auditing the import execution layer.
 
 ---
 

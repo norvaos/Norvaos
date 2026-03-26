@@ -13,7 +13,7 @@ export function verifyCronAuth(request: Request): NextResponse | null {
 export function authenticateCron(request: Request, cronName: string): NextResponse | null {
   const cronSecret = process.env.CRON_SECRET
   if (!cronSecret) {
-    log.warn('[cron] CRON_SECRET not set — allowing request in development', { cron_name: cronName })
+    log.warn('[cron] CRON_SECRET not set  -  allowing request in development', { cron_name: cronName })
     return null
   }
   const authHeader = request.headers.get('authorization')

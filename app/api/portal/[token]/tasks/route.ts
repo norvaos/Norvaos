@@ -9,7 +9,7 @@ const tokenLookupLimiter = createRateLimiter({ windowMs: 60_000, maxRequests: 30
 
 /**
  * Fetch client-visible tasks for the matter associated with this portal link.
- * Read-only — clients cannot modify tasks.
+ * Read-only  -  clients cannot modify tasks.
  */
 async function handleGet(
   request: Request,

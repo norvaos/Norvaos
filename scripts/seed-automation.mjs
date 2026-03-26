@@ -38,7 +38,7 @@ const STAGE_AUTO_TASKS = {
     { title: 'Calculate and verify scores', description: 'Calculate ranking scores and verify all point claims', priority: 'high', due_days_offset: 2 },
     { title: 'Prepare application forms', description: 'Complete all required application forms', priority: 'high', due_days_offset: 5 },
     { title: 'Draft personal statement / LOE', description: 'Draft letter of explanation if applicable', priority: 'medium', due_days_offset: 7 },
-    { title: 'Quality review — internal check', description: 'Senior review of complete application package before submission', priority: 'high', due_days_offset: 10 },
+    { title: 'Quality review  -  internal check', description: 'Senior review of complete application package before submission', priority: 'high', due_days_offset: 10 },
   ],
   submitted: [
     { title: 'Submit application', description: 'Upload and submit complete application package', priority: 'high', due_days_offset: 1 },
@@ -76,8 +76,8 @@ const CHECKLIST_DOCUMENTS = [
   { document_name: 'Birth Certificate', description: 'Original or certified true copy with English/French translation if applicable', is_required: true, sort_order: 2, category: 'identity' },
   { document_name: 'National ID Card', description: 'Front and back copy', is_required: false, sort_order: 3, category: 'identity' },
   { document_name: 'Passport-Size Photos', description: 'Two recent photos meeting specifications (35mm x 45mm)', is_required: true, sort_order: 4, category: 'identity' },
-  { document_name: 'Marriage Certificate', description: 'If applicable — certified copy with translation', is_required: false, sort_order: 5, category: 'identity' },
-  { document_name: 'Divorce Certificate', description: 'If applicable — certified copy with translation', is_required: false, sort_order: 6, category: 'identity' },
+  { document_name: 'Marriage Certificate', description: 'If applicable  -  certified copy with translation', is_required: false, sort_order: 5, category: 'identity' },
+  { document_name: 'Divorce Certificate', description: 'If applicable  -  certified copy with translation', is_required: false, sort_order: 6, category: 'identity' },
   { document_name: 'Language Test Results (IELTS/CELPIP/TEF)', description: 'Official test results less than 2 years old', is_required: true, sort_order: 10, category: 'language' },
   { document_name: 'Educational Credential Assessment (ECA)', description: 'WES or equivalent designated organization report', is_required: true, sort_order: 11, category: 'education' },
   { document_name: 'Degree/Diploma Certificates', description: 'Certified copies of all post-secondary credentials', is_required: true, sort_order: 12, category: 'education' },
@@ -118,7 +118,7 @@ async function main() {
     // Check if auto_tasks is already populated
     const existingTasks = Array.isArray(stage.auto_tasks) ? stage.auto_tasks : []
     if (existingTasks.length > 0) {
-      console.log(`  ⏭️  ${stage.name} (${stage.slug}) — already has ${existingTasks.length} auto-tasks, skipping`)
+      console.log(`  ⏭️  ${stage.name} (${stage.slug})  -  already has ${existingTasks.length} auto-tasks, skipping`)
       continue
     }
 
@@ -132,7 +132,7 @@ async function main() {
     }
 
     if (!matchedTasks) {
-      console.log(`  ⚠️  ${stage.name} (${stage.slug}) — no matching auto-task pattern`)
+      console.log(`  ⚠️  ${stage.name} (${stage.slug})  -  no matching auto-task pattern`)
       continue
     }
 
@@ -144,7 +144,7 @@ async function main() {
     if (updateErr) {
       console.error(`  ❌ Failed to update ${stage.name}:`, updateErr.message)
     } else {
-      console.log(`  ✅ ${stage.name} (${stage.slug}) — added ${matchedTasks.length} auto-tasks`)
+      console.log(`  ✅ ${stage.name} (${stage.slug})  -  added ${matchedTasks.length} auto-tasks`)
       updatedCount++
     }
   }
@@ -173,7 +173,7 @@ async function main() {
       .eq('case_type_id', ct.id)
 
     if (count && count > 0) {
-      console.log(`  ⏭️  ${ct.name} — already has ${count} checklist templates, skipping`)
+      console.log(`  ⏭️  ${ct.name}  -  already has ${count} checklist templates, skipping`)
       continue
     }
 
@@ -191,7 +191,7 @@ async function main() {
     if (insertErr) {
       console.error(`  ❌ Failed to seed ${ct.name}:`, insertErr.message)
     } else {
-      console.log(`  ✅ ${ct.name} — added ${templates.length} checklist templates`)
+      console.log(`  ✅ ${ct.name}  -  added ${templates.length} checklist templates`)
       checklistCount++
     }
   }

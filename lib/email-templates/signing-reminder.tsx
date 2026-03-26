@@ -44,7 +44,7 @@ export function SigningReminderEmail({
     day: 'numeric',
   })
 
-  const subject = `Reminder: Your Signature is Still Needed — ${documentTitle}`
+  const subject = `Reminder: Your Signature is Still Needed  -  ${documentTitle}`
 
   return (
     <Html>
@@ -131,7 +131,7 @@ export async function renderSigningReminderEmail(
   props: SigningReminderEmailProps
 ): Promise<{ html: string; text: string; subject: string }> {
   const html = await render(<SigningReminderEmail {...props} />)
-  const subject = `Reminder: Your Signature is Still Needed — ${props.documentTitle}`
+  const subject = `Reminder: Your Signature is Still Needed  -  ${props.documentTitle}`
 
   const greeting = props.signerFirstName
     ? `Hi ${props.signerFirstName},`

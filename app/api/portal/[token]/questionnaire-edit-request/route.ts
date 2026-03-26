@@ -5,7 +5,7 @@ import { validatePortalToken, PortalAuthError } from '@/lib/services/portal-auth
 
 const rateLimiter = createRateLimiter({ windowMs: 60_000, maxRequests: 10 })
 
-// ── GET — Check if pending edit request exists ───────────────────────────────
+// ── GET  -  Check if pending edit request exists ───────────────────────────────
 
 export async function GET(
   request: Request,
@@ -57,7 +57,7 @@ export async function GET(
   }
 }
 
-// ── POST — Submit edit request ───────────────────────────────────────────────
+// ── POST  -  Submit edit request ───────────────────────────────────────────────
 
 export async function POST(
   request: Request,

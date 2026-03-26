@@ -1,5 +1,5 @@
 // ============================================================================
-// Trust Reporting Service — LSO-Compliant Trust Accounting Reports
+// Trust Reporting Service  -  LSO-Compliant Trust Accounting Reports
 // ============================================================================
 // Provides read-only reporting functions for trust accounting:
 //   - Client trust listing (By-Law 9 requirement)

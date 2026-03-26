@@ -56,7 +56,7 @@ export function useCanonicalProfile(contactId: string) {
       } as CanonicalProfileWithFields
     },
     enabled: !!contactId,
-    staleTime: 1000 * 60 * 2, // 2 minutes — profile data changes moderately
+    staleTime: 1000 * 60 * 2, // 2 minutes  -  profile data changes moderately
   })
 }
 
@@ -185,7 +185,7 @@ export function useUpdateCanonicalField() {
       if (result.updated) {
         toast.success('Field updated')
       } else if (result.conflictId) {
-        toast.warning('Value conflict detected — review required')
+        toast.warning('Value conflict detected  -  review required')
         qc.invalidateQueries({ queryKey: canonicalProfileKeys.conflicts(input.profileId) })
       }
     },
@@ -213,7 +213,7 @@ export function useCanonicalConflicts(profileId: string) {
       return data as CanonicalProfileConflictRow[]
     },
     enabled: !!profileId,
-    staleTime: 1000 * 30, // 30 seconds — conflicts need prompt attention
+    staleTime: 1000 * 30, // 30 seconds  -  conflicts need prompt attention
   })
 }
 
@@ -325,7 +325,7 @@ export function useCanonicalSnapshots(matterId: string) {
       return data as CanonicalProfileSnapshotRow[]
     },
     enabled: !!matterId,
-    staleTime: 1000 * 60 * 5, // 5 minutes — snapshots rarely change
+    staleTime: 1000 * 60 * 5, // 5 minutes  -  snapshots rarely change
   })
 }
 

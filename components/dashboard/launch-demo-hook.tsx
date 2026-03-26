@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * LaunchDemoHook — Directive 29.2: Arjun Mehta Live-Demo
+ * LaunchDemoHook  -  Directive 29.2: Arjun Mehta Live-Demo
  *
  * On first login for a new firm, pins the demo matter (Arjun Mehta)
  * to the top of the dashboard with an Amber Glow urgency indicator.
@@ -54,7 +54,7 @@ function useDemoMatter(tenantId: string) {
     queryFn: async (): Promise<DemoMatter | null> => {
       const supabase = createClient()
 
-      // Look for the demo matter — search by title pattern or a demo flag
+      // Look for the demo matter  -  search by title pattern or a demo flag
       const { data } = await supabase
         .from('matters')
         .select('id, title, matter_number, status, date_opened')
@@ -106,7 +106,7 @@ export function LaunchDemoHook({ tenantId, userId }: LaunchDemoHookProps) {
       a.click()
       URL.revokeObjectURL(url)
     } catch {
-      // Silently fail — non-critical
+      // Silently fail  -  non-critical
     }
   }
 
@@ -149,7 +149,7 @@ export function LaunchDemoHook({ tenantId, userId }: LaunchDemoHookProps) {
               </h3>
             </div>
 
-            {/* Matter info — line-clamp-3 for Nastaliq zero-overflow guarantee */}
+            {/* Matter info  -  line-clamp-3 for Nastaliq zero-overflow guarantee */}
             <p className="text-xs text-muted-foreground mb-2 line-clamp-3">
               <span className="font-semibold text-foreground">{demoMatter.title}</span>
               {demoMatter.matter_number && (
@@ -157,7 +157,7 @@ export function LaunchDemoHook({ tenantId, userId }: LaunchDemoHookProps) {
                   ({demoMatter.matter_number})
                 </span>
               )}
-              {' — '}
+              {'  -  '}
               Open the file to see the Norva Intelligence engine in action: Fact-Anchors from Norva Ear,
               Audit-Mirror readability scoring, and the Ghost-Writer draft with source attribution.
             </p>

@@ -50,10 +50,10 @@ BEGIN
 
   -- 3-way conflict search across ALL contacts (active + inactive) in the same tenant
   -- Match types:
-  --   1. Email match (exact, case-insensitive) — high confidence
-  --   2. Passport match (exact) — high confidence
-  --   3. Name + DOB match (exact name + exact DOB) — high confidence
-  --   4. Name match only (fuzzy via trigram) — low confidence, flagged for review
+  --   1. Email match (exact, case-insensitive)  -  high confidence
+  --   2. Passport match (exact)  -  high confidence
+  --   3. Name + DOB match (exact name + exact DOB)  -  high confidence
+  --   4. Name match only (fuzzy via trigram)  -  low confidence, flagged for review
   FOR v_row IN
     SELECT DISTINCT ON (c2.id)
       c2.id AS contact_id,
@@ -139,4 +139,4 @@ BEGIN
 END;
 $$;
 
-COMMENT ON FUNCTION fn_conflict_check_enhanced IS '3-way conflict check: Name + DOB + Passport + Email across active and archived contacts/matters. Directive 5.5 — Conflict-Check Auto-Audit.';
+COMMENT ON FUNCTION fn_conflict_check_enhanced IS '3-way conflict check: Name + DOB + Passport + Email across active and archived contacts/matters. Directive 5.5  -  Conflict-Check Auto-Audit.';

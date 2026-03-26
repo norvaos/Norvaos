@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Stage Engine Tests — Matter Stage Transitions (Generic + Immigration)
+ * Stage Engine Tests  -  Matter Stage Transitions (Generic + Immigration)
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Proves:

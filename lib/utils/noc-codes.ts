@@ -7,12 +7,12 @@
  * NOC 2021 uses 5-digit codes and the TEER (Training, Education,
  * Experience, and Responsibilities) category system:
  *
- *   TEER 0 — Management occupations
- *   TEER 1 — Occupations usually requiring a university degree
- *   TEER 2 — Occupations usually requiring a college diploma or apprenticeship (2+ years)
- *   TEER 3 — Occupations usually requiring a college diploma or apprenticeship (< 2 years)
- *   TEER 4 — Occupations usually requiring a high school diploma or on-the-job training
- *   TEER 5 — Occupations usually requiring short work demonstration or on-the-job training
+ *   TEER 0  -  Management occupations
+ *   TEER 1  -  Occupations usually requiring a university degree
+ *   TEER 2  -  Occupations usually requiring a college diploma or apprenticeship (2+ years)
+ *   TEER 3  -  Occupations usually requiring a college diploma or apprenticeship (< 2 years)
+ *   TEER 4  -  Occupations usually requiring a high school diploma or on-the-job training
+ *   TEER 5  -  Occupations usually requiring short work demonstration or on-the-job training
  */
 
 export interface NocCode {
@@ -26,7 +26,7 @@ export interface NocCode {
 
 export const NOC_CODES: readonly NocCode[] = [
   // ---------------------------------------------------------------------------
-  // TEER 0 — Management occupations
+  // TEER 0  -  Management occupations
   // ---------------------------------------------------------------------------
   { code: "00010", title: "Legislators", teer: 0 },
   { code: "00011", title: "Senior government managers and officials", teer: 0 },
@@ -70,7 +70,7 @@ export const NOC_CODES: readonly NocCode[] = [
   { code: "90011", title: "Utilities managers", teer: 0 },
 
   // ---------------------------------------------------------------------------
-  // TEER 1 — Occupations usually requiring a university degree
+  // TEER 1  -  Occupations usually requiring a university degree
   // ---------------------------------------------------------------------------
   { code: "11100", title: "Financial auditors and accountants", teer: 1 },
   { code: "11101", title: "Financial and investment analysts", teer: 1 },
@@ -154,7 +154,7 @@ export const NOC_CODES: readonly NocCode[] = [
   { code: "41405", title: "Education policy researchers, consultants and program officers", teer: 1 },
 
   // ---------------------------------------------------------------------------
-  // TEER 2 — Occupations usually requiring a college diploma or apprenticeship (2+ years)
+  // TEER 2  -  Occupations usually requiring a college diploma or apprenticeship (2+ years)
   // ---------------------------------------------------------------------------
   { code: "12200", title: "Accounting technicians and bookkeepers", teer: 2 },
   { code: "12201", title: "Insurance adjusters and claims examiners", teer: 2 },
@@ -208,7 +208,7 @@ export const NOC_CODES: readonly NocCode[] = [
   { code: "63200", title: "Cooks", teer: 2 },
 
   // ---------------------------------------------------------------------------
-  // TEER 3 — Occupations usually requiring a college diploma or apprenticeship (< 2 years)
+  // TEER 3  -  Occupations usually requiring a college diploma or apprenticeship (< 2 years)
   // ---------------------------------------------------------------------------
   { code: "13200", title: "Customs brokers", teer: 3 },
   { code: "13201", title: "Production and transportation logistics coordinators", teer: 3 },
@@ -271,7 +271,7 @@ export const NOC_CODES: readonly NocCode[] = [
   { code: "73400", title: "Drilling and blasting", teer: 3 },
 
   // ---------------------------------------------------------------------------
-  // TEER 4 — Occupations usually requiring a high school diploma
+  // TEER 4  -  Occupations usually requiring a high school diploma
   // ---------------------------------------------------------------------------
   { code: "44200", title: "Early childhood educators and assistants", teer: 4 },
   { code: "65100", title: "Cashiers", teer: 4 },
@@ -300,7 +300,7 @@ export const NOC_CODES: readonly NocCode[] = [
   { code: "95109", title: "Other labourers in processing, manufacturing and utilities", teer: 4 },
 
   // ---------------------------------------------------------------------------
-  // TEER 5 — Occupations usually requiring short work demonstration or on-the-job training
+  // TEER 5  -  Occupations usually requiring short work demonstration or on-the-job training
   // ---------------------------------------------------------------------------
   { code: "75110", title: "Landscaping and grounds maintenance labourers", teer: 5 },
   { code: "75200", title: "Logging and forestry labourers", teer: 5 },

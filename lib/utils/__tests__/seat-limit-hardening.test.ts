@@ -6,7 +6,7 @@
  *   1. Pending invite controls (cap, expiry, unique index)
  *   2. Platform-admin lockdown (route restriction, rate limiting, audit)
  *
- * Tests are structural (source scanning) — they read source files and assert
+ * Tests are structural (source scanning)  -  they read source files and assert
  * on content patterns, following the seat-limit-invariant.test.ts pattern.
  */
 
@@ -28,7 +28,7 @@ function readSource(relPath: string): string {
 // 1. Pending Invite Controls
 // ═══════════════════════════════════════════════════════════════════════════
 
-describe('hardening — pending invite cap', () => {
+describe('hardening  -  pending invite cap', () => {
   it('checkSeatLimit enforces a pending invite soft cap', () => {
     const source = readSource('lib/services/seat-limit.ts')
     expect(source).toContain('PENDING_INVITE_HARD_CAP')
@@ -68,7 +68,7 @@ describe('hardening — pending invite cap', () => {
   })
 })
 
-describe('hardening — expired invite handling', () => {
+describe('hardening  -  expired invite handling', () => {
   it('checkSeatLimit performs on-read expiration of stale invites', () => {
     const source = readSource('lib/services/seat-limit.ts')
     // Should update stale pending invites to expired status using shared constant
@@ -89,7 +89,7 @@ describe('hardening — expired invite handling', () => {
 
   it('nightly cleanup cron marks stale pending invites as expired', () => {
     const source = readSource('app/api/cron/expire-invites/route.ts')
-    // Uses shared constants — same as checkSeatLimit on-read expiration
+    // Uses shared constants  -  same as checkSeatLimit on-read expiration
     expect(source).toContain('update({ status: INVITE_EXPIRY_STATUS })')
     expect(source).toContain("eq('status', INVITE_PENDING_STATUS)")
     expect(source).toContain("lt('expires_at'")
@@ -109,7 +109,7 @@ describe('hardening — expired invite handling', () => {
   })
 })
 
-describe('hardening — unique partial index for active invites', () => {
+describe('hardening  -  unique partial index for active invites', () => {
   it('migration 040 exists', () => {
     expect(existsSync(resolve(ROOT, 'scripts/migrations/040-invite-indexes-and-cap.sql'))).toBe(true)
   })
@@ -132,7 +132,7 @@ describe('hardening — unique partial index for active invites', () => {
 // 2. Platform-Admin Lockdown
 // ═══════════════════════════════════════════════════════════════════════════
 
-describe('hardening — platform-admin route restriction', () => {
+describe('hardening  -  platform-admin route restriction', () => {
   it('platform-admin.ts documents /api/admin/* restriction', () => {
     const source = readSource('lib/services/platform-admin.ts')
     expect(source).toContain('/api/admin/')
@@ -166,7 +166,7 @@ describe('hardening — platform-admin route restriction', () => {
   })
 })
 
-describe('hardening — admin route rate limiting', () => {
+describe('hardening  -  admin route rate limiting', () => {
   it('platform-admin.ts exports checkAdminRateLimit', () => {
     const source = readSource('lib/services/platform-admin.ts')
     expect(source).toContain('export function checkAdminRateLimit')
@@ -193,7 +193,7 @@ describe('hardening — admin route rate limiting', () => {
   })
 })
 
-describe('hardening — mandatory reason for admin mutations', () => {
+describe('hardening  -  mandatory reason for admin mutations', () => {
   it('PATCH max-users requires reason', () => {
     const source = readSource('app/api/admin/tenants/[id]/max-users/route.ts')
     expect(source).toContain('reason')
@@ -202,7 +202,7 @@ describe('hardening — mandatory reason for admin mutations', () => {
   })
 })
 
-describe('hardening — platform-admin audit logging', () => {
+describe('hardening  -  platform-admin audit logging', () => {
   it('platform-admin.ts exports logPlatformAdminAction', () => {
     const source = readSource('lib/services/platform-admin.ts')
     expect(source).toContain('export async function logPlatformAdminAction')
@@ -240,7 +240,7 @@ describe('hardening — platform-admin audit logging', () => {
   })
 })
 
-describe('hardening — admin console double-gating', () => {
+describe('hardening  -  admin console double-gating', () => {
   it('GET /api/admin/tenants returns 403 for non-platform-admin', () => {
     const source = readSource('app/api/admin/tenants/route.ts')
     // Route uses withPlatformAdmin wrapper which handles auth + PlatformAdminError catch internally,
@@ -275,7 +275,7 @@ describe('hardening — admin console double-gating', () => {
 // 3. Integration: Denial Logging Includes Reason
 // ═══════════════════════════════════════════════════════════════════════════
 
-describe('hardening — denial logging with reason', () => {
+describe('hardening  -  denial logging with reason', () => {
   it('logSeatLimitDenial accepts optional reason parameter', () => {
     const source = readSource('lib/services/seat-limit.ts')
     expect(source).toContain('reason?: string | null')
@@ -298,10 +298,10 @@ describe('hardening — denial logging with reason', () => {
 })
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 4. Concurrency Safety — accept-invite worst-case path
+// 4. Concurrency Safety  -  accept-invite worst-case path
 // ═══════════════════════════════════════════════════════════════════════════
 
-describe('hardening — concurrency: two accept-invite, one seat remaining', () => {
+describe('hardening  -  concurrency: two accept-invite, one seat remaining', () => {
   it('accept-invite calls checkSeatLimit BEFORE admin.auth.admin.createUser', () => {
     const source = readSource('app/api/auth/accept-invite/route.ts')
     const seatCheckIdx = source.indexOf('checkSeatLimit(invite.tenant_id)')
@@ -347,7 +347,7 @@ describe('hardening — concurrency: two accept-invite, one seat remaining', () 
 // 5. UI Error Contract: SEAT_LIMIT_REACHED + PENDING_INVITE_CAP
 // ═══════════════════════════════════════════════════════════════════════════
 
-describe('hardening — UI error contract', () => {
+describe('hardening  -  UI error contract', () => {
   it('Users page handles SEAT_LIMIT_REACHED code in invite mutation', () => {
     const source = readSource('app/(dashboard)/settings/users/page.tsx')
     expect(source).toContain("error.code === 'SEAT_LIMIT_REACHED'")
@@ -386,7 +386,7 @@ describe('hardening — UI error contract', () => {
 // 6. UI Copy: Seats = Active Users Only
 // ═══════════════════════════════════════════════════════════════════════════
 
-describe('hardening — UI seat policy copy', () => {
+describe('hardening  -  UI seat policy copy', () => {
   it('Users page header clarifies invites do not consume seats', () => {
     const source = readSource('app/(dashboard)/settings/users/page.tsx')
     expect(source).toContain('Pending invitations do not consume seats')
@@ -409,7 +409,7 @@ describe('hardening — UI seat policy copy', () => {
 // 7. Platform-Admin Token Rotation Proof
 // ═══════════════════════════════════════════════════════════════════════════
 
-describe('hardening — platform-admin token rotation', () => {
+describe('hardening  -  platform-admin token rotation', () => {
   it('checkPlatformAdmin uses direct string equality (no caching)', () => {
     const source = readSource('lib/services/platform-admin.ts')
     // The check reads process.env.PLATFORM_ADMIN_SECRET on every call
@@ -427,7 +427,7 @@ describe('hardening — platform-admin token rotation', () => {
 
   it('no token caching or session mechanism exists', () => {
     const source = readSource('lib/services/platform-admin.ts')
-    // checkPlatformAdmin is a pure function — no state, no cache
+    // checkPlatformAdmin is a pure function  -  no state, no cache
     expect(source).not.toContain('tokenCache')
     expect(source).not.toContain('sessionStore')
     expect(source).not.toContain('cachedSecret')
@@ -438,7 +438,7 @@ describe('hardening — platform-admin token rotation', () => {
 // 8. Admin UI Guardrail: > 2× Confirmation
 // ═══════════════════════════════════════════════════════════════════════════
 
-describe('hardening — admin max_users > 2x guardrail', () => {
+describe('hardening  -  admin max_users > 2x guardrail', () => {
   it('admin tenants page tracks slug confirmation state', () => {
     const source = readSource('app/(dashboard)/admin/tenants/page.tsx')
     expect(source).toContain('slugConfirm')
@@ -467,7 +467,7 @@ describe('hardening — admin max_users > 2x guardrail', () => {
 // 9. Invite Expiry Shared Constants
 // ═══════════════════════════════════════════════════════════════════════════
 
-describe('hardening — invite expiry shared constants', () => {
+describe('hardening  -  invite expiry shared constants', () => {
   it('seat-limit.ts exports INVITE_EXPIRY_STATUS and INVITE_PENDING_STATUS', () => {
     const source = readSource('lib/services/seat-limit.ts')
     expect(source).toContain("export const INVITE_EXPIRY_STATUS = 'expired'")
@@ -511,7 +511,7 @@ describe('hardening — invite expiry shared constants', () => {
 // 10. Index + Query Plan Proof Script
 // ═══════════════════════════════════════════════════════════════════════════
 
-describe('hardening — EXPLAIN ANALYZE script exists', () => {
+describe('hardening  -  EXPLAIN ANALYZE script exists', () => {
   it('explain-seat-limit-queries.sql exists', () => {
     expect(existsSync(resolve(ROOT, 'scripts/explain-seat-limit-queries.sql'))).toBe(true)
   })
@@ -544,7 +544,7 @@ describe('hardening — EXPLAIN ANALYZE script exists', () => {
 // 11. Observability Alerts
 // ═══════════════════════════════════════════════════════════════════════════
 
-describe('hardening — observability alerts', () => {
+describe('hardening  -  observability alerts', () => {
   it('alerts.ts exists', () => {
     expect(existsSync(resolve(ROOT, 'lib/utils/alerts.ts'))).toBe(true)
   })

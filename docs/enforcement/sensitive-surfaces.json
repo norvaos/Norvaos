@@ -457,6 +457,18 @@
       "category": "billing",
       "reason": "Lead conversion executor (billing queries for retainer setup, consumed only by convert-and-retain command route)",
       "required_controls": ["service-layer-only"]
+    },
+    {
+      "path": "app/api/invoices/overdue/route.ts",
+      "category": "billing",
+      "reason": "Overdue invoices API (billing queries with billing:view permission check)",
+      "required_controls": ["checkBillingPermission"]
+    },
+    {
+      "path": "app/api/matters/[id]/gating-status/route.ts",
+      "category": "stage_gating",
+      "reason": "Matter gating status API (evaluates stage gating rules)",
+      "required_controls": ["authenticateRequest"]
     }
   ]
 }

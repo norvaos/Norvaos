@@ -193,7 +193,7 @@ async function handlePost(request: NextRequest) {
         )
       }
 
-      // Determine OneDrive folder path — organized by entity type
+      // Determine OneDrive folder path  -  organized by entity type
       // Structure: NorvaOS/Matters/{MatterName}/, NorvaOS/Contacts/{ContactName}/, etc.
       const effectiveMatterId = matterId || (slotData?.matter_id ?? null)
       let folderPath = 'NorvaOS'
@@ -296,7 +296,7 @@ async function handlePost(request: NextRequest) {
           file_name: effectiveFileName,
           file_type: file.type,
           file_size: file.size,
-          storage_path: '', // No local storage — stored in OneDrive
+          storage_path: '', // No local storage  -  stored in OneDrive
           category: effectiveCategory,
           description: description,
           external_id: oneDriveItemId,
@@ -353,7 +353,7 @@ async function handlePost(request: NextRequest) {
         await invalidateGating(auth.tenantId, effectiveMatterId)
       }
 
-      // Directive 012: Smart notification batching — check readiness instead
+      // Directive 012: Smart notification batching  -  check readiness instead
       // of alerting per-document. Only fires "Matter Ready for Review" when
       // 100% of Identity + Financial slots are filled.
       if (effectiveMatterId) {
@@ -376,7 +376,7 @@ async function handlePost(request: NextRequest) {
     }
 
     // ─── Supabase Storage Upload (default) ────────────────────────────────────
-    // Determine file path — auto-rename for slot uploads, legacy for non-slot
+    // Determine file path  -  auto-rename for slot uploads, legacy for non-slot
     const adminSupabase = createAdminClient()
     const fileExt = file.name.split('.').pop() ?? 'bin'
     let filePath: string
@@ -391,7 +391,7 @@ async function handlePost(request: NextRequest) {
         matterNumber,
         slotSlug: slotData.slot_slug,
         personRole: slotData.person_role,
-        versionNumber: 0, // Placeholder — real version assigned by RPC
+        versionNumber: 0, // Placeholder  -  real version assigned by RPC
         originalExtension: fileExt,
       })
       // Use timestamp prefix to avoid storage collisions before version is known
@@ -480,7 +480,7 @@ async function handlePost(request: NextRequest) {
 
       if (rpcError) {
         console.error('Version tracking RPC error:', rpcError)
-        // Document was uploaded successfully — version tracking failure is logged
+        // Document was uploaded successfully  -  version tracking failure is logged
         // but does not fail the request. The slot status was updated by the RPC
         // or will need manual intervention.
       } else {
@@ -517,7 +517,7 @@ async function handlePost(request: NextRequest) {
       }
     }
 
-    // Directive 012: Smart notification batching — check readiness instead
+    // Directive 012: Smart notification batching  -  check readiness instead
     // of alerting per-document. Only fires "Matter Ready for Review" when
     // 100% of Identity + Financial slots are filled.
     if (effectiveMatterId) {

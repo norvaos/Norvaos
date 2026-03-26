@@ -13,9 +13,9 @@
  *   node scripts/seed-staging-auth-users.mjs
  *
  * Environment:
- *   NEXT_PUBLIC_SUPABASE_URL   — Supabase project URL
- *   SUPABASE_SERVICE_ROLE_KEY  — Service role key (admin access)
- *   STAGING_PASSWORD           — Password for all test users (default: TestPass123!)
+ *   NEXT_PUBLIC_SUPABASE_URL    -  Supabase project URL
+ *   SUPABASE_SERVICE_ROLE_KEY   -  Service role key (admin access)
+ *   STAGING_PASSWORD            -  Password for all test users (default: TestPass123!)
  *
  * Reads from: .env.local (if present)
  */
@@ -43,7 +43,7 @@ function loadEnvLocal() {
       }
     }
   } catch {
-    // .env.local not found — use existing env
+    // .env.local not found  -  use existing env
   }
 }
 
@@ -137,7 +137,7 @@ async function createOrGetUser(email) {
 
   if (!createRes.ok) {
     const err = await createRes.text()
-    throw new Error(`Failed to create ${email}: ${createRes.status} — ${err}`)
+    throw new Error(`Failed to create ${email}: ${createRes.status}  -  ${err}`)
   }
 
   const user = await createRes.json()

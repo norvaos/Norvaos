@@ -1,4 +1,4 @@
-# NorvaOS — Restore Test Evidence
+# NorvaOS  -  Restore Test Evidence
 
 **Date:** 2026-03-15
 **Environment:** Production (Supabase project `ztsjvsutlrfisnrwdwfl`)
@@ -20,7 +20,7 @@ Validate that the production database can be reliably backed up and restored wit
 
 ---
 
-## 2. Baseline Snapshot — Database Object Inventory
+## 2. Baseline Snapshot  -  Database Object Inventory
 
 | Object Type | Count |
 |---|---|
@@ -46,7 +46,7 @@ Validate that the production database can be reliably backed up and restored wit
 
 ---
 
-## 3. Row Count Baseline — Key Tables
+## 3. Row Count Baseline  -  Key Tables
 
 | Table | Row Count |
 |---|---|
@@ -104,7 +104,7 @@ Validate that the production database can be reliably backed up and restored wit
 | waitlist | 6 |
 | document_template_versions | 12 |
 
-**Tables with 0 rows:** 106 tables (structural tables awaiting production use — trust accounting, email, billing, marketing, etc.)
+**Tables with 0 rows:** 106 tables (structural tables awaiting production use  -  trust accounting, email, billing, marketing, etc.)
 
 ---
 
@@ -116,15 +116,15 @@ Validate that the production database can be reliably backed up and restored wit
 
 | Table | Reason |
 |---|---|
-| `common_field_registry` | Shared reference data — no tenant_id column. Used for IRCC form field mapping across all tenants. |
-| `plan_features` | SaaS plan feature definitions — global config, not tenant-scoped. |
-| `waitlist` | Public waitlist signups — pre-authentication, no tenant context. |
+| `common_field_registry` | Shared reference data  -  no tenant_id column. Used for IRCC form field mapping across all tenants. |
+| `plan_features` | SaaS plan feature definitions  -  global config, not tenant-scoped. |
+| `waitlist` | Public waitlist signups  -  pre-authentication, no tenant context. |
 
 **Assessment:** All three exceptions are reference/public tables with no tenant-scoped data. RLS coverage is correct.
 
 ---
 
-## 5. Trigger Functional Tests — Live Execution Results
+## 5. Trigger Functional Tests  -  Live Execution Results
 
 ### Test 5.1: Invoice Paid Immutability
 
@@ -140,11 +140,11 @@ CONTEXT: PL/pgSQL function prevent_paid_invoice_mutation() line 15 at RAISE
 
 **Cleanup attempt:** `UPDATE invoices SET status = 'draft' WHERE invoice_number = 'RESTORE-TEST-001'`
 
-**Result:** ✅ **ALSO BLOCKED** — status field is also protected. Trigger prevents all core field mutations on paid invoices, including status itself. Test data required temporary trigger disable for cleanup, which itself confirms the trigger's completeness.
+**Result:** ✅ **ALSO BLOCKED**  -  status field is also protected. Trigger prevents all core field mutations on paid invoices, including status itself. Test data required temporary trigger disable for cleanup, which itself confirms the trigger's completeness.
 
 ---
 
-### Test 5.2: Audit Log Immutability — UPDATE
+### Test 5.2: Audit Log Immutability  -  UPDATE
 
 **Test:** `UPDATE audit_logs SET action = 'tampered' WHERE id = (SELECT id FROM audit_logs LIMIT 1)`
 
@@ -156,7 +156,7 @@ CONTEXT: PL/pgSQL function prevent_audit_log_mutation() line 3 at RAISE
 
 ---
 
-### Test 5.3: Audit Log Immutability — DELETE
+### Test 5.3: Audit Log Immutability  -  DELETE
 
 **Test:** `DELETE FROM audit_logs WHERE id = (SELECT id FROM audit_logs LIMIT 1)`
 
@@ -168,7 +168,7 @@ CONTEXT: PL/pgSQL function prevent_audit_log_mutation() line 3 at RAISE
 
 ---
 
-### Test 5.4: Trust Transaction Immutability — Trigger Existence
+### Test 5.4: Trust Transaction Immutability  -  Trigger Existence
 
 | Trigger | Table | Event | Status |
 |---|---|---|---|
@@ -219,7 +219,7 @@ CONTEXT: PL/pgSQL function prevent_audit_log_mutation() line 3 at RAISE
 
 **Total FK constraints:** 700
 
-No orphaned row violations detected (all FK constraints are enforced at the database level — any violation would have caused INSERT/UPDATE failures in normal operation).
+No orphaned row violations detected (all FK constraints are enforced at the database level  -  any violation would have caused INSERT/UPDATE failures in normal operation).
 
 ---
 
@@ -293,7 +293,7 @@ After any restore, the following must be verified:
 | RLS enforcement | ✅ 209/212 enabled (3 documented exceptions) |
 | FK referential integrity | ✅ 700 constraints enforced |
 | Index integrity | ✅ 820 indexes present |
-| Immutability controls | ✅ Invoice, audit log, trust — all blocking mutations |
+| Immutability controls | ✅ Invoice, audit log, trust  -  all blocking mutations |
 | Segregation of duties | ✅ All 3 triggers present and active |
 | Portal token security | ✅ 47/47 hashed, 0 plaintext |
 | Migration tracking | ✅ All migrations recorded through segregation_of_duties_triggers |

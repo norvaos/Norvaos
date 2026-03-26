@@ -2,7 +2,7 @@
  * Tenant-safe Redis cache layer.
  *
  * INVARIANT: Every cache key MUST start with `t:{tenantId}:`.
- * This is enforced at runtime — invalid keys throw immediately.
+ * This is enforced at runtime  -  invalid keys throw immediately.
  *
  * When UPSTASH_REDIS_REST_URL is not set, all operations become
  * no-ops (get returns null, set/del are void). This is the rollback
@@ -32,7 +32,7 @@ const TENANT_KEY_RE = /^t:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-
 export function assertTenantKey(key: string): void {
   if (!TENANT_KEY_RE.test(key)) {
     throw new Error(
-      `Cache key must start with t:{tenantId}: (UUID format) — got: "${key.slice(0, 60)}"`
+      `Cache key must start with t:{tenantId}: (UUID format)  -  got: "${key.slice(0, 60)}"`
     )
   }
 }
@@ -95,7 +95,7 @@ export async function del(key: string): Promise<void> {
 /**
  * Delete all keys matching a tenant-scoped prefix pattern.
  *
- * Pattern MUST be `t:{tenantId}:some:prefix:*` — the function verifies
+ * Pattern MUST be `t:{tenantId}:some:prefix:*`  -  the function verifies
  * the pattern starts with a valid tenant prefix and ends with `*`.
  *
  * Uses SCAN to avoid blocking Redis.
@@ -104,11 +104,11 @@ export async function prefixDel(pattern: string): Promise<void> {
   // Validate pattern is tenant-scoped
   if (!TENANT_KEY_RE.test(pattern)) {
     throw new Error(
-      `prefixDel pattern must start with t:{tenantId}: — got: "${pattern.slice(0, 60)}"`
+      `prefixDel pattern must start with t:{tenantId}:  -  got: "${pattern.slice(0, 60)}"`
     )
   }
   if (!pattern.endsWith('*')) {
-    throw new Error(`prefixDel pattern must end with * — got: "${pattern.slice(0, 60)}"`)
+    throw new Error(`prefixDel pattern must end with *  -  got: "${pattern.slice(0, 60)}"`)
   }
 
   // Extract tenant prefix and verify pattern cannot cross tenants
@@ -139,7 +139,7 @@ export async function prefixDel(pattern: string): Promise<void> {
       }
     } while (cursor !== 0)
   } catch (err) {
-    // Re-throw cross-tenant errors — those are security violations
+    // Re-throw cross-tenant errors  -  those are security violations
     if (err instanceof Error && err.message.includes('Cross-tenant')) {
       throw err
     }

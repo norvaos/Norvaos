@@ -1,5 +1,5 @@
 /**
- * IRCC Forms Engine — Stale Dependency Tracker
+ * IRCC Forms Engine  -  Stale Dependency Tracker
  *
  * Pure function module (no I/O, no database). Detects stale dependencies
  * and computes invalidation updates when parent field values change.
@@ -148,7 +148,7 @@ export function applyStaleUpdates(
         stale_reason: update.reason,
       }
     } else {
-      // mark_stale — preserve value
+      // mark_stale  -  preserve value
       result[update.profile_path] = {
         ...existing,
         stale: true,
@@ -178,7 +178,7 @@ export function detectVisibilityTransition(
     field.show_when as Parameters<typeof normalizeLegacyCondition>[0]
   )
 
-  // No condition means always visible — no transition possible
+  // No condition means always visible  -  no transition possible
   if (!condition) return null
 
   const wasVisible = evaluateCondition(condition, oldValues)

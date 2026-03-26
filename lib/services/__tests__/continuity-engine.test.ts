@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Directives 018 / 024 — Continuity Engine & Document Freshness Tests
+ * Directives 018 / 024  -  Continuity Engine & Document Freshness Tests
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Tests the Asymmetric Shield logic:
@@ -21,7 +21,7 @@ import {
   type DateRange,
 } from '@/lib/utils/continuity'
 
-describe('Directive 018: Continuity Engine — Gap Detection', () => {
+describe('Directive 018: Continuity Engine  -  Gap Detection', () => {
 
   describe('checkChronologicalGaps', () => {
     it('returns gapless for continuous dates', () => {
@@ -221,7 +221,7 @@ describe('Directive 018: Continuity Engine — Gap Detection', () => {
   })
 })
 
-// ─── Directive 024: Document Freshness — Stale-Date Monitor ─────────────────
+// ─── Directive 024: Document Freshness  -  Stale-Date Monitor ─────────────────
 
 import {
   checkDocumentFreshness,
@@ -229,7 +229,7 @@ import {
   PROCESSING_TIME_ESTIMATES,
 } from '@/lib/services/document-freshness'
 
-describe('Directive 024: Document Freshness — Stale-Date Monitor', () => {
+describe('Directive 024: Document Freshness  -  Stale-Date Monitor', () => {
   const today = new Date()
 
   function daysFromNow(days: number): string {
@@ -272,7 +272,7 @@ describe('Directive 024: Document Freshness — Stale-Date Monitor', () => {
       document_type: 'police_certificate',
       issue_date: daysAgo(30),
       expiry_date: daysFromNow(120),
-    }, 'visitor_visa') // 42 day processing — won't expire during processing
+    }, 'visitor_visa') // 42 day processing  -  won't expire during processing
     expect(result.status).toBe('warning')
   })
 

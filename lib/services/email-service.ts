@@ -35,7 +35,7 @@ interface SendClientEmailParams {
 function getResend(): Resend | null {
   const apiKey = process.env.RESEND_API_KEY
   if (!apiKey) {
-    console.warn('[email-service] RESEND_API_KEY not configured — emails will be skipped')
+    console.warn('[email-service] RESEND_API_KEY not configured  -  emails will be skipped')
     return null
   }
   return new Resend(apiKey)
@@ -106,7 +106,7 @@ async function fetchMatterRef(supabase: SupabaseClient<Database>, matterId: stri
 /**
  * Send a stage change notification email to a client contact.
  * Called from `notifyStageChange()` in stage-engine.ts.
- * Non-blocking: all errors caught internally — never throws.
+ * Non-blocking: all errors caught internally  -  never throws.
  */
 export async function sendStageChangeEmail(params: SendStageChangeEmailParams): Promise<void> {
   const { supabase, tenantId, matterId, contactId, stageName, previousStageName } = params
@@ -229,7 +229,7 @@ export async function sendStageChangeEmail(params: SendStageChangeEmailParams): 
       }
     }
   } catch (err) {
-    // Non-blocking — never throw from email service
+    // Non-blocking  -  never throw from email service
     console.error('[email-service] Failed to send stage change email:', err)
     try {
       await logNotification(supabase, {
@@ -241,7 +241,7 @@ export async function sendStageChangeEmail(params: SendStageChangeEmailParams): 
         metadata: { stage_name: stageName },
       })
     } catch {
-      // Even logging failed — nothing more to do
+      // Even logging failed  -  nothing more to do
     }
   }
 }
@@ -251,7 +251,7 @@ export async function sendStageChangeEmail(params: SendStageChangeEmailParams): 
 /**
  * Send a generic client notification email.
  * Called from the automation engine `send_client_email` action.
- * Non-blocking: all errors caught internally — never throws.
+ * Non-blocking: all errors caught internally  -  never throws.
  */
 export async function sendClientEmail(params: SendClientEmailParams): Promise<void> {
   const { supabase, tenantId, matterId, contactId, notificationType, templateData } = params
@@ -516,16 +516,16 @@ interface SendInternalEmailParams {
   message: string
   entityType?: string
   entityId?: string
-  /** Pre-rendered HTML — bypasses internal notification template (Directive 40.0 §3) */
+  /** Pre-rendered HTML  -  bypasses internal notification template (Directive 40.0 §3) */
   htmlOverride?: string
-  /** Pre-rendered plain text — used with htmlOverride */
+  /** Pre-rendered plain text  -  used with htmlOverride */
   textOverride?: string
 }
 
 /**
  * Send a notification email to an internal staff member.
  * Called from the notification dispatch engine.
- * Non-blocking: all errors caught internally — never throws.
+ * Non-blocking: all errors caught internally  -  never throws.
  */
 export async function sendInternalEmail(params: SendInternalEmailParams): Promise<void> {
   const { supabase, tenantId, recipientEmail, recipientName, title, message, entityType, entityId, htmlOverride, textOverride } = params
@@ -541,7 +541,7 @@ export async function sendInternalEmail(params: SendInternalEmailParams): Promis
     let subject: string
 
     if (htmlOverride) {
-      // Directive 40.0 §3: Pre-rendered localised template — skip internal notification rendering
+      // Directive 40.0 §3: Pre-rendered localised template  -  skip internal notification rendering
       html = htmlOverride
       text = textOverride ?? message
       subject = title
@@ -590,7 +590,7 @@ export async function sendInternalEmail(params: SendInternalEmailParams): Promis
       text,
     })
   } catch (err) {
-    // Non-blocking — never throw from email service
+    // Non-blocking  -  never throw from email service
     console.error('[email-service] Failed to send internal email:', err)
   }
 }

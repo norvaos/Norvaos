@@ -1,5 +1,5 @@
 /**
- * IRCC Forms Engine — Condition Types
+ * IRCC Forms Engine  -  Condition Types
  *
  * Unified condition model supporting AND/OR grouped logic with 14 operators.
  * Used by show_when, required_condition, and composite_validation_rules.

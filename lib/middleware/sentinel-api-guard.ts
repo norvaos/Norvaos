@@ -1,5 +1,5 @@
 /**
- * SENTINEL API Guard — Defense-in-depth tenant isolation at the API layer.
+ * SENTINEL API Guard  -  Defense-in-depth tenant isolation at the API layer.
  *
  * Wraps route handlers to intercept any Supabase errors that indicate
  * a cross-tenant access attempt (PostgreSQL error code 42501) and
@@ -77,7 +77,7 @@ export function withSentinelGuard(
         )
       }
 
-      // Unknown error — don't leak details
+      // Unknown error  -  don't leak details
       console.error(`[SENTINEL][${routeLabel}] Unhandled error:`, error)
 
       // Directive 008: Every 500 error captured with full stack trace

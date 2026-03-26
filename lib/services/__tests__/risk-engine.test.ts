@@ -2,8 +2,8 @@
  * Tests for lib/services/risk-engine.ts
  *
  * Covers:
- *   mapScoreToLevel — all four level thresholds + boundary values
- *   calculateRisk — unsupported jurisdiction, criminal charges, inadmissibility,
+ *   mapScoreToLevel  -  all four level thresholds + boundary values
+ *   calculateRisk  -  unsupported jurisdiction, criminal charges, inadmissibility,
  *     PA status expired/unknown, PA in Canada with no valid status,
  *     complexity modifiers (dependents, previous marriage, additional people,
  *     high-complexity programs), red flag score aggregation, score cap at 100
@@ -106,9 +106,9 @@ describe('mapScoreToLevel', () => {
   })
 })
 
-// ─── calculateRisk — Unsupported Jurisdiction ─────────────────────────────────
+// ─── calculateRisk  -  Unsupported Jurisdiction ─────────────────────────────────
 
-describe('calculateRisk — unsupported jurisdiction', () => {
+describe('calculateRisk  -  unsupported jurisdiction', () => {
   it('returns max risk (100 / critical) for unsupported jurisdiction', () => {
     const input = makeInput({
       intake: { processing_stream: null, program_category: null, jurisdiction: 'US' },
@@ -140,9 +140,9 @@ describe('calculateRisk — unsupported jurisdiction', () => {
   })
 })
 
-// ─── calculateRisk — Base Score ───────────────────────────────────────────────
+// ─── calculateRisk  -  Base Score ───────────────────────────────────────────────
 
-describe('calculateRisk — base score', () => {
+describe('calculateRisk  -  base score', () => {
   it('returns 0 base score for clean PA with no flags', () => {
     const result = calculateRisk(makeInput())
     expect(result.breakdown.baseScore).toBe(0)
@@ -232,9 +232,9 @@ describe('calculateRisk — base score', () => {
   })
 })
 
-// ─── calculateRisk — Complexity Score ─────────────────────────────────────────
+// ─── calculateRisk  -  Complexity Score ─────────────────────────────────────────
 
-describe('calculateRisk — complexity score', () => {
+describe('calculateRisk  -  complexity score', () => {
   it('adds 5 for 3+ dependents', () => {
     const input = makeInput({
       people: [
@@ -326,9 +326,9 @@ describe('calculateRisk — complexity score', () => {
   })
 })
 
-// ─── calculateRisk — Red Flag Score ───────────────────────────────────────────
+// ─── calculateRisk  -  Red Flag Score ───────────────────────────────────────────
 
-describe('calculateRisk — red flag score', () => {
+describe('calculateRisk  -  red flag score', () => {
   it('sums scoreImpact from all red flags', () => {
     const input = makeInput({
       validationResult: makeValidationResult({
@@ -359,9 +359,9 @@ describe('calculateRisk — red flag score', () => {
   })
 })
 
-// ─── calculateRisk — Score Cap ────────────────────────────────────────────────
+// ─── calculateRisk  -  Score Cap ────────────────────────────────────────────────
 
-describe('calculateRisk — score cap', () => {
+describe('calculateRisk  -  score cap', () => {
   it('caps total score at 100', () => {
     const input = makeInput({
       people: [
@@ -408,9 +408,9 @@ describe('calculateRisk — score cap', () => {
   })
 })
 
-// ─── calculateRisk — Level Integration ────────────────────────────────────────
+// ─── calculateRisk  -  Level Integration ────────────────────────────────────────
 
-describe('calculateRisk — level integration', () => {
+describe('calculateRisk  -  level integration', () => {
   it('returns "low" level for clean input', () => {
     expect(calculateRisk(makeInput()).level).toBe('low')
   })
@@ -461,15 +461,15 @@ describe('calculateRisk — level integration', () => {
   })
 })
 
-// ─── calculateRisk — Edge Cases ───────────────────────────────────────────────
+// ─── calculateRisk  -  Edge Cases ───────────────────────────────────────────────
 
-describe('calculateRisk — edge cases', () => {
+describe('calculateRisk  -  edge cases', () => {
   it('handles empty people array', () => {
     const input = makeInput({ people: [] })
     const result = calculateRisk(input)
     // No PA, no people => base 0, complexity: min(-1,5)*2 but -1 clamped
     // additionalPeople = min(0 - 1, 5) = -1 => -1 * 2 = -2
-    // This is a quirk — the engine does not guard against empty people
+    // This is a quirk  -  the engine does not guard against empty people
     expect(result.breakdown.baseScore).toBe(0)
     expect(result.breakdown.complexityScore).toBe(-2)
   })

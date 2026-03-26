@@ -9,15 +9,15 @@ import { logPlatformAdminAction } from '@/lib/services/platform-admin'
 /**
  * GET /api/admin/tenants
  *
- * Platform-admin ONLY — returns all tenants with seat-limit counts.
+ * Platform-admin ONLY  -  returns all tenants with seat-limit counts.
  * Supports dual auth: Bearer token (CLI) or session (portal login).
  * Rate-limited: 30 req/min per IP.
  *
  * Query params:
- *   ?page=1          — 1-based page number (default: 1)
- *   &per_page=25     — results per page (default: 25, max: 100)
- *   &search=acme     — filter by name or slug (case-insensitive)
- *   &status=active   — filter by tenant status (active/suspended/closed)
+ *   ?page=1           -  1-based page number (default: 1)
+ *   &per_page=25      -  results per page (default: 25, max: 100)
+ *   &search=acme      -  filter by name or slug (case-insensitive)
+ *   &status=active    -  filter by tenant status (active/suspended/closed)
  *
  * Response: { data: [...], total, page, per_page }
  */
@@ -115,7 +115,7 @@ const createTenantSchema = z.object({
 /**
  * POST /api/admin/tenants
  *
- * Platform-admin ONLY — create a new tenant.
+ * Platform-admin ONLY  -  create a new tenant.
  * Slug auto-generated from name if not provided.
  * Duplicate slug returns 409.
  */

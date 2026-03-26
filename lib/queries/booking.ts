@@ -44,7 +44,7 @@ export function useBookingPages(tenantId: string) {
     queryFn: async () => {
       const supabase = createClient()
 
-      // No direct FK from booking_pages to users in generated types — batch resolve
+      // No direct FK from booking_pages to users in generated types  -  batch resolve
       const { data: pages, error } = await supabase
         .from('booking_pages')
         .select('*')
@@ -210,7 +210,7 @@ export function useAppointments(
     queryFn: async () => {
       const supabase = createClient()
 
-      // No direct FK from appointments to booking_pages/users in generated types — batch resolve
+      // No direct FK from appointments to booking_pages/users in generated types  -  batch resolve
       let q = supabase
         .from('appointments')
         .select('*')

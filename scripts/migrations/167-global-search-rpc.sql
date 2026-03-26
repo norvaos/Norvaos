@@ -1,6 +1,6 @@
 -- Migration 167: Secure Global Search RPC
 -- Single-call search across contacts, matters, leads, tasks.
--- Filters by auth.uid() at the database level — no tenant_id passed from client.
+-- Filters by auth.uid() at the database level  -  no tenant_id passed from client.
 -- Returns only columns needed for the search result card (lean payload).
 
 CREATE OR REPLACE FUNCTION public.global_search(search_term text, result_limit int DEFAULT 5)
@@ -17,7 +17,7 @@ DECLARE
   _leads     jsonb;
   _tasks     jsonb;
 BEGIN
-  -- Resolve tenant from auth.uid() — enforced at DB level
+  -- Resolve tenant from auth.uid()  -  enforced at DB level
   SELECT tenant_id INTO _tenant_id
   FROM users
   WHERE auth_user_id = auth.uid();

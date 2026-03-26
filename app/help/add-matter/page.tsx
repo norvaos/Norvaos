@@ -117,9 +117,9 @@ function MattersListMockup() {
           </thead>
           <tbody>
             {[
-              { num: '2026-0019', title: 'Ajaypal Singh — Visitor / Work Permit...', area: 'Immigration', status: 'Active', priority: 'Medium', lawyer: 'Zia Waseer' },
-              { num: '2026-0018', title: 'Khansa Ayyaz — Visitor / Work Permit...', area: 'Immigration', status: 'Active', priority: 'Medium', lawyer: 'Zia Waseer' },
-              { num: '2026-0017', title: 'Inaaya Zia — Visitor / Work Permit...', area: 'Immigration', status: 'Active', priority: 'Urgent', lawyer: 'Zia Waseer' },
+              { num: '2026-0019', title: 'Ajaypal Singh  -  Visitor / Work Permit...', area: 'Immigration', status: 'Active', priority: 'Medium', lawyer: 'Zia Waseer' },
+              { num: '2026-0018', title: 'Khansa Ayyaz  -  Visitor / Work Permit...', area: 'Immigration', status: 'Active', priority: 'Medium', lawyer: 'Zia Waseer' },
+              { num: '2026-0017', title: 'Inaaya Zia  -  Visitor / Work Permit...', area: 'Immigration', status: 'Active', priority: 'Urgent', lawyer: 'Zia Waseer' },
             ].map(row => (
               <tr key={row.num} className="border-b border-gray-50 hover:bg-gray-50/50">
                 <td className="py-2.5 text-indigo-600 font-medium">{row.num}</td>
@@ -171,7 +171,7 @@ function NewMatterFormMockup() {
               <div className="mt-1 rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs text-gray-400 flex items-center gap-2">
                 <Search className="h-3 w-3" /> Search or create a contact...
               </div>
-              <p className="mt-0.5 text-xs text-amber-600">→ Type the client's name — existing contacts appear as suggestions</p>
+              <p className="mt-0.5 text-xs text-amber-600">→ Type the client's name  -  existing contacts appear as suggestions</p>
             </div>
           </div>
         </div>
@@ -248,8 +248,8 @@ function MatterWorkspaceMockup() {
       {/* Matter Header */}
       <div className="border-b border-gray-100 px-5 py-3">
         <div className="flex items-center gap-2 flex-wrap">
-          <p className="font-semibold text-gray-900 text-sm">Inaaya Zia — Visitor / Work Permit / Entry Matters</p>
-          <span className="text-gray-400 text-xs">— Inaaya Zia</span>
+          <p className="font-semibold text-gray-900 text-sm">Inaaya Zia  -  Visitor / Work Permit / Entry Matters</p>
+          <span className="text-gray-400 text-xs"> -  Inaaya Zia</span>
           <MockupBadge color="bg-gray-100 text-gray-600" label="# 2026-0017" />
           <MockupBadge color="bg-emerald-50 text-emerald-700" label="Active" />
           <MockupBadge color="bg-red-50 text-red-700" label="Urgent" />
@@ -279,7 +279,7 @@ function MatterWorkspaceMockup() {
       <div className="mx-5 my-3 rounded-xl bg-emerald-50 border border-emerald-200 px-4 py-3 flex items-center justify-between">
         <div>
           <p className="text-xs font-semibold text-emerald-800 uppercase tracking-wide">Next Action</p>
-          <p className="text-sm font-medium text-emerald-900 mt-0.5">All checks passed — file the application with IRCC</p>
+          <p className="text-sm font-medium text-emerald-900 mt-0.5">All checks passed  -  file the application with IRCC</p>
         </div>
         <button className="rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-semibold text-white whitespace-nowrap">Proceed to IRCC Filing</button>
       </div>
@@ -307,13 +307,13 @@ function MatterWorkspaceMockup() {
 
 const onPageSections = [
   { id: 'overview', label: 'Overview' },
-  { id: 'step1', label: 'Step 1 — Open the form' },
-  { id: 'step2', label: 'Step 2 — Basic Information' },
-  { id: 'step3', label: 'Step 3 — Classification' },
-  { id: 'step4', label: 'Step 4 — Assignment' },
-  { id: 'step5', label: 'Step 5 — Billing' },
-  { id: 'step6', label: 'Step 6 — Status & Security' },
-  { id: 'step7', label: 'Step 7 — Create & what happens next' },
+  { id: 'step1', label: 'Step 1  -  Open the form' },
+  { id: 'step2', label: 'Step 2  -  Basic Information' },
+  { id: 'step3', label: 'Step 3  -  Classification' },
+  { id: 'step4', label: 'Step 4  -  Assignment' },
+  { id: 'step5', label: 'Step 5  -  Billing' },
+  { id: 'step6', label: 'Step 6  -  Status & Security' },
+  { id: 'step7', label: 'Step 7  -  Create & what happens next' },
   { id: 'workspace', label: 'The Matter Workspace' },
   { id: 'after-creation', label: 'What to do after creating' },
   { id: 'tips', label: 'Tips & Common Mistakes' },
@@ -388,7 +388,7 @@ export default function AddMatterHelpPage() {
               </div>
               <div>
                 <h1 className="text-3xl font-bold text-gray-900">Adding a Matter</h1>
-                <p className="text-gray-500 mt-0.5">Complete step-by-step guide — from opening the form to working the case</p>
+                <p className="text-gray-500 mt-0.5">Complete step-by-step guide  -  from opening the form to working the case</p>
               </div>
             </div>
             <div className="flex gap-3 flex-wrap text-xs">
@@ -403,10 +403,10 @@ export default function AddMatterHelpPage() {
             <h2 className="text-xl font-bold text-gray-900 mb-4">Overview</h2>
             <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm space-y-4">
               <p className="text-sm text-gray-600 leading-relaxed">
-                A <strong>Matter</strong> is the central object in NorvaOS. Every active case lives inside a matter — its documents, tasks, deadlines, billing, questionnaire, communications, and full activity log are all stored here.
+                A <strong>Matter</strong> is the central object in NorvaOS. Every active case lives inside a matter  -  its documents, tasks, deadlines, billing, questionnaire, communications, and full activity log are all stored here.
               </p>
               <p className="text-sm text-gray-600 leading-relaxed">
-                Creating a matter takes about 60 seconds. You fill in the client, practice area, matter type, responsible lawyer, and billing type. After that, the system sets up the workspace automatically — document checklist, intake form, and (for immigration matters) the readiness matrix.
+                Creating a matter takes about 60 seconds. You fill in the client, practice area, matter type, responsible lawyer, and billing type. After that, the system sets up the workspace automatically  -  document checklist, intake form, and (for immigration matters) the readiness matrix.
               </p>
               <div className="grid grid-cols-3 gap-3">
                 {[
@@ -422,7 +422,7 @@ export default function AddMatterHelpPage() {
                 ))}
               </div>
               <Callout type="info" title="Before you create a matter">
-                Make sure the client exists as a Contact first. If they don't, you can create a contact directly from the matter form — but it's cleaner to add the contact first so their full profile is set up.
+                Make sure the client exists as a Contact first. If they don't, you can create a contact directly from the matter form  -  but it's cleaner to add the contact first so their full profile is set up.
               </Callout>
             </div>
           </section>
@@ -438,7 +438,7 @@ export default function AddMatterHelpPage() {
               <p className="text-sm text-gray-600 leading-relaxed">There are two ways to get to the New Matter form:</p>
               <div className="grid grid-cols-2 gap-4">
                 <div className="rounded-xl border-2 border-indigo-200 bg-indigo-50 p-4">
-                  <p className="font-semibold text-indigo-800 text-sm mb-1">Option A — From the Matters list</p>
+                  <p className="font-semibold text-indigo-800 text-sm mb-1">Option A  -  From the Matters list</p>
                   <ol className="space-y-1 text-xs text-indigo-700">
                     <li>1. Click <strong>Matters</strong> in the left sidebar</li>
                     <li>2. Click <strong>+ New Matter</strong> button (top right)</li>
@@ -446,7 +446,7 @@ export default function AddMatterHelpPage() {
                   </ol>
                 </div>
                 <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
-                  <p className="font-semibold text-gray-800 text-sm mb-1">Option B — From a Contact profile</p>
+                  <p className="font-semibold text-gray-800 text-sm mb-1">Option B  -  From a Contact profile</p>
                   <ol className="space-y-1 text-xs text-gray-600">
                     <li>1. Open a contact's profile</li>
                     <li>2. Click <strong>Open Matter</strong> button</li>
@@ -456,7 +456,7 @@ export default function AddMatterHelpPage() {
               </div>
 
               <div>
-                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">What you see — Matters list page</p>
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">What you see  -  Matters list page</p>
                 <MattersListMockup />
               </div>
             </div>
@@ -477,9 +477,9 @@ export default function AddMatterHelpPage() {
                   <FieldDoc
                     name="Title"
                     required
-                    desc="The name of the matter as it will appear everywhere in the system. Be consistent — your team will search by this name."
-                    example="Ajaypal Singh — Study Permit 2026"
-                    note="Convention: [Client Name] — [Application Type] [Year]"
+                    desc="The name of the matter as it will appear everywhere in the system. Be consistent  -  your team will search by this name."
+                    example="Ajaypal Singh  -  Study Permit 2026"
+                    note="Convention: [Client Name]  -  [Application Type] [Year]"
                   />
                   <FieldDoc
                     name="Description"
@@ -489,7 +489,7 @@ export default function AddMatterHelpPage() {
                   <FieldDoc
                     name="Primary Contact"
                     required
-                    desc="The main client for this matter. Start typing their name — the system searches your existing contacts. If they don't exist, click '+ Add Another Contact' to create them inline."
+                    desc="The main client for this matter. Start typing their name  -  the system searches your existing contacts. If they don't exist, click '+ Add Another Contact' to create them inline."
                     example="Type 'Singh' to find Ajaypal Singh"
                     note="You can add multiple contacts (e.g. sponsor + principal applicant) after creation"
                   />
@@ -501,7 +501,7 @@ export default function AddMatterHelpPage() {
               </div>
 
               <Callout type="tip" title="Naming convention matters">
-                Use a consistent naming format across your firm. A good format is: <strong>[Last Name, First Name] — [Matter Type] [Year]</strong>. This makes the matters list easy to scan and search.
+                Use a consistent naming format across your firm. A good format is: <strong>[Last Name, First Name]  -  [Matter Type] [Year]</strong>. This makes the matters list easy to scan and search.
               </Callout>
             </div>
           </section>
@@ -536,8 +536,8 @@ export default function AddMatterHelpPage() {
                 <p className="text-sm font-semibold text-blue-800 mb-2">Why Practice Area and Matter Type matter</p>
                 <div className="space-y-1.5 text-xs text-blue-700">
                   {[
-                    'Immigration matters get the full immigration workspace — readiness matrix, IRCC questionnaire, form generation',
-                    'Non-immigration matters use the standard tab layout — tasks, docs, billing, notes',
+                    'Immigration matters get the full immigration workspace  -  readiness matrix, IRCC questionnaire, form generation',
+                    'Non-immigration matters use the standard tab layout  -  tasks, docs, billing, notes',
                     'Each matter type has its own document checklist so you only see relevant document slots',
                     'Intake questions in the Onboarding tab are driven by the matter type schema',
                   ].map(item => (
@@ -582,7 +582,7 @@ export default function AddMatterHelpPage() {
               </div>
 
               <Callout type="info" title="Assignment drives notifications">
-                The Responsible Lawyer receives all system notifications for this matter — new client uploads, status changes, tasks coming due. Make sure the right person is assigned.
+                The Responsible Lawyer receives all system notifications for this matter  -  new client uploads, status changes, tasks coming due. Make sure the right person is assigned.
               </Callout>
             </div>
           </section>
@@ -617,7 +617,7 @@ export default function AddMatterHelpPage() {
                 </div>
                 <FieldDoc
                   name="Estimated Value (CAD)"
-                  desc="The estimated total fee for this matter. This populates revenue projections in Reports. It is NOT the invoice — the actual invoice is created separately."
+                  desc="The estimated total fee for this matter. This populates revenue projections in Reports. It is NOT the invoice  -  the actual invoice is created separately."
                   example="3500.00"
                   note="This is auto-filled if you have fee templates set up in Settings → Matter Types"
                 />
@@ -676,7 +676,7 @@ export default function AddMatterHelpPage() {
                   name="Visibility"
                   desc="Controls who in your firm can see this matter."
                   example="Visible to All"
-                  note="Use 'Restricted' for sensitive matters — only assigned lawyers + admins can access"
+                  note="Use 'Restricted' for sensitive matters  -  only assigned lawyers + admins can access"
                 />
 
                 <FieldDoc
@@ -706,7 +706,7 @@ export default function AddMatterHelpPage() {
 
               <div className="space-y-3">
                 {[
-                  { icon: Briefcase, title: 'Matter workspace created', desc: 'A new matter page is generated with all sections ready — questions, documents, tasks, billing, and communications.' },
+                  { icon: Briefcase, title: 'Matter workspace created', desc: 'A new matter page is generated with all sections ready  -  questions, documents, tasks, billing, and communications.' },
                   { icon: FileText, title: 'Document checklist loaded', desc: 'Based on the matter type, the required document slots are pre-populated. For immigration: passport, photos, proof of funds, etc.' },
                   { icon: BookOpen, title: 'Intake form ready', desc: 'The Onboarding tab is populated with intake questions based on the matter type. You can start filling these immediately or send to the client.' },
                   { icon: Layers, title: 'Immigration workspace activated', desc: 'For immigration matters, the readiness matrix engine starts. It immediately shows what\'s missing and what the next step is.' },
@@ -726,7 +726,7 @@ export default function AddMatterHelpPage() {
               </div>
 
               <Callout type="tip" title="You are taken directly to the matter">
-                After clicking Create Matter, the system redirects you straight to the new matter's workspace. You don't need to go back to the list — just start working on it immediately.
+                After clicking Create Matter, the system redirects you straight to the new matter's workspace. You don't need to go back to the list  -  just start working on it immediately.
               </Callout>
             </div>
           </section>
@@ -739,7 +739,7 @@ export default function AddMatterHelpPage() {
               <p className="text-sm text-gray-600 leading-relaxed">After creation, you land on the matter page. Here's what each part does:</p>
 
               <div>
-                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">What you see — matter detail page</p>
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">What you see  -  matter detail page</p>
                 <MatterWorkspaceMockup />
               </div>
 
@@ -755,7 +755,7 @@ export default function AddMatterHelpPage() {
                   <div className="grid grid-cols-2 gap-2 text-xs">
                     {[
                       { label: 'Overall status badge', desc: 'e.g. "Ready for Filing", "Documents Missing", "Questions Incomplete"' },
-                      { label: 'Readiness %', desc: 'Percentage of all requirements met — documents, questions, and reviews combined' },
+                      { label: 'Readiness %', desc: 'Percentage of all requirements met  -  documents, questions, and reviews combined' },
                       { label: 'Drafting status', desc: '"READY" when all questions are answered and form pack can be drafted' },
                       { label: 'Filing status', desc: '"READY" when documents are accepted and lawyer review is done' },
                       { label: 'Forms %', desc: 'What percentage of IRCC form fields are complete' },
@@ -778,7 +778,7 @@ export default function AddMatterHelpPage() {
                       { tab: 'IRCC Intake', desc: 'The full questionnaire that drives IRCC form auto-fill. The most important tab for immigration matters.' },
                       { tab: 'Client Review', desc: 'Send the completed forms to the client for review and sign-off before filing.' },
                       { tab: 'Tasks', desc: 'All tasks linked to this matter. Create, assign, and track work here.' },
-                      { tab: 'Contacts', desc: 'All people connected to this matter — principal applicant, spouse, dependants, sponsors.' },
+                      { tab: 'Contacts', desc: 'All people connected to this matter  -  principal applicant, spouse, dependants, sponsors.' },
                       { tab: 'More', desc: 'Billing, documents, deadlines, communications, and activity log.' },
                     ].map(({ tab, desc }) => (
                       <div key={tab} className="flex gap-2">
@@ -791,15 +791,15 @@ export default function AddMatterHelpPage() {
 
                 <div>
                   <h3 className="font-semibold text-gray-900 mb-3">④ Next Action Panel (green bar)</h3>
-                  <p className="text-sm text-gray-600">This is the most important element on the page. It always tells you exactly what to do next based on the live state of the matter. It changes automatically as you complete steps. Never ignore this panel — if something is blocking the case, the reason is stated here in plain language.</p>
+                  <p className="text-sm text-gray-600">This is the most important element on the page. It always tells you exactly what to do next based on the live state of the matter. It changes automatically as you complete steps. Never ignore this panel  -  if something is blocking the case, the reason is stated here in plain language.</p>
                   <div className="mt-2 rounded-xl bg-gray-50 border border-gray-100 p-3">
                     <p className="text-xs font-semibold text-gray-600 mb-2">Examples of what it shows:</p>
                     <div className="space-y-1.5">
                       {[
-                        '"Spouse passport missing — upload required before drafting"',
-                        '"3 questions incomplete — open IRCC Intake to complete"',
+                        '"Spouse passport missing  -  upload required before drafting"',
+                        '"3 questions incomplete  -  open IRCC Intake to complete"',
                         '"Lawyer review required before final pack can be generated"',
-                        '"All checks passed — file the application with IRCC"',
+                        '"All checks passed  -  file the application with IRCC"',
                       ].map(msg => (
                         <div key={msg} className="rounded-lg bg-white border border-gray-100 px-3 py-2 text-xs text-gray-700 font-mono">{msg}</div>
                       ))}
@@ -833,7 +833,7 @@ export default function AddMatterHelpPage() {
                   },
                   {
                     n: 3, title: 'Complete the IRCC Intake questionnaire (immigration only)',
-                    desc: 'Click IRCC Intake → work through each section — Personal Info, Travel History, Employment, Family. Complete as much as you can from the initial consultation. The client can fill in the rest through the portal.',
+                    desc: 'Click IRCC Intake → work through each section  -  Personal Info, Travel History, Employment, Family. Complete as much as you can from the initial consultation. The client can fill in the rest through the portal.',
                     tag: 'Immigration only',
                     tagColor: 'bg-indigo-50 text-indigo-700',
                   },
@@ -901,7 +901,7 @@ export default function AddMatterHelpPage() {
                 <div className="space-y-2">
                   {[
                     { mistake: 'Creating the matter without a contact', fix: 'Always link a primary contact. Without one, client portal access can\'t be set up and communications can\'t be logged.' },
-                    { mistake: 'Selecting the wrong Practice Area or Matter Type', fix: 'This loads the wrong document checklist and may not activate the immigration workspace. If you pick the wrong type, edit the matter immediately — some settings are hard to change later.' },
+                    { mistake: 'Selecting the wrong Practice Area or Matter Type', fix: 'This loads the wrong document checklist and may not activate the immigration workspace. If you pick the wrong type, edit the matter immediately  -  some settings are hard to change later.' },
                     { mistake: 'Leaving the Responsible Lawyer blank', fix: 'The system requires a responsible lawyer. Without one, notifications won\'t be sent and the matter won\'t appear on anyone\'s dashboard.' },
                     { mistake: 'Setting priority to Urgent for all matters', fix: 'If everything is urgent, nothing is urgent. Reserve Urgent for matters with real imminent deadlines. Use High for matters needing attention soon.' },
                   ].map(({ mistake, fix }) => (

@@ -10,7 +10,7 @@ export function Breadcrumbs() {
   const pathname = usePathname()
   const { t } = useI18n()
 
-  // Human-readable labels for route segments — uses t() for i18n
+  // Human-readable labels for route segments  -  uses t() for i18n
   const segmentLabels: Record<string, string> = useMemo(
     () => ({
       '': t('nav.home'),
@@ -52,7 +52,7 @@ export function Breadcrumbs() {
    */
   function segmentLabel(segment: string): string {
     if (segmentLabels[segment]) return segmentLabels[segment]
-    // UUIDs — don't render
+    // UUIDs  -  don't render
     if (/^[0-9a-f]{8}-/.test(segment)) return ''
     // Fallback: title-case with dashes replaced
     return segment
@@ -73,7 +73,7 @@ export function Breadcrumbs() {
     currentPath += `/${segment}`
     const label = segmentLabel(segment)
     if (!label) {
-      // UUID segment — keep href building but skip rendering
+      // UUID segment  -  keep href building but skip rendering
       continue
     }
     crumbs.push({ label, href: currentPath })

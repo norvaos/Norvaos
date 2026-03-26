@@ -6,7 +6,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 /**
  * DELETE /api/leads/import/[batchId]/discard
  *
- * Discard an import batch — deletes staging rows and marks batch as discarded.
+ * Discard an import batch  -  deletes staging rows and marks batch as discarded.
  */
 export async function DELETE(
   _request: Request,

@@ -101,7 +101,7 @@ export function TransactionLogViewer({
           <Lock className="h-4 w-4 text-muted-foreground" />
           Transaction Log
           <span className="text-[10px] font-normal text-muted-foreground">
-            Append-only audit trail — immutable
+            Append-only audit trail  -  immutable
           </span>
         </CardTitle>
       </CardHeader>

@@ -640,7 +640,7 @@ function SortableElementItem({
         )}
         {element.type === 'page_break' && (
           <div className="text-[10px] text-muted-foreground py-1">
-            — PAGE BREAK —
+             -  PAGE BREAK  - 
           </div>
         )}
         {element.type === 'signature_block' && (

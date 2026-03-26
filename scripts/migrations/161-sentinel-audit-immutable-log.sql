@@ -1,9 +1,9 @@
 -- =============================================================================
--- Migration 161 — Team SENTINEL Immutable Audit Log
+-- Migration 161  -  Team SENTINEL Immutable Audit Log
 -- =============================================================================
 --
 -- Creates an append-only, immutable audit log for SENTINEL security events.
--- Records cannot be updated or deleted — a trigger enforces this at the DB level.
+-- Records cannot be updated or deleted  -  a trigger enforces this at the DB level.
 --
 -- Events logged include: tenant boundary violations, RLS bypass attempts,
 -- unauthorised access, retainer gate blocks, and other security-relevant actions.
@@ -34,12 +34,12 @@ CREATE TABLE IF NOT EXISTS sentinel_audit_log (
 );
 
 
--- ── 2. Immutability guard — prevent UPDATE and DELETE ────────────────────────
+-- ── 2. Immutability guard  -  prevent UPDATE and DELETE ────────────────────────
 
 CREATE OR REPLACE FUNCTION sentinel_audit_immutable_guard()
 RETURNS TRIGGER AS $$
 BEGIN
-  RAISE EXCEPTION 'SENTINEL: Audit log is immutable — cannot modify or delete records';
+  RAISE EXCEPTION 'SENTINEL: Audit log is immutable  -  cannot modify or delete records';
 END;
 $$ LANGUAGE plpgsql;
 
@@ -145,5 +145,5 @@ COMMENT ON FUNCTION sentinel_audit_immutable_guard() IS
 COMMENT ON FUNCTION sentinel_log_event(TEXT, TEXT, UUID, UUID, TEXT, UUID, JSONB) IS
   'SECURITY DEFINER function to insert a row into sentinel_audit_log. '
   'Automatically captures auth.uid() as auth_user_id. '
-  'This is the ONLY sanctioned way to write to the audit log — '
+  'This is the ONLY sanctioned way to write to the audit log  -  '
   'direct INSERT is blocked by RLS (no INSERT policy for authenticated users).';

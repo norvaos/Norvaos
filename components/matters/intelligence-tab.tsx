@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * Norva Intelligence — Deep-Work Tab (Directive 13.1 + 17.1 + 17.2)
+ * Norva Intelligence  -  Deep-Work Tab (Directive 13.1 + 17.1 + 17.2)
  *
  * Full-width three-column layout mounted as a dedicated ZoneD tab.
  *
@@ -10,10 +10,10 @@
  * Right Column:  Fact-Anchor sidebar (source quotes from Norva Ear sessions)
  *
  * Polyglot Extensions (Directive 17.0):
- *   17.1 — Fact-Anchor sidebar shows original-language script for non-English
+ *   17.1  -  Fact-Anchor sidebar shows original-language script for non-English
  *          sessions (Urdu, Mandarin, Arabic, etc.) with hover "Legal Mirror"
  *          English translation tooltips.
- *   17.2 — Ghost-Writer editor respects dir="rtl" for the 4 RTL languages
+ *   17.2  -  Ghost-Writer editor respects dir="rtl" for the 4 RTL languages
  *          in the Global 15 (Arabic, Urdu, Farsi, Hebrew). Detects client
  *          language from Norva Ear sessions and adapts layout automatically.
  */
@@ -76,7 +76,7 @@ interface DraftResponse {
 interface FactAnchor {
   fact: string
   sourceQuote: string
-  /** Original-language snippet (non-English sessions) — Directive 17.1 */
+  /** Original-language snippet (non-English sessions)  -  Directive 17.1 */
   originalScript?: string
   /** ISO 639-1 source language code (e.g., 'ur', 'zh', 'ar') */
   sourceLanguage?: string
@@ -216,7 +216,7 @@ export function IntelligenceTabPanel({ matterId, tenantId }: IntelligenceTabPane
           })))
         }
       } catch {
-        // Non-critical — fact anchors are optional
+        // Non-critical  -  fact anchors are optional
       }
     }
     loadAnchors()
@@ -329,7 +329,7 @@ export function IntelligenceTabPanel({ matterId, tenantId }: IntelligenceTabPane
   return (
     <div className="flex h-full overflow-hidden">
       {/* ════════════════════════════════════════════════════════════════════
-          LEFT COLUMN — Audit-Mirror + Drift-Sentry
+          LEFT COLUMN  -  Audit-Mirror + Drift-Sentry
           ════════════════════════════════════════════════════════════════════ */}
       <div className="w-72 flex-none border-r overflow-y-auto p-4 space-y-4">
         {/* Audit-Mirror Score */}
@@ -489,7 +489,7 @@ export function IntelligenceTabPanel({ matterId, tenantId }: IntelligenceTabPane
       </div>
 
       {/* ════════════════════════════════════════════════════════════════════
-          CENTER COLUMN — Ghost-Writer Editor
+          CENTER COLUMN  -  Ghost-Writer Editor
           ════════════════════════════════════════════════════════════════════ */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Toolbar */}
@@ -613,7 +613,7 @@ export function IntelligenceTabPanel({ matterId, tenantId }: IntelligenceTabPane
                 </div>
               </div>
 
-              {/* Missing/Expired fields warning — scroll target for Compliance Alert Badge */}
+              {/* Missing/Expired fields warning  -  scroll target for Compliance Alert Badge */}
               {draft.missingFields.length > 0 && (
                 <div data-section="compliance-expiry" className="rounded-lg border border-amber-200 dark:border-amber-900 bg-amber-50 dark:bg-amber-950/30 p-3">
                   <p className="text-[11px] font-medium text-amber-700 dark:text-amber-400">
@@ -629,7 +629,7 @@ export function IntelligenceTabPanel({ matterId, tenantId }: IntelligenceTabPane
                 </div>
               )}
 
-              {/* Draft body — Directive 8.1: Fact-Anchor Tooltips + 17.2: RTL-Aware */}
+              {/* Draft body  -  Directive 8.1: Fact-Anchor Tooltips + 17.2: RTL-Aware */}
               <div dir={isEditorRTL ? 'rtl' : 'ltr'}>
                 {draft.sourceAttributions.length > 0 ? (
                   <FactAnchorTooltip
@@ -707,7 +707,7 @@ export function IntelligenceTabPanel({ matterId, tenantId }: IntelligenceTabPane
       </div>
 
       {/* ════════════════════════════════════════════════════════════════════
-          RIGHT COLUMN — Fact-Anchor Sidebar
+          RIGHT COLUMN  -  Fact-Anchor Sidebar
           ════════════════════════════════════════════════════════════════════ */}
       <div className="w-72 flex-none border-l overflow-y-auto p-4 space-y-4">
         <div className="flex items-center gap-1.5">
@@ -784,7 +784,7 @@ export function IntelligenceTabPanel({ matterId, tenantId }: IntelligenceTabPane
                         {/* English "Legal Mirror" translation (on hover) */}
                         <div className="invisible group-hover/polyglot:visible absolute z-40 left-0 right-0 top-full mt-1 rounded-md border bg-card shadow-lg p-2 animate-in fade-in-0 zoom-in-95 duration-150">
                           <p className="text-[9px] text-primary font-semibold uppercase tracking-wider mb-0.5">
-                            Legal Mirror — English Translation
+                            Legal Mirror  -  English Translation
                           </p>
                           <p className="text-[10px] text-muted-foreground leading-snug italic">
                             &ldquo;{anchor.sourceQuote}&rdquo;
@@ -818,7 +818,7 @@ export function IntelligenceTabPanel({ matterId, tenantId }: IntelligenceTabPane
                 <ExternalLink className="h-3 w-3 mt-0.5 flex-none" />
                 <span className="leading-tight">
                   <span className="font-medium">{src.field}</span>
-                  <span className="text-muted-foreground/60"> — {src.source}</span>
+                  <span className="text-muted-foreground/60">  -  {src.source}</span>
                 </span>
               </div>
             ))}

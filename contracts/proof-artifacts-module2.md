@@ -1,4 +1,4 @@
-# Proof Artifacts — Team 3 / Module 2
+# Proof Artifacts  -  Team 3 / Module 2
 ## Notification and Communications Adapters
 
 **Date:** 2026-03-16
@@ -7,7 +7,7 @@
 
 ## Smoke Test Procedures
 
-### Test 1 — Successful Email Send
+### Test 1  -  Successful Email Send
 
 **Setup:**
 - Set `RESEND_API_KEY` to a valid key
@@ -44,7 +44,7 @@ const result = await sendEmail(
 
 ---
 
-### Test 2 — Failed Send with Retry
+### Test 2  -  Failed Send with Retry
 
 **Setup:**
 - Set `RESEND_API_KEY` to an invalid key (or unset)
@@ -61,18 +61,18 @@ const result = await sendEmail(
 ```typescript
 { sent: false, error: 'RESEND_API_KEY is not configured...', attempts: 1 }
 ```
-(NonRetryableError — stops after 1 attempt)
+(NonRetryableError  -  stops after 1 attempt)
 
 **For transient failure simulation** (mock Resend to return 500):
 - Expect `attempts: 3`
-- Expect 3 `"Attempt failed — will retry"` log lines
+- Expect 3 `"Attempt failed  -  will retry"` log lines
 - Expect 1 `"All retry attempts exhausted"` log line
 
 **Pass criteria:** `result.sent === false`, `result.attempts <= 3`, Sentry capture triggered.
 
 ---
 
-### Test 3 — Retry then Succeed
+### Test 3  -  Retry then Succeed
 
 **Setup:**
 - Mock Resend to fail on attempts 1 and 2, succeed on attempt 3
@@ -94,13 +94,13 @@ const result = await sendEmail(payload, { tenantId: 'test-tenant-001' })
 { sent: true, messageId: 'msg_abc', attempts: 3 }
 ```
 
-**Expected log lines:** 2x `"Attempt failed — will retry"`, 1x `"Retry succeeded"`, 1x `"Email delivered successfully"`.
+**Expected log lines:** 2x `"Attempt failed  -  will retry"`, 1x `"Retry succeeded"`, 1x `"Email delivered successfully"`.
 
 **Pass criteria:** `result.sent === true`, `result.attempts === 3`.
 
 ---
 
-### Test 4 — Duplicate Prevention
+### Test 4  -  Duplicate Prevention
 
 **Steps:**
 ```typescript
@@ -130,14 +130,14 @@ result2 // { dispatched: false, reason: 'deduplicated', attempts: 0, ... }
 
 **Expected log line for result2:**
 ```json
-{"level":"info","message":"Notification deduplicated — already dispatched within window","event_type":"task_assigned","entity_id":"task-123"}
+{"level":"info","message":"Notification deduplicated  -  already dispatched within window","event_type":"task_assigned","entity_id":"task-123"}
 ```
 
 **Pass criteria:** Second call returns `reason: 'deduplicated'`, no duplicate dispatch to engine.
 
 ---
 
-### Test 5 — PII Not in Logs
+### Test 5  -  PII Not in Logs
 
 **Steps:**
 1. Run Test 1 (successful send) with recipients `john.doe.realname@example.com`
@@ -153,7 +153,7 @@ result2 // { dispatched: false, reason: 'deduplicated', attempts: 0, ... }
 
 ---
 
-### Test 6 — Alert Threshold
+### Test 6  -  Alert Threshold
 
 **Steps:**
 ```typescript
@@ -189,7 +189,7 @@ const exceeded = checkAlertThreshold('test-tenant-001')
 
 ---
 
-### Test 7 — Dead Letter Queue
+### Test 7  -  Dead Letter Queue
 
 **Steps:**
 ```typescript

@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Lead Conversion Gate — Full Branch Coverage Tests
+ * Lead Conversion Gate  -  Full Branch Coverage Tests
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Proves:
@@ -151,7 +151,7 @@ describe('evaluateConversionGates', () => {
 
   // ─── Gate Enable/Disable ──────────────────────────────────────────────
 
-  it('skips disabled gates — they do not appear in results', async () => {
+  it('skips disabled gates  -  they do not appear in results', async () => {
     const supabase = allPassingSupabase()
     const result = await evaluateConversionGates(supabase, 'lead-1', 'tenant-1', makeConfig())
 
@@ -323,7 +323,7 @@ describe('evaluateConversionGates', () => {
       expect(gate?.reason).toBe('Conflict check has not been run yet.')
     })
 
-    it('alpha RPC returns null result — falls through to existing status', async () => {
+    it('alpha RPC returns null result  -  falls through to existing status', async () => {
       const supabase = createMockSupabaseWithRpc(
         {
           leads: {
@@ -721,7 +721,7 @@ describe('evaluateConversionGates', () => {
 
     it('passes via trust_transactions path when matter has deposit', async () => {
       // Retainer has no payment_amount, but there's a matter with trust transactions.
-      // We need a more nuanced mock here — matters query returns data, trust_transactions query returns count.
+      // We need a more nuanced mock here  -  matters query returns data, trust_transactions query returns count.
       const supabase = createMockSupabaseWithRpc({
         leads: { selectData: { status: 'active', converted_matter_id: null } },
         lead_retainer_packages: { selectData: { payment_status: 'pending', payment_amount: null } },
@@ -849,7 +849,7 @@ describe('evaluateConversionGates', () => {
   // Integration: All 8 Optional Gates + Always-On Gate
   // ═══════════════════════════════════════════════════════════════════════
 
-  describe('full integration — all gates enabled', () => {
+  describe('full integration  -  all gates enabled', () => {
     it('returns canConvert = true when every gate passes', async () => {
       const supabase = createMockSupabaseWithRpc(
         {

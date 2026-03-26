@@ -1,5 +1,5 @@
 /**
- * First-Hour Command Centre — TanStack Query hooks.
+ * First-Hour Command Centre  -  TanStack Query hooks.
  *
  * Directive 26.1: Real-time metrics for the first 60 minutes of firm onboarding.
  * Tracks Clio-to-Norva sync velocity, Ghost-Writer usage, and Language Toggle distribution.
@@ -35,7 +35,7 @@ export function useFirstHourMetrics(enabled = true) {
       return response.json() as Promise<FirstHourMetrics>
     },
     enabled,
-    staleTime: 15_000,        // 15s — live dashboard
+    staleTime: 15_000,        // 15s  -  live dashboard
     refetchInterval: 15_000,  // Auto-poll every 15s
     refetchOnWindowFocus: true,
   })

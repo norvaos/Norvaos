@@ -1,11 +1,11 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Form Pack Types — TypeScript interfaces for the IRCC form generation system.
+ * Form Pack Types  -  TypeScript interfaces for the IRCC form generation system.
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Maps to the DB tables created in 052-ircc-form-packs.sql:
- *   form_pack_versions  — one row per generated draft/approved version
- *   form_pack_artifacts — one row per PDF file in a version (INSERT-only)
+ *   form_pack_versions   -  one row per generated draft/approved version
+ *   form_pack_artifacts  -  one row per PDF file in a version (INSERT-only)
  *
  * These types are the canonical representation used across:
  *   - React Query hooks (lib/queries/form-packs.ts)
@@ -17,7 +17,7 @@
 // ── Pack Type ─────────────────────────────────────────────────────────────────
 
 /**
- * Form pack type identifier — any IRCC form code (DB-driven, no hardcoded union).
+ * Form pack type identifier  -  any IRCC form code (DB-driven, no hardcoded union).
  */
 export type PackType = string
 
@@ -73,7 +73,7 @@ export interface FormPackVersion {
 /**
  * One PDF file within a form pack version.
  * Mirrors `form_pack_artifacts` table from migration 052.
- * INSERT-only — no updates or deletes allowed.
+ * INSERT-only  -  no updates or deletes allowed.
  */
 export interface FormPackArtifact {
   id: string
@@ -173,7 +173,7 @@ export interface PackReadiness {
     missing: MissingField[]
   }
 
-  /** Validation gate — blocking errors and non-blocking warnings */
+  /** Validation gate  -  blocking errors and non-blocking warnings */
   validation: {
     /** Blocking errors that prevent generation */
     errors: ValidationError[]
@@ -268,7 +268,7 @@ export interface RequiredField {
   /** Section grouping for UI display */
   section: string
   /**
-   * Optional condition — field is only required when this evaluates to true.
+   * Optional condition  -  field is only required when this evaluates to true.
    * Used for spouse fields (required only if marital.status is married/common_law).
    */
   condition?: {

@@ -13,7 +13,7 @@ import {
  *
  * Fetch the genesis block (Sovereign Birth Certificate) for a matter.
  * Query params:
- *   ?verify=true — also verify SHA-256 hash integrity
+ *   ?verify=true  -  also verify SHA-256 hash integrity
  */
 async function handleGet(
   request: Request,
@@ -48,17 +48,29 @@ async function handleGet(
  * Idempotent: returns 409 if already exists (revoke first).
  */
 async function handlePost(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const auth = await authenticateRequest()
     const { id: matterId } = await params
 
+    const body = await request.json().catch(() => ({})) as {
+      conflictSearchId?: string
+    }
+
+    if (!body.conflictSearchId) {
+      return NextResponse.json(
+        { error: 'conflictSearchId is required  -  Directive 032: Conflict-to-Genesis Weld' },
+        { status: 400 },
+      )
+    }
+
     const result = await generateGenesisBlock({
       tenantId: auth.tenantId,
       matterId,
       userId: auth.userId,
+      conflictSearchId: body.conflictSearchId,
     })
 
     if (!result.success) {
@@ -69,7 +81,7 @@ async function handlePost(
     return NextResponse.json({
       success: true,
       genesis: result.data,
-      message: 'Genesis block sealed — Sovereign Birth Certificate created',
+      message: 'Genesis block sealed  -  Sovereign Birth Certificate created',
     })
   } catch (error) {
     if (error instanceof AuthError) {
@@ -83,7 +95,7 @@ async function handlePost(
 /**
  * DELETE /api/matters/[id]/genesis-block
  *
- * Revoke the genesis block (Partner-level only). Does NOT delete — marks
+ * Revoke the genesis block (Partner-level only). Does NOT delete  -  marks
  * as revoked with full audit trail. After revocation, POST can be called
  * again to generate a new genesis block.
  *
@@ -122,7 +134,7 @@ async function handleDelete(
     return NextResponse.json({
       success: true,
       genesis: result.data,
-      message: 'Genesis block revoked — Partner audit trail recorded',
+      message: 'Genesis block revoked  -  Partner audit trail recorded',
     })
   } catch (error) {
     if (error instanceof AuthError) {

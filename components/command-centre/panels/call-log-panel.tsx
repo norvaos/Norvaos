@@ -146,7 +146,7 @@ export function CallLogPanel() {
   const { tenantId, entityType, entityId, contact, userId } = useCommandCentre()
   const createActivity = useCreateActivity()
 
-  // ── Data sources — same as front desk ────────────────────────
+  // ── Data sources  -  same as front desk ────────────────────────
   // Primary: activities table (covers all event types from both front desk and command centre)
   const { data: allActivities, isLoading: activitiesLoading } = useActivities({
     tenantId,
@@ -164,7 +164,7 @@ export function CallLogPanel() {
     const entries: UnifiedLogEntry[] = []
     const emailLogIds = new Set<string>()
 
-    // 1. Email logs (dedicated email table — highest fidelity for emails)
+    // 1. Email logs (dedicated email table  -  highest fidelity for emails)
     for (const e of emailLogs ?? []) {
       emailLogIds.add(e.id)
       entries.push({
@@ -172,15 +172,15 @@ export function CallLogPanel() {
         category: 'email',
         title: e.subject ?? (e.direction === 'in' ? 'Email received' : 'Email sent'),
         description: e.direction === 'in'
-          ? `From: ${e.from_address ?? '—'}`
-          : `To: ${e.from_address ?? '—'}`,
+          ? `From: ${e.from_address ?? ' - '}`
+          : `To: ${e.from_address ?? ' - '}`,
         created_at: e.sent_at ?? e.created_at,
         metadata: { direction: e.direction === 'in' ? 'inbound' : 'outbound' },
         activity_type: 'email_log',
       })
     }
 
-    // 2. Activities table — covers front desk + command centre logs
+    // 2. Activities table  -  covers front desk + command centre logs
     for (const a of allActivities ?? []) {
       const cat = categorize(a.activity_type)
       if (!cat) continue
@@ -258,7 +258,7 @@ export function CallLogPanel() {
     const title = `${dirLabel} call ${outcome === 'connected' ? 'with' : 'to'} ${contactName}`
     const descParts = [outcomeInfo.label]
     if (duration) descParts.push(`(${formatDuration(duration)})`)
-    if (notes) descParts.push(`— ${notes}`)
+    if (notes) descParts.push(` -  ${notes}`)
 
     try {
       await createActivity.mutateAsync({
@@ -300,7 +300,7 @@ export function CallLogPanel() {
               <MessageSquare className="h-4 w-4 shrink-0 text-slate-600" />
               <span className="text-sm font-medium text-slate-700">Communications</span>
 
-              {/* Count badges — visible when collapsed */}
+              {/* Count badges  -  visible when collapsed */}
               {!expanded && !isLoading && totalCount > 0 && (
                 <div className="flex items-center gap-1 ml-1 flex-wrap">
                   {counts.call > 0 && (

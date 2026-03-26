@@ -1,5 +1,5 @@
 /**
- * Next.js Edge Middleware — session management + PIPEDA data sovereignty enforcement.
+ * Next.js Edge Middleware  -  session management + PIPEDA data sovereignty enforcement.
  *
  * IMPORTANT: This runs in Edge Runtime. No Node.js crypto or Supabase admin client.
  * Sovereignty logging is done via fire-and-forget fetch() to an internal API endpoint.
@@ -87,7 +87,7 @@ function fireSovereigntyLog(params: {
   // Build absolute URL for internal endpoint
   const origin = request.nextUrl.origin
 
-  // Fire-and-forget — intentionally not awaited
+  // Fire-and-forget  -  intentionally not awaited
   fetch(`${origin}/api/internal/sovereignty-log`, {
     method: 'POST',
     headers: {

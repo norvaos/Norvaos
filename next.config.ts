@@ -19,7 +19,7 @@ const nextConfig: NextConfig = {
   output: 'standalone',
 
   // ── Dev performance: tree-shake barrel imports ─────────────────────────
-  // lucide-react ships 1,400+ icons in one barrel — without this, every
+  // lucide-react ships 1,400+ icons in one barrel  -  without this, every
   // `from 'lucide-react'` import compiles ALL icons on-demand.
   // recharts similarly ships a large barrel.  This setting tells Turbopack
   // to resolve individual exports, cutting dev compile times dramatically.
@@ -33,7 +33,7 @@ const nextConfig: NextConfig = {
     NEXT_PUBLIC_BUILD_TIME: new Date().toISOString(),
   },
 
-  // Image optimization — allow Supabase storage URLs
+  // Image optimization  -  allow Supabase storage URLs
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "*.supabase.co" },

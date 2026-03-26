@@ -1,5 +1,5 @@
 /**
- * Trust Accounting & IOLTA Compliance — Service Layer Barrel
+ * Trust Accounting & IOLTA Compliance  -  Service Layer Barrel
  *
  * Phase 7: LSO By-Law 9 compliant trust accounting.
  *
@@ -12,7 +12,7 @@
 // Canonical shared types + compliance helpers
 export * from './trust-compliance-service'
 
-// Ledger service — skip duplicate ServiceResult & getAvailableBalance
+// Ledger service  -  skip duplicate ServiceResult & getAvailableBalance
 export {
   recordDeposit,
   recordDisbursement,
@@ -39,7 +39,7 @@ export {
   type AccountLedgerResult,
 } from './trust-ledger-service'
 
-// Reconciliation service — skip duplicate ServiceResult, PaginatedResult, PaginationParams
+// Reconciliation service  -  skip duplicate ServiceResult, PaginatedResult, PaginationParams
 export {
   createReconciliation,
   setStatementBalance,
@@ -57,7 +57,7 @@ export {
   listReconciliations,
 } from './trust-reconciliation-service'
 
-// Reporting service — skip duplicate ServiceResult, PaginatedResult, PaginationParams
+// Reporting service  -  skip duplicate ServiceResult, PaginatedResult, PaginationParams
 export {
   getClientTrustListing,
   getAccountSummary,
@@ -82,14 +82,14 @@ export {
   type LSOComplianceReport,
 } from './trust-reporting-service'
 
-// Trust Reconciler — Clio-to-Norva migration balance comparison (Directive 20.1)
+// Trust Reconciler  -  Clio-to-Norva migration balance comparison (Directive 20.1)
 export {
   reconcileClioMigration,
   type TrustMismatch,
   type ReconciliationReport,
 } from './trust-reconciler'
 
-// LedgerGuard Middleware — Fiduciary Gate (Directive 20.0)
+// LedgerGuard Middleware  -  Fiduciary Gate (Directive 20.0)
 export {
   validateTrustModification,
   enforceLedgerGuard,
@@ -99,7 +99,7 @@ export {
   type LedgerGuardResult,
 } from './ledger-guard'
 
-// Compliance Examination Snapshots — Directive 004, Pillar 1
+// Compliance Examination Snapshots  -  Directive 004, Pillar 1
 export {
   generateComplianceSnapshot,
   listComplianceSnapshots,
@@ -111,7 +111,7 @@ export {
   type SnapshotType,
 } from './compliance-examination-service'
 
-// Auto-Reconciliation & Disbursement Lockdown — Directive 004, Pillar 2
+// Auto-Reconciliation & Disbursement Lockdown  -  Directive 004, Pillar 2
 export {
   runAutoReconciliation,
   checkDisbursementLock,

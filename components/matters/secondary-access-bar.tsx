@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * SecondaryAccessBar — Horizontal icon row that opens tab content in slide-over sheets.
+ * SecondaryAccessBar  -  Horizontal icon row that opens tab content in slide-over sheets.
  *
  * Shows up to 6 primary items as labeled buttons. Remaining items collapse
  * into a "More ▸" dropdown. Sheets preserve state across toggles by keeping
@@ -183,7 +183,7 @@ export function SecondaryAccessBar({
           </Button>
         ))}
 
-        {/* More overflow — only shown when there are secondary items */}
+        {/* More overflow  -  only shown when there are secondary items */}
         {secondaryConfigs.length > 0 && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -212,7 +212,7 @@ export function SecondaryAccessBar({
         )}
       </div>
 
-      {/* Sheet panels — mounted sheets stay in DOM for state preservation */}
+      {/* Sheet panels  -  mounted sheets stay in DOM for state preservation */}
       {availableConfigs.map((config) =>
         mountedSheets.has(config.key) ? (
           <Sheet

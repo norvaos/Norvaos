@@ -1,10 +1,10 @@
 -- ═══════════════════════════════════════════════════════════════════════════════
--- Migration 068 — Section Field-Level Config & Custom Fields
+-- Migration 068  -  Section Field-Level Config & Custom Fields
 -- ═══════════════════════════════════════════════════════════════════════════════
 --
 -- Adds two JSONB columns to matter_type_section_config:
---   1. field_config  — controls visibility of individual fields per section
---   2. custom_fields — defines additional custom fields per section
+--   1. field_config   -  controls visibility of individual fields per section
+--   2. custom_fields  -  defines additional custom fields per section
 --
 -- Also adds ircc_question_set_codes to matter_types for Phase 3 (IRCC question
 -- set assignment per matter type).

@@ -128,7 +128,7 @@ export default function TimeTrackingPage() {
               <SelectContent>
                 {(matters ?? []).map((m) => (
                   <SelectItem key={m.id} value={m.id}>
-                    {m.matter_number ? `${m.matter_number} — ` : ''}{m.title}
+                    {m.matter_number ? `${m.matter_number}  -  ` : ''}{m.title}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -173,7 +173,7 @@ export default function TimeTrackingPage() {
               <SelectItem value="all">All matters</SelectItem>
               {(matters ?? []).map((m) => (
                 <SelectItem key={m.id} value={m.id}>
-                  {m.matter_number ? `${m.matter_number} — ` : ''}{m.title}
+                  {m.matter_number ? `${m.matter_number}  -  ` : ''}{m.title}
                 </SelectItem>
               ))}
             </SelectContent>

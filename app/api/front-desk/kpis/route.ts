@@ -12,8 +12,8 @@ import { withTiming } from '@/lib/middleware/request-timing'
  *
  * Returns computed KPI values with color thresholds.
  *
- * Mode 1: shiftId — returns KPIs for a single shift
- * Mode 2: userId + date — returns aggregated KPIs across all shifts for that user/date
+ * Mode 1: shiftId  -  returns KPIs for a single shift
+ * Mode 2: userId + date  -  returns aggregated KPIs across all shifts for that user/date
  */
 
 // Pre-migration: RPC function names aren't in generated DB types yet.

@@ -1,19 +1,19 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * E-Sign Subsystem — State Machine & Transition Rules
+ * E-Sign Subsystem  -  State Machine & Transition Rules
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Defines the signing request lifecycle and enforces valid transitions.
  *
  * States:
- *   pending     — request created, not yet sent
- *   sent        — email delivered to signer
- *   viewed      — signer opened the signing page
- *   signed      — signer executed signature (terminal)
- *   declined    — signer declined to sign (terminal)
- *   expired     — request expired without action (terminal)
- *   cancelled   — lawyer cancelled the request (terminal)
- *   superseded  — replaced by a new request (terminal)
+ *   pending      -  request created, not yet sent
+ *   sent         -  email delivered to signer
+ *   viewed       -  signer opened the signing page
+ *   signed       -  signer executed signature (terminal)
+ *   declined     -  signer declined to sign (terminal)
+ *   expired      -  request expired without action (terminal)
+ *   cancelled    -  lawyer cancelled the request (terminal)
+ *   superseded   -  replaced by a new request (terminal)
  */
 
 // ─── Status Constants ────────────────────────────────────────────────────────

@@ -26,6 +26,6 @@ DROP TRIGGER IF EXISTS trg_sentinel_tenant_isolation ON activities;
 
 COMMENT ON FUNCTION enforce_tenant_isolation_trigger() IS
   'SENTINEL tenant isolation trigger function (migration 160). '
-  'Automatic triggers dropped in migration 165 — replaced by '
+  'Automatic triggers dropped in migration 165  -  replaced by '
   'log_cross_tenant_violation() triggers from migration 163 which '
   'also write to sentinel_audit_log on violations.';

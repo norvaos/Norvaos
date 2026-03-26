@@ -1,10 +1,10 @@
 /**
- * Migration 179 — Norva Command Intelligence Suite
+ * Migration 179  -  Norva Command Intelligence Suite
  *
  * Tables:
- *   1. norva_ear_sessions   — Consultation Co-Pilot recordings + transcripts
- *   2. audit_optimizer_scans         — Audit-Optimizer: Pre-submission IRCC AI-readability audits (table name retained)
- *   3. case_law_alerts       — Jurisdictional Drift Sentry (CanLII monitoring)
+ *   1. norva_ear_sessions    -  Consultation Co-Pilot recordings + transcripts
+ *   2. audit_optimizer_scans          -  Audit-Optimizer: Pre-submission IRCC AI-readability audits (table name retained)
+ *   3. case_law_alerts        -  Jurisdictional Drift Sentry (CanLII monitoring)
  *
  * All tables: RLS-enabled, tenant-isolated, soft-delete where applicable.
  */

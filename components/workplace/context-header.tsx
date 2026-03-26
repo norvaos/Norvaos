@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * ContextHeader (Zone 1) — Compact, information-dense header bar.
+ * ContextHeader (Zone 1)  -  Compact, information-dense header bar.
  *
  * Shows: matter title/number, type, current stage, readiness %, blocker count,
  * responsible lawyer, next suggested action, next deadline, portal status.
@@ -151,7 +151,7 @@ export function ContextHeader({
           <h1 className="text-base font-semibold truncate">{matter.title}</h1>
           {primaryClientName && (
             <span className="text-sm text-muted-foreground shrink-0">
-              — {primaryClientName}
+               -  {primaryClientName}
             </span>
           )}
           {matter.matter_number && (

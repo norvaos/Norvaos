@@ -1,9 +1,9 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Auto-Mapper — heuristic XFA field → profile path matching
+ * Auto-Mapper  -  heuristic XFA field → profile path matching
  * ═══════════════════════════════════════════════════════════════════════════════
  *
- * Pure synchronous module — no I/O, no DB access.
+ * Pure synchronous module  -  no I/O, no DB access.
  * Called during form upload (after XFA scan) to auto-populate profile_path
  * and is_mapped for high-confidence matches, reducing admin mapping work.
  *

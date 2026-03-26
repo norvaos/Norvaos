@@ -318,7 +318,7 @@ const RULE_REGISTRY: Record<ContradictionRuleKey, RuleFn> = {
  * Evaluate all contradiction rules specified in the playbook.
  * Returns an array of detected contradictions (may be empty).
  *
- * Pure function — no side effects. Caller is responsible for persisting.
+ * Pure function  -  no side effects. Caller is responsible for persisting.
  */
 export function evaluateContradictions(ctx: ContradictionContext): ContradictionFlag[] {
   const flags: ContradictionFlag[] = []
@@ -336,7 +336,7 @@ export function evaluateContradictions(ctx: ContradictionContext): Contradiction
         flags.push(result)
       }
     } catch {
-      // Fail-open for individual rules — log but don't block
+      // Fail-open for individual rules  -  log but don't block
       console.error(`[CONTRADICTION] Rule "${ruleKey}" threw an error`)
     }
   }

@@ -97,7 +97,7 @@ async function handlePatch(request: Request, { params }: { params: Promise<{ use
           return NextResponse.json({ error: 'Failed to update email.' }, { status: 500 })
         }
         if (authErr?.message === 'User not found') {
-          log.warn('[update-user] Auth user not found for email update — updating DB only', { userId })
+          log.warn('[update-user] Auth user not found for email update  -  updating DB only', { userId })
         }
       }
       const { error: emailUpdateErr } = await admin

@@ -1,15 +1,15 @@
 -- =============================================================================
--- Migration 203 — Directive 004 / Pillar 4: Statute of Limitations & Deadline Shield
+-- Migration 203  -  Directive 004 / Pillar 4: Statute of Limitations & Deadline Shield
 -- =============================================================================
 --
 -- Implements compliance-grade deadline protection for immigration matters.
 --
 --   1. Shield columns on matter_deadlines (immutable while matter is active)
---   2. ircc_deadline_rules catalogue — IRCC filing deadline definitions
+--   2. ircc_deadline_rules catalogue  -  IRCC filing deadline definitions
 --   3. Seed 14 common IRCC deadline rules
---   4. shield_deadline_guard() trigger — prevents deletion/dismissal of shielded deadlines
---   5. rpc_scan_matter_deadlines() — auto-generates deadlines from matching rules
---   6. auto_scan_on_matter_create() trigger — fires scan on new immigration matters
+--   4. shield_deadline_guard() trigger  -  prevents deletion/dismissal of shielded deadlines
+--   5. rpc_scan_matter_deadlines()  -  auto-generates deadlines from matching rules
+--   6. auto_scan_on_matter_create() trigger  -  fires scan on new immigration matters
 --
 -- Depends on: 009 (matter_types, deadline_types, matter_deadlines),
 --             matters table (id, tenant_id, matter_type_id, status, practice_area_id, date_opened)
@@ -34,7 +34,7 @@ ALTER TABLE matter_deadlines
 COMMENT ON COLUMN matter_deadlines.is_shielded     IS 'When true, deadline cannot be deleted or dismissed while matter is active. Compliance shield.';
 COMMENT ON COLUMN matter_deadlines.shield_reason    IS 'Human-readable reason why this deadline is protected (e.g. IRCC Compliance: Biometrics appointment).';
 COMMENT ON COLUMN matter_deadlines.auto_generated   IS 'True if this deadline was auto-created by the system from an ircc_deadline_rules match.';
-COMMENT ON COLUMN matter_deadlines.source_rule_id   IS 'FK to ircc_deadline_rules.id — which rule generated this deadline.';
+COMMENT ON COLUMN matter_deadlines.source_rule_id   IS 'FK to ircc_deadline_rules.id  -  which rule generated this deadline.';
 COMMENT ON COLUMN matter_deadlines.alert_24h_sent   IS 'Whether the 24-hour warning alert has been dispatched.';
 COMMENT ON COLUMN matter_deadlines.alert_1w_sent    IS 'Whether the 1-week warning alert has been dispatched.';
 COMMENT ON COLUMN matter_deadlines.alert_1m_sent    IS 'Whether the 1-month warning alert has been dispatched.';
@@ -175,7 +175,7 @@ VALUES
   (
     'IRCC-REFUGEE-HEARING-0',
     'Refugee Hearing Date',
-    'Refugee hearing before the IRB. No extensions — attendance is mandatory.',
+    'Refugee hearing before the IRB. No extensions  -  attendance is mandatory.',
     'immigration',
     ARRAY['refugee'],
     'manual',
@@ -314,7 +314,7 @@ BEGIN
     END IF;
   END IF;
 
-  -- Matter is active — enforce shield
+  -- Matter is active  -  enforce shield
   IF TG_OP = 'DELETE' THEN
     RAISE EXCEPTION 'COMPLIANCE: Shielded deadline cannot be deleted while matter is active'
       USING ERRCODE = 'P0001';
@@ -351,7 +351,7 @@ CREATE TRIGGER trg_shield_deadline_guard
 -- 5. RPC FUNCTION: rpc_scan_matter_deadlines(p_matter_id, p_tenant_id, p_user_id)
 -- ═══════════════════════════════════════════════════════════════════════════
 -- Scans ircc_deadline_rules for matching rules and auto-creates shielded
--- deadlines on the given matter. Idempotent — skips rules already applied.
+-- deadlines on the given matter. Idempotent  -  skips rules already applied.
 
 CREATE OR REPLACE FUNCTION rpc_scan_matter_deadlines(
   p_matter_id  UUID,
@@ -468,7 +468,7 @@ BEGIN
 END;
 $$;
 
-COMMENT ON FUNCTION rpc_scan_matter_deadlines(UUID, UUID, UUID) IS 'Scans ircc_deadline_rules for rules matching the matter practice area and type, then auto-creates shielded deadlines. Idempotent — skips duplicates.';
+COMMENT ON FUNCTION rpc_scan_matter_deadlines(UUID, UUID, UUID) IS 'Scans ircc_deadline_rules for rules matching the matter practice area and type, then auto-creates shielded deadlines. Idempotent  -  skips duplicates.';
 
 
 -- ═══════════════════════════════════════════════════════════════════════════

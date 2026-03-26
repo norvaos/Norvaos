@@ -17,7 +17,7 @@
 
 BEGIN;
 
--- ── 0. Schema guard — ensure description column exists on matter_stages ──
+-- ── 0. Schema guard  -  ensure description column exists on matter_stages ──
 ALTER TABLE matter_stages ADD COLUMN IF NOT EXISTS description TEXT;
 
 -- ── 1. Clear FK references in matter_stage_state (all tenants) ──────────
@@ -41,9 +41,9 @@ DELETE FROM matter_stage_pipelines;
 
 -- ── 3. Create / replace seed_tenant_defaults(p_tenant_id UUID) ───────────
 -- The function is idempotent:
---   • Practice areas  — INSERT … ON CONFLICT DO NOTHING
---   • Matter types    — INSERT … ON CONFLICT DO NOTHING  (IDs preserved)
---   • Pipelines+stages — fresh insert after deletion above
+--   • Practice areas   -  INSERT … ON CONFLICT DO NOTHING
+--   • Matter types     -  INSERT … ON CONFLICT DO NOTHING  (IDs preserved)
+--   • Pipelines+stages  -  fresh insert after deletion above
 CREATE OR REPLACE FUNCTION seed_tenant_defaults(p_tenant_id UUID)
 RETURNS VOID
 LANGUAGE plpgsql
@@ -71,7 +71,7 @@ BEGIN
    WHERE tenant_id = p_tenant_id AND name = 'General';
 
   -- ────────────────────────────────────────────────────────────
-  -- MATTER TYPES  (ON CONFLICT DO NOTHING — preserve IDs)
+  -- MATTER TYPES  (ON CONFLICT DO NOTHING  -  preserve IDs)
   -- ────────────────────────────────────────────────────────────
   IF v_imm_pa_id IS NOT NULL THEN
     INSERT INTO matter_types
@@ -93,11 +93,11 @@ BEGIN
        'Provincial Nominee, Family Class, H&C, and other permanent residence streams.',
        '#6366f1', 'shield-check', TRUE, 4),
 
-      (p_tenant_id, v_imm_pa_id, 'Visitor Visa — Inside Canada',
+      (p_tenant_id, v_imm_pa_id, 'Visitor Visa  -  Inside Canada',
        'Extension of visitor status or Temporary Resident Permit for applicants already in Canada.',
        '#38bdf8', 'plane-landing', TRUE, 5),
 
-      (p_tenant_id, v_imm_pa_id, 'Visitor Visa — Outside Canada',
+      (p_tenant_id, v_imm_pa_id, 'Visitor Visa  -  Outside Canada',
        'Temporary Resident Visa (TRV) application for applicants residing outside Canada.',
        '#3b82f6', 'plane', TRUE, 6),
 
@@ -105,11 +105,11 @@ BEGIN
        'Open work permit for graduates of eligible Canadian designated learning institutions.',
        '#a855f7', 'award', TRUE, 7),
 
-      (p_tenant_id, v_imm_pa_id, 'Spousal Sponsorship — Inside Canada',
+      (p_tenant_id, v_imm_pa_id, 'Spousal Sponsorship  -  Inside Canada',
        'Inland spousal/common-law PR sponsorship. Applicant receives an Open Work Permit while awaiting decision.',
        '#ec4899', 'heart', TRUE, 8),
 
-      (p_tenant_id, v_imm_pa_id, 'Spousal Sponsorship — Outside Canada',
+      (p_tenant_id, v_imm_pa_id, 'Spousal Sponsorship  -  Outside Canada',
        'Outland spousal/common-law PR sponsorship. Applicant resides outside Canada during processing.',
        '#f43f5e', 'heart-handshake', TRUE, 9)
     ON CONFLICT (tenant_id, practice_area_id, name) DO NOTHING;
@@ -130,7 +130,7 @@ BEGIN
   -- ────────────────────────────────────────────────────────────
 
   -- ══════════════════════════════════════════════════════════
-  -- STUDY PERMIT — 9 stages (sky blue family)
+  -- STUDY PERMIT  -  9 stages (sky blue family)
   -- ══════════════════════════════════════════════════════════
   SELECT id INTO v_mt_id FROM matter_types
    WHERE tenant_id = p_tenant_id
@@ -193,7 +193,7 @@ BEGIN
   END IF;
 
   -- ══════════════════════════════════════════════════════════
-  -- WORK PERMIT — 10 stages (violet family)
+  -- WORK PERMIT  -  10 stages (violet family)
   -- ══════════════════════════════════════════════════════════
   SELECT id INTO v_mt_id FROM matter_types
    WHERE tenant_id = p_tenant_id
@@ -260,7 +260,7 @@ BEGIN
   END IF;
 
   -- ══════════════════════════════════════════════════════════
-  -- EXPRESS ENTRY — 12 stages (amber/gold family)
+  -- EXPRESS ENTRY  -  12 stages (amber/gold family)
   -- ══════════════════════════════════════════════════════════
   SELECT id INTO v_mt_id FROM matter_types
    WHERE tenant_id = p_tenant_id
@@ -295,7 +295,7 @@ BEGIN
        'Create and submit the Express Entry profile in the IRCC portal. Record profile number, ITA eligibility details, and CRS score.',
        '#d97706', 4, FALSE, FALSE, 1, '[]'::jsonb, 30),
 
-      (p_tenant_id, v_pip_id, 'In the Pool — Awaiting ITA',
+      (p_tenant_id, v_pip_id, 'In the Pool  -  Awaiting ITA',
        'Profile is active in the Express Entry pool. Monitor draws and advise client on CRS cutoff trends.',
        '#b45309', 5, FALSE, FALSE, 1, '[]'::jsonb, 38),
 
@@ -335,7 +335,7 @@ BEGIN
   END IF;
 
   -- ══════════════════════════════════════════════════════════
-  -- PR APPLICATION — 11 stages (indigo family)
+  -- PR APPLICATION  -  11 stages (indigo family)
   -- ══════════════════════════════════════════════════════════
   SELECT id INTO v_mt_id FROM matter_types
    WHERE tenant_id = p_tenant_id
@@ -406,21 +406,21 @@ BEGIN
   END IF;
 
   -- ══════════════════════════════════════════════════════════
-  -- VISITOR VISA — INSIDE CANADA — 9 stages (sky family)
+  -- VISITOR VISA  -  INSIDE CANADA  -  9 stages (sky family)
   -- ══════════════════════════════════════════════════════════
   SELECT id INTO v_mt_id FROM matter_types
    WHERE tenant_id = p_tenant_id
      AND practice_area_id = v_imm_pa_id
-     AND name = 'Visitor Visa — Inside Canada';
+     AND name = 'Visitor Visa  -  Inside Canada';
 
   IF v_mt_id IS NOT NULL THEN
     INSERT INTO matter_stage_pipelines
       (tenant_id, matter_type_id, name, is_default, is_active)
-    VALUES (p_tenant_id, v_mt_id, 'Visitor Visa — Inside Canada', TRUE, TRUE)
+    VALUES (p_tenant_id, v_mt_id, 'Visitor Visa  -  Inside Canada', TRUE, TRUE)
     ON CONFLICT (tenant_id, matter_type_id, name) DO NOTHING;
 
     SELECT id INTO v_pip_id FROM matter_stage_pipelines
-     WHERE tenant_id = p_tenant_id AND matter_type_id = v_mt_id AND name = 'Visitor Visa — Inside Canada';
+     WHERE tenant_id = p_tenant_id AND matter_type_id = v_mt_id AND name = 'Visitor Visa  -  Inside Canada';
 
     INSERT INTO matter_stages
       (tenant_id, pipeline_id, name, description, color, sort_order, is_terminal, auto_close_matter, sla_days, gating_rules, completion_pct)
@@ -469,21 +469,21 @@ BEGIN
   END IF;
 
   -- ══════════════════════════════════════════════════════════
-  -- VISITOR VISA — OUTSIDE CANADA — 10 stages (blue family)
+  -- VISITOR VISA  -  OUTSIDE CANADA  -  10 stages (blue family)
   -- ══════════════════════════════════════════════════════════
   SELECT id INTO v_mt_id FROM matter_types
    WHERE tenant_id = p_tenant_id
      AND practice_area_id = v_imm_pa_id
-     AND name = 'Visitor Visa — Outside Canada';
+     AND name = 'Visitor Visa  -  Outside Canada';
 
   IF v_mt_id IS NOT NULL THEN
     INSERT INTO matter_stage_pipelines
       (tenant_id, matter_type_id, name, is_default, is_active)
-    VALUES (p_tenant_id, v_mt_id, 'Visitor Visa — Outside Canada', TRUE, TRUE)
+    VALUES (p_tenant_id, v_mt_id, 'Visitor Visa  -  Outside Canada', TRUE, TRUE)
     ON CONFLICT (tenant_id, matter_type_id, name) DO NOTHING;
 
     SELECT id INTO v_pip_id FROM matter_stage_pipelines
-     WHERE tenant_id = p_tenant_id AND matter_type_id = v_mt_id AND name = 'Visitor Visa — Outside Canada';
+     WHERE tenant_id = p_tenant_id AND matter_type_id = v_mt_id AND name = 'Visitor Visa  -  Outside Canada';
 
     INSERT INTO matter_stages
       (tenant_id, pipeline_id, name, description, color, sort_order, is_terminal, auto_close_matter, sla_days, gating_rules, completion_pct)
@@ -536,7 +536,7 @@ BEGIN
   END IF;
 
   -- ══════════════════════════════════════════════════════════
-  -- POST-GRADUATE WORK PERMIT (PGWP) — 10 stages (purple family)
+  -- POST-GRADUATE WORK PERMIT (PGWP)  -  10 stages (purple family)
   -- ══════════════════════════════════════════════════════════
   SELECT id INTO v_mt_id FROM matter_types
    WHERE tenant_id = p_tenant_id
@@ -603,21 +603,21 @@ BEGIN
   END IF;
 
   -- ══════════════════════════════════════════════════════════
-  -- SPOUSAL SPONSORSHIP — INSIDE CANADA — 12 stages (pink family)
+  -- SPOUSAL SPONSORSHIP  -  INSIDE CANADA  -  12 stages (pink family)
   -- ══════════════════════════════════════════════════════════
   SELECT id INTO v_mt_id FROM matter_types
    WHERE tenant_id = p_tenant_id
      AND practice_area_id = v_imm_pa_id
-     AND name = 'Spousal Sponsorship — Inside Canada';
+     AND name = 'Spousal Sponsorship  -  Inside Canada';
 
   IF v_mt_id IS NOT NULL THEN
     INSERT INTO matter_stage_pipelines
       (tenant_id, matter_type_id, name, is_default, is_active)
-    VALUES (p_tenant_id, v_mt_id, 'Spousal Sponsorship — Inside Canada', TRUE, TRUE)
+    VALUES (p_tenant_id, v_mt_id, 'Spousal Sponsorship  -  Inside Canada', TRUE, TRUE)
     ON CONFLICT (tenant_id, matter_type_id, name) DO NOTHING;
 
     SELECT id INTO v_pip_id FROM matter_stage_pipelines
-     WHERE tenant_id = p_tenant_id AND matter_type_id = v_mt_id AND name = 'Spousal Sponsorship — Inside Canada';
+     WHERE tenant_id = p_tenant_id AND matter_type_id = v_mt_id AND name = 'Spousal Sponsorship  -  Inside Canada';
 
     INSERT INTO matter_stages
       (tenant_id, pipeline_id, name, description, color, sort_order, is_terminal, auto_close_matter, sla_days, gating_rules, completion_pct)
@@ -678,21 +678,21 @@ BEGIN
   END IF;
 
   -- ══════════════════════════════════════════════════════════
-  -- SPOUSAL SPONSORSHIP — OUTSIDE CANADA — 12 stages (rose family)
+  -- SPOUSAL SPONSORSHIP  -  OUTSIDE CANADA  -  12 stages (rose family)
   -- ══════════════════════════════════════════════════════════
   SELECT id INTO v_mt_id FROM matter_types
    WHERE tenant_id = p_tenant_id
      AND practice_area_id = v_imm_pa_id
-     AND name = 'Spousal Sponsorship — Outside Canada';
+     AND name = 'Spousal Sponsorship  -  Outside Canada';
 
   IF v_mt_id IS NOT NULL THEN
     INSERT INTO matter_stage_pipelines
       (tenant_id, matter_type_id, name, is_default, is_active)
-    VALUES (p_tenant_id, v_mt_id, 'Spousal Sponsorship — Outside Canada', TRUE, TRUE)
+    VALUES (p_tenant_id, v_mt_id, 'Spousal Sponsorship  -  Outside Canada', TRUE, TRUE)
     ON CONFLICT (tenant_id, matter_type_id, name) DO NOTHING;
 
     SELECT id INTO v_pip_id FROM matter_stage_pipelines
-     WHERE tenant_id = p_tenant_id AND matter_type_id = v_mt_id AND name = 'Spousal Sponsorship — Outside Canada';
+     WHERE tenant_id = p_tenant_id AND matter_type_id = v_mt_id AND name = 'Spousal Sponsorship  -  Outside Canada';
 
     INSERT INTO matter_stages
       (tenant_id, pipeline_id, name, description, color, sort_order, is_terminal, auto_close_matter, sla_days, gating_rules, completion_pct)
@@ -753,7 +753,7 @@ BEGIN
   END IF;
 
   -- ══════════════════════════════════════════════════════════
-  -- GENERAL MATTER — 6 stages (slate family)
+  -- GENERAL MATTER  -  6 stages (slate family)
   -- ══════════════════════════════════════════════════════════
   SELECT id INTO v_mt_id FROM matter_types
    WHERE tenant_id = p_tenant_id

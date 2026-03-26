@@ -1,5 +1,5 @@
 -- ============================================================================
--- Migration 116: retainer_agreements — Matter-scoped retainer generation flow
+-- Migration 116: retainer_agreements  -  Matter-scoped retainer generation flow
 -- ============================================================================
 -- Creates the retainer_agreements table for the 6-step generation modal.
 -- Separate from lead_retainer_packages (which tracks pre-matter retainers).
@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS retainer_agreements (
   -- Scope of services (Step 2)
   scope_of_services     TEXT,
 
-  -- Fee schedule (Step 3) — JSONB array of { description, amount, quantity }
+  -- Fee schedule (Step 3)  -  JSONB array of { description, amount, quantity }
   fee_schedule          JSONB        NOT NULL DEFAULT '[]'::jsonb,
   hst_applicable        BOOLEAN      NOT NULL DEFAULT true,
   hst_rate              NUMERIC(5,4) NOT NULL DEFAULT 0.13,

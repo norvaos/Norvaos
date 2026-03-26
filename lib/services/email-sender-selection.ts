@@ -13,12 +13,12 @@ export interface SelectedSender {
 // ─── Sender Selection Priority ──────────────────────────────────────────────
 //
 // Implements the sender selection priority from the Addendum:
-//   1. Reply continuity — if replying to a thread, use the account that last
+//   1. Reply continuity  -  if replying to a thread, use the account that last
 //      sent in the thread (preserves conversation context)
-//   2. Matter preference — if the matter has a preferred_email_account_id, use it
-//   3. Practice area shared mailbox — if the matter's practice area has a
+//   2. Matter preference  -  if the matter has a preferred_email_account_id, use it
+//   3. Practice area shared mailbox  -  if the matter's practice area has a
 //      shared mailbox configured, use it
-//   4. User's personal account — fall back to the user's personal email account
+//   4. User's personal account  -  fall back to the user's personal email account
 //
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -36,7 +36,7 @@ export async function selectSender(
   matterId: string,
   threadId?: string
 ): Promise<SelectedSender | null> {
-  // 1. Reply continuity — use the account that last sent in the thread
+  // 1. Reply continuity  -  use the account that last sent in the thread
   if (threadId) {
     const { data: thread } = await supabase
       .from('email_threads')
@@ -57,13 +57,13 @@ export async function selectSender(
           accountId: account.id,
           emailAddress: account.email_address,
           displayName: account.display_name,
-          reason: 'Reply continuity — using same account as last outbound message in thread',
+          reason: 'Reply continuity  -  using same account as last outbound message in thread',
         }
       }
     }
   }
 
-  // 2. Matter preference — matter has a preferred_email_account_id
+  // 2. Matter preference  -  matter has a preferred_email_account_id
   const { data: matter } = await supabase
     .from('matters')
     .select('preferred_email_account_id, practice_area_id')
@@ -83,7 +83,7 @@ export async function selectSender(
         accountId: account.id,
         emailAddress: account.email_address,
         displayName: account.display_name,
-        reason: 'Matter preference — using preferred email account for this matter',
+        reason: 'Matter preference  -  using preferred email account for this matter',
       }
     }
   }

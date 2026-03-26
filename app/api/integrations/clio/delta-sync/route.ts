@@ -1,7 +1,7 @@
 /**
- * GET  /api/integrations/clio/delta-sync — Get active session status
- * POST /api/integrations/clio/delta-sync — Start a new delta-sync session
- * DELETE /api/integrations/clio/delta-sync — Stop the active session
+ * GET  /api/integrations/clio/delta-sync  -  Get active session status
+ * POST /api/integrations/clio/delta-sync  -  Start a new delta-sync session
+ * DELETE /api/integrations/clio/delta-sync  -  Stop the active session
  */
 
 import { NextResponse } from 'next/server'

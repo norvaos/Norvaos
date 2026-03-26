@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * EmailThreadList — Shows recent email threads for the current matter.
+ * EmailThreadList  -  Shows recent email threads for the current matter.
  *
  * Sorted by last_message_at. Displays subject, participants, last message
  * preview, and unread indicator.

@@ -148,7 +148,7 @@ export function CommandCentreProvider({ entityType, entityId, children }: Provid
     enabled: !!tenantId,
   })
 
-  // ── Practice areas (shared hook — cached 5min, eliminates duplicate query) ──
+  // ── Practice areas (shared hook  -  cached 5min, eliminates duplicate query) ──
   const { data: practiceAreasData } = useEnabledPracticeAreas(tenantId || undefined)
 
   // ── Computed values ───────────────────────────────────────────
@@ -264,7 +264,7 @@ export function CommandCentreProvider({ entityType, entityId, children }: Provid
     const endStr = formatTimeHM(endTime)
     const durationStr = formatElapsed(duration)
 
-    const noteContent = `## Meeting Log — ${dateStr}\n\n**Client:** ${contactName}\n**Date:** ${dateStr}\n**Start:** ${startStr}\n**End:** ${endStr}\n**Duration:** ${durationStr}\n\n### Discussion Summary\n- \n\n### Key Decisions\n- \n\n### Action Items\n- [ ] \n`
+    const noteContent = `## Meeting Log  -  ${dateStr}\n\n**Client:** ${contactName}\n**Date:** ${dateStr}\n**Start:** ${startStr}\n**End:** ${endStr}\n**Duration:** ${durationStr}\n\n### Discussion Summary\n- \n\n### Key Decisions\n- \n\n### Action Items\n- [ ] \n`
 
     try {
       await createNote.mutateAsync({

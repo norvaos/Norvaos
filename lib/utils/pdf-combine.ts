@@ -1,5 +1,5 @@
 // ============================================================================
-// PDF Combine Utility — Client-side multi-page PDF creation
+// PDF Combine Utility  -  Client-side multi-page PDF creation
 // ============================================================================
 // Combines multiple images and/or PDFs into a single multi-page PDF.
 // Uses pdf-lib (lazy-loaded) to avoid bloating the main bundle.

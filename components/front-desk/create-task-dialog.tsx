@@ -22,7 +22,7 @@ import {
 } from '@/components/ui/select'
 
 /**
- * Create Task Dialog — Front Desk
+ * Create Task Dialog  -  Front Desk
  *
  * Searchable task title combobox with pre-filled immigration/family law
  * task templates. Supports "Add New" for custom titles.
@@ -42,7 +42,7 @@ const TASK_TEMPLATES = [
   'Request marriage certificate',
   'Collect sponsor financial documents',
   'Obtain bank statements (12 months)',
-  'Collect tax returns (NOA — last 3 years)',
+  'Collect tax returns (NOA  -  last 3 years)',
   'Request pay stubs (last 3 months)',
   'Obtain immigration status documents',
   'Collect travel history documentation',
@@ -190,7 +190,7 @@ export function CreateTaskDialog({
   const dueDateEmpty  = !dueDate.trim()
   const reasonEmpty   = reason.trim().length < 10
   // Only show the matter dropdown when the contact has actual linked matters
-  // (exclude the '__none' placeholder — it counts as zero real matters)
+  // (exclude the '__none' placeholder  -  it counts as zero real matters)
   const activeMatters = matterOptions.filter((m) => m.value !== '__none' && m.value !== '')
 
   function handleSubmit() {
@@ -216,7 +216,7 @@ export function CreateTaskDialog({
 
         <div className="space-y-4 py-1">
 
-          {/* ── Task Title — searchable templates ── */}
+          {/* ── Task Title  -  searchable templates ── */}
           <div className="space-y-1.5">
             <Label>
               Task Title <span className="text-red-500">*</span>
@@ -239,7 +239,7 @@ export function CreateTaskDialog({
               </div>
             )}
 
-            {/* Search input — shown when no preset selected or while searching */}
+            {/* Search input  -  shown when no preset selected or while searching */}
             {(!titlePreset || titleSearch || showAddNew) && (
               <>
                 <div className="relative">
@@ -276,7 +276,7 @@ export function CreateTaskDialog({
                       {template}
                     </button>
                   ))}
-                  {/* Add New option — always at bottom */}
+                  {/* Add New option  -  always at bottom */}
                   <button
                     type="button"
                     className="w-full text-left px-3 py-1.5 text-sm text-primary hover:bg-primary/5 border-t font-medium transition-colors"

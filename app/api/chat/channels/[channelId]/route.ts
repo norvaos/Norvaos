@@ -5,7 +5,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { withTiming } from '@/lib/middleware/request-timing'
 
 /**
- * GET /api/chat/channels/[channelId] — Get channel details with members
+ * GET /api/chat/channels/[channelId]  -  Get channel details with members
  */
 async function handleGet(
   _request: Request,

@@ -1,24 +1,24 @@
 'use client'
 
 /**
- * ZoneD — Main Workspace
+ * ZoneD  -  Main Workspace
  *
  * 12-tab strip giving access to every facet of the matter.
  * Tabs (in order):
- *   1. Overview      — UnifiedCaseDetailsTab (core + immigration fields)
- *   2. Documents     — DocumentSlotPanel (file requirements + upload)
- *   3. Intelligence  — Norva Intelligence deep-work panel (Audit-Mirror + Ghost-Writer + Fact-Anchors)
- *   4. Forms         — FormsTab (IRCC form instances)
- *   5. Questionnaire — ImmigrationReadiness → QuestionsWorkflowSection
- *   6. Review        — ReviewTab (gate blockers + contradiction flags + lawyer sign-off)
- *   7. Billing       — BillingTab (time, invoices, retainer)
- *   8. Communications— stub (Sprint 7)
- *   9. Correspondence— stub (Sprint 4)
- *  10. Tasks         — TasksTab
- *  11. Notes         — NotesEditor + ActivityTimeline
- *  12. IRCC Portal   — Side-by-Side Engine (Field-to-Clip + Submission Checklist + Final Package)
+ *   1. Overview       -  UnifiedCaseDetailsTab (core + immigration fields)
+ *   2. Documents      -  DocumentSlotPanel (file requirements + upload)
+ *   3. Intelligence   -  Norva Intelligence deep-work panel (Audit-Mirror + Ghost-Writer + Fact-Anchors)
+ *   4. Forms          -  FormsTab (IRCC form instances)
+ *   5. Questionnaire  -  ImmigrationReadiness → QuestionsWorkflowSection
+ *   6. Review         -  ReviewTab (gate blockers + contradiction flags + lawyer sign-off)
+ *   7. Billing        -  BillingTab (time, invoices, retainer)
+ *   8. Communications -  stub (Sprint 7)
+ *   9. Correspondence -  stub (Sprint 4)
+ *  10. Tasks          -  TasksTab
+ *  11. Notes          -  NotesEditor + ActivityTimeline
+ *  12. IRCC Portal    -  Side-by-Side Engine (Field-to-Clip + Submission Checklist + Final Package)
  *
- * Spec ref: Section 3 — Zone D: Main Workspace
+ * Spec ref: Section 3  -  Zone D: Main Workspace
  */
 
 import { useState, useEffect, useCallback } from 'react'
@@ -99,7 +99,7 @@ export interface ZoneDProps {
 
 // ── Internal wrappers for readiness-dependent tabs ───────────────────────────
 
-// QuestionnaireTabContent removed — Questionnaire tab now renders IRCCIntakeTab directly
+// QuestionnaireTabContent removed  -  Questionnaire tab now renders IRCCIntakeTab directly
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
@@ -156,11 +156,11 @@ export function ZoneD({ matter, tenantId, initialTab = 'details' }: ZoneDProps) 
   const handleTabChange = useCallback((value: string) => {
     const tab = value as TabId
     setActiveTab(tab)
-    // replaceState keeps the history stack clean — no extra back-button entries
+    // replaceState keeps the history stack clean  -  no extra back-button entries
     window.history.replaceState(null, '', `#${tab}`)
   }, [])
 
-  // Navigation handler for ReviewTab — maps section names to tab IDs
+  // Navigation handler for ReviewTab  -  maps section names to tab IDs
   const handleReviewNavigate = useCallback(
     (section: 'documents' | 'questionnaire' | 'forms') => {
       handleTabChange(section)
@@ -196,7 +196,7 @@ export function ZoneD({ matter, tenantId, initialTab = 'details' }: ZoneDProps) 
 
         {/* ── Tab panels (each scrolls independently) ────────────────────── */}
 
-        {/* 1 — Details */}
+        {/* 1  -  Details */}
         <TabsContent value="details" className="flex-1 overflow-y-auto m-0 p-0">
           <div className="space-y-3 p-0">
             <UnifiedCaseDetailsTab
@@ -206,7 +206,7 @@ export function ZoneD({ matter, tenantId, initialTab = 'details' }: ZoneDProps) 
               contactId={primaryContactId ?? null}
               caseTypeId={matter.case_type_id ?? null}
             />
-            {/* Rules at Opening — bottom of details tab */}
+            {/* Rules at Opening  -  bottom of details tab */}
             <div className="px-4 pb-4">
               <RulesAtOpeningPanel
                 matterId={matter.id}
@@ -217,7 +217,7 @@ export function ZoneD({ matter, tenantId, initialTab = 'details' }: ZoneDProps) 
           </div>
         </TabsContent>
 
-        {/* 2 — Documents (Slots + Archive) */}
+        {/* 2  -  Documents (Slots + Archive) */}
         <TabsContent value="documents" className="flex-1 overflow-y-auto m-0 p-0">
           <DocumentsTab
             matterId={matter.id}
@@ -226,7 +226,7 @@ export function ZoneD({ matter, tenantId, initialTab = 'details' }: ZoneDProps) 
             matterTypeId={matter.matter_type_id ?? null}
             enforcementEnabled={true}
           />
-          {/* Directive 22.2 — Classifier-categorised file archive */}
+          {/* Directive 22.2  -  Classifier-categorised file archive */}
           <div className="border-t">
             <DocumentArchivePanel
               matterId={matter.id}
@@ -235,7 +235,7 @@ export function ZoneD({ matter, tenantId, initialTab = 'details' }: ZoneDProps) 
           </div>
         </TabsContent>
 
-        {/* 3 — Intelligence */}
+        {/* 3  -  Intelligence */}
         <TabsContent value="intelligence" className="flex-1 overflow-hidden m-0 p-0">
           <IntelligenceTabPanel
             matterId={matter.id}
@@ -243,7 +243,7 @@ export function ZoneD({ matter, tenantId, initialTab = 'details' }: ZoneDProps) 
           />
         </TabsContent>
 
-        {/* 4 — Forms */}
+        {/* 4  -  Forms */}
         <TabsContent value="forms" className="flex-1 overflow-y-auto m-0 p-0">
           <FormsTab
             matterId={matter.id}
@@ -251,7 +251,7 @@ export function ZoneD({ matter, tenantId, initialTab = 'details' }: ZoneDProps) 
           />
         </TabsContent>
 
-        {/* 4 — Questionnaire */}
+        {/* 4  -  Questionnaire */}
         <TabsContent value="questionnaire" className="flex-1 overflow-y-auto m-0 p-0">
           <IRCCIntakeTab
             matterId={matter.id}
@@ -261,7 +261,7 @@ export function ZoneD({ matter, tenantId, initialTab = 'details' }: ZoneDProps) 
           />
         </TabsContent>
 
-        {/* 5 — Review */}
+        {/* 5  -  Review */}
         <TabsContent value="review" className="flex-1 overflow-y-auto m-0 p-0">
           <ReviewTab
             matterId={matter.id}
@@ -270,7 +270,7 @@ export function ZoneD({ matter, tenantId, initialTab = 'details' }: ZoneDProps) 
           />
         </TabsContent>
 
-        {/* 6 — Billing */}
+        {/* 6  -  Billing */}
         <TabsContent value="billing" className="flex-1 overflow-y-auto m-0 p-0">
           <BillingTab
             matterId={matter.id}
@@ -279,17 +279,17 @@ export function ZoneD({ matter, tenantId, initialTab = 'details' }: ZoneDProps) 
           />
         </TabsContent>
 
-        {/* 7 — Communications */}
+        {/* 7  -  Communications */}
         <TabsContent value="communications" className="flex-1 overflow-y-auto m-0 p-0">
           <CommunicationsTab matterId={matter.id} tenantId={tenantId} />
         </TabsContent>
 
-        {/* 8 — Correspondence */}
+        {/* 8  -  Correspondence */}
         <TabsContent value="correspondence" className="flex-1 overflow-y-auto m-0 p-0">
           <CorrespondenceTab matterId={matter.id} tenantId={tenantId} />
         </TabsContent>
 
-        {/* 9 — Tasks */}
+        {/* 9  -  Tasks */}
         <TabsContent value="tasks" className="flex-1 overflow-y-auto m-0 p-0">
           <TasksTab
             matterId={matter.id}
@@ -300,7 +300,7 @@ export function ZoneD({ matter, tenantId, initialTab = 'details' }: ZoneDProps) 
           />
         </TabsContent>
 
-        {/* 10 — Notes */}
+        {/* 10  -  Notes */}
         <TabsContent value="notes" className="flex-1 overflow-y-auto m-0 p-0">
           <div className="grid grid-rows-[auto_1fr] gap-0 h-full">
             <div className="border-b p-4">
@@ -312,7 +312,7 @@ export function ZoneD({ matter, tenantId, initialTab = 'details' }: ZoneDProps) 
           </div>
         </TabsContent>
 
-        {/* 12 — Lead Snapshot (Intake History) */}
+        {/* 12  -  Lead Snapshot (Intake History) */}
         <TabsContent value="lead-snapshot" className="flex-1 overflow-y-auto m-0 p-0">
           <LeadSnapshotTab
             matterId={matter.id}
@@ -320,7 +320,7 @@ export function ZoneD({ matter, tenantId, initialTab = 'details' }: ZoneDProps) 
           />
         </TabsContent>
 
-        {/* 11 — IRCC Portal (Side-by-Side Engine) */}
+        {/* 11  -  IRCC Portal (Side-by-Side Engine) */}
         <TabsContent value="ircc-portal" className="flex-1 overflow-hidden m-0 p-0">
           <IRCCSideBySideEngine
             matterId={matter.id}

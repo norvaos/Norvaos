@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Jurisdiction Matcher — "Smart-Prefill: Strings to UUIDs"
+ * Jurisdiction Matcher  -  "Smart-Prefill: Strings to UUIDs"
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Maps raw jurisdiction strings (e.g., "Canada", "CAN", "Canadien") to

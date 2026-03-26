@@ -3,7 +3,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 export default function MatterDetailLoading() {
   return (
     <div className="space-y-6">
-      {/* Header bar — title + status badge + priority badge + actions */}
+      {/* Header bar  -  title + status badge + priority badge + actions */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Skeleton className="h-7 w-56" />

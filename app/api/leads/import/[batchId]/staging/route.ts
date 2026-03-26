@@ -39,7 +39,7 @@ export async function GET(
       return NextResponse.json({ success: false, error: 'Batch not found' }, { status: 404 })
     }
 
-    // Build query — lean columns for the review table
+    // Build query  -  lean columns for the review table
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let query = (admin as any)
       .from('lead_import_staging')

@@ -1,8 +1,8 @@
 /**
  * stage-transitions.ts
  * Query hooks for:
- *   - stage_transition_log  (Zone E — audit rail)
- *   - matter_risk_flags     (Zone A + Zone C — risk badges)
+ *   - stage_transition_log  (Zone E  -  audit rail)
+ *   - matter_risk_flags     (Zone A + Zone C  -  risk badges)
  *
  * Both tables created in migration 113-workplace-shell-tables.sql
  */
@@ -77,7 +77,7 @@ export function useStageTransitionLog(matterId: string | null | undefined) {
       return (data ?? []) as StageTransitionWithUser[]
     },
     enabled: !!matterId,
-    staleTime: 30 * 1000,   // 30s — re-fetch frequently to stay current
+    staleTime: 30 * 1000,   // 30s  -  re-fetch frequently to stay current
     refetchOnWindowFocus: true,
   })
 }
@@ -104,7 +104,7 @@ export function useCreateStageTransition() {
       qc.invalidateQueries({ queryKey: stageTransitionKeys.byMatter(vars.matter_id) })
     },
     onError: () => {
-      // Non-fatal — log silently; don't block stage advance
+      // Non-fatal  -  log silently; don't block stage advance
       console.error('[stage-transitions] Failed to write transition log entry')
     },
   })
@@ -159,7 +159,7 @@ export function useMatterRiskFlagsAll(matterId: string | null | undefined) {
 }
 
 /**
- * Count of open risk flags — used by Zone A badge without loading full list.
+ * Count of open risk flags  -  used by Zone A badge without loading full list.
  */
 export function useMatterRiskFlagCount(matterId: string | null | undefined) {
   return useQuery({

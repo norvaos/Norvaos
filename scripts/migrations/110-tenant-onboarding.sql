@@ -5,7 +5,7 @@
 -- with a shared, durable DB table suitable for multi-instance and serverless
 -- deployments.
 --
--- Team 3 / Priority 2 — DB-backed onboarding tracker
+-- Team 3 / Priority 2  -  DB-backed onboarding tracker
 -- Date: 2026-03-16
 -- =============================================================================
 

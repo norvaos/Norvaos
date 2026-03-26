@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * ClientFormList — Lists all form instances assigned to a client for a matter.
+ * ClientFormList  -  Lists all form instances assigned to a client for a matter.
  *
  * Fetches form instances via useMatterFormInstances and displays each as a
  * clickable card with form name, status badge, and completion progress.

@@ -1,13 +1,13 @@
 /**
- * Platform-admin audit logging — immutable, append-only.
+ * Platform-admin audit logging  -  immutable, append-only.
  *
  * Every platform-admin mutation MUST call `logPlatformAdminAudit()`.
  * Writes to three destinations:
- *   1. `platform_admin_audit_logs` — cross-tenant, immutable (no UPDATE/DELETE)
- *   2. `audit_logs` — tenant-scoped (for the affected tenant's own audit trail)
- *   3. `activities` — tenant-scoped (for the affected tenant's activity feed)
+ *   1. `platform_admin_audit_logs`  -  cross-tenant, immutable (no UPDATE/DELETE)
+ *   2. `audit_logs`  -  tenant-scoped (for the affected tenant's own audit trail)
+ *   3. `activities`  -  tenant-scoped (for the affected tenant's activity feed)
  *
- * Fire-and-forget via Promise.allSettled — never blocks the response.
+ * Fire-and-forget via Promise.allSettled  -  never blocks the response.
  */
 
 import { createAdminClient } from '@/lib/supabase/admin'
@@ -36,7 +36,7 @@ export interface PlatformAdminAuditParams {
  * 2. audit_logs (tenant-scoped)
  * 3. activities (tenant-scoped)
  *
- * Fire-and-forget — never blocks the response.
+ * Fire-and-forget  -  never blocks the response.
  */
 export async function logPlatformAdminAudit(params: PlatformAdminAuditParams): Promise<void> {
   const {

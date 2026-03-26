@@ -17,7 +17,7 @@ interface StatCardProps {
   iconColor?: string
   loading?: boolean
   className?: string
-  /** Optional URL — clicking the card navigates to this path */
+  /** Optional URL  -  clicking the card navigates to this path */
   href?: string
 }
 

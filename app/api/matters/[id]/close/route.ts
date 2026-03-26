@@ -7,7 +7,7 @@ import { withTiming } from '@/lib/middleware/request-timing'
  * POST /api/matters/[id]/close
  *
  * Server-side closure guard. Checks all blockers in one pass and returns
- * all failures in a single 422 response — no partial information hiding.
+ * all failures in a single 422 response  -  no partial information hiding.
  *
  * Auth: Lawyer or Admin only.
  *
@@ -56,7 +56,7 @@ async function handlePost(
       trust_override_reason?: string
     }
 
-    // Use admin client to bypass RLS — auth already verified above
+    // Use admin client to bypass RLS  -  auth already verified above
     const admin = createAdminClient()
 
     // 3. Verify matter belongs to tenant
@@ -152,7 +152,7 @@ async function handlePost(
       const hasReason = (trust_override_reason?.trim().length ?? 0) >= 30
 
       if (isAdmin && hasOverride && hasReason) {
-        // Admin override — allowed with audit trail (logged in activity below)
+        // Admin override  -  allowed with audit trail (logged in activity below)
       } else if (isAdmin && hasOverride && !hasReason) {
         blockers.push({
           type: 'trust_override_missing_reason',
@@ -161,7 +161,7 @@ async function handlePost(
       } else {
         blockers.push({
           type: 'unreconciled_trust',
-          message: `Trust transactions are not reconciled — outstanding balance of ${trustBalance} cents must be cleared before closing`,
+          message: `Trust transactions are not reconciled  -  outstanding balance of ${trustBalance} cents must be cleared before closing`,
         })
       }
     }

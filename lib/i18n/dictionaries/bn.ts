@@ -1,5 +1,5 @@
 /**
- * বাংলা (bn) — Bengali dictionary.
+ * বাংলা (bn)  -  Bengali dictionary.
  * For Bengali-speaking clients (Bangladesh, West Bengal, diaspora).
  */
 
@@ -69,7 +69,7 @@ export const bn: Partial<Record<DictionaryKey, string>> = {
   'dashboard.deadline_today': 'Today',
   'dashboard.deadline_1_day': '1 day',
   'dashboard.deadline_days': '{days} days',
-  'dashboard.deadlines_14_days': 'Deadlines — Next 14 Days',
+  'dashboard.deadlines_14_days': 'Deadlines  -  Next 14 Days',
   'dashboard.no_deadlines_14': 'No deadlines in the next 14 days',
   'dashboard.no_deadlines_14_desc': 'Typed deadlines on matters will appear here.',
   'dashboard.unknown_matter': 'Unknown matter',
@@ -98,12 +98,12 @@ export const bn: Partial<Record<DictionaryKey, string>> = {
   'common.save': 'সংরক্ষণ',
   'common.view': 'দেখুন',
 
-  // ── নির্দেশনা 41.0 — যোগাযোগ ও ভল্ট ──────────────────────────────────
+  // ── নির্দেশনা 41.0  -  যোগাযোগ ও ভল্ট ──────────────────────────────────
   'contact.badge.retained_client': 'ধরে রাখা মক্কেল',
   'contact.badge.prospective_lead': 'সম্ভাব্য লিড',
   'contact.badge.contact': 'যোগাযোগ',
   'contact.command_centre': 'কমান্ড সেন্টার',
-  'contact.command_centre_red_alert': 'প্রস্তুতির স্কোর সংকটজনকভাবে কম — তাৎক্ষণিক মনোযোগ প্রয়োজন',
+  'contact.command_centre_red_alert': 'প্রস্তুতির স্কোর সংকটজনকভাবে কম  -  তাৎক্ষণিক মনোযোগ প্রয়োজন',
   'contact.intake_funnel': 'গ্রহণ ফানেল',
   'contact.intake_progress': 'গ্রহণ অগ্রগতি',
   'contact.matter_readiness': 'মামলার প্রস্তুতি',
@@ -116,13 +116,13 @@ export const bn: Partial<Record<DictionaryKey, string>> = {
   'vault.title': 'Norva Vault',
   'vault.empty': 'Norva Vault খালি',
   'vault.empty_description': 'এই যোগাযোগের জন্য কোনো নথি আপলোড করা হয়নি।',
-  'vault.sentinel_eye': 'Sentinel Eye — দেখুন ও যাচাই করুন',
+  'vault.sentinel_eye': 'Sentinel Eye  -  দেখুন ও যাচাই করুন',
   'vault.file_tampered': 'সতর্কতা: ফাইল পরিবর্তিত হয়েছে',
   'vault.sha256_verified': 'SHA-256 যাচাইকৃত',
   'vault.hash_pending': 'হ্যাশ মুলতুবি',
   'vault.integrity_alert': 'অখণ্ডতা সতর্কতা',
   'vault.untracked': 'অনুসরণবিহীন',
-  'vault.no_preview': 'পূর্বরূপ উপলব্ধ নয় — ফাইল URL অনুপস্থিত',
+  'vault.no_preview': 'পূর্বরূপ উপলব্ধ নয়  -  ফাইল URL অনুপস্থিত',
 
   'legal.retainer_title': 'আইনি সেবা চুক্তি',
   'legal.retainer_intro': 'এই চুক্তি প্রদত্ত আইনি সেবার শর্তাবলী নির্ধারণ করে।',
@@ -203,12 +203,12 @@ export const bn: Partial<Record<DictionaryKey, string>> = {
   'status.days_remaining': '{days} দিন বাকি',
   'status.verified': 'যাচাইকৃত',
   'status.expiry_label': 'মেয়াদ',
-  'status.sentinel_tamper_title': 'সেন্টিনেল সতর্কতা — কারসাজি সনাক্ত',
+  'status.sentinel_tamper_title': 'সেন্টিনেল সতর্কতা  -  কারসাজি সনাক্ত',
   'status.sentinel_tamper_body': 'নথির হ্যাশ মিলছে না। এই নথিটি NorvaOS-এর বাইরে পরিবর্তন করা হয়েছে।',
-  'status.vault_verified_title': 'নোর্ভা ভল্ট — অখণ্ডতা যাচাইকৃত',
+  'status.vault_verified_title': 'নোর্ভা ভল্ট  -  অখণ্ডতা যাচাইকৃত',
   'status.vault_verified_body': 'এই নথিটি নোর্ভা ভল্টে হ্যাশ-লক করা আছে। যেকোনো কারসাজি সনাক্ত করা হবে।',
 
-  // ── Leads Command Centre (Directive 40.0 — Sovereign Layer) ─────────────
+  // ── Leads Command Centre (Directive 40.0  -  Sovereign Layer) ─────────────
   'leads.title': 'লিড',
   'leads.add_lead': 'লিড যোগ করুন',
   'leads.import': 'আমদানি',
@@ -331,7 +331,7 @@ export const bn: Partial<Record<DictionaryKey, string>> = {
   'form.notes_placeholder': 'Add any additional notes about this contact...',
   'form.create_contact': 'Create Contact',
   'form.save_changes': 'Save Changes',
-  'form.review_required_ocr': 'Review Required — OCR could not extract',
+  'form.review_required_ocr': 'Review Required  -  OCR could not extract',
   'form.section_basic_info': 'Basic Information',
   'form.section_contact_details': 'Contact Details',
   'form.section_address': 'Address',

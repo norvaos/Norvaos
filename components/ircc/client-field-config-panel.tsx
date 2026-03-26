@@ -419,7 +419,7 @@ export function ClientFieldConfigPanel({ formId }: { formId: string }) {
               <div>
                 <div className="px-4 py-2 bg-amber-50/50 text-xs text-amber-600 font-medium flex items-center gap-1.5">
                   <Filter className="h-3 w-3" />
-                  System / Meta Fields ({systemFieldCount}) — auto-hidden from clients
+                  System / Meta Fields ({systemFieldCount})  -  auto-hidden from clients
                 </div>
                 <div className="divide-y divide-slate-100 opacity-40">
                   {mergedFields
@@ -429,8 +429,8 @@ export function ClientFieldConfigPanel({ formId }: { formId: string }) {
                         key={field.id}
                         className="grid grid-cols-[36px_36px_1fr_120px] gap-2 px-4 py-2 items-center"
                       >
-                        <div className="text-center text-xs text-slate-300">—</div>
-                        <div className="text-center text-xs text-slate-300">—</div>
+                        <div className="text-center text-xs text-slate-300"> - </div>
+                        <div className="text-center text-xs text-slate-300"> - </div>
                         <div className="text-xs text-slate-400 truncate">
                           {field.suggested_label || field.xfa_path}
                         </div>

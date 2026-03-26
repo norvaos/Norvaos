@@ -1,14 +1,14 @@
 'use client'
 
 /**
- * WorkplaceShell — The 5-zone unified workplace layout container.
+ * WorkplaceShell  -  The 5-zone unified workplace layout container.
  *
  * Layout (CSS Grid):
- *   Zone 1 (top, full width):   ContextHeader — always visible
- *   Zone 4 (left, 56px):        QuickAccessRail — icon buttons
- *   Zone 2 (centre, flexible):  CentralActionSurface — scrollable content
- *   Zone 3 (right, ~380px):     CommunicationPanel — email threads + compose
- *   Zone 5 (drawer overlay):    RightDrawer — slide-over triggered by Z4 clicks
+ *   Zone 1 (top, full width):   ContextHeader  -  always visible
+ *   Zone 4 (left, 56px):        QuickAccessRail  -  icon buttons
+ *   Zone 2 (centre, flexible):  CentralActionSurface  -  scrollable content
+ *   Zone 3 (right, ~380px):     CommunicationPanel  -  email threads + compose
+ *   Zone 5 (drawer overlay):    RightDrawer  -  slide-over triggered by Z4 clicks
  *
  * Responsive: Communication panel collapses on smaller screens (< lg).
  */

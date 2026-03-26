@@ -7,14 +7,14 @@ import { createServerSupabaseClient } from '@/lib/supabase/server'
 /**
  * GET /api/matters/[id]/financial-clearance
  *
- * Financial Kill-Switch — calls the Postgres RPC `check_financial_clearance`
+ * Financial Kill-Switch  -  calls the Postgres RPC `check_financial_clearance`
  * which computes outstanding balance and unallocated trust funds entirely
  * in the database. No frontend calculations.
  *
  * Returns: { cleared, outstanding_cents, unallocated_cents, trust_balance_cents,
  *            total_billed_cents, blockers[] }
  *
- * Auth: Sentinel 403 — authenticateRequest() + requirePermission('billing', 'view')
+ * Auth: Sentinel 403  -  authenticateRequest() + requirePermission('billing', 'view')
  * Tenant isolation enforced both here AND inside the RPC (via auth.uid()).
  */
 async function handleGet(

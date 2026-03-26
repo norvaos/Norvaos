@@ -155,7 +155,7 @@ async function handleGet(
       // -- Add each version (latest first)
       for (const version of versions) {
         const label = versions.length > 1
-          ? `${slot.slot_name} — v${version.version_number}`
+          ? `${slot.slot_name}  -  v${version.version_number}`
           : slot.slot_name
 
         tocEntries.push({
@@ -196,7 +196,7 @@ async function handleGet(
                 currentPage++
               }
             } catch {
-              // Corrupted PDF — add placeholder
+              // Corrupted PDF  -  add placeholder
               const errPage = combined.addPage([PAGE_W, PAGE_H])
               currentPage++
               errPage.drawText(`PDF could not be read: ${version.file_name}`, {

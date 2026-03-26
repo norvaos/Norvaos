@@ -1,7 +1,7 @@
 // ============================================================================
 // POST /api/command/record-consultation-outcome
 // Records consultation outcome with proper state transitions, task creation,
-// closure records, retainer package preparation — all in one transaction.
+// closure records, retainer package preparation  -  all in one transaction.
 // ============================================================================
 
 import { NextResponse } from 'next/server'
@@ -135,7 +135,7 @@ function validatePayload(body: OutcomePayload): string | null {
       break
 
     case 'no_show':
-      // No additional fields required — confirmation only
+      // No additional fields required  -  confirmation only
       break
 
     case 'book_follow_up':
@@ -156,8 +156,8 @@ function validatePayload(body: OutcomePayload): string | null {
 // ─── Outcome labels ─────────────────────────────────────────────────────────
 
 const OUTCOME_LABELS: Record<OutcomeType, string> = {
-  send_retainer: 'Retained — Pending Retainer',
-  follow_up_later: 'Thinking — Follow-up Required',
+  send_retainer: 'Retained  -  Pending Retainer',
+  follow_up_later: 'Thinking  -  Follow-up Required',
   client_declined: 'Client Declined',
   not_a_fit: 'Not Suitable',
   referred_out: 'Referred Out',
@@ -293,7 +293,7 @@ async function handlePost(request: Request) {
 
     switch (outcome) {
       // ═══════════════════════════════════════════════════════════
-      // SEND RETAINER — Client intends to retain
+      // SEND RETAINER  -  Client intends to retain
       // ═══════════════════════════════════════════════════════════
       case 'send_retainer': {
         const p = body as SendRetainerPayload
@@ -343,7 +343,7 @@ async function handlePost(request: Request) {
 
         const scopeLabel = p.personScope === 'joint' ? 'Joint' : 'Single'
         commandSummary.push(
-          `Retainer package prepared — ${matterTypeName} (${scopeLabel})`
+          `Retainer package prepared  -  ${matterTypeName} (${scopeLabel})`
         )
 
         // 3. Auto-load default fee template if one exists and none was specified
@@ -366,7 +366,7 @@ async function handlePost(request: Request) {
           /retainer.*sent|sent.*retainer/i.test(s.name)
         )
 
-        // Build update payload — set conflict as cleared (lawyer chose to engage)
+        // Build update payload  -  set conflict as cleared (lawyer chose to engage)
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const sendRetainerUpdate: Record<string, any> = {
           consultation_status: 'completed',
@@ -393,7 +393,7 @@ async function handlePost(request: Request) {
         }
 
         // 4b. Create intake profile (marks intake as complete for conversion gates)
-        // In the send_retainer flow, the consultation IS the intake — lawyer has
+        // In the send_retainer flow, the consultation IS the intake  -  lawyer has
         // gathered all info needed to proceed.
         try {
           const { data: existingProfile } = await supabase
@@ -464,7 +464,7 @@ async function handlePost(request: Request) {
       }
 
       // ═══════════════════════════════════════════════════════════
-      // FOLLOW UP LATER — Client needs time to decide
+      // FOLLOW UP LATER  -  Client needs time to decide
       // ═══════════════════════════════════════════════════════════
       case 'follow_up_later': {
         const p = body as FollowUpLaterPayload
@@ -520,7 +520,7 @@ async function handlePost(request: Request) {
           .insert({
             tenant_id: tenantId,
             contact_id: lead.contact_id,
-            title: `Follow up with ${contactName} — post-consultation`,
+            title: `Follow up with ${contactName}  -  post-consultation`,
             due_date: p.followUpDate,
             assigned_to: p.followUpOwner,
             assigned_by: userId,
@@ -544,7 +544,7 @@ async function handlePost(request: Request) {
       }
 
       // ═══════════════════════════════════════════════════════════
-      // CLIENT DECLINED — Attended but declined to retain
+      // CLIENT DECLINED  -  Attended but declined to retain
       // ═══════════════════════════════════════════════════════════
       case 'client_declined': {
         const p = body as ClientDeclinedPayload
@@ -563,7 +563,7 @@ async function handlePost(request: Request) {
 
         commandSummary.push('Consultation outcome recorded (client_declined)')
 
-        // 2. Create closure record — target "Closed – Client Declined" stage
+        // 2. Create closure record  -  target "Closed – Client Declined" stage
         const lostStage = stages.find((s) => /client.?declin/i.test(s.name))
           ?? stages.find((s) => s.is_lost_stage)
         const { data: closure } = await admin
@@ -581,7 +581,7 @@ async function handlePost(request: Request) {
 
         closureRecordId = closure?.id ?? null
         commandSummary.push(
-          `Closure record created: ${p.declineReason}${p.declineDetails ? ` — ${p.declineDetails}` : ''}`
+          `Closure record created: ${p.declineReason}${p.declineDetails ? `  -  ${p.declineDetails}` : ''}`
         )
 
         // 3. Move to lost stage + mark lead as lost
@@ -611,7 +611,7 @@ async function handlePost(request: Request) {
       }
 
       // ═══════════════════════════════════════════════════════════
-      // NOT A FIT — Not suitable for the firm
+      // NOT A FIT  -  Not suitable for the firm
       // ═══════════════════════════════════════════════════════════
       case 'not_a_fit': {
         const p = body as NotAFitPayload
@@ -646,7 +646,7 @@ async function handlePost(request: Request) {
 
         closureRecordId = closure?.id ?? null
         commandSummary.push(
-          `Closure record created: ${p.notFitReason}${p.notFitDetails ? ` — ${p.notFitDetails}` : ''}`
+          `Closure record created: ${p.notFitReason}${p.notFitDetails ? `  -  ${p.notFitDetails}` : ''}`
         )
 
         await admin
@@ -673,7 +673,7 @@ async function handlePost(request: Request) {
       }
 
       // ═══════════════════════════════════════════════════════════
-      // REFERRED OUT — Referred to another firm
+      // REFERRED OUT  -  Referred to another firm
       // ═══════════════════════════════════════════════════════════
       case 'referred_out': {
         const p = body as ReferredOutPayload
@@ -735,10 +735,10 @@ async function handlePost(request: Request) {
       }
 
       // ═══════════════════════════════════════════════════════════
-      // NO SHOW — Client did not attend
+      // NO SHOW  -  Client did not attend
       // ═══════════════════════════════════════════════════════════
       case 'no_show': {
-        // 1. Update consultation status (no outcome — meeting didn't happen)
+        // 1. Update consultation status (no outcome  -  meeting didn't happen)
         await admin
           .from('lead_consultations')
           .update({
@@ -797,7 +797,7 @@ async function handlePost(request: Request) {
       }
 
       // ═══════════════════════════════════════════════════════════
-      // BOOK FOLLOW-UP — Schedule a follow-up consultation
+      // BOOK FOLLOW-UP  -  Schedule a follow-up consultation
       // ═══════════════════════════════════════════════════════════
       case 'book_follow_up': {
         const p = body as BookFollowUpPayload
@@ -924,13 +924,13 @@ async function handlePost(request: Request) {
     if (outcome === 'send_retainer') {
       currentStatus.retainer = 'Not yet sent'
       currentStatus.payment = 'Not requested'
-      currentStatus.fileOpening = 'Blocked — retainer not signed, payment not received'
+      currentStatus.fileOpening = 'Blocked  -  retainer not signed, payment not received'
     } else if (outcome === 'follow_up_later') {
       currentStatus.followUp = `Scheduled for ${(body as FollowUpLaterPayload).followUpDate}`
     } else if (['client_declined', 'not_a_fit', 'referred_out'].includes(outcome)) {
-      currentStatus.leadStatus = 'Closed — Lost'
+      currentStatus.leadStatus = 'Closed  -  Lost'
     } else if (outcome === 'no_show') {
-      currentStatus.consultation = 'No Show — follow-up task created'
+      currentStatus.consultation = 'No Show  -  follow-up task created'
     } else if (outcome === 'book_follow_up') {
       currentStatus.consultation = `Follow-up booked: ${(body as BookFollowUpPayload).followUpDate}`
     }

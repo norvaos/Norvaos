@@ -1,5 +1,5 @@
 /**
- * Portal token validation — shared helper for all portal routes.
+ * Portal token validation  -  shared helper for all portal routes.
  *
  * Tokens are stored as SHA-256 hashes in portal_links.token_hash.
  * This function hashes the incoming token and looks up by hash.

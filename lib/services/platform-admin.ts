@@ -1,12 +1,12 @@
 /**
- * Platform-admin auth module — NorvaOS Super Admin Portal.
+ * Platform-admin auth module  -  NorvaOS Super Admin Portal.
  *
  * Two auth paths:
  *   1. Bearer token (CLI / external tooling): PLATFORM_ADMIN_SECRET env var
  *   2. Session-based (portal login): auth.users → platform_admins DB table
  *
- * `checkPlatformAdmin(request)` — low-level Bearer token check (backward compat)
- * `requirePlatformAdmin(request)` — full dual-auth gate, throws on failure
+ * `checkPlatformAdmin(request)`  -  low-level Bearer token check (backward compat)
+ * `requirePlatformAdmin(request)`  -  full dual-auth gate, throws on failure
  *
  * RESTRICTION: Both functions must ONLY be called from routes under /api/admin/*.
  * This is enforced by structural regression tests.
@@ -16,7 +16,7 @@
  * ════════════════════════════════════════════════════════════════════════════
  *
  * The token check is a direct string-equality comparison against the
- * PLATFORM_ADMIN_SECRET env var on every request — no caching, no sessions.
+ * PLATFORM_ADMIN_SECRET env var on every request  -  no caching, no sessions.
  * Rotation is therefore immediate:
  *
  *   1. Generate a new secret:  `openssl rand -hex 32`
@@ -24,14 +24,14 @@
  *      (Vercel → Settings → Environment Variables → Edit → Save).
  *   3. Redeploy (Vercel redeploys automatically on env var change; if not,
  *      trigger a redeploy manually).
- *   4. Old token stops working INSTANTLY — the new serverless instances read
+ *   4. Old token stops working INSTANTLY  -  the new serverless instances read
  *      the updated env var, and the direct equality check rejects old values.
  *   5. Update all external tooling / CLI scripts with the new secret.
  *   6. Verify: call GET /api/admin/tenants with the OLD token → expect 403.
  *   7. Verify: call GET /api/admin/tenants with the NEW token → expect 200.
  *
  * There is no grace period, no dual-token window, no cached credential.
- * The check is `token === process.env.PLATFORM_ADMIN_SECRET` — nothing more.
+ * The check is `token === process.env.PLATFORM_ADMIN_SECRET`  -  nothing more.
  * ════════════════════════════════════════════════════════════════════════════
  */
 
@@ -96,7 +96,7 @@ export function checkPlatformAdmin(request: Request): PlatformAdminResult {
 }
 
 /**
- * Full platform-admin gate — supports both Bearer token AND session-based auth.
+ * Full platform-admin gate  -  supports both Bearer token AND session-based auth.
  *
  * Usage in route handlers:
  *   const adminCtx = await requirePlatformAdmin(request)
@@ -114,7 +114,7 @@ export async function requirePlatformAdmin(request: Request): Promise<PlatformAd
     return { isPlatformAdmin: true, adminId: null, authMethod: 'bearer-token' }
   }
 
-  // Path 2: Session-based (portal login) — check auth.users → platform_admins
+  // Path 2: Session-based (portal login)  -  check auth.users → platform_admins
   try {
     const auth = await authenticateRequest()
     const admin = createAdminClient()
@@ -129,10 +129,10 @@ export async function requirePlatformAdmin(request: Request): Promise<PlatformAd
       return { isPlatformAdmin: true, adminId: data.id, authMethod: 'session' }
     }
   } catch {
-    // Not authenticated or not in platform_admins table — fall through to denial
+    // Not authenticated or not in platform_admins table  -  fall through to denial
   }
 
-  // Denied — log attempt for security observability
+  // Denied  -  log attempt for security observability
   log.warn('[platform-admin] Unauthorized access attempt', {
     ip: ip ?? 'unknown',
     path,

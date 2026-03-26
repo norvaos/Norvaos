@@ -1,5 +1,5 @@
 /**
- * useGhostWriterTrigger — Automatically triggers Ghost-Writer draft generation
+ * useGhostWriterTrigger  -  Automatically triggers Ghost-Writer draft generation
  * when a new inbound email arrives on a matter-associated thread.
  *
  * Listens to Supabase Realtime inserts on `email_messages` and fires the
@@ -48,7 +48,7 @@ export function useGhostWriterTrigger({
           // Only process inbound messages
           if (message.direction !== 'inbound') return
 
-          // Deduplicate — don't process the same message twice
+          // Deduplicate  -  don't process the same message twice
           const msgId = message.id as string
           if (processedRef.current.has(msgId)) return
           processedRef.current.add(msgId)

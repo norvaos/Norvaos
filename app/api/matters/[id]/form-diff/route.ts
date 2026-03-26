@@ -9,12 +9,12 @@ import { logDataMismatchWarning } from '@/lib/services/sentinel-audit'
 /**
  * GET /api/matters/[id]/form-diff
  *
- * History-Diff Engine — compares current matter data against the frozen
+ * History-Diff Engine  -  compares current matter data against the frozen
  * input_snapshot from the last form pack version. Returns field-level
  * mismatches for display in the IRCC forms tab.
  *
  * Query params:
- *   ?form_code=IMM5257E — optional filter by specific form code
+ *   ?form_code=IMM5257E  -  optional filter by specific form code
  */
 async function handleGet(
   request: Request,

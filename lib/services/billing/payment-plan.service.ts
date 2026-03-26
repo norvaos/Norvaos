@@ -1,9 +1,9 @@
 // ============================================================================
-// Payment Plan Service — creation, approval, cancellation, instalment payment
+// Payment Plan Service  -  creation, approval, cancellation, instalment payment
 // ============================================================================
 // Manages the payment plan lifecycle on top of the existing invoice/payments
 // infrastructure.  Invoice totals remain authoritative through the existing
-// trg_payments_recalculate trigger — this service does NOT touch
+// trg_payments_recalculate trigger  -  this service does NOT touch
 // calculate_invoice_totals() or any invoice status transition directly.
 //
 // Overdue detection is query-time only:
@@ -153,7 +153,7 @@ export async function createPaymentPlan(
   const impliedTotal = instalmentAmountCents * instalmentCount
   const diff = Math.abs(impliedTotal - totalAmountCents)
   if (diff > instalmentCount) {
-    // More than 1 cent per instalment of variance — reject
+    // More than 1 cent per instalment of variance  -  reject
     return {
       success: false,
       error: `Instalment amount (${instalmentAmountCents}¢ × ${instalmentCount}) does not reconcile to plan total (${totalAmountCents}¢)`,
@@ -439,7 +439,7 @@ export async function payInstalment(
   }
 
   // ── Fetch invoice contact for payment record ─────────────────────────────
-  // contact_id is NOT NULL on payments — fetch is required
+  // contact_id is NOT NULL on payments  -  fetch is required
   const { data: invoiceContact, error: contactErr } = await fromInvoices(supabase)
     .select('contact_id')
     .eq('id', plan.invoice_id)
@@ -501,7 +501,7 @@ export async function payInstalment(
     .update({
       instalments_paid: newInstalmentsPaid,
       status: isComplete ? 'completed' : 'active',
-      // When complete, next_due_date is irrelevant but column is NOT NULL — use today
+      // When complete, next_due_date is irrelevant but column is NOT NULL  -  use today
       next_due_date: nextDueDate ?? now.split('T')[0],
       updated_at: now,
     })
@@ -532,7 +532,7 @@ export async function payInstalment(
       matterId: plan.matter_id,
       performedBy: userId,
       eventType: 'payment_plan_completed',
-      eventDescription: `Payment plan completed — all ${plan.instalments_total} instalments paid`,
+      eventDescription: `Payment plan completed  -  all ${plan.instalments_total} instalments paid`,
       changedFields: { status: { before: 'active', after: 'completed' } },
     })
   }

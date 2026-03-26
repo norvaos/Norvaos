@@ -1,5 +1,5 @@
 /**
- * Français (fr) — French dictionary.
+ * Français (fr)  -  French dictionary.
  * Legal terminology translated for Canadian French (LSO Rule 3.2-2 compliance).
  */
 
@@ -71,7 +71,7 @@ export const fr: Partial<Record<DictionaryKey, string>> = {
   'dashboard.deadline_today': 'Aujourd\'hui',
   'dashboard.deadline_1_day': '1 jour',
   'dashboard.deadline_days': '{days} jours',
-  'dashboard.deadlines_14_days': 'Échéances — 14 prochains jours',
+  'dashboard.deadlines_14_days': 'Échéances  -  14 prochains jours',
   'dashboard.no_deadlines_14': 'Aucune échéance dans les 14 prochains jours',
   'dashboard.no_deadlines_14_desc': 'Les échéances typées des dossiers apparaîtront ici.',
   'dashboard.unknown_matter': 'Dossier inconnu',
@@ -101,12 +101,12 @@ export const fr: Partial<Record<DictionaryKey, string>> = {
   'common.save': 'Enregistrer',
   'common.view': 'Afficher',
 
-  // ── Directive 41.0 — Contacts & Vault ────────────────────────────────────
+  // ── Directive 41.0  -  Contacts & Vault ────────────────────────────────────
   'contact.badge.retained_client': 'Client sous mandat',
   'contact.badge.prospective_lead': 'Prospect potentiel',
   'contact.badge.contact': 'Contact',
   'contact.command_centre': 'Centre de commande',
-  'contact.command_centre_red_alert': 'Le score de préparation est critique — attention immédiate requise',
+  'contact.command_centre_red_alert': 'Le score de préparation est critique  -  attention immédiate requise',
   'contact.intake_funnel': 'Entonnoir d\'accueil',
   'contact.intake_progress': 'Progression de l\'accueil',
   'contact.matter_readiness': 'Préparation du dossier',
@@ -119,13 +119,13 @@ export const fr: Partial<Record<DictionaryKey, string>> = {
   'vault.title': 'Norva Vault',
   'vault.empty': 'Norva Vault vide',
   'vault.empty_description': 'Aucun document téléversé pour ce contact.',
-  'vault.sentinel_eye': 'Sentinel Eye — Voir et vérifier',
+  'vault.sentinel_eye': 'Sentinel Eye  -  Voir et vérifier',
   'vault.file_tampered': 'Attention : Fichier altéré',
   'vault.sha256_verified': 'SHA-256 vérifié',
   'vault.hash_pending': 'Hachage en attente',
   'vault.integrity_alert': 'Alerte d\'intégrité',
   'vault.untracked': 'Non suivi',
-  'vault.no_preview': 'Aperçu non disponible — URL du fichier manquante',
+  'vault.no_preview': 'Aperçu non disponible  -  URL du fichier manquante',
 
   // ── Déclarations juridiques ──────────────────────────────────────────────
   'legal.retainer_title': 'Mandat de représentation',
@@ -211,12 +211,12 @@ export const fr: Partial<Record<DictionaryKey, string>> = {
   'status.days_remaining': '{days}j restants',
   'status.verified': 'Vérifié',
   'status.expiry_label': 'Expiration',
-  'status.sentinel_tamper_title': 'ALERTE SENTINELLE — Altération détectée',
+  'status.sentinel_tamper_title': 'ALERTE SENTINELLE  -  Altération détectée',
   'status.sentinel_tamper_body': 'Discordance de hachage du document. Ce document a été modifié en dehors de NorvaOS.',
-  'status.vault_verified_title': 'Coffre Norva — Intégrité vérifiée',
+  'status.vault_verified_title': 'Coffre Norva  -  Intégrité vérifiée',
   'status.vault_verified_body': 'Ce document est verrouillé par hachage dans le Coffre Norva. Toute altération sera détectée.',
 
-  // ── Leads Command Centre (Directive 40.0 — Sovereign Layer) ─────────────
+  // ── Leads Command Centre (Directive 40.0  -  Sovereign Layer) ─────────────
   'leads.title': 'Prospects',
   'leads.add_lead': 'Ajouter un prospect',
   'leads.import': 'Importer',
@@ -338,7 +338,7 @@ export const fr: Partial<Record<DictionaryKey, string>> = {
   'form.notes_placeholder': 'Ajoutez des notes supplémentaires sur ce contact...',
   'form.create_contact': 'Créer le contact',
   'form.save_changes': 'Enregistrer les modifications',
-  'form.review_required_ocr': 'Révision requise — l\'OCR n\'a pas pu extraire',
+  'form.review_required_ocr': 'Révision requise  -  l\'OCR n\'a pas pu extraire',
   'form.section_basic_info': 'Informations de base',
   'form.section_contact_details': 'Coordonnées',
   'form.section_address': 'Adresse',

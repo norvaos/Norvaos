@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * NorvaWhisper — Branded contextual tooltip ("Norva Whispers").
+ * NorvaWhisper  -  Branded contextual tooltip ("Norva Whispers").
  *
  * Unlike the generic HelperTip (ⓘ icon → plain text), NorvaWhisper shows
  * a branded tooltip with a tiny Norva logo, an intent headline, and a
@@ -13,7 +13,7 @@
  *   2. Inline (title + children): for one-off dynamic content
  *
  * Performance: zero external libs, Radix Tooltip (already loaded), SVG inline.
- * 0ms TBT guaranteed — no lazy imports or heavy renders.
+ * 0ms TBT guaranteed  -  no lazy imports or heavy renders.
  */
 
 import {

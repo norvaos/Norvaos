@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Conflict Engine — Scan, Score, Match & Decision Logic
+ * Conflict Engine  -  Scan, Score, Match & Decision Logic
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Searches contacts, matters (via matter_contacts), and leads for potential

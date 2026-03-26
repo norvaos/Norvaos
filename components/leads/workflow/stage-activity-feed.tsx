@@ -10,7 +10,7 @@ import type { LeadStageHistoryRow, Activity, UserRow } from './lead-workflow-typ
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
-/** Unified feed item — either a stage transition or an activity */
+/** Unified feed item  -  either a stage transition or an activity */
 type FeedItem =
   | { type: 'stage_transition'; data: LeadStageHistoryRow; timestamp: string }
   | { type: 'activity'; data: Activity; timestamp: string }

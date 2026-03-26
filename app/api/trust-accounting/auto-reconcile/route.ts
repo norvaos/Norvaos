@@ -1,5 +1,5 @@
 /**
- * POST /api/trust-accounting/auto-reconcile — Run auto-reconciliation for a trust account
+ * POST /api/trust-accounting/auto-reconcile  -  Run auto-reconciliation for a trust account
  */
 
 import { NextRequest, NextResponse } from 'next/server'

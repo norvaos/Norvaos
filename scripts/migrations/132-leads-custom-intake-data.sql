@@ -14,4 +14,4 @@ CREATE INDEX IF NOT EXISTS idx_leads_custom_intake_data
   ON leads USING gin (custom_intake_data)
   WHERE custom_intake_data IS NOT NULL;
 
--- No RLS changes needed — leads already has tenant-scoped RLS.
+-- No RLS changes needed  -  leads already has tenant-scoped RLS.

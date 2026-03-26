@@ -1,4 +1,4 @@
-# IRCC Intake UX Hardening Plan — Cold-Start and Staff Clarity
+# IRCC Intake UX Hardening Plan  -  Cold-Start and Staff Clarity
 
 ## Context
 
@@ -27,7 +27,7 @@ Replace the text-only source indicator with a **colour-coded left-border strip +
 | `canonical_prefill` | cyan-400 | "Prefilled" | cyan outline |
 | `extraction` | amber-400 | "Extracted" | amber outline |
 | `migration` | gray-400 | "Migrated" | gray outline |
-| (no answer) | transparent | — | — |
+| (no answer) | transparent |  -  |  -  |
 
 **Visual treatment**: Add a 2px left border on the field container `<div>` using the source colour. The badge replaces the current 10px text. Fields with `needs_review: true` get a yellow background highlight (`bg-yellow-50`) and an eye icon.
 
@@ -70,10 +70,10 @@ Both use basic `Select` dropdowns. No autocomplete. No search. Client enters by 
 
 | File | Change |
 |---|---|
-| `lib/constants/countries.ts` | **NEW** — Single source of truth for country list (name + alpha-2 code) |
+| `lib/constants/countries.ts` | **NEW**  -  Single source of truth for country list (name + alpha-2 code) |
 | `components/ircc/workspace/field-input.tsx` | Replace `Select` for country type with `CountryCombobox` |
 | `components/ircc/ircc-questionnaire.tsx` | Replace `COUNTRIES` array with import from shared constant. Replace Select with `CountryCombobox`. |
-| `components/ui/country-combobox.tsx` | **NEW** — Searchable country picker using shadcn Command/Popover pattern |
+| `components/ui/country-combobox.tsx` | **NEW**  -  Searchable country picker using shadcn Command/Popover pattern |
 
 ### Acceptance Criteria
 
@@ -98,7 +98,7 @@ Add a **"Set All to No" button** at the top of the background section. The butto
 1. Only appears in staff mode
 2. Only appears when at least 2 background fields are unanswered
 3. Requires a confirmation step: "This will set all unanswered background questions to 'No'. Confirm?"
-4. Only sets fields that are currently empty — does NOT overwrite existing "Yes" answers
+4. Only sets fields that are currently empty  -  does NOT overwrite existing "Yes" answers
 5. Marks all set fields with `source: 'staff_entry'`
 
 Additionally, render background boolean fields as a **compact yes/no matrix** instead of individual switch rows:
@@ -126,8 +126,8 @@ When any answer is "Yes", the detail field expands below that row (using existin
 | File | Change |
 |---|---|
 | `components/ircc/workspace/questionnaire-renderer.tsx` | Detect background section (section_key = 'background'). Render as compact matrix instead of individual FieldInputs. Add "Set All to No" button. |
-| `components/ircc/workspace/background-matrix.tsx` | **NEW** — Compact yes/no matrix for boolean-heavy sections |
-| `components/ircc/ircc-questionnaire.tsx` | Add same matrix rendering for portal background step (optional — can defer to staff-only first) |
+| `components/ircc/workspace/background-matrix.tsx` | **NEW**  -  Compact yes/no matrix for boolean-heavy sections |
+| `components/ircc/ircc-questionnaire.tsx` | Add same matrix rendering for portal background step (optional  -  can defer to staff-only first) |
 
 ### Acceptance Criteria
 
@@ -173,10 +173,10 @@ When any answer is "Yes", the detail field expands below that row (using existin
 
 ### Not Modified
 
-- Engine code (`lib/ircc/`) — no changes
-- API routes — no changes
-- Database schema — no changes
-- Types — no changes
+- Engine code (`lib/ircc/`)  -  no changes
+- API routes  -  no changes
+- Database schema  -  no changes
+- Types  -  no changes
 
 ---
 

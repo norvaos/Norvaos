@@ -1,4 +1,4 @@
-# Phase 8 — Final Closure Memo
+# Phase 8  -  Final Closure Memo
 
 **Date:** 2026-03-15
 **Status:** Approved for production
@@ -28,9 +28,9 @@
 
 | Migration | Supabase Version | Objects Created |
 |---|---|---|
-| 102 — Invoice Paid Immutability | 20260315212522 | 2 triggers (`trg_invoices_paid_immutable`, `trg_invoices_paid_no_delete`), 2 functions (`prevent_paid_invoice_mutation`, `prevent_paid_invoice_delete`), 1 function (`prevent_issued_cheque_mutation`), 1 trigger (`trg_cheques_issued_immutable`) |
-| 103 — Portal Token Hashing | 20260315212546 | 1 column (`token_hash`), 1 index (`idx_portal_links_token_hash`), 2 columns (`last_rate_limit_hit_at`, `rate_limit_count`), data migration (47 tokens hashed, plaintext redacted) |
-| 104 — Segregation of Duties | 20260315212602 | 3 triggers (`trg_disbursement_segregation`, `trg_payment_plan_segregation`, `trg_write_off_segregation`), 3 functions (`enforce_disbursement_segregation`, `enforce_payment_plan_segregation`, `enforce_write_off_segregation`) |
+| 102  -  Invoice Paid Immutability | 20260315212522 | 2 triggers (`trg_invoices_paid_immutable`, `trg_invoices_paid_no_delete`), 2 functions (`prevent_paid_invoice_mutation`, `prevent_paid_invoice_delete`), 1 function (`prevent_issued_cheque_mutation`), 1 trigger (`trg_cheques_issued_immutable`) |
+| 103  -  Portal Token Hashing | 20260315212546 | 1 column (`token_hash`), 1 index (`idx_portal_links_token_hash`), 2 columns (`last_rate_limit_hit_at`, `rate_limit_count`), data migration (47 tokens hashed, plaintext redacted) |
+| 104  -  Segregation of Duties | 20260315212602 | 3 triggers (`trg_disbursement_segregation`, `trg_payment_plan_segregation`, `trg_write_off_segregation`), 3 functions (`enforce_disbursement_segregation`, `enforce_payment_plan_segregation`, `enforce_write_off_segregation`) |
 
 ### New Files (9)
 
@@ -52,8 +52,8 @@
 
 | File | Change |
 |---|---|
-| `lib/services/auth.ts` | Added `is_active` check — deactivated users blocked at API level |
-| `lib/supabase/middleware.ts` | Added `is_active` check — deactivated users redirected at navigation level |
+| `lib/services/auth.ts` | Added `is_active` check  -  deactivated users blocked at API level |
+| `lib/supabase/middleware.ts` | Added `is_active` check  -  deactivated users redirected at navigation level |
 | `lib/services/require-role.ts` | RBAC enforcement helper |
 | `lib/queries/portal-links.ts` | Token creation now hashes via Web Crypto, stores `token_hash`, redacts plaintext |
 | `lib/queries/trust-accounting.ts` | Fixed `useTrustReport` enabled guard (`!!params.trustAccountId` added) |
@@ -74,7 +74,7 @@
 
 **Portal routes converted to `validatePortalToken()` (22):**
 
-All routes under `app/api/portal/[token]/` — billing (2), booking, calendar, client-upload, events, ircc-forms (3), ircc-questionnaire (2), messages, questionnaire-edit-request, questionnaire, shared-documents, slot-upload, statement, summary, tasks, timeline, trust, upload.
+All routes under `app/api/portal/[token]/`  -  billing (2), booking, calendar, client-upload, events, ircc-forms (3), ircc-questionnaire (2), messages, questionnaire-edit-request, questionnaire, shared-documents, slot-upload, statement, summary, tasks, timeline, trust, upload.
 
 **API routes with RBAC added in Phase 8 (25):**
 
@@ -137,7 +137,7 @@ All routes under `app/api/portal/[token]/` — billing (2), booking, calendar, c
 
 - [ ] Execute post-deploy validation checklist (Section 4)
 - [ ] Verify Sentry receiving events (if DSN configured)
-- [ ] Monitor Vercel function logs for 15 minutes — no unhandled errors
+- [ ] Monitor Vercel function logs for 15 minutes  -  no unhandled errors
 
 ---
 
@@ -145,25 +145,25 @@ All routes under `app/api/portal/[token]/` — billing (2), booking, calendar, c
 
 ### Authentication and Authorization
 
-- [ ] Login as Admin user — dashboard loads
-- [ ] Login as non-Admin user — restricted routes return 403
+- [ ] Login as Admin user  -  dashboard loads
+- [ ] Login as non-Admin user  -  restricted routes return 403
 - [ ] Deactivated user cannot access any API route or navigate past middleware
 
 ### Trust Tab
 
-- [ ] Open any matter — Trust tab visible in QuickAccessRail
+- [ ] Open any matter  -  Trust tab visible in QuickAccessRail
 - [ ] Trust tab opens TrustPanel in RightDrawer
 
 ### Portal
 
-- [ ] Create new portal link — token stored as `REDACTED`, `token_hash` populated
-- [ ] Access portal via valid token — loads correctly
-- [ ] Access portal via invalid token — returns 404
+- [ ] Create new portal link  -  token stored as `REDACTED`, `token_hash` populated
+- [ ] Access portal via valid token  -  loads correctly
+- [ ] Access portal via invalid token  -  returns 404
 
 ### Immutability
 
-- [ ] Create invoice, mark paid, attempt edit via UI — blocked
-- [ ] Audit logs page — no edit/delete controls exposed
+- [ ] Create invoice, mark paid, attempt edit via UI  -  blocked
+- [ ] Audit logs page  -  no edit/delete controls exposed
 
 ### API Health
 
@@ -172,8 +172,8 @@ All routes under `app/api/portal/[token]/` — billing (2), booking, calendar, c
 
 ### Error Reporting
 
-- [ ] Trigger client error — appears in Sentry (if DSN configured)
-- [ ] Check Vercel logs — structured JSON format with `tenant_id`
+- [ ] Trigger client error  -  appears in Sentry (if DSN configured)
+- [ ] Check Vercel logs  -  structured JSON format with `tenant_id`
 
 ---
 
@@ -191,7 +191,7 @@ All routes under `app/api/portal/[token]/` — billing (2), booking, calendar, c
 
 ### Process Carry-Forward
 
-Future phases must include in their initial approval submission — not as follow-up:
+Future phases must include in their initial approval submission  -  not as follow-up:
 
 - Runtime proof (live trigger tests, live API denial tests)
 - Restore proof (database object inventory, trigger functional verification)

@@ -31,14 +31,14 @@ const eslintConfig = defineConfig([
       ...(reactHooksPlugin ? { "react-hooks": reactHooksPlugin } : {}),
     },
     rules: {
-      // TypeScript — Supabase client type limitation (project-wide pattern)
+      // TypeScript  -  Supabase client type limitation (project-wide pattern)
       "@typescript-eslint/no-explicit-any": "warn",
       "@typescript-eslint/no-require-imports": "warn",
-      // General JS — pre-existing in legacy scripts
+      // General JS  -  pre-existing in legacy scripts
       "prefer-const": "warn",
-      // React — apostrophes in JSX text across dashboard UI pages
+      // React  -  apostrophes in JSX text across dashboard UI pages
       ...(reactPlugin ? { "react/no-unescaped-entities": "warn" } : {}),
-      // React Compiler rules — pre-existing violations in dashboard UI pages
+      // React Compiler rules  -  pre-existing violations in dashboard UI pages
       ...(reactHooksPlugin
         ? {
             "react-hooks/set-state-in-effect": "warn",

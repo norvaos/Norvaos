@@ -480,7 +480,7 @@ export function TaskForm({
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
-          {/* Assigned To — Staff or Client */}
+          {/* Assigned To  -  Staff or Client */}
           <FormItem>
             <FormLabel>Assigned To</FormLabel>
             {/* Mode toggle */}
@@ -616,7 +616,7 @@ export function TaskForm({
             )}
           />
 
-          {/* Category — hidden when client_facing (controlled by Assigned To toggle) */}
+          {/* Category  -  hidden when client_facing (controlled by Assigned To toggle) */}
           {form.watch('category') !== 'client_facing' && (
             <FormField
               control={form.control}

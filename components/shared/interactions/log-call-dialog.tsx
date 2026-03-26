@@ -112,7 +112,7 @@ export function LogCallDialog({
     const descParts: string[] = []
     descParts.push(outcomeInfo.label)
     if (duration) descParts.push(`(${formatDuration(duration)})`)
-    if (notes) descParts.push(`— ${notes}`)
+    if (notes) descParts.push(` -  ${notes}`)
     const description = descParts.join(' ')
 
     try {

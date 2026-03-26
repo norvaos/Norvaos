@@ -122,10 +122,10 @@ export async function POST(request: Request) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         prevMappedFieldsForRestore = (oldMapped as any[]) ?? []
 
-        // Null out form_id on form_pack_versions before deletion — this FK has no ON DELETE CASCADE
+        // Null out form_id on form_pack_versions before deletion  -  this FK has no ON DELETE CASCADE
         await supabase.from('form_pack_versions').update({ form_id: null }).eq('form_id', oldFormId)
 
-        // Delete old form — cascade removes its fields, sections, stream links, and assignments
+        // Delete old form  -  cascade removes its fields, sections, stream links, and assignments
         const { error: deleteErr } = await supabase.from('ircc_forms').delete().eq('id', oldFormId)
         if (deleteErr) {
           console.error('[ircc-forms/upload] Failed to delete old form (will retry without mappings):', deleteErr.message)
@@ -136,7 +136,7 @@ export async function POST(request: Request) {
       }
     } catch (replaceErr) {
       console.error('[ircc-forms/upload] Pre-insert replace step failed:', replaceErr instanceof Error ? replaceErr.message : replaceErr)
-      // Continue — insert will fail below if conflict still exists
+      // Continue  -  insert will fail below if conflict still exists
     }
 
     const { data: form, error: insertError } = await supabase
@@ -283,7 +283,7 @@ export async function POST(request: Request) {
 
       if (fieldsError) {
         console.error('[ircc-forms/upload] Failed to insert fields:', fieldsError)
-        // Don't fail the whole upload — form record exists, fields can be re-scanned
+        // Don't fail the whole upload  -  form record exists, fields can be re-scanned
       }
     }
 
@@ -310,7 +310,7 @@ export async function POST(request: Request) {
           const toRestore = (newFields as any[]).filter((f) => prevByPath.has(f.xfa_path))
 
           if (toRestore.length > 0) {
-            // Parallel bulk update — each field gets its previous mapping applied
+            // Parallel bulk update  -  each field gets its previous mapping applied
             await Promise.all(
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               toRestore.map((newField: any) => {
@@ -343,7 +343,7 @@ export async function POST(request: Request) {
         }
       }
     } catch (restoreErr) {
-      // Non-fatal — mappings can be re-applied manually or via seed script
+      // Non-fatal  -  mappings can be re-applied manually or via seed script
       console.error('[ircc-forms/upload] Mapping restore failed (non-fatal):', restoreErr instanceof Error ? restoreErr.message : restoreErr)
     }
 
@@ -390,7 +390,7 @@ export async function POST(request: Request) {
         }
       }
     } catch (linkErr) {
-      // Non-fatal — form is fully usable, linking can be done manually
+      // Non-fatal  -  form is fully usable, linking can be done manually
       console.error('[ircc-forms/upload] Auto-link step failed (non-fatal):', linkErr instanceof Error ? linkErr.message : linkErr)
     }
 

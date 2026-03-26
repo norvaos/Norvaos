@@ -1,5 +1,5 @@
 /**
- * CanLII API Client — Jurisdictional Drift Sentry
+ * CanLII API Client  -  Jurisdictional Drift Sentry
  *
  * Provides typed access to the CanLII case law API for monitoring
  * immigration-relevant court decisions across federal jurisdictions.

@@ -31,7 +31,7 @@ export interface ReturnStageInput {
   /**
    * When true, step 6 (open critical deficiency check) is skipped.
    * Used exclusively by the auto-rollback path triggered by critical deficiency creation,
-   * where the newly created deficiency IS the open one — checking would create a circular
+   * where the newly created deficiency IS the open one  -  checking would create a circular
    * block. Manual return-stage calls must never set this (default: false).
    */
   skipCriticalDeficiencyCheck?: boolean
@@ -229,7 +229,7 @@ export async function returnMatterToStage(
     })
 
   if (activityErr) {
-    // Non-fatal — activity log failure should not roll back the transition.
+    // Non-fatal  -  activity log failure should not roll back the transition.
     // Log the error but do not throw.
     console.error('[exception-workflow] Failed to write activity record:', activityErr.message)
   }

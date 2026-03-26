@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * CorrespondenceTab — Zone D tab #8
+ * CorrespondenceTab  -  Zone D tab #8
  *
  * IRCC correspondence timeline for immigration matters.
  * Persisted to `ircc_correspondence` (migration 117).
@@ -79,7 +79,7 @@ function JRDeadlineBadge({
       <div className="flex items-center gap-1.5 mt-2 px-2.5 py-1.5 rounded-md bg-red-50 border border-red-200">
         <XCircle className="h-4 w-4 text-red-600 shrink-0" />
         <span className="text-xs font-semibold text-red-700">
-          JR DEADLINE PASSED — {format(deadline, 'MMMM d, yyyy')}
+          JR DEADLINE PASSED  -  {format(deadline, 'MMMM d, yyyy')}
         </span>
       </div>
     )
@@ -212,7 +212,7 @@ function MilestoneRow({
             </div>
           )}
 
-          {/* File attach button — uploads to matter-documents bucket */}
+          {/* File attach button  -  uploads to matter-documents bucket */}
           {onAttach && (
             <div className="flex flex-col gap-1">
               <Label className="text-xs text-muted-foreground opacity-0 select-none">
@@ -433,7 +433,7 @@ export function CorrespondenceTab({ matterId, tenantId }: CorrespondenceTabProps
       <div className="flex-1 overflow-y-auto px-4 py-2">
         <div className="divide-y">
 
-          {/* 1 — Application Received (AOR) */}
+          {/* 1  -  Application Received (AOR) */}
           <MilestoneRow
             icon={<FileText className="h-4 w-4" />}
             label="Application Received (AOR)"
@@ -444,7 +444,7 @@ export function CorrespondenceTab({ matterId, tenantId }: CorrespondenceTabProps
             attachedPath={byType('AOR')?.document_path}
           />
 
-          {/* 2 — Biometrics Request */}
+          {/* 2  -  Biometrics Request */}
           <MilestoneRow
             icon={<ScanFace className="h-4 w-4" />}
             label="Biometrics Request"
@@ -466,7 +466,7 @@ export function CorrespondenceTab({ matterId, tenantId }: CorrespondenceTabProps
             attachedPath={byType('biometrics_request')?.document_path}
           />
 
-          {/* 3 — Medical Request */}
+          {/* 3  -  Medical Request */}
           <MilestoneRow
             icon={<Stethoscope className="h-4 w-4" />}
             label="Medical Request"
@@ -488,7 +488,7 @@ export function CorrespondenceTab({ matterId, tenantId }: CorrespondenceTabProps
             attachedPath={byType('medical_request')?.document_path}
           />
 
-          {/* 4 — Additional Documents Request */}
+          {/* 4  -  Additional Documents Request */}
           <MilestoneRow
             icon={<FileText className="h-4 w-4" />}
             label="Additional Documents Request"
@@ -510,7 +510,7 @@ export function CorrespondenceTab({ matterId, tenantId }: CorrespondenceTabProps
             attachedPath={byType('additional_docs_request')?.document_path}
           />
 
-          {/* 5 — Decision Notice */}
+          {/* 5  -  Decision Notice */}
           <div className="flex gap-4 py-3">
             <div className="flex flex-col items-center">
               <div className={cn(
@@ -596,7 +596,7 @@ export function CorrespondenceTab({ matterId, tenantId }: CorrespondenceTabProps
                   </div>
                 )}
 
-                {/* Attach — uploads to matter-documents bucket */}
+                {/* Attach  -  uploads to matter-documents bucket */}
                 <div className="flex flex-col gap-1">
                   <Label className="text-xs text-muted-foreground opacity-0 select-none">
                     Attach
@@ -632,7 +632,7 @@ export function CorrespondenceTab({ matterId, tenantId }: CorrespondenceTabProps
                 </div>
               </div>
 
-              {/* JR Deadline badge — shown when decision date is set */}
+              {/* JR Deadline badge  -  shown when decision date is set */}
               {decisionDate && (
                 <JRDeadlineBadge
                   decisionDate={decisionDate}
@@ -642,7 +642,7 @@ export function CorrespondenceTab({ matterId, tenantId }: CorrespondenceTabProps
             </div>
           </div>
 
-          {/* 6 — Refusal section (conditional) */}
+          {/* 6  -  Refusal section (conditional) */}
           {showRefusal && (
             <div className="flex gap-4 py-3">
               <div className="flex flex-col items-center">
@@ -653,7 +653,7 @@ export function CorrespondenceTab({ matterId, tenantId }: CorrespondenceTabProps
               <div className="flex-1 min-w-0 pb-1">
                 <div className="flex items-center gap-2 mb-2">
                   <AlertTriangle className="h-4 w-4 text-red-500" />
-                  <span className="text-sm font-medium text-red-700">Refused — Judicial Review Window</span>
+                  <span className="text-sm font-medium text-red-700">Refused  -  Judicial Review Window</span>
                 </div>
                 <p className="text-xs text-muted-foreground">
                   JR deadline is calculated automatically from the decision date above.

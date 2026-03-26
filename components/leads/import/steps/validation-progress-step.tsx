@@ -87,7 +87,7 @@ export function ValidationProgressStep({ batchStatus, isCommitting }: Validation
 
       <div className="mt-4 flex items-center gap-2 text-xs text-muted-foreground">
         <Loader2 className="h-3 w-3 animate-spin" />
-        This runs in the background — do not close this window
+        This runs in the background  -  do not close this window
       </div>
     </div>
   )

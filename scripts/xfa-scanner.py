@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 """
-XFA Field Scanner — extracts all fillable field paths from an IRCC XFA PDF.
+XFA Field Scanner  -  extracts all fillable field paths from an IRCC XFA PDF.
 
 Usage:
   python3 xfa-scanner.py <path-to-pdf>
@@ -140,7 +140,7 @@ def extract_fields_from_template(template_root, ns: dict) -> list:
         name = elem.get('name', '')
 
         if not name:
-            # Unnamed wrapper — recurse, no path contribution
+            # Unnamed wrapper  -  recurse, no path contribution
             for child in elem:
                 walk(child, path_parts)
             return
@@ -158,7 +158,7 @@ def extract_fields_from_template(template_root, ns: dict) -> list:
             })
 
         elif local_tag in ('subform', 'subformSet', 'area', 'exclGroup'):
-            # Container — iterate children, tracking last draw text seen
+            # Container  -  iterate children, tracking last draw text seen
             last_draw: str | None = None
             for child in elem:
                 child_local = get_local(child)
@@ -172,13 +172,13 @@ def extract_fields_from_template(template_root, ns: dict) -> list:
                 elif child_local == 'field' and child_name:
                     walk(child, current_path, caption_hint=last_draw)
                 elif child_local in ('subform', 'subformSet', 'area', 'exclGroup'):
-                    # Nested container — don't bleed draw context into it
+                    # Nested container  -  don't bleed draw context into it
                     walk(child, current_path)
                 else:
                     walk(child, current_path)
 
         else:
-            # Other elements — recurse without caption context
+            # Other elements  -  recurse without caption context
             for child in elem:
                 walk(child, current_path)
 
@@ -250,7 +250,7 @@ def extract_fields_from_datasets(datasets_root, root_element: str) -> list:
                     'caption_label': None,  # No draw context in datasets fallback
                 })
             else:
-                # Container — recurse
+                # Container  -  recurse
                 walk(child, current_path)
 
     walk(scan_root, [])
@@ -269,7 +269,7 @@ def scan_pdf(pdf_path: str) -> dict:
             'is_xfa': False,
             'field_count': 0,
             'fields': [],
-            'error': 'No AcroForm found — this may be a non-fillable PDF',
+            'error': 'No AcroForm found  -  this may be a non-fillable PDF',
         }
 
     xfa = acroform.get('/XFA')
@@ -280,7 +280,7 @@ def scan_pdf(pdf_path: str) -> dict:
             'is_xfa': False,
             'field_count': 0,
             'fields': [],
-            'note': 'No XFA entry — this is an AcroForm PDF (use pdf-lib, not pikepdf)',
+            'note': 'No XFA entry  -  this is an AcroForm PDF (use pdf-lib, not pikepdf)',
         }
 
     items = list(xfa)

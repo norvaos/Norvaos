@@ -104,7 +104,7 @@ async function handleGet(
 
     // 5. Build the proof document
     const proof = {
-      title: 'Chronological Proof — Gapless Affidavit Data',
+      title: 'Chronological Proof  -  Gapless Affidavit Data',
       matter: {
         id: matter.id,
         title: matter.title,
@@ -137,8 +137,8 @@ async function handleGet(
         total_employment_gaps: personalGaps.gaps.length,
         submission_ready: addressGaps.isGapless && personalGaps.isGapless,
         verdict: addressGaps.isGapless && personalGaps.isGapless
-          ? 'GAPLESS VERIFIED — File meets chronological continuity standard'
-          : `GAPS DETECTED — ${addressGaps.gaps.length + personalGaps.gaps.length} dark period(s) require resolution`,
+          ? 'GAPLESS VERIFIED  -  File meets chronological continuity standard'
+          : `GAPS DETECTED  -  ${addressGaps.gaps.length + personalGaps.gaps.length} dark period(s) require resolution`,
       },
     }
 

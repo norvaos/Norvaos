@@ -1,4 +1,4 @@
--- Migration 180: Ghost-Writer — AI email reply drafts
+-- Migration 180: Ghost-Writer  -  AI email reply drafts
 -- Stores AI-generated reply drafts for inbound emails. Each inbound email
 -- in a matter-associated thread triggers Ghost-Writer to pre-generate a
 -- response draft before the lawyer opens the thread.

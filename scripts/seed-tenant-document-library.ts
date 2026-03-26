@@ -9,7 +9,7 @@
  *   2. Inserts them into tenant_document_library for every tenant
  *   3. Backfills library_slot_id on existing document_slot_templates rows
  *      that match by slug + tenant (links legacy seeded templates to library)
- *   4. Safe to re-run — uses ON CONFLICT DO NOTHING for inserts
+ *   4. Safe to re-run  -  uses ON CONFLICT DO NOTHING for inserts
  */
 
 import { createClient } from '@supabase/supabase-js'
@@ -64,7 +64,7 @@ async function main() {
     for (const slot of preset.presets) {
       const slug = toSlug(slot.slot_name)
       if (libraryMap.has(slug)) {
-        // Merge tags — slot appears in multiple bundles
+        // Merge tags  -  slot appears in multiple bundles
         const existing = libraryMap.get(slug)!
         if (!existing.tags.includes(preset.id)) {
           existing.tags.push(preset.id)

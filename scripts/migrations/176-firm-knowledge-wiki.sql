@@ -51,7 +51,7 @@ CREATE TABLE IF NOT EXISTS wiki_playbooks (
   updated_at      TIMESTAMPTZ DEFAULT now(),
   created_by      UUID REFERENCES users(id),
   updated_by      UUID REFERENCES users(id),
-  -- Full-text search vector (populated by trigger — see below)
+  -- Full-text search vector (populated by trigger  -  see below)
   search_vector   TSVECTOR,
   UNIQUE(tenant_id, slug)
 );
@@ -106,7 +106,7 @@ CREATE TABLE IF NOT EXISTS wiki_snippets (
   updated_at      TIMESTAMPTZ DEFAULT now(),
   created_by      UUID REFERENCES users(id),
   updated_by      UUID REFERENCES users(id),
-  -- Full-text search vector (populated by trigger — see below)
+  -- Full-text search vector (populated by trigger  -  see below)
   search_vector   TSVECTOR
 );
 
@@ -120,7 +120,7 @@ CREATE INDEX IF NOT EXISTS idx_wiki_snippets_search ON wiki_snippets USING GIN(s
 CREATE INDEX IF NOT EXISTS idx_wiki_snippets_type ON wiki_snippets(tenant_id, snippet_type) WHERE is_active = true;
 CREATE INDEX IF NOT EXISTS idx_wiki_snippets_tags ON wiki_snippets USING GIN(tags);
 
--- ── 5. Search RPC (VELOCITY engine — < 100ms target) ────────────────────────
+-- ── 5. Search RPC (VELOCITY engine  -  < 100ms target) ────────────────────────
 
 -- ── 5a. Trigger functions to populate search_vector on INSERT/UPDATE ────────
 -- (Cannot use GENERATED ALWAYS because array_to_string is not immutable)
@@ -157,7 +157,7 @@ CREATE TRIGGER trg_wiki_snippets_search_vector
   BEFORE INSERT OR UPDATE ON wiki_snippets
   FOR EACH ROW EXECUTE FUNCTION wiki_snippets_search_vector_trigger();
 
--- ── 5b. Search RPC (VELOCITY engine — < 100ms target) ─────────────────────
+-- ── 5b. Search RPC (VELOCITY engine  -  < 100ms target) ─────────────────────
 
 CREATE OR REPLACE FUNCTION wiki_search(
   p_search_term TEXT,

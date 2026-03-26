@@ -36,7 +36,7 @@ BEGIN
     LIMIT 1;
 
   IF v_user_id IS NULL THEN
-    RAISE NOTICE 'No user found for tenant — skipping seed';
+    RAISE NOTICE 'No user found for tenant  -  skipping seed';
     RETURN;
   END IF;
 
@@ -47,7 +47,7 @@ BEGIN
   IF v_form_id IS NOT NULL THEN
     -- Update existing form with new fields and settings
     UPDATE intake_forms SET
-      name = 'Canadian Visit Visa — Invitation Letter Request',
+      name = 'Canadian Visit Visa  -  Invitation Letter Request',
       description = 'Complete this multi-step form to request an invitation letter for a Canadian visitor visa. Please provide all required information and upload supporting documents.',
       fields = '[
         {
@@ -434,7 +434,7 @@ BEGIN
         'success_message', 'Thank you! Your invitation letter request has been received. Our immigration team will review your documents and get in touch within 2-3 business days.',
         'sections', jsonb_build_array(
           jsonb_build_object('id', 'sec_visitor', 'title', 'Visitor Information', 'description', 'Please provide the visitor''s personal details and contact information.', 'sort_order', 0),
-          jsonb_build_object('id', 'sec_visit', 'title', 'Visit Details', 'description', 'Tell us about the planned visit — purpose, duration, and relationship to the host.', 'sort_order', 1),
+          jsonb_build_object('id', 'sec_visit', 'title', 'Visit Details', 'description', 'Tell us about the planned visit  -  purpose, duration, and relationship to the host.', 'sort_order', 1),
           jsonb_build_object('id', 'sec_host', 'title', 'Host Information', 'description', 'Information about the person hosting the visitor in Canada.', 'sort_order', 2),
           jsonb_build_object('id', 'sec_financial', 'title', 'Financial Support & Accommodation', 'description', 'How will the trip be funded and where will the visitor stay?', 'sort_order', 3),
           jsonb_build_object('id', 'sec_documents', 'title', 'Documents Upload', 'description', 'Upload required and supporting documents for the visa application.', 'sort_order', 4),
@@ -457,7 +457,7 @@ BEGIN
       status, is_active, created_by
     ) VALUES (
       v_tenant_id,
-      'Canadian Visit Visa — Invitation Letter Request',
+      'Canadian Visit Visa  -  Invitation Letter Request',
       'visa-invitation-letter',
       'Complete this multi-step form to request an invitation letter for a Canadian visitor visa. Please provide all required information and upload supporting documents.',
       '[
@@ -845,7 +845,7 @@ BEGIN
         'success_message', 'Thank you! Your invitation letter request has been received. Our immigration team will review your documents and get in touch within 2-3 business days.',
         'sections', jsonb_build_array(
           jsonb_build_object('id', 'sec_visitor', 'title', 'Visitor Information', 'description', 'Please provide the visitor''s personal details and contact information.', 'sort_order', 0),
-          jsonb_build_object('id', 'sec_visit', 'title', 'Visit Details', 'description', 'Tell us about the planned visit — purpose, duration, and relationship to the host.', 'sort_order', 1),
+          jsonb_build_object('id', 'sec_visit', 'title', 'Visit Details', 'description', 'Tell us about the planned visit  -  purpose, duration, and relationship to the host.', 'sort_order', 1),
           jsonb_build_object('id', 'sec_host', 'title', 'Host Information', 'description', 'Information about the person hosting the visitor in Canada.', 'sort_order', 2),
           jsonb_build_object('id', 'sec_financial', 'title', 'Financial Support & Accommodation', 'description', 'How will the trip be funded and where will the visitor stay?', 'sort_order', 3),
           jsonb_build_object('id', 'sec_documents', 'title', 'Documents Upload', 'description', 'Upload required and supporting documents for the visa application.', 'sort_order', 4),

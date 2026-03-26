@@ -1,6 +1,6 @@
 -- ══════════════════════════════════════════════════════════════════════════════
 -- Migration 148: Seed Canadian IRCC Default Communication Templates
--- Phase 6 — Jurisdictional defaults for all existing tenants
+-- Phase 6  -  Jurisdictional defaults for all existing tenants
 -- ══════════════════════════════════════════════════════════════════════════════
 -- Inserts 6 immigration templates per tenant with is_system_default = true.
 -- ON CONFLICT DO NOTHING ensures idempotent re-runs.

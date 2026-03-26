@@ -1,5 +1,5 @@
 /**
- * Polyglot Bridge — Bifurcated i18n Configuration (Directive 18.0)
+ * Polyglot Bridge  -  Bifurcated i18n Configuration (Directive 18.0)
  *
  * TWO-TIER LOCALIZATION:
  *   Admin-Core (staff/lawyer): English + French ONLY
@@ -144,7 +144,7 @@ export function persistLocale(code: LocaleCode): void {
   }
 }
 
-// ── Norva Ear — Translation-aware languages ─────────────────────────────────
+// ── Norva Ear  -  Translation-aware languages ─────────────────────────────────
 // Languages the Norva Ear Neural Translation Layer can transcribe + translate.
 
 export const NORVA_EAR_LANGUAGES = [
@@ -175,7 +175,7 @@ export function isNorvaEarRTL(code: string): boolean {
 
 export type NorvaEarLanguageCode = (typeof NORVA_EAR_LANGUAGES)[number]['code']
 
-// ── Bilingual Retainer — language pairs ─────────────────────────────────────
+// ── Bilingual Retainer  -  language pairs ─────────────────────────────────────
 // Retainers can be generated in any Global 15 language paired with English.
 
 export const BILINGUAL_PAIRS: Array<{

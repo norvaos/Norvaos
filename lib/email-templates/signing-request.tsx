@@ -46,7 +46,7 @@ export function SigningRequestEmail({
     day: 'numeric',
   })
 
-  const subject = `Action Required: Please Sign — ${documentTitle}`
+  const subject = `Action Required: Please Sign  -  ${documentTitle}`
 
   return (
     <Html>
@@ -138,7 +138,7 @@ export async function renderSigningRequestEmail(
   props: SigningRequestEmailProps
 ): Promise<{ html: string; text: string; subject: string }> {
   const html = await render(<SigningRequestEmail {...props} />)
-  const subject = `Action Required: Please Sign — ${props.documentTitle}`
+  const subject = `Action Required: Please Sign  -  ${props.documentTitle}`
 
   const greeting = props.signerFirstName
     ? `Hi ${props.signerFirstName},`

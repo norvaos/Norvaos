@@ -1,10 +1,10 @@
 /**
- * GET /api/conflicts/fuzzy-search — Fuzzy search contacts, leads, and/or matters
+ * GET /api/conflicts/fuzzy-search  -  Fuzzy search contacts, leads, and/or matters
  *
  * Query params:
- *   q         — search term (required)
- *   type      — contacts | leads | matters | all (default: all)
- *   threshold — similarity threshold 0.0-1.0 (default: 0.3)
+ *   q          -  search term (required)
+ *   type       -  contacts | leads | matters | all (default: all)
+ *   threshold  -  similarity threshold 0.0-1.0 (default: 0.3)
  *
  * Directive 005.2: Cross-entity fuzzy-match search for conflict detection.
  */

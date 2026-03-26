@@ -39,7 +39,7 @@ export function TrustStatusIndicator({
   } else if (isZeroBalance) {
     status = 'critical'
     label = 'Zero Balance'
-    description = 'Trust balance is $0.00 — no funds available'
+    description = 'Trust balance is $0.00  -  no funds available'
   } else if (hasOverdue) {
     status = 'warning'
     label = 'Overdue'

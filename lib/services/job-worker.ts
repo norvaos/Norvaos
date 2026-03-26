@@ -1,5 +1,5 @@
 /**
- * Job Worker — polls the queue and dispatches jobs to registered handlers.
+ * Job Worker  -  polls the queue and dispatches jobs to registered handlers.
  *
  * Designed to run inside a Vercel cron route or a long-running process.
  * Supports configurable poll interval, concurrency, per-job timeout, and
@@ -51,7 +51,7 @@ export function resetShutdown(): void {
 
 /**
  * Process a single batch of jobs. This is the primary entry point for cron-based
- * invocations — dequeue a batch, run handlers, return a summary.
+ * invocations  -  dequeue a batch, run handlers, return a summary.
  */
 export async function processJobs(
   options: ProcessJobsOptions = {},
@@ -82,7 +82,7 @@ export async function processJobs(
       result.processed++
 
       if (!hasHandler(job.job_type)) {
-        log.warn('No handler for job type — skipping', {
+        log.warn('No handler for job type  -  skipping', {
           job_id: job.id,
           job_type: job.job_type,
         })

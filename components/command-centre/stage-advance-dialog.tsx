@@ -219,7 +219,7 @@ export function StageAdvanceDialog({
             ) : (
               <>
                 <ArrowRight className="mr-2 h-4 w-4" />
-                Yes — advance to &ldquo;{proposedStageName}&rdquo;
+                Yes  -  advance to &ldquo;{proposedStageName}&rdquo;
               </>
             )}
           </Button>
@@ -237,7 +237,7 @@ export function StageAdvanceDialog({
             disabled={isSubmitting}
             className="w-full text-slate-500"
           >
-            Cancel — go back
+            Cancel  -  go back
           </Button>
         </div>
       </DialogContent>

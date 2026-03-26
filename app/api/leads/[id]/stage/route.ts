@@ -63,7 +63,7 @@ async function handleGet(
  * POST /api/leads/[id]/stage
  *
  * Advance a lead to a new stage. Guards are evaluated by the stage engine.
- * Business logic remains in the service layer — this route only validates
+ * Business logic remains in the service layer  -  this route only validates
  * input and delegates.
  *
  * Body: { targetStage: string, reason?: string }

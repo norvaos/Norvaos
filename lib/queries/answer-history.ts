@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * IRCC Forms Engine — Answer History & Reuse Log React Query Hooks
+ * IRCC Forms Engine  -  Answer History & Reuse Log React Query Hooks
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Module M: Schema, Versioning, and Audit Trail.
@@ -10,10 +10,10 @@
  * (migration 145).
  *
  * Query hooks:
- *   useInstanceAnswerHistory  — all history rows for an instance
- *   useFieldAnswerHistory     — history for a single field in an instance
- *   useInstanceReuseLog       — reuse events targeting an instance
- *   useMatterReuseLog         — reuse events across all instances in a matter
+ *   useInstanceAnswerHistory   -  all history rows for an instance
+ *   useFieldAnswerHistory      -  history for a single field in an instance
+ *   useInstanceReuseLog        -  reuse events targeting an instance
+ *   useMatterReuseLog          -  reuse events across all instances in a matter
  */
 
 import { useQuery } from '@tanstack/react-query'

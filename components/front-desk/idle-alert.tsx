@@ -4,7 +4,7 @@ import { AlertTriangle, Clock, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 /**
- * Idle Alert — warns front desk staff about inactivity.
+ * Idle Alert  -  warns front desk staff about inactivity.
  *
  * 10-min idle → amber banner (dismissible)
  * 30-min idle → blocking modal "Are you still there?"
@@ -44,7 +44,7 @@ export function IdleAlert({ idleMinutes, isIdle, isLongIdle, onDismiss }: IdleAl
             className="w-full bg-slate-900 hover:bg-slate-800"
             size="lg"
           >
-            I&apos;m here — resume tracking
+            I&apos;m here  -  resume tracking
           </Button>
         </div>
       </div>
@@ -58,7 +58,7 @@ export function IdleAlert({ idleMinutes, isIdle, isLongIdle, onDismiss }: IdleAl
         <Clock className="w-4 h-4 text-amber-600" />
         <span className="text-sm text-amber-800">
           <span className="font-medium">Idle for {idleMinutes} minutes</span>
-          {' — '}activity tracking paused
+          {'  -  '}activity tracking paused
         </span>
       </div>
       <Button

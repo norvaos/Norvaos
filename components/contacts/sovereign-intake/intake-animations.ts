@@ -1,20 +1,20 @@
 /**
- * Sovereign Intake Animation Classes — Directive 42.0
+ * Sovereign Intake Animation Classes  -  Directive 42.0
  *
  * Micro-animations for progressive disclosure and prestige UX.
  * Uses Tailwind animate-in utilities.
  */
 
-/** Fade in from bottom — used for card/section entrance */
+/** Fade in from bottom  -  used for card/section entrance */
 export const ANIM_FADE_UP = 'animate-in fade-in slide-in-from-bottom-4 duration-500'
 
-/** Fade in from right — used for step transitions */
+/** Fade in from right  -  used for step transitions */
 export const ANIM_FADE_RIGHT = 'animate-in fade-in slide-in-from-right-4 duration-400'
 
-/** Zoom in — used for badges and success states */
+/** Zoom in  -  used for badges and success states */
 export const ANIM_ZOOM = 'animate-in zoom-in-50 fade-in duration-300'
 
-/** Pulse glow — used for the compliance passed state */
+/** Pulse glow  -  used for the compliance passed state */
 export const ANIM_PULSE_GREEN = 'animate-pulse text-emerald-500'
 
 /** Staggered delay classes for sequential field appearance */

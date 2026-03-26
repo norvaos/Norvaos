@@ -147,7 +147,7 @@ describe('startSLA', () => {
         if (args.length === 0) {
           return new (dateSpy.getMockImplementation() ? Date : Object.getPrototypeOf(Date))(fixed.getTime())
         }
-        // For `new Date(ms)` — used to compute dueAt
+        // For `new Date(ms)`  -  used to compute dueAt
         return new (Object.getPrototypeOf(Date).constructor)(args[0])
       } as unknown as () => Date,
     )

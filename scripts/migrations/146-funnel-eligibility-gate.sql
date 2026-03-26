@@ -6,7 +6,7 @@
 -- Verified-Workflow Funnel. These columns record when/who/what the
 -- eligibility gate outcome was for immigration matters.
 --
--- No new RLS needed — matter_intake already has tenant-scoped RLS.
+-- No new RLS needed  -  matter_intake already has tenant-scoped RLS.
 -- ═══════════════════════════════════════════════════════════════════════════════
 
 ALTER TABLE matter_intake

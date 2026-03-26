@@ -1,5 +1,5 @@
 /**
- * English (en) — Base dictionary.
+ * English (en)  -  Base dictionary.
  * All keys defined here must exist in every other locale dictionary.
  */
 
@@ -69,7 +69,7 @@ export const en = {
   'dashboard.deadline_today': 'Today',
   'dashboard.deadline_1_day': '1 day',
   'dashboard.deadline_days': '{days} days',
-  'dashboard.deadlines_14_days': 'Deadlines — Next 14 Days',
+  'dashboard.deadlines_14_days': 'Deadlines  -  Next 14 Days',
   'dashboard.no_deadlines_14': 'No deadlines in the next 14 days',
   'dashboard.no_deadlines_14_desc': 'Typed deadlines on matters will appear here.',
   'dashboard.unknown_matter': 'Unknown matter',
@@ -102,12 +102,12 @@ export const en = {
   'common.save': 'Save',
   'common.view': 'View',
 
-  // ── Directive 41.0 — Identity & Vault Labels ──────────────────────────────
+  // ── Directive 41.0  -  Identity & Vault Labels ──────────────────────────────
   'contact.badge.retained_client': 'Retained Client',
   'contact.badge.prospective_lead': 'Prospective Lead',
   'contact.badge.contact': 'Contact',
   'contact.command_centre': 'Command Centre',
-  'contact.command_centre_red_alert': 'Readiness score is critically low — immediate attention required',
+  'contact.command_centre_red_alert': 'Readiness score is critically low  -  immediate attention required',
   'contact.intake_funnel': 'Intake Funnel',
   'contact.intake_progress': 'Intake Progress',
   'contact.matter_readiness': 'Matter Readiness',
@@ -120,13 +120,13 @@ export const en = {
   'vault.title': 'Norva Vault',
   'vault.empty': 'Norva Vault Empty',
   'vault.empty_description': 'No documents uploaded for this contact.',
-  'vault.sentinel_eye': 'Sentinel Eye — View & Verify',
+  'vault.sentinel_eye': 'Sentinel Eye  -  View & Verify',
   'vault.file_tampered': 'Caution: File Tampered',
   'vault.sha256_verified': 'SHA-256 Verified',
   'vault.hash_pending': 'Hash Pending',
   'vault.integrity_alert': 'Integrity Alert',
   'vault.untracked': 'Untracked',
-  'vault.no_preview': 'No preview available — file URL missing',
+  'vault.no_preview': 'No preview available  -  file URL missing',
 
   // ── Legal Declarations ───────────────────────────────────────────────────
   'legal.retainer_title': 'Retainer Agreement',
@@ -171,7 +171,7 @@ export const en = {
   'ear.translation_note': 'Original language preserved. English translation provided for legal drafting.',
 
   // ── Legal-Contextual Mapping (Directive 15.0) ─────────────────────────
-  // These terms must be legally contextual — NOT literal translations.
+  // These terms must be legally contextual  -  NOT literal translations.
   'legal_term.common_law_partner': 'Common-Law Partner',
   'legal_term.trust_account': 'Trust Account',
   'legal_term.permanent_residence': 'Permanent Residence',
@@ -215,12 +215,12 @@ export const en = {
   'status.days_remaining': '{days}d remaining',
   'status.verified': 'Verified',
   'status.expiry_label': 'Expiry',
-  'status.sentinel_tamper_title': 'SENTINEL ALERT — Tamper Detected',
+  'status.sentinel_tamper_title': 'SENTINEL ALERT  -  Tamper Detected',
   'status.sentinel_tamper_body': 'Document hash mismatch detected. This document has been modified outside NorvaOS.',
-  'status.vault_verified_title': 'Norva Vault — Integrity Verified',
+  'status.vault_verified_title': 'Norva Vault  -  Integrity Verified',
   'status.vault_verified_body': 'This document is hash-locked in the Norva Vault. Any tampering will be detected.',
 
-  // ── Leads Command Centre (Directive 40.0 — Sovereign Layer) ─────────────
+  // ── Leads Command Centre (Directive 40.0  -  Sovereign Layer) ─────────────
   'leads.title': 'Leads',
   'leads.add_lead': 'Add Lead',
   'leads.import': 'Import',
@@ -399,7 +399,7 @@ export const en = {
   'form.notes_placeholder': 'Add any additional notes about this contact...',
   'form.create_contact': 'Create Contact',
   'form.save_changes': 'Save Changes',
-  'form.review_required_ocr': 'Review Required — OCR could not extract',
+  'form.review_required_ocr': 'Review Required  -  OCR could not extract',
   'form.section_basic_info': 'Basic Information',
   'form.section_contact_details': 'Contact Details',
   'form.section_address': 'Address',

@@ -53,7 +53,7 @@ function ExpandableChanges({ changes }: { changes: unknown }) {
   const [expanded, setExpanded] = useState(false)
 
   if (!changes || (typeof changes === 'object' && Object.keys(changes as object).length === 0)) {
-    return <span className="text-muted-foreground text-xs">—</span>
+    return <span className="text-muted-foreground text-xs"> - </span>
   }
 
   const json = JSON.stringify(changes, null, 2)
@@ -269,10 +269,10 @@ function AdminAuditLogInner() {
                       </Badge>
                     </TableCell>
                     <TableCell className="text-xs text-muted-foreground">
-                      {entry.entity_type ?? '—'}
+                      {entry.entity_type ?? ' - '}
                     </TableCell>
                     <TableCell className="max-w-[100px] truncate text-xs text-muted-foreground" title={entry.entity_id ?? ''}>
-                      {entry.entity_id ?? '—'}
+                      {entry.entity_id ?? ' - '}
                     </TableCell>
                     <TableCell>
                       <Badge

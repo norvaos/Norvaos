@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * BillingTab — Zone D Billing workspace
+ * BillingTab  -  Zone D Billing workspace
  *
  * Sections:
  *   A. Outstanding Balance Summary Card
@@ -266,7 +266,7 @@ function RecordTrustTransactionDialog({
 
       if (error) {
         if (error.message?.includes('cannot go negative')) {
-          toast.error('Norva Trust Ledger — Insufficient trust balance for this transaction')
+          toast.error('Norva Trust Ledger  -  Insufficient trust balance for this transaction')
         } else {
           toast.error(`Failed to record transaction: ${error.message}`)
         }
@@ -276,7 +276,7 @@ function RecordTrustTransactionDialog({
       queryClient.invalidateQueries({ queryKey: ['trust-transactions', matterId] })
       queryClient.invalidateQueries({ queryKey: ['trust-transactions-all', matterId] })
       queryClient.invalidateQueries({ queryKey: ['matters'] })
-      toast.success('Norva Trust Ledger — Transaction recorded')
+      toast.success('Norva Trust Ledger  -  Transaction recorded')
       resetForm()
       onOpenChange(false)
     } catch {
@@ -323,7 +323,7 @@ function RecordTrustTransactionDialog({
                     .filter((t) => t.transaction_type !== 'reversal')
                     .map((t) => (
                       <SelectItem key={t.id} value={t.id}>
-                        {formatDate(t.effective_date)} — {t.description} ({fmtCents(t.amount_cents)})
+                        {formatDate(t.effective_date)}  -  {t.description} ({fmtCents(t.amount_cents)})
                       </SelectItem>
                     ))}
                 </SelectContent>
@@ -336,7 +336,7 @@ function RecordTrustTransactionDialog({
             </div>
           )}
 
-          {/* Transaction type (hidden when correction is on — auto-set to reversal) */}
+          {/* Transaction type (hidden when correction is on  -  auto-set to reversal) */}
           {!isCorrection && (
             <div>
               <Label className="text-xs">Transaction Type</Label>
@@ -467,7 +467,7 @@ function TrustWidget({ matterId, tenantId, trustBalance }: { matterId: string; t
         {(trustBalance ?? 0) > 0 && (trustBalance ?? 0) < 50000 && (
           <div className="flex items-center gap-2 rounded-md bg-amber-50 border border-amber-200 px-3 py-2 text-xs text-amber-700">
             <AlertTriangle className="size-4 shrink-0" />
-            <span>Low trust balance — consider requesting a retainer top-up from the client.</span>
+            <span>Low trust balance  -  consider requesting a retainer top-up from the client.</span>
           </div>
         )}
 
@@ -624,10 +624,10 @@ function GenerateInvoiceSheet({
       const amountCents = Math.round(parseFloat(feeAmount || '0') * 100)
       const desc =
         billingType === 'flat_fee'
-          ? `Flat Fee — ${matter.title}`
+          ? `Flat Fee  -  ${matter.title}`
           : billingType === 'milestone'
-          ? `Milestone Fee — ${matter.title}`
-          : `Legal Services — ${matter.title}`
+          ? `Milestone Fee  -  ${matter.title}`
+          : `Legal Services  -  ${matter.title}`
       lineItems = [{ description: desc, quantity: 1, unitPrice: amountCents }]
     }
 
@@ -1204,10 +1204,10 @@ export function BillingTab({ matterId, tenantId, matter }: BillingTabProps) {
                   key={inv.id}
                   className="grid grid-cols-[110px_85px_90px_90px_100px_1fr] gap-2 px-2 py-2 text-sm items-center rounded hover:bg-slate-50"
                 >
-                  <span className="font-mono text-xs truncate">{inv.invoice_number ?? '—'}</span>
+                  <span className="font-mono text-xs truncate">{inv.invoice_number ?? ' - '}</span>
                   <span className="text-xs">{formatDate(inv.issue_date ?? '')}</span>
                   <span className="text-xs font-medium">{fmtCents(inv.total_amount ?? 0)}</span>
-                  <span className="text-xs">{inv.due_date ? formatDate(inv.due_date) : '—'}</span>
+                  <span className="text-xs">{inv.due_date ? formatDate(inv.due_date) : ' - '}</span>
                   <Badge
                     variant="outline"
                     className={`text-[10px] py-0 px-1.5 w-fit font-medium border ${statusBadgeClass(inv.status)}`}

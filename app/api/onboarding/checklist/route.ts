@@ -8,7 +8,7 @@ import { withTiming } from '@/lib/middleware/request-timing'
  *
  * Returns the hybrid onboarding checklist for the authenticated tenant.
  *
- * 4 auto-detected items: computed live from DB signals — never stored.
+ * 4 auto-detected items: computed live from DB signals  -  never stored.
  * 2 manual items: fetched from tenant_onboarding_checklist table.
  *
  * Auto-detection uses the admin client to read across tables without relying

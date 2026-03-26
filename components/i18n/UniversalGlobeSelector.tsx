@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * UniversalGlobeSelector — Searchable language dropdown (Directive 16.2)
+ * UniversalGlobeSelector  -  Searchable language dropdown (Directive 16.2)
  *
  * Features:
  *   - Globe icon trigger button
@@ -43,7 +43,7 @@ interface UniversalGlobeSelectorProps {
   value: string
   /** Called when user selects a new locale */
   onChange: (code: string) => void
-  /** Which audience set to show — 'admin' = en/fr, 'client' = Global 15 */
+  /** Which audience set to show  -  'admin' = en/fr, 'client' = Global 15 */
   audience?: LocaleAudience
   /** Compact trigger (just globe icon) vs labelled trigger */
   compact?: boolean

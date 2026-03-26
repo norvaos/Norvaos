@@ -20,7 +20,7 @@ export const intakeKeys = {
 
 // ─── Fetch Intake ───────────────────────────────────────────────────────────
 
-// Lean column fragment — only the 16 columns actually consumed by UI components.
+// Lean column fragment  -  only the 16 columns actually consumed by UI components.
 // Avoids fetching 37 columns via SELECT * (100/20 compliance).
 const MATTER_INTAKE_COLUMNS = [
   'id',
@@ -79,7 +79,7 @@ export function useIntakePrefill(matterId: string) {
       return getIntakePrefill(supabase, matterId)
     },
     enabled: !!matterId,
-    staleTime: 5 * 60 * 1000, // Snapshot is immutable — 5 min cache
+    staleTime: 5 * 60 * 1000, // Snapshot is immutable  -  5 min cache
   })
 }
 
@@ -216,7 +216,7 @@ export function useRecalculateRisk() {
       if (result.validation.isValid) {
         toast.success(`Risk score: ${result.risk.score} (${result.risk.level})`)
       } else {
-        toast.warning(`${result.validation.hardStops} issue(s) found — review required`)
+        toast.warning(`${result.validation.hardStops} issue(s) found  -  review required`)
       }
     },
     onError: (error: Error) => {

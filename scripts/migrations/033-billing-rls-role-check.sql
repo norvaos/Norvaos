@@ -12,7 +12,7 @@
 -- SCOPE:
 --   invoices              – SELECT/INSERT/UPDATE/DELETE → require billing:view
 --   invoice_line_items    – SELECT/INSERT/UPDATE/DELETE → require billing:view
---                           (no tenant_id column — joins through invoices)
+--                           (no tenant_id column  -  joins through invoices)
 --   payments              – SELECT/INSERT/UPDATE/DELETE → require billing:view
 --   time_entries          – UNCHANGED (time tracking is cross-role)
 --
@@ -68,7 +68,7 @@ CREATE POLICY invoices_billing_access ON invoices
     AND has_billing_view()
   );
 
--- ── invoice_line_items (NO tenant_id — joins through invoices.invoice_id) ──
+-- ── invoice_line_items (NO tenant_id  -  joins through invoices.invoice_id) ──
 
 DROP POLICY IF EXISTS tenant_isolation_invoice_line_items ON invoice_line_items;
 

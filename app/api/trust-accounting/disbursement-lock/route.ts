@@ -1,5 +1,5 @@
 /**
- * GET /api/trust-accounting/disbursement-lock — Check disbursement lock status
+ * GET /api/trust-accounting/disbursement-lock  -  Check disbursement lock status
  */
 
 import { NextRequest, NextResponse } from 'next/server'

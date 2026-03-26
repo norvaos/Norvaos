@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * ClientQuestionnaire — Client-facing questionnaire wrapper for the portal.
+ * ClientQuestionnaire  -  Client-facing questionnaire wrapper for the portal.
  *
  * Wraps QuestionnaireRenderer in client mode with additional UX:
  * - Welcome header with form name and optional message

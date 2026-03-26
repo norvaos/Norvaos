@@ -10,14 +10,14 @@ import { describe, it, expect, vi } from 'vitest'
 // Mock the admin client BEFORE importing requirePermission
 vi.mock('@/lib/supabase/admin', () => ({
   createAdminClient: vi.fn(() => {
-    throw new Error('requirePermission must NOT call createAdminClient — zero DB calls expected')
+    throw new Error('requirePermission must NOT call createAdminClient  -  zero DB calls expected')
   }),
 }))
 
 // Also ensure no direct supabase calls
 vi.mock('@/lib/supabase/server', () => ({
   createServerSupabaseClient: vi.fn(() => {
-    throw new Error('requirePermission must NOT call createServerSupabaseClient — zero DB calls expected')
+    throw new Error('requirePermission must NOT call createServerSupabaseClient  -  zero DB calls expected')
   }),
 }))
 
@@ -53,7 +53,7 @@ const lawyerRole: AuthRole = {
   is_system: true,
 }
 
-describe('requirePermission — zero DB calls', () => {
+describe('requirePermission  -  zero DB calls', () => {
   it('is synchronous (not async)', () => {
     const auth = makeAuthContext(adminRole)
     const result = requirePermission(auth, 'settings', 'edit')
@@ -99,7 +99,7 @@ describe('requirePermission — zero DB calls', () => {
   })
 
   it('never calls createAdminClient or createServerSupabaseClient', () => {
-    // The mocks above throw if called — if we get here, they were not called.
+    // The mocks above throw if called  -  if we get here, they were not called.
     const auth = makeAuthContext(adminRole)
     requirePermission(auth, 'settings', 'edit')
 

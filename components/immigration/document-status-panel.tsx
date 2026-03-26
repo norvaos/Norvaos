@@ -6,7 +6,7 @@
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Replaces the old editable DocumentChecklistPanel. Derives its data entirely
- * from document_slots — no manual checklist editing, no inline status changes.
+ * from document_slots  -  no manual checklist editing, no inline status changes.
  *
  * Displays a completion progress bar and a grouped table of document statuses.
  */

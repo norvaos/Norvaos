@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * Portal Analytics — Client-side event emitter for portal usage tracking.
+ * Portal Analytics  -  Client-side event emitter for portal usage tracking.
  *
  * Non-blocking, fire-and-forget. Buffers events in memory, flushes every 10s.
  * Uses navigator.sendBeacon on page unload for reliable delivery.
@@ -65,12 +65,12 @@ export function track(
       event_data: eventData ?? {},
     })
   } catch {
-    // Never throw — analytics must not break the portal
+    // Never throw  -  analytics must not break the portal
   }
 }
 
 /**
- * Cleanup — call on unmount if needed.
+ * Cleanup  -  call on unmount if needed.
  */
 export function destroyPortalAnalytics(): void {
   if (_flushTimer) {

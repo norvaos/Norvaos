@@ -43,7 +43,7 @@ interface PiiFieldProps {
   label: string
   /** The raw (unmasked) PII value */
   value: string | null | undefined
-  /** Type of PII field — controls masking pattern */
+  /** Type of PII field  -  controls masking pattern */
   fieldType: PiiFieldType
   /** Field key for audit logging */
   fieldKey: string
@@ -106,7 +106,7 @@ export function PiiField({
         }),
       })
     } catch {
-      // Non-blocking — the reveal still works even if logging fails
+      // Non-blocking  -  the reveal still works even if logging fails
       console.error('[PII] Failed to log reveal event')
     }
   }, [selectedReason, pii, fieldKey, matterId])
@@ -131,7 +131,7 @@ export function PiiField({
 
   const maskedValue = maskPiiValue(value, fieldType)
 
-  // Admin (no masking) — show raw value, no shield
+  // Admin (no masking)  -  show raw value, no shield
   if (isNoMasking) {
     return (
       <div className="space-y-1">
@@ -273,7 +273,7 @@ export function PiiField({
             </div>
 
             <p className="text-xs text-muted-foreground">
-              Accessed by: {appUser?.email ?? 'Unknown'} — This event is logged to the
+              Accessed by: {appUser?.email ?? 'Unknown'}  -  This event is logged to the
               immutable SENTINEL audit trail.
             </p>
           </div>

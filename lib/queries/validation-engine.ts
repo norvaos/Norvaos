@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * IRCC Forms Engine — Validation Engine React Query Hooks
+ * IRCC Forms Engine  -  Validation Engine React Query Hooks
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Bridges the validation rules engine (validateFormInstance, checkGenerationReadiness)

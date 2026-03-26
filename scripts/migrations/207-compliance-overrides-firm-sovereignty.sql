@@ -2,12 +2,12 @@ BEGIN;
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 -- Migration 207: Compliance Overrides & Firm Sovereignty
--- Directives 026 + 027 — NorvaOS
+-- Directives 026 + 027  -  NorvaOS
 -- ═══════════════════════════════════════════════════════════════════════════════
 
 
 -- ═══════════════════════════════════════════════════════════════════════════════
--- Directive 026: Compliance Overrides — Emergency Override Log
+-- Directive 026: Compliance Overrides  -  Emergency Override Log
 -- ═══════════════════════════════════════════════════════════════════════════════
 
 CREATE TABLE IF NOT EXISTS compliance_overrides (
@@ -49,7 +49,7 @@ CREATE POLICY "compliance_overrides_tenant_update" ON compliance_overrides
 
 
 -- ═══════════════════════════════════════════════════════════════════════════════
--- Directive 027: Firm Global Audit Ledger — Genesis Zero
+-- Directive 027: Firm Global Audit Ledger  -  Genesis Zero
 -- ═══════════════════════════════════════════════════════════════════════════════
 
 CREATE TABLE IF NOT EXISTS firm_global_audit_ledger (

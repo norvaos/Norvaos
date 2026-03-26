@@ -49,7 +49,7 @@ export async function resolveDefaultPipelineAndStage(
     }
   }
 
-  // 3. Auto-create if none exists — full 14-stage Core Intake & Retainer Pipeline
+  // 3. Auto-create if none exists  -  full 14-stage Core Intake & Retainer Pipeline
   if (!pipelineId) {
     const { data: newPipeline } = await supabase
       .from('pipelines')

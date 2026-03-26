@@ -91,7 +91,7 @@ BEGIN
     created_by
   ) VALUES (
     v_user_row.tenant_id,
-    'Judicial Review — ' || v_source_matter.title,
+    'Judicial Review  -  ' || v_source_matter.title,
     'Judicial Review matter linked from: ' || v_source_matter.title || ' (' || p_source_matter_id || ')',
     v_source_matter.practice_area_id,
     v_resolved_mt_id,

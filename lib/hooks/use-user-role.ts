@@ -14,7 +14,7 @@ interface UserRole {
 /**
  * Resolve the current user's role from their role_id.
  * Returns the full role object (name, permissions, is_system).
- * Cached for 5 minutes — roles rarely change within a session.
+ * Cached for 5 minutes  -  roles rarely change within a session.
  */
 export function useUserRole() {
   const { appUser } = useUser()

@@ -469,7 +469,7 @@ export function CaseInsightsPanel({ matterId, tenantId, stageEnteredAt, currentS
           <div className="flex items-center gap-2 py-3 px-4 bg-green-50 border border-green-200 rounded-lg">
             <CheckCircle2 className="h-4 w-4 text-green-600" />
             <span className="text-xs font-medium text-green-800">
-              No issues found — case is on track
+              No issues found  -  case is on track
             </span>
           </div>
         )}

@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * useCertification — Directive 029: Norva Sovereign Academy
+ * useCertification  -  Directive 029: Norva Sovereign Academy
  *
  * Checks whether the current auth user has completed the Academy
  * and earned norva_certified: true in their user_metadata.
@@ -38,6 +38,6 @@ export function useCertification() {
         completedModules: (metadata.academy_completed_modules as string[]) ?? [],
       }
     },
-    staleTime: 1000 * 60 * 5, // 5 min — certification rarely changes
+    staleTime: 1000 * 60 * 5, // 5 min  -  certification rarely changes
   })
 }

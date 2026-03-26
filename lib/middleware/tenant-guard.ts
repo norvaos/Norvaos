@@ -1,5 +1,5 @@
 /**
- * Tenant Guard — Hard 403 enforcement for cross-tenant access.
+ * Tenant Guard  -  Hard 403 enforcement for cross-tenant access.
  *
  * Team SENTINEL requirement: If a user attempts to access a resource
  * belonging to a different tenant, throw a hard 403 error instead of
@@ -52,7 +52,7 @@ export async function assertTenantOwnership(
   if (resourceTenantId !== auth.tenantId) {
     // Log the violation using admin client (bypasses RLS)
     const admin = createAdminClient()
-    // Fire-and-forget audit log — don't block the 403 response
+    // Fire-and-forget audit log  -  don't block the 403 response
     void Promise.resolve(admin.rpc('sentinel_log_event' as never, {
       p_event_type: 'TENANT_VIOLATION',
       p_severity: 'critical',

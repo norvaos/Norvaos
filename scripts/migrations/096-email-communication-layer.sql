@@ -1,14 +1,14 @@
 -- ============================================================================
 -- Migration 096: Email Communication Layer
 -- ============================================================================
--- 1. email_accounts — per-user and shared mailbox OAuth connections
--- 2. email_account_access — granular access to shared mailboxes
--- 3. email_threads — conversation grouping with matter/contact association
--- 4. email_messages — individual email messages synced from providers
--- 5. email_attachments — message attachment metadata
--- 6. email_association_events — audit trail for thread-to-matter linking
--- 7. unmatched_email_queue — triage queue for unassociated threads
--- 8. email_send_events — outbound email audit trail
+-- 1. email_accounts  -  per-user and shared mailbox OAuth connections
+-- 2. email_account_access  -  granular access to shared mailboxes
+-- 3. email_threads  -  conversation grouping with matter/contact association
+-- 4. email_messages  -  individual email messages synced from providers
+-- 5. email_attachments  -  message attachment metadata
+-- 6. email_association_events  -  audit trail for thread-to-matter linking
+-- 7. unmatched_email_queue  -  triage queue for unassociated threads
+-- 8. email_send_events  -  outbound email audit trail
 -- 9. Alter matters: preferred_email_account_id
 -- ============================================================================
 
@@ -103,7 +103,7 @@ CREATE TABLE IF NOT EXISTS email_threads (
   association_method TEXT CHECK (association_method IN ('manual', 'subject_match', 'contact_match', 'thread_lock')),
   -- Reply context
   last_sender_account_id UUID REFERENCES email_accounts(id) ON DELETE SET NULL,
-  -- Draft locking — prevents two users from drafting replies simultaneously
+  -- Draft locking  -  prevents two users from drafting replies simultaneously
   draft_locked_by UUID REFERENCES users(id) ON DELETE SET NULL,
   draft_locked_at TIMESTAMPTZ,
   -- Metadata
@@ -264,7 +264,7 @@ CREATE POLICY email_send_events_tenant_isolation ON email_send_events
 
 CREATE INDEX IF NOT EXISTS idx_email_send_events_matter ON email_send_events (matter_id);
 
--- ─── 9. Alter matters — preferred email account ─────────────────────────────
+-- ─── 9. Alter matters  -  preferred email account ─────────────────────────────
 
 ALTER TABLE matters
   ADD COLUMN IF NOT EXISTS preferred_email_account_id UUID REFERENCES email_accounts(id) ON DELETE SET NULL;

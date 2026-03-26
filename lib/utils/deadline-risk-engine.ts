@@ -2,7 +2,7 @@
  * Deadline Risk Scoring Engine
  *
  * Pure functions for quantifying deadline risk across immigration matters.
- * Zero React / Supabase dependencies — consumed by UI components and cron jobs.
+ * Zero React / Supabase dependencies  -  consumed by UI components and cron jobs.
  *
  * Scoring formula:
  *   Urgency (exponential curve based on days remaining)
@@ -78,7 +78,7 @@ const TYPE_CRITICALITY: Record<string, number> = {
   custom: 0.5,
 }
 
-/** Max look-ahead in days — anything further out gets urgency 0. */
+/** Max look-ahead in days  -  anything further out gets urgency 0. */
 const URGENCY_HORIZON_DAYS = 60
 
 // ── Core Scoring ────────────────────────────────────────────────────────────────
@@ -122,7 +122,7 @@ export function classifyRiskLevel(score: number): RiskLevel {
 }
 
 /**
- * UI config for each risk level — colors follow the existing codebase palette.
+ * UI config for each risk level  -  colors follow the existing codebase palette.
  */
 export function getRiskLevelConfig(level: RiskLevel): {
   label: string
@@ -213,7 +213,7 @@ export function calculateDeadlineRiskScore(
   let score: number
 
   if (daysUntilDue < 0) {
-    // Overdue — elevated base with penalty
+    // Overdue  -  elevated base with penalty
     const penalty = computeOverduePenalty(Math.abs(daysUntilDue), priorityMul, typeCrit)
     factors.push({
       label: `Overdue penalty (+${Math.abs(daysUntilDue)}d)`,

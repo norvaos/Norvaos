@@ -440,7 +440,7 @@ export function SovereignConflictStep({
           </div>
         )}
 
-        {/* Results — clear (no matches at all) */}
+        {/* Results  -  clear (no matches at all) */}
         {scanState === 'clear' && (
           <div className="animate-in fade-in slide-in-from-bottom-2 duration-300 space-y-4">
             <div className="flex flex-col items-center gap-3 rounded-lg border border-green-200 bg-green-50 p-6 text-center dark:border-green-800 dark:bg-green-950/40">
@@ -461,7 +461,7 @@ export function SovereignConflictStep({
           </div>
         )}
 
-        {/* Results — conflict resolved */}
+        {/* Results  -  conflict resolved */}
         {scanState === 'resolved' && resolvedMatch && (
           <div className="animate-in fade-in slide-in-from-bottom-2 duration-300 space-y-4">
             <div className="flex flex-col items-center gap-3 rounded-lg border border-green-200 bg-green-50 p-6 text-center dark:border-green-800 dark:bg-green-950/40">
@@ -498,7 +498,7 @@ export function SovereignConflictStep({
           </div>
         )}
 
-        {/* Results — conflicts found, unresolved */}
+        {/* Results  -  conflicts found, unresolved */}
         {scanState === 'conflict' && (
           <div className="animate-in fade-in slide-in-from-bottom-2 duration-300 space-y-4">
             <div className="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-950/40">
@@ -572,7 +572,7 @@ export function SovereignConflictStep({
                     </div>
                   </div>
 
-                  {/* Directive 42.3 — Resolution Accelerator: multi-select reasons */}
+                  {/* Directive 42.3  -  Resolution Accelerator: multi-select reasons */}
                   {justifyingMatchId === match.id && (
                     <div className="animate-in fade-in slide-in-from-top-2 duration-200 space-y-3 border-t pt-3">
                       <label className="text-xs font-medium text-muted-foreground">
@@ -630,7 +630,7 @@ export function SovereignConflictStep({
                         />
                       )}
 
-                      {/* Confirm button — turns Sovereign Purple when satisfied */}
+                      {/* Confirm button  -  turns Sovereign Purple when satisfied */}
                       <div className="flex items-center justify-between">
                         <span className="text-xs text-muted-foreground">
                           {selectedReasons.length === 0

@@ -269,7 +269,7 @@ export function useCopyFolderTemplates() {
 
           if (insertError) {
             if (insertError.code === '23505') {
-              // Slug already exists on target — map to the existing row so children resolve
+              // Slug already exists on target  -  map to the existing row so children resolve
               const { data: existing } = await supabase
                 .from('matter_folder_templates')
                 .select('id')

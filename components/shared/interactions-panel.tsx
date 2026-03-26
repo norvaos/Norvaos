@@ -86,7 +86,7 @@ export function InteractionsPanel({
         </CardContent>
       </Card>
 
-      {/* Dialogs — only render the active one */}
+      {/* Dialogs  -  only render the active one */}
       {contactId && (
         <>
           <LogCallDialog

@@ -52,7 +52,7 @@ export function useUnreadNotificationCount(userId: string) {
       return data?.length ?? 0
     },
     enabled: !!userId,
-    staleTime: 30_000, // 30s — avoid hammering on every re-render
+    staleTime: 30_000, // 30s  -  avoid hammering on every re-render
     retry: 1, // Don't retry aggressively if notifications fail
   })
 }

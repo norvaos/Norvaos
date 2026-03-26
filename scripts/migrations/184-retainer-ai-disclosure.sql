@@ -1,5 +1,5 @@
 /**
- * Migration 184 — Add AI-Usage Disclosure flag to retainer_agreements
+ * Migration 184  -  Add AI-Usage Disclosure flag to retainer_agreements
  *
  * Per 2026 Federal Court guidelines, retainer agreements may include
  * an AI-usage disclosure statement. This boolean tracks whether the

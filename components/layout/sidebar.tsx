@@ -270,7 +270,7 @@ function NavDropdown({ item, pathname, isCollapsed, featureFlags }: NavDropdownP
 }
 
 // ---------------------------------------------------------------------------
-// Data prefetch helpers — warm the TanStack Query cache on hover
+// Data prefetch helpers  -  warm the TanStack Query cache on hover
 // ---------------------------------------------------------------------------
 
 type PrefetchFn = (queryClient: ReturnType<typeof import('@tanstack/react-query').useQueryClient>) => void
@@ -284,7 +284,7 @@ const DATA_PREFETCH_ROUTES = new Set(['/matters', '/contacts', '/leads', '/tasks
  */
 function buildPrefetchFn(href: string, tenantId: string): PrefetchFn | undefined {
   const defaultParams = { tenantId }
-  const staleTime = 1000 * 60 * 2 // 2 min — avoid re-fetching if data is fresh
+  const staleTime = 1000 * 60 * 2 // 2 min  -  avoid re-fetching if data is fresh
 
   switch (href) {
     case '/matters':

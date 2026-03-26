@@ -148,7 +148,7 @@ function RevenueWidget({ tenantId }: { tenantId: string }) {
       <CardHeader className="pb-2">
         <div className="flex items-center gap-2">
           <DollarSign className="h-4 w-4 text-muted-foreground" />
-          <CardTitle className="text-sm font-semibold">Revenue — This Month vs Last</CardTitle>
+          <CardTitle className="text-sm font-semibold">Revenue  -  This Month vs Last</CardTitle>
         </div>
       </CardHeader>
       <CardContent className="pt-0">
@@ -239,7 +239,7 @@ function OutstandingBalanceWidget({ tenantId }: { tenantId: string }) {
       <CardHeader className="pb-2">
         <div className="flex items-center gap-2">
           <AlertTriangle className="h-4 w-4 text-amber-500" />
-          <CardTitle className="text-sm font-semibold">Top 5 Matters — Outstanding Balance</CardTitle>
+          <CardTitle className="text-sm font-semibold">Top 5 Matters  -  Outstanding Balance</CardTitle>
         </div>
       </CardHeader>
       <CardContent className="pt-0 space-y-1.5">
@@ -445,7 +445,7 @@ export default function PartnerDashboardPage() {
         <BarChart3 className="h-6 w-6 text-indigo-600" />
         <div>
           <h1 className="text-xl font-bold">Partner Dashboard</h1>
-          <p className="text-sm text-muted-foreground">Firm-wide overview — pipeline, revenue, utilisation, and risk.</p>
+          <p className="text-sm text-muted-foreground">Firm-wide overview  -  pipeline, revenue, utilisation, and risk.</p>
         </div>
       </div>
 

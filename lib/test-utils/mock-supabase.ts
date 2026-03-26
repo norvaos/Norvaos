@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Supabase Mock Factory — Chainable Query Builder for Tests
+ * Supabase Mock Factory  -  Chainable Query Builder for Tests
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Creates a mock Supabase client that supports the chaining pattern used by
@@ -67,7 +67,7 @@ function createChain(config: MockTableConfig) {
   chain.maybeSingle = vi.fn().mockResolvedValue({ data: selectResult.data, error: selectResult.error })
   makeThenable(chain, selectResult)
 
-  // INSERT chain — must be awaitable for `const { error } = await supabase.from().insert()`
+  // INSERT chain  -  must be awaitable for `const { error } = await supabase.from().insert()`
   const insertChain: Record<string, unknown> = {}
   for (const method of chainMethods) {
     insertChain[method] = vi.fn().mockReturnValue(insertChain)
@@ -78,7 +78,7 @@ function createChain(config: MockTableConfig) {
 
   chain.insert = vi.fn().mockReturnValue(insertChain)
 
-  // UPDATE chain — must be awaitable
+  // UPDATE chain  -  must be awaitable
   const updateChain: Record<string, unknown> = {}
   for (const method of chainMethods) {
     updateChain[method] = vi.fn().mockReturnValue(updateChain)

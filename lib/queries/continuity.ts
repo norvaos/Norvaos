@@ -1,13 +1,13 @@
 /**
- * Continuity & Shadow Matter Query Hooks — Directives 018 / 021 / 024
+ * Continuity & Shadow Matter Query Hooks  -  Directives 018 / 021 / 024
  *
  * Hooks for:
- *   - useNarrativeContext — fetch narrative context for a matter
- *   - useGaplessProof — fetch chronological proof
- *   - useAddressHistory — fetch address history for a matter
- *   - usePersonalHistory — fetch personal/employment history
- *   - useProspectTriggers — fetch active prospect triggers
- *   - useInitializeShadowMatter — mutation to create shadow matter
+ *   - useNarrativeContext  -  fetch narrative context for a matter
+ *   - useGaplessProof  -  fetch chronological proof
+ *   - useAddressHistory  -  fetch address history for a matter
+ *   - usePersonalHistory  -  fetch personal/employment history
+ *   - useProspectTriggers  -  fetch active prospect triggers
+ *   - useInitializeShadowMatter  -  mutation to create shadow matter
  */
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
@@ -78,7 +78,7 @@ export function useInitializeShadowMatter() {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: continuityKeys.prospectTriggers })
-      toast.success('Norva Shadow Matter initialised — Atomic Transfer complete')
+      toast.success('Norva Shadow Matter initialised  -  Atomic Transfer complete')
     },
     onError: (error) => {
       toast.error(error instanceof Error ? error.message : 'Failed to create shadow matter')

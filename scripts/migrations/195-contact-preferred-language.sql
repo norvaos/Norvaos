@@ -1,5 +1,5 @@
 -- ============================================================================
--- Migration 195 — Contact preferred_language: index + data backfill
+-- Migration 195  -  Contact preferred_language: index + data backfill
 -- ============================================================================
 -- The dedicated column was added in migration 184 (polyglot-bridge).
 -- This migration adds:

@@ -54,7 +54,7 @@ export function useCommunicationTemplates(
       return data as TemplateRow[]
     },
     enabled: !!tenantId,
-    staleTime: 1000 * 60 * 5, // 5 min — reference data
+    staleTime: 1000 * 60 * 5, // 5 min  -  reference data
   })
 }
 

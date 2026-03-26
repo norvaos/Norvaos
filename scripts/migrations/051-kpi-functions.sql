@@ -9,7 +9,7 @@ BEGIN;
 -- ─── 1. compute_shift_kpis ──────────────────────────────────────────────────
 -- Aggregates all KPI-relevant metrics for a single shift.
 -- Called by GET /api/front-desk/kpis?shiftId=X
--- Returns a JSONB object with raw metric values — threshold evaluation
+-- Returns a JSONB object with raw metric values  -  threshold evaluation
 -- happens in application code (lib/services/front-desk-kpis.ts).
 
 CREATE OR REPLACE FUNCTION compute_shift_kpis(p_shift_id UUID)

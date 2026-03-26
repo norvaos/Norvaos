@@ -1,6 +1,6 @@
 -- ============================================================
 -- 009-norva-os-multi-practice.sql
--- Norva OS — Phase 1: Multi-Practice Framework
+-- Norva OS  -  Phase 1: Multi-Practice Framework
 -- ============================================================
 -- Adds the generic matter type system, matter stage pipelines,
 -- deadline types, practice area enablement flags, per-user
@@ -14,7 +14,7 @@
 BEGIN;
 
 -- ============================================================
--- 1. PRACTICE AREAS — add is_enabled flag
+-- 1. PRACTICE AREAS  -  add is_enabled flag
 -- ============================================================
 ALTER TABLE practice_areas
   ADD COLUMN IF NOT EXISTS is_enabled BOOLEAN NOT NULL DEFAULT TRUE;
@@ -23,7 +23,7 @@ ALTER TABLE practice_areas
 UPDATE practice_areas SET is_enabled = is_active WHERE is_enabled IS DISTINCT FROM is_active;
 
 -- ============================================================
--- 2. USERS — add practice_filter_preference
+-- 2. USERS  -  add practice_filter_preference
 -- ============================================================
 ALTER TABLE users
   ADD COLUMN IF NOT EXISTS practice_filter_preference VARCHAR(50) DEFAULT 'all';
@@ -174,7 +174,7 @@ CREATE OR REPLACE TRIGGER deadline_types_updated_at
   FOR EACH ROW EXECUTE FUNCTION update_updated_at();
 
 -- ============================================================
--- 7. MATTER DEADLINES — add deadline_type_id FK (non-breaking)
+-- 7. MATTER DEADLINES  -  add deadline_type_id FK (non-breaking)
 -- Existing deadline_type VARCHAR column preserved.
 -- deadline_type_id links to the new typed catalog.
 -- ============================================================
@@ -330,7 +330,7 @@ CREATE OR REPLACE TRIGGER matter_stage_state_updated_at
   FOR EACH ROW EXECUTE FUNCTION update_updated_at();
 
 -- ============================================================
--- 12. MATTERS — add matter_type_id FK (nullable, backward-compat)
+-- 12. MATTERS  -  add matter_type_id FK (nullable, backward-compat)
 -- ============================================================
 ALTER TABLE matters
   ADD COLUMN IF NOT EXISTS matter_type_id UUID
@@ -347,7 +347,7 @@ CREATE INDEX IF NOT EXISTS idx_matters_tenant_practice_type
 -- 13. SEED DATA
 -- Seeds Real Estate + Immigration practice areas, matter types,
 -- stage pipelines, stages, and deadline type catalogs.
--- All inserts are ON CONFLICT DO NOTHING — safe to re-run.
+-- All inserts are ON CONFLICT DO NOTHING  -  safe to re-run.
 -- ============================================================
 DO $$
 DECLARE
@@ -363,7 +363,7 @@ BEGIN
   -- Resolve the first (and only) tenant
   SELECT id INTO v_tenant_id FROM tenants ORDER BY created_at LIMIT 1;
   IF v_tenant_id IS NULL THEN
-    RAISE NOTICE '[009] No tenant found — skipping seed data.';
+    RAISE NOTICE '[009] No tenant found  -  skipping seed data.';
     RETURN;
   END IF;
 

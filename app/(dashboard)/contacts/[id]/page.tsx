@@ -363,13 +363,13 @@ export default function ContactDetailPage() {
                     .insert({
                       tenant_id: tenantId,
                       contact_id: contactId,
-                      title: `${displayName} — New Enquiry`,
+                      title: `${displayName}  -  New Enquiry`,
                       status: 'new',
                       source: 'classification_change',
                       created_by: appUser?.id ?? null,
                     })
                   if (!leadErr) {
-                    toast.success('Lead pipeline activated — new lead created for this contact.')
+                    toast.success('Lead pipeline activated  -  new lead created for this contact.')
                   }
                 } else {
                   toast.info('Active lead already exists for this contact.')
@@ -382,7 +382,7 @@ export default function ContactDetailPage() {
 
             // Professional classification notice
             if (['lawyer', 'ircc_officer', 'consultant', 'judge', 'government'].includes(newClassification ?? '')) {
-              toast.info(`Classified as ${newClassification?.replace(/_/g, ' ')} — auto-sync from matters is now disabled.`)
+              toast.info(`Classified as ${newClassification?.replace(/_/g, ' ')}  -  auto-sync from matters is now disabled.`)
             }
           }
         },
@@ -474,7 +474,7 @@ export default function ContactDetailPage() {
               <h1 className="text-2xl font-semibold text-slate-900">
                 {displayName}
               </h1>
-              {/* Logic-Gate Badge — Directive 41.0 Status Authority */}
+              {/* Logic-Gate Badge  -  Directive 41.0 Status Authority */}
               {(stats?.matterCount ?? 0) > 0 ? (
                 <Badge className="gap-1.5 bg-emerald-50 text-emerald-700 border-emerald-300 hover:bg-emerald-50 font-semibold tracking-wide text-[11px] uppercase">
                   <ShieldCheck className="size-3.5" />
@@ -583,7 +583,7 @@ export default function ContactDetailPage() {
                 </TooltipTrigger>
                 {isRedScore && (
                   <TooltipContent side="bottom" className="bg-red-50 text-red-800 border-red-200">
-                    Readiness score is critically low — immediate attention required
+                    Readiness score is critically low  -  immediate attention required
                   </TooltipContent>
                 )}
               </Tooltip>
@@ -825,10 +825,10 @@ function OverviewTab({
   const updateContact = useUpdateContact()
   const queryClient = useQueryClient()
 
-  // Active lead — drives the pipeline widget so it mirrors the Leads page stage.
+  // Active lead  -  drives the pipeline widget so it mirrors the Leads page stage.
   const { data: activeLead, isLoading: leadLoading } = useContactActiveLead(contactId)
 
-  // Lead stage advance — calls the lead stage API and invalidates the cache.
+  // Lead stage advance  -  calls the lead stage API and invalidates the cache.
   const [isAdvancingStage, setIsAdvancingStage] = useState(false)
   const handleLeadStageAdvance = async (targetStage: string) => {
     if (!activeLead?.id || isAdvancingStage) return
@@ -1113,7 +1113,7 @@ function OverviewTab({
 
       {/* Right column: Stats sidebar */}
       <div className="space-y-4">
-        {/* Intake Funnel — Directive 41.0 Command Centre Sync */}
+        {/* Intake Funnel  -  Directive 41.0 Command Centre Sync */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center justify-between text-sm">
@@ -1129,7 +1129,7 @@ function OverviewTab({
             {leadLoading ? (
               <div className="h-16 animate-pulse rounded bg-slate-100" />
             ) : (() => {
-              // Resolve the current stage — fallback to pipeline_stage for contacts without an active lead
+              // Resolve the current stage  -  fallback to pipeline_stage for contacts without an active lead
               const currentStage = activeLead?.current_stage ?? contact.pipeline_stage ?? 'new_lead'
               const stageIndex = ACTIVE_STAGES.indexOf(currentStage as typeof ACTIVE_STAGES[number])
               const effectiveIndex = stageIndex >= 0 ? stageIndex : 0
@@ -1140,7 +1140,7 @@ function OverviewTab({
 
               return (
                 <div className="space-y-3">
-                  {/* Funnel Chevron — visual stage indicators */}
+                  {/* Funnel Chevron  -  visual stage indicators */}
                   <div className="flex items-center gap-0.5 overflow-x-auto pb-1">
                     {ACTIVE_STAGES.map((stage, idx) => {
                       const isCompleted = idx < effectiveIndex
@@ -1199,7 +1199,7 @@ function OverviewTab({
                     </p>
                   </div>
 
-                  {/* Advance button — only for contacts with an active lead */}
+                  {/* Advance button  -  only for contacts with an active lead */}
                   {activeLead && nextStage && (
                     <div className="border-t border-slate-100 pt-2">
                       <button
@@ -1223,7 +1223,7 @@ function OverviewTab({
           </CardContent>
         </Card>
 
-        {/* Readiness — Directive 41.0: Intake Completion (Leads) / Legal Success (Clients) */}
+        {/* Readiness  -  Directive 41.0: Intake Completion (Leads) / Legal Success (Clients) */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center justify-between text-sm">
@@ -1236,7 +1236,7 @@ function OverviewTab({
           </CardContent>
         </Card>
 
-        {/* Norva Vault Monitor — SHA-256 document integrity (replaces legacy Quick Stats) */}
+        {/* Norva Vault Monitor  -  SHA-256 document integrity (replaces legacy Quick Stats) */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-sm">
@@ -1807,7 +1807,7 @@ function IntakeTab({ contactId, tenantSettings, tenantId }: { contactId: string;
   }
 
   function formatFieldValue(field: IntakeField, val: unknown): string {
-    if (val === null || val === undefined) return '—'
+    if (val === null || val === undefined) return ' - '
     if (Array.isArray(val)) {
       return val.map((v: string) => {
         if (typeof v === 'string' && v.startsWith('__other__:')) return `Other: ${v.replace('__other__:', '')}`
@@ -1824,7 +1824,7 @@ function IntakeTab({ contactId, tenantSettings, tenantId }: { contactId: string;
   }
 
   function formatCheckInAnswer(val: unknown): string {
-    if (val === null || val === undefined) return '—'
+    if (val === null || val === undefined) return ' - '
     if (Array.isArray(val)) return val.join(', ')
     if (typeof val === 'boolean') return val ? 'Yes' : 'No'
     return String(val)
@@ -2055,7 +2055,7 @@ function ImmigrationTab({
           }
         }
       } catch {
-        // Non-fatal — contact blob was already saved
+        // Non-fatal  -  contact blob was already saved
       }
 
       queryClient.invalidateQueries({ queryKey: ['contact', contactId] })

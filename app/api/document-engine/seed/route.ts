@@ -1,5 +1,5 @@
 /**
- * POST /api/document-engine/seed — Seed default templates for the current tenant
+ * POST /api/document-engine/seed  -  Seed default templates for the current tenant
  */
 
 import { NextResponse } from 'next/server'

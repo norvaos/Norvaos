@@ -163,7 +163,7 @@ export function NorvaEarPanel({ matterId, matterTitle }: NorvaEarPanelProps) {
         recorder.start()
         mediaRecorderRef.current = recorder
       } catch {
-        // Microphone not available — user can paste transcript manually
+        // Microphone not available  -  user can paste transcript manually
       }
 
       toast.success('Recording started')
@@ -273,7 +273,7 @@ export function NorvaEarPanel({ matterId, matterTitle }: NorvaEarPanelProps) {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Mic className="h-5 w-5 text-indigo-600" />
-              Norva Ear — Consultation Co-Pilot
+              Norva Ear  -  Consultation Co-Pilot
             </DialogTitle>
             <DialogDescription>
               Record and transcribe consultations, then extract material facts automatically.

@@ -22,12 +22,12 @@ import { createAdminClient } from '@/lib/supabase/admin'
  * Auth: Lawyer, Admin, or Paralegal.
  *
  * Body: {
- *   form_template_id: string   — template slug (e.g. 'IMM5257E', 'IMM1294E')
- *   generation_key?:  string   — caller-supplied idempotency key (UUID)
- *   field_overrides?: Record<string, unknown>  — optional field value overrides
+ *   form_template_id: string    -  template slug (e.g. 'IMM5257E', 'IMM1294E')
+ *   generation_key?:  string    -  caller-supplied idempotency key (UUID)
+ *   field_overrides?: Record<string, unknown>   -  optional field value overrides
  * }
  *
- * Sprint 6, Week 2 — 2026-03-17
+ * Sprint 6, Week 2  -  2026-03-17
  */
 async function handlePost(
   request: Request,
@@ -104,7 +104,7 @@ async function handlePost(
       .maybeSingle()
 
     if (existing) {
-      // Job already exists — return it (idempotent)
+      // Job already exists  -  return it (idempotent)
       return NextResponse.json(
         {
           success: true,
@@ -181,7 +181,7 @@ async function handlePost(
           }
 
           // Update log: set status='processing' + processing_started_at
-          // Only update if still 'pending' — the sidecar may have already
+          // Only update if still 'pending'  -  the sidecar may have already
           // called back with 'completed' before this fire-and-forget resumes.
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           await (admin as any)
@@ -194,7 +194,7 @@ async function handlePost(
             .eq('status', 'pending')
         } catch (sidecarErr) {
           console.error('[generate-form] Sidecar dispatch error:', sidecarErr)
-          // Non-fatal — job stays pending; scheduled worker will pick it up.
+          // Non-fatal  -  job stays pending; scheduled worker will pick it up.
         }
       }).catch((e: unknown) => {
         console.error('[generate-form] Sidecar promise chain error:', e)

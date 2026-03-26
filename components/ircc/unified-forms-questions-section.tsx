@@ -491,7 +491,7 @@ function AssignedFormRow({
                   {section.fields.length} field{section.fields.length !== 1 ? 's' : ''}
                   {section.fields.length <= 6 && (
                     <span className="text-slate-300 ml-1">
-                      — {section.fields.map(f => f.label).join(', ')}
+                       -  {section.fields.map(f => f.label).join(', ')}
                     </span>
                   )}
                 </p>

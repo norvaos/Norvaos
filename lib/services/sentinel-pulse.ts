@@ -1,5 +1,5 @@
 /**
- * Sentinel Pulse — Directive 023
+ * Sentinel Pulse  -  Directive 023
  *
  * Daily scan that detects expiring documents at 180, 90, and 30 day
  * thresholds and creates prospect_triggers for the retention pipeline.

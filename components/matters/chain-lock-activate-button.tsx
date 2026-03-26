@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * ChainLockActivateButton — Directive 016 + 016.1: "Emerald Flow" Chain-Lock Visual
+ * ChainLockActivateButton  -  Directive 016 + 016.1: "Emerald Flow" Chain-Lock Visual
  *
  * Wrapped in a GenesisGuard that enforces:
  *   - readinessScore must be 100
@@ -31,6 +31,8 @@ import {
 import { Lock, Sparkles, Loader2, ShieldCheck, ShieldAlert } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { PreFlightChecklist } from '@/components/matters/pre-flight-checklist'
+import { SovereignSparkle } from '@/components/layout/sovereign-sparkle'
+import { useUIStore } from '@/lib/stores/ui-store'
 
 // ── Exported Hooks ─────────────────────────────────────────────────────────────
 
@@ -68,18 +70,22 @@ function useGenerateGenesisBlock() {
       matterId,
       tenantId,
       userId,
+      conflictSearchId,
     }: {
       matterId: string
       tenantId: string
       userId: string
+      conflictSearchId: string
+      _onSparkle?: () => void
     }) => {
       const supabase = createClient()
 
-      // 1. Generate the genesis block
+      // 1. Generate the genesis block (Directive 032: conflict search weld)
       const { data, error } = await supabase.rpc('fn_generate_matter_genesis_block', {
         p_matter_id: matterId,
         p_tenant_id: tenantId,
         p_user_id: userId,
+        p_conflict_search_id: conflictSearchId,
       })
       if (error) throw error
 
@@ -97,8 +103,14 @@ function useGenerateGenesisBlock() {
       return data
     },
     onSuccess: (_data, variables) => {
-      // 3. Sovereign Confetti — Emerald Green + Sovereign Gold
+      // 3. Sovereign Confetti  -  Emerald Green + Sovereign Gold
       fireSovereignConfetti()
+
+      // Directive 032: Fire the 8-second Sovereign Sparkle overlay
+      variables._onSparkle?.()
+
+      // Session B: UI_REFRESH event  -  force CSS re-render for liquid-fill sync
+      useUIStore.getState().fireSovereignIgnition()
 
       // 4. Invalidate all relevant caches
       queryClient.invalidateQueries({ queryKey: ['genesis-block', variables.matterId] })
@@ -229,6 +241,7 @@ export function ChainLockActivateButton({
   const [showSparkle, setShowSparkle] = useState(false)
   const [dissolving, setDissolving] = useState(false)
   const [preFlightOpen, setPreFlightOpen] = useState(false)
+  const [showSovereignSparkle, setShowSovereignSparkle] = useState(false)
   const prevGenesisRef = useRef<boolean>(false)
 
   const isSealed = !!genesis
@@ -237,7 +250,7 @@ export function ChainLockActivateButton({
   // Trigger dissolve → sparkle animation when genesis transitions null → exists
   useEffect(() => {
     if (isSealed && !prevGenesisRef.current) {
-      // Fresh seal — animate the transition
+      // Fresh seal  -  animate the transition
       setDissolving(true)
       const timer = setTimeout(() => {
         setDissolving(false)
@@ -247,7 +260,7 @@ export function ChainLockActivateButton({
       return () => clearTimeout(timer)
     }
     if (isSealed && prevGenesisRef.current) {
-      // Already sealed on mount — skip animation
+      // Already sealed on mount  -  skip animation
       setShowSparkle(true)
     }
     prevGenesisRef.current = isSealed
@@ -273,10 +286,35 @@ export function ChainLockActivateButton({
 
     if (!userRow) return
 
+    // Directive 032: Resolve the cleared conflict search for the matter's client
+    const { data: mc } = await supabase
+      .from('matter_contacts')
+      .select('contact_id')
+      .eq('matter_id', matterId)
+      .eq('role', 'client')
+      .order('created_at', { ascending: true })
+      .limit(1)
+      .maybeSingle()
+
+    if (!mc?.contact_id) return
+
+    const { data: search } = await (supabase as any)
+      .from('global_conflict_results')
+      .select('id')
+      .eq('source_entity_id', mc.contact_id)
+      .eq('status', 'clear')
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle()
+
+    if (!search?.id) return
+
     generateGenesis.mutate({
       matterId,
       tenantId,
       userId: userRow.id,
+      conflictSearchId: search.id,
+      _onSparkle: () => setShowSovereignSparkle(true),
     })
   }, [matterId, tenantId, generateGenesis])
 
@@ -289,7 +327,7 @@ export function ChainLockActivateButton({
     )
   }
 
-  // Wrap in GenesisGuard — blocks activation unless readiness === 100
+  // Wrap in GenesisGuard  -  blocks activation unless readiness === 100
   return (
     <GenesisGuard readinessScore={readinessScore} genesisExists={isSealed}>
       <TooltipProvider>
@@ -307,7 +345,7 @@ export function ChainLockActivateButton({
                 className,
               )}
             >
-              {/* Lock icon — dissolves when genesis block created */}
+              {/* Lock icon  -  dissolves when genesis block created */}
               {!isSealed && !isGenerating && (
                 <Lock className={cn(
                   'mr-1.5 h-3.5 w-3.5 transition-all',
@@ -320,7 +358,7 @@ export function ChainLockActivateButton({
                 <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
               )}
 
-              {/* Sovereign Sparkle — appears after lock dissolves */}
+              {/* Sovereign Sparkle  -  appears after lock dissolves */}
               {isSealed && showSparkle && !dissolving && (
                 <Sparkles className="mr-1.5 h-3.5 w-3.5 animate-sovereign-sparkle text-emerald-600" />
               )}
@@ -350,7 +388,7 @@ export function ChainLockActivateButton({
         </Tooltip>
       </TooltipProvider>
 
-      {/* Directive 019: Pre-Flight Checklist — hard-gate before genesis */}
+      {/* Directive 019: Pre-Flight Checklist  -  hard-gate before genesis */}
       <PreFlightChecklist
         open={preFlightOpen}
         onOpenChange={setPreFlightOpen}
@@ -358,6 +396,11 @@ export function ChainLockActivateButton({
         tenantId={tenantId}
         onAllPassed={handlePreFlightPassed}
       />
+
+      {/* Directive 032: 8-second Sovereign Sparkle on Genesis ignition */}
+      {showSovereignSparkle && (
+        <SovereignSparkle onDismiss={() => setShowSovereignSparkle(false)} />
+      )}
     </GenesisGuard>
   )
 }

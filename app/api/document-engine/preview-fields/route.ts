@@ -1,5 +1,5 @@
 /**
- * POST /api/document-engine/preview-fields — Preview resolved fields without generating
+ * POST /api/document-engine/preview-fields  -  Preview resolved fields without generating
  */
 
 import { NextRequest, NextResponse } from 'next/server'
@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
 
     const { mappings, conditions } = templateResult.data
 
-    // Build field context (simplified — matter + contact data)
+    // Build field context (simplified  -  matter + contact data)
     const matterResult = matterId
       ? await adminClient.from('matters').select('*').eq('id', matterId).single()
       : { data: null }

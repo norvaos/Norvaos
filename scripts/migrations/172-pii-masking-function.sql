@@ -1,5 +1,5 @@
 -- =============================================================================
--- Migration 172 — PII Masking Function
+-- Migration 172  -  PII Masking Function
 -- =============================================================================
 --
 -- Creates fn_get_masked_pii() which returns a masked version of a PII value.

@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * Norva Sovereign Academy — Directive 029
+ * Norva Sovereign Academy  -  Directive 029
  *
  * High-prestige onboarding hub with three Norva Sovereign video modules.
  * Once a user watches all three videos, they receive norva_certified: true
@@ -43,7 +43,7 @@ interface AcademyModule {
   description: string
   duration: string
   icon: React.ReactNode
-  /** Guidde/Mux embed URL — injected per-tenant via provisioning */
+  /** Guidde/Mux embed URL  -  injected per-tenant via provisioning */
   videoUrl: string | null
   topics: string[]
 }
@@ -53,7 +53,7 @@ const ACADEMY_MODULES: AcademyModule[] = [
     id: 'fortress-foundations',
     title: 'Module 1: The Fortress Foundations',
     description:
-      'Understand the NorvaOS architecture — RLS, immutable ledgers, HMAC hash chains, and the Sovereign Shield that protects every matter.',
+      'Understand the NorvaOS architecture  -  RLS, immutable ledgers, HMAC hash chains, and the Sovereign Shield that protects every matter.',
     duration: '12 min',
     icon: <Shield className="h-6 w-6 text-violet-600" />,
     videoUrl: null,
@@ -66,7 +66,7 @@ const ACADEMY_MODULES: AcademyModule[] = [
   },
   {
     id: 'intake-to-genesis',
-    title: 'Module 2: Intake to Genesis — The Breeze',
+    title: 'Module 2: Intake to Genesis  -  The Breeze',
     description:
       'Master the end-to-end flow from lead intake, through OCR identity injection, conflict scanning, to the Sovereign Sparkle genesis seal.',
     duration: '18 min',
@@ -82,7 +82,7 @@ const ACADEMY_MODULES: AcademyModule[] = [
   },
   {
     id: 'sovereign-oversight',
-    title: 'Module 3: Sovereign Oversight — The Shield',
+    title: 'Module 3: Sovereign Oversight  -  The Shield',
     description:
       'Learn to use the firm-wide compliance dashboard, audit simulation mode, emergency overrides, and the Global Expiry Sentinel.',
     duration: '15 min',
@@ -198,7 +198,7 @@ export default function AcademyPage() {
               <BookOpen className="h-4 w-4 text-muted-foreground" />
               <span className="text-sm font-medium">
                 {isCertified
-                  ? 'All modules completed — You are Sovereign Certified'
+                  ? 'All modules completed  -  You are Sovereign Certified'
                   : `${completedModules.length} of ${ACADEMY_MODULES.length} modules completed`}
               </span>
             </div>
@@ -338,7 +338,7 @@ export default function AcademyPage() {
             </h2>
             <p className="text-sm text-amber-700/80 dark:text-amber-400/80 max-w-md mx-auto">
               You have completed all three Norva Sovereign Academy modules.
-              Your sidebar avatar now bears the Gold Sparkle — the mark of a Master of the Fortress.
+              Your sidebar avatar now bears the Gold Sparkle  -  the mark of a Master of the Fortress.
             </p>
           </CardContent>
         </Card>

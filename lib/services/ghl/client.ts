@@ -81,7 +81,7 @@ export async function ghlFetch<T = unknown>(
       body: body ? JSON.stringify(body) : undefined,
     })
 
-    // Rate limiting — bounded retry respecting Retry-After
+    // Rate limiting  -  bounded retry respecting Retry-After
     if (res.status === 429) {
       if (rateLimit429Count >= MAX_GHL_RATE_LIMIT_RETRIES) {
         throw new GhlApiError(
@@ -100,7 +100,7 @@ export async function ghlFetch<T = unknown>(
       continue
     }
 
-    // Expired or revoked token — attempt one forced refresh, then retry
+    // Expired or revoked token  -  attempt one forced refresh, then retry
     // getValidGhlToken({ force: true }) throws GhlConnectionError on refresh failure,
     // which propagates to the caller without further retries.
     if (res.status === 401 && !tokenRefreshed) {

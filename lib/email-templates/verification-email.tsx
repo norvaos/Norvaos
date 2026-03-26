@@ -76,7 +76,7 @@ export function VerificationEmail({
           {/* Footer */}
           <Section style={footerStyle}>
             <Text style={footerTextStyle}>
-              NorvaOS — A Complete Legal Operating System
+              NorvaOS  -  A Complete Legal Operating System
             </Text>
             <Text style={footerTextStyle}>
               <Link href="https://norvaos.com" style={{ color: '#6b7280' }}>norvaos.com</Link>
@@ -103,10 +103,10 @@ export async function renderVerificationEmail(props: VerificationEmailProps): Pr
     '',
     "If you didn't create a NorvaOS account, you can safely ignore this email.",
     '',
-    'NorvaOS — A Complete Legal Operating System',
+    'NorvaOS  -  A Complete Legal Operating System',
   ].join('\n')
 
-  return { html, text, subject: 'Verify your email address — NorvaOS' }
+  return { html, text, subject: 'Verify your email address  -  NorvaOS' }
 }
 
 // ── Inline Styles ──

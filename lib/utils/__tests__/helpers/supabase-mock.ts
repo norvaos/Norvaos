@@ -10,7 +10,7 @@
  *     users:   { single: { data: { id: 'u1', is_active: true }, error: null }, count: 3 },
  *   })
  *
- *   // Chainable — just like real Supabase client
+ *   // Chainable  -  just like real Supabase client
  *   const { data } = await supabase.from('tenants').select('status').eq('id', '...').single()
  */
 

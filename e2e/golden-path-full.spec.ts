@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test'
 
 /**
- * MASTER E2E: Golden Path — Intake to Invoice (Full)
+ * MASTER E2E: Golden Path  -  Intake to Invoice (Full)
  *
  * Deployment gate test for NorvaOS. This serial suite exercises the
  * complete lifecycle: client intake, lead-to-matter conversion,
@@ -22,7 +22,7 @@ test.describe.serial('Golden Path: Intake to Invoice (Full)', () => {
   let leadEmail: string
   let matterId: string
 
-  // Minimal valid PDF — no external fixture required
+  // Minimal valid PDF  -  no external fixture required
   const testPdf = Buffer.from(
     '%PDF-1.4\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj\n' +
       '2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj\n' +
@@ -39,7 +39,7 @@ test.describe.serial('Golden Path: Intake to Invoice (Full)', () => {
   // ─────────────────────────────────────────────────────────────────
   // Step 1: Client Intake
   // ─────────────────────────────────────────────────────────────────
-  test('Step 1 — Submit client intake via public form', async ({ page }) => {
+  test('Step 1  -  Submit client intake via public form', async ({ page }) => {
     test.setTimeout(30_000)
 
     leadFirstName = 'GP-Test'
@@ -81,7 +81,7 @@ test.describe.serial('Golden Path: Intake to Invoice (Full)', () => {
   // ─────────────────────────────────────────────────────────────────
   // Step 2: Lead → Matter Conversion
   // ─────────────────────────────────────────────────────────────────
-  test('Step 2 — Convert lead to matter', async ({ page }) => {
+  test('Step 2  -  Convert lead to matter', async ({ page }) => {
     test.setTimeout(30_000)
 
     // Navigate to leads list and find the intake we just created
@@ -105,12 +105,12 @@ test.describe.serial('Golden Path: Intake to Invoice (Full)', () => {
     // Click "Convert to Matter"
     await page.getByRole('button', { name: /convert to matter|convert/i }).click()
 
-    // Fill conversion form — matter type
+    // Fill conversion form  -  matter type
     const matterTypeField = page.getByLabel(/matter type/i)
     await matterTypeField.click()
     await page.getByRole('option', { name: /spousal sponsorship/i }).first().click()
 
-    // Fill conversion form — practice area (if separate from intake)
+    // Fill conversion form  -  practice area (if separate from intake)
     const conversionPracticeArea = page.getByLabel(/practice area/i)
     if (await conversionPracticeArea.isVisible({ timeout: 3_000 }).catch(() => false)) {
       await conversionPracticeArea.click()
@@ -135,7 +135,7 @@ test.describe.serial('Golden Path: Intake to Invoice (Full)', () => {
   // ─────────────────────────────────────────────────────────────────
   // Step 3: Document Upload & Classification
   // ─────────────────────────────────────────────────────────────────
-  test('Step 3 — Upload document and verify classification', async ({ page }) => {
+  test('Step 3  -  Upload document and verify classification', async ({ page }) => {
     test.setTimeout(30_000)
 
     // Navigate to the matter detail page
@@ -174,7 +174,7 @@ test.describe.serial('Golden Path: Intake to Invoice (Full)', () => {
 
     await expect(documentRow).toBeVisible({ timeout: 10_000 })
 
-    // Verify AI classification was applied (async — retry with generous timeout)
+    // Verify AI classification was applied (async  -  retry with generous timeout)
     await expect(async () => {
       const categoryCell = documentRow
         .locator('[data-testid="document-category"]')
@@ -188,7 +188,7 @@ test.describe.serial('Golden Path: Intake to Invoice (Full)', () => {
   // ─────────────────────────────────────────────────────────────────
   // Step 4: Task Verification
   // ─────────────────────────────────────────────────────────────────
-  test('Step 4 — Verify automated tasks were created', async ({ page }) => {
+  test('Step 4  -  Verify automated tasks were created', async ({ page }) => {
     test.setTimeout(30_000)
 
     // Navigate to matter detail
@@ -219,7 +219,7 @@ test.describe.serial('Golden Path: Intake to Invoice (Full)', () => {
   // ─────────────────────────────────────────────────────────────────
   // Step 5: Invoice Generation
   // ─────────────────────────────────────────────────────────────────
-  test('Step 5 — Create an invoice with a line item', async ({ page }) => {
+  test('Step 5  -  Create an invoice with a line item', async ({ page }) => {
     test.setTimeout(30_000)
 
     // Navigate to matter detail
@@ -239,7 +239,7 @@ test.describe.serial('Golden Path: Intake to Invoice (Full)', () => {
     const descriptionField = page.getByLabel(/description/i).or(
       page.getByPlaceholder(/description/i),
     )
-    await descriptionField.first().fill(`Golden Path E2E — consultation fee (${ts})`)
+    await descriptionField.first().fill(`Golden Path E2E  -  consultation fee (${ts})`)
 
     const amountField = page.getByLabel(/amount|price|rate/i).or(
       page.getByPlaceholder(/amount/i),
@@ -255,7 +255,7 @@ test.describe.serial('Golden Path: Intake to Invoice (Full)', () => {
     // Save / create the invoice
     await page.getByRole('button', { name: /save|create|submit/i }).click()
 
-    // Verify invoice was created — look for the amount or a success indicator
+    // Verify invoice was created  -  look for the amount or a success indicator
     await expect(
       page.getByText(/\$500|500\.00/i).or(
         page.getByText(/invoice created|saved|success/i),
@@ -266,7 +266,7 @@ test.describe.serial('Golden Path: Intake to Invoice (Full)', () => {
   // ─────────────────────────────────────────────────────────────────
   // Step 6: Payment via Stripe (simulation)
   // ─────────────────────────────────────────────────────────────────
-  test('Step 6 — Send invoice and complete Stripe test payment', async ({ page }) => {
+  test('Step 6  -  Send invoice and complete Stripe test payment', async ({ page }) => {
     test.setTimeout(60_000)
 
     // Navigate to matter billing

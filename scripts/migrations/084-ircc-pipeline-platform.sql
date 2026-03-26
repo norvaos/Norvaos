@@ -1,5 +1,5 @@
 -- ═══════════════════════════════════════════════════════════════════════════════
--- 084 — IRCC Pipeline Platform Extensions
+-- 084  -  IRCC Pipeline Platform Extensions
 -- ═══════════════════════════════════════════════════════════════════════════════
 --
 -- Extends the IRCC form management platform (mig 057) with:
@@ -23,7 +23,7 @@ ALTER TABLE form_pack_versions
 ALTER TABLE form_pack_versions
   ADD COLUMN IF NOT EXISTS form_id UUID REFERENCES ircc_forms(id);
 
--- ── 3. field_verifications — Lawyer field-level sign-off ──────────────────────
+-- ── 3. field_verifications  -  Lawyer field-level sign-off ──────────────────────
 
 CREATE TABLE IF NOT EXISTS field_verifications (
   id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -59,7 +59,7 @@ CREATE POLICY field_verifications_delete ON field_verifications
   FOR DELETE TO authenticated
   USING (tenant_id = public.get_current_tenant_id());
 
--- ── 4. profile_field_history — Immigration data audit trail ───────────────────
+-- ── 4. profile_field_history  -  Immigration data audit trail ───────────────────
 
 CREATE TABLE IF NOT EXISTS profile_field_history (
   id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -88,4 +88,4 @@ CREATE POLICY profile_field_history_insert ON profile_field_history
   FOR INSERT TO authenticated
   WITH CHECK (tenant_id = public.get_current_tenant_id());
 
--- History is append-only — no update or delete policies
+-- History is append-only  -  no update or delete policies

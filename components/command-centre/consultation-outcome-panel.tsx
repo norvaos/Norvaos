@@ -132,7 +132,7 @@ export function ConsultationOutcomePanel() {
   const [summary, setSummary] = useState<CommandSummaryData | null>(null)
 
   // ── Form state (send_retainer fields auto-populated from lead) ─
-  // send_retainer — reads from lead.matter_type_id / lead.person_scope when available
+  // send_retainer  -  reads from lead.matter_type_id / lead.person_scope when available
   const [matterTypeId, setMatterTypeId] = useState(lead?.matter_type_id ?? '')
   const [personScope, setPersonScope] = useState<'single' | 'joint'>(
     (lead?.person_scope as 'single' | 'joint') ?? 'single'
@@ -344,7 +344,7 @@ export function ConsultationOutcomePanel() {
   // Runs once when send_retainer is selected and no matter type is yet chosen
   useEffect(() => {
     if (selectedOutcome !== 'send_retainer') return
-    if (matterTypeId) return   // already set — don't overwrite
+    if (matterTypeId) return   // already set  -  don't overwrite
     if (!matterTypes?.length) return
 
     const cf = (lead?.custom_fields ?? {}) as Record<string, string>
@@ -361,8 +361,8 @@ export function ConsultationOutcomePanel() {
         inferredName = 'Express Entry'
       } else if (pathway === 'family_class') {
         inferredName = currentStatus && currentStatus !== 'no_status'
-          ? 'Spousal Sponsorship — Inside Canada'
-          : 'Spousal Sponsorship — Outside Canada'
+          ? 'Spousal Sponsorship  -  Inside Canada'
+          : 'Spousal Sponsorship  -  Outside Canada'
       } else {
         inferredName = 'PR Application'
       }
@@ -372,12 +372,12 @@ export function ConsultationOutcomePanel() {
       inferredName = studyGoal === 'pgwp' ? 'Post-Graduate Work Permit (PGWP)' : 'Study Permit'
     } else if (goal === 'visitor_visa') {
       inferredName = currentStatus === 'no_status'
-        ? 'Visitor Visa — Outside Canada'
-        : 'Visitor Visa — Inside Canada'
+        ? 'Visitor Visa  -  Outside Canada'
+        : 'Visitor Visa  -  Inside Canada'
     } else if (goal === 'family_sponsorship') {
       inferredName = currentStatus && currentStatus !== 'no_status'
-        ? 'Spousal Sponsorship — Inside Canada'
-        : 'Spousal Sponsorship — Outside Canada'
+        ? 'Spousal Sponsorship  -  Inside Canada'
+        : 'Spousal Sponsorship  -  Outside Canada'
     }
 
     if (!inferredName) return
@@ -490,7 +490,7 @@ export function ConsultationOutcomePanel() {
       case 'no_show':
         return stages.find((s) => /no.?show/i.test(s.name)) ?? null
       default:
-        return null // book_follow_up — no stage advance
+        return null // book_follow_up  -  no stage advance
     }
   }, [selectedOutcome, stages])
 
@@ -511,17 +511,17 @@ export function ConsultationOutcomePanel() {
         ]
       case 'client_declined':
         return [
-          'Lead closed as Lost — Client Declined',
+          'Lead closed as Lost  -  Client Declined',
           'Closure record created with decline reason',
         ]
       case 'not_a_fit':
         return [
-          'Lead closed as Lost — Not a Fit',
+          'Lead closed as Lost  -  Not a Fit',
           'Closure record created with reason',
         ]
       case 'referred_out':
         return [
-          'Lead closed as Lost — Referred Out',
+          'Lead closed as Lost  -  Referred Out',
           `Closure record created (referred to: ${referredToName || '…'})`,
         ]
       case 'no_show':
@@ -637,10 +637,10 @@ export function ConsultationOutcomePanel() {
     queryClient,
   ])
 
-  // ── Initiate submit — show stage-advance dialog (or submit directly) ──
+  // ── Initiate submit  -  show stage-advance dialog (or submit directly) ──
   const handleInitiateSubmit = useCallback(() => {
     if (!isFormValid || isSubmitting) return
-    // book_follow_up never advances a stage — bypass the dialog
+    // book_follow_up never advances a stage  -  bypass the dialog
     if (selectedOutcome === 'book_follow_up' || !proposedStage) {
       void handleSubmit(false)
       return
@@ -854,7 +854,7 @@ export function ConsultationOutcomePanel() {
 
   const handleRecordPayment = useCallback(() => {
     if (!lead?.id || !latestRetainer?.id || !paymentAmount) return
-    // Show confirmation if retainer is already signed (paper flow) — this payment would trigger matter creation
+    // Show confirmation if retainer is already signed (paper flow)  -  this payment would trigger matter creation
     const isSignedPaper = latestRetainer.status === 'signed' && latestRetainer.signing_method === 'paper'
     if (isSignedPaper) {
       setPendingConversionAction('payment')
@@ -904,7 +904,7 @@ export function ConsultationOutcomePanel() {
       queryClient.invalidateQueries({ queryKey: ['leads'] }) // Refresh leads list/kanban
 
       if (data.matterId && data.matterNumber) {
-        toast.success(`Retainer signed — Matter ${data.matterNumber} created`, {
+        toast.success(`Retainer signed  -  Matter ${data.matterNumber} created`, {
           description: 'Lead has been converted to an active matter.',
           duration: 5000,
         })
@@ -937,7 +937,7 @@ export function ConsultationOutcomePanel() {
       toast.error('Please enter the verification code from the printed retainer')
       return
     }
-    // Show confirmation if payment was already received — this upload would trigger matter creation
+    // Show confirmation if payment was already received  -  this upload would trigger matter creation
     const paymentReceived = latestRetainer.payment_status === 'paid' || latestRetainer.payment_status === 'partial'
     if (paymentReceived) {
       setPendingConversionAction('upload')
@@ -968,7 +968,7 @@ export function ConsultationOutcomePanel() {
         <div className="flex items-center gap-2">
           <CheckCircle2 className="h-5 w-5 text-green-600 shrink-0" />
           <span className="font-semibold text-sm text-slate-900">
-            Consultation Completed — {summary.outcomeLabel}
+            Consultation Completed  -  {summary.outcomeLabel}
           </span>
         </div>
 
@@ -1023,7 +1023,7 @@ export function ConsultationOutcomePanel() {
   if (!selectedOutcome) {
     return (
       <div className="px-4 py-2 space-y-3">
-        {/* ── Retainer Action Hub — single source of truth for all retainer lifecycle actions ── */}
+        {/* ── Retainer Action Hub  -  single source of truth for all retainer lifecycle actions ── */}
         {hasRetainerPackage && (
           <div className="bg-white border border-slate-200 rounded-lg p-3 space-y-2.5">
             {/* Header row: title + status badge */}
@@ -1060,11 +1060,11 @@ export function ConsultationOutcomePanel() {
                   <p className="text-[10px] font-medium text-slate-500 uppercase">Retainer</p>
                   <p className="text-xs font-medium text-slate-800">
                     {retainerState === 'draft' && 'Not yet saved'}
-                    {retainerState === 'saved' && 'Saved — not sent'}
-                    {retainerState === 'sent' && 'Sent — awaiting signature'}
+                    {retainerState === 'saved' && 'Saved  -  not sent'}
+                    {retainerState === 'sent' && 'Sent  -  awaiting signature'}
                     {retainerState === 'viewed' && 'Viewed by lead'}
                     {retainerState === 'signed' && 'Signed'}
-                    {retainerState === 'partial' && 'Retained — partial payment'}
+                    {retainerState === 'partial' && 'Retained  -  partial payment'}
                     {retainerState === 'paid' && 'Fully retained'}
                   </p>
                 </div>
@@ -1077,7 +1077,7 @@ export function ConsultationOutcomePanel() {
                     {latestRetainer.payment_status === 'not_requested' && 'Not requested'}
                     {latestRetainer.payment_status === 'requested' && 'Requested'}
                     {latestRetainer.payment_status === 'partial' && (
-                      <>Partial — {paymentBalance ? `$${(paymentBalance.totalPaid / 100).toLocaleString('en-CA', { minimumFractionDigits: 2 })} paid` : ''}</>
+                      <>Partial  -  {paymentBalance ? `$${(paymentBalance.totalPaid / 100).toLocaleString('en-CA', { minimumFractionDigits: 2 })} paid` : ''}</>
                     )}
                     {latestRetainer.payment_status === 'paid' && 'Paid in full'}
                     {latestRetainer.payment_status === 'waived' && 'Waived'}
@@ -1098,7 +1098,7 @@ export function ConsultationOutcomePanel() {
                     ) : (
                       latestRetainer.total_amount_cents
                         ? `$${(Number(latestRetainer.total_amount_cents) / 100).toLocaleString('en-CA', { minimumFractionDigits: 2 })}`
-                        : '—'
+                        : ' - '
                     )}
                   </p>
                 </div>
@@ -1109,7 +1109,7 @@ export function ConsultationOutcomePanel() {
             <TooltipProvider delayDuration={300}>
               <div className="flex items-center gap-2 flex-wrap">
 
-                {/* DRAFT — no fees yet */}
+                {/* DRAFT  -  no fees yet */}
                 {retainerState === 'draft' && (
                   <Tooltip>
                     <TooltipTrigger asChild>
@@ -1121,7 +1121,7 @@ export function ConsultationOutcomePanel() {
                   </Tooltip>
                 )}
 
-                {/* SAVED — fees built, ready to send or collect payment */}
+                {/* SAVED  -  fees built, ready to send or collect payment */}
                 {retainerState === 'saved' && (
                   <>
                     <Tooltip>
@@ -1198,7 +1198,7 @@ export function ConsultationOutcomePanel() {
                   </>
                 )}
 
-                {/* SENT / VIEWED — waiting for signature */}
+                {/* SENT / VIEWED  -  waiting for signature */}
                 {(retainerState === 'sent' || retainerState === 'viewed') && (
                   <>
                     <Tooltip>
@@ -1283,7 +1283,7 @@ export function ConsultationOutcomePanel() {
                   </>
                 )}
 
-                {/* SIGNED — record payment */}
+                {/* SIGNED  -  record payment */}
                 {retainerState === 'signed' && (
                   <>
                     <Tooltip>
@@ -1328,10 +1328,10 @@ export function ConsultationOutcomePanel() {
                   </>
                 )}
 
-                {/* PARTIAL — payment received but balance remaining */}
+                {/* PARTIAL  -  payment received but balance remaining */}
                 {retainerState === 'partial' && (
                   <>
-                    {/* Signing options — only if retainer is not yet signed (payment came first) */}
+                    {/* Signing options  -  only if retainer is not yet signed (payment came first) */}
                     {latestRetainer.status !== 'signed' && activeSigningReq?.status !== 'signed' && (
                       <>
                         <Tooltip>
@@ -1414,7 +1414,7 @@ export function ConsultationOutcomePanel() {
                   </>
                 )}
 
-                {/* PAID — fully retained */}
+                {/* PAID  -  fully retained */}
                 {retainerState === 'paid' && (
                   <>
                     <Badge className="bg-green-100 text-green-700 text-xs gap-1 h-7 px-2.5">
@@ -1429,7 +1429,7 @@ export function ConsultationOutcomePanel() {
                       </TooltipTrigger>
                       <TooltipContent>Preview the retainer agreement PDF</TooltipContent>
                     </Tooltip>
-                    {/* Signing options — if retainer not yet signed but payment already recorded */}
+                    {/* Signing options  -  if retainer not yet signed but payment already recorded */}
                     {latestRetainer.status !== 'signed' && activeSigningReq?.status !== 'signed' && (
                       <>
                         <Tooltip>
@@ -1473,7 +1473,7 @@ export function ConsultationOutcomePanel() {
                   </>
                 )}
 
-                {/* Cancel — available in all pre-completion states */}
+                {/* Cancel  -  available in all pre-completion states */}
                 {retainerState !== 'paid' && (
                   <Tooltip>
                     <TooltipTrigger asChild>
@@ -1492,7 +1492,7 @@ export function ConsultationOutcomePanel() {
                   </Tooltip>
                 )}
 
-                {/* Convert to Matter — shown when retainer is signed/paid but lead not yet converted */}
+                {/* Convert to Matter  -  shown when retainer is signed/paid but lead not yet converted */}
                 {(retainerState === 'signed' || retainerState === 'partial' || retainerState === 'paid') && !isConverted && (
                   <Tooltip>
                     <TooltipTrigger asChild>
@@ -1761,7 +1761,7 @@ export function ConsultationOutcomePanel() {
           </div>
         )}
 
-        {/* Hide outcome grid once retainer package exists — only show if no active retainer */}
+        {/* Hide outcome grid once retainer package exists  -  only show if no active retainer */}
         {!hasRetainerPackage && (
           <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
             {CONSULTATION_OUTCOMES.map((o) => {
@@ -1935,7 +1935,7 @@ export function ConsultationOutcomePanel() {
                 </Select>
               </div>
 
-              {/* Flat fee amount — shown only when billing type is flat_fee */}
+              {/* Flat fee amount  -  shown only when billing type is flat_fee */}
               {billingType === 'flat_fee' && (
                 <div className="space-y-1.5">
                   <Label className="text-xs">Flat Fee Amount (CAD) *</Label>
@@ -2191,7 +2191,7 @@ export function ConsultationOutcomePanel() {
           </>
         )}
 
-        {/* ── NO SHOW — confirmation only ────────────────────── */}
+        {/* ── NO SHOW  -  confirmation only ────────────────────── */}
         {selectedOutcome === 'no_show' && (
           <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-sm text-amber-800">
             <div className="flex items-start gap-2">
@@ -2278,7 +2278,7 @@ export function ConsultationOutcomePanel() {
         return (
           <div className="rounded-lg border border-emerald-200 bg-emerald-50/70 p-3 space-y-2">
             <p className="text-[11px] font-semibold text-emerald-800 uppercase tracking-wide">
-              ✓ Consultation Summary — Ready to Send
+              ✓ Consultation Summary  -  Ready to Send
             </p>
             <ul className="space-y-1">
               {[

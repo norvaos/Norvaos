@@ -56,7 +56,7 @@ export function PortalStatusCard({ matterId, tenantId, matterTitle, matterNumber
       ? Math.round((completedRequirements / totalRequirements) * 100)
       : 0
 
-  // Copy portal link — uses dedicated utility (no clipboard API)
+  // Copy portal link  -  uses dedicated utility (no clipboard API)
   const handleCopyLink = () => {
     if (!activeLink || !portalUrl) {
       toast.error('No active portal link found')

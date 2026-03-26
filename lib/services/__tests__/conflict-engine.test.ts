@@ -1,20 +1,20 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Conflict Engine — Comprehensive Test Suite
+ * Conflict Engine  -  Comprehensive Test Suite
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Covers:
- *   calculateConflictScore — weight accumulation, max-across-matches, cap at 100
+ *   calculateConflictScore  -  weight accumulation, max-across-matches, cap at 100
  *   scoreToStatus (via calculateConflictScore + runConflictScan integration)
- *   isConflictCleared — cleared_by_lawyer, waiver_obtained, all other statuses
- *   isScanStale — null date, fresh scan, stale scan, custom threshold
- *   deduplicateMatches — merging reasons, category priority, confidence max
- *   runConflictScan — full orchestration (contact fetch, scan create, match finders,
+ *   isConflictCleared  -  cleared_by_lawyer, waiver_obtained, all other statuses
+ *   isScanStale  -  null date, fresh scan, stale scan, custom threshold
+ *   deduplicateMatches  -  merging reasons, category priority, confidence max
+ *   runConflictScan  -  full orchestration (contact fetch, scan create, match finders,
  *       dedup, insert, score, status update, audit log, error/failure path)
- *   recordConflictDecision — decision insert, status mapping, audit, notification
- *   Match finders — name (exact + fuzzy + fallback), email, phone (normalization),
+ *   recordConflictDecision  -  decision insert, status mapping, audit, notification
+ *   Match finders  -  name (exact + fuzzy + fallback), email, phone (normalization),
  *       address, DOB, organisation, adverse party (both directions)
- *   Edge cases — no name, no email, no phone, no address, no DOB, no org,
+ *   Edge cases  -  no name, no email, no phone, no address, no DOB, no org,
  *       empty match results, false positives, phone suffix matching
  */
 
@@ -261,7 +261,7 @@ describe('calculateConflictScore', () => {
   })
 
   it('exact_name + dob is near-certainty conflict at 90', () => {
-    // exact_name(50) + dob(40) = 90 — Directive 011: near-certainty threshold
+    // exact_name(50) + dob(40) = 90  -  Directive 011: near-certainty threshold
     const matches = [
       makeMatchInsert({
         match_reasons: [
@@ -328,7 +328,7 @@ describe('calculateConflictScore', () => {
 })
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// scoreToStatus (tested indirectly — exported via runConflictScan but the
+// scoreToStatus (tested indirectly  -  exported via runConflictScan but the
 // thresholds are critical legal logic, so we verify via calculateConflictScore
 // boundaries that feed into the status)
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -516,7 +516,7 @@ describe('isScanStale', () => {
 })
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// runConflictScan — full orchestration
+// runConflictScan  -  full orchestration
 // ═══════════════════════════════════════════════════════════════════════════════
 
 /**
@@ -549,7 +549,7 @@ function setupFullScanMocks(opts: {
   const callCounters: Record<string, number> = {}
   const fromMap: Record<string, ReturnType<typeof createMockChain>> = {}
 
-  // contacts chain — needs to handle both the initial fetch AND the update calls
+  // contacts chain  -  needs to handle both the initial fetch AND the update calls
   const contactsChain = createMockChain({ data: contact, error: opts.contactError ?? null })
   // Override update to return a fresh chain for the contact update path
   const contactUpdateChain = createMockChain({ data: null, error: null })
@@ -1108,7 +1108,7 @@ describe('deduplicateMatches (tested via score calculation)', () => {
       match_reasons: [{ field: 'email', our_value: 'a@b.com', their_value: 'a@b.com', similarity: 100 }],
     })
 
-    // calculateConflictScore doesn't dedup — it operates on pre-deduped matches
+    // calculateConflictScore doesn't dedup  -  it operates on pre-deduped matches
     // But we can verify the score of the merged match would be higher
     // Two separate matches: max(50, 25) = 50
     expect(calculateConflictScore([match1, match2] as never[])).toBe(50)
@@ -1151,7 +1151,7 @@ describe('edge cases and false positive scenarios', () => {
       contact: { first_name: null, last_name: 'Khan' },
     })
 
-    // Should not throw — the engine should handle partial names
+    // Should not throw  -  the engine should handle partial names
     const result = await runConflictScan(supabase, {
       contactId: CONTACT_ID,
       tenantId: TENANT_ID,
@@ -1268,7 +1268,7 @@ describe('conflict score boundary values', () => {
   })
 
   it('score of exactly 49 is still review_suggested', () => {
-    // address(15) + phone(20) + org(15) = 50 — too high
+    // address(15) + phone(20) + org(15) = 50  -  too high
     // Let's use: email(25) + fuzzy_name at ~120% of 20 = need 24 => sim=120 is capped
     // Better: address(15) + phone(20) + fuzzy_name at 70% = 15+20+14 = 49
     const matches = [
@@ -1286,7 +1286,7 @@ describe('conflict score boundary values', () => {
   })
 
   it('exact_name alone (50) is the review_required boundary', () => {
-    // exact_name(50) = 50 — exactly at review_required threshold
+    // exact_name(50) = 50  -  exactly at review_required threshold
     const matches = [
       makeMatchInsert({
         match_reasons: [
@@ -1352,7 +1352,7 @@ describe('phone normalization scenarios (integration)', () => {
     // The engine should skip it. This is tested at the code level:
     // phones.filter(p => p.length >= 7) means "555" is excluded
     // We verify by checking that a short phone doesn't produce matches
-    // (Tested indirectly through the full scan — no error thrown)
+    // (Tested indirectly through the full scan  -  no error thrown)
   })
 })
 

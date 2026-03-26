@@ -12,7 +12,7 @@ test.use({ storageState: './e2e/.auth/admin.json' })
  * guarantee: audit chain integrity, transaction immutability, disbursement
  * lockdown, PIPEDA sovereignty, Deadline Shield, and the Conflict Engine.
  *
- * All assertions are resilient — they pass on a fresh database with no trust
+ * All assertions are resilient  -  they pass on a fresh database with no trust
  * accounts, matters, or seeded transactions.
  * ═══════════════════════════════════════════════════════════════════════════════
  */
@@ -20,7 +20,7 @@ test.use({ storageState: './e2e/.auth/admin.json' })
 const SHA256_REGEX = /^[0-9a-f]{64}$/
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// SUITE 1 — Audit Chain Integrity Verification
+// SUITE 1  -  Audit Chain Integrity Verification
 // ═══════════════════════════════════════════════════════════════════════════════
 
 test.describe('Directive 007: Audit Chain Integrity', () => {
@@ -123,12 +123,12 @@ test.describe('Directive 007: Audit Chain Integrity', () => {
 })
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// SUITE 2 — Trust Transaction Immutability
+// SUITE 2  -  Trust Transaction Immutability
 // ═══════════════════════════════════════════════════════════════════════════════
 
 test.describe('Directive 007: Trust Transaction Immutability', () => {
   test('trust deposit endpoint enforces required fields', async ({ request }) => {
-    // POST with a valid deposit body — on a fresh DB the trust account / matter
+    // POST with a valid deposit body  -  on a fresh DB the trust account / matter
     // will not exist, so the API should return a predictable error (400 or 500),
     // NOT a crash (e.g. HTML error page).
     const res = await request.post('/api/trust-accounting/transactions', {
@@ -137,7 +137,7 @@ test.describe('Directive 007: Trust Transaction Immutability', () => {
         matterId: '00000000-0000-4000-a000-000000000002',
         transactionType: 'deposit',
         amountCents: 50000,
-        description: 'E2E Directive 007 — disaster recovery deposit test',
+        description: 'E2E Directive 007  -  disaster recovery deposit test',
         paymentMethod: 'eft',
         effectiveDate: '2026-03-25',
       },
@@ -146,8 +146,8 @@ test.describe('Directive 007: Trust Transaction Immutability', () => {
     const body = await res.json()
 
     // Two acceptable outcomes:
-    // 1. 201 — the deposit succeeded (trust account + matter exist)
-    // 2. 4xx/5xx with a JSON error — trust account or matter missing
+    // 1. 201  -  the deposit succeeded (trust account + matter exist)
+    // 2. 4xx/5xx with a JSON error  -  trust account or matter missing
     // Both prove the chain is operational.
     expect(typeof body.success).toBe('boolean')
 
@@ -185,7 +185,7 @@ test.describe('Directive 007: Trust Transaction Immutability', () => {
 })
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// SUITE 3 — Disbursement Lockdown Verification
+// SUITE 3  -  Disbursement Lockdown Verification
 // ═══════════════════════════════════════════════════════════════════════════════
 
 test.describe('Directive 007: Disbursement Lockdown', () => {
@@ -229,8 +229,8 @@ test.describe('Directive 007: Disbursement Lockdown', () => {
     const body = await res.json()
 
     // Two acceptable outcomes:
-    // 1. 201 — reconciliation succeeded
-    // 2. 4xx/5xx — trust account does not exist, but endpoint is operational
+    // 1. 201  -  reconciliation succeeded
+    // 2. 4xx/5xx  -  trust account does not exist, but endpoint is operational
     expect(typeof body.success).toBe('boolean')
 
     if (res.status() === 201) {
@@ -242,13 +242,13 @@ test.describe('Directive 007: Disbursement Lockdown', () => {
 })
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// SUITE 4 — PIPEDA Sovereignty Verification
+// SUITE 4  -  PIPEDA Sovereignty Verification
 // ═══════════════════════════════════════════════════════════════════════════════
 
 test.describe('Directive 007: PIPEDA Sovereignty', () => {
   test('API requests with Canadian origin are allowed', async ({ request }) => {
     // Any authenticated PII route should succeed from localhost (inherently allowed).
-    // Use the compliance-snapshots list as a proxy — it touches PII-adjacent data.
+    // Use the compliance-snapshots list as a proxy  -  it touches PII-adjacent data.
     const res = await request.get('/api/trust-accounting/compliance-snapshots')
     expect(res.ok()).toBeTruthy()
 
@@ -257,7 +257,7 @@ test.describe('Directive 007: PIPEDA Sovereignty', () => {
   })
 
   test('sovereignty log endpoint exists and requires auth', async ({ request }) => {
-    // POST without X-Internal-Secret header — must return 401, NOT 404.
+    // POST without X-Internal-Secret header  -  must return 401, NOT 404.
     const res = await request.post('/api/internal/sovereignty-log', {
       data: {
         sourceIp: '127.0.0.1',
@@ -277,7 +277,7 @@ test.describe('Directive 007: PIPEDA Sovereignty', () => {
   test('sovereignty log endpoint accepts events with valid secret', async ({ request }) => {
     const cronSecret = process.env.CRON_SECRET
     // Skip if CRON_SECRET is not available in the test environment
-    test.skip(!cronSecret, 'CRON_SECRET not available — skipping live sovereignty log test')
+    test.skip(!cronSecret, 'CRON_SECRET not available  -  skipping live sovereignty log test')
 
     const res = await request.post('/api/internal/sovereignty-log', {
       headers: { 'x-internal-secret': cronSecret! },
@@ -299,7 +299,7 @@ test.describe('Directive 007: PIPEDA Sovereignty', () => {
 })
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// SUITE 5 — Deadline Shield Verification
+// SUITE 5  -  Deadline Shield Verification
 // ═══════════════════════════════════════════════════════════════════════════════
 
 test.describe('Directive 007: Deadline Shield', () => {
@@ -341,8 +341,8 @@ test.describe('Directive 007: Deadline Shield', () => {
     const body = await res.json()
 
     // Two acceptable outcomes:
-    // 1. 200 — scan completed (matter exists)
-    // 2. 500 — matter not found, but the endpoint is operational (structured error)
+    // 1. 200  -  scan completed (matter exists)
+    // 2. 500  -  matter not found, but the endpoint is operational (structured error)
     if (res.ok()) {
       expect(body.success).toBe(true)
     } else {
@@ -363,12 +363,12 @@ test.describe('Directive 007: Deadline Shield', () => {
 })
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// SUITE 6 — Conflict Engine Integrity
+// SUITE 6  -  Conflict Engine Integrity
 // ═══════════════════════════════════════════════════════════════════════════════
 
 test.describe('Directive 007: Conflict Engine Integrity', () => {
   test('conflict scan endpoint is operational', async ({ request }) => {
-    // Use a non-existent contact ID — the endpoint should respond with a
+    // Use a non-existent contact ID  -  the endpoint should respond with a
     // structured error (not a crash or HTML page).
     const fakeContactId = '00000000-0000-4000-a000-000000000077'
     const res = await request.post(`/api/contacts/${fakeContactId}/conflict-scan`, {
@@ -378,11 +378,11 @@ test.describe('Directive 007: Conflict Engine Integrity', () => {
     const body = await res.json()
 
     if (res.ok()) {
-      // Contact existed — verify scan completed
+      // Contact existed  -  verify scan completed
       const scan = body.scan ?? body.data?.scan ?? body
       expect(scan.status).toBeTruthy()
     } else {
-      // Contact does not exist — structured error proves endpoint is live
+      // Contact does not exist  -  structured error proves endpoint is live
       expect(body.error ?? body.message).toBeTruthy()
       // Must NOT be 404 on the route itself (that would mean no endpoint)
       // A 500 from "contact not found" in the service layer is acceptable
@@ -395,7 +395,7 @@ test.describe('Directive 007: Conflict Engine Integrity', () => {
     const res = await request.post(`/api/contacts/${fakeContactId}/conflict-decision`, {
       data: {
         decision: 'no_conflict',
-        notes: 'E2E Directive 007 — conflict engine operational check',
+        notes: 'E2E Directive 007  -  conflict engine operational check',
       },
     })
 
@@ -417,7 +417,7 @@ test.describe('Directive 007: Conflict Engine Integrity', () => {
 
     const body = await res.json()
 
-    // Endpoint exists — either returns data or a structured error
+    // Endpoint exists  -  either returns data or a structured error
     if (res.ok()) {
       expect(body).toBeTruthy()
     } else {

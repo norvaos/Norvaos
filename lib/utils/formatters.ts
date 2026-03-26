@@ -16,7 +16,7 @@ function toDateFnsTokens(fmt: string): string {
   return fmt
     .replace(/YYYY/g, 'yyyy') // 4-digit year
     .replace(/DD/g,   'dd')   // day of month (2-digit)
-  // MM (month) and MMM (month abbrev) are identical in date-fns — no change needed.
+  // MM (month) and MMM (month abbrev) are identical in date-fns  -  no change needed.
 }
 
 /** Called by TenantProvider after the tenant data loads. */

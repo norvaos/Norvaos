@@ -65,7 +65,7 @@ const TABLE_PAGE_SIZE = 50
 const VISUAL_VIEW_PAGE_SIZE = 500
 
 // ---------------------------------------------------------------------------
-// Debounce hook — delays search until user stops typing
+// Debounce hook  -  delays search until user stops typing
 // ---------------------------------------------------------------------------
 function useDebouncedValue<T>(value: T, delayMs: number): T {
   const [debounced, setDebounced] = useState(value)

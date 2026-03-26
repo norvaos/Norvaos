@@ -168,7 +168,7 @@ export function KioskIdScanner({
     )
   }
 
-  // Preview state — show captured/uploaded image with confirm/retake
+  // Preview state  -  show captured/uploaded image with confirm/retake
   if (preview) {
     return (
       <div className="flex flex-col items-center gap-6 w-full max-w-lg mx-auto px-4">
@@ -263,7 +263,7 @@ export function KioskIdScanner({
     )
   }
 
-  // Choose mode — camera or upload
+  // Choose mode  -  camera or upload
   return (
     <div className="flex flex-col items-center gap-6 w-full max-w-md mx-auto px-4">
       <h2 className="text-2xl font-semibold text-slate-900 text-center">

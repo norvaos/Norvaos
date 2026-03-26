@@ -147,7 +147,7 @@ function ProfilePathCombobox({
               }}
             >
               <span className="font-mono text-blue-600">{e.path}</span>
-              <span className="text-muted-foreground ml-1.5">— {e.label}</span>
+              <span className="text-muted-foreground ml-1.5"> -  {e.label}</span>
             </button>
           ))}
         </div>
@@ -202,7 +202,7 @@ function PreviewPanel({
             <div>
               <SheetTitle className="text-base">Form Preview</SheetTitle>
               <SheetDescription className="text-xs mt-0.5">
-                Approximate render — verify final output in Adobe Reader
+                Approximate render  -  verify final output in Adobe Reader
               </SheetDescription>
             </div>
             <Button variant="ghost" size="icon" className="h-7 w-7" onClick={onClose}>
@@ -427,18 +427,18 @@ function FieldRow({ field }: { field: IrccFormField }) {
         <TableCell className="font-mono text-xs text-muted-foreground max-w-[180px] truncate">
           {field.xfa_path}
         </TableCell>
-        <TableCell className="text-xs max-w-[150px] truncate">{field.label ?? field.suggested_label ?? '—'}</TableCell>
+        <TableCell className="text-xs max-w-[150px] truncate">{field.label ?? field.suggested_label ?? ' - '}</TableCell>
         <TableCell className="font-mono text-xs text-blue-600 max-w-[180px] truncate">
           {field.profile_path ?? (
             <span className="text-muted-foreground italic">unmapped</span>
           )}
         </TableCell>
-        <TableCell className="text-xs">{field.field_type ?? '—'}</TableCell>
+        <TableCell className="text-xs">{field.field_type ?? ' - '}</TableCell>
         <TableCell className="text-center">
           {field.is_required ? (
             <CheckCircle2 className="h-3.5 w-3.5 text-green-600 mx-auto" />
           ) : (
-            <span className="text-muted-foreground">—</span>
+            <span className="text-muted-foreground"> - </span>
           )}
         </TableCell>
         <TableCell className="text-center">
@@ -933,7 +933,7 @@ export default function IrccFormEditorPage() {
           <div>
             <span className="font-semibold font-mono">{form.form_code}</span>
             {form.form_name && (
-              <span className="text-muted-foreground ml-1.5">— {form.form_name}</span>
+              <span className="text-muted-foreground ml-1.5"> -  {form.form_name}</span>
             )}
           </div>
 

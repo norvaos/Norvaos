@@ -58,7 +58,7 @@ export function usePiiMaskingConfig(): {
       } | null
     },
     enabled: !!appUser?.id,
-    staleTime: 1000 * 60 * 10, // 10 min — role doesn't change often
+    staleTime: 1000 * 60 * 10, // 10 min  -  role doesn't change often
     refetchOnWindowFocus: false,
   })
 

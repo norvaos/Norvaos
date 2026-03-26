@@ -9,7 +9,7 @@
  * - PII protection: email addresses are masked in log output;
  *   email body content never appears in logs
  * - Sentry capture on permanent Resend API failure
- * - Returns a typed DeliveryResult — callers do not need try/catch
+ * - Returns a typed DeliveryResult  -  callers do not need try/catch
  *
  * Scope constraint: wraps existing email delivery infrastructure;
  * does not change email content, template selection, or recipient logic.
@@ -39,7 +39,7 @@ export interface EmailDeliveryPayload {
   bcc?: string[]
   /**
    * Opaque correlation tag for delivery tracking (e.g. notification type).
-   * Never logged in full — used only for structured metadata.
+   * Never logged in full  -  used only for structured metadata.
    */
   correlationTag?: string
 }
@@ -85,7 +85,7 @@ function getResendClient(): Resend {
   const apiKey = process.env.RESEND_API_KEY
   if (!apiKey) {
     throw new NonRetryableError(
-      'RESEND_API_KEY is not configured — email delivery is disabled',
+      'RESEND_API_KEY is not configured  -  email delivery is disabled',
     )
   }
   return new Resend(apiKey)
@@ -97,7 +97,7 @@ function getResendClient(): Resend {
  * Determine whether a Resend API error is retryable.
  *
  * Resend surfaces errors as objects with a `statusCode` field.
- * 4xx errors (except 429) are permanent — retrying will not help.
+ * 4xx errors (except 429) are permanent  -  retrying will not help.
  * 429 and 5xx errors are transient and should be retried.
  */
 function classifyResendError(err: unknown): { retryable: boolean; message: string } {
@@ -169,7 +169,7 @@ export async function sendEmail(
         bcc: payload.bcc,
       } as Parameters<typeof resend.emails.send>[0])
 
-      // Resend SDK returns { data, error } — surface error as thrown exception
+      // Resend SDK returns { data, error }  -  surface error as thrown exception
       if (sendResult.error) {
         const { retryable, message } = classifyResendError(sendResult.error)
         if (!retryable) {
@@ -230,7 +230,7 @@ export async function sendEmail(
     return { sent: true, messageId, attempts: result.attempts }
   }
 
-  // Permanent failure — capture to Sentry with tenant context
+  // Permanent failure  -  capture to Sentry with tenant context
   const errorMessage = result.error.message
 
   Sentry.withScope((scope) => {

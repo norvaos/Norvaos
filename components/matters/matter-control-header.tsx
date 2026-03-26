@@ -1,11 +1,11 @@
 'use client'
 
 /**
- * MatterControlHeader — Clean 3-row control header for the unified immigration workspace.
+ * MatterControlHeader  -  Clean 3-row control header for the unified immigration workspace.
  *
  * Row 1: Back button, title, client name, matter number, status/priority badges, edit/actions
  * Row 2: Stage pipeline bar (immigration or generic)
- * Row 3: Operational metrics — type, readiness %, drafting/filing status, lawyer review, stale packs
+ * Row 3: Operational metrics  -  type, readiness %, drafting/filing status, lawyer review, stale packs
  */
 
 import { Badge } from '@/components/ui/badge'
@@ -90,7 +90,7 @@ export function MatterControlHeader({
     <div className="rounded-lg border bg-card px-4 py-2.5 space-y-1.5">
       {/* Metrics strip */}
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
-        {/* Matter type — iron-canvas-guard for long translations */}
+        {/* Matter type  -  iron-canvas-guard for long translations */}
         {matterTypeName && (
           <span className="font-medium text-slate-700 iron-canvas-guard max-w-[200px]" title={matterTypeName}>
             {matterTypeName}

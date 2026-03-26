@@ -35,7 +35,7 @@ export function PortalTimeline({ token, primaryColor, language = 'en' }: PortalT
         setCurrentStageId(data.currentStageId ?? null)
       })
       .catch(() => {
-        // Silently fail — timeline is optional
+        // Silently fail  -  timeline is optional
       })
       .finally(() => setLoading(false))
   }, [token])

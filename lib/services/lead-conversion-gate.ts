@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Lead Conversion Gate — Legal/Compliance Gating Before Matter Creation
+ * Lead Conversion Gate  -  Legal/Compliance Gating Before Matter Creation
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Conversion is a controlled legal-operational state change, not a convenience
@@ -82,13 +82,13 @@ export async function evaluateConversionGates(
     results.push(result)
   }
 
-  // 7. Readiness Score (if enabled — blocks conversion if score < 70%)
+  // 7. Readiness Score (if enabled  -  blocks conversion if score < 70%)
   if (gates.readiness_complete) {
     const result = await checkReadinessComplete(supabase, leadId)
     results.push(result)
   }
 
-  // 8. Trust Deposit Received (if enabled — Norva Ledger confirmation)
+  // 8. Trust Deposit Received (if enabled  -  Norva Ledger confirmation)
   if (gates.trust_deposit_received) {
     const result = await checkTrustDepositReceived(supabase, leadId)
     results.push(result)
@@ -194,7 +194,7 @@ async function checkRetainerSigned(
     label: 'Retainer Signed',
     passed,
     reason: passed ? undefined : retainer
-      ? `Retainer status is "${retainer.status}" — the client must sign the retainer agreement before this lead can become a matter. Open the Retainer tab and send or re-send the retainer for signature.`
+      ? `Retainer status is "${retainer.status}"  -  the client must sign the retainer agreement before this lead can become a matter. Open the Retainer tab and send or re-send the retainer for signature.`
       : 'No retainer package found. Go to the Retainer tab, build a retainer package, send it to the client, and wait for them to sign.',
     enabled: true,
   }
@@ -220,7 +220,7 @@ async function checkPaymentReceived(
     label: 'Payment Received',
     passed,
     reason: passed ? undefined : retainer
-      ? `Payment status is "${retainer.payment_status}" — at least a partial payment must be recorded before opening a matter. Open the Retainer tab and click "Record Payment".`
+      ? `Payment status is "${retainer.payment_status}"  -  at least a partial payment must be recorded before opening a matter. Open the Retainer tab and click "Record Payment".`
       : 'No retainer package found. Go to the Retainer tab, build a retainer package, send it, and record payment once received.',
     enabled: true,
   }

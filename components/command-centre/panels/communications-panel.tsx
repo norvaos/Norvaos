@@ -65,9 +65,9 @@ const ACTIVITY_ICONS: Record<string, { icon: React.ReactNode; color: string }> =
 // ─── Component ──────────────────────────────────────────────────────
 
 /**
- * Communications Panel — recent calls, emails, messages for the matter's contact.
+ * Communications Panel  -  recent calls, emails, messages for the matter's contact.
  *
- * Rule #19: No N+1 — single query, no nested fetches.
+ * Rule #19: No N+1  -  single query, no nested fetches.
  */
 export function CommunicationsPanel() {
   const { contact, tenantId, entityType } = useCommandCentre()

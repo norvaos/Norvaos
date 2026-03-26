@@ -84,8 +84,8 @@ async function handleGet(request: NextRequest) {
  * POST /api/webhooks/microsoft
  *
  * Handles two scenarios:
- * 1. Subscription validation — Microsoft may POST with ?validationToken=xxx
- * 2. Change notifications — JSON body with { value: [...notifications] }
+ * 1. Subscription validation  -  Microsoft may POST with ?validationToken=xxx
+ * 2. Change notifications  -  JSON body with { value: [...notifications] }
  *
  * MUST return 202 Accepted within 30 seconds (Graph API requirement).
  * Actual sync work is enqueued as a background job.
@@ -133,7 +133,7 @@ async function handlePost(request: NextRequest) {
     )
   }
 
-  // Fire-and-forget: don't await — return 202 immediately.
+  // Fire-and-forget: don't await  -  return 202 immediately.
   // In serverless, we need to await to avoid premature termination.
   // Use Promise.allSettled so one failure doesn't block others.
   void Promise.allSettled(processingPromises)
@@ -173,7 +173,7 @@ async function processNotification(
 
   // 2. Validate clientState to prevent spoofed notifications
   if (subscription.client_state && subscription.client_state !== clientState) {
-    log.error('[webhook/microsoft] clientState mismatch — possible spoofing', {
+    log.error('[webhook/microsoft] clientState mismatch  -  possible spoofing', {
       subscriptionId,
       expected: subscription.client_state,
       received: clientState ?? '(none)',
@@ -200,7 +200,7 @@ async function processNotification(
 
   // 3. Debounce: skip if same connection was synced recently
   if (shouldDebounce(subscription.connection_id)) {
-    log.info('[webhook/microsoft] Debounced — connection synced recently', {
+    log.info('[webhook/microsoft] Debounced  -  connection synced recently', {
       connectionId: subscription.connection_id,
       subscriptionId,
     })

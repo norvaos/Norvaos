@@ -1,5 +1,5 @@
 /**
- * Português (pt) — Portuguese dictionary.
+ * Português (pt)  -  Portuguese dictionary.
  * Terminologia jurídica traduzida para português brasileiro (contexto imigratório canadense).
  */
 
@@ -71,7 +71,7 @@ export const pt: Partial<Record<DictionaryKey, string>> = {
   'dashboard.deadline_today': 'Today',
   'dashboard.deadline_1_day': '1 day',
   'dashboard.deadline_days': '{days} days',
-  'dashboard.deadlines_14_days': 'Deadlines — Next 14 Days',
+  'dashboard.deadlines_14_days': 'Deadlines  -  Next 14 Days',
   'dashboard.no_deadlines_14': 'No deadlines in the next 14 days',
   'dashboard.no_deadlines_14_desc': 'Typed deadlines on matters will appear here.',
   'dashboard.unknown_matter': 'Unknown matter',
@@ -101,12 +101,12 @@ export const pt: Partial<Record<DictionaryKey, string>> = {
   'common.save': 'Salvar',
   'common.view': 'Visualizar',
 
-  // ── Diretiva 41.0 — Contatos e Vault ─────────────────────────────────────
+  // ── Diretiva 41.0  -  Contatos e Vault ─────────────────────────────────────
   'contact.badge.retained_client': 'Cliente Retido',
   'contact.badge.prospective_lead': 'Potencial Cliente',
   'contact.badge.contact': 'Contato',
   'contact.command_centre': 'Centro de Comando',
-  'contact.command_centre_red_alert': 'A pontuação de prontidão está criticamente baixa — atenção imediata necessária',
+  'contact.command_centre_red_alert': 'A pontuação de prontidão está criticamente baixa  -  atenção imediata necessária',
   'contact.intake_funnel': 'Funil de Admissão',
   'contact.intake_progress': 'Progresso da Admissão',
   'contact.matter_readiness': 'Prontidão do Caso',
@@ -119,13 +119,13 @@ export const pt: Partial<Record<DictionaryKey, string>> = {
   'vault.title': 'Norva Vault',
   'vault.empty': 'Norva Vault Vazio',
   'vault.empty_description': 'Nenhum documento enviado para este contato.',
-  'vault.sentinel_eye': 'Sentinel Eye — Ver e Verificar',
+  'vault.sentinel_eye': 'Sentinel Eye  -  Ver e Verificar',
   'vault.file_tampered': 'Cuidado: Arquivo Adulterado',
   'vault.sha256_verified': 'SHA-256 Verificado',
   'vault.hash_pending': 'Hash Pendente',
   'vault.integrity_alert': 'Alerta de Integridade',
   'vault.untracked': 'Não Rastreado',
-  'vault.no_preview': 'Pré-visualização indisponível — URL do arquivo ausente',
+  'vault.no_preview': 'Pré-visualização indisponível  -  URL do arquivo ausente',
 
   // ── Declarações Jurídicas ──────────────────────────────────────────────────
   'legal.retainer_title': 'Contrato de Prestação de Serviços Jurídicos',
@@ -211,12 +211,12 @@ export const pt: Partial<Record<DictionaryKey, string>> = {
   'status.days_remaining': '{days}d restantes',
   'status.verified': 'Verificado',
   'status.expiry_label': 'Expiração',
-  'status.sentinel_tamper_title': 'ALERTA SENTINELA — Adulteração detectada',
+  'status.sentinel_tamper_title': 'ALERTA SENTINELA  -  Adulteração detectada',
   'status.sentinel_tamper_body': 'Discrepância de hash do documento. Este documento foi modificado fora do NorvaOS.',
-  'status.vault_verified_title': 'Cofre Norva — Integridade verificada',
+  'status.vault_verified_title': 'Cofre Norva  -  Integridade verificada',
   'status.vault_verified_body': 'Este documento está bloqueado por hash no Cofre Norva. Qualquer adulteração será detectada.',
 
-  // ── Leads Command Centre (Directive 40.0 — Sovereign Layer) ─────────────
+  // ── Leads Command Centre (Directive 40.0  -  Sovereign Layer) ─────────────
   'leads.title': 'Leads',
   'leads.add_lead': 'Adicionar lead',
   'leads.import': 'Importar',
@@ -339,7 +339,7 @@ export const pt: Partial<Record<DictionaryKey, string>> = {
   'form.notes_placeholder': 'Add any additional notes about this contact...',
   'form.create_contact': 'Create Contact',
   'form.save_changes': 'Save Changes',
-  'form.review_required_ocr': 'Review Required — OCR could not extract',
+  'form.review_required_ocr': 'Review Required  -  OCR could not extract',
   'form.section_basic_info': 'Basic Information',
   'form.section_contact_details': 'Contact Details',
   'form.section_address': 'Address',

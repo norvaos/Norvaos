@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Verify IRCC Form Migration — Compare DB data against hardcoded constants
+ * Verify IRCC Form Migration  -  Compare DB data against hardcoded constants
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Runs after `seed-ircc-forms.ts` to verify that the DB-seeded data matches
@@ -40,21 +40,21 @@ const EXPECTED = {
   forms: [
     {
       form_code: 'IMM5257E',
-      form_name: 'IMM 5257E — Application for Temporary Resident Visa',
+      form_name: 'IMM 5257E  -  Application for Temporary Resident Visa',
       xfa_root_element: 'form1',
       checksum: '18f5185fb088fdab8be2b52ac76f0bb8500b3c0cc19e4ac2792c73e0a7ea423a',
       mapping_version: 'IMM5257E-map-v1.0',
     },
     {
       form_code: 'IMM5406',
-      form_name: 'IMM 5406 — Additional Family Information',
+      form_name: 'IMM 5406  -  Additional Family Information',
       xfa_root_element: 'IMM_5406',
       checksum: '94fbb23db198a1382c3b2fd6aefb147b2bea4d309c9d80e5e4b2a66c812a824e',
       mapping_version: 'IMM5406-map-v1.0',
     },
     {
       form_code: 'IMM5476E',
-      form_name: 'IMM 5476E — Use of a Representative',
+      form_name: 'IMM 5476E  -  Use of a Representative',
       xfa_root_element: 'IMM_5476',
       checksum: 'aca5c476b93d1c496b1afbc2cfe843499e852e31dcf0c192153bd01f8d6c56c4',
       mapping_version: 'IMM5476E-map-v1.0',
@@ -132,7 +132,7 @@ const EXPECTED = {
 // ═══════════════════════════════════════════════════════════════════════════════
 
 async function verify() {
-  console.log('🔍 IRCC Migration Verifier — Starting...\n')
+  console.log('🔍 IRCC Migration Verifier  -  Starting...\n')
 
   let totalChecks = 0
   let passedChecks = 0
@@ -148,7 +148,7 @@ async function verify() {
       failedChecks++
       const msg = detail ? `${name}: ${detail}` : name
       failures.push(msg)
-      console.log(`  ❌ ${name}${detail ? ` — ${detail}` : ''}`)
+      console.log(`  ❌ ${name}${detail ? `  -  ${detail}` : ''}`)
     }
   }
 

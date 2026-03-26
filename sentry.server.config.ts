@@ -1,7 +1,7 @@
 import * as Sentry from '@sentry/nextjs'
 
 /**
- * Sentry Server Configuration — Directive 008: System-Wide Telemetry
+ * Sentry Server Configuration  -  Directive 008: System-Wide Telemetry
  *
  * Captures:
  *   - All 500 errors with full stack traces
@@ -35,7 +35,7 @@ if (dsn) {
     beforeSend(event, hint) {
       const error = hint?.originalException
 
-      // Tag RLS violations (PostgreSQL 42501 — insufficient_privilege)
+      // Tag RLS violations (PostgreSQL 42501  -  insufficient_privilege)
       if (error instanceof Error) {
         const msg = error.message || ''
 

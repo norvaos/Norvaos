@@ -1,11 +1,11 @@
 -- ============================================================================
 -- Migration 029: Portal Document Compliance
--- Phase B.4 — Client Portal + Document Compliance Automation
+-- Phase B.4  -  Client Portal + Document Compliance Automation
 -- ============================================================================
 -- New tables:
---   1. document_requests      — audit trail for "Send Document Request" actions
---   2. document_reminders     — history of automated/manual reminders
---   3. document_reminder_configs — per-tenant reminder schedule settings
+--   1. document_requests       -  audit trail for "Send Document Request" actions
+--   2. document_reminders      -  history of automated/manual reminders
+--   3. document_reminder_configs  -  per-tenant reminder schedule settings
 --
 -- Column additions:
 --   matter_stages.client_label, notify_client_on_stage_change
@@ -100,7 +100,7 @@ CREATE POLICY document_reminder_configs_tenant_isolation ON document_reminder_co
 
 -- ─── 4. Column additions to existing tables ────────────────────────────────
 
--- Client-facing stage labels (nullable — falls back to stage name when null)
+-- Client-facing stage labels (nullable  -  falls back to stage name when null)
 ALTER TABLE matter_stages
   ADD COLUMN IF NOT EXISTS client_label TEXT DEFAULT NULL;
 ALTER TABLE case_stage_definitions

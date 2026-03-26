@@ -60,7 +60,7 @@ export async function checkSeatLimit(tenantId: string): Promise<SeatLimitResult>
   const admin = createAdminClient()
 
   // ── On-read expiration: mark stale invites as expired ──
-  // Fire-and-forget — don't block the check. The count query below uses
+  // Fire-and-forget  -  don't block the check. The count query below uses
   // expires_at > now() so stale rows are excluded even if this hasn't committed yet.
   const now = new Date().toISOString()
 
@@ -149,7 +149,7 @@ export async function checkSeatLimit(tenantId: string): Promise<SeatLimitResult>
 /**
  * Return the canonical HTTP 409 response for a seat-limit denial.
  *
- * Every seat-limit denial across the entire app uses this shape — no other
+ * Every seat-limit denial across the entire app uses this shape  -  no other
  * format is acceptable. Consumers can pattern-match on `code: 'SEAT_LIMIT_REACHED'`.
  *
  * When the denial is due to the pending-invite cap, `reason: 'PENDING_INVITE_CAP'`
@@ -190,7 +190,7 @@ export interface SeatLimitDenialParams {
  * entry_point exists within the last hour, skip the DB writes (still emits
  * a structured warn log so real-time streaming sees every denial).
  *
- * Fire-and-forget via Promise.allSettled — never blocks the response.
+ * Fire-and-forget via Promise.allSettled  -  never blocks the response.
  */
 export async function logSeatLimitDenial(params: SeatLimitDenialParams): Promise<void> {
   const {
@@ -205,7 +205,7 @@ export async function logSeatLimitDenial(params: SeatLimitDenialParams): Promise
     reason,
   } = params
 
-  // Always emit structured log (no dedupe — streaming consumers see every hit)
+  // Always emit structured log (no dedupe  -  streaming consumers see every hit)
   log.warn('[seat-limit] denied', {
     tenant_id,
     active_user_count,
@@ -231,7 +231,7 @@ export async function logSeatLimitDenial(params: SeatLimitDenialParams): Promise
     .gte('created_at', oneHourAgo)
 
   if (recentCount && recentCount > 0) {
-    // Recent audit entry exists — skip DB writes to avoid spam
+    // Recent audit entry exists  -  skip DB writes to avoid spam
     return
   }
 

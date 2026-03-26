@@ -1,11 +1,11 @@
 'use client'
 
 /**
- * SovereignComplianceStep — Directive 42.0, Step 3: Compliance Review
+ * SovereignComplianceStep  -  Directive 42.0, Step 3: Compliance Review
  *
  * Informational step shown after contact + lead creation. Displays the
  * current compliance matrix, next-step guidance, and navigation options.
- * This step does NOT block — it is purely informational.
+ * This step does NOT block  -  it is purely informational.
  */
 
 import { useRouter } from 'next/navigation'

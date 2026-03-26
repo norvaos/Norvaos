@@ -2,7 +2,7 @@
 -- Run this in Supabase SQL Editor
 
 -- =========================================================================
--- Documents table — file metadata for attachments
+-- Documents table  -  file metadata for attachments
 -- =========================================================================
 CREATE TABLE IF NOT EXISTS documents (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -35,7 +35,7 @@ CREATE POLICY "documents_tenant_isolation" ON documents
   FOR ALL USING (tenant_id = get_user_tenant_id());
 
 -- =========================================================================
--- Notes table — standalone notes linked to matters/contacts/leads
+-- Notes table  -  standalone notes linked to matters/contacts/leads
 -- =========================================================================
 CREATE TABLE IF NOT EXISTS notes (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -63,7 +63,7 @@ CREATE POLICY "notes_tenant_isolation" ON notes
   FOR ALL USING (tenant_id = get_user_tenant_id());
 
 -- =========================================================================
--- Audit logs table — track who changed what
+-- Audit logs table  -  track who changed what
 -- =========================================================================
 CREATE TABLE IF NOT EXISTS audit_logs (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),

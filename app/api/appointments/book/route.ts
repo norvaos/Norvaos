@@ -162,7 +162,7 @@ async function handlePost(request: Request) {
       tenant_id: tenantId,
       user_id: page.user_id,
       activity_type: 'booking_created',
-      title: `Booking: ${guestName} — ${page.title}`,
+      title: `Booking: ${guestName}  -  ${page.title}`,
       entity_type: 'contact',
       entity_id: contactId,
       metadata: {

@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * IntakeWizardPanel — v2
+ * IntakeWizardPanel  -  v2
  *
  * Interactive intake session for leads. One question at a time, conversational UI.
  *
@@ -9,7 +9,7 @@
  *  - Two-column layout: question on left, live answer log on right
  *  - "Why are we asking this?" expandable help section per question
  *  - "Help me figure this out" button for questions with a not_sure option
- *  - Fixed progress: shows "Step X" + "Y answers recorded" — never "X of 27"
+ *  - Fixed progress: shows "Step X" + "Y answers recorded"  -  never "X of 27"
  *  - Answer sidebar shows ALL recorded answers in real-time (not just last 4)
  *  - Completed state shows accurate count without false denominator
  */
@@ -212,14 +212,14 @@ function IntakeWizardInner({
     if (matterTypeName && recs.length > 0) {
       const mtLower = matterTypeName.toLowerCase()
       // Build keyword set from the matter type name
-      const mtKeywords = mtLower.split(/[\s—–\-/()]+/).filter((w) => w.length > 2)
+      const mtKeywords = mtLower.split(/[\s - –\-/()]+/).filter((w) => w.length > 2)
 
       const scored = recs.map((rec) => {
         const titleLower = rec.title.toLowerCase()
         const codeLower = rec.code.toLowerCase()
         // Check if this recommendation matches the selected matter type
         const titleMatch = mtKeywords.some((kw) => titleLower.includes(kw) || codeLower.includes(kw))
-        const nameInTitle = titleLower.includes(mtLower) || mtLower.includes(titleLower.split('—')[0].trim())
+        const nameInTitle = titleLower.includes(mtLower) || mtLower.includes(titleLower.split(' - ')[0].trim())
         return { rec, score: nameInTitle ? 2 : titleMatch ? 1 : 0 }
       })
 
@@ -309,7 +309,7 @@ function IntakeWizardInner({
 
         <Separator />
 
-        {/* Answer summary — two columns */}
+        {/* Answer summary  -  two columns */}
         <div className="px-4 py-3 space-y-2">
           <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">Session Summary</p>
           <div className="grid grid-cols-2 gap-x-6 gap-y-2">
@@ -379,7 +379,7 @@ function IntakeWizardInner({
                   <p className="text-[10px] text-indigo-700">
                     <span className="font-semibold">Selected matter type:</span> {matterTypeName}
                     {matterTypeConfig?.eligibility_summary && (
-                      <span className="text-indigo-600"> — {matterTypeConfig.eligibility_summary}</span>
+                      <span className="text-indigo-600">  -  {matterTypeConfig.eligibility_summary}</span>
                     )}
                   </p>
                 </div>
@@ -408,7 +408,7 @@ function IntakeWizardInner({
   }
 
   // ──────────────────────────────────────────────────────────────
-  // ACTIVE — two-column layout
+  // ACTIVE  -  two-column layout
   // ──────────────────────────────────────────────────────────────
   if (!currentQuestion) {
     setWizardState('completed')
@@ -562,7 +562,7 @@ function IntakeWizardInner({
             </div>
           )}
 
-          {/* Help me figure this out — only if not_sure option exists */}
+          {/* Help me figure this out  -  only if not_sure option exists */}
           {figureItOutOpt && (
             <button
               onClick={() => answerSingle(currentQuestion, figureItOutOpt.value)}

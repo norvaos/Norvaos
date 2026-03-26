@@ -1,14 +1,14 @@
 /**
- * Migration 185 — Golden Ledger Directive (20.0)
+ * Migration 185  -  Golden Ledger Directive (20.0)
  *
- * 1. admin_alerts table — system-generated alerts for TRUST_MISMATCH, etc.
- * 2. trust_transactions.reason_code — LedgerGuard enforcement column
+ * 1. admin_alerts table  -  system-generated alerts for TRUST_MISMATCH, etc.
+ * 2. trust_transactions.reason_code  -  LedgerGuard enforcement column
  *
  * RLS-enabled, tenant-isolated.
  */
 
 -- ═══════════════════════════════════════════════════════════════════════════════
--- 1. Admin Alerts — System-generated alerts for admin dashboard
+-- 1. Admin Alerts  -  System-generated alerts for admin dashboard
 -- ═══════════════════════════════════════════════════════════════════════════════
 
 CREATE TABLE IF NOT EXISTS admin_alerts (

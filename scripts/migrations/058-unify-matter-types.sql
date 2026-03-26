@@ -1,5 +1,5 @@
 -- ═══════════════════════════════════════════════════════════════════════════════
--- Migration 058: Unify Matter Types — IRCC Forms + Section Config
+-- Migration 058: Unify Matter Types  -  IRCC Forms + Section Config
 -- ═══════════════════════════════════════════════════════════════════════════════
 --
 -- Replaces the immigration_case_types parallel hierarchy by:

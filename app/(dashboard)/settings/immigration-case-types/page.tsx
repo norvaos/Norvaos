@@ -1553,7 +1553,7 @@ function DocumentSlotTemplatesSection({
           <div className="flex-1 overflow-y-auto space-y-1 min-h-0 border rounded-md p-2">
             {filteredLibrary.length === 0 ? (
               <p className="text-sm text-slate-400 text-center py-4">
-                {search || filterTag !== 'all' ? 'No entries match.' : 'Library is empty — seed it first.'}
+                {search || filterTag !== 'all' ? 'No entries match.' : 'Library is empty  -  seed it first.'}
               </p>
             ) : (
               filteredLibrary.map((entry) => {
@@ -1803,7 +1803,7 @@ function StreamFormsSection({
 }
 
 // ==========================================================
-// Detail Panel (right side — stages + checklist for selected type)
+// Detail Panel (right side  -  stages + checklist for selected type)
 // ==========================================================
 
 function DetailPanel({

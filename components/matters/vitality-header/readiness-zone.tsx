@@ -71,7 +71,7 @@ function ScoreRing({ score, shieldComplete = false }: { score: number; shieldCom
 
   return (
     <div className="relative shrink-0">
-      {/* Directive 016: Emerald Glow — only when shield requirements 100% met */}
+      {/* Directive 016: Emerald Glow  -  only when shield requirements 100% met */}
       {colours.emerald && (
         <div
           className="absolute inset-0 rounded-full"
@@ -81,7 +81,7 @@ function ScoreRing({ score, shieldComplete = false }: { score: number; shieldCom
           }}
         />
       )}
-      {/* Gold-Pulse glow — only when score >= 95 (non-shield) */}
+      {/* Gold-Pulse glow  -  only when score >= 95 (non-shield) */}
       {colours.gold && (
         <div
           className="absolute inset-0 rounded-full"
@@ -519,7 +519,7 @@ export function ReadinessZone({ data, isLoading, onDrillDown }: ReadinessZonePro
                   </Badge>
                 </TooltipTrigger>
                 <TooltipContent>
-                  Compliance score: {complianceDomain.pct}% — Click to view expiring documents
+                  Compliance score: {complianceDomain.pct}%  -  Click to view expiring documents
                 </TooltipContent>
               </Tooltip>
             )

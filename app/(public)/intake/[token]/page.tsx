@@ -1,5 +1,5 @@
 /**
- * External Intake Portal — Server Component
+ * External Intake Portal  -  Server Component
  *
  * Validates portal_links token, fetches matter + tenant branding,
  * and renders the client-facing intake form.
@@ -76,7 +76,7 @@ export default async function IntakePage({ params }: Props) {
     return <IntakeExpired />
   }
 
-  // 3. Fetch matter — block completed matters
+  // 3. Fetch matter  -  block completed matters
   const { data: matter } = await admin
     .from('matters')
     .select('id, title, matter_number, matter_type_id, status')

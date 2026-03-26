@@ -44,7 +44,7 @@ CREATE POLICY "trust_bank_accounts_select" ON trust_bank_accounts
     tenant_id = (SELECT tenant_id FROM users WHERE auth_user_id = auth.uid())
   );
 
--- ─── 3. trust_reconciliations (conditional — only if table exists) ────────────
+-- ─── 3. trust_reconciliations (conditional  -  only if table exists) ────────────
 
 DO $$
 BEGIN
@@ -65,7 +65,7 @@ BEGIN
 END
 $$;
 
--- ─── 4. trust_audit_log (conditional — only if table exists) ──────────────────
+-- ─── 4. trust_audit_log (conditional  -  only if table exists) ──────────────────
 
 DO $$
 BEGIN
@@ -86,7 +86,7 @@ BEGIN
 END
 $$;
 
--- ─── 5. trust_holds (conditional — only if table exists) ──────────────────────
+-- ─── 5. trust_holds (conditional  -  only if table exists) ──────────────────────
 
 DO $$
 BEGIN
@@ -107,7 +107,7 @@ BEGIN
 END
 $$;
 
--- ─── 6. trust_disbursement_requests (conditional — only if table exists) ──────
+-- ─── 6. trust_disbursement_requests (conditional  -  only if table exists) ──────
 
 DO $$
 BEGIN
@@ -128,7 +128,7 @@ BEGIN
 END
 $$;
 
--- ─── 7. conflict_of_interest (conditional — only if table exists) ─────────────
+-- ─── 7. conflict_of_interest (conditional  -  only if table exists) ─────────────
 
 DO $$
 BEGIN

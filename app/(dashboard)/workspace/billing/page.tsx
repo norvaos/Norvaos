@@ -168,7 +168,7 @@ export default function BillingWorkspace() {
                           </Link>
                         </td>
                         <td className="py-2 text-muted-foreground">
-                          {inv.due_date ? formatDate(inv.due_date) : '—'}
+                          {inv.due_date ? formatDate(inv.due_date) : ' - '}
                         </td>
                         <td className="py-2 text-right font-medium">
                           {formatCurrency(inv.balance_due ?? inv.total_amount ?? 0, inv.currency_code ?? 'CAD')}
@@ -258,7 +258,7 @@ export default function BillingWorkspace() {
                         <p className="text-xs text-red-600 font-medium">{daysOverdue}d overdue</p>
                       </div>
                       <p className="text-xs text-muted-foreground mt-0.5">
-                        Due {inv.due_date ? formatDate(inv.due_date) : '—'} · {formatCurrency(inv.balance_due ?? inv.total_amount ?? 0)}
+                        Due {inv.due_date ? formatDate(inv.due_date) : ' - '} · {formatCurrency(inv.balance_due ?? inv.total_amount ?? 0)}
                       </p>
                     </li>
                   )

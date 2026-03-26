@@ -23,7 +23,7 @@ const NAV_ITEMS = [
 ]
 
 /**
- * Front Desk header — no sidebar, just a top navigation bar.
+ * Front Desk header  -  no sidebar, just a top navigation bar.
  *
  * Rule #10: Separate locked interface. Restricted header only
  * (firm name, avatar, bell, logout). No settings/reports/pipelines/billing links.
@@ -136,7 +136,7 @@ export function FrontDeskHeader({ userId, userName, avatarUrl, firmName }: Front
   return (
     <header className="bg-white border-b border-slate-200 px-4 py-2">
       <div className="flex items-center justify-between max-w-[1600px] mx-auto">
-        {/* Left — firm name */}
+        {/* Left  -  firm name */}
         <div className="flex items-center gap-6">
           <Link href="/front-desk" className="flex items-center gap-2">
             <span className="text-lg font-bold text-slate-900">{firmName}</span>
@@ -172,7 +172,7 @@ export function FrontDeskHeader({ userId, userName, avatarUrl, firmName }: Front
           </nav>
         </div>
 
-        {/* Right — shift, kiosk, notifications, avatar, logout */}
+        {/* Right  -  shift, kiosk, notifications, avatar, logout */}
         <div className="flex items-center gap-2">
           {/* Shift Indicator */}
           {activeShift ? (

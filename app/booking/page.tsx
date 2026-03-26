@@ -52,7 +52,7 @@ export default async function BookingDirectoryPage({ searchParams }: Props) {
     )
   }
 
-  // Fetch all published booking pages for this tenant (no FK join — query user separately)
+  // Fetch all published booking pages for this tenant (no FK join  -  query user separately)
   const { data: pages } = await admin
     .from('booking_pages')
     .select('*')

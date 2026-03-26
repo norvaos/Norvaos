@@ -27,7 +27,7 @@ import { cn } from '@/lib/utils'
 function DocumentsZoneSkeleton() {
   return (
     <div className="space-y-3" role="status" aria-label="Loading documents">
-      {/* Stats bar skeleton — 6 blocks */}
+      {/* Stats bar skeleton  -  6 blocks */}
       <div className="flex flex-wrap gap-3">
         {Array.from({ length: 6 }).map((_, i) => (
           <div key={i} className="flex flex-col items-center gap-1 min-w-[48px]">
@@ -44,7 +44,7 @@ function DocumentsZoneSkeleton() {
         <Skeleton className="h-3.5 w-10" />
       </div>
 
-      {/* Pending cards skeleton — 4 cards */}
+      {/* Pending cards skeleton  -  4 cards */}
       <div className="flex gap-2 overflow-hidden pb-1">
         {Array.from({ length: 4 }).map((_, i) => (
           <Skeleton key={i} className="h-[100px] w-[160px] shrink-0 rounded-lg" />

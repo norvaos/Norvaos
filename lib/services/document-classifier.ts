@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Document Classifier — AI-Powered OCR Auto-Tagging (Directive 5.4)
+ * Document Classifier  -  AI-Powered OCR Auto-Tagging (Directive 5.4)
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * When files cross the Clio-to-Norva bridge (or any import), the classifier
@@ -93,15 +93,15 @@ const FILENAME_RULES: PatternRule[] = [
   { patterns: [/power.?of.?attorney/i, /\bpoa\b/i], category: 'legal', type: 'power_of_attorney', confidence: 0.9 },
 
   // Immigration
-  { patterns: [/imm\s*\d{4}/i, /ircc/i, /immigration.?form/i], category: 'immigration', type: 'immigration_form', confidence: 0.9 },
+  { patterns: [/imm\s*\d{4}/i, /^ircc\b/i, /\bircc\s+(form|submission|application)/i, /immigration.?form/i], category: 'immigration', type: 'immigration_form', confidence: 0.9 },
   { patterns: [/travel.?hist/i, /entry.?stamp/i, /visa.?stamp/i], category: 'immigration', type: 'travel_history', confidence: 0.85 },
   { patterns: [/police.?clear/i, /criminal.?record/i, /\bpcc\b/i], category: 'immigration', type: 'police_clearance', confidence: 0.9 },
 
-  // Correspondence
-  { patterns: [/letter/i, /correspondence/i], category: 'correspondence', type: 'letter', confidence: 0.7 },
+  // Employment / Education (must come BEFORE generic letter/correspondence)
+  { patterns: [/employ\w*.?letter/i, /job.?letter/i, /reference.?letter/i, /\broe\b/i], category: 'financial', type: 'employment_letter', confidence: 0.85 },
 
-  // Employment / Education
-  { patterns: [/employ.?letter/i, /job.?letter/i, /reference.?letter/i, /\broe\b/i], category: 'financial', type: 'employment_letter', confidence: 0.85 },
+  // Correspondence (must come AFTER employment letter to avoid false matches)
+  { patterns: [/letter/i, /correspondence/i], category: 'correspondence', type: 'letter', confidence: 0.7 },
   { patterns: [/diploma/i, /transcript/i, /degree/i, /\bwes\b/i, /credential/i, /\beca\b/i], category: 'immigration', type: 'education_credential', confidence: 0.85 },
 
   // Medical

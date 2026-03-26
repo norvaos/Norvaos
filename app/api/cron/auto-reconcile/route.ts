@@ -32,7 +32,7 @@ function advanceNextRunDate(currentDate: string, frequency: string): string {
 }
 
 async function handlePost(request: Request) {
-  // Auth check — fail-closed
+  // Auth check  -  fail-closed
   const cronSecret = process.env['CRON_SECRET']
   if (!cronSecret) {
     return NextResponse.json({ error: 'Server misconfigured: CRON_SECRET not set' }, { status: 500 })

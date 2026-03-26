@@ -2,7 +2,7 @@
 
 **Integration ID:** `notification-engine`
 **Module:** Team 3 / Module 1
-**Status:** Draft — Pending Proof Validation
+**Status:** Draft  -  Pending Proof Validation
 **Last Updated:** 2026-03-15
 **Source Files Audited:**
 - `lib/services/notification-engine.ts`
@@ -17,9 +17,9 @@ The notification engine (`dispatchNotification`) is the unified entry point for 
 
 **Three delivery channels:**
 
-1. **In-app** — Writes a row to the `notifications` table; surfaced to users via real-time subscription or polling from the frontend
-2. **Email** — Sends via Resend using `sendInternalEmail()` from `email-service.ts`; targets internal staff email addresses (not client email addresses)
-3. **Push** — Web push notifications via `sendPushNotification()` from `lib/services/push-service.ts`; placeholder/partial implementation
+1. **In-app**  -  Writes a row to the `notifications` table; surfaced to users via real-time subscription or polling from the frontend
+2. **Email**  -  Sends via Resend using `sendInternalEmail()` from `email-service.ts`; targets internal staff email addresses (not client email addresses)
+3. **Push**  -  Web push notifications via `sendPushNotification()` from `lib/services/push-service.ts`; placeholder/partial implementation
 
 **Client-facing notification emails** (stage change, document request, deadline alert, general) are handled by separate functions in `email-service.ts` (`sendStageChangeEmail`, `sendClientEmail`) and are distinct from the notification engine. Those functions also log to `client_notifications` and use Resend directly, bypassing `dispatchNotification`.
 
@@ -45,8 +45,8 @@ Tenants can override per-event channel configuration via `tenants.settings.notif
 The notification engine itself holds no credentials. Credentials are managed by the services it delegates to:
 
 - **Email channel:** `sendInternalEmail()` in `email-service.ts` reads `RESEND_API_KEY` at call time. If absent, the function silently returns without sending.
-- **Push channel:** `sendPushNotification()` in `lib/services/push-service.ts` — not audited in detail; credentials assumed to be VAPID keys in environment variables.
-- **In-app channel:** Direct database insert via Supabase client — no external credentials required.
+- **Push channel:** `sendPushNotification()` in `lib/services/push-service.ts`  -  not audited in detail; credentials assumed to be VAPID keys in environment variables.
+- **In-app channel:** Direct database insert via Supabase client  -  no external credentials required.
 
 ---
 
@@ -54,15 +54,15 @@ The notification engine itself holds no credentials. Credentials are managed by 
 
 ### Dispatch Level
 
-`dispatchNotification` uses `Promise.allSettled(promises)` to fan out to all channels for all recipients. `allSettled` ensures that a failure in one channel or one recipient does not abort other deliveries. Results (fulfilled/rejected) are not inspected — settled rejections are silently discarded.
+`dispatchNotification` uses `Promise.allSettled(promises)` to fan out to all channels for all recipients. `allSettled` ensures that a failure in one channel or one recipient does not abort other deliveries. Results (fulfilled/rejected) are not inspected  -  settled rejections are silently discarded.
 
-**IDENTIFIED GAP — No retry on channel delivery failure:** If `deliverInApp`, `deliverEmail`, or `deliverPush` throws (or their internal promises reject), the exception is caught by their individual `try/catch` blocks, logged, and dropped. There is no retry mechanism. A transient Supabase error on `deliverInApp` or a transient Resend API error on `deliverEmail` will result in a permanently missed notification with no retry.
+**IDENTIFIED GAP  -  No retry on channel delivery failure:** If `deliverInApp`, `deliverEmail`, or `deliverPush` throws (or their internal promises reject), the exception is caught by their individual `try/catch` blocks, logged, and dropped. There is no retry mechanism. A transient Supabase error on `deliverInApp` or a transient Resend API error on `deliverEmail` will result in a permanently missed notification with no retry.
 
 ### Per-Channel Behaviour
 
 **In-app (`deliverInApp`):**
 - One `insert` to `notifications` table
-- On failure: `log.error('In-app notification failed', ...)` — error is logged and swallowed
+- On failure: `log.error('In-app notification failed', ...)`  -  error is logged and swallowed
 - No retry
 
 **Email (`deliverEmail`):**
@@ -73,14 +73,14 @@ The notification engine itself holds no credentials. Credentials are managed by 
 **Push (`deliverPush`):**
 - Calls `sendPushNotification()` from `push-service.ts`
 - Only web push subscriptions with `endpoint` and `keys` are processed
-- On failure: `log.error('Push notification failed', ...)` — error is logged and swallowed
+- On failure: `log.error('Push notification failed', ...)`  -  error is logged and swallowed
 - No retry
 
 ---
 
 ## 4. Idempotency Guarantees
 
-**IDENTIFIED GAP — No deduplication on dispatch:** `dispatchNotification` does not check whether a notification for the same event has already been sent to the same recipient. If called twice with the same event (e.g., due to a bug in the calling code or a cron job running twice), it will:
+**IDENTIFIED GAP  -  No deduplication on dispatch:** `dispatchNotification` does not check whether a notification for the same event has already been sent to the same recipient. If called twice with the same event (e.g., due to a bug in the calling code or a cron job running twice), it will:
 - Insert duplicate rows in the `notifications` table (in-app)
 - Attempt to send duplicate emails via Resend
 - Attempt to send duplicate push notifications
@@ -95,7 +95,7 @@ There is no idempotency key on the `notifications` table insert, and no deduplic
 |---|---|
 | `event.recipientUserIds` is empty | Returns immediately (no work done, no log) |
 | Tenant settings fetch fails | Falls through to default triggers (`DEFAULT_TRIGGERS`) |
-| All channels disabled for event type | Returns with `log.debug('Notification skipped — all channels disabled')` |
+| All channels disabled for event type | Returns with `log.debug('Notification skipped  -  all channels disabled')` |
 | User fetch returns empty | Returns immediately |
 | User has no email | Email channel skipped (checked by `user.email` truthiness) |
 | User's `email_notifications` pref is `false` | Email channel skipped |
@@ -106,7 +106,7 @@ There is no idempotency key on the `notifications` table insert, and no deduplic
 | `deliverPush` fails | Logged via `log.error`; other channels continue |
 | Outer `try/catch` in `dispatchNotification` triggers | Logged via `log.error('Notification dispatch failed', ...)` with `tenant_id` and `event_type`; function returns without throwing |
 
-The engine is designed to be non-throwing — `dispatchNotification` never propagates exceptions to the caller.
+The engine is designed to be non-throwing  -  `dispatchNotification` never propagates exceptions to the caller.
 
 ---
 
@@ -115,13 +115,13 @@ The engine is designed to be non-throwing — `dispatchNotification` never propa
 ### Logging
 
 The notification engine uses the structured `log` utility from `lib/utils/logger.ts` for its own log calls:
-- `log.debug` — channel disabled skip
-- `log.info` — successful dispatch completion (includes `tenant_id`, `event_type`, `recipient_count`, enabled `channels`)
-- `log.error` — dispatch-level failure, in-app failure, push failure
+- `log.debug`  -  channel disabled skip
+- `log.info`  -  successful dispatch completion (includes `tenant_id`, `event_type`, `recipient_count`, enabled `channels`)
+- `log.error`  -  dispatch-level failure, in-app failure, push failure
 
 However, the email channel (`deliverEmail` → `sendInternalEmail`) uses `console.error` rather than `log.error`.
 
-**IDENTIFIED GAP — Mixed logging in email path:** The email delivery path within the notification engine ultimately uses `console.error` (in `email-service.ts`), which is inconsistent with the structured logging used by the engine itself. Email delivery failures will not appear with `tenant_id` context in log aggregators.
+**IDENTIFIED GAP  -  Mixed logging in email path:** The email delivery path within the notification engine ultimately uses `console.error` (in `email-service.ts`), which is inconsistent with the structured logging used by the engine itself. Email delivery failures will not appear with `tenant_id` context in log aggregators.
 
 ### Structured Log Fields (on success)
 
@@ -133,10 +133,10 @@ When `log.info('Notification dispatched', ...)` is called, the following fields 
 
 ### Database Audit Trail
 
-- `notifications` table — one row per in-app notification per recipient; includes `tenant_id`, `user_id`, `title`, `message`, `notification_type`, `entity_type`, `entity_id`, `channels`, `priority`
-- `client_notifications` table — used by client-facing email functions (`sendClientEmail`, `sendStageChangeEmail`), not by `dispatchNotification`
+- `notifications` table  -  one row per in-app notification per recipient; includes `tenant_id`, `user_id`, `title`, `message`, `notification_type`, `entity_type`, `entity_id`, `channels`, `priority`
+- `client_notifications` table  -  used by client-facing email functions (`sendClientEmail`, `sendStageChangeEmail`), not by `dispatchNotification`
 
-**IDENTIFIED GAP — No email delivery audit for staff notifications:** `deliverEmail` calls `sendInternalEmail`, which does not write to `client_notifications` or any audit table. There is no persistent record of internal staff notification emails attempted or delivered. Only the in-app `notifications` row serves as evidence of the event.
+**IDENTIFIED GAP  -  No email delivery audit for staff notifications:** `deliverEmail` calls `sendInternalEmail`, which does not write to `client_notifications` or any audit table. There is no persistent record of internal staff notification emails attempted or delivered. Only the in-app `notifications` row serves as evidence of the event.
 
 ---
 
@@ -188,7 +188,7 @@ All `notifications` inserts include `tenant_id`. Tenant channel config is fetche
 
 ## 10. Acceptance Criteria
 
-- [ ] `dispatchNotification` never throws — all errors are caught and logged
+- [ ] `dispatchNotification` never throws  -  all errors are caught and logged
 - [ ] In-app notifications are inserted to `notifications` table with correct `tenant_id`, `user_id`, `notification_type`
 - [ ] Users with `email_notifications: false` in `notification_prefs` do not receive email notifications
 - [ ] Tenant with all channels disabled for an event type skips dispatch cleanly with a debug log

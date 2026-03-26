@@ -7,7 +7,7 @@ import { incrementDbCalls } from '@/lib/middleware/request-timing'
 import { AsyncLocalStorage } from 'node:async_hooks'
 import { cookies } from 'next/headers'
 
-/** Pre-resolved role data — populated once in authenticateRequest(). */
+/** Pre-resolved role data  -  populated once in authenticateRequest(). */
 export interface AuthRole {
   id: string
   name: string
@@ -53,8 +53,8 @@ const AUTH_LOOKUP_TTL = 120 // seconds
  * Authenticate an API route request and resolve user + tenant context.
  *
  * Optimizations (Scale Fix Pack v1):
- *   1. Request-scoped memo — second call in same request = 0 DB queries
- *   2. Redis cache — maps authUserId → (userId, tenantId), TTL 120s
+ *   1. Request-scoped memo  -  second call in same request = 0 DB queries
+ *   2. Redis cache  -  maps authUserId → (userId, tenantId), TTL 120s
  *   3. Falls back to DB query on cache miss
  */
 export async function authenticateRequest(): Promise<AuthContext> {
@@ -88,7 +88,7 @@ export async function authenticateRequest(): Promise<AuthContext> {
     // Cache failures never break auth
   }
 
-  // 3. DB query (cache miss path) — now includes role_id + is_active for zero-cost permission checks.
+  // 3. DB query (cache miss path)  -  now includes role_id + is_active for zero-cost permission checks.
   // A user may belong to multiple tenants (one users row per tenant). We resolve the
   // active tenant via the norvaos-active-tenant cookie written by persistActiveTenant()
   // on the client. When the cookie is present we add .eq('tenant_id', …) so the query
@@ -100,7 +100,7 @@ export async function authenticateRequest(): Promise<AuthContext> {
     const cookieStore = await cookies()
     activeTenantId = cookieStore.get('norvaos-active-tenant')?.value ?? null
   } catch {
-    // cookies() may throw outside a request context (e.g. tests) — safe to ignore
+    // cookies() may throw outside a request context (e.g. tests)  -  safe to ignore
   }
 
   let usersQuery = supabase
@@ -125,7 +125,7 @@ export async function authenticateRequest(): Promise<AuthContext> {
     throw new AuthError('No tenant associated with user', 403)
   }
 
-  // Block deactivated users — immediate enforcement regardless of session state
+  // Block deactivated users  -  immediate enforcement regardless of session state
   if (appUser.is_active === false) {
     throw new AuthError('Account deactivated', 403)
   }

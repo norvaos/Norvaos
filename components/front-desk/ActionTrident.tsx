@@ -1,17 +1,17 @@
 'use client'
 
 /**
- * ActionTrident — Directive 32.0 §2: The Funnel
+ * ActionTrident  -  Directive 32.0 §2: The Funnel
  *
  * Three glass-morphism action cards forming the client entry funnel:
- *   Card A (Intake)     — Gold-pulse primary CTA, the "Starting Point"
- *   Card B (Vault Drop) — Secure document upload
- *   Card C (Portal)     — Client portal access with biometric verification
+ *   Card A (Intake)      -  Gold-pulse primary CTA, the "Starting Point"
+ *   Card B (Vault Drop)  -  Secure document upload
+ *   Card C (Portal)      -  Client portal access with biometric verification
  *
  * Iron Canvas compliant: text-balance headers, IronCanvasGuard on labels,
  * responsive 1-col → 3-col grid with gap-8.
  *
- * Directive 36.1: Liquid-Layout hardened — `isolation: isolate` on cards
+ * Directive 36.1: Liquid-Layout hardened  -  `isolation: isolate` on cards
  * prevents Gold-Pulse border ghosting during 4K↔Mobile snap-resize.
  * CSS containment on grid prevents reflow propagation to sibling zones.
  */
@@ -153,7 +153,7 @@ export function ActionTrident({
               <Icon className="h-6 w-6" />
             </div>
 
-            {/* Title — line-clamp-2 for Nastaliq safety (no whitespace-nowrap conflict) */}
+            {/* Title  -  line-clamp-2 for Nastaliq safety (no whitespace-nowrap conflict) */}
             <h3 className={cn(
               'relative z-10 text-lg font-bold text-foreground mb-2',
               'text-balance line-clamp-2',
@@ -161,7 +161,7 @@ export function ActionTrident({
               {title}
             </h3>
 
-            {/* Description — clamped to 3 lines, max-height caps Nastaliq line-height */}
+            {/* Description  -  clamped to 3 lines, max-height caps Nastaliq line-height */}
             <p className={cn(
               'relative z-10 text-sm text-muted-foreground leading-relaxed flex-1',
               'line-clamp-3',

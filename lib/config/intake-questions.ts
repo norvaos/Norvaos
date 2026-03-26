@@ -29,7 +29,7 @@ export interface IntakeQuestion {
   question: string
   /** Additional context shown below the question */
   subtext?: string
-  /** Plain-English explanation of WHY we ask this question — shown in the "Why are we asking this?" help section */
+  /** Plain-English explanation of WHY we ask this question  -  shown in the "Why are we asking this?" help section */
   why?: string
   /** Key used to store the answer in custom_fields / the answer map */
   saveAs: string
@@ -127,7 +127,7 @@ export const INTAKE_QUESTIONS: IntakeQuestion[] = [
         value: 'global_talent',
         label: 'Hire a highly skilled tech worker quickly',
         emoji: '⚡',
-        hint: 'Global Talent Stream — 2-week processing',
+        hint: 'Global Talent Stream  -  2-week processing',
         nextId: 'q_timeline',
       },
       {
@@ -271,10 +271,10 @@ export const INTAKE_QUESTIONS: IntakeQuestion[] = [
     nextId: 'q_timeline',
     optional: true,
     options: [
-      { value: 'just_arrived', label: 'Just arrived — claim not yet filed', emoji: '🛬' },
-      { value: 'claim_filed', label: 'Claim filed — waiting for hearing', emoji: '📅' },
+      { value: 'just_arrived', label: 'Just arrived  -  claim not yet filed', emoji: '🛬' },
+      { value: 'claim_filed', label: 'Claim filed  -  waiting for hearing', emoji: '📅' },
       { value: 'hearing_soon', label: 'Hearing scheduled (within 3 months)', emoji: '⏰' },
-      { value: 'rejected', label: 'Claim rejected — considering appeal or PRRA', emoji: '❌' },
+      { value: 'rejected', label: 'Claim rejected  -  considering appeal or PRRA', emoji: '❌' },
       { value: 'appeal_filed', label: 'RAD appeal filed', emoji: '⚖️' },
     ],
   },
@@ -343,7 +343,7 @@ export const INTAKE_QUESTIONS: IntakeQuestion[] = [
   {
     id: 'q_pr_pathway',
     question: 'Which PR pathway is the client most likely eligible for?',
-    subtext: 'Not sure? Use "Help me figure this out" — the system will recommend based on the other answers.',
+    subtext: 'Not sure? Use "Help me figure this out"  -  the system will recommend based on the other answers.',
     why: 'Different PR pathways have different eligibility criteria, points scores, and processing timelines. Identifying the right one early prevents wasted applications. Express Entry is points-based; PNP adds provincial nomination; Family Class is sponsorship-based. The wrong pathway choice can cost months of delays.',
     saveAs: 'pr_pathway',
     type: 'single',
@@ -382,7 +382,7 @@ export const INTAKE_QUESTIONS: IntakeQuestion[] = [
   {
     id: 'q_education',
     question: "What is the client's highest level of education?",
-    why: 'Education directly affects CRS points in Express Entry — a Master\'s or PhD can add up to 150 extra points (Academic bonus). It also determines NOC TEER eligibility and whether an Educational Credential Assessment (ECA) is needed for foreign degrees.',
+    why: 'Education directly affects CRS points in Express Entry  -  a Master\'s or PhD can add up to 150 extra points (Academic bonus). It also determines NOC TEER eligibility and whether an Educational Credential Assessment (ECA) is needed for foreign degrees.',
     saveAs: 'education_level',
     type: 'single',
     nextId: 'q_language',
@@ -401,7 +401,7 @@ export const INTAKE_QUESTIONS: IntakeQuestion[] = [
   {
     id: 'q_language',
     question: 'Has the client taken a language test (IELTS, CELPIP, TEF, TCF)?',
-    why: 'Language ability is the most heavily weighted factor in Express Entry — up to 160 CRS points per language (320 for bilingual). CLB 9+ in English/French can make or break an application. The test type matters: CELPIP is Canada-specific, IELTS General is widely accepted, TEF/TCF for French.',
+    why: 'Language ability is the most heavily weighted factor in Express Entry  -  up to 160 CRS points per language (320 for bilingual). CLB 9+ in English/French can make or break an application. The test type matters: CELPIP is Canada-specific, IELTS General is widely accepted, TEF/TCF for French.',
     saveAs: 'language_test',
     type: 'single',
     nextId: 'q_clb',
@@ -411,7 +411,7 @@ export const INTAKE_QUESTIONS: IntakeQuestion[] = [
       { value: 'celpip', label: 'CELPIP', emoji: '🍁' },
       { value: 'tef', label: 'TEF Canada (French)', emoji: '🇫🇷' },
       { value: 'tcf', label: 'TCF Canada (French)', emoji: '🇫🇷' },
-      { value: 'not_yet', label: 'Not yet — test pending', emoji: '⏳', nextId: 'q_work_experience' },
+      { value: 'not_yet', label: 'Not yet  -  test pending', emoji: '⏳', nextId: 'q_work_experience' },
       { value: 'none', label: 'No test taken', emoji: '❌', nextId: 'q_work_experience' },
     ],
   },
@@ -440,7 +440,7 @@ export const INTAKE_QUESTIONS: IntakeQuestion[] = [
     id: 'q_work_experience',
     question: 'How many years of skilled work experience does the client have?',
     subtext: 'Include both Canadian and foreign skilled work (NOC TEER 0, 1, 2, or 3).',
-    why: 'Work experience is a core CRS factor. Canadian work experience specifically — even 1 year in a TEER 0/1/2/3 occupation — opens up the Canadian Experience Class (CEC). Foreign skilled work experience earns additional CRS points. "Skilled" means NOC TEER 0, 1, 2, or 3 — not unskilled labour.',
+    why: 'Work experience is a core CRS factor. Canadian work experience specifically  -  even 1 year in a TEER 0/1/2/3 occupation  -  opens up the Canadian Experience Class (CEC). Foreign skilled work experience earns additional CRS points. "Skilled" means NOC TEER 0, 1, 2, or 3  -  not unskilled labour.',
     saveAs: 'work_experience_years',
     type: 'single',
     nextId: 'q_job_offer',
@@ -462,8 +462,8 @@ export const INTAKE_QUESTIONS: IntakeQuestion[] = [
     type: 'single',
     nextId: 'q_province',
     options: [
-      { value: 'yes_lmia', label: 'Yes — LMIA-supported offer', emoji: '✅', hint: '+50 CRS points' },
-      { value: 'yes_exempt', label: 'Yes — LMIA-exempt offer', emoji: '✅', hint: '+0 or +25 CRS points depending on NOC' },
+      { value: 'yes_lmia', label: 'Yes  -  LMIA-supported offer', emoji: '✅', hint: '+50 CRS points' },
+      { value: 'yes_exempt', label: 'Yes  -  LMIA-exempt offer', emoji: '✅', hint: '+0 or +25 CRS points depending on NOC' },
       { value: 'no', label: 'No job offer', emoji: '❌' },
       { value: 'not_sure', label: "Not sure if LMIA is required", emoji: '❓' },
     ],
@@ -502,7 +502,7 @@ export const INTAKE_QUESTIONS: IntakeQuestion[] = [
     nextId: 'q_billing_arrangement',
     options: [
       { value: 'new_permit_lmia', label: 'New employer-specific permit (LMIA-based)', emoji: '📋' },
-      { value: 'new_permit_exempt', label: 'New permit — LMIA exempt (ICA, CUSMA, ICT, etc.)', emoji: '🤝' },
+      { value: 'new_permit_exempt', label: 'New permit  -  LMIA exempt (ICA, CUSMA, ICT, etc.)', emoji: '🤝' },
       { value: 'pgwp', label: 'Post-Graduation Work Permit (PGWP)', emoji: '🎓' },
       { value: 'iec', label: 'International Experience Canada (IEC / Working Holiday)', emoji: '🎒' },
       { value: 'restore_extend', label: 'Restore or extend an existing permit', emoji: '🔄' },
@@ -554,7 +554,7 @@ export const INTAKE_QUESTIONS: IntakeQuestion[] = [
       { value: 'spouse_common_law', label: 'Spouse or common-law partner', emoji: '💍' },
       { value: 'conjugal', label: 'Conjugal partner', emoji: '❤️' },
       { value: 'dependent_child', label: 'Dependent child', emoji: '👶' },
-      { value: 'parent_grandparent', label: 'Parent or grandparent (PGP)', emoji: '👴', hint: 'Lottery-based — intake only open certain years' },
+      { value: 'parent_grandparent', label: 'Parent or grandparent (PGP)', emoji: '👴', hint: 'Lottery-based  -  intake only open certain years' },
       { value: 'other_relative', label: 'Other relative', emoji: '👥' },
     ],
   },
@@ -567,10 +567,10 @@ export const INTAKE_QUESTIONS: IntakeQuestion[] = [
     type: 'single',
     nextId: 'q_billing_arrangement',
     options: [
-      { value: 'yes', label: 'Yes — residency requirement met', emoji: '✅' },
-      { value: 'close', label: 'Almost — within 6 months of meeting it', emoji: '⏳' },
-      { value: 'no', label: 'No — not yet eligible', emoji: '❌' },
-      { value: 'not_sure', label: "Not sure — need to calculate", emoji: '❓' },
+      { value: 'yes', label: 'Yes  -  residency requirement met', emoji: '✅' },
+      { value: 'close', label: 'Almost  -  within 6 months of meeting it', emoji: '⏳' },
+      { value: 'no', label: 'No  -  not yet eligible', emoji: '❌' },
+      { value: 'not_sure', label: "Not sure  -  need to calculate", emoji: '❓' },
     ],
   },
 
@@ -584,7 +584,7 @@ export const INTAKE_QUESTIONS: IntakeQuestion[] = [
     options: [
       { value: 'iad', label: 'Immigration Appeal Division (IAD)', emoji: '⚖️', hint: 'Sponsorship refusal or removal order' },
       { value: 'rad', label: 'Refugee Appeal Division (RAD)', emoji: '🕊️' },
-      { value: 'judicial_review', label: 'Federal Court — Judicial Review', emoji: '🏛️' },
+      { value: 'judicial_review', label: 'Federal Court  -  Judicial Review', emoji: '🏛️' },
       { value: 'irb_other', label: 'Other IRB proceeding (ID or RPD)', emoji: '📋' },
       { value: 'ministerial_relief', label: 'Ministerial Relief / Security review', emoji: '🔒' },
     ],
@@ -595,7 +595,7 @@ export const INTAKE_QUESTIONS: IntakeQuestion[] = [
     id: 'q_appeal_deadline',
     question: 'Is there a known appeal or JR deadline?',
     subtext: 'IAD: 30 days from removal order. Federal Court JR: 15 days (inland) / 60 days (abroad).',
-    why: 'Appeal deadlines in immigration law are STRICT — missing one can permanently bar the client from that remedy with no exceptions. We flag these immediately as critical tasks in the matter. If a deadline is approaching, this intake may need to be paused and an emergency task created right away.',
+    why: 'Appeal deadlines in immigration law are STRICT  -  missing one can permanently bar the client from that remedy with no exceptions. We flag these immediately as critical tasks in the matter. If a deadline is approaching, this intake may need to be paused and an emergency task created right away.',
     saveAs: 'appeal_deadline',
     type: 'date',
     optional: true,
@@ -612,25 +612,25 @@ export const INTAKE_QUESTIONS: IntakeQuestion[] = [
     type: 'single',
     nextId: 'q_billing_arrangement',
     options: [
-      { value: 'asap', label: 'Urgent — within 4 weeks', emoji: '🔴', hint: 'Impending removal, expiry, or departure' },
+      { value: 'asap', label: 'Urgent  -  within 4 weeks', emoji: '🔴', hint: 'Impending removal, expiry, or departure' },
       { value: '1_3_months', label: '1 – 3 months', emoji: '🟡' },
       { value: '3_6_months', label: '3 – 6 months', emoji: '🟢' },
-      { value: '6_plus_months', label: 'No rush — 6+ months', emoji: '⚪' },
+      { value: '6_plus_months', label: 'No rush  -  6+ months', emoji: '⚪' },
       { value: 'not_sure', label: "Not sure", emoji: '❓' },
     ],
   },
 
-  // ── Q: Billing arrangement (MANDATORY — must ask before recommendation) ──
+  // ── Q: Billing arrangement (MANDATORY  -  must ask before recommendation) ──
   {
     id: 'q_billing_arrangement',
     question: 'What billing arrangement will apply to this matter?',
-    why: 'A matter cannot be formally opened in NorvaOS until a billing arrangement is confirmed. This protects both the firm and the client — it ensures everyone agrees on fees before work begins. Pro Bono and Fee Deferred are valid options but must be explicitly chosen (not assumed). This is a regulatory best practice.',
+    why: 'A matter cannot be formally opened in NorvaOS until a billing arrangement is confirmed. This protects both the firm and the client  -  it ensures everyone agrees on fees before work begins. Pro Bono and Fee Deferred are valid options but must be explicitly chosen (not assumed). This is a regulatory best practice.',
     subtext:
       'A matter cannot be opened until the billing arrangement is confirmed. ' +
       'Pro Bono and Fee Deferred are valid options but must be explicitly selected.',
     saveAs: 'billing_arrangement',
     type: 'single',
-    nextId: null, // END — triggers recommendation
+    nextId: null, // END  -  triggers recommendation
     options: [
       {
         value: 'flat_fee',
@@ -653,13 +653,13 @@ export const INTAKE_QUESTIONS: IntakeQuestion[] = [
         value: 'pro_bono',
         label: 'Pro Bono (no fee)',
         emoji: '🤝',
-        hint: 'No retainer required — matter opens immediately upon commitment',
+        hint: 'No retainer required  -  matter opens immediately upon commitment',
       },
       {
         value: 'fee_deferred',
         label: 'Fee Deferred',
         emoji: '📅',
-        hint: 'Fee agreed but collected later — document reason for deferral',
+        hint: 'Fee agreed but collected later  -  document reason for deferral',
       },
     ],
   },
@@ -693,7 +693,7 @@ export function getNextQuestionId(
 // ─── Recommendation engine ───────────────────────────────────────────────────
 
 export interface IntakeRecommendation {
-  /** Short title, e.g. "Express Entry — Federal Skilled Worker" */
+  /** Short title, e.g. "Express Entry  -  Federal Skilled Worker" */
   title: string
   /** IRCC application code or key, e.g. "EE-FSW" */
   code: string
@@ -713,7 +713,7 @@ export interface IntakeRecommendation {
 
 /**
  * Generates up to 3 recommended immigration routes based on the collected answers.
- * This is a rule-based engine — it will be augmented by Claude AI inference at the
+ * This is a rule-based engine  -  it will be augmented by Claude AI inference at the
  * end of the wizard UI.
  */
 export function generateRecommendations(answers: IntakeAnswers): IntakeRecommendation[] {
@@ -742,13 +742,13 @@ export function generateRecommendations(answers: IntakeAnswers): IntakeRecommend
   if (who === 'employer') {
     if (employerGoal === 'global_talent') {
       results.push({
-        title: 'Global Talent Stream (LMIA — GTS)',
+        title: 'Global Talent Stream (LMIA  -  GTS)',
         code: 'GTS',
         emoji: '⚡',
         confidence: 'strong',
         rationale: [
           'Client explicitly identified as needing highly skilled tech workers',
-          'GTS offers 2-week processing — fastest LMIA route available',
+          'GTS offers 2-week processing  -  fastest LMIA route available',
         ],
         processingTime: '2 weeks (Government service standard)',
       })
@@ -756,7 +756,7 @@ export function generateRecommendations(answers: IntakeAnswers): IntakeRecommend
     if (employerGoal === 'hire_foreign_worker' || employerGoal === 'global_talent') {
       if (answers.lmia_stream === 'high_wage') {
         results.push({
-          title: 'LMIA — High-Wage Stream',
+          title: 'LMIA  -  High-Wage Stream',
           code: 'LMIA-HW',
           emoji: '💼',
           confidence: 'strong',
@@ -765,7 +765,7 @@ export function generateRecommendations(answers: IntakeAnswers): IntakeRecommend
         })
       } else if (answers.lmia_stream === 'low_wage') {
         results.push({
-          title: 'LMIA — Low-Wage Stream',
+          title: 'LMIA  -  Low-Wage Stream',
           code: 'LMIA-LW',
           emoji: '🔧',
           confidence: 'strong',
@@ -774,7 +774,7 @@ export function generateRecommendations(answers: IntakeAnswers): IntakeRecommend
         })
       } else if (answers.lmia_stream === 'agricultural') {
         results.push({
-          title: 'LMIA — Agricultural / SAWP',
+          title: 'LMIA  -  Agricultural / SAWP',
           code: 'LMIA-AG',
           emoji: '🌾',
           confidence: 'strong',
@@ -783,7 +783,7 @@ export function generateRecommendations(answers: IntakeAnswers): IntakeRecommend
         })
       } else {
         results.push({
-          title: 'LMIA — Stream Assessment Required',
+          title: 'LMIA  -  Stream Assessment Required',
           code: 'LMIA-TBD',
           emoji: '📋',
           confidence: 'likely',
@@ -812,7 +812,7 @@ export function generateRecommendations(answers: IntakeAnswers): IntakeRecommend
   if (goal === 'appeal_review' || appealType) {
     if (appealType === 'judicial_review') {
       results.push({
-        title: 'Federal Court — Judicial Review',
+        title: 'Federal Court  -  Judicial Review',
         code: 'JR',
         emoji: '🏛️',
         confidence: 'strong',
@@ -843,7 +843,7 @@ export function generateRecommendations(answers: IntakeAnswers): IntakeRecommend
         code: 'IAD',
         emoji: '⚖️',
         confidence: 'strong',
-        rationale: ['Removal order or sponsorship refusal — IAD has jurisdiction'],
+        rationale: ['Removal order or sponsorship refusal  -  IAD has jurisdiction'],
         processingTime: '1 – 3 years',
         deadlineWarning: '⚠ IAD appeal must be filed within 30 days of removal order.',
       })
@@ -856,17 +856,17 @@ export function generateRecommendations(answers: IntakeAnswers): IntakeRecommend
     if (refugeeType === 'inland_claim' || (status === 'refugee_claimant' && !refugeeType)) {
       const isPreHearing = refugeeStage === 'claim_filed' || refugeeStage === 'hearing_soon' || refugeeStage === 'just_arrived'
       results.push({
-        title: 'Inland Refugee Claim — RPD Hearing',
+        title: 'Inland Refugee Claim  -  RPD Hearing',
         code: 'RPD',
         emoji: '🕊️',
         confidence: 'strong',
         rationale: [
           'Client is claiming refugee protection from within Canada',
-          isPreHearing ? 'Claim is pre-hearing — RPD preparation required' : 'Claim rejected — consider RAD or JR',
+          isPreHearing ? 'Claim is pre-hearing  -  RPD preparation required' : 'Claim rejected  -  consider RAD or JR',
         ],
         processingTime: '18 – 24 months (varies by office)',
         deadlineWarning: refugeeStage === 'hearing_soon'
-          ? '⚠ Hearing within 3 months — disclosure deadline may have passed. Review immediately.'
+          ? '⚠ Hearing within 3 months  -  disclosure deadline may have passed. Review immediately.'
           : undefined,
       })
     }
@@ -904,7 +904,7 @@ export function generateRecommendations(answers: IntakeAnswers): IntakeRecommend
       rationale: [
         eligible
           ? 'Residency requirement appears to be met or nearly met'
-          : 'Residency obligation not yet met — application cannot proceed until satisfied',
+          : 'Residency obligation not yet met  -  application cannot proceed until satisfied',
         'Language requirement (CLB 4+) and Citizenship test required for ages 18 – 54',
       ],
       processingTime: '12 – 24 months',
@@ -934,11 +934,11 @@ export function generateRecommendations(answers: IntakeAnswers): IntakeRecommend
         emoji: '🔄',
         confidence: 'strong',
         rationale: [
-          type === 'restore' ? 'Status expired — restoration must be filed promptly (within 90 days)' : 'Client wishes to extend authorised stay',
+          type === 'restore' ? 'Status expired  -  restoration must be filed promptly (within 90 days)' : 'Client wishes to extend authorised stay',
         ],
         processingTime: type === 'restore' ? '~2 – 3 months' : '~1 – 2 months',
         deadlineWarning: type === 'restore'
-          ? '⚠ Restoration must be filed within 90 days of status expiry — confirm expiry date immediately.'
+          ? '⚠ Restoration must be filed within 90 days of status expiry  -  confirm expiry date immediately.'
           : undefined,
       })
     } else {
@@ -972,8 +972,8 @@ export function generateRecommendations(answers: IntakeAnswers): IntakeRecommend
       emoji: '🎓',
       confidence: 'strong',
       rationale: [
-        sg === 'student_direct' ? 'Client is from an SDS-eligible country — faster processing (20 days)' : 'Standard study permit application',
-        sg === 'restore' ? '⚠ Restoration required — must file within 90 days of status expiry' : 'Acceptance letter from DLI required',
+        sg === 'student_direct' ? 'Client is from an SDS-eligible country  -  faster processing (20 days)' : 'Standard study permit application',
+        sg === 'restore' ? '⚠ Restoration required  -  must file within 90 days of status expiry' : 'Acceptance letter from DLI required',
       ],
       processingTime: sg === 'student_direct' ? '~20 days' : '~4 – 12 weeks (varies by visa office)',
       deadlineWarning:
@@ -1046,7 +1046,7 @@ export function generateRecommendations(answers: IntakeAnswers): IntakeRecommend
         confidence: 'likely',
         rationale: [
           'Client wishes to sponsor a parent or grandparent',
-          'Intake pool is only open certain years — confirm current IRCC intake status',
+          'Intake pool is only open certain years  -  confirm current IRCC intake status',
           'Super Visa is an alternative if PGP intake is closed',
         ],
         processingTime: '24 – 48 months',
@@ -1090,12 +1090,12 @@ export function generateRecommendations(answers: IntakeAnswers): IntakeRecommend
       // Canadian Experience Class
       if (status === 'worker' || status === 'student') {
         results.push({
-          title: 'Express Entry — Canadian Experience Class (CEC)',
+          title: 'Express Entry  -  Canadian Experience Class (CEC)',
           code: 'EE-CEC',
           emoji: '⚡',
           confidence: hasExperience ? 'strong' : 'likely',
           rationale: [
-            'Client has Canadian temporary status — CEC requires 1 year of skilled Canadian work experience',
+            'Client has Canadian temporary status  -  CEC requires 1 year of skilled Canadian work experience',
             hasStrongCLB ? 'Language scores meet CEC requirements' : 'Language scores need verification for CLB 7+ requirement',
             hasExperience ? 'Work experience appears sufficient' : 'Confirm 1 year of skilled Canadian work experience (NOC TEER 0/1/2/3)',
           ],
@@ -1106,7 +1106,7 @@ export function generateRecommendations(answers: IntakeAnswers): IntakeRecommend
       // Federal Skilled Worker
       if (pw === 'not_sure' || pw === 'express_entry') {
         results.push({
-          title: 'Express Entry — Federal Skilled Worker (FSW)',
+          title: 'Express Entry  -  Federal Skilled Worker (FSW)',
           code: 'EE-FSW',
           emoji: '⚡',
           confidence: hasExperience && hasDegree && hasStrongCLB ? 'strong' : 'likely',
@@ -1114,7 +1114,7 @@ export function generateRecommendations(answers: IntakeAnswers): IntakeRecommend
             'Most internationally educated applicants use the FSW stream',
             hasDegree ? 'Education level meets minimum requirements' : 'Education assessment (ECA) required if degree obtained outside Canada',
             hasStrongCLB ? 'Language profile appears strong' : 'CLB 7+ required in all four abilities',
-            hasJobOffer ? 'Job offer adds significant CRS points' : 'No job offer — CRS score may need PNP boost',
+            hasJobOffer ? 'Job offer adds significant CRS points' : 'No job offer  -  CRS score may need PNP boost',
           ],
           processingTime: '~6 months from ITA',
         })
@@ -1123,16 +1123,16 @@ export function generateRecommendations(answers: IntakeAnswers): IntakeRecommend
 
     if (pw === 'pnp' || (pw === 'not_sure' && province && province !== 'not_decided')) {
       results.push({
-        title: `Provincial Nominee Program — ${province ?? 'TBD'} Stream`,
+        title: `Provincial Nominee Program  -  ${province ?? 'TBD'} Stream`,
         code: 'PNP',
         emoji: '🏔️',
         confidence: 'likely',
         rationale: [
-          `Target province is ${province ?? 'not yet identified'} — review province-specific streams`,
+          `Target province is ${province ?? 'not yet identified'}  -  review province-specific streams`,
           'PNP nomination adds 600 CRS points in Express Entry (guaranteed ITA)',
-          province === 'ON' ? 'OINP — check Human Capital Priorities or Masters Graduate stream' : '',
-          province === 'BC' ? 'BCPNP — check Skills Immigration, Tech Pilot, or International Graduate stream' : '',
-          province === 'AB' ? 'AINP — check Alberta Opportunity Stream or Express Entry' : '',
+          province === 'ON' ? 'OINP  -  check Human Capital Priorities or Masters Graduate stream' : '',
+          province === 'BC' ? 'BCPNP  -  check Skills Immigration, Tech Pilot, or International Graduate stream' : '',
+          province === 'AB' ? 'AINP  -  check Alberta Opportunity Stream or Express Entry' : '',
         ].filter(Boolean),
         processingTime: '~12 – 24 months (includes provincial processing)',
       })

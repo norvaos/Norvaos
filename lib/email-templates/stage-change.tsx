@@ -140,7 +140,7 @@ export async function renderStageChangeEmail(props: StageChangeEmailProps): Prom
   subject: string
 }> {
   const html = await render(<StageChangeEmail {...props} />)
-  const subject = `Case Update: ${props.matterReference} — ${props.newStageName}`
+  const subject = `Case Update: ${props.matterReference}  -  ${props.newStageName}`
   const text = [
     props.clientFirstName ? `Dear ${props.clientFirstName},` : 'Dear Client,',
     '',

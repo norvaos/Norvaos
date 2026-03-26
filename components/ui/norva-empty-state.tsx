@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * NorvaEmptyState — Branded empty-state with "First-Look" quick-start logic.
+ * NorvaEmptyState  -  Branded empty-state with "First-Look" quick-start logic.
  *
  * Replaces generic "No X yet" messages with actionable guidance:
  *   - Norva logo mark for brand consistency
@@ -40,7 +40,7 @@ function NorvaWatermark() {
 
 export interface QuickStartStep {
   label: string
-  /** Optional href — if provided, step renders as a link */
+  /** Optional href  -  if provided, step renders as a link */
   href?: string
   /** Optional click handler */
   onClick?: () => void
@@ -49,9 +49,9 @@ export interface QuickStartStep {
 interface NorvaEmptyStateProps {
   /** Lucide icon to display above the headline */
   icon?: LucideIcon
-  /** Main headline — should name the Norva Signature feature */
+  /** Main headline  -  should name the Norva Signature feature */
   title: string
-  /** Actionable description — what to do, not just what's missing */
+  /** Actionable description  -  what to do, not just what's missing */
   description: string
   /** Quick-start steps shown as a numbered list */
   quickStart?: QuickStartStep[]

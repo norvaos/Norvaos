@@ -150,7 +150,7 @@ export const recordMeetingOutcomeAction: ActionDefinition<RecordMeetingOutcomeIn
             tenant_id: tenantId,
             matter_id: input.matterId,
             title: `Post-consultation: ${matter.title}`,
-            description: input.notes ?? 'Consultation complete — review and determine next steps',
+            description: input.notes ?? 'Consultation complete  -  review and determine next steps',
             priority: 'medium',
             due_date: consultDate.toISOString().split('T')[0],
             assigned_to: matter.responsible_lawyer_id ?? userId,

@@ -1,10 +1,10 @@
 /**
- * Genesis Block Query Hooks — Directive 015 / 015.1
+ * Genesis Block Query Hooks  -  Directive 015 / 015.1
  *
  * TanStack Query hooks for the Sovereign Birth Certificate:
- *   • useGenesisBlock — fetch genesis status
- *   • useGenerateGenesisBlock — seal new genesis
- *   • useRevokeGenesisBlock — Partner-level revocation
+ *   • useGenesisBlock  -  fetch genesis status
+ *   • useGenerateGenesisBlock  -  seal new genesis
+ *   • useRevokeGenesisBlock  -  Partner-level revocation
  */
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
@@ -67,7 +67,7 @@ export function useGenesisBlock(matterId: string | undefined) {
       return res.json()
     },
     enabled: !!matterId,
-    staleTime: 1000 * 60 * 5, // 5 min — genesis blocks are immutable
+    staleTime: 1000 * 60 * 5, // 5 min  -  genesis blocks are immutable
   })
 }
 
@@ -77,9 +77,11 @@ export function useGenerateGenesisBlock() {
   const qc = useQueryClient()
 
   return useMutation({
-    mutationFn: async (matterId: string) => {
+    mutationFn: async ({ matterId, conflictSearchId }: { matterId: string; conflictSearchId: string }) => {
       const res = await fetch(`/api/matters/${matterId}/genesis-block`, {
         method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ conflictSearchId }),
       })
 
       if (!res.ok) {
@@ -89,9 +91,9 @@ export function useGenerateGenesisBlock() {
 
       return res.json()
     },
-    onSuccess: (_data, matterId) => {
+    onSuccess: (_data, { matterId }) => {
       qc.invalidateQueries({ queryKey: genesisKeys.detail(matterId) })
-      toast.success('Norva Genesis Block sealed — Sovereign Birth Certificate recorded')
+      toast.success('Norva Genesis Block sealed  -  Sovereign Birth Certificate recorded')
     },
     onError: (error) => {
       toast.error(error instanceof Error ? error.message : 'Failed to seal genesis block')
@@ -121,7 +123,7 @@ export function useRevokeGenesisBlock() {
     },
     onSuccess: (_data, { matterId }) => {
       qc.invalidateQueries({ queryKey: genesisKeys.detail(matterId) })
-      toast.success('Norva Genesis Block revoked — Partner audit trail recorded')
+      toast.success('Norva Genesis Block revoked  -  Partner audit trail recorded')
     },
     onError: (error) => {
       toast.error(error instanceof Error ? error.message : 'Failed to revoke genesis block')

@@ -166,7 +166,7 @@ export function ImmigrationReadinessHub({ matterId, userId, userRole }: Props) {
             />
           </div>
 
-          {/* ── Next Action (promoted — most important for workflow) ── */}
+          {/* ── Next Action (promoted  -  most important for workflow) ── */}
           {nextAction && (
             <NextActionSection
               nextAction={nextAction}
@@ -284,7 +284,7 @@ export function ImmigrationReadinessHub({ matterId, userId, userRole }: Props) {
             </div>
           )}
 
-          {/* Next Action section rendered above matrix — see NextActionSection */}
+          {/* Next Action section rendered above matrix  -  see NextActionSection */}
         </CardContent>
       </Card>
 
@@ -320,7 +320,7 @@ function NextActionSection({
   isLawyer: boolean
   onReview: () => void
 }) {
-  // Status-aware accent colours — use full static class strings for Tailwind JIT
+  // Status-aware accent colours  -  use full static class strings for Tailwind JIT
   const wrapperClass = intakeStatus === 'ready_for_filing'
     ? 'flex items-center justify-between rounded-lg border-l-4 border-l-green-500 border bg-green-50/50 dark:bg-green-950/20 p-3'
     : intakeStatus === 'deficiency_outstanding'
@@ -395,7 +395,7 @@ function ReadinessMatrixPanel({ matrix }: { matrix: ReadinessMatrix }) {
           <span className="font-medium">Overall Readiness</span>
           <span style={{ color: overallColor }} className="font-semibold">
             {matrix.overallPct}%
-            {matrix.meetsThreshold && ' — Threshold met'}
+            {matrix.meetsThreshold && '  -  Threshold met'}
           </span>
         </div>
         <Progress value={matrix.overallPct} className="h-2" />
@@ -574,8 +574,8 @@ function LawyerReviewDialog({
         onSuccess: () => {
           toast.success(
             action === 'approved'
-              ? 'Review approved — matter is ready for filing'
-              : 'Changes requested — matter moved to deficiency'
+              ? 'Review approved  -  matter is ready for filing'
+              : 'Changes requested  -  matter moved to deficiency'
           )
           setNotes('')
           onOpenChange(false)

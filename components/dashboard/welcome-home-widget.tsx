@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * Welcome Home — Migration Summary Widget (Directive 11.1)
+ * Welcome Home  -  Migration Summary Widget (Directive 11.1)
  *
  * Shows a "Summary of the Move" card for newly migrated firms.
  * Displays migration stats: matters needing audit, classified documents,
@@ -144,7 +144,7 @@ export function WelcomeHomeWidget({ tenantId }: WelcomeHomeWidgetProps) {
             <div>
               <h3 className="text-sm font-semibold flex items-center gap-1">
                 Welcome Home
-                <NorvaWhisper title="Norva Bridge — Migration Complete" side="right">
+                <NorvaWhisper title="Norva Bridge  -  Migration Complete" side="right">
                   Your data has been migrated from Clio into the Norva ecosystem. This summary shows what the Norva Bridge processed during the transition.
                 </NorvaWhisper>
               </h3>
@@ -217,15 +217,15 @@ export function WelcomeHomeWidget({ tenantId }: WelcomeHomeWidgetProps) {
             <p className="text-lg font-bold tabular-nums">{stats.syncTotalSynced}</p>
             <p className="text-[10px] text-muted-foreground leading-tight">
               {syncActive
-                ? `Items synced — ${daysRemaining}d remaining`
+                ? `Items synced  -  ${daysRemaining}d remaining`
                 : stats.syncStatus === 'completed'
-                  ? 'Items synced — complete'
+                  ? 'Items synced  -  complete'
                   : 'Delta-Sync inactive'}
             </p>
           </div>
         </div>
 
-        {/* Vault-Migration Certificate — pinned when migration complete */}
+        {/* Vault-Migration Certificate  -  pinned when migration complete */}
         {stats.syncStatus === 'completed' && (
           <VaultMigrationCertificateBanner />
         )}

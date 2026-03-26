@@ -1,7 +1,7 @@
 import { z } from 'zod/v4'
 
 // ---------------------------------------------------------------------------
-// Step 1 — Inviter Information
+// Step 1  -  Inviter Information
 // ---------------------------------------------------------------------------
 
 export const inviterSchema = z.object({
@@ -25,7 +25,7 @@ export const inviterSchema = z.object({
 })
 
 // ---------------------------------------------------------------------------
-// Step 2 — Visitor Information
+// Step 2  -  Visitor Information
 // ---------------------------------------------------------------------------
 
 export const visitorSchema = z.object({
@@ -44,7 +44,7 @@ export const visitorSchema = z.object({
 })
 
 // ---------------------------------------------------------------------------
-// Step 3 — Visit Details
+// Step 3  -  Visit Details
 // ---------------------------------------------------------------------------
 
 export const visitSchema = z.object({
@@ -72,7 +72,7 @@ export const visitSchema = z.object({
 })
 
 // ---------------------------------------------------------------------------
-// Step 4 — Accommodation & Financial Support
+// Step 4  -  Accommodation & Financial Support
 // ---------------------------------------------------------------------------
 
 export const accommodationSchema = z.object({
@@ -91,7 +91,7 @@ export const accommodationSchema = z.object({
 })
 
 // ---------------------------------------------------------------------------
-// Step 5 — Additional Visitors
+// Step 5  -  Additional Visitors
 // ---------------------------------------------------------------------------
 
 export const additionalVisitorSchema = z.object({
@@ -159,5 +159,5 @@ export const STEP_FIELDS: Record<number, string[]> = {
     'accommodation.staying_with',
     'accommodation.expense_responsibility',
   ],
-  4: [], // Additional visitors — validated inline
+  4: [], // Additional visitors  -  validated inline
 }

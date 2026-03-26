@@ -148,7 +148,7 @@ describe('RequirePermission – component rendering', () => {
 
     expect(screen.queryByTestId('protected-content')).not.toBeInTheDocument()
     expect(screen.queryByTestId('require-permission-denied')).not.toBeInTheDocument()
-    // Should NOT render granted or denied — only loading skeletons
+    // Should NOT render granted or denied  -  only loading skeletons
     expect(screen.queryByTestId('require-permission-granted')).not.toBeInTheDocument()
     // The container should have content (the skeleton divs)
     expect(container.innerHTML.length).toBeGreaterThan(0)

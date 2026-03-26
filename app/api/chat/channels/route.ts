@@ -16,7 +16,7 @@ const createChannelSchema = z.object({
 )
 
 /**
- * GET /api/chat/channels — List current user's chat channels
+ * GET /api/chat/channels  -  List current user's chat channels
  * Returns channels with last message preview and unread count.
  */
 async function handleGet() {
@@ -56,7 +56,7 @@ async function handleGet() {
       return NextResponse.json({ error: 'Failed to fetch channel details' }, { status: 500 })
     }
 
-    // Fetch per-channel data — parallelize inner queries (was N+3 sequential)
+    // Fetch per-channel data  -  parallelize inner queries (was N+3 sequential)
     const channelResults = await Promise.all(
       channels.map(async (channel) => {
         const lastRead = lastReadMap.get(channel.id)
@@ -143,7 +143,7 @@ async function handleGet() {
 }
 
 /**
- * POST /api/chat/channels — Create a new channel
+ * POST /api/chat/channels  -  Create a new channel
  * Body: { name?: string, channel_type: 'group' | 'matter', member_ids: string[], matter_id?: string }
  */
 async function handlePost(request: Request) {

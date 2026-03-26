@@ -1,6 +1,6 @@
 // ============================================================================
 // CRS (Comprehensive Ranking System) Scoring Engine
-// Express Entry — Immigration, Refugees and Citizenship Canada (IRCC)
+// Express Entry  -  Immigration, Refugees and Citizenship Canada (IRCC)
 //
 // Pure calculation functions. Zero dependencies on React, Supabase, or UI.
 // All scoring tables sourced from official IRCC CRS criteria.
@@ -305,7 +305,7 @@ function getEducationTier(level: string): number {
 }
 
 function getLanguageTier(clb: LanguageScores): number {
-  // Based on highest CLB among all 4 abilities — but IRCC uses minimum of all 4
+  // Based on highest CLB among all 4 abilities  -  but IRCC uses minimum of all 4
   // Actually per IRCC: "CLB 7 or more on all first official language abilities"
   const min = Math.min(clb.listening, clb.reading, clb.writing, clb.speaking)
   if (min >= 9) return 2

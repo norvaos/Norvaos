@@ -49,7 +49,7 @@ export interface NextAction {
  *
  * Uses `(supabase as any).from(...)` for tables that may not yet appear in the
  * generated Database type (e.g. matter_sla_tracking, document_slots,
- * matter_intake) — same pattern as sla-engine.ts.
+ * matter_intake)  -  same pattern as sla-engine.ts.
  *
  * @param matterId   - UUID of the matter
  * @param tenantId   - UUID of the owning tenant

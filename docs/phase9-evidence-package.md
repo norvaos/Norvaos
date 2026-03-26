@@ -1,4 +1,4 @@
-# Phase 9 Evidence Package — Revenue Operations: Invoice Lifecycle Automation
+# Phase 9 Evidence Package  -  Revenue Operations: Invoice Lifecycle Automation
 
 **Date**: 2026-03-15
 **Supabase Project**: ztsjvsutlrfisnrwdwfl
@@ -19,13 +19,13 @@ Phase 9 delivers the invoice-to-payment automation layer: email dispatch with PD
 | 3 | `lib/utils/receipt-pdf.ts` | Receipt PDF generator (pdf-lib + Inter fonts) |
 | 4 | `scripts/migrations/105-invoice-lifecycle.sql` | Lifecycle columns, updated trigger, partial indexes |
 | 5 | `scripts/migrations/106-rename-invoice-total-column.sql` | Rename `total` -> `total_amount` to match codebase |
-| 6 | `app/api/invoices/[id]/send/route.ts` | POST — send invoice email with PDF attachment |
-| 7 | `app/api/invoices/[id]/receipt/route.ts` | POST — send payment receipt email |
-| 8 | `app/api/invoices/batch-send/route.ts` | POST — batch send up to 50 invoices |
-| 9 | `app/api/contacts/[id]/statement/route.ts` | GET — client billing statement |
-| 10 | `app/api/cron/overdue-detection/route.ts` | Daily 6AM UTC — transitions past-due invoices |
-| 11 | `app/api/cron/invoice-reminders/route.ts` | Monday 2PM UTC — sends payment reminders |
-| 12 | `app/api/cron/aging-recalculation/route.ts` | Daily 4AM UTC — recalculates aging buckets |
+| 6 | `app/api/invoices/[id]/send/route.ts` | POST  -  send invoice email with PDF attachment |
+| 7 | `app/api/invoices/[id]/receipt/route.ts` | POST  -  send payment receipt email |
+| 8 | `app/api/invoices/batch-send/route.ts` | POST  -  batch send up to 50 invoices |
+| 9 | `app/api/contacts/[id]/statement/route.ts` | GET  -  client billing statement |
+| 10 | `app/api/cron/overdue-detection/route.ts` | Daily 6AM UTC  -  transitions past-due invoices |
+| 11 | `app/api/cron/invoice-reminders/route.ts` | Monday 2PM UTC  -  sends payment reminders |
+| 12 | `app/api/cron/aging-recalculation/route.ts` | Daily 4AM UTC  -  recalculates aging buckets |
 
 ### Modified Files (4)
 
@@ -42,13 +42,13 @@ Phase 9 delivers the invoice-to-payment automation layer: email dispatch with PD
 
 ## 2. Migrations Applied
 
-### Migration 105 — Invoice Lifecycle
+### Migration 105  -  Invoice Lifecycle
 - **Status**: Applied to production
 - **Columns added**: `last_reminder_at`, `reminder_count`, `sent_at`, `sent_to_email`, `receipt_sent_at`
 - **Indexes added**: `idx_invoices_status_due_date` (partial), `idx_invoices_reminder_tracking` (partial)
-- **Trigger updated**: `prevent_paid_invoice_mutation()` — allows metadata writes, blocks financial field changes
+- **Trigger updated**: `prevent_paid_invoice_mutation()`  -  allows metadata writes, blocks financial field changes
 
-### Migration 106 — Column Rename
+### Migration 106  -  Column Rename
 - **Status**: Applied to production
 - **Change**: `invoices.total` renamed to `invoices.total_amount`
 - **Reason**: DB column name was `total` but all TypeScript types and application code referenced `total_amount`. This was a pre-existing latent mismatch (no invoice data existed so it hadn't manifested). Proof pack caught it during trigger testing.
@@ -71,8 +71,8 @@ sent_to_email     | text                     | null
 ### Proof 2: Partial Indexes Exist
 **Result**: PASS
 ```
-idx_invoices_status_due_date    — btree (status, due_date) WHERE status IN ('sent','viewed','overdue')
-idx_invoices_reminder_tracking  — btree (status, due_date, last_reminder_at) WHERE status IN ('sent','viewed','overdue')
+idx_invoices_status_due_date     -  btree (status, due_date) WHERE status IN ('sent','viewed','overdue')
+idx_invoices_reminder_tracking   -  btree (status, due_date, last_reminder_at) WHERE status IN ('sent','viewed','overdue')
 ```
 
 ### Proof 3: Metadata Update on Paid Invoice (Positive Path)
@@ -105,12 +105,12 @@ CONTEXT: PL/pgSQL function prevent_paid_invoice_delete() line 4 at RAISE
 ### Proof 5: Overdue Detection Query
 **Result**: PASS
 - Query `SELECT COUNT(*) FROM invoices WHERE status IN ('sent','viewed') AND due_date < CURRENT_DATE` executed successfully
-- 0 candidates (no invoice data yet — expected)
+- 0 candidates (no invoice data yet  -  expected)
 
 ### Proof 6: Aging Bucket Query
 **Result**: PASS
 - Aging bucket CASE query executed successfully
-- Empty result set (no unpaid invoices — expected)
+- Empty result set (no unpaid invoices  -  expected)
 
 ### Proof 7: Reminder Index Usage (EXPLAIN)
 **Result**: PASS
@@ -119,21 +119,21 @@ Index Scan using idx_invoices_reminder_tracking on invoices (cost=0.12..2.35 row
   Index Cond: ((status)::text = 'overdue'::text)
   Filter: (tenant_id = 'da1788a2-...'::uuid)
 ```
-- Optimizer uses the partial index as designed — no sequential scans.
+- Optimizer uses the partial index as designed  -  no sequential scans.
 
 ---
 
 ## 4. TypeScript Compilation
 
-**Result**: PASS — zero Phase 9 type errors
+**Result**: PASS  -  zero Phase 9 type errors
 - All 16 Phase 9 files compile cleanly
-- 3 pre-existing errors in `lib/services/notifications/` (delivery-tracker module + Resend type) — unrelated to Phase 9
+- 3 pre-existing errors in `lib/services/notifications/` (delivery-tracker module + Resend type)  -  unrelated to Phase 9
 
 ---
 
 ## 5. Build Verification
 
-**Result**: PASS — `npx next build` completes successfully
+**Result**: PASS  -  `npx next build` completes successfully
 - All new API routes compiled
 - All cron routes compiled
 - All UI components compiled
@@ -182,32 +182,32 @@ Index Scan using idx_invoices_reminder_tracking on invoices (cost=0.12..2.35 row
 **Column name mismatch**: `invoices.total` (DB) vs `total_amount` (TypeScript types + all code)
 - **Root cause**: Pre-existing. The column was created as `total` in an earlier migration, but the manually-maintained TypeScript types defined it as `total_amount`. No invoice data existed, so the mismatch was latent.
 - **Discovery**: Proof 3 INSERT failed with `column "total_amount" does not exist`.
-- **Fix**: Migration 106 — `ALTER TABLE invoices RENAME COLUMN total TO total_amount`
+- **Fix**: Migration 106  -  `ALTER TABLE invoices RENAME COLUMN total TO total_amount`
 - **Impact**: Without this fix, all invoice email dispatch, PDF generation, and amount calculations would have returned `undefined` at runtime.
 
 ---
 
 ## 9. Known Limitations
 
-1. **Email delivery requires RESEND_API_KEY** — All email functions gracefully return `{ success: false, error: 'RESEND_API_KEY not configured' }` when the key is missing.
-2. **PDF font loading** — Receipt PDF uses `readFileSync` for Inter font from `public/fonts/`. Requires font files to be present at deploy time.
-3. **Cron auth in development** — When `CRON_SECRET` is unset, cron endpoints accept any request (dev passthrough).
-4. **Batch send rate limit** — 100ms delay between emails is client-side. No server-side queue. Max 50 per batch.
-5. **Client statement trust balance** — Uses `amount_cents` from `trust_transactions`. Assumes all trust transactions have valid `matter_id` linkage.
+1. **Email delivery requires RESEND_API_KEY**  -  All email functions gracefully return `{ success: false, error: 'RESEND_API_KEY not configured' }` when the key is missing.
+2. **PDF font loading**  -  Receipt PDF uses `readFileSync` for Inter font from `public/fonts/`. Requires font files to be present at deploy time.
+3. **Cron auth in development**  -  When `CRON_SECRET` is unset, cron endpoints accept any request (dev passthrough).
+4. **Batch send rate limit**  -  100ms delay between emails is client-side. No server-side queue. Max 50 per batch.
+5. **Client statement trust balance**  -  Uses `amount_cents` from `trust_transactions`. Assumes all trust transactions have valid `matter_id` linkage.
 
 ---
 
 ## 10. Checklist
 
-- [x] Migration 105 applied — lifecycle columns + indexes
-- [x] Migration 106 applied — column rename fix
-- [x] Immutability trigger verified — metadata allowed, financial fields blocked
+- [x] Migration 105 applied  -  lifecycle columns + indexes
+- [x] Migration 106 applied  -  column rename fix
+- [x] Immutability trigger verified  -  metadata allowed, financial fields blocked
 - [x] 4 API routes created with auth + audit logging
 - [x] 3 cron routes created with CRON_SECRET auth
 - [x] vercel.json updated with 3 new cron entries
 - [x] TanStack Query hooks added for all new endpoints
-- [x] UI wired — "Send Invoice" replaces "Send", "Send Receipt" added for paid invoices
+- [x] UI wired  -  "Send Invoice" replaces "Send", "Send Receipt" added for paid invoices
 - [x] TypeScript compilation: zero Phase 9 errors
 - [x] Next.js build: PASS
 - [x] 7 proof tests executed against live Supabase: all PASS
-- [x] Test data cleaned up — zero residual test invoices
+- [x] Test data cleaned up  -  zero residual test invoices

@@ -1,14 +1,14 @@
 -- Migration 109: Tenant setup log and onboarding checklist
 --
--- tenant_setup_log   — idempotency log for bootstrap/seed actions (admin-only)
--- tenant_onboarding_checklist — stores manual checklist completions only;
+-- tenant_setup_log    -  idempotency log for bootstrap/seed actions (admin-only)
+-- tenant_onboarding_checklist  -  stores manual checklist completions only;
 --                               auto-detected items are computed at read time
 
 BEGIN;
 
 -- ── tenant_setup_log ──────────────────────────────────────────────────────────
 -- Records every platform-admin bootstrap action.
--- UNIQUE(tenant_id, action) enforces idempotency — same action cannot be applied
+-- UNIQUE(tenant_id, action) enforces idempotency  -  same action cannot be applied
 -- twice to the same tenant.
 
 CREATE TABLE IF NOT EXISTS tenant_setup_log (
@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS tenant_setup_log (
 CREATE INDEX IF NOT EXISTS idx_tenant_setup_log_tenant
   ON tenant_setup_log(tenant_id, applied_at DESC);
 
--- No direct client reads — all access via platform-admin API routes with admin client.
+-- No direct client reads  -  all access via platform-admin API routes with admin client.
 ALTER TABLE tenant_setup_log ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "setup_log_no_client_access" ON tenant_setup_log
   USING (false);

@@ -1,11 +1,11 @@
 /**
- * Norva Ledger — Government Fee Disbursement Engine
+ * Norva Ledger  -  Government Fee Disbursement Engine
  *
  * React Query hooks for the government fee disbursement workflow:
- *   1. useGovernmentDisbursement — fetch status + readiness gate
- *   2. useAuthorizeDisbursement — reserve funds for filing
- *   3. useConfirmDisbursement  — confirm after IRCC payment
- *   4. useCancelDisbursement   — cancel reservation
+ *   1. useGovernmentDisbursement  -  fetch status + readiness gate
+ *   2. useAuthorizeDisbursement  -  reserve funds for filing
+ *   3. useConfirmDisbursement   -  confirm after IRCC payment
+ *   4. useCancelDisbursement    -  cancel reservation
  */
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'

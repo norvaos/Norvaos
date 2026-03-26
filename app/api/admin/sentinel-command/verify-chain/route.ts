@@ -14,7 +14,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
  * Admin-only access (settings:edit permission gate).
  *
  * Query params:
- *   ?limit=1000  — max rows to verify (default 1000, max 10000)
+ *   ?limit=1000   -  max rows to verify (default 1000, max 10000)
  */
 async function handleGet(request: Request) {
   try {
@@ -35,7 +35,7 @@ async function handleGet(request: Request) {
 
     const admin = createAdminClient()
 
-    // RPC not yet in generated types — cast through unknown
+    // RPC not yet in generated types  -  cast through unknown
     const { data, error } = await (admin.rpc as any)('sentinel_verify_chain', {
       p_limit: limit,
     }) as { data: unknown; error: any }

@@ -1,6 +1,6 @@
 /**
- * GET  /api/collections/payment-plans — List payment plans
- * POST /api/collections/payment-plans — Create a new payment plan
+ * GET  /api/collections/payment-plans  -  List payment plans
+ * POST /api/collections/payment-plans  -  Create a new payment plan
  */
 
 import { NextRequest, NextResponse } from 'next/server'

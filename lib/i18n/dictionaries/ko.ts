@@ -1,5 +1,5 @@
 /**
- * 한국어 (ko) — Korean dictionary.
+ * 한국어 (ko)  -  Korean dictionary.
  * For Korean-speaking clients (South Korea, diaspora).
  */
 
@@ -69,7 +69,7 @@ export const ko: Partial<Record<DictionaryKey, string>> = {
   'dashboard.deadline_today': 'Today',
   'dashboard.deadline_1_day': '1 day',
   'dashboard.deadline_days': '{days} days',
-  'dashboard.deadlines_14_days': 'Deadlines — Next 14 Days',
+  'dashboard.deadlines_14_days': 'Deadlines  -  Next 14 Days',
   'dashboard.no_deadlines_14': 'No deadlines in the next 14 days',
   'dashboard.no_deadlines_14_desc': 'Typed deadlines on matters will appear here.',
   'dashboard.unknown_matter': 'Unknown matter',
@@ -98,12 +98,12 @@ export const ko: Partial<Record<DictionaryKey, string>> = {
   'common.save': '저장',
   'common.view': '보기',
 
-  // ── 지침 41.0 — 연락처 및 보관함 ─────────────────────────────────────────
+  // ── 지침 41.0  -  연락처 및 보관함 ─────────────────────────────────────────
   'contact.badge.retained_client': '위임 고객',
   'contact.badge.prospective_lead': '잠재 고객',
   'contact.badge.contact': '연락처',
   'contact.command_centre': '커맨드 센터',
-  'contact.command_centre_red_alert': '준비 점수가 매우 낮습니다 — 즉각적인 주의가 필요합니다',
+  'contact.command_centre_red_alert': '준비 점수가 매우 낮습니다  -  즉각적인 주의가 필요합니다',
   'contact.intake_funnel': '접수 퍼널',
   'contact.intake_progress': '접수 진행률',
   'contact.matter_readiness': '사건 준비 상태',
@@ -116,13 +116,13 @@ export const ko: Partial<Record<DictionaryKey, string>> = {
   'vault.title': 'Norva Vault',
   'vault.empty': 'Norva Vault 비어 있음',
   'vault.empty_description': '이 연락처에 대한 업로드된 문서가 없습니다.',
-  'vault.sentinel_eye': 'Sentinel Eye — 보기 및 검증',
+  'vault.sentinel_eye': 'Sentinel Eye  -  보기 및 검증',
   'vault.file_tampered': '주의: 파일 변조됨',
   'vault.sha256_verified': 'SHA-256 검증됨',
   'vault.hash_pending': '해시 대기 중',
   'vault.integrity_alert': '무결성 경고',
   'vault.untracked': '추적되지 않음',
-  'vault.no_preview': '미리보기 불가 — 파일 URL 누락',
+  'vault.no_preview': '미리보기 불가  -  파일 URL 누락',
 
   'legal.retainer_title': '법률 서비스 계약서',
   'legal.retainer_intro': '본 계약서는 제공될 법률 서비스의 조건을 명시합니다.',
@@ -203,12 +203,12 @@ export const ko: Partial<Record<DictionaryKey, string>> = {
   'status.days_remaining': '{days}일 남음',
   'status.verified': '검증됨',
   'status.expiry_label': '만료',
-  'status.sentinel_tamper_title': 'SENTINEL 경보 — 변조 감지',
+  'status.sentinel_tamper_title': 'SENTINEL 경보  -  변조 감지',
   'status.sentinel_tamper_body': '문서 해시 불일치. 이 문서가 NorvaOS 외부에서 수정되었습니다.',
-  'status.vault_verified_title': 'Norva 금고 — 무결성 검증됨',
+  'status.vault_verified_title': 'Norva 금고  -  무결성 검증됨',
   'status.vault_verified_body': '이 문서는 Norva 금고에서 해시 잠금되어 있습니다. 모든 변조가 감지됩니다.',
 
-  // ── Leads Command Centre (Directive 40.0 — Sovereign Layer) ─────────────
+  // ── Leads Command Centre (Directive 40.0  -  Sovereign Layer) ─────────────
   'leads.title': '리드',
   'leads.add_lead': '리드 추가',
   'leads.import': '가져오기',
@@ -331,7 +331,7 @@ export const ko: Partial<Record<DictionaryKey, string>> = {
   'form.notes_placeholder': 'Add any additional notes about this contact...',
   'form.create_contact': 'Create Contact',
   'form.save_changes': 'Save Changes',
-  'form.review_required_ocr': 'Review Required — OCR could not extract',
+  'form.review_required_ocr': 'Review Required  -  OCR could not extract',
   'form.section_basic_info': 'Basic Information',
   'form.section_contact_details': 'Contact Details',
   'form.section_address': 'Address',

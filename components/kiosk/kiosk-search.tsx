@@ -202,7 +202,7 @@ export function KioskSearch({ token, locale, onSelect, onWalkIn, onReturnClient,
 
       {/* Walk-in and returning client options */}
       <div className="pt-4 border-t border-slate-200 w-full space-y-3">
-        {/* Return Client — prominent, solid button */}
+        {/* Return Client  -  prominent, solid button */}
         <button
           type="button"
           onClick={onReturnClient}
@@ -215,7 +215,7 @@ export function KioskSearch({ token, locale, onSelect, onWalkIn, onReturnClient,
           {t.returning_client_button}
         </button>
 
-        {/* Walk-in — secondary, ghost */}
+        {/* Walk-in  -  secondary, ghost */}
         <button
           type="button"
           onClick={onWalkIn}

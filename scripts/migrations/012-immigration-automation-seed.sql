@@ -1,5 +1,5 @@
 -- ============================================================================
--- Migration 012: Immigration Automation Engine — Seed Data
+-- Migration 012: Immigration Automation Engine  -  Seed Data
 -- ============================================================================
 -- Populates auto_tasks on case_stage_definitions, checklist_templates,
 -- and automation_rules for the immigration practice. These provide
@@ -49,7 +49,7 @@ SET auto_tasks = '[
   {"title": "Calculate and verify CRS score", "description": "Calculate Comprehensive Ranking System score and verify all point claims", "priority": "high", "due_days_offset": 2},
   {"title": "Prepare application forms", "description": "Complete all required IRCC application forms", "priority": "high", "due_days_offset": 5},
   {"title": "Draft personal statement / LOE", "description": "Draft letter of explanation if applicable", "priority": "medium", "due_days_offset": 7},
-  {"title": "Quality review — internal check", "description": "Senior review of complete application package before submission", "priority": "high", "due_days_offset": 10}
+  {"title": "Quality review  -  internal check", "description": "Senior review of complete application package before submission", "priority": "high", "due_days_offset": 10}
 ]'::jsonb
 WHERE slug LIKE '%application%prep%' OR slug LIKE '%preparation%'
   AND auto_tasks = '[]'::jsonb;
@@ -106,8 +106,8 @@ CROSS JOIN (
     ('Birth Certificate', 'Original or certified true copy with English/French translation if applicable', true, 2, 'identity'),
     ('National ID Card', 'Front and back copy', false, 3, 'identity'),
     ('Passport-Size Photos', 'Two recent photos meeting IRCC specifications (35mm x 45mm)', true, 4, 'identity'),
-    ('Marriage Certificate', 'If applicable — certified copy with translation', false, 5, 'identity'),
-    ('Divorce Certificate', 'If applicable — certified copy with translation', false, 6, 'identity'),
+    ('Marriage Certificate', 'If applicable  -  certified copy with translation', false, 5, 'identity'),
+    ('Divorce Certificate', 'If applicable  -  certified copy with translation', false, 6, 'identity'),
     ('Language Test Results (IELTS/CELPIP/TEF)', 'Official test results less than 2 years old', true, 10, 'language'),
     ('Educational Credential Assessment (ECA)', 'WES or equivalent designated organization report', true, 11, 'education'),
     ('Degree/Diploma Certificates', 'Certified copies of all post-secondary credentials', true, 12, 'education'),
@@ -134,7 +134,7 @@ WHERE NOT EXISTS (
 -- --------------------------------------------------------------------------
 -- The stage_entered_at column already exists on matter_immigration.
 -- This is used by the front-end to calculate days-in-stage.
--- No schema changes needed — just ensuring the column is populated
+-- No schema changes needed  -  just ensuring the column is populated
 -- on all stage transitions (handled by stage-engine.ts).
 
 COMMIT;

@@ -207,7 +207,7 @@ export default function AdminMatterTypesPage() {
                   </TableCell>
                   <TableCell>
                     <Badge variant="outline" className="text-xs">
-                      {mt.practice_areas?.name ?? '—'}
+                      {mt.practice_areas?.name ?? ' - '}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-center tabular-nums">

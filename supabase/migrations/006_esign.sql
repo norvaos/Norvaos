@@ -1,11 +1,11 @@
 -- ═══════════════════════════════════════════════════════════════════════════════
--- Migration 006 — E-Sign Subsystem
+-- Migration 006  -  E-Sign Subsystem
 -- ═══════════════════════════════════════════════════════════════════════════════
 --
 -- Three tables:
---   1. signing_documents  — Immutable document snapshots (INSERT-ONLY)
---   2. signing_requests   — Signing workflow with state machine
---   3. signing_events     — Append-only audit ledger
+--   1. signing_documents   -  Immutable document snapshots (INSERT-ONLY)
+--   2. signing_requests    -  Signing workflow with state machine
+--   3. signing_events      -  Append-only audit ledger
 --
 -- Design principles:
 --   - Document-oriented: signing_documents is type-agnostic (retainer, engagement, etc.)
@@ -17,7 +17,7 @@
 --
 
 -- ═══════════════════════════════════════════════════════════════════════════════
--- 1. signing_documents — Immutable Document Snapshots
+-- 1. signing_documents  -  Immutable Document Snapshots
 -- ═══════════════════════════════════════════════════════════════════════════════
 
 CREATE TABLE signing_documents (
@@ -40,7 +40,7 @@ CREATE INDEX idx_signing_documents_tenant ON signing_documents (tenant_id);
 CREATE INDEX idx_signing_documents_matter ON signing_documents (matter_id);
 CREATE INDEX idx_signing_documents_source ON signing_documents (source_entity_type, source_entity_id);
 
-COMMENT ON TABLE signing_documents IS 'Immutable document snapshots for electronic signing. INSERT-ONLY — no updates or deletes.';
+COMMENT ON TABLE signing_documents IS 'Immutable document snapshots for electronic signing. INSERT-ONLY  -  no updates or deletes.';
 COMMENT ON COLUMN signing_documents.document_type IS 'retainer_agreement, engagement_letter, disengagement_letter, authorization, acknowledgement, general';
 COMMENT ON COLUMN signing_documents.source_entity_type IS 'Origin record type: invoice, document_instance, etc.';
 COMMENT ON COLUMN signing_documents.source_entity_id IS 'FK to the source record (invoice.id, document_instance.id, etc.)';
@@ -49,7 +49,7 @@ COMMENT ON COLUMN signing_documents.checksum_sha256 IS 'SHA-256 hex digest of th
 
 
 -- ═══════════════════════════════════════════════════════════════════════════════
--- 2. signing_requests — Signing Workflow
+-- 2. signing_requests  -  Signing Workflow
 -- ═══════════════════════════════════════════════════════════════════════════════
 
 CREATE TABLE signing_requests (
@@ -134,7 +134,7 @@ COMMENT ON COLUMN signing_requests.superseded_by IS 'Points to the new signing_r
 
 
 -- ═══════════════════════════════════════════════════════════════════════════════
--- 3. signing_events — Append-Only Audit Ledger
+-- 3. signing_events  -  Append-Only Audit Ledger
 -- ═══════════════════════════════════════════════════════════════════════════════
 
 CREATE TABLE signing_events (

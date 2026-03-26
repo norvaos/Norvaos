@@ -82,7 +82,7 @@ export function PipelineProgress({
         </div>
       </div>
 
-      {/* Stage labels — clickable if onStageChange provided */}
+      {/* Stage labels  -  clickable if onStageChange provided */}
       <TooltipProvider delayDuration={200}>
         <div className="flex items-start justify-between">
           {PIPELINE_STAGES.map((stage, index) => {

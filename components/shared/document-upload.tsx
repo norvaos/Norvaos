@@ -112,7 +112,7 @@ interface DocumentUploadProps {
   entityId: string
   tenantId: string
   entityName?: string
-  /** When true, only renders the upload area — hides the document list below */
+  /** When true, only renders the upload area  -  hides the document list below */
   hideList?: boolean
 }
 
@@ -180,7 +180,7 @@ export function DocumentUpload({ entityType, entityId, tenantId, entityName, hid
         errors.push(`"${file.name}" exceeds the 25 MB limit (${formatFileSize(file.size)})`)
         continue
       }
-      // Validate file type — check MIME type or extension fallback
+      // Validate file type  -  check MIME type or extension fallback
       const ext = file.name.split('.').pop()?.toLowerCase() ?? ''
       const allowedExts = ACCEPTED_EXTENSIONS.split(',').map((e) => e.replace('.', ''))
       if (!ACCEPTED_FILE_TYPES.includes(file.type) && !allowedExts.includes(ext)) {
@@ -197,7 +197,7 @@ export function DocumentUpload({ entityType, entityId, tenantId, entityName, hid
     if (validFiles.length === 0) return
 
     setSelectedFiles(validFiles)
-    // Initialize editable file names — auto-name if entityName provided
+    // Initialize editable file names  -  auto-name if entityName provided
     const names: Record<number, string> = {}
     validFiles.forEach((file, idx) => {
       names[idx] = buildAutoName(file.name, category, idx)

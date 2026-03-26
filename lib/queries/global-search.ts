@@ -46,7 +46,7 @@ export const globalSearchKeys = {
 // ─── Hook ────────────────────────────────────────────────────────────────────
 
 /**
- * Calls the `global_search` RPC — a single Postgres function that searches
+ * Calls the `global_search` RPC  -  a single Postgres function that searches
  * contacts, matters, leads, and tasks in one round trip.
  *
  * Security: the RPC resolves tenant_id from `auth.uid()` inside the function
@@ -68,8 +68,8 @@ export function useGlobalSearch(searchTerm: string) {
       return data as unknown as GlobalSearchResult
     },
     enabled: searchTerm.trim().length > 0,
-    staleTime: 1000 * 30,       // 30s — repeated searches feel instant
-    gcTime: 1000 * 60 * 2,      // 2min — keep recent searches warm
+    staleTime: 1000 * 30,       // 30s  -  repeated searches feel instant
+    gcTime: 1000 * 60 * 2,      // 2min  -  keep recent searches warm
     placeholderData: (prev) => prev, // show previous results while fetching new
   })
 }

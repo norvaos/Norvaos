@@ -1,7 +1,7 @@
 import { z } from 'zod/v4'
 
 /**
- * Step 1: Conflict Search — just name fields
+ * Step 1: Conflict Search  -  just name fields
  */
 export const conflictSearchSchema = z.object({
   first_name: z.string().min(1, 'First name is required').max(100),
@@ -11,7 +11,7 @@ export const conflictSearchSchema = z.object({
 export type ConflictSearchValues = z.infer<typeof conflictSearchSchema>
 
 /**
- * Step 2: Contact Details — minimal collection
+ * Step 2: Contact Details  -  minimal collection
  */
 export const contactDetailsSchema = z.object({
   first_name: z.string().min(1, 'First name is required').max(100),

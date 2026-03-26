@@ -92,7 +92,7 @@ type Lead = Database['public']['Tables']['leads']['Row']
 // Main page component
 // ---------------------------------------------------------------------------
 
-// ─── Mini ScoreRing (Directive 36.1 — Sovereign Layer) ───────────────────────
+// ─── Mini ScoreRing (Directive 36.1  -  Sovereign Layer) ───────────────────────
 const MINI_RING_SIZE = 36
 const MINI_RING_CENTER = MINI_RING_SIZE / 2
 const MINI_RING_RADIUS = 14
@@ -577,14 +577,14 @@ export default function LeadsPage() {
 
       const targetStage = stages?.find((s) => s.id === targetStageId)
 
-      // Check if target stage is a lost stage — requires a lost reason
+      // Check if target stage is a lost stage  -  requires a lost reason
       if (targetStage?.is_lost_stage) {
-        // Do NOT apply optimistic move yet — wait for confirmation
+        // Do NOT apply optimistic move yet  -  wait for confirmation
         setPendingLostMove({ leadId, stageId: targetStageId })
         return
       }
 
-      // Check if target stage is "Deferred" — requires a reactivation date
+      // Check if target stage is "Deferred"  -  requires a reactivation date
       if (targetStage && /deferred/i.test(targetStage.name)) {
         // Optimistic move, then open date picker
         applyOptimisticStageMove(leadId, targetStageId)
@@ -638,7 +638,7 @@ export default function LeadsPage() {
     [pendingDeferredMove, updateLeadStage, updateLead, queryClient]
   )
 
-  // Deferred dialog: cancel — revert the optimistic move
+  // Deferred dialog: cancel  -  revert the optimistic move
   const handleDeferredCancel = useCallback(() => {
     setPendingDeferredMove(null)
     queryClient.invalidateQueries({ queryKey: leadKeys.lists() })
@@ -675,7 +675,7 @@ export default function LeadsPage() {
     [pendingLostMove, applyOptimisticStageMove, updateLeadStage, updateLead, queryClient]
   )
 
-  // Lost dialog: cancel — no optimistic update was applied, just clear
+  // Lost dialog: cancel  -  no optimistic update was applied, just clear
   const handleLostCancel = useCallback(() => {
     setPendingLostMove(null)
   }, [])
@@ -752,7 +752,7 @@ export default function LeadsPage() {
           <div className="flex items-center gap-4">
             <h1 className="text-2xl font-semibold text-slate-900">{t('leads.title', 'Leads')}</h1>
 
-            {/* ScoreRing — Pipeline Readiness (Directive 36.1) */}
+            {/* ScoreRing  -  Pipeline Readiness (Directive 36.1) */}
             {totalLeads > 0 && (
               <div className="flex items-center gap-2">
                 <MiniScoreRing score={pipelineReadiness} />
@@ -1055,7 +1055,7 @@ export default function LeadsPage() {
         </div>
       </div>
 
-      {/* Main content area — Kanban or Table */}
+      {/* Main content area  -  Kanban or Table */}
       <div className="flex-1 overflow-hidden">
         {stagesLoading || leadsLoading ? (
           viewMode === 'kanban' ? (
@@ -1307,8 +1307,8 @@ function LeadsTable({
           {leads.map((lead) => {
             const contact = lead.contact_id ? contactsMap[lead.contact_id] : null
             const contactName = contact
-              ? [contact.first_name, contact.last_name].filter(Boolean).join(' ') || contact.email_primary || '—'
-              : '—'
+              ? [contact.first_name, contact.last_name].filter(Boolean).join(' ') || contact.email_primary || ' - '
+              : ' - '
             const stage = stageMap.get(lead.stage_id)
             const tempInfo = LEAD_TEMPERATURES.find((t) => t.value === lead.temperature)
             const assignee = lead.assigned_to ? usersMap[lead.assigned_to] : null
@@ -1352,7 +1352,7 @@ function LeadsTable({
                       {tempInfo.label}
                     </Badge>
                   ) : (
-                    <span className="text-xs text-slate-400">—</span>
+                    <span className="text-xs text-slate-400"> - </span>
                   )}
                 </TableCell>
 
@@ -1370,13 +1370,13 @@ function LeadsTable({
                       )}
                     </div>
                   ) : (
-                    <span className="text-xs text-slate-400">—</span>
+                    <span className="text-xs text-slate-400"> - </span>
                   )}
                 </TableCell>
 
                 {/* Source */}
                 <TableCell>
-                  <span className="text-xs text-slate-600">{lead.source ?? '—'}</span>
+                  <span className="text-xs text-slate-600">{lead.source ?? ' - '}</span>
                 </TableCell>
 
                 {/* Value */}
@@ -1386,7 +1386,7 @@ function LeadsTable({
                       {formatCurrency(lead.estimated_value)}
                     </span>
                   ) : (
-                    <span className="text-xs text-slate-400">—</span>
+                    <span className="text-xs text-slate-400"> - </span>
                   )}
                 </TableCell>
 
@@ -1413,14 +1413,14 @@ function LeadsTable({
                       {formatDate(lead.next_follow_up)}
                     </span>
                   ) : (
-                    <span className="text-xs text-slate-400">—</span>
+                    <span className="text-xs text-slate-400"> - </span>
                   )}
                 </TableCell>
 
                 {/* Created */}
                 <TableCell>
                   <span className="text-xs text-slate-500 tabular-nums">
-                    {lead.created_at ? formatDate(lead.created_at) : '—'}
+                    {lead.created_at ? formatDate(lead.created_at) : ' - '}
                   </span>
                 </TableCell>
 

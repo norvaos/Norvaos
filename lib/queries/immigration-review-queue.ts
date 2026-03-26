@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Immigration Review Queue — TanStack Query Hooks
+ * Immigration Review Queue  -  TanStack Query Hooks
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Server-side filtered query for the immigration review queue.

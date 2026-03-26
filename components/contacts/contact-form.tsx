@@ -220,7 +220,7 @@ export function ContactForm({
 }: ContactFormProps) {
   const { t } = useI18n()
   const [additionalDetailsOpen, setAdditionalDetailsOpen] = useState(false)
-  /** Fields the OCR parser flagged as needing manual review — shows amber border */
+  /** Fields the OCR parser flagged as needing manual review  -  shows amber border */
   const [reviewRequiredFields, setReviewRequiredFields] = useState<Set<string>>(new Set())
 
   const form = useForm<ContactFormValues>({
@@ -252,7 +252,7 @@ export function ContactForm({
     // Ensure contact type is individual
     form.setValue('contact_type', 'individual')
 
-    // Flag fields the parser couldn't confidently extract — amber "Review Required" border
+    // Flag fields the parser couldn't confidently extract  -  amber "Review Required" border
     if (fields.review_required && fields.review_required.length > 0) {
       setReviewRequiredFields(new Set(fields.review_required))
     } else {
@@ -336,7 +336,7 @@ export function ContactForm({
           )}
         />
 
-        {/* Classification — visible in both create and edit */}
+        {/* Classification  -  visible in both create and edit */}
         <FormField
           control={form.control}
           name="client_status"
@@ -353,7 +353,7 @@ export function ContactForm({
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {/* Client Lifecycle — auto-managed by system for these */}
+                  {/* Client Lifecycle  -  auto-managed by system for these */}
                   <SelectItem value="lead">
                     <span className="flex items-center gap-2">
                       <span className="size-2 rounded-full bg-amber-400" />
@@ -454,7 +454,7 @@ export function ContactForm({
                 <SelectContent>
                   {CLIENT_LOCALES.map((locale) => (
                     <SelectItem key={locale.code} value={locale.code}>
-                      {locale.nativeLabel} — {locale.label}
+                      {locale.nativeLabel}  -  {locale.label}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -474,7 +474,7 @@ export function ContactForm({
             {t('form.section_basic_info' as any)}
           </h3>
 
-          {/* ID Scanner — scan a government ID to auto-fill fields */}
+          {/* ID Scanner  -  scan a government ID to auto-fill fields */}
           {mode === 'create' && contactType === 'individual' && (
             <IdScanner onScanComplete={handleScanComplete} />
           )}
@@ -519,7 +519,7 @@ export function ContactForm({
                 />
               </div>
 
-              {/* Date of Birth — year-first picker */}
+              {/* Date of Birth  -  year-first picker */}
               <FormField
                 control={form.control}
                 name="date_of_birth"
@@ -700,7 +700,7 @@ export function ContactForm({
             )}
           />
 
-          {/* City, Province, Postal Code, Country — visually grouped */}
+          {/* City, Province, Postal Code, Country  -  visually grouped */}
           <div className="rounded-lg border bg-muted/30 p-4 space-y-3">
             <div className="grid grid-cols-2 gap-4">
               <FormField

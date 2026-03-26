@@ -54,7 +54,7 @@ const TodaysAppointmentsWidget = dynamic(
   { loading: () => <ImmigrationWidgetSkeleton /> }
 )
 
-// Lazy-load Compliance Health Bar — Directive 41.3
+// Lazy-load Compliance Health Bar  -  Directive 41.3
 const ComplianceHealthBar = dynamic(
   () => import('@/components/dashboard/compliance-health-bar').then((m) => ({ default: m.ComplianceHealthBar })),
   { loading: () => <></> }
@@ -66,7 +66,7 @@ const RiskOverviewWidget = dynamic(
   { loading: () => <ImmigrationWidgetSkeleton /> }
 )
 
-// Lazy-load immigration widgets — only rendered when immigration section is visible
+// Lazy-load immigration widgets  -  only rendered when immigration section is visible
 const ActiveFilesByStageWidget = dynamic(
   () => import('@/components/immigration/dashboard-widgets').then((m) => ({ default: m.ActiveFilesByStageWidget })),
   { loading: () => <ImmigrationWidgetSkeleton /> }
@@ -96,27 +96,33 @@ const StaffWellnessMeter = dynamic(
   { loading: () => <ImmigrationWidgetSkeleton /> }
 )
 
-// Lazy-load quick-start checklist — only shown for empty tenants
+// Lazy-load quick-start checklist  -  only shown for empty tenants
 const QuickStartChecklist = dynamic(
   () => import('@/components/dashboard/quick-start-checklist').then((m) => ({ default: m.QuickStartChecklist })),
   { ssr: false }
 )
 
-// Lazy-load Welcome Home migration summary — only shown for migrated firms
+// Lazy-load Welcome Home migration summary  -  only shown for migrated firms
 const WelcomeHomeWidget = dynamic(
   () => import('@/components/dashboard/welcome-home-widget').then((m) => ({ default: m.WelcomeHomeWidget })),
   { ssr: false }
 )
 
-// Lazy-load Launch Demo Hook — Directive 29.2: Arjun Mehta first-login CTA
+// Lazy-load Launch Demo Hook  -  Directive 29.2: Arjun Mehta first-login CTA
 const LaunchDemoHook = dynamic(
   () => import('@/components/dashboard/launch-demo-hook').then((m) => ({ default: m.LaunchDemoHook })),
   { ssr: false }
 )
 
-// Lazy-load Action Trident — Directive 0.0: client entry funnel on dashboard
+// Lazy-load Action Trident  -  Directive 0.0: client entry funnel on dashboard
 const ActionTrident = dynamic(
   () => import('@/components/front-desk/ActionTrident').then((m) => ({ default: m.ActionTrident })),
+  { ssr: false }
+)
+
+// Lazy-load Glass Fortress Matrix  -  Session A: "Prestige" Architect
+const GlassFortressMatrix = dynamic(
+  () => import('@/components/dashboard/glass-fortress-matrix').then((m) => ({ default: m.GlassFortressMatrix })),
   { ssr: false }
 )
 
@@ -218,7 +224,7 @@ function useDashboardStats(tenantId: string, userId: string, practiceAreaId: str
       const monthStart = startOfMonth(new Date()).toISOString()
       const today = format(new Date(), 'yyyy-MM-dd')
 
-      // Active matters query — scoped to practice area if filter is active
+      // Active matters query  -  scoped to practice area if filter is active
       let mattersQ = supabase
         .from('matters')
         .select('*', { count: 'exact', head: true })
@@ -263,7 +269,7 @@ function useDashboardStats(tenantId: string, userId: string, practiceAreaId: str
   })
 }
 
-/** Lightweight check for Quick Start checklist — contacts + trust accounts */
+/** Lightweight check for Quick Start checklist  -  contacts + trust accounts */
 function useQuickStartStatus(tenantId: string) {
   return useQuery({
     queryKey: ['dashboard', 'quick-start', tenantId],
@@ -286,7 +292,7 @@ function useQuickStartStatus(tenantId: string) {
       }
     },
     enabled: !!tenantId,
-    staleTime: 5 * 60 * 1000, // 5 minutes — reference data
+    staleTime: 5 * 60 * 1000, // 5 minutes  -  reference data
   })
 }
 
@@ -444,7 +450,7 @@ function useLeadPipeline(tenantId: string) {
       return fetchPipelineData(supabase, pipeline, tenantId)
     },
     enabled: !!tenantId,
-    staleTime: 5 * 60 * 1000, // 5 minutes — pipeline data changes infrequently
+    staleTime: 5 * 60 * 1000, // 5 minutes  -  pipeline data changes infrequently
   })
 }
 
@@ -825,7 +831,7 @@ function RecentActivityWidget({ tenantId }: { tenantId: string }) {
 }
 
 // ---------------------------------------------------------------------------
-// Upcoming Deadlines Widget (legacy — matters.next_deadline)
+// Upcoming Deadlines Widget (legacy  -  matters.next_deadline)
 // ---------------------------------------------------------------------------
 
 function UpcomingDeadlinesWidget({ tenantId }: { tenantId: string }) {
@@ -1143,21 +1149,24 @@ export default function DashboardPage() {
         />
       )}
 
-      {/* ---- Launch Demo Hook — Directive 29.2: Arjun Mehta first-login ---- */}
+      {/* ---- Launch Demo Hook  -  Directive 29.2: Arjun Mehta first-login ---- */}
       <LaunchDemoHook tenantId={tenantId} userId={userId} />
 
-      {/* ---- Welcome Home — Migration Summary (Directive 11.1) ---- */}
+      {/* ---- Welcome Home  -  Migration Summary (Directive 11.1) ---- */}
       <WelcomeHomeWidget tenantId={tenantId} />
 
-      {/* ---- Action Trident — Directive 0.0: Client Entry Funnel ---- */}
+      {/* ---- Action Trident  -  Directive 0.0: Client Entry Funnel ---- */}
       <ActionTrident
         intakeHref="/leads?action=new"
         vaultHref="/documents?action=upload"
         portalHref="/settings/portal"
       />
 
-      {/* ---- Firm Compliance Health — Directive 41.3 ---- */}
+      {/* ---- Firm Compliance Health  -  Directive 41.3 ---- */}
       <ComplianceHealthBar />
+
+      {/* ---- Glass Fortress Matrix  -  Session A: "Prestige" Architect ---- */}
+      <GlassFortressMatrix />
 
       {/* ---- Stats Row ---- */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">

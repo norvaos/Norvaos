@@ -47,7 +47,7 @@ async function handlePost(
       overrideTaxCheck = true
     }
   } catch {
-    // Empty or non-JSON body — treat as no override
+    // Empty or non-JSON body  -  treat as no override
   }
 
   const result = await finalizeInvoice({ supabase: admin, invoiceId, tenantId, userId, overrideTaxCheck })

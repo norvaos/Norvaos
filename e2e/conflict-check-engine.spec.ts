@@ -4,7 +4,7 @@ test.use({ storageState: './e2e/.auth/admin.json' })
 
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Conflict Check Engine — Playwright E2E Verification
+ * Conflict Check Engine  -  Playwright E2E Verification
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Law Society of Ontario Rule 3.4-1: A lawyer must not act or continue to act
@@ -20,8 +20,8 @@ test.use({ storageState: './e2e/.auth/admin.json' })
  *   6. Verify decision is recorded and status updates
  *
  * API-level tests (faster, no UI flakiness):
- *   7. POST /api/contacts/[id]/conflict-scan — verify scan + match response
- *   8. POST /api/contacts/[id]/conflict-decision — verify decision recording
+ *   7. POST /api/contacts/[id]/conflict-scan  -  verify scan + match response
+ *   8. POST /api/contacts/[id]/conflict-decision  -  verify decision recording
  * ═══════════════════════════════════════════════════════════════════════════════
  */
 
@@ -36,8 +36,8 @@ const contactA = {
 
 const contactB = {
   firstName: 'E2E-Conflict',
-  lastName: `Existing-${now}`, // Same name — triggers exact_name match (weight 30)
-  email: `conflict-a-${now}@test.norvaos.com`, // Same email — triggers email_match (weight 25)
+  lastName: `Existing-${now}`, // Same name  -  triggers exact_name match (weight 30)
+  email: `conflict-a-${now}@test.norvaos.com`, // Same email  -  triggers email_match (weight 25)
   phone: '416-555-8802',
 }
 
@@ -69,10 +69,10 @@ async function createContact(
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// SUITE 1 — API-Level Conflict Engine Verification
+// SUITE 1  -  API-Level Conflict Engine Verification
 // ═══════════════════════════════════════════════════════════════════════════════
 
-test.describe('Conflict Check Engine — API', () => {
+test.describe('Conflict Check Engine  -  API', () => {
   test.beforeAll(async ({ request }) => {
     // Create two contacts with overlapping PII
     contactAId = await createContact(request, contactA)
@@ -160,12 +160,12 @@ test.describe('Conflict Check Engine — API', () => {
 })
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// SUITE 2 — UI-Level Conflict Engine Verification
+// SUITE 2  -  UI-Level Conflict Engine Verification
 // ═══════════════════════════════════════════════════════════════════════════════
 
-test.describe('Conflict Check Engine — UI', () => {
+test.describe('Conflict Check Engine  -  UI', () => {
   test.beforeAll(async ({ request }) => {
-    // Ensure contacts exist (idempotent — may already exist from API suite)
+    // Ensure contacts exist (idempotent  -  may already exist from API suite)
     if (!contactAId) contactAId = await createContact(request, contactA)
     if (!contactBId) contactBId = await createContact(request, contactB)
 
@@ -242,10 +242,10 @@ test.describe('Conflict Check Engine — UI', () => {
 })
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// SUITE 3 — Conflict Gate: Blocked contact cannot open a matter
+// SUITE 3  -  Conflict Gate: Blocked contact cannot open a matter
 // ═══════════════════════════════════════════════════════════════════════════════
 
-test.describe('Conflict Gate — Matter Opening Block', () => {
+test.describe('Conflict Gate  -  Matter Opening Block', () => {
   test('blocked contact triggers conflict warning when opening a matter', async ({
     page,
     request,

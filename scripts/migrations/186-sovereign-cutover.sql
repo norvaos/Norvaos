@@ -1,5 +1,5 @@
 /**
- * Migration 186 — Sovereign Cutover (Directive 35.1)
+ * Migration 186  -  Sovereign Cutover (Directive 35.1)
  *
  * The "God-Switch": Flips tenants from Clio-Legacy safety mode to the
  * Sovereign Workspace (Intelligence Hub + Global 15 + Fact-Anchors).

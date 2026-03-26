@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Lead Workflow — React Query Hooks
+ * Lead Workflow  -  React Query Hooks
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Client-side query and mutation hooks for the lead intake automation pipeline.
@@ -12,44 +12,44 @@
  *   - Toast notifications for user feedback
  *
  * All mutations delegate to API routes which call the service layer.
- * No business logic in these hooks — they are data access + cache management.
+ * No business logic in these hooks  -  they are data access + cache management.
  *
  * ─── DATA ACCESS BOUNDARY RULE ─────────────────────────────────────────────
  *
  * There are two data access patterns in this file. Each hook uses exactly one.
  * The rule for which pattern a hook uses is:
  *
- * 1. DIRECT SUPABASE READ — Used for **read-only, single-table, RLS-protected
+ * 1. DIRECT SUPABASE READ  -  Used for **read-only, single-table, RLS-protected
  *    queries** that do not require guard evaluation, cross-entity orchestration,
  *    three-tier template resolution, or any server-side business logic.
  *    These are pure data fetches. RLS on the table enforces tenant isolation.
  *
  *    Hooks using this pattern:
- *      - useLeadStageHistory          (lead_stage_history — read-only audit trail)
- *      - useLeadMilestones            (lead_milestone_groups + tasks — read-only)
- *      - useLeadCommunicationEvents   (lead_communication_events — read-only)
- *      - useLeadInsights              (lead_ai_insights — read-only)
- *      - useLeadConsultations         (lead_consultations — read-only)
- *      - useLeadRetainerPackages      (lead_retainer_packages — read-only)
- *      - useLeadQualificationDecisions(lead_qualification_decisions — read-only)
- *      - useLeadClosureRecords        (lead_closure_records — read-only)
+ *      - useLeadStageHistory          (lead_stage_history  -  read-only audit trail)
+ *      - useLeadMilestones            (lead_milestone_groups + tasks  -  read-only)
+ *      - useLeadCommunicationEvents   (lead_communication_events  -  read-only)
+ *      - useLeadInsights              (lead_ai_insights  -  read-only)
+ *      - useLeadConsultations         (lead_consultations  -  read-only)
+ *      - useLeadRetainerPackages      (lead_retainer_packages  -  read-only)
+ *      - useLeadQualificationDecisions(lead_qualification_decisions  -  read-only)
+ *      - useLeadClosureRecords        (lead_closure_records  -  read-only)
  *
- * 2. API ROUTE — Used when the query or mutation involves **business logic,
+ * 2. API ROUTE  -  Used when the query or mutation involves **business logic,
  *    guard evaluation, multi-step orchestration, three-tier config/template
  *    resolution, or any write operation**. These go through authenticated API
  *    routes which delegate to the service layer.
  *
  *    Hooks using this pattern:
- *      - useLeadStageTransitions      (GET — evaluates transition guards)
- *      - useConversionGates           (GET — evaluates all conversion gates)
- *      - useLeadAutomationSettings    (GET — three-tier resolution: registry → settings → templates)
- *      - useAdvanceLeadStage          (POST — guard evaluation + stage engine)
- *      - useCloseLead                 (POST — closure engine orchestration)
- *      - useReopenLead                (POST — reopen engine orchestration)
- *      - useConvertLead               (POST — full gating + matter creation)
- *      - useLogCommunicationEvent     (POST — auto-complete + template resolution)
- *      - useGenerateInsights          (POST — AI service invocation)
- *      - useAcceptInsight             (PUT — insight acceptance + audit)
+ *      - useLeadStageTransitions      (GET  -  evaluates transition guards)
+ *      - useConversionGates           (GET  -  evaluates all conversion gates)
+ *      - useLeadAutomationSettings    (GET  -  three-tier resolution: registry → settings → templates)
+ *      - useAdvanceLeadStage          (POST  -  guard evaluation + stage engine)
+ *      - useCloseLead                 (POST  -  closure engine orchestration)
+ *      - useReopenLead                (POST  -  reopen engine orchestration)
+ *      - useConvertLead               (POST  -  full gating + matter creation)
+ *      - useLogCommunicationEvent     (POST  -  auto-complete + template resolution)
+ *      - useGenerateInsights          (POST  -  AI service invocation)
+ *      - useAcceptInsight             (PUT  -  insight acceptance + audit)
  *
  * When adding new hooks, follow this rule:
  *   - If the hook is a READ against a SINGLE RLS-protected table with NO
@@ -919,12 +919,12 @@ export function useRecordRetainerPayment() {
       queryClient.invalidateQueries({ queryKey: ['leads'] })
 
       if (data.matterId && data.matterNumber) {
-        toast.success(`Payment recorded — Matter ${data.matterNumber} created`)
+        toast.success(`Payment recorded  -  Matter ${data.matterNumber} created`)
       } else if (data.matterId) {
-        toast.success('Payment recorded — Lead converted to matter')
+        toast.success('Payment recorded  -  Lead converted to matter')
       } else if (data.paymentStatus === 'partial') {
         const balance = `$${(data.balance / 100).toFixed(2)}`
-        toast.success(`Payment recorded — Balance remaining: ${balance}`)
+        toast.success(`Payment recorded  -  Balance remaining: ${balance}`)
       } else {
         toast.success('Payment recorded')
       }

@@ -2,7 +2,7 @@
  * refusal-engine.ts
  *
  * Pure-function engine for IRCC refusal workflow logic.
- * No DB calls — all functions are synchronous and side-effect-free.
+ * No DB calls  -  all functions are synchronous and side-effect-free.
  * Sprint 6, Week 2.
  */
 

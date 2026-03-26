@@ -1,7 +1,7 @@
-# Scope Memo — Team 3 / Module 1: Integration Inventory and Contract Package
+# Scope Memo  -  Team 3 / Module 1: Integration Inventory and Contract Package
 
 **Module:** Team 3 / Module 1
-**Delivery Type:** Documentation only — zero runtime changes
+**Delivery Type:** Documentation only  -  zero runtime changes
 **Date:** 2026-03-15
 **Author:** Team 3 / Module 1 Agent
 **Reviewers:** Lead Engineer, Operations, Security
@@ -10,7 +10,7 @@
 
 ## 1. Module Objective
 
-Produce a complete integration inventory and contract package for all third-party and internal service integrations in NorvaOS. Contracts are derived from source code as read — they document actual behaviour, not intended behaviour. All gaps between expected and observed behaviour are flagged explicitly.
+Produce a complete integration inventory and contract package for all third-party and internal service integrations in NorvaOS. Contracts are derived from source code as read  -  they document actual behaviour, not intended behaviour. All gaps between expected and observed behaviour are flagged explicitly.
 
 ---
 
@@ -70,18 +70,18 @@ The following source files were read during the audit. None were modified.
 
 The following are explicitly out of scope for this module. No changes of any kind were made to these areas:
 
-- **Core database schema** — No migrations written, no table definitions changed
-- **Auth and session management** — `lib/supabase/`, `lib/services/auth.ts` not modified
-- **RBAC and permissions** — `lib/services/require-role.ts` not modified
-- **RLS policies** — No SQL policy changes
-- **Billing and Stripe charging logic** — Only the webhook consumer was read; no billing logic touched
-- **Trust accounting** — Not in scope
-- **All existing API routes** — No route handlers modified
-- **All existing React components and pages** — No UI changes
-- **All existing database query hooks** — `lib/queries/` not modified
-- **Supabase migrations** — `scripts/migrations/` not modified
-- **Environment variables** — No `.env` files read or modified; variables only referenced as documented in source
-- **Third-party service configurations** — No changes to Azure AD app, Stripe dashboard, GHL app, or Clio app settings
+- **Core database schema**  -  No migrations written, no table definitions changed
+- **Auth and session management**  -  `lib/supabase/`, `lib/services/auth.ts` not modified
+- **RBAC and permissions**  -  `lib/services/require-role.ts` not modified
+- **RLS policies**  -  No SQL policy changes
+- **Billing and Stripe charging logic**  -  Only the webhook consumer was read; no billing logic touched
+- **Trust accounting**  -  Not in scope
+- **All existing API routes**  -  No route handlers modified
+- **All existing React components and pages**  -  No UI changes
+- **All existing database query hooks**  -  `lib/queries/` not modified
+- **Supabase migrations**  -  `scripts/migrations/` not modified
+- **Environment variables**  -  No `.env` files read or modified; variables only referenced as documented in source
+- **Third-party service configurations**  -  No changes to Azure AD app, Stripe dashboard, GHL app, or Clio app settings
 
 ---
 

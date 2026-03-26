@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * PortalLegalTeam — Two-column contact block with role descriptions.
+ * PortalLegalTeam  -  Two-column contact block with role descriptions.
  * Shows lawyer + support staff with clear contact responsibility guidance.
  */
 

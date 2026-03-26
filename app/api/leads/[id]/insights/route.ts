@@ -8,7 +8,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 /**
  * POST /api/leads/[id]/insights
  *
- * Generate AI insights for a lead. The AI service is assistive-only —
+ * Generate AI insights for a lead. The AI service is assistive-only  - 
  * outputs are stored as suggestions, never auto-applied.
  */
 async function handlePost(
@@ -58,7 +58,7 @@ async function handlePost(
 /**
  * PUT /api/leads/[id]/insights
  *
- * Accept an AI insight — marks it as human-accepted and logs the decision.
+ * Accept an AI insight  -  marks it as human-accepted and logs the decision.
  * This is the explicit human approval step required by the AI-assistive-only rule.
  *
  * Body: { insightId: string, notes?: string }

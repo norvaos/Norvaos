@@ -5,7 +5,7 @@
 -- the rollback update to fail with a constraint violation and silently leave matters
 -- in their original status instead of being marked as reverted.
 --
--- This value must NEVER appear in business-facing UIs or reports — it is filtered
+-- This value must NEVER appear in business-facing UIs or reports  -  it is filtered
 -- out at the query layer via IMPORT_REVERTED_STATUS from lib/utils/matter-status.ts.
 
 BEGIN;

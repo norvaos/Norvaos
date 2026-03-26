@@ -201,7 +201,7 @@ function NewInvoiceContent() {
                 <SelectContent>
                   {matters.map((m) => (
                     <SelectItem key={m.id} value={m.id}>
-                      {m.matter_number ? `${m.matter_number} — ` : ''}{m.title}
+                      {m.matter_number ? `${m.matter_number}  -  ` : ''}{m.title}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -346,7 +346,7 @@ function NewInvoiceContent() {
                 </div>
                 {taxConfig.isOutOfProvince && (
                   <p className="text-[10px] text-amber-600 font-medium">
-                    Dynamic Tax Adjustment: {(taxConfig.rate * 100).toFixed(0)}% {taxConfig.label} Applied (Out-of-Province Client — {taxConfig.provinceCode})
+                    Dynamic Tax Adjustment: {(taxConfig.rate * 100).toFixed(0)}% {taxConfig.label} Applied (Out-of-Province Client  -  {taxConfig.provinceCode})
                   </p>
                 )}
                 {!selectedMatterId && (

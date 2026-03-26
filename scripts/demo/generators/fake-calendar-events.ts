@@ -1,15 +1,15 @@
-// ALL DATA IS SYNTHETIC — NOT REAL CLIENT DATA
+// ALL DATA IS SYNTHETIC  -  NOT REAL CLIENT DATA
 
 const EVENT_TEMPLATES = [
-  { title: 'Initial Consultation — Immigration Matter', type: 'consultation', duration: 60 },
+  { title: 'Initial Consultation  -  Immigration Matter', type: 'consultation', duration: 60 },
   { title: 'IRCC Biometrics Appointment', type: 'appointment', duration: 30 },
   { title: 'Refugee Board Hearing', type: 'hearing', duration: 120 },
   { title: 'Document Review Meeting', type: 'meeting', duration: 45 },
   { title: 'Application Filing Deadline', type: 'deadline', duration: 0 },
-  { title: 'Family Court Hearing — Custody', type: 'hearing', duration: 90 },
+  { title: 'Family Court Hearing  -  Custody', type: 'hearing', duration: 90 },
   { title: 'Settlement Conference', type: 'meeting', duration: 120 },
   { title: 'Medical Exam Appointment', type: 'appointment', duration: 60 },
-  { title: 'Client Debrief — Post-Decision', type: 'meeting', duration: 30 },
+  { title: 'Client Debrief  -  Post-Decision', type: 'meeting', duration: 30 },
   { title: 'Spousal Sponsorship Interview', type: 'interview', duration: 60 },
 ]
 
@@ -56,7 +56,7 @@ export function generateFakeCalendarEvents(
       tenant_id: tenantId,
       matter_id: matterIds[i % matterIds.length],
       title: template.title,
-      description: `Demo calendar event ${i + 1} — synthetic data for demonstration purposes only.`,
+      description: `Demo calendar event ${i + 1}  -  synthetic data for demonstration purposes only.`,
       event_type: template.type,
       start_time: startDate.toISOString(),
       end_time: endDate.toISOString(),

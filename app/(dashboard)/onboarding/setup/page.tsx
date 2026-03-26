@@ -401,7 +401,7 @@ export default function SetupWizardPage() {
       {currentStep === 0 && (
         <div className="rounded-lg border border-slate-200 bg-white p-6 space-y-5">
           <div>
-            <h3 className="text-base font-semibold text-slate-900">Step 1 of 4 — Office Profile</h3>
+            <h3 className="text-base font-semibold text-slate-900">Step 1 of 4  -  Office Profile</h3>
             <p className="mt-1 text-sm text-slate-500">
               Set your firm name, contact details, and timezone.
             </p>
@@ -432,7 +432,7 @@ export default function SetupWizardPage() {
                     <FormControl>
                       <Input placeholder="123 Legal Street, Toronto, ON" {...field} />
                     </FormControl>
-                    <FormDescription>Optional — can be set later in Firm Settings.</FormDescription>
+                    <FormDescription>Optional  -  can be set later in Firm Settings.</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -447,7 +447,7 @@ export default function SetupWizardPage() {
                     <FormControl>
                       <Input placeholder="+1 (416) 555-0100" {...field} />
                     </FormControl>
-                    <FormDescription>Optional — can be set later in Firm Settings.</FormDescription>
+                    <FormDescription>Optional  -  can be set later in Firm Settings.</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -497,7 +497,7 @@ export default function SetupWizardPage() {
       {currentStep === 1 && (
         <div className="rounded-lg border border-slate-200 bg-white p-6 space-y-5">
           <div>
-            <h3 className="text-base font-semibold text-slate-900">Step 2 of 4 — Your First Practice Area</h3>
+            <h3 className="text-base font-semibold text-slate-900">Step 2 of 4  -  Your First Practice Area</h3>
             <p className="mt-1 text-sm text-slate-500">
               Practice areas organise your matters. You can add more later.
             </p>
@@ -603,7 +603,7 @@ export default function SetupWizardPage() {
       {currentStep === 2 && (
         <div className="rounded-lg border border-slate-200 bg-white p-6 space-y-5">
           <div>
-            <h3 className="text-base font-semibold text-slate-900">Step 3 of 4 — Invite Your Team</h3>
+            <h3 className="text-base font-semibold text-slate-900">Step 3 of 4  -  Invite Your Team</h3>
             <p className="mt-1 text-sm text-slate-500">
               Send invitations to your team members. You can invite more from Settings later.
             </p>
@@ -722,15 +722,15 @@ export default function SetupWizardPage() {
           <div className="rounded-md bg-slate-50 border border-slate-200 p-4 text-left space-y-2">
             <SummaryRow
               label="Firm name"
-              value={summary.firmName ?? tenant?.name ?? '—'}
+              value={summary.firmName ?? tenant?.name ?? ' - '}
             />
             <SummaryRow
               label="Timezone"
-              value={summary.timezone ?? tenant?.timezone ?? '—'}
+              value={summary.timezone ?? tenant?.timezone ?? ' - '}
             />
             <SummaryRow
               label="Practice area"
-              value={summary.step2Skipped ? 'Skipped' : (summary.practiceAreaName ?? '—')}
+              value={summary.step2Skipped ? 'Skipped' : (summary.practiceAreaName ?? ' - ')}
               muted={summary.step2Skipped}
             />
             <SummaryRow
@@ -740,7 +740,7 @@ export default function SetupWizardPage() {
                   ? 'Skipped'
                   : summary.invitedEmails.length > 0
                     ? `${summary.invitedEmails.length} sent`
-                    : '—'
+                    : ' - '
               }
               muted={summary.step3Skipped}
             />

@@ -104,7 +104,7 @@ export function ContactActionBar({
     { value: '__none', label: 'No related matter' },
     ...(contactMatters ?? []).map((m) => ({
       value: m.id,
-      label: `${m.matter_number ?? ''} — ${m.title ?? 'Untitled'}`.trim(),
+      label: `${m.matter_number ?? ''}  -  ${m.title ?? 'Untitled'}`.trim(),
     })),
   ]
 
@@ -149,7 +149,7 @@ export function ContactActionBar({
 
   const taskOptions = (contactTasks ?? []).map((t) => ({
     value: t.id,
-    label: `${t.title}${t.due_date ? ` — due ${t.due_date}` : ''} (${t.status})`,
+    label: `${t.title}${t.due_date ? `  -  due ${t.due_date}` : ''} (${t.status})`,
   }))
 
   // ─── Fetch contact's upcoming appointments for dropdown ───────────────
@@ -177,7 +177,7 @@ export function ContactActionBar({
     const staffName = staffList.find((s) => s.id === a.user_id)?.name ?? 'Staff'
     return {
       value: a.id,
-      label: `${a.appointment_date} ${a.start_time} — ${staffName} (${a.status})`,
+      label: `${a.appointment_date} ${a.start_time}  -  ${staffName} (${a.status})`,
     }
   })
 
@@ -287,7 +287,7 @@ export function ContactActionBar({
       }),
     },
     // Log Meeting uses its own dedicated dialog (LogMeetingDialog)
-    // — it is NOT in the communicationActions array; the button is rendered separately below.
+    //  -  it is NOT in the communicationActions array; the button is rendered separately below.
   ]
 
   // Time slot options for appointment booking
@@ -498,7 +498,7 @@ export function ContactActionBar({
     ] as ActionConfig[] : []),
   ]
 
-  // Row 3: Tasks — handled via dedicated CreateTaskDialog (see below)
+  // Row 3: Tasks  -  handled via dedicated CreateTaskDialog (see below)
   const taskActions: ActionConfig[] = []
 
   // Build "current value" hints for Request Edit
@@ -541,7 +541,7 @@ export function ContactActionBar({
             },
             {
               value: 'name',
-              label: `Name (current: ${[contactFull?.first_name, contactFull?.last_name].filter(Boolean).join(' ') || '—'})`,
+              label: `Name (current: ${[contactFull?.first_name, contactFull?.last_name].filter(Boolean).join(' ') || ' - '})`,
             },
             { value: 'address', label: 'Address' },
             { value: 'other',   label: 'Other field' },
@@ -742,14 +742,14 @@ export function ContactActionBar({
 
   return (
     <div className="space-y-3">
-      {/* Communication group — Log Meeting button is rendered here outside the generic list */}
+      {/* Communication group  -  Log Meeting button is rendered here outside the generic list */}
       <div className="space-y-1.5">
         <span className="text-[11px] font-medium uppercase tracking-wider text-slate-400">
           Communication
         </span>
         <div className="flex flex-wrap gap-2">
           {communicationActions.map(renderActionButton)}
-          {/* Notify Staff — dedicated dialog */}
+          {/* Notify Staff  -  dedicated dialog */}
           <Button
             onClick={() => setNotifyStaffOpen(true)}
             className="bg-purple-600 hover:bg-purple-700 text-white"
@@ -762,7 +762,7 @@ export function ContactActionBar({
             )}
             Notify Staff
           </Button>
-          {/* Log Meeting — dedicated dialog */}
+          {/* Log Meeting  -  dedicated dialog */}
           <Button
             onClick={() => setLogMeetingOpen(true)}
             className="bg-violet-600 hover:bg-violet-700 text-white"
@@ -780,7 +780,7 @@ export function ContactActionBar({
 
       {config.show_action_appointments !== false && renderGroup('Appointments', appointmentActions)}
 
-      {/* Tasks group — uses dedicated CreateTaskDialog */}
+      {/* Tasks group  -  uses dedicated CreateTaskDialog */}
       {config.show_action_tasks !== false && (
         <div className="space-y-1.5">
           <span className="text-[11px] font-medium uppercase tracking-wider text-slate-400">
@@ -803,7 +803,7 @@ export function ContactActionBar({
         </div>
       )}
 
-      {/* Other group — includes Upload Document, Request Edit, and New Walk-In */}
+      {/* Other group  -  includes Upload Document, Request Edit, and New Walk-In */}
       <div className="space-y-1.5">
         <span className="text-[11px] font-medium uppercase tracking-wider text-slate-400">
           Other
@@ -811,7 +811,7 @@ export function ContactActionBar({
         <div className="flex flex-wrap gap-2">
           {filteredOtherActions.map(renderActionButton)}
 
-          {/* Upload Document — dedicated dialog */}
+          {/* Upload Document  -  dedicated dialog */}
           {config.show_action_documents !== false && (
             <Button
               onClick={() => setUploadDocOpen(true)}
@@ -827,7 +827,7 @@ export function ContactActionBar({
             </Button>
           )}
 
-          {/* New Walk-In — fires callback instead of opening a dialog */}
+          {/* New Walk-In  -  fires callback instead of opening a dialog */}
           {config.show_action_walk_in !== false && (
             <Button
               onClick={() => onCreateIntake?.()}

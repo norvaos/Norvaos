@@ -1,7 +1,7 @@
 /**
  * TanStack Query hooks for Trust Transaction Log (append-only financial event log)
  *
- * Read-only hooks — the transaction log is written internally by services.
+ * Read-only hooks  -  the transaction log is written internally by services.
  */
 
 import { useQuery } from '@tanstack/react-query'

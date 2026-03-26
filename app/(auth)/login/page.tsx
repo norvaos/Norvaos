@@ -104,7 +104,7 @@ function LoginForm() {
             email: data.email,
           })
         } else {
-          // Don't leak whether the email exists — always show generic message
+          // Don't leak whether the email exists  -  always show generic message
           setFormError({
             type: 'credentials',
             message: 'Invalid email or password. Please check your credentials and try again.',

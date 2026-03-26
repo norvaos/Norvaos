@@ -6,12 +6,12 @@ import { withTiming } from '@/lib/middleware/request-timing'
 /**
  * GET /api/admin/tenants/[id]/setup
  *
- * Platform-admin ONLY — tenant setup state.
+ * Platform-admin ONLY  -  tenant setup state.
  * Returns bootstrap log entries, role/practice-area counts,
  * and manual onboarding checklist completions.
  *
  * No cross-tenant leakage: all queries are scoped to the tenantId param
- * and use the admin client (bypasses RLS — access is gated by requirePlatformAdmin).
+ * and use the admin client (bypasses RLS  -  access is gated by requirePlatformAdmin).
  */
 const handleGet = withPlatformAdmin(async (_request, ctx) => {
   const { id: tenantId } = ctx.params
@@ -28,7 +28,7 @@ const handleGet = withPlatformAdmin(async (_request, ctx) => {
     return NextResponse.json({ error: 'Tenant not found.' }, { status: 404 })
   }
 
-  // Fetch all data in parallel — all queries are tenant-scoped
+  // Fetch all data in parallel  -  all queries are tenant-scoped
   const [
     setupLogResult,
     rolesResult,

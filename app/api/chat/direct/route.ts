@@ -10,8 +10,8 @@ const directMessageSchema = z.object({
 })
 
 /**
- * POST /api/chat/direct — Find or create a direct message channel
- * Body: { user_id: string } — the other user to DM
+ * POST /api/chat/direct  -  Find or create a direct message channel
+ * Body: { user_id: string }  -  the other user to DM
  */
 async function handlePost(request: Request) {
   try {
@@ -48,7 +48,7 @@ async function handlePost(request: Request) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 })
     }
 
-    // Find existing direct channel between these two users — parallel
+    // Find existing direct channel between these two users  -  parallel
     const [{ data: myChannels }, { data: theirChannels }] = await Promise.all([
       supabase
         .from('chat_channel_members')
@@ -91,7 +91,7 @@ async function handlePost(request: Request) {
       }
     }
 
-    // No existing DM found — create one (write — admin client)
+    // No existing DM found  -  create one (write  -  admin client)
     const { data: channel, error: chError } = await admin
       .from('chat_channels')
       .insert({
@@ -106,7 +106,7 @@ async function handlePost(request: Request) {
       return NextResponse.json({ error: 'Failed to create channel' }, { status: 500 })
     }
 
-    // Add both users as members (write — admin client)
+    // Add both users as members (write  -  admin client)
     const { error: memError } = await admin
       .from('chat_channel_members')
       .insert([

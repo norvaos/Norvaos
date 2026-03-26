@@ -12,7 +12,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════════
 
 
--- ── 1. matter_folder_templates — defines the folder hierarchy per matter type ─
+-- ── 1. matter_folder_templates  -  defines the folder hierarchy per matter type ─
 
 CREATE TABLE IF NOT EXISTS matter_folder_templates (
   id                      UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -56,7 +56,7 @@ CREATE POLICY mft_delete ON matter_folder_templates
   USING (tenant_id = public.get_current_tenant_id());
 
 
--- ── 2. matter_folders — per-matter instances of folder templates ──────────────
+-- ── 2. matter_folders  -  per-matter instances of folder templates ──────────────
 
 CREATE TABLE IF NOT EXISTS matter_folders (
   id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),

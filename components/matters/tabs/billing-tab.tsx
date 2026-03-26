@@ -387,7 +387,7 @@ export function BillingTab({ matterId, tenantId, matter }: { matterId: string; t
 
   return (
     <div className="space-y-6">
-      {/* Snapshot indicator — shows when fees were locked */}
+      {/* Snapshot indicator  -  shows when fees were locked */}
       {feeSnapshot && (
         <div className="flex items-center gap-2 rounded-md border border-slate-200 bg-slate-50 px-3 py-2">
           <Lock className="h-3.5 w-3.5 text-slate-500 shrink-0" />
@@ -406,7 +406,7 @@ export function BillingTab({ matterId, tenantId, matter }: { matterId: string; t
             </Badge>
           ) : taxLabel && taxRate != null ? (
             <Badge variant="outline" className="ml-auto text-xs border-slate-300 text-slate-700">
-              {applicantLocation} — {taxLabel} {taxRate}%
+              {applicantLocation}  -  {taxLabel} {taxRate}%
             </Badge>
           ) : null}
         </div>
@@ -452,8 +452,8 @@ export function BillingTab({ matterId, tenantId, matter }: { matterId: string; t
                   <div key={te.id} className="grid grid-cols-[80px_60px_70px_70px_1fr_60px_50px] gap-2 px-2 py-2 text-sm items-center rounded hover:bg-slate-50">
                     <span className="text-xs">{formatDate(te.entry_date)}</span>
                     <span className="text-xs">{hrs}h {mins > 0 ? `${mins}m` : ''}</span>
-                    <span className="text-xs">{te.hourly_rate ? `$${Number(te.hourly_rate).toFixed(0)}` : '—'}</span>
-                    <span className="text-xs font-medium">{amount > 0 ? `$${amount.toFixed(2)}` : '—'}</span>
+                    <span className="text-xs">{te.hourly_rate ? `$${Number(te.hourly_rate).toFixed(0)}` : ' - '}</span>
+                    <span className="text-xs font-medium">{amount > 0 ? `$${amount.toFixed(2)}` : ' - '}</span>
                     <span className="text-xs truncate">{te.description}</span>
                     <span>{te.is_billable ? <Badge variant="outline" className="text-xs py-0">{te.invoice_id ? 'Billed' : 'Yes'}</Badge> : <span className="text-xs text-muted-foreground">No</span>}</span>
                     <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => deleteTimeEntry.mutate(te.id)} disabled={!!te.invoice_id}><Trash2 className="h-3 w-3" /></Button>
@@ -567,7 +567,7 @@ export function BillingTab({ matterId, tenantId, matter }: { matterId: string; t
                       <Checkbox checked={selectedEntries.has(e.id)} onCheckedChange={() => toggleEntry(e.id)} />
                       <span className="text-xs flex-1 truncate">{e.description}</span>
                       <span className="text-xs text-muted-foreground">{hrs}h{mins > 0 ? ` ${mins}m` : ''}</span>
-                      <span className="text-xs font-medium">{amt > 0 ? `$${amt.toFixed(2)}` : '—'}</span>
+                      <span className="text-xs font-medium">{amt > 0 ? `$${amt.toFixed(2)}` : ' - '}</span>
                     </div>
                   )
                 })}

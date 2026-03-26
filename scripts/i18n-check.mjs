@@ -65,7 +65,7 @@ async function main() {
     const extra = [...localeKeys].filter((k) => !enKeys.has(k))
 
     if (missing.length === 0 && extra.length === 0) {
-      console.log(`  ✓ ${locale}: ${localeKeys.size} keys — parity OK`)
+      console.log(`  ✓ ${locale}: ${localeKeys.size} keys  -  parity OK`)
     } else {
       if (missing.length > 0) {
         console.log(`  ✗ ${locale}: MISSING ${missing.length} keys`)

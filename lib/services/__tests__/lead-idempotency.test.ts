@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Wave 6 — Failure-Resistance Tests: Idempotency Ledger
+ * Wave 6  -  Failure-Resistance Tests: Idempotency Ledger
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Proves the idempotency ledger correctly prevents duplicate operations.
@@ -135,7 +135,7 @@ describe('idempotencyKeys', () => {
   })
 
   describe('conversion', () => {
-    it('one key per lead — enforces single conversion', () => {
+    it('one key per lead  -  enforces single conversion', () => {
       const key1 = idempotencyKeys.conversion('lead-1')
       const key2 = idempotencyKeys.conversion('lead-1')
       expect(key1).toBe(key2)

@@ -2,7 +2,7 @@
 
 **Integration ID:** `stripe`
 **Module:** Team 3 / Module 1
-**Status:** Draft — Pending Proof Validation
+**Status:** Draft  -  Pending Proof Validation
 **Last Updated:** 2026-03-15
 **Source Files Audited:**
 - `app/api/webhooks/stripe/route.ts`
@@ -11,7 +11,7 @@
 
 ## 1. Integration Purpose and Scope
 
-The Stripe integration receives webhook events from Stripe to manage subscription lifecycle for NorvaOS tenants. It is a pure inbound webhook consumer — NorvaOS does not initiate calls to Stripe from this route. Stripe API calls to retrieve subscription objects are made during event processing.
+The Stripe integration receives webhook events from Stripe to manage subscription lifecycle for NorvaOS tenants. It is a pure inbound webhook consumer  -  NorvaOS does not initiate calls to Stripe from this route. Stripe API calls to retrieve subscription objects are made during event processing.
 
 **Events handled:**
 
@@ -43,7 +43,7 @@ stripe.webhooks.constructEvent(body, signature, STRIPE_WEBHOOK_SECRET)
 - If signature verification fails, returns 400 with `'Invalid signature'`
 - `STRIPE_WEBHOOK_SECRET` is read from environment at call time; if undefined, `constructEvent` will throw
 
-**IDENTIFIED GAP — Missing env var causes silent 400s:** If `STRIPE_WEBHOOK_SECRET` is not set (`process.env.STRIPE_WEBHOOK_SECRET!` with non-null assertion), signature verification will throw. This will cause all webhook deliveries to return 400, and Stripe will mark the endpoint as failing. There is no startup check or early warning for a missing secret.
+**IDENTIFIED GAP  -  Missing env var causes silent 400s:** If `STRIPE_WEBHOOK_SECRET` is not set (`process.env.STRIPE_WEBHOOK_SECRET!` with non-null assertion), signature verification will throw. This will cause all webhook deliveries to return 400, and Stripe will mark the endpoint as failing. There is no startup check or early warning for a missing secret.
 
 ### Database Access
 
@@ -73,8 +73,8 @@ Stripe automatically retries failed webhook deliveries:
 
 There is no internal retry within the handler. Each database operation runs once. If an update fails, the outer `try/catch` returns 500, which causes Stripe to retry the entire event.
 
-**IDENTIFIED GAP — No idempotency guard:** Stripe guarantees at-least-once delivery. The same event may be delivered multiple times (e.g., on network timeout before the 200 is received). There is no stored Stripe event ID (`event.id`) check before processing. Duplicate event processing can result in:
-- Duplicate rows in `billing_invoices` (for `invoice.paid` and `invoice.payment_failed`) — the insert has no `onConflict` clause
+**IDENTIFIED GAP  -  No idempotency guard:** Stripe guarantees at-least-once delivery. The same event may be delivered multiple times (e.g., on network timeout before the 200 is received). There is no stored Stripe event ID (`event.id`) check before processing. Duplicate event processing can result in:
+- Duplicate rows in `billing_invoices` (for `invoice.paid` and `invoice.payment_failed`)  -  the insert has no `onConflict` clause
 - Harmless double-updates on `tenants` and `subscriptions` (idempotent by nature since they upsert the same values)
 
 ### Stripe API Call Within Handler
@@ -87,11 +87,11 @@ There is no internal retry within the handler. Each database operation runs once
 
 ### Tenant and Subscription Updates
 
-Updates to `tenants` and upserts to `subscriptions` are naturally idempotent — the same event processed twice produces the same final state.
+Updates to `tenants` and upserts to `subscriptions` are naturally idempotent  -  the same event processed twice produces the same final state.
 
 ### Billing Invoice Records
 
-**IDENTIFIED GAP — Non-idempotent invoice insert:** `billing_invoices` uses `.insert()` without `onConflict`. Replaying an `invoice.paid` or `invoice.payment_failed` event will create a duplicate `billing_invoices` row. The table should have a unique constraint on `stripe_invoice_id` and the insert should use `upsert`.
+**IDENTIFIED GAP  -  Non-idempotent invoice insert:** `billing_invoices` uses `.insert()` without `onConflict`. Replaying an `invoice.paid` or `invoice.payment_failed` event will create a duplicate `billing_invoices` row. The table should have a unique constraint on `stripe_invoice_id` and the insert should use `upsert`.
 
 ### Tenant Lookup Fallback
 
@@ -106,13 +106,13 @@ For `customer.subscription.updated`, if `metadata.tenant_id` is not present on t
 | Missing `stripe-signature` header | 400 | Stripe retries |
 | Invalid signature | 400 | Stripe retries |
 | `STRIPE_WEBHOOK_SECRET` not set | 400 (constructEvent throws) | Stripe retries |
-| Missing `tenant_id` in `checkout.session.completed` | Logs error; `break` (returns 200) | Stripe does NOT retry — event is consumed |
-| No tenant found for Stripe customer | Logs error; `break` (returns 200) | Stripe does NOT retry — event is consumed |
+| Missing `tenant_id` in `checkout.session.completed` | Logs error; `break` (returns 200) | Stripe does NOT retry  -  event is consumed |
+| No tenant found for Stripe customer | Logs error; `break` (returns 200) | Stripe does NOT retry  -  event is consumed |
 | Database update fails | 500 | Stripe retries |
 | `stripe.subscriptions.retrieve` fails | 500 | Stripe retries |
 | Unknown event type | Logs; returns 200 | Stripe does NOT retry |
 
-**IDENTIFIED GAP — Silent consumption on missing tenant:** If `tenant_id` is absent from checkout session metadata, or if no tenant is found for a customer ID, the handler logs an error and breaks out of the switch, ultimately returning `{ received: true }` with status 200. This permanently acknowledges the event — Stripe will not re-deliver it. There is no dead-letter queue, alert, or compensating action. Revenue-impacting events can be silently lost.
+**IDENTIFIED GAP  -  Silent consumption on missing tenant:** If `tenant_id` is absent from checkout session metadata, or if no tenant is found for a customer ID, the handler logs an error and breaks out of the switch, ultimately returning `{ received: true }` with status 200. This permanently acknowledges the event  -  Stripe will not re-deliver it. There is no dead-letter queue, alert, or compensating action. Revenue-impacting events can be silently lost.
 
 ---
 
@@ -120,31 +120,31 @@ For `customer.subscription.updated`, if `metadata.tenant_id` is not present on t
 
 ### Logging
 
-The Stripe webhook handler uses `console.log`, `console.error` directly — not the structured `log` utility.
+The Stripe webhook handler uses `console.log`, `console.error` directly  -  not the structured `log` utility.
 
 Specific log points:
-- `'Webhook signature verification failed: {message}'` — `console.error` on bad signature
-- `'No tenant_id in checkout session metadata'` — `console.error`
-- `'No tenant found for Stripe customer: {customer}'` — `console.error`
-- `'Checkout completed for tenant {id}, plan: {tier}'` — `console.log`
-- `'Subscription updated for tenant {id}: {status}, plan: {tier}'` — `console.log`
-- `'Subscription cancelled for tenant {id}'` — `console.log`
-- `'Invoice paid for tenant {id}: ${amount}'` — `console.log`
-- `'Payment failed for tenant {id}'` — `console.log`
-- `'Unhandled event type: {type}'` — `console.log`
-- `'Webhook processing error: {error}'` — `console.error` on outer catch
+- `'Webhook signature verification failed: {message}'`  -  `console.error` on bad signature
+- `'No tenant_id in checkout session metadata'`  -  `console.error`
+- `'No tenant found for Stripe customer: {customer}'`  -  `console.error`
+- `'Checkout completed for tenant {id}, plan: {tier}'`  -  `console.log`
+- `'Subscription updated for tenant {id}: {status}, plan: {tier}'`  -  `console.log`
+- `'Subscription cancelled for tenant {id}'`  -  `console.log`
+- `'Invoice paid for tenant {id}: ${amount}'`  -  `console.log`
+- `'Payment failed for tenant {id}'`  -  `console.log`
+- `'Unhandled event type: {type}'`  -  `console.log`
+- `'Webhook processing error: {error}'`  -  `console.error` on outer catch
 
-**IDENTIFIED GAP — Unstructured logging:** All webhook logging uses `console.*` without `tenant_id` as a structured field. Log correlation across events for a single tenant is manual.
+**IDENTIFIED GAP  -  Unstructured logging:** All webhook logging uses `console.*` without `tenant_id` as a structured field. Log correlation across events for a single tenant is manual.
 
-**IDENTIFIED GAP — No Stripe event ID in logs:** `event.id` (the unique Stripe event identifier) is not included in any log line. This makes it impossible to correlate a log entry with a specific Stripe event when debugging delivery issues.
+**IDENTIFIED GAP  -  No Stripe event ID in logs:** `event.id` (the unique Stripe event identifier) is not included in any log line. This makes it impossible to correlate a log entry with a specific Stripe event when debugging delivery issues.
 
 ### Database Audit Trail
 
-- `tenants.subscription_status`, `subscription_tier`, `stripe_customer_id` — updated per subscription event
-- `subscriptions` — upserted per subscription event; includes `status`, `billing_interval`, `cancel_at_period_end`, `current_period_start`, `current_period_end`
-- `billing_invoices` — inserted per invoice event; includes `stripe_invoice_id`, `amount`, `currency`, `status`, `invoice_url`, `invoice_pdf`, `period_start`, `period_end`
+- `tenants.subscription_status`, `subscription_tier`, `stripe_customer_id`  -  updated per subscription event
+- `subscriptions`  -  upserted per subscription event; includes `status`, `billing_interval`, `cancel_at_period_end`, `current_period_start`, `current_period_end`
+- `billing_invoices`  -  inserted per invoice event; includes `stripe_invoice_id`, `amount`, `currency`, `status`, `invoice_url`, `invoice_pdf`, `period_start`, `period_end`
 
-**IDENTIFIED GAP — No webhook event log table:** Stripe event IDs are not stored anywhere. There is no table recording which events have been processed, when, and with what outcome. Debugging replay or identifying missing events requires querying Stripe's dashboard.
+**IDENTIFIED GAP  -  No webhook event log table:** Stripe event IDs are not stored anywhere. There is no table recording which events have been processed, when, and with what outcome. Debugging replay or identifying missing events requires querying Stripe's dashboard.
 
 ---
 
@@ -165,9 +165,9 @@ Specific log points:
 ## 8. Tenant Isolation
 
 Tenant isolation in webhook processing relies on:
-1. `checkout.session.completed` — `tenant_id` comes from Stripe session metadata (set during checkout creation elsewhere in the billing flow)
-2. `customer.subscription.updated/deleted` — tenant resolved by `stripe_customer_id` lookup in `tenants` table
-3. `invoice.paid/failed` — tenant resolved by `stripe_customer_id` lookup in `tenants` table
+1. `checkout.session.completed`  -  `tenant_id` comes from Stripe session metadata (set during checkout creation elsewhere in the billing flow)
+2. `customer.subscription.updated/deleted`  -  tenant resolved by `stripe_customer_id` lookup in `tenants` table
+3. `invoice.paid/failed`  -  tenant resolved by `stripe_customer_id` lookup in `tenants` table
 
 All database writes use the service-role client but explicitly include `tenant_id` in every write and lookup. This is correct behaviour for webhook processing.
 

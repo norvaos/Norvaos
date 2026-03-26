@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * Norva Ledger — Government Fee Disbursement Card
+ * Norva Ledger  -  Government Fee Disbursement Card
  *
  * Three states:
  *   1. PRE-AUTHORIZATION: Shows fee breakdown + readiness gate status
@@ -119,7 +119,7 @@ export function GovernmentDisbursementCard({ matterId }: GovernmentDisbursementC
     )
   }
 
-  // No government fees configured — don't render
+  // No government fees configured  -  don't render
   if (error || !data || data.government_fee_cents === 0) {
     return null
   }
@@ -162,7 +162,7 @@ export function GovernmentDisbursementCard({ matterId }: GovernmentDisbursementC
             <div className="flex items-center gap-2">
               <Shield className="h-4 w-4 text-amber-600 dark:text-amber-400" />
               <CardTitle className="text-sm font-semibold">
-                Norva Ledger — Government Fee Disbursement
+                Norva Ledger  -  Government Fee Disbursement
               </CardTitle>
             </div>
             {isDisbursed && (

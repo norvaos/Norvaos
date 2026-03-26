@@ -1,5 +1,5 @@
 /**
- * Legacy Surface Retirement — Phase D
+ * Legacy Surface Retirement  -  Phase D
  *
  * Maps old routes to their new locations or replacement panels.
  * Used to show deprecation notices and guide users to the new experience.

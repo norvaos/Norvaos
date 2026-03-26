@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Document Engine — Template Service
+ * Document Engine  -  Template Service
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Template CRUD, versioning, publishing, cloning, archival, deletion.
@@ -11,7 +11,7 @@
  *   - Publishing creates an immutable version snapshot
  *   - Only empty draft templates can be deleted (soft-delete via is_active)
  *   - Used templates can only be archived (after supersession)
- *   - System templates cannot be deleted or archived — only cloned
+ *   - System templates cannot be deleted or archived  -  only cloned
  */
 
 import type { SupabaseClient } from '@supabase/supabase-js'
@@ -289,7 +289,7 @@ export async function publishVersion(
     const mappingKeys = new Set((vMappings ?? []).map(m => m.field_key))
     const conditionKeys = new Set((vConditions ?? []).map(c => c.condition_key))
 
-    // Check 1: Unmapped fields — placeholders in body not in mappings
+    // Check 1: Unmapped fields  -  placeholders in body not in mappings
     const placeholderRegex = /\{\{([^}]+)\}\}/g
     const bodyPlaceholders = new Set<string>()
     let pm: RegExpExecArray | null
@@ -301,13 +301,13 @@ export async function publishVersion(
       publishErrors.push(`Unmapped placeholders: ${unmapped.join(', ')}`)
     }
 
-    // Check 2: Orphan placeholders — mappings not referenced in body
+    // Check 2: Orphan placeholders  -  mappings not referenced in body
     const orphans = [...mappingKeys].filter(k => !bodyPlaceholders.has(k))
     if (orphans.length > 0) {
       publishErrors.push(`Orphan mappings (not in template body): ${orphans.join(', ')}`)
     }
 
-    // Check 3: Invalid conditions — conditions referenced in body but not defined
+    // Check 3: Invalid conditions  -  conditions referenced in body but not defined
     const bodyConditions = new Set<string>()
     if (body.sections) {
       for (const section of body.sections) {
@@ -324,7 +324,7 @@ export async function publishVersion(
       publishErrors.push(`Invalid conditions (referenced but not defined): ${invalidConditions.join(', ')}`)
     }
 
-    // Check 4: Broken clause slots — slots with no assignments
+    // Check 4: Broken clause slots  -  slots with no assignments
     const clauseSlots = new Set<string>()
     if (body.sections) {
       for (const section of body.sections) {
@@ -343,12 +343,12 @@ export async function publishVersion(
       publishErrors.push(`Clause slots with no assignments: ${brokenSlots.join(', ')}`)
     }
 
-    // Check 5: Preview validation — body must be valid JSON structure
+    // Check 5: Preview validation  -  body must be valid JSON structure
     if (!body.sections || !Array.isArray(body.sections)) {
       publishErrors.push('Template body missing sections array')
     }
 
-    // Check 6: Structure check — sections must have required properties
+    // Check 6: Structure check  -  sections must have required properties
     if (body.sections) {
       for (let i = 0; i < body.sections.length; i++) {
         const s = body.sections[i]
@@ -577,7 +577,7 @@ export async function archiveTemplate(
   }
 
   if (template.is_system_template) {
-    return { success: false, error: 'System templates cannot be archived — clone instead' }
+    return { success: false, error: 'System templates cannot be archived  -  clone instead' }
   }
 
   // Check for active published version
@@ -589,7 +589,7 @@ export async function archiveTemplate(
     .limit(1)
 
   if (publishedVersions && publishedVersions.length > 0) {
-    return { success: false, error: 'Cannot archive a template with an active published version — supersede it first' }
+    return { success: false, error: 'Cannot archive a template with an active published version  -  supersede it first' }
   }
 
   // Check for in-flight instances
@@ -600,7 +600,7 @@ export async function archiveTemplate(
     .in('status', ['draft', 'pending_review', 'approved', 'sent', 'partially_signed'])
 
   if (count && count > 0) {
-    return { success: false, error: `Cannot archive — ${count} document(s) are still in progress` }
+    return { success: false, error: `Cannot archive  -  ${count} document(s) are still in progress` }
   }
 
   // Archive
@@ -661,7 +661,7 @@ export async function deleteTemplate(
     .limit(1)
 
   if (versions && versions.length > 0) {
-    return { success: false, error: 'Cannot delete — template has non-draft versions' }
+    return { success: false, error: 'Cannot delete  -  template has non-draft versions' }
   }
 
   // Check no instances exist
@@ -671,7 +671,7 @@ export async function deleteTemplate(
     .eq('template_id', params.templateId)
 
   if (count && count > 0) {
-    return { success: false, error: 'Cannot delete — template has generated documents' }
+    return { success: false, error: 'Cannot delete  -  template has generated documents' }
   }
 
   // Soft-delete

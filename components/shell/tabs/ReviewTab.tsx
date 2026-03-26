@@ -1,14 +1,14 @@
 'use client'
 
 /**
- * ReviewTab — Multi-Level Lawyer Review
+ * ReviewTab  -  Multi-Level Lawyer Review
  *
  * Three sections on a single scrollable page:
- *   A. Gate Blockers          — readiness blockers with one-click navigation
- *   B. Contradiction Flags    — per-flag inline override with reason textarea
- *   C. Lawyer Sign-off        — approve / return-for-correction / undo
+ *   A. Gate Blockers           -  readiness blockers with one-click navigation
+ *   B. Contradiction Flags     -  per-flag inline override with reason textarea
+ *   C. Lawyer Sign-off         -  approve / return-for-correction / undo
  *
- * Spec ref: Sprint review workflow, Section 5 — Review tab
+ * Spec ref: Sprint review workflow, Section 5  -  Review tab
  */
 
 import { useState } from 'react'
@@ -42,7 +42,7 @@ export interface ReviewTabProps {
   onNavigateToSection: (section: 'documents' | 'questionnaire' | 'forms') => void
 }
 
-// ── Section A — Gate Blockers ──────────────────────────────────────────────
+// ── Section A  -  Gate Blockers ──────────────────────────────────────────────
 
 function BlockerIcon({ type }: { type: string }) {
   if (type === 'document') return <FileText className="h-3.5 w-3.5 text-slate-500 shrink-0" />
@@ -121,7 +121,7 @@ function GateBlockersSection({
       {items.length === 0 ? (
         <div className="flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 p-3 text-sm text-green-700">
           <CheckCircle2 className="h-4 w-4 shrink-0" />
-          No gate blockers — file is clear to advance.
+          No gate blockers  -  file is clear to advance.
         </div>
       ) : (
         <div className="space-y-1.5">
@@ -151,7 +151,7 @@ function GateBlockersSection({
   )
 }
 
-// ── Section B — Contradiction Flags ───────────────────────────────────────
+// ── Section B  -  Contradiction Flags ───────────────────────────────────────
 
 interface ContradictionFlagRowProps {
   flag: ContradictionFlag
@@ -286,7 +286,7 @@ function ContradictionFlagsSection({ matterId }: { matterId: string }) {
           Contradictions overridden on{' '}
           {readinessData.contradictions.overrideAt
             ? new Date(readinessData.contradictions.overrideAt).toLocaleDateString('en-CA')
-            : '—'}
+            : ' - '}
         </div>
       )}
 
@@ -312,7 +312,7 @@ function ContradictionFlagsSection({ matterId }: { matterId: string }) {
   )
 }
 
-// ── Section C — Lawyer Sign-off ────────────────────────────────────────────
+// ── Section C  -  Lawyer Sign-off ────────────────────────────────────────────
 
 function LawyerSignOffSection({
   matterId,
@@ -448,7 +448,7 @@ function LawyerSignOffSection({
         </div>
       )}
 
-      {/* Pending / null — action area */}
+      {/* Pending / null  -  action area */}
       {(!status || status === 'pending' || status === 'not_required') && (
         <div className="space-y-3">
           <Textarea

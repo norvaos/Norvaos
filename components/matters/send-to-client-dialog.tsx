@@ -1,11 +1,11 @@
 'use client'
 
 /**
- * SendToClientDialog — unified 2-tab dialog for client communication.
+ * SendToClientDialog  -  unified 2-tab dialog for client communication.
  *
  * Tabs:
- *  1. Custom Email — compose and send a one-off email to the client
- *  2. Portal Link — manage / create / share the portal link
+ *  1. Custom Email  -  compose and send a one-off email to the client
+ *  2. Portal Link  -  manage / create / share the portal link
  *
  * Note: Document requests are handled by SendDocumentRequestDialog separately
  * (called directly from the CommandToolbar to avoid nested dialogs).

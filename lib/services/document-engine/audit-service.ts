@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Document Engine — Audit Service
+ * Document Engine  -  Audit Service
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Fire-and-forget event logging to append-only audit tables.

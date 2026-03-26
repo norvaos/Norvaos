@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * useIntakePresence — Supabase Realtime presence hook for intake monitoring.
+ * useIntakePresence  -  Supabase Realtime presence hook for intake monitoring.
  *
  * Staff-side: subscribes to the intake:{matterId} channel to detect
  * when a client is actively editing their intake forms.

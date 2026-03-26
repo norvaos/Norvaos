@@ -1,5 +1,5 @@
 /**
- * TanStack Query hooks for Jurisdictional Drift Sentry — Case law alerts.
+ * TanStack Query hooks for Jurisdictional Drift Sentry  -  Case law alerts.
  *
  * Budget: all column fragments < 20 cols per query.
  */
@@ -41,7 +41,7 @@ export function useCaseLawAlerts() {
       const json = await res.json()
       return (json.alerts ?? []) as CaseLawAlert[]
     },
-    staleTime: 1000 * 60 * 10, // 10 min — case law doesn't change that fast
+    staleTime: 1000 * 60 * 10, // 10 min  -  case law doesn't change that fast
   })
 }
 

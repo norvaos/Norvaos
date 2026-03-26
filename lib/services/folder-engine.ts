@@ -1,5 +1,5 @@
 // ============================================================================
-// Folder Engine — Matter Folder Generation from Templates
+// Folder Engine  -  Matter Folder Generation from Templates
 // ============================================================================
 //
 // Generates per-matter folder instances from matter_folder_templates when
@@ -7,8 +7,8 @@
 // after document slots are generated.
 //
 // Public API:
-//   generateMatterFolders()   — create folder instances for a matter
-//   assignSlotsToFolders()    — assign document slots to their folders
+//   generateMatterFolders()    -  create folder instances for a matter
+//   assignSlotsToFolders()     -  assign document slots to their folders
 // ============================================================================
 
 import type { SupabaseClient } from '@supabase/supabase-js'
@@ -27,7 +27,7 @@ export interface GenerateFoldersParams {
 /**
  * Generate folder instances for a matter based on folder templates.
  * Preserves the parent-child hierarchy using a two-pass insertion.
- * Idempotent — skips if folders already exist for the matter.
+ * Idempotent  -  skips if folders already exist for the matter.
  */
 export async function generateMatterFolders(
   params: GenerateFoldersParams
@@ -143,7 +143,7 @@ function sortChildrenByDepth(
     }
   }
 
-  // Any remaining (orphans) — push anyway
+  // Any remaining (orphans)  -  push anyway
   sorted.push(...remaining)
   return sorted
 }

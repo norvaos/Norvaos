@@ -1,5 +1,5 @@
 /**
- * GET /api/trust-accounting/reports — Trust accounting reports
+ * GET /api/trust-accounting/reports  -  Trust accounting reports
  *
  * Query params:
  *   report: 'client_listing' | 'account_summary' | 'cheque_register' | 'holds' | 'audit_trail'

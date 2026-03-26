@@ -42,10 +42,10 @@ async function handleGet(
  * POST /api/matters/[id]/ircc-review
  *
  * Actions:
- *   action: 'create'       — Initiates a new client review record
- *   action: 'mark_sent'    — Marks review as sent (with optional signingRequestId)
- *   action: 'mark_signed'  — Marks review as signed (unlocks final form pack)
- *   action: 'mark_declined'— Marks review as declined
+ *   action: 'create'        -  Initiates a new client review record
+ *   action: 'mark_sent'     -  Marks review as sent (with optional signingRequestId)
+ *   action: 'mark_signed'   -  Marks review as signed (unlocks final form pack)
+ *   action: 'mark_declined' -  Marks review as declined
  */
 async function handlePost(
   request: NextRequest,

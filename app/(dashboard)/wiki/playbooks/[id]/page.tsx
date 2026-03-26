@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * Playbook Editor — Notion-style block editor with version control.
+ * Playbook Editor  -  Notion-style block editor with version control.
  *
  * Features:
  * - Block types: heading, paragraph, checklist, callout, divider, code, quote
@@ -63,7 +63,7 @@ function createBlock(type: WikiBlockContent['type'], content = ''): WikiBlockCon
  *  2. TipTap JSON (seeded playbooks): { type: "doc", content: [{ type: "heading", ... }] }
  */
 function parseBlocks(content: Json): WikiBlockContent[] {
-  // Already an array — native block format
+  // Already an array  -  native block format
   if (Array.isArray(content)) {
     return content.length === 0
       ? [createBlock('paragraph')]

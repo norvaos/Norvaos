@@ -116,7 +116,7 @@ export async function PATCH(
       return NextResponse.json({ error: 'Document not found' }, { status: 404 })
     }
 
-    // Record first view only — do not overwrite existing viewed timestamp
+    // Record first view only  -  do not overwrite existing viewed timestamp
     if (!doc.client_viewed_at) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await (admin as any)

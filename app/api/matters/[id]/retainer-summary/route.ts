@@ -103,7 +103,7 @@ async function handleGet(
 
 // ── POST /api/matters/[id]/retainer-summary ───────────────────────────────────
 // Records a payment against the retainer package directly from the matter page.
-// The lead has already been converted — no conversion logic is triggered here.
+// The lead has already been converted  -  no conversion logic is triggered here.
 
 async function handlePost(
   request: NextRequest,
@@ -167,7 +167,7 @@ async function handlePost(
     await admin.from('activities').insert({
       tenant_id: auth.tenantId,
       activity_type: 'retainer_payment_recorded',
-      title: `Payment recorded: ${amountFmt}${!isFullyPaid ? ` (balance: ${balanceFmt})` : ' — paid in full'}`,
+      title: `Payment recorded: ${amountFmt}${!isFullyPaid ? ` (balance: ${balanceFmt})` : '  -  paid in full'}`,
       description: [
         `Payment: ${amountFmt} via ${paymentMethod}`,
         reference ? `Reference: ${reference}` : null,

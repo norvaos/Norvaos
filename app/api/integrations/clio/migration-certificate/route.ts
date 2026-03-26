@@ -7,7 +7,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 /**
  * GET /api/integrations/clio/migration-certificate
  *
- * Directive 16.1 — Vault-Migration Certificate
+ * Directive 16.1  -  Vault-Migration Certificate
  *
  * Generates a "Norva-Secured Certificate" PDF after first Delta-Sync completion.
  * Aggregates migration stats and security posture into a professional PDF receipt.
@@ -242,11 +242,11 @@ async function generateMigrationCertificate(stats: CertificateStats): Promise<Ui
   y -= 8
 
   const securityItems = [
-    'SHA-256 Vault Hashing — Active on all documents',
-    'PII Masking — Role-based access controls enabled',
-    'SENTINEL Audit Trail — Immutable event logging operational',
-    'Emergency Kill-Switch — Armed and monitoring',
-    'Chain of Custody — PDF export ready for Law Society audits',
+    'SHA-256 Vault Hashing  -  Active on all documents',
+    'PII Masking  -  Role-based access controls enabled',
+    'SENTINEL Audit Trail  -  Immutable event logging operational',
+    'Emergency Kill-Switch  -  Armed and monitoring',
+    'Chain of Custody  -  PDF export ready for Law Society audits',
   ]
 
   securityItems.forEach((item) => {
@@ -301,7 +301,7 @@ async function generateMigrationCertificate(stats: CertificateStats): Promise<Ui
   y -= 15
 
   drawCentred('This certificate is generated from immutable SENTINEL audit records.', 7, italicFont, rgb(0.5, 0.55, 0.6))
-  drawCentred('Norva OS — Professional Safety, by Design.', 7, italicFont, rgb(0.5, 0.55, 0.6))
+  drawCentred('Norva OS  -  Professional Safety, by Design.', 7, italicFont, rgb(0.5, 0.55, 0.6))
 
   return doc.save()
 }

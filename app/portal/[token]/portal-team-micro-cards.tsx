@@ -1,10 +1,10 @@
 'use client'
 
 /**
- * PortalTeamMicroCards — High-density, mobile-first team display.
+ * PortalTeamMicroCards  -  High-density, mobile-first team display.
  *
  * Shows Responsible Lawyer + Case Assistant as compact cards with:
- * - Avatar initials (no photo URL needed — works universally)
+ * - Avatar initials (no photo URL needed  -  works universally)
  * - Public-facing contact info only (email, phone)
  * - Privacy Rule: internal Slack/extensions stay masked
  * - Elite mobile layout: single-column stacked, responsive 2-col on sm+
@@ -68,7 +68,7 @@ function MicroCard({
         </div>
       </div>
 
-      {/* Contact actions — large tap targets for mobile */}
+      {/* Contact actions  -  large tap targets for mobile */}
       <div className="mt-3 space-y-1.5">
         {member.email && (
           <a
@@ -97,7 +97,7 @@ function MicroCard({
         )}
       </div>
 
-      {/* Role description — privacy-safe public guidance */}
+      {/* Role description  -  privacy-safe public guidance */}
       {member.roleDescription && (
         <p className="mt-2 text-[11px] text-slate-500 italic leading-snug">
           {member.roleDescription}

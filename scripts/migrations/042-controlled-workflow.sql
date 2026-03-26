@@ -53,7 +53,7 @@ ALTER TABLE workflow_actions ENABLE ROW LEVEL SECURITY;
 CREATE POLICY workflow_actions_tenant_policy ON workflow_actions
   USING (tenant_id = public.get_user_tenant_id());
 
--- Rule #4: Immutability — block both UPDATE and DELETE
+-- Rule #4: Immutability  -  block both UPDATE and DELETE
 CREATE OR REPLACE FUNCTION prevent_workflow_action_update()
 RETURNS TRIGGER AS $$
 BEGIN

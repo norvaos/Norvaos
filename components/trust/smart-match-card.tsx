@@ -66,7 +66,7 @@ function MatchSuggestion({
 
   return (
     <div className="flex items-start gap-3 rounded-lg border border-dashed border-green-300 bg-green-50/50 dark:border-green-700 dark:bg-green-950/20 p-3 transition-colors hover:bg-green-50 dark:hover:bg-green-950/30">
-      {/* Left — Deposit info */}
+      {/* Left  -  Deposit info */}
       <div className="flex-1 min-w-0 space-y-1">
         <div className="flex items-center gap-2 flex-wrap">
           <Badge variant="outline" className={cn('text-[10px] font-medium', badge.cls)}>
@@ -95,7 +95,7 @@ function MatchSuggestion({
             </span>{' '}
             to Invoice{' '}
             <span className="font-medium text-foreground">
-              {match.invoice_number ?? '—'}
+              {match.invoice_number ?? ' - '}
             </span>
           </span>
         </div>
@@ -114,7 +114,7 @@ function MatchSuggestion({
         )}
       </div>
 
-      {/* Right — Apply button */}
+      {/* Right  -  Apply button */}
       <Button
         size="sm"
         variant="default"
@@ -163,7 +163,7 @@ export function SmartMatchCard({ matterId }: SmartMatchCardProps) {
   }
 
   if (error || !suggestions || suggestions.length === 0) {
-    return null // Silent — no suggestions, no card
+    return null // Silent  -  no suggestions, no card
   }
 
   const exactMatches = suggestions.filter((s) => s.match_type === 'exact')
@@ -238,7 +238,7 @@ export function SmartMatchCard({ matterId }: SmartMatchCardProps) {
         </CardContent>
       </Card>
 
-      {/* Confirmation Dialog — human-in-the-loop */}
+      {/* Confirmation Dialog  -  human-in-the-loop */}
       <Dialog open={!!confirmMatch} onOpenChange={() => setConfirmMatch(null)}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
@@ -263,7 +263,7 @@ export function SmartMatchCard({ matterId }: SmartMatchCardProps) {
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Invoice</span>
                 <span className="font-medium">
-                  {confirmMatch.invoice_number ?? '—'}
+                  {confirmMatch.invoice_number ?? ' - '}
                 </span>
               </div>
               <div className="flex justify-between text-sm">

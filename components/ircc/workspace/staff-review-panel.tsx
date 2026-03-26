@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * StaffReviewPanel — Internal staff review and override layer
+ * StaffReviewPanel  -  Internal staff review and override layer
  *
  * Module I of the IRCC Forms Engine. Provides staff with a comprehensive
  * review interface for client-submitted answers, including:
@@ -342,7 +342,7 @@ export function StaffReviewPanel({
   const trustConflicts = useMemo(() => {
     const conflicts: TrustConflict[] = []
 
-    // Group answers by profilePath — look for paths that have both a
+    // Group answers by profilePath  -  look for paths that have both a
     // client_portal source and have been verified from a canonical source.
     // In practice, conflicts are detected when a client_portal value differs
     // from a canonical_prefill value that was previously verified.
@@ -396,7 +396,7 @@ export function StaffReviewPanel({
     setStaffOverrides((prev) => ({ ...prev, [profilePath]: value }))
   }, [])
 
-  /** Accept a client value — verify the answer as-is */
+  /** Accept a client value  -  verify the answer as-is */
   const handleAcceptField = useCallback(
     (profilePath: string) => {
       setActionInProgress(profilePath)
@@ -450,7 +450,7 @@ export function StaffReviewPanel({
     [instanceId, tenantId, saveAnswersMutation, verifyAnswerMutation],
   )
 
-  /** Approve all answers — verify every unverified field */
+  /** Approve all answers  -  verify every unverified field */
   const handleApproveAll = useCallback(async () => {
     setActionInProgress('approve-all')
     const unverifiedPaths = Object.entries(answerMap)
@@ -499,7 +499,7 @@ export function StaffReviewPanel({
     setActionInProgress(null)
   }, [uncontestedFields, instanceId, tenantId, verifyAnswerMutation])
 
-  /** Reject the instance — update status and optionally add notes */
+  /** Reject the instance  -  update status and optionally add notes */
   const handleReject = useCallback(() => {
     setActionInProgress('reject')
     updateStatusMutation.mutate(
@@ -519,7 +519,7 @@ export function StaffReviewPanel({
     )
   }, [instanceId, matterId, updateStatusMutation])
 
-  /** Mark as reviewed — update instance status to 'approved' */
+  /** Mark as reviewed  -  update instance status to 'approved' */
   const handleMarkAsReviewed = useCallback(() => {
     setActionInProgress('mark-reviewed')
     updateStatusMutation.mutate(
@@ -607,7 +607,7 @@ export function StaffReviewPanel({
               </Badge>
             )}
 
-            {/* Stale count badge — clickable to navigate to stale tab */}
+            {/* Stale count badge  -  clickable to navigate to stale tab */}
             {staleCount > 0 && (
               <button onClick={() => setActiveTab('stale')}>
                 <Badge
@@ -671,7 +671,7 @@ export function StaffReviewPanel({
               <AlertTriangle className="h-3.5 w-3.5 text-amber-500" />
               <AlertDescription className="text-[10px]">
                 <span className="font-semibold">{trustConflicts.length} trust conflict{trustConflicts.length !== 1 ? 's' : ''}</span>
-                {' '}— client values differ from verified canonical values. Review in the Comparison tab.
+                {' '} -  client values differ from verified canonical values. Review in the Comparison tab.
               </AlertDescription>
             </Alert>
           </div>
@@ -773,7 +773,7 @@ export function StaffReviewPanel({
 
       {/* ── Tab Content ─────────────────────────────────────────────────────── */}
       <div className="flex-1 overflow-hidden">
-        {/* Questionnaire tab — full form renderer in staff mode */}
+        {/* Questionnaire tab  -  full form renderer in staff mode */}
         {activeTab === 'questionnaire' && (
           <QuestionnaireRenderer
             instanceId={instanceId}
@@ -784,7 +784,7 @@ export function StaffReviewPanel({
           />
         )}
 
-        {/* Comparison tab — side-by-side review */}
+        {/* Comparison tab  -  side-by-side review */}
         {activeTab === 'comparison' && (
           <ScrollArea className="h-full">
             <div className="p-3 space-y-3">
@@ -873,7 +873,7 @@ export function StaffReviewPanel({
           </ScrollArea>
         )}
 
-        {/* Stale tab — stale fields panel */}
+        {/* Stale tab  -  stale fields panel */}
         {activeTab === 'stale' && (
           <ScrollArea className="h-full">
             <div className="p-3">

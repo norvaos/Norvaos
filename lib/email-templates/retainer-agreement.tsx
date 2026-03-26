@@ -58,7 +58,7 @@ export function RetainerAgreementEmail({
   return (
     <Html lang={locale}>
       <Head />
-      <Preview>{tr.subject} — {matterReference}</Preview>
+      <Preview>{tr.subject}  -  {matterReference}</Preview>
       <Body style={bodyStyle}>
         <Container style={containerStyle}>
           {/* Header */}
@@ -157,7 +157,7 @@ export async function renderRetainerAgreementEmail(
   const tr = getRetainerAgreementStrings(locale)
 
   const html = await render(<RetainerAgreementEmail {...props} />)
-  const subject = `${tr.subject} — ${props.matterReference}`
+  const subject = `${tr.subject}  -  ${props.matterReference}`
 
   const dateLocale = locale === 'fr' ? 'fr-CA' : 'en-CA'
   const formattedExpiry = new Date(props.expiresAt).toLocaleDateString(dateLocale, {

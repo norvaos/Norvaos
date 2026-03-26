@@ -7,7 +7,7 @@ import { withTiming } from '@/lib/middleware/request-timing'
 /**
  * POST /api/admin/tenants/[id]/invites/[inviteId]/revoke
  *
- * Platform-admin ONLY — revoke a pending invite.
+ * Platform-admin ONLY  -  revoke a pending invite.
  *
  * Body: { reason: string }
  */

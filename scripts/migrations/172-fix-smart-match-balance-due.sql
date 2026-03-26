@@ -1,5 +1,5 @@
 -- ============================================================================
--- Migration 172: Fix Smart-Match RPCs — balance_due is GENERATED
+-- Migration 172: Fix Smart-Match RPCs  -  balance_due is GENERATED
 -- ============================================================================
 -- balance_due on invoices is GENERATED ALWAYS AS (total - amount_paid) STORED.
 -- Invoice financial fields are guarded by trg_guard_invoice_financial_fields.
@@ -11,7 +11,7 @@
 
 
 -- ============================================================================
--- 1. fn_apply_trust_allocation — PATCHED
+-- 1. fn_apply_trust_allocation  -  PATCHED
 -- ============================================================================
 
 CREATE OR REPLACE FUNCTION fn_apply_trust_allocation(
@@ -70,7 +70,7 @@ BEGIN
   END IF;
 
   IF v_invoice.status IN ('paid', 'voided') THEN
-    RAISE EXCEPTION 'Invoice is already % — cannot allocate', v_invoice.status
+    RAISE EXCEPTION 'Invoice is already %  -  cannot allocate', v_invoice.status
       USING ERRCODE = 'P0409';
   END IF;
 
@@ -182,7 +182,7 @@ $$;
 
 
 -- ============================================================================
--- 2. fn_reverse_trust_allocation — PATCHED
+-- 2. fn_reverse_trust_allocation  -  PATCHED
 -- ============================================================================
 
 CREATE OR REPLACE FUNCTION fn_reverse_trust_allocation(

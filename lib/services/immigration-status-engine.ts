@@ -76,7 +76,7 @@ interface ContradictionFlag {
 
 /**
  * Compute what the immigration intake status should be based on current data.
- * Pure function — no DB calls, no side effects.
+ * Pure function  -  no DB calls, no side effects.
  */
 export function computeStatus(ctx: StatusComputeContext): {
   status: ImmigrationIntakeStatus
@@ -129,12 +129,12 @@ export function computeStatus(ctx: StatusComputeContext): {
       if (hasDeficientDocs) {
         const rejected = activeSlots.filter((s) => s.status === 'rejected')
         const needsReUpload = activeSlots.filter((s) => s.status === 'needs_re_upload')
-        if (rejected.length > 0) blockedReasons.push(`${rejected.length} document(s) rejected — awaiting re-upload`)
+        if (rejected.length > 0) blockedReasons.push(`${rejected.length} document(s) rejected  -  awaiting re-upload`)
         if (needsReUpload.length > 0) blockedReasons.push(`${needsReUpload.length} document(s) flagged for re-upload`)
       }
       if (hasBlockingContradictions) {
         const blockingCount = contradictions.filter((c) => c.severity === 'blocking').length
-        blockedReasons.push(`${blockingCount} blocking contradiction(s) — resolve or override in Readiness Hub`)
+        blockedReasons.push(`${blockingCount} blocking contradiction(s)  -  resolve or override in Readiness Hub`)
       }
       return { status: 'deficiency_outstanding', blockedReasons }
     }
@@ -242,7 +242,7 @@ export function computeStatus(ctx: StatusComputeContext): {
     return { status: 'lawyer_review', blockedReasons: ['Awaiting lawyer review'] }
   }
 
-  // No lawyer review required — check filing readiness directly
+  // No lawyer review required  -  check filing readiness directly
   const filingBlocks = checkFilingReadiness(playbook, ctx, activeSlots, activeFormPacks, contradictions, hasBlockingContradictions)
   if (filingBlocks.length > 0) {
     return { status: 'drafting_enabled', blockedReasons: filingBlocks }
@@ -321,7 +321,7 @@ function checkFilingReadiness(
     }
     if (!matrix.meetsThreshold) {
       blocks.push(
-        `Overall readiness is ${matrix.overallPct}% — minimum threshold is ${playbook.readinessThreshold ?? 85}%`
+        `Overall readiness is ${matrix.overallPct}%  -  minimum threshold is ${playbook.readinessThreshold ?? 85}%`
       )
     }
   }
@@ -356,7 +356,7 @@ export async function syncImmigrationIntakeStatus(
 
   // 2. Fetch document slots (including person fields for readiness matrix)
   // Also select slot_slug directly: on-demand PUT slots have slot_template_id = null,
-  // so the template-lookup path gives '' for them — fall back to the direct column.
+  // so the template-lookup path gives '' for them  -  fall back to the direct column.
   const { data: slots } = await supabase
     .from('document_slots')
     .select('slot_template_id, slot_slug, status, is_required, is_active, person_id, person_role')
@@ -421,7 +421,7 @@ export async function syncImmigrationIntakeStatus(
     try {
       // Fetch profile for matrix evaluation.
       // Try matter_contacts (CRM link) first, then fall back to matter_people
-      // (portal/immigration link) — immigration matters link the client via
+      // (portal/immigration link)  -  immigration matters link the client via
       // matter_people.contact_id, not necessarily matter_contacts.is_primary.
       let resolvedContactId: string | null = null
 

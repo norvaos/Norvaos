@@ -16,24 +16,24 @@ type MatterInsert = Database['public']['Tables']['matters']['Insert']
 // ─── Matter pools ─────────────────────────────────────────────────────────────
 
 const IMMIGRATION_TITLES = [
-  'Express Entry — Federal Skilled Worker Application',
-  'Spousal Sponsorship — Inland PR Application',
+  'Express Entry  -  Federal Skilled Worker Application',
+  'Spousal Sponsorship  -  Inland PR Application',
   'Temporary Foreign Worker Permit Renewal',
-  'Study Permit Extension — Graduate Program',
+  'Study Permit Extension  -  Graduate Program',
   'Canadian Citizenship Application (Adult)',
-  'Refugee Protection Claim — Pre-Removal Risk Assessment',
-  'Intra-Company Transfer — Work Permit',
-  'Provincial Nominee Program — Ontario Skilled Trades',
+  'Refugee Protection Claim  -  Pre-Removal Risk Assessment',
+  'Intra-Company Transfer  -  Work Permit',
+  'Provincial Nominee Program  -  Ontario Skilled Trades',
   'Humanitarian & Compassionate Application',
 ]
 
 const FAMILY_LAW_TITLES = [
-  'Uncontested Divorce — Separation Agreement',
-  'Child Custody and Access — Variation Application',
-  'Property Division — Matrimonial Home Dispute',
+  'Uncontested Divorce  -  Separation Agreement',
+  'Child Custody and Access  -  Variation Application',
+  'Property Division  -  Matrimonial Home Dispute',
   'Child Support Recalculation Application',
-  'Adoption — Step-Parent Domestic Proceeding',
-  'Domestic Violence — Emergency Restraining Order',
+  'Adoption  -  Step-Parent Domestic Proceeding',
+  'Domestic Violence  -  Emergency Restraining Order',
 ]
 
 const STATUSES: Array<MatterInsert['status']> = [
@@ -97,7 +97,7 @@ export function generateFakeMatters(
       tenant_id: tenantId,
       matter_number: fakeMatterNumber(i),
       title,
-      description: `Demo immigration matter — ${title.toLowerCase()}. All data is synthetic.`,
+      description: `Demo immigration matter  -  ${title.toLowerCase()}. All data is synthetic.`,
       matter_type: 'immigration',
       status,
       priority: pick(PRIORITIES),
@@ -131,7 +131,7 @@ export function generateFakeMatters(
       tenant_id: tenantId,
       matter_number: fakeMatterNumber(idx),
       title,
-      description: `Demo family law matter — ${title.toLowerCase()}. All data is synthetic.`,
+      description: `Demo family law matter  -  ${title.toLowerCase()}. All data is synthetic.`,
       matter_type: 'family_law',
       status,
       priority: pick(PRIORITIES),

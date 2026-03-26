@@ -1,5 +1,5 @@
 /**
- * Readiness Score — TanStack Query hook
+ * Readiness Score  -  TanStack Query hook
  *
  * POSTs to /api/matters/[id]/readiness which recomputes the composite score
  * server-side and persists it before returning the breakdown.
@@ -36,6 +36,6 @@ export function useReadinessScore(matterId: string) {
       return res.json() as Promise<ReadinessResult>
     },
     enabled: !!matterId,
-    staleTime: 1000 * 30, // 30 s — revalidate frequently
+    staleTime: 1000 * 30, // 30 s  -  revalidate frequently
   })
 }

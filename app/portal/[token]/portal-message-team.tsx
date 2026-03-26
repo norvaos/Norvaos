@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * PortalMessageTeam — "Message My Team" button.
+ * PortalMessageTeam  -  "Message My Team" button.
  *
  * Live chat placeholder (Velocity-powered real-time messaging coming soon).
  * For now: triggers a secure mailto: with the Matter ID in the subject line.
@@ -24,7 +24,7 @@ export function PortalMessageTeam({
 }: PortalMessageTeamProps) {
   const subject = encodeURIComponent(`[${matterRef}] Client Message`)
   const body = encodeURIComponent(
-    `Hi,\n\nRegarding my case ${matterRef}${matterTitle ? ` — ${matterTitle}` : ''}:\n\n[Your message here]\n\nThank you.`
+    `Hi,\n\nRegarding my case ${matterRef}${matterTitle ? `  -  ${matterTitle}` : ''}:\n\n[Your message here]\n\nThank you.`
   )
   const mailtoHref = `mailto:${lawyerEmail}?subject=${subject}&body=${body}`
 

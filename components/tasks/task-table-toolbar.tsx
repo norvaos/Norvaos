@@ -128,7 +128,7 @@ export function TaskTableToolbar({ onCreateTask, userCount, currentView = 'table
 
         {/* ----- Right side ----- */}
 
-        {/* Group By dropdown — Table view only */}
+        {/* Group By dropdown  -  Table view only */}
         {isTableView && (
           <Popover>
             <PopoverTrigger asChild>
@@ -162,7 +162,7 @@ export function TaskTableToolbar({ onCreateTask, userCount, currentView = 'table
           </Popover>
         )}
 
-        {/* Show / Hide Completed toggle — Table view only */}
+        {/* Show / Hide Completed toggle  -  Table view only */}
         {isTableView && (
           <Button
             variant="outline"
@@ -181,7 +181,7 @@ export function TaskTableToolbar({ onCreateTask, userCount, currentView = 'table
           </Button>
         )}
 
-        {/* Column Visibility dropdown — Table view only */}
+        {/* Column Visibility dropdown  -  Table view only */}
         {isTableView && (
           <Popover>
             <PopoverTrigger asChild>

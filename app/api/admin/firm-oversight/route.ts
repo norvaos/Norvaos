@@ -7,7 +7,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 /**
  * GET /api/admin/firm-oversight
  *
- * Directive 025 — Firm Oversight Dashboard ("5-Second Health Check")
+ * Directive 025  -  Firm Oversight Dashboard ("5-Second Health Check")
  *
  * Returns a grid of all active matters split into:
  *   - Hardened (Genesis Sealed) vs Soft (In-Progress)

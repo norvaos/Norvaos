@@ -67,7 +67,7 @@ export default function PartnerPulseDashboard() {
               Partner Pulse
             </h1>
             <p className="text-sm text-muted-foreground mt-1">
-              Firm-wide performance at a glance — revenue, workload, and bottlenecks.
+              Firm-wide performance at a glance  -  revenue, workload, and bottlenecks.
             </p>
           </div>
           <PeriodFilter

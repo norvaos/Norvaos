@@ -1,4 +1,4 @@
-# Phase 10 — Team 1 Closeout Package
+# Phase 10  -  Team 1 Closeout Package
 
 **Date:** 2026-03-16
 **Team:** Team 1
@@ -12,42 +12,42 @@
 
 | # | File | Workstream | Change Type |
 |---|------|-----------|-------------|
-| 1 | `app/api/contacts/[id]/statement/route.ts` | 10.1 | MODIFIED — added matter-scoped access control, status filtering, outstanding exclusions |
-| 2 | `lib/services/invoice-email-service.ts` | 10.2 | MODIFIED — added `partially_paid` to reminder eligibility whitelist (line 380) |
+| 1 | `app/api/contacts/[id]/statement/route.ts` | 10.1 | MODIFIED  -  added matter-scoped access control, status filtering, outstanding exclusions |
+| 2 | `lib/services/invoice-email-service.ts` | 10.2 | MODIFIED  -  added `partially_paid` to reminder eligibility whitelist (line 380) |
 
 **Review-only files (no code changes):**
 
 | # | File | Workstream | Result |
 |---|------|-----------|--------|
-| 3 | `app/api/invoices/[id]/send/route.ts` | 10.2 | No change needed — delegates to `sendInvoiceEmail()` |
-| 4 | `app/api/invoices/[id]/receipt/route.ts` | 10.2 | No change needed — delegates to `sendReceiptEmail()`, status-agnostic |
-| 5 | `app/api/invoices/batch-send/route.ts` | 10.2 | No change needed — delegates to `sendInvoiceEmail()` per invoice |
-| 6 | `app/api/cron/overdue-detection/route.ts` | 10.2 | No change needed — checks `['sent', 'viewed', 'partially_paid']`, all valid |
-| 7 | `app/api/cron/invoice-reminders/route.ts` | 10.2 | No change needed — queries `status === 'overdue'`, delegates to `sendReminderEmail()` |
-| 8 | `app/api/cron/aging-recalculation/route.ts` | 10.2 | No change needed — checks `['sent', 'viewed', 'partially_paid', 'overdue']`, all valid |
+| 3 | `app/api/invoices/[id]/send/route.ts` | 10.2 | No change needed  -  delegates to `sendInvoiceEmail()` |
+| 4 | `app/api/invoices/[id]/receipt/route.ts` | 10.2 | No change needed  -  delegates to `sendReceiptEmail()`, status-agnostic |
+| 5 | `app/api/invoices/batch-send/route.ts` | 10.2 | No change needed  -  delegates to `sendInvoiceEmail()` per invoice |
+| 6 | `app/api/cron/overdue-detection/route.ts` | 10.2 | No change needed  -  checks `['sent', 'viewed', 'partially_paid']`, all valid |
+| 7 | `app/api/cron/invoice-reminders/route.ts` | 10.2 | No change needed  -  queries `status === 'overdue'`, delegates to `sendReminderEmail()` |
+| 8 | `app/api/cron/aging-recalculation/route.ts` | 10.2 | No change needed  -  checks `['sent', 'viewed', 'partially_paid', 'overdue']`, all valid |
 
 **Shared helpers (not modified):**
 
-- `lib/services/matter-access.ts` — LOCKED, imported and called as-is
-- `lib/services/require-role.ts` — no change
-- `lib/services/auth.ts` — no change
+- `lib/services/matter-access.ts`  -  LOCKED, imported and called as-is
+- `lib/services/require-role.ts`  -  no change
+- `lib/services/auth.ts`  -  no change
 
 ---
 
-## 2. Statement Route Authorization — Runtime Proof
+## 2. Statement Route Authorization  -  Runtime Proof
 
 ### Test Data Seeded
 
 | Invoice | Status | Matter | Contact | Total | Purpose |
 |---------|--------|--------|---------|-------|---------|
 | P10-AUTH-001 | sent | Matter A (non-restricted) | Alice | $565.00 | Authorized + client-visible |
-| P10-RESTR-001 | sent | Matter B (restricted, no admin override) | Alice | $847.50 | Unauthorized — restricted matter |
+| P10-RESTR-001 | sent | Matter B (restricted, no admin override) | Alice | $847.50 | Unauthorized  -  restricted matter |
 | P10-VOID-001 | void | Matter A | Alice | $339.00 | Client-visible but excluded from outstanding |
 | P10-DRAFT-001 | draft | Matter A | Alice | $226.00 | Not client-visible |
 
 Matter B: `is_restricted=true`, `restricted_admin_override=false`, `responsible_lawyer_id=Pat Paralegal` (not Alex). Alex (Admin) is denied access via path 1 (blocked by restriction) and path 2 (no override).
 
-### P1 — Authorized Access
+### P1  -  Authorized Access
 
 **User:** Alex Admin (Admin role, billing:view via Admin bypass)
 **Request:** `GET /api/contacts/c0000000-.../statement`
@@ -57,12 +57,12 @@ Matter B: `is_restricted=true`, `restricted_admin_override=false`, `responsible_
 - Contact: Alice NewInquiry
 - Matter count: 1 (Iris Converted - Immigration Case only)
 - Invoice count: 2 (P10-AUTH-001 sent, P10-VOID-001 void)
-- Total invoiced: 56500 (only sent invoice — void excluded from totals)
+- Total invoiced: 56500 (only sent invoice  -  void excluded from totals)
 - Total outstanding: 56500
 
-**Result: PASS** — authorized user receives statement with authorized matters and correct totals.
+**Result: PASS**  -  authorized user receives statement with authorized matters and correct totals.
 
-### P2 — Unauthorized Matter Access Blocked
+### P2  -  Unauthorized Matter Access Blocked
 
 **Same request as P1.** Alice has invoices on both Matter A (non-restricted) and Matter B (restricted).
 
@@ -71,36 +71,36 @@ Matter B: `is_restricted=true`, `restricted_admin_override=false`, `responsible_
 - Invoice P10-RESTR-001 absent from response: **true**
 - Outstanding total does NOT include $847.50 from restricted matter: **true**
 
-**Result: PASS** — restricted matter and its invoices are completely filtered out.
+**Result: PASS**  -  restricted matter and its invoices are completely filtered out.
 
-### P3 — Cross-Tenant Denied
+### P3  -  Cross-Tenant Denied
 
 **User:** Alex Admin
 **Request:** `GET /api/contacts/00000000-0000-0000-0000-999999999999/statement`
 **HTTP Status:** 404
 **Response:** `{"error":"Contact not found"}`
 
-**Result: PASS** — contact not in Alex's tenant returns 404.
+**Result: PASS**  -  contact not in Alex's tenant returns 404.
 
-### P4 — Mixed-Contact/Mixed-Matter Filtering
+### P4  -  Mixed-Contact/Mixed-Matter Filtering
 
 **Same P1 response analyzed for status filtering:**
 
-- Draft invoice (P10-DRAFT-001) present in response: **false** — excluded by `NON_CLIENT_VISIBLE_STATUSES`
-- Void invoice (P10-VOID-001) present in response: **true** — client-visible
-- Void excluded from outstanding totals: **true** — outstanding = 56500 (not 56500 + 33900)
+- Draft invoice (P10-DRAFT-001) present in response: **false**  -  excluded by `NON_CLIENT_VISIBLE_STATUSES`
+- Void invoice (P10-VOID-001) present in response: **true**  -  client-visible
+- Void excluded from outstanding totals: **true**  -  outstanding = 56500 (not 56500 + 33900)
 - Restricted matter invoices filtered: **true** (P2)
 
-**Result: PASS** — mixed statuses and mixed matters correctly filtered.
+**Result: PASS**  -  mixed statuses and mixed matters correctly filtered.
 
-### P5 — Permission Denial
+### P5  -  Permission Denial
 
 **User:** Laura Lawyer (Lawyer role, no `billing:view` permission)
 **Request:** `GET /api/contacts/c0000000-.../statement`
 **HTTP Status:** 403
 **Response:** `{"error":"Permission denied: billing:view"}`
 
-**Result: PASS** — user without billing permission receives 403.
+**Result: PASS**  -  user without billing permission receives 403.
 
 ---
 
@@ -128,8 +128,8 @@ Covered in P2 + P4 above. The statement route now enforces three layers:
 
 | Layer | Enforcement | Evidence |
 |-------|-------------|----------|
-| Authentication | `authenticateRequest()` — JWT validation, user lookup | P3: unauthenticated/cross-tenant → 404 |
-| Permission | `requirePermission(auth, 'billing', 'view')` — RBAC check | P5: no billing:view → 403 |
+| Authentication | `authenticateRequest()`  -  JWT validation, user lookup | P3: unauthenticated/cross-tenant → 404 |
+| Permission | `requirePermission(auth, 'billing', 'view')`  -  RBAC check | P5: no billing:view → 403 |
 | Matter-scoped access | `checkMatterAccess(supabase, auth.userId, matterId)` per matter | P2: restricted matter filtered; P1: authorized matter returned |
 
 ---
@@ -144,7 +144,7 @@ Covered in P3 above. Existing tenant isolation via `.eq('tenant_id', tenantId)` 
 
 ### Send Guard (invoice-email-service.ts line 72)
 
-**Current code:** `if (invoice.status !== 'draft')` — only draft invoices can be sent.
+**Current code:** `if (invoice.status !== 'draft')`  -  only draft invoices can be sent.
 
 **Migration 107 impact:** When Migration 107 is applied, the lifecycle becomes `draft → finalized → sent`. The send guard must change to `if (invoice.status !== 'finalized')` so that only finalized invoices can be sent. **This change is NOT deployed** because Migration 107 is not live. It is recorded as a mandatory change when Migration 107 is applied.
 
@@ -158,12 +158,12 @@ Covered in P3 above. Existing tenant isolation via `.eq('tenant_id', tenantId)` 
 ### Statement Route Status Filtering
 
 **Added constants:**
-- `NON_CLIENT_VISIBLE_STATUSES = ['draft', 'finalized']` — excluded from response data
-- `EXCLUDED_FROM_OUTSTANDING = ['void', 'written_off', 'cancelled']` — excluded from outstanding totals
+- `NON_CLIENT_VISIBLE_STATUSES = ['draft', 'finalized']`  -  excluded from response data
+- `EXCLUDED_FROM_OUTSTANDING = ['void', 'written_off', 'cancelled']`  -  excluded from outstanding totals
 
 These are forward-compatible with Migration 107. When `finalized` becomes a live status, it will be correctly hidden from client-facing statements.
 
-### Cron Routes — No Changes Required
+### Cron Routes  -  No Changes Required
 
 | Cron | Status Check | Migration 107 Compatible | Reason |
 |------|-------------|-------------------------|--------|
@@ -206,7 +206,7 @@ These are forward-compatible with Migration 107. When `finalized` becomes a live
 
 | # | Risk | Status | Carry-Forward |
 |---|------|--------|---------------|
-| OR-6 | Statement route lacked matter-scoped access control | **CLOSED** | N/A — implemented and proven in this phase |
+| OR-6 | Statement route lacked matter-scoped access control | **CLOSED** | N/A  -  implemented and proven in this phase |
 | OR-7 | Send guard must be reconciled when Migration 107 is applied (`!== 'draft'` → `!== 'finalized'`) | Open | Mandatory prerequisite for Migration 107 deployment |
 
 ---
@@ -235,9 +235,9 @@ These are forward-compatible with Migration 107. When `finalized` becomes a live
 **Open Risk #6 is now CLOSED.**
 
 The statement route (`/api/contacts/[id]/statement`) now enforces all three authorization layers:
-1. **Authentication** — `authenticateRequest()` validates JWT and resolves user context
-2. **Permission** — `requirePermission(auth, 'billing', 'view')` checks RBAC
-3. **Matter-scoped access** — `checkMatterAccess(supabase, auth.userId, matterId)` enforces the 9-path matter access model per matter
+1. **Authentication**  -  `authenticateRequest()` validates JWT and resolves user context
+2. **Permission**  -  `requirePermission(auth, 'billing', 'view')` checks RBAC
+3. **Matter-scoped access**  -  `checkMatterAccess(supabase, auth.userId, matterId)` enforces the 9-path matter access model per matter
 
 Runtime proofs P1–P5 demonstrate that:
 - Authorized users receive only authorized matter data

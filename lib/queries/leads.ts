@@ -23,7 +23,7 @@ interface LeadListParams {
   sortDirection?: 'asc' | 'desc'
 }
 
-/** Columns fetched for lead detail views — 20 cols max (100/20 budget). */
+/** Columns fetched for lead detail views  -  20 cols max (100/20 budget). */
 const LEAD_DETAIL_COLUMNS = 'id, tenant_id, contact_id, status, current_stage, pipeline_id, stage_id, practice_area_id, matter_type_id, responsible_lawyer_id, assigned_to, estimated_value, temperature, source, utm_source, utm_medium, utm_campaign, retainer_status, payment_status, created_at' as const
 
 export const leadKeys = {
@@ -128,7 +128,7 @@ export function useCreateLead() {
         changes: { contact_id: lead.contact_id, temperature: lead.temperature, status: lead.status },
       })
 
-      // Fire conflict scan in the background — updates contact.conflict_status
+      // Fire conflict scan in the background  -  updates contact.conflict_status
       // and lead.conflict_status automatically
       if (lead.contact_id) {
         fetch(`/api/contacts/${lead.contact_id}/conflict-scan`, {
@@ -271,7 +271,7 @@ export function useConvertLead() {
           })
         }
       } catch {
-        // Kit activation failure is non-fatal — lead is already converted
+        // Kit activation failure is non-fatal  -  lead is already converted
         console.warn('Kit activation after lead conversion failed (non-fatal)')
       }
 

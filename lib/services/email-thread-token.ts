@@ -6,7 +6,7 @@ import type { Database } from '@/lib/types/database'
 //
 // Every outgoing email from NorvaOS embeds a unique, HMAC-signed token in the
 // footer. When a reply arrives, the token is extracted and matched against the
-// originating matter — giving a 100% confidence association without relying on
+// originating matter  -  giving a 100% confidence association without relying on
 // subject lines, contact emails, or any other heuristic.
 //
 // Token format: NRV-<base64url(HMAC-SHA256(matterId + tenantId, secret))[:16]>
@@ -31,7 +31,7 @@ function getSecret(): string {
 
 /**
  * Generate a deterministic thread token for a given matter + tenant pair.
- * Deterministic so the same matter always produces the same token — no
+ * Deterministic so the same matter always produces the same token  -  no
  * need to store tokens in the database.
  */
 export function generateThreadToken(matterId: string, tenantId: string): string {

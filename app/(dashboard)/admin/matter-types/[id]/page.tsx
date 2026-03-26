@@ -132,7 +132,7 @@ function IconPreview({ name }: { name: string }) {
   return <Icon className="size-5 text-foreground" />
 }
 
-// ─── Tab 1 — General ─────────────────────────────────────────────────────────
+// ─── Tab 1  -  General ─────────────────────────────────────────────────────────
 
 interface GeneralTabProps {
   matterTypeId: string
@@ -313,7 +313,7 @@ function GeneralTab({ matterTypeId, tenantId }: GeneralTabProps) {
   )
 }
 
-// ─── Tab 2 — Document Checklist ───────────────────────────────────────────────
+// ─── Tab 2  -  Document Checklist ───────────────────────────────────────────────
 
 interface DocChecklistTabProps {
   matterTypeId: string
@@ -551,7 +551,7 @@ function DocChecklistTab({ matterTypeId, tenantId }: DocChecklistTabProps) {
   )
 }
 
-// ─── Tab 3 — Task Templates ───────────────────────────────────────────────────
+// ─── Tab 3  -  Task Templates ───────────────────────────────────────────────────
 
 interface TaskTemplatesTabProps {
   matterTypeId: string
@@ -782,7 +782,7 @@ function TaskTemplatesTab({ matterTypeId, tenantId }: TaskTemplatesTabProps) {
   )
 }
 
-// ─── Tab 4 — SLA Config ───────────────────────────────────────────────────────
+// ─── Tab 4  -  SLA Config ───────────────────────────────────────────────────────
 
 interface SlaTabProps {
   matterTypeId: string
@@ -887,7 +887,7 @@ function SlaTab({ matterTypeId, tenantId }: SlaTabProps) {
   )
 }
 
-// ─── Tab 5 — Billing Defaults ─────────────────────────────────────────────────
+// ─── Tab 5  -  Billing Defaults ─────────────────────────────────────────────────
 
 interface BillingTabProps {
   matterTypeId: string

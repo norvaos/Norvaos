@@ -101,7 +101,7 @@ export function MapColumnsStep({
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value={UNMAPPED}>
-                        <span className="text-muted-foreground">— Skip —</span>
+                        <span className="text-muted-foreground"> -  Skip  - </span>
                       </SelectItem>
                       {BULK_LEAD_FIELDS.map((field) => (
                         <SelectItem
@@ -117,7 +117,7 @@ export function MapColumnsStep({
                   </Select>
                 </TableCell>
                 <TableCell className="text-xs text-muted-foreground truncate max-w-[200px]">
-                  {preview[0]?.[header] ?? '—'}
+                  {preview[0]?.[header] ?? ' - '}
                 </TableCell>
               </TableRow>
             ))}

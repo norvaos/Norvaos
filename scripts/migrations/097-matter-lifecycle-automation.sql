@@ -5,13 +5,13 @@
 -- and the post-decision lifecycle for immigration matters.
 --
 -- Tables:
---   1. post_submission_document_types — configurable document type catalogue
---   2. matter_outcome_events — tracks outcomes (approval, refusal, etc.)
---   3. expiry_reminder_rules — configurable reminder offsets
---   4. extracted_document_fields — OCR/AI extracted fields from documents
---   5. contact_status_records — permits, visas, PR cards with expiry tracking
---   6. drafting_prep_questions — questions for pre-drafting preparation
---   7. drafting_prep_responses — matter-specific answers
+--   1. post_submission_document_types  -  configurable document type catalogue
+--   2. matter_outcome_events  -  tracks outcomes (approval, refusal, etc.)
+--   3. expiry_reminder_rules  -  configurable reminder offsets
+--   4. extracted_document_fields  -  OCR/AI extracted fields from documents
+--   5. contact_status_records  -  permits, visas, PR cards with expiry tracking
+--   6. drafting_prep_questions  -  questions for pre-drafting preparation
+--   7. drafting_prep_responses  -  matter-specific answers
 -- ============================================================================
 
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -251,21 +251,21 @@ DO $$ BEGIN
 END $$;
 
 -- ═══════════════════════════════════════════════════════════════════════════════
--- 8. Seed Data — Standard IRCC Post-Submission Document Types
+-- 8. Seed Data  -  Standard IRCC Post-Submission Document Types
 -- ═══════════════════════════════════════════════════════════════════════════════
 -- NOTE: These are seeded per-tenant. In a multi-tenant setup, run for each tenant.
 -- For now, we insert with a placeholder tenant_id that should be replaced.
 -- The application layer seeds these on first use via getPostSubmissionDocTypes().
 
--- No hard-coded tenant seed — the application layer initialises these per tenant.
+-- No hard-coded tenant seed  -  the application layer initialises these per tenant.
 
 -- ═══════════════════════════════════════════════════════════════════════════════
--- 9. Seed Data — Default Expiry Reminder Rules
+-- 9. Seed Data  -  Default Expiry Reminder Rules
 -- ═══════════════════════════════════════════════════════════════════════════════
 -- Same approach: seeded per-tenant by the application layer on first access.
 
 -- ═══════════════════════════════════════════════════════════════════════════════
--- 10. Helper function — seed post-submission doc types for a tenant
+-- 10. Helper function  -  seed post-submission doc types for a tenant
 -- ═══════════════════════════════════════════════════════════════════════════════
 
 CREATE OR REPLACE FUNCTION seed_post_submission_doc_types(p_tenant_id UUID)
@@ -294,7 +294,7 @@ END;
 $$;
 
 -- ═══════════════════════════════════════════════════════════════════════════════
--- 11. Helper function — seed default expiry reminder rules for a tenant
+-- 11. Helper function  -  seed default expiry reminder rules for a tenant
 -- ═══════════════════════════════════════════════════════════════════════════════
 
 CREATE OR REPLACE FUNCTION seed_expiry_reminder_rules(p_tenant_id UUID)

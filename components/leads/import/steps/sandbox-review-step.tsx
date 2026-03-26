@@ -208,7 +208,7 @@ export function SandboxReviewStep({
                   <TableCell className="text-sm">
                     {row.first_name} {row.last_name}
                   </TableCell>
-                  <TableCell className="text-xs text-muted-foreground">{row.email ?? '—'}</TableCell>
+                  <TableCell className="text-xs text-muted-foreground">{row.email ?? ' - '}</TableCell>
                   <TableCell>
                     <Badge variant={STATUS_BADGES[row.validation_status]?.variant ?? 'outline'} className="text-xs">
                       {STATUS_BADGES[row.validation_status]?.label ?? row.validation_status}

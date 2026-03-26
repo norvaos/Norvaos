@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * WorkspaceNavRail — Column 1
+ * WorkspaceNavRail  -  Column 1
  *
  * Minimisable vertical nav rail (72px collapsed / 240px expanded).
  * Each section shows a completion badge:

@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Rejection-path integration tests — Sprint 6, Week 2, Day 1
+ * Rejection-path integration tests  -  Sprint 6, Week 2, Day 1
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * These tests produce ACTUAL executed results, not theory.
@@ -9,10 +9,10 @@
  *   1. Route-level role checks return the correct boolean for all roles
  *   2. Service-level guards throw the correct errors under the correct conditions
  *
- * We test the service layer directly — Next.js route handlers cannot be
+ * We test the service layer directly  -  Next.js route handlers cannot be
  * instantiated in vitest without a full HTTP server.
  *
- * Sprint 6, Week 2 — 2026-03-17
+ * Sprint 6, Week 2  -  2026-03-17
  */
 
 import { describe, it, expect, vi } from 'vitest'
@@ -141,7 +141,7 @@ function buildHappyPathSupabase(deficiencyRows: { id: string }[] = []) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// Suite 1 — return-stage: role enforcement
+// Suite 1  -  return-stage: role enforcement
 // ═══════════════════════════════════════════════════════════════════════════════
 
 describe('rejection-paths', () => {
@@ -153,7 +153,7 @@ describe('rejection-paths', () => {
      * of the auth logic without needing to spin up an HTTP server.
      */
 
-    it('rejects non-Lawyer/Admin — checks role === Lawyer || role === Admin', () => {
+    it('rejects non-Lawyer/Admin  -  checks role === Lawyer || role === Admin', () => {
       // The function must return false for anything that is not Lawyer or Admin
       expect(isAuthorisedToReturnStage('Paralegal')).toBe(false)
       expect(isAuthorisedToReturnStage('Front Desk')).toBe(false)
@@ -186,12 +186,12 @@ describe('rejection-paths', () => {
   })
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // Suite 2 — return-stage: business rule enforcement (service layer)
+  // Suite 2  -  return-stage: business rule enforcement (service layer)
   // ═══════════════════════════════════════════════════════════════════════════
 
   describe('return-stage: business rule enforcement', () => {
 
-    it('throws when return_reason < 50 chars — server-side', async () => {
+    it('throws when return_reason < 50 chars  -  server-side', async () => {
       const supabase = buildHappyPathSupabase()
       const shortReason = 'Too short.'
 
@@ -200,7 +200,7 @@ describe('rejection-paths', () => {
       ).rejects.toThrow('Return reason must be at least 50 characters')
     })
 
-    it('throws when return_reason is exactly 49 characters — boundary', async () => {
+    it('throws when return_reason is exactly 49 characters  -  boundary', async () => {
       const supabase = buildHappyPathSupabase()
       const fortyNineChars = 'X'.repeat(49)
 
@@ -209,7 +209,7 @@ describe('rejection-paths', () => {
       ).rejects.toThrow('Return reason must be at least 50 characters')
     })
 
-    it('throws when target stage is not earlier — server-side', async () => {
+    it('throws when target stage is not earlier  -  server-side', async () => {
       // Build a mock where the target stage has a HIGHER sort_order than current
       const stageStateRow = {
         id:                'ss-rp-later',
@@ -237,7 +237,7 @@ describe('rejection-paths', () => {
       ).rejects.toThrow('Target stage is not earlier than current stage')
     })
 
-    it('throws when critical deficiency open (manual call) — server-side', async () => {
+    it('throws when critical deficiency open (manual call)  -  server-side', async () => {
       // buildHappyPathSupabase returns a non-empty deficiency array ⟹ check fires
       const supabase = buildHappyPathSupabase([{ id: 'def-critical-001' }])
 
@@ -264,7 +264,7 @@ describe('rejection-paths', () => {
   })
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // Suite 3 — deficiency resolve: role enforcement
+  // Suite 3  -  deficiency resolve: role enforcement
   // ═══════════════════════════════════════════════════════════════════════════
 
   describe('deficiency resolve: role enforcement', () => {
@@ -287,7 +287,7 @@ describe('rejection-paths', () => {
 
     it('rejects Legal Assistant / Paralegal (both map to same check)', () => {
       expect(isAuthorisedToResolveDeficiency('Paralegal')).toBe(false)
-      // 'Legal Assistant' is not a system role name — confirm it is also rejected
+      // 'Legal Assistant' is not a system role name  -  confirm it is also rejected
       expect(isAuthorisedToResolveDeficiency('Legal Assistant')).toBe(false)
     })
 
@@ -307,20 +307,20 @@ describe('rejection-paths', () => {
       expect(isAuthorisedToResolveDeficiency('')).toBe(false)
     })
 
-    it('is case-sensitive — lowercase "lawyer" is rejected', () => {
+    it('is case-sensitive  -  lowercase "lawyer" is rejected', () => {
       expect(isAuthorisedToResolveDeficiency('lawyer')).toBe(false)
       expect(isAuthorisedToResolveDeficiency('admin')).toBe(false)
     })
   })
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // Suite 4 — deficiency resolve: validation
+  // Suite 4  -  deficiency resolve: validation
   // ═══════════════════════════════════════════════════════════════════════════
 
   describe('deficiency resolve: validation', () => {
     /**
      * The PATCH route must validate resolution_notes length.
-     * We test the guard logic directly as a pure function — the 20-char minimum
+     * We test the guard logic directly as a pure function  -  the 20-char minimum
      * is the service-level rule enforced before any DB write.
      */
 
@@ -337,7 +337,7 @@ describe('rejection-paths', () => {
       expect(result.error).toMatch(/20/)
     })
 
-    it('rejects resolution_notes of 19 characters — boundary', () => {
+    it('rejects resolution_notes of 19 characters  -  boundary', () => {
       const nineteenChars = 'a'.repeat(19)
       const result = validateResolutionNotes(nineteenChars)
       expect(result.valid).toBe(false)
@@ -363,7 +363,7 @@ describe('rejection-paths', () => {
   })
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // Suite 5 — trust_transaction: role check (DB-enforced, documented here)
+  // Suite 5  -  trust_transaction: role check (DB-enforced, documented here)
   // ═══════════════════════════════════════════════════════════════════════════
 
   describe('trust transaction: role check logic', () => {
@@ -381,7 +381,7 @@ describe('rejection-paths', () => {
      */
 
     it('documents that trust_transactions INSERT is DB-enforced via get_my_role() IN (Billing, Admin)', () => {
-      // This test is intentionally documentary — the DB enforces the constraint.
+      // This test is intentionally documentary  -  the DB enforces the constraint.
       // The assertion below confirms the expected allowed roles are Billing and Admin only.
       const allowedRoles = ['Billing', 'Admin']
       const rejectedRoles = ['Lawyer', 'Paralegal', 'Front Desk']
@@ -399,7 +399,7 @@ describe('rejection-paths', () => {
   })
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // Suite 6 — matter_intake: role check (DB-enforced, documented here)
+  // Suite 6  -  matter_intake: role check (DB-enforced, documented here)
   // ═══════════════════════════════════════════════════════════════════════════
 
   describe('matter_intake: role check logic', () => {

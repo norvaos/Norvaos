@@ -1,7 +1,7 @@
 # ─── CODEOWNERS ──────────────────────────────────────────────────────────────
 #
 # Any change to enforcement governance files requires approval from the
-# enforcement reviewers group. This is a hard gate — not optional.
+# enforcement reviewers group. This is a hard gate  -  not optional.
 #
 # ENFORCEMENT FREEZE (enforcement-v1.0.0, 2026-03-01):
 # All paths below are frozen. Modifications require version-bump protocol:
@@ -14,7 +14,7 @@
 # GitHub Docs: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
 
 # ── Enforcement governance files ────────────────────────────────────────────
-# Spec, registry, and waivers — these define what the system enforces.
+# Spec, registry, and waivers  -  these define what the system enforces.
 # Changes here can silently weaken security if not reviewed.
 
 docs/enforcement/                       @norvaos/enforcement-reviewers

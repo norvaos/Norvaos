@@ -11,12 +11,12 @@ sprint rollback is required.
 
 ---
 
-## Migration 128 — Read Model SELECT Restrictions
+## Migration 128  -  Read Model SELECT Restrictions
 
 **Forward migration file**: `128-read-model-rls.sql`
 **Rollback script**: `128-read-model-rls.rollback.sql`
 **Applied**: 2026-03-17
-**Risk**: Low — no tables, columns, or indexes are created or dropped.
+**Risk**: Low  -  no tables, columns, or indexes are created or dropped.
 The rollback replaces role-gated SELECT policies with tenant-only SELECT
 policies on nine tables. No data is lost.
 
@@ -68,12 +68,12 @@ ORDER BY c.relname;
 
 ---
 
-## Migration 129 — Refusal Workflow, Closure Columns, Submission Confirmation
+## Migration 129  -  Refusal Workflow, Closure Columns, Submission Confirmation
 
 **Forward migration file**: `129-refusal-closure-submission.sql`
 **Rollback script**: `129-refusal-closure-submission.rollback.sql`
 **Applied**: 2026-03-17
-**Risk**: High — drops `refusal_actions` table (all JR deadline audit rows
+**Risk**: High  -  drops `refusal_actions` table (all JR deadline audit rows
 permanently lost), removes six columns from `ircc_correspondence`, three
 columns from `matters`, and four columns from `matter_intake`. Also reverts
 the `matters.status` CHECK constraint to exclude `'refused'` and
@@ -92,7 +92,7 @@ the `matters.status` CHECK constraint to exclude `'refused'` and
 - [ ] Confirm POST `.../handle-refusal` route is disabled (returns 503).
 - [ ] Confirm POST `.../close` route is disabled (returns 503).
 - [ ] Alert legal team that any computed JR deadlines will no longer be stored
-      in the database — record them manually if still active.
+      in the database  -  record them manually if still active.
 - [ ] Take a full Supabase database backup.
 
 ### Run the rollback
@@ -145,12 +145,12 @@ WHERE table_schema = 'public'
 
 ---
 
-## Migration 130 — form_generation_log Table
+## Migration 130  -  form_generation_log Table
 
 **Forward migration file**: `130-form-generation-log.sql`
 **Rollback script**: `130-form-generation-log.rollback.sql`
 **Applied**: 2026-03-17
-**Risk**: Medium — drops the entire `form_generation_log` table. All pending,
+**Risk**: Medium  -  drops the entire `form_generation_log` table. All pending,
 processing, completed, and failed PDF generation job records are permanently
 lost. The `output_path` references to generated PDFs in Supabase Storage are
 lost (the actual files in Storage are NOT deleted). The `generate-form`,

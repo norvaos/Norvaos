@@ -179,7 +179,7 @@ export default function SettingsFirmPage() {
 
   // ── Consequence Guard: warn before changing an already-set regulatory body ──
   // Only fires when the user explicitly selects a DIFFERENT regulatory body
-  // from the dropdown — never on page load, form reset, or non-jurisdiction saves.
+  // from the dropdown  -  never on page load, form reset, or non-jurisdiction saves.
   const [showConsequenceWarning, setShowConsequenceWarning] = useState(false)
   const [pendingRegulatoryChange, setPendingRegulatoryChange] = useState<string | null>(null)
   const [confirmCountdown, setConfirmCountdown] = useState(3)
@@ -228,7 +228,7 @@ export default function SettingsFirmPage() {
         currency: tenant.currency ?? 'CAD',
         date_format: tenant.date_format ?? 'YYYY-MM-DD',
       })
-      // Mark page as ready after initial form hydration — prevents
+      // Mark page as ready after initial form hydration  -  prevents
       // the Consequence Guard from firing during the reset cycle.
       setTimeout(() => { pageReadyRef.current = true }, 500)
     }
@@ -405,7 +405,7 @@ export default function SettingsFirmPage() {
                               {resolved.name} ({resolved.abbr})
                             </p>
                             <p className="text-xs text-emerald-600">
-                              {resolved.scope === 'federal' ? 'Federal regulatory body' : `Provincial — ${resolved.description}`}
+                              {resolved.scope === 'federal' ? 'Federal regulatory body' : `Provincial  -  ${resolved.description}`}
                             </p>
                           </div>
                         </div>
@@ -423,7 +423,7 @@ export default function SettingsFirmPage() {
                     <Lock className="h-3.5 w-3.5 text-muted-foreground" />
                     <span className="text-lg">{j?.flag ?? ''}</span>
                     <span className="text-sm font-medium">{j?.name ?? firmData.jurisdiction_code}</span>
-                    <span className="text-xs text-muted-foreground">(Country — set at creation)</span>
+                    <span className="text-xs text-muted-foreground">(Country  -  set at creation)</span>
                   </div>
                 )
               })()}

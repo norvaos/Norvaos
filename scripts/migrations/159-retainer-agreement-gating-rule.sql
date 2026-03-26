@@ -1,5 +1,5 @@
 -- =============================================================================
--- Migration 159 — Retainer Agreement Gating Rule for Stage Engine
+-- Migration 159  -  Retainer Agreement Gating Rule for Stage Engine
 -- =============================================================================
 --
 -- Adds a new gating rule type `require_retainer_agreement` to matter_stages.
@@ -73,9 +73,9 @@ COMMENT ON COLUMN matter_stages.retainer_gate_config IS
   '"allow_expired" (boolean), "retainer_types" (text[]). '
   'Example: {"minimum_status": "signed"}';
 
--- ── 3. RLS — matter_stages already has RLS enabled from migration 009. ──────
+-- ── 3. RLS  -  matter_stages already has RLS enabled from migration 009. ──────
 -- Verify the existing policy covers the new columns (it does, since column-
--- level RLS is not a thing in PostgreSQL — row policies apply to all columns).
+-- level RLS is not a thing in PostgreSQL  -  row policies apply to all columns).
 -- For safety, ensure the policy exists:
 
 DO $$

@@ -46,7 +46,7 @@ export async function createServerSupabaseClient() {
 }
 
 /**
- * Service role Supabase client — bypasses RLS entirely.
+ * Service role Supabase client  -  bypasses RLS entirely.
  * Use ONLY for server-side operations that require elevated privileges,
  * such as storage uploads, admin operations, etc.
  * NEVER expose to client-side code.

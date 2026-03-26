@@ -27,7 +27,7 @@
  *   matters         view create edit del
  *   leads           view create edit del
  *   tasks           view create edit del
- *   documents       view create edit del  (portal uploads bypass — token auth)
+ *   documents       view create edit del  (portal uploads bypass  -  token auth)
  *   communications  view create edit del
  *   billing         view create edit del  ← see Billing section below
  *   reports         view export           (only 2 actions, no create/edit/del)
@@ -81,7 +81,7 @@
  *     • Use the RetainerBuilder to create invoices or record payments
  *
  *   Denied UX: billing entity shows "Billing Restricted" (not "Access Restricted")
- *   with zero numeric inference — no dollar signs, no financial terms.
+ *   with zero numeric inference  -  no dollar signs, no financial terms.
  *
  *   The /api/invoices/[id]/pdf route additionally logs a denied audit event
  *   (action: "invoice_pdf_download_denied") with role_name, IP, and user-agent
@@ -122,7 +122,7 @@
  *   Database         SECURITY DEFINER RPCs    migrations/027-enforcement.sql
  *   triggers         + role name check        Only Admin can toggle enforcement
  *
- *   Portal (public)  Token-based auth         No role check — token = access
+ *   Portal (public)  Token-based auth         No role check  -  token = access
  *                    No user session           Document uploads use admin client
  *
  * ═══════════════════════════════════════════════════════════════════════════════

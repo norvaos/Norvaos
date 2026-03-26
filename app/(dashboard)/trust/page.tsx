@@ -81,7 +81,7 @@ function formatCurrency(cents: number): string {
 }
 
 function formatDate(dateStr: string | null | undefined): string {
-  if (!dateStr) return '—'
+  if (!dateStr) return ' - '
   return new Date(dateStr).toLocaleDateString('en-CA', {
     year: 'numeric',
     month: 'short',
@@ -90,7 +90,7 @@ function formatDate(dateStr: string | null | undefined): string {
 }
 
 function formatDateTime(dateStr: string | null | undefined): string {
-  if (!dateStr) return '—'
+  if (!dateStr) return ' - '
   return new Date(dateStr).toLocaleString('en-CA', {
     year: 'numeric',
     month: 'short',
@@ -289,7 +289,7 @@ function TrustDashboard() {
                 const a = acc as { id: string; account_name?: string; bank_name?: string }
                 return (
                   <SelectItem key={a.id} value={a.id}>
-                    {a.account_name ?? 'Unnamed Account'} — {a.bank_name ?? ''}
+                    {a.account_name ?? 'Unnamed Account'}  -  {a.bank_name ?? ''}
                   </SelectItem>
                 )
               })}
@@ -396,10 +396,10 @@ function TrustDashboard() {
                         return (
                           <TableRow key={e.matter_id ?? i}>
                             <TableCell className="font-medium">
-                              {e.file_number ?? '—'}{' '}
+                              {e.file_number ?? ' - '}{' '}
                               <span className="text-slate-500">{e.matter_title ?? ''}</span>
                             </TableCell>
-                            <TableCell>{e.client_name ?? '—'}</TableCell>
+                            <TableCell>{e.client_name ?? ' - '}</TableCell>
                             <TableCell className="text-right font-mono">
                               {formatCurrency(e.balance_cents ?? 0)}
                             </TableCell>
@@ -461,8 +461,8 @@ function TrustDashboard() {
                                 {(t.transaction_type ?? '').replace(/_/g, ' ')}
                               </Badge>
                             </TableCell>
-                            <TableCell className="max-w-[200px] truncate">{t.description ?? '—'}</TableCell>
-                            <TableCell>{t.file_number ?? t.matter_title ?? '—'}</TableCell>
+                            <TableCell className="max-w-[200px] truncate">{t.description ?? ' - '}</TableCell>
+                            <TableCell>{t.file_number ?? t.matter_title ?? ' - '}</TableCell>
                             <TableCell className={cn('text-right font-mono', isDebit ? 'text-red-600' : 'text-emerald-600')}>
                               {isDebit ? '- ' : '+ '}
                               {formatCurrency(Math.abs(t.amount_cents ?? 0))}
@@ -529,9 +529,9 @@ function TrustDashboard() {
                         return (
                           <TableRow key={req.id ?? i}>
                             <TableCell>{formatDate(req.created_at)}</TableCell>
-                            <TableCell className="font-medium">{req.payee_name ?? '—'}</TableCell>
-                            <TableCell>{req.file_number ?? req.matter_title ?? '—'}</TableCell>
-                            <TableCell className="max-w-[180px] truncate">{req.description ?? '—'}</TableCell>
+                            <TableCell className="font-medium">{req.payee_name ?? ' - '}</TableCell>
+                            <TableCell>{req.file_number ?? req.matter_title ?? ' - '}</TableCell>
+                            <TableCell className="max-w-[180px] truncate">{req.description ?? ' - '}</TableCell>
                             <TableCell className="text-right font-mono">
                               {formatCurrency(req.amount_cents ?? 0)}
                             </TableCell>
@@ -615,10 +615,10 @@ function TrustDashboard() {
                         }
                         return (
                           <TableRow key={chq.id ?? i}>
-                            <TableCell className="font-mono">{chq.cheque_number ?? '—'}</TableCell>
+                            <TableCell className="font-mono">{chq.cheque_number ?? ' - '}</TableCell>
                             <TableCell>{formatDate(chq.issued_date)}</TableCell>
-                            <TableCell className="font-medium">{chq.payee_name ?? '—'}</TableCell>
-                            <TableCell className="max-w-[200px] truncate">{chq.memo ?? '—'}</TableCell>
+                            <TableCell className="font-medium">{chq.payee_name ?? ' - '}</TableCell>
+                            <TableCell className="max-w-[200px] truncate">{chq.memo ?? ' - '}</TableCell>
                             <TableCell className="text-right font-mono">
                               {formatCurrency(chq.amount_cents ?? 0)}
                             </TableCell>
@@ -681,7 +681,7 @@ function TrustDashboard() {
                         return (
                           <TableRow key={rec.id ?? i}>
                             <TableCell>
-                              {formatDate(rec.period_start)} — {formatDate(rec.period_end)}
+                              {formatDate(rec.period_start)}  -  {formatDate(rec.period_end)}
                             </TableCell>
                             <TableCell>
                               <StatusBadge status={rec.status ?? 'draft'} />
@@ -693,10 +693,10 @@ function TrustDashboard() {
                               )}
                             </TableCell>
                             <TableCell className="text-right font-mono">
-                              {rec.book_balance_cents != null ? formatCurrency(rec.book_balance_cents) : '—'}
+                              {rec.book_balance_cents != null ? formatCurrency(rec.book_balance_cents) : ' - '}
                             </TableCell>
                             <TableCell className="text-right font-mono">
-                              {rec.bank_balance_cents != null ? formatCurrency(rec.bank_balance_cents) : '—'}
+                              {rec.bank_balance_cents != null ? formatCurrency(rec.bank_balance_cents) : ' - '}
                             </TableCell>
                             <TableCell>{formatDateTime(rec.completed_at)}</TableCell>
                           </TableRow>
@@ -714,7 +714,7 @@ function TrustDashboard() {
         <TabsContent value="audit">
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Norva Vault — Trust Audit Trail</CardTitle>
+              <CardTitle className="text-base">Norva Vault  -  Trust Audit Trail</CardTitle>
             </CardHeader>
             <CardContent>
               {auditLoading ? (
@@ -753,10 +753,10 @@ function TrustDashboard() {
                                 {(e.action ?? '').replace(/_/g, ' ')}
                               </Badge>
                             </TableCell>
-                            <TableCell>{e.user_name ?? e.user_email ?? '—'}</TableCell>
-                            <TableCell className="max-w-[250px] truncate">{e.details ?? '—'}</TableCell>
+                            <TableCell>{e.user_name ?? e.user_email ?? ' - '}</TableCell>
+                            <TableCell className="max-w-[250px] truncate">{e.details ?? ' - '}</TableCell>
                             <TableCell className="text-xs text-slate-500">
-                              {e.reference_type ? `${e.reference_type}:${e.reference_id ?? ''}` : '—'}
+                              {e.reference_type ? `${e.reference_type}:${e.reference_id ?? ''}` : ' - '}
                             </TableCell>
                           </TableRow>
                         )

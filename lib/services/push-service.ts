@@ -52,7 +52,7 @@ export async function sendPushNotification(
   payload: PushPayload,
 ): Promise<number> {
   if (!ensureVapid()) {
-    log.debug('Push notification skipped — VAPID keys not configured')
+    log.debug('Push notification skipped  -  VAPID keys not configured')
     return 0
   }
 

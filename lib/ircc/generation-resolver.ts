@@ -1,5 +1,5 @@
 /**
- * IRCC Forms Engine — Generation Resolver (Module L)
+ * IRCC Forms Engine  -  Generation Resolver (Module L)
  *
  * Bridges the per-instance answer engine to the existing generation pipeline.
  * Resolves per-instance answers into the flat resolved_fields map that the
@@ -34,7 +34,7 @@ export interface GenerationResolverResult {
   conflicts: Array<{ profilePath: string; reason: string }>
   /** Fields that were skipped (empty/null) */
   skippedPaths: string[]
-  /** Validation gate result — must be canGenerate=true to proceed */
+  /** Validation gate result  -  must be canGenerate=true to proceed */
   readinessCheck: {
     canGenerate: boolean
     blockerCount: number
@@ -98,7 +98,7 @@ export function transformValueForXfa(
     return value ? trueVal : falseVal
   }
 
-  // Date split — extract year/month/day component from YYYY-MM-DD string
+  // Date split  -  extract year/month/day component from YYYY-MM-DD string
   if (field.date_split && typeof value === 'string') {
     const parts = value.split('-')
     if (parts.length === 3) {
@@ -111,7 +111,7 @@ export function transformValueForXfa(
           return parts[2]
       }
     }
-    // Malformed date — return as-is
+    // Malformed date  -  return as-is
   }
 
   // Number -> string

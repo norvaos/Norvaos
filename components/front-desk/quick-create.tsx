@@ -90,7 +90,7 @@ const ALL_COUNTRIES = [
 ]
 
 // ─── Default Screening Questions ─────────────────────────────────────────────
-// Imported from shared utils — single source of truth for the full question set.
+// Imported from shared utils  -  single source of truth for the full question set.
 // Cast to TenantKioskQuestion[] so the ScreeningQuestions renderer accepts them.
 
 const DEFAULT_SCREENING_QUESTIONS = SHARED_SCREENING_QUESTIONS as unknown as TenantKioskQuestion[]
@@ -148,7 +148,7 @@ function CountryPicker({ value, onChange }: { value: string; onChange: (v: strin
 }
 
 // ─── Screening Questions Renderer ────────────────────────────────────────────
-// One question at a time — compact stepper with progress bar.
+// One question at a time  -  compact stepper with progress bar.
 
 function ScreeningQuestions({
   questions,
@@ -556,7 +556,7 @@ export function QuickCreate({ onCreated }: QuickCreateProps) {
   }
 
   function validateStep2(): boolean {
-    // practiceAreaId is optional — no required fields remain on this step
+    // practiceAreaId is optional  -  no required fields remain on this step
     setStep2Errors({})
     return true
   }
@@ -605,7 +605,7 @@ export function QuickCreate({ onCreated }: QuickCreateProps) {
       // Go to screening step
       setStep(3)
     } else {
-      // No screening — submit now
+      // No screening  -  submit now
       try {
         await createMutation.mutateAsync()
         toast.success('Intake created successfully')

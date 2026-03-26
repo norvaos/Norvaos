@@ -1,6 +1,6 @@
 /**
- * GET  /api/trust-accounting/compliance-snapshots — List compliance snapshots
- * POST /api/trust-accounting/compliance-snapshots — Generate a new snapshot
+ * GET  /api/trust-accounting/compliance-snapshots  -  List compliance snapshots
+ * POST /api/trust-accounting/compliance-snapshots  -  Generate a new snapshot
  */
 
 import { NextRequest, NextResponse } from 'next/server'

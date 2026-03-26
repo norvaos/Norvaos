@@ -88,7 +88,7 @@ export function useCalendarEvents(
 
       // Fetch deadlines, tasks, and calendar events in parallel
       const [deadlinesRes, tasksRes, calEventsRes, recurringEventsRes] = await Promise.all([
-        // Deadlines — exclude completed/dismissed
+        // Deadlines  -  exclude completed/dismissed
         (() => {
           let q = supabase
             .from('matter_deadlines')
@@ -104,7 +104,7 @@ export function useCalendarEvents(
           return q
         })(),
 
-        // Tasks — exclude deleted, must have due_date
+        // Tasks  -  exclude deleted, must have due_date
         (() => {
           let q = supabase
             .from('tasks')
@@ -121,7 +121,7 @@ export function useCalendarEvents(
           return q
         })(),
 
-        // Calendar events — only active, within date range (non-recurring)
+        // Calendar events  -  only active, within date range (non-recurring)
         (() => {
           let q = supabase
             .from('calendar_events')
@@ -138,7 +138,7 @@ export function useCalendarEvents(
           return q
         })(),
 
-        // Recurring calendar events — fetch all active recurring events
+        // Recurring calendar events  -  fetch all active recurring events
         // Their start_at may be before rangeStart, but occurrences recur into range
         (() => {
           let q = supabase
@@ -228,7 +228,7 @@ export function useCalendarEvents(
         ...expandedRecurring,
       ]
 
-      // Normalize calendar events (no FK joins — types not registered)
+      // Normalize calendar events (no FK joins  -  types not registered)
       const calendarEventItems: CalendarEvent[] = allCalendarEventRows.map((row) => ({
         id: `event-${row.id}`,
         source: 'event' as const,

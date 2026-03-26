@@ -1,6 +1,6 @@
 /**
- * GET    /api/trust-accounting/disbursements/[id] — Get disbursement request detail
- * PATCH  /api/trust-accounting/disbursements/[id] — Approve or reject a disbursement request
+ * GET    /api/trust-accounting/disbursements/[id]  -  Get disbursement request detail
+ * PATCH  /api/trust-accounting/disbursements/[id]  -  Approve or reject a disbursement request
  */
 
 import { NextRequest, NextResponse } from 'next/server'
@@ -85,7 +85,7 @@ export async function PATCH(
     }
 
     if (action === 'approve') {
-      // C4: Segregation of duties — approver cannot be preparer
+      // C4: Segregation of duties  -  approver cannot be preparer
       if (req.prepared_by === auth.userId) {
         return NextResponse.json(
           { success: false, error: 'Segregation of duties: the preparer cannot approve their own disbursement request' },

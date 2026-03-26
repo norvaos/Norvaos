@@ -18,7 +18,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
  *
  * Body: { contactId: string, formCode: string }
  *
- * Form code is validated against ircc_forms in the DB — any active form the
+ * Form code is validated against ircc_forms in the DB  -  any active form the
  * tenant has uploaded is accepted (not a hardcoded allow-list).
  *
  * Template loading order:
@@ -46,7 +46,7 @@ async function handlePost(request: Request) {
     const body = await request.json()
     const { contactId, matterId, personRole = 'principal_applicant', formCode } = body as {
       contactId?: string
-      matterId?: string   // preferred — reads matter-scoped profile
+      matterId?: string   // preferred  -  reads matter-scoped profile
       personRole?: string // which person in the matter (default: principal_applicant)
       formCode?: string
     }
@@ -65,7 +65,7 @@ async function handlePost(request: Request) {
       )
     }
 
-    // 3. Validate form code against DB — any active form for this tenant is valid
+    // 3. Validate form code against DB  -  any active form for this tenant is valid
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: dbForm, error: dbFormError } = await (admin as any)
       .from('ircc_forms')
@@ -86,7 +86,7 @@ async function handlePost(request: Request) {
       )
     }
 
-    // 4. Resolve profile — matter-scoped takes priority over contact canonical
+    // 4. Resolve profile  -  matter-scoped takes priority over contact canonical
     //
     //   Path A (preferred): matterId provided → read matter_people.profile_data
     //     for the specified person_role. This is the matter-scoped snapshot.
@@ -123,7 +123,7 @@ async function handlePost(request: Request) {
         .maybeSingle()
 
       if (formInstance?.id && formInstance.answers && Object.keys(formInstance.answers as object).length > 0) {
-        // Use instance answers — flatten AnswerMap to profile shape
+        // Use instance answers  -  flatten AnswerMap to profile shape
         const instanceAnswers = formInstance.answers as Record<string, { value: unknown }>
         for (const [path, record] of Object.entries(instanceAnswers)) {
           if (record?.value !== null && record?.value !== undefined) {
@@ -178,7 +178,7 @@ async function handlePost(request: Request) {
         }
       }
     } else {
-      // Path B: legacy — contact-level canonical profile
+      // Path B: legacy  -  contact-level canonical profile
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { data: contact, error: contactError } = await (admin as any)
         .from('contacts')
@@ -221,7 +221,7 @@ async function handlePost(request: Request) {
       blankPdfBytes = new Uint8Array(buf)
       resolvedTemplatePath = localTemplatePath
     } catch {
-      // Local file missing — download from Supabase Storage
+      // Local file missing  -  download from Supabase Storage
       const { data: storageBlob, error: storageErr } = await admin.storage
         .from('documents')
         .download(dbForm.storage_path)
@@ -250,10 +250,10 @@ async function handlePost(request: Request) {
       const fieldCount = testDoc.getForm().getFields().length
 
       if (fieldCount > 0) {
-        // Template has fillable AcroForm fields — fill them with pdf-lib
+        // Template has fillable AcroForm fields  -  fill them with pdf-lib
         pdfBytes = await fillIRCCForm(blankPdfBytes, profile, formCode)
       } else {
-        // Template is XFA-based — fill via DB-driven XFA engine (pikepdf/Python)
+        // Template is XFA-based  -  fill via DB-driven XFA engine (pikepdf/Python)
         // CRITICAL: No fallback to summary PDF for IRCC forms.
         console.log(
           `[generate-pdf] ${formCode} is XFA. Using DB-driven fill (form id: ${dbForm.id})`,

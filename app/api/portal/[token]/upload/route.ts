@@ -4,7 +4,7 @@ import { createRateLimiter } from '@/lib/middleware/rate-limit'
 import { withTiming } from '@/lib/middleware/request-timing'
 import { validatePortalToken, PortalAuthError } from '@/lib/services/portal-auth'
 
-// 30 requests per minute per IP — prevents brute-force token enumeration
+// 30 requests per minute per IP  -  prevents brute-force token enumeration
 const tokenLookupLimiter = createRateLimiter({ windowMs: 60_000, maxRequests: 30 })
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10 MB

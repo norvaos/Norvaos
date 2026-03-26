@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * Migration Demo Page — Clio-Escape Onboarding Experience (Directive 7.2)
+ * Migration Demo Page  -  Clio-Escape Onboarding Experience (Directive 7.2)
  *
  * Standalone demo page showing the dramatic migration progress bar.
  * Access: /onboarding/migration-demo

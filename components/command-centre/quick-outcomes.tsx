@@ -101,7 +101,7 @@ export function QuickOutcomes() {
     [stages]
   )
 
-  // Current stage detection — highlight button matching current stage
+  // Current stage detection  -  highlight button matching current stage
   const currentStageId = lead?.stage_id
   const isAtConsult = currentStageId === consultStage?.id
   const isAtRetainerSent = currentStageId === retainerSentStage?.id
@@ -183,7 +183,7 @@ export function QuickOutcomes() {
   return (
     <>
       <div className="px-4 py-2 flex items-center gap-2 overflow-x-auto">
-        {/* Book Consult — Step 1 Gate: Conflict check must be initiated */}
+        {/* Book Consult  -  Step 1 Gate: Conflict check must be initiated */}
         <Button
           variant={isAtConsult ? 'default' : 'outline'}
           size="sm"
@@ -231,7 +231,7 @@ export function QuickOutcomes() {
           <span className="md:hidden">No-Show</span>
         </Button>
 
-        {/* Send Retainer — Step 2 Gate: Conflict check + Gov ID required */}
+        {/* Send Retainer  -  Step 2 Gate: Conflict check + Gov ID required */}
         <Button
           variant={isAtRetainerSent ? 'default' : 'outline'}
           size="sm"

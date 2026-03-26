@@ -1,5 +1,5 @@
 /**
- * Kiosk-specific rate limiter — keyed by tenant token + IP.
+ * Kiosk-specific rate limiter  -  keyed by tenant token + IP.
  *
  * Applies sliding-window rate limiting to all kiosk API endpoints.
  * Reuses the in-memory createRateLimiter() from rate-limit.ts.

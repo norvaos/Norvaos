@@ -7,7 +7,7 @@ import { withTiming } from '@/lib/middleware/request-timing'
 /**
  * POST /api/admin/tenants/[id]/cache
  *
- * Platform-admin ONLY — purge all cached data for a tenant.
+ * Platform-admin ONLY  -  purge all cached data for a tenant.
  *
  * Body: { reason: string }
  */
@@ -26,7 +26,7 @@ const handlePost = withPlatformAdmin(async (request, { params, adminCtx, ip, use
 
   if (!isRedisEnabled()) {
     return NextResponse.json({
-      data: { tenant_id: tenantId, purged: false, message: 'Redis not enabled — no cache to purge.' },
+      data: { tenant_id: tenantId, purged: false, message: 'Redis not enabled  -  no cache to purge.' },
       error: null,
     })
   }

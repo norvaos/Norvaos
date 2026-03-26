@@ -123,7 +123,7 @@ export function KioskQuestions({
                 <p className="text-sm text-slate-500">{r.description}</p>
               )}
 
-              {/* Select — radio cards */}
+              {/* Select  -  radio cards */}
               {q.field_type === 'select' && (
                 <div className="grid gap-2">
                   {r.options.map((opt) => {
@@ -149,7 +149,7 @@ export function KioskQuestions({
                 </div>
               )}
 
-              {/* Multi-select — checkable cards */}
+              {/* Multi-select  -  checkable cards */}
               {q.field_type === 'multi_select' && (
                 <div className="grid gap-2">
                   {r.options.map((opt) => {
@@ -213,7 +213,7 @@ export function KioskQuestions({
                 />
               )}
 
-              {/* Boolean — Yes/No buttons */}
+              {/* Boolean  -  Yes/No buttons */}
               {q.field_type === 'boolean' && (
                 <div className="flex gap-3">
                   {[
@@ -243,7 +243,7 @@ export function KioskQuestions({
           )
         })}
 
-        {/* Additional comments — always shown */}
+        {/* Additional comments  -  always shown */}
         <div className="space-y-2 pt-4 border-t border-slate-200">
           <label className="text-sm font-medium text-slate-900">
             {t.questions_additional_comments}

@@ -1,5 +1,5 @@
 // ============================================================================
-// Jurisdiction Configuration — v1: Canada-only
+// Jurisdiction Configuration  -  v1: Canada-only
 // ============================================================================
 
 export interface JurisdictionDef {
@@ -52,7 +52,7 @@ export const CANADIAN_PROVINCES: ProvinceDef[] = [
 // ── Regulatory Bodies ────────────────────────────────────────────────────────
 // Covers both provincial Law Societies (for lawyers/paralegals) and federal
 // bodies (CICC for immigration consultants). A firm selects their primary
-// regulatory body — this drives compliance rules system-wide.
+// regulatory body  -  this drives compliance rules system-wide.
 
 export type RegulatoryScope = 'provincial' | 'federal'
 
@@ -68,7 +68,7 @@ export interface RegulatoryBodyDef {
 
 export const REGULATORY_BODIES: RegulatoryBodyDef[] = [
   // ── Federal ──
-  { code: 'CICC', name: 'College of Immigration and Citizenship Consultants', abbr: 'CICC', scope: 'federal', provinceCode: null, description: 'Regulates Regulated Canadian Immigration Consultants (RCICs) — federal jurisdiction' },
+  { code: 'CICC', name: 'College of Immigration and Citizenship Consultants', abbr: 'CICC', scope: 'federal', provinceCode: null, description: 'Regulates Regulated Canadian Immigration Consultants (RCICs)  -  federal jurisdiction' },
   // ── Provincial (A–Z) ──
   { code: 'LSA',  name: 'Law Society of Alberta', abbr: 'LSA', scope: 'provincial', provinceCode: 'AB', description: 'Regulates lawyers and articling students in Alberta' },
   { code: 'LSBC', name: 'Law Society of British Columbia', abbr: 'LSBC', scope: 'provincial', provinceCode: 'BC', description: 'Regulates lawyers and articling students in British Columbia' },

@@ -1,5 +1,5 @@
 // ============================================================================
-// Invoice Audit Service — append-only audit log writer (Billing Module)
+// Invoice Audit Service  -  append-only audit log writer (Billing Module)
 // ============================================================================
 // The invoice_audit_log table has DB-level triggers that block UPDATE and
 // DELETE, making this an append-only ledger.  All mutations in the billing
@@ -27,7 +27,7 @@ export interface AppendAuditEventInput {
   /**
    * The authenticated user performing the action.
    * Pass null for system-driven events (e.g. portal-view with no auth user).
-   * When null the audit row is silently skipped — performed_by is NOT NULL.
+   * When null the audit row is silently skipped  -  performed_by is NOT NULL.
    */
   performedBy: string | null
   eventType: InvoiceAuditEventType
@@ -40,7 +40,7 @@ export interface AppendAuditEventInput {
 /**
  * Append a single event to invoice_audit_log.
  *
- * This function never throws — audit log failures are logged to console.error
+ * This function never throws  -  audit log failures are logged to console.error
  * so they never block the primary billing operation.
  *
  * If performedBy is null the insert is skipped entirely because performed_by
@@ -58,7 +58,7 @@ export async function appendAuditEvent(input: AppendAuditEventInput): Promise<vo
     changedFields,
   } = input
 
-  // performed_by is NOT NULL in the DB — skip rather than fail on null
+  // performed_by is NOT NULL in the DB  -  skip rather than fail on null
   if (!performedBy) {
     return
   }

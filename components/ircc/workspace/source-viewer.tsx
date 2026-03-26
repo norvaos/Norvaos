@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * SourceViewer — Column 2
+ * SourceViewer  -  Column 2
  *
  * Left pane: scrollable list of document slots.
  *   - Green check = document present
@@ -79,7 +79,7 @@ function SlotRow({ slot, isActive, isPinned, onSelect, onPin }: SlotRowProps) {
           </p>
         )}
         {!hasDoc && isRequired && (
-          <p className="text-[10px] text-red-500 mt-0.5">Required — missing</p>
+          <p className="text-[10px] text-red-500 mt-0.5">Required  -  missing</p>
         )}
       </div>
 
@@ -250,7 +250,7 @@ export function SourceViewer({
 
   return (
     <div className="flex h-full overflow-hidden">
-      {/* Slot list — 38% */}
+      {/* Slot list  -  38% */}
       <div className="w-[38%] shrink-0 border-r flex flex-col overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between px-3 py-2 border-b bg-muted/30 shrink-0">
@@ -284,7 +284,7 @@ export function SourceViewer({
         </ScrollArea>
       </div>
 
-      {/* PDF viewer — 62% */}
+      {/* PDF viewer  -  62% */}
       <div className="flex-1 min-w-0 overflow-hidden">
         {activeSlot
           ? <PDFViewer slot={activeSlot as SlotWithDoc} />

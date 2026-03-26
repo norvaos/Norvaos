@@ -1,5 +1,5 @@
 -- ============================================================================
--- Migration 107: NorvaOS Billing Module — Full Invoice Engine
+-- Migration 107: NorvaOS Billing Module  -  Full Invoice Engine
 -- ============================================================================
 --
 -- A. Fix existing trigger: prevent_paid_invoice_mutation references old column
@@ -122,7 +122,7 @@ ALTER TABLE invoices
 ALTER TABLE invoices
   ADD COLUMN IF NOT EXISTS currency_code TEXT NOT NULL DEFAULT 'CAD';
 
--- Category subtotals (cents) — cached, updated by calculate_invoice_totals()
+-- Category subtotals (cents)  -  cached, updated by calculate_invoice_totals()
 ALTER TABLE invoices
   ADD COLUMN IF NOT EXISTS subtotal_fees            INTEGER NOT NULL DEFAULT 0,
   ADD COLUMN IF NOT EXISTS subtotal_disbursements   INTEGER NOT NULL DEFAULT 0,
@@ -235,7 +235,7 @@ COMMENT ON TABLE billing_categories IS
   'System-level reference table. Immutable. '
   'Defines the four billing line categories used throughout the invoice engine.';
 
--- No RLS needed — system reference table, publicly readable
+-- No RLS needed  -  system reference table, publicly readable
 
 -- ── F2. disbursement_categories ─────────────────────────────────────────────
 
@@ -810,7 +810,7 @@ CREATE TRIGGER trg_guard_invoice_financial_fields
   BEFORE UPDATE ON invoices
   FOR EACH ROW EXECUTE FUNCTION guard_invoice_financial_fields();
 
--- ── I3. calculate_invoice_totals() — the only authorised path to update ───────
+-- ── I3. calculate_invoice_totals()  -  the only authorised path to update ───────
 --       invoice financial fields. Called by service layer via supabase.rpc().
 
 CREATE OR REPLACE FUNCTION calculate_invoice_totals(p_invoice_id UUID)

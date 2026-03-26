@@ -44,7 +44,7 @@ const RULE_TYPES_ORDER: RuleType[] = [
   'form_pack_config',
 ]
 
-// ── Hash helper (Web Crypto API — browser-compatible) ─────────────────────────
+// ── Hash helper (Web Crypto API  -  browser-compatible) ─────────────────────────
 
 function sortedStringify(value: unknown): string {
   if (value === null || typeof value !== 'object' || Array.isArray(value)) {
@@ -129,7 +129,7 @@ function SnapshotCard({ snapshot, currentMatterTypeHash }: SnapshotCardProps) {
     day: 'numeric',
   })
 
-  // Drift detection — only meaningful for matter_type_config (we have the live hash)
+  // Drift detection  -  only meaningful for matter_type_config (we have the live hash)
   let driftBadge: ReactNode = null
   if (snapshot.rule_type === 'matter_type_config' && currentMatterTypeHash != null) {
     const isDrifted = currentMatterTypeHash !== snapshot.version_hash

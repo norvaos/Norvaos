@@ -1,15 +1,15 @@
 'use client'
 
 /**
- * I18nProvider — Global i18n context (Directive 32.0 Nuclear Fix)
+ * I18nProvider  -  Global i18n context (Directive 32.0 Nuclear Fix)
  *
  * Single source of truth for locale, dictionary, and text direction.
  * Locale changes propagate to all consumers via React context.
  *
  * PERSISTENCE HIERARCHY (Database is Supreme Commander):
- *   1. DB `users.locale_preference` — authoritative, loaded via userLocalePreference prop
- *   2. localStorage `norva-locale` — client-side cache, PURGED if DB disagrees
- *   3. Browser detection — fallback only if both DB and localStorage are empty
+ *   1. DB `users.locale_preference`  -  authoritative, loaded via userLocalePreference prop
+ *   2. localStorage `norva-locale`  -  client-side cache, PURGED if DB disagrees
+ *   3. Browser detection  -  fallback only if both DB and localStorage are empty
  *
  * On setLocale:
  *   - Updates React state immediately
@@ -49,7 +49,7 @@ import { loadDictionary } from './dictionaries'
 interface I18nContextValue {
   /** Current locale code */
   locale: LocaleCode
-  /** Switch locale — persists to localStorage, DB, and updates document direction */
+  /** Switch locale  -  persists to localStorage, DB, and updates document direction */
   setLocale: (code: LocaleCode) => void
   /** Translate a dot-path dictionary key; falls back to English, then the raw key */
   t: (key: DictionaryKey, fallback?: string) => string
@@ -71,7 +71,7 @@ interface I18nProviderProps {
   children: ReactNode
   /** Which audience is this provider serving? Defaults to 'client'. */
   audience?: LocaleAudience
-  /** DB locale_preference from the users table — Supreme Commander */
+  /** DB locale_preference from the users table  -  Supreme Commander */
   userLocalePreference?: string | null
   /** Whether the user data is still loading */
   userLoading?: boolean
@@ -97,7 +97,7 @@ export function I18nProvider({
   // ── NUCLEAR FIX #1: DB is Supreme Commander ────────────────────────────────
   // When userLocalePreference arrives from DB, it OVERRIDES everything.
   // localStorage is purged if it conflicts.
-  // CRITICAL: Dictionary is loaded BEFORE isHydrated is set — no flash of English.
+  // CRITICAL: Dictionary is loaded BEFORE isHydrated is set  -  no flash of English.
   useEffect(() => {
     // Don't hydrate until user loading is complete
     if (userLoading) return
@@ -117,7 +117,7 @@ export function I18nProvider({
         persistLocale(targetLocale)
       }
     } else {
-      // No DB preference — fall back to localStorage → browser detection
+      // No DB preference  -  fall back to localStorage → browser detection
       const persisted = getPersistedLocale()
       if (persisted) {
         targetLocale = clampLocaleForAudience(persisted, audience)
@@ -131,9 +131,9 @@ export function I18nProvider({
     applyDocumentDirection(targetLocale)
     setLocaleState(targetLocale)
 
-    // Load the dictionary BEFORE marking hydrated — no English flash
+    // Load the dictionary BEFORE marking hydrated  -  no English flash
     loadDictionary(targetLocale).then((dict) => {
-      console.info('[I18nProvider] Dictionary loaded for:', targetLocale, '— keys:', Object.keys(dict).length)
+      console.info('[I18nProvider] Dictionary loaded for:', targetLocale, ' -  keys:', Object.keys(dict).length)
       setDictionary(dict)
       setIsHydrated(true)
     })
@@ -142,7 +142,7 @@ export function I18nProvider({
   // ── Load dictionary lazily when locale changes AFTER initial hydration ───
   const initialLocaleRef = useRef<LocaleCode | null>(null)
   useEffect(() => {
-    // Skip the initial load — handled by the hydration effect above
+    // Skip the initial load  -  handled by the hydration effect above
     if (!isHydrated) return
     if (initialLocaleRef.current === null) {
       initialLocaleRef.current = locale
@@ -200,7 +200,7 @@ export function I18nProvider({
     [locale, setLocale, t, dictionary, isRTL, userLocalePreference, isHydrated],
   )
 
-  // NUCLEAR FIX #1: Block rendering until hydrated — no flash of English
+  // NUCLEAR FIX #1: Block rendering until hydrated  -  no flash of English
   if (!isHydrated) {
     return (
       <I18nContext.Provider value={value}>

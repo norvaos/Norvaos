@@ -1,11 +1,11 @@
 -- ============================================================================
 -- Migration 180: SENTINEL Emergency Lockdown Protocol + Chain of Custody
 -- ============================================================================
--- Directive 2.4: Kill-Switch — auto-revoke session + lock matter on:
+-- Directive 2.4: Kill-Switch  -  auto-revoke session + lock matter on:
 --   - 3+ DOCUMENT_TAMPER events from same user in 1 hour
 --   - Unauthorized PII_REVEAL from suspicious pattern (rate limit breach)
 --
--- Directive 2.5: Chain of Custody — audit report data view for PDF export
+-- Directive 2.5: Chain of Custody  -  audit report data view for PDF export
 -- ============================================================================
 
 
@@ -75,7 +75,7 @@ BEGIN
     AND event_type = p_event_type
     AND created_at > now() - (p_window_minutes || ' minutes')::INTERVAL;
 
-  -- Below threshold — no action
+  -- Below threshold  -  no action
   IF _event_count < p_threshold THEN
     RETURN jsonb_build_object(
       'locked', false,

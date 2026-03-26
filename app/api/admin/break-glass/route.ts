@@ -7,7 +7,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 
 /**
  * GET /api/admin/break-glass
- * Admin-only — requirePermission throws 403 if unauthorised.
+ * Admin-only  -  requirePermission throws 403 if unauthorised.
  *
  * Returns all active break-glass grants for the tenant.
  * Requires settings:view permission.

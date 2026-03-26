@@ -1,5 +1,5 @@
 /**
- * Ghost-Writer — AI email reply draft generator.
+ * Ghost-Writer  -  AI email reply draft generator.
  *
  * For every inbound email associated with a matter, Ghost-Writer pre-generates
  * a professional response draft using the matter's context (client info,
@@ -52,14 +52,14 @@ function buildGhostWriterSystemPrompt(lawyerName: string | null): string {
 
 RULES:
 - Write a concise, professional reply to the inbound email.
-- Keep the tone warm but formal — this is a law firm communicating with a client.
+- Keep the tone warm but formal  -  this is a law firm communicating with a client.
 - Reference specific case details from the matter context when relevant.
 - If the email asks about timelines, acknowledge the question but avoid making promises.
 - If the email contains documents or attachments, acknowledge receipt.
 - Never fabricate case facts, dates, or immigration status information.
 - If you lack information to answer a question, write "[REVIEW NEEDED: ...]" so the lawyer knows to fill in.
 - Keep the response under 200 words unless the complexity warrants more.
-- Do NOT include a subject line — just the reply body.
+- Do NOT include a subject line  -  just the reply body.
 - Start the reply with a greeting (e.g., "Dear [Name],") and end with a professional closing.
 - Use Canadian English spelling (colour, organisation, etc.).`
 }

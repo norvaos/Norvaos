@@ -83,7 +83,7 @@ function StagesZoneSkeleton() {
       {/* Progress bar skeleton */}
       <Skeleton className="h-1.5 w-full rounded-full" />
 
-      {/* Chevron stepper skeleton — 5 segments */}
+      {/* Chevron stepper skeleton  -  5 segments */}
       <div className="flex w-full gap-[3px]">
         {Array.from({ length: 5 }).map((_, i) => (
           <Skeleton

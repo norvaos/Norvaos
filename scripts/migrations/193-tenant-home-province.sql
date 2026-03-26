@@ -5,7 +5,7 @@
 --          and Place-of-Supply tax logic.
 -- ============================================================================
 
--- Add column (nullable — existing tenants keep NULL until configured)
+-- Add column (nullable  -  existing tenants keep NULL until configured)
 ALTER TABLE tenants
   ADD COLUMN IF NOT EXISTS home_province TEXT;
 

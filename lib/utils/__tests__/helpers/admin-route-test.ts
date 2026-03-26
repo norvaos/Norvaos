@@ -11,7 +11,7 @@
  *   const res = await statusPATCH(req, { params: Promise.resolve({ id: TEST_IDS.TENANT_ID }) })
  */
 
-/** Standard test UUIDs — deterministic for assertion matching */
+/** Standard test UUIDs  -  deterministic for assertion matching */
 export const TEST_IDS = {
   TENANT_ID: '00000000-0000-0000-0000-000000000001',
   USER_ID: '00000000-0000-0000-0000-000000000002',
@@ -20,7 +20,7 @@ export const TEST_IDS = {
   INVITE_ID: '00000000-0000-0000-0000-000000000005',
 } as const
 
-/** Standard PLATFORM_ADMIN_SECRET for tests — must match vi.stubEnv */
+/** Standard PLATFORM_ADMIN_SECRET for tests  -  must match vi.stubEnv */
 export const TEST_ADMIN_SECRET = 'test-platform-admin-secret-for-tests'
 
 export interface AdminRequestOptions {

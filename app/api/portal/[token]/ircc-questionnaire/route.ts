@@ -5,7 +5,7 @@ import { withTiming } from '@/lib/middleware/request-timing'
 import { countClientVisibleFields } from '@/lib/ircc/questionnaire-engine-db'
 import { validatePortalToken, PortalAuthError } from '@/lib/services/portal-auth'
 
-// 30 requests per minute per IP — prevents brute-force token enumeration
+// 30 requests per minute per IP  -  prevents brute-force token enumeration
 const tokenLookupLimiter = createRateLimiter({ windowMs: 60_000, maxRequests: 30 })
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -262,7 +262,7 @@ async function handleGet(
     }
 
     // ── 6. Return response ────────────────────────────────────────────────────
-    // ALWAYS return current form_codes from DB — never use stale session form_codes.
+    // ALWAYS return current form_codes from DB  -  never use stale session form_codes.
     // If the matter type has no forms configured, return null so the portal
     // shows "no questionnaire available" instead of wrong/stale questions.
     return NextResponse.json({
@@ -451,11 +451,11 @@ async function handlePost(
         }
       }
     } catch (instanceErr) {
-      // Non-fatal — contacts.immigration_data write already succeeded
+      // Non-fatal  -  contacts.immigration_data write already succeeded
       console.error('[portal-ircc-questionnaire] Instance dual-write error (non-fatal):', instanceErr)
     }
 
-    // Mark session as having portal saves — prevents stale contact immigration_data
+    // Mark session as having portal saves  -  prevents stale contact immigration_data
     // from pre-filling this session on subsequent GET requests.
     if (session && !complete) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -501,7 +501,7 @@ async function handlePost(
         void (admin as any).from('profile_field_history').insert(historyRows)
       }
     } catch {
-      // History is non-critical — never block the main save
+      // History is non-critical  -  never block the main save
     }
 
     // If completing, mark the session as completed

@@ -1,14 +1,14 @@
 'use client'
 
 /**
- * useFieldLock — Field-level locking via Supabase Realtime broadcast.
+ * useFieldLock  -  Field-level locking via Supabase Realtime broadcast.
  *
  * When Lawyer A starts editing a field, they broadcast a "field_lock" event.
  * Lawyer B sees "Lawyer A is editing..." and the field becomes read-only.
  * When Lawyer A stops typing (5s timeout) or blurs, a "field_unlock" is sent.
  *
  * Uses broadcast (not presence) because field locks are ephemeral actions
- * that don't need to survive reconnection — if a user disconnects, their
+ * that don't need to survive reconnection  -  if a user disconnects, their
  * locks automatically expire via the timeout.
  *
  * SENTINEL: tenant_id is included in the payload so cross-tenant leaks

@@ -75,7 +75,7 @@ async function handlePost(
     }
 
     // 4. Contact-level DOB lockout (Phase 6 hardening)
-    // Tracks attempts by contact_id, not session — prevents session restart bypass
+    // Tracks attempts by contact_id, not session  -  prevents session restart bypass
     const metadata = (session.metadata ?? {}) as Record<string, unknown>
 
     if (session.contact_id) {
@@ -102,7 +102,7 @@ async function handlePost(
 
     // 5. Look up contact's DOB
     if (!session.contact_id) {
-      // New client — no contact record, skip verification
+      // New client  -  no contact record, skip verification
       await admin
         .from('check_in_sessions')
         .update({
@@ -134,7 +134,7 @@ async function handlePost(
       ?? null
 
     if (!storedDob) {
-      // No DOB on file — auto-verify (new/incomplete profile)
+      // No DOB on file  -  auto-verify (new/incomplete profile)
       await admin
         .from('check_in_sessions')
         .update({
@@ -209,7 +209,7 @@ async function handlePost(
       )
     }
 
-    // 7. Verification passed — update session
+    // 7. Verification passed  -  update session
     await admin
       .from('check_in_sessions')
       .update({

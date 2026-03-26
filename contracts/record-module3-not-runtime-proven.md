@@ -1,7 +1,7 @@
-# Formal Record — Module 3 Runtime Proof Status
+# Formal Record  -  Module 3 Runtime Proof Status
 
 **Record Type:** Delivery Classification Note
-**Module:** Team 3 / Module 3 — Demo Environment Tooling
+**Module:** Team 3 / Module 3  -  Demo Environment Tooling
 **Date Recorded:** 2026-03-16
 **Recorded By:** Team 3 (Claude Code delivery agent)
 **Review Cycle:** Team 3 Final Closeout, 2026-03-14 to 2026-03-16
@@ -66,7 +66,7 @@ Inserting time entries... 25 rows
 Validating row counts...  PASS
 Manifest written: scripts/demo/manifests/seed-<timestamp>.json
 
-DONE — demo tenant seeded successfully.
+DONE  -  demo tenant seeded successfully.
 ```
 
 ### verify-demo-isolation output (expected format)
@@ -100,7 +100,7 @@ Deleting contacts...      20 rows deleted
 Reseed requested. Running seed...
 [seed output follows]
 
-DONE — demo tenant reset and reseeded.
+DONE  -  demo tenant reset and reseeded.
 ```
 
 ---
@@ -113,7 +113,7 @@ This record is closed and Module 3 is considered **runtime-proven** when an oper
 2. Runs `verify-demo-isolation.ts` and attaches the full console output showing ALL CHECKS PASSED
 3. Runs `reset-demo-tenant.ts` with `--delete-only` and attaches the deletion counts
 
-Attach those outputs to the Team 3 closeout package and mark Module 3 as `RUNTIME PROVEN — [date]`.
+Attach those outputs to the Team 3 closeout package and mark Module 3 as `RUNTIME PROVEN  -  [date]`.
 
 ---
 
@@ -123,7 +123,7 @@ The seed and reset scripts will refuse to run against a non-demo tenant unless `
 
 ```typescript
 if (!DEMO_TENANT_ID.includes('demo') && process.env.ALLOW_NON_DEMO_TENANT !== 'true') {
-  console.error('ABORTED — DEMO_TENANT_ID does not contain "demo"')
+  console.error('ABORTED  -  DEMO_TENANT_ID does not contain "demo"')
   process.exit(1)
 }
 ```

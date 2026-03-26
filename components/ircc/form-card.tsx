@@ -100,7 +100,7 @@ export function FormCard({
         <div className="mt-3 flex items-center justify-between">
           <div className="min-w-0">
             <p className="text-xs text-slate-400">
-              {form.file_name} ({form.file_size ? `${(form.file_size / 1024).toFixed(0)} KB` : '—'})
+              {form.file_name} ({form.file_size ? `${(form.file_size / 1024).toFixed(0)} KB` : ' - '})
             </p>
             {form.form_date && (
               <p className="text-[10px] text-slate-400 mt-0.5">
@@ -109,7 +109,7 @@ export function FormCard({
             )}
           </div>
           <div className="flex items-center gap-1">
-            {/* Edit fields link — navigates to dedicated field editor */}
+            {/* Edit fields link  -  navigates to dedicated field editor */}
             <Link
               href={`/settings/ircc-form-library/${form.id}`}
               onClick={(e) => e.stopPropagation()}

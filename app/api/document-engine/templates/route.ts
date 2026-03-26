@@ -1,6 +1,6 @@
 /**
- * GET  /api/document-engine/templates — List templates
- * POST /api/document-engine/templates — Create template
+ * GET  /api/document-engine/templates  -  List templates
+ * POST /api/document-engine/templates  -  Create template
  */
 
 import { NextRequest, NextResponse } from 'next/server'

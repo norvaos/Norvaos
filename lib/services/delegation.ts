@@ -14,9 +14,9 @@ import { log } from '@/lib/utils/logger'
 /**
  * Create a new matter delegation.
  *
- * @param matterId — if null, delegates access to all matters of the delegating user
- * @param accessLevel — 'read' or 'read_write'
- * @param expiresAt — optional ISO timestamp; null = no expiry
+ * @param matterId  -  if null, delegates access to all matters of the delegating user
+ * @param accessLevel  -  'read' or 'read_write'
+ * @param expiresAt  -  optional ISO timestamp; null = no expiry
  */
 export async function createDelegation(
   supabase: SupabaseClient<Database>,

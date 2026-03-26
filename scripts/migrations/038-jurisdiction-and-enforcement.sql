@@ -5,7 +5,7 @@
 BEGIN;
 
 -- ═══════════════════════════════════════════════════════════════════════════
--- 1. jurisdiction_code on tenants — CA-only CHECK for v1
+-- 1. jurisdiction_code on tenants  -  CA-only CHECK for v1
 -- ═══════════════════════════════════════════════════════════════════════════
 
 ALTER TABLE tenants
@@ -18,7 +18,7 @@ ALTER TABLE tenants
 CREATE INDEX IF NOT EXISTS idx_tenants_jurisdiction ON tenants(jurisdiction_code);
 
 -- ═══════════════════════════════════════════════════════════════════════════
--- 2. Immutability trigger — prevents UPDATE of jurisdiction_code after creation
+-- 2. Immutability trigger  -  prevents UPDATE of jurisdiction_code after creation
 --    Applies to ALL roles including service_role.
 --    Override for testing: DROP TRIGGER trg_tenants_jurisdiction_immutable ON tenants;
 -- ═══════════════════════════════════════════════════════════════════════════

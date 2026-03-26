@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Directive 015 / 015.1 — Genesis Block Service Unit Tests
+ * Directive 015 / 015.1  -  Genesis Block Service Unit Tests
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Tests the Sovereign Birth Certificate (Digital Notary) logic:
@@ -70,7 +70,7 @@ function buildTestPayload(overrides?: Partial<{
   return {
     matter_id: 'matter-001',
     matter_number: 'MAT-2026-0001',
-    matter_title: 'Spousal Sponsorship — Khan',
+    matter_title: 'Spousal Sponsorship  -  Khan',
     tenant_id: 'tenant-001',
     generated_at: '2026-03-25T10:00:00Z',
     generated_by: 'user-001',
@@ -173,7 +173,7 @@ function computeGenesisHash(payload: GenesisPayload): string {
 // Test Suite
 // ═══════════════════════════════════════════════════════════════════════════════
 
-describe('Directive 015/015.1: Genesis Block — Sovereign Birth Certificate', () => {
+describe('Directive 015/015.1: Genesis Block  -  Sovereign Birth Certificate', () => {
 
   // ── SHA-256 Hash Integrity ──────────────────────────────────────────────
 
@@ -371,6 +371,174 @@ describe('Directive 015/015.1: Genesis Block — Sovereign Birth Certificate', (
       payload.retainer_agreement.agreement_id = 'NO_RETAINER'
       const { isCompliant } = evaluateCompliance(payload)
       expect(isCompliant).toBe(false)
+    })
+  })
+
+  // ── Directive 032: Conflict-to-Genesis Weld ─────────────────────────
+
+  describe('Directive 032: Conflict-to-Genesis Weld', () => {
+
+    interface ConflictSearch {
+      id: string
+      status: 'clear' | 'review_suggested' | 'review_required' | 'blocked'
+      source_entity_id: string
+      tenant_id: string
+      created_at: string
+    }
+
+    function validateWeld(params: {
+      conflictSearch: ConflictSearch | null
+      contactId: string | null
+      tenantId: string
+    }): { valid: boolean; error?: string } {
+      // 032.1 Search must exist
+      if (!params.conflictSearch) {
+        return { valid: false, error: 'WELD FAILURE: Conflict search not found' }
+      }
+
+      // 032.2 Status must be CLEARED
+      if (params.conflictSearch.status !== 'clear') {
+        return { valid: false, error: `WELD FAILURE: Conflict search has status "${params.conflictSearch.status}"  -  must be "clear"` }
+      }
+
+      // 032.3 Must belong to the correct client
+      if (params.contactId && params.conflictSearch.source_entity_id !== params.contactId) {
+        return { valid: false, error: `WELD FAILURE: Conflict search belongs to ${params.conflictSearch.source_entity_id} but matter client is ${params.contactId}` }
+      }
+
+      // 032.4 Tenant must match
+      if (params.conflictSearch.tenant_id !== params.tenantId) {
+        return { valid: false, error: 'WELD FAILURE: Conflict search tenant mismatch' }
+      }
+
+      return { valid: true }
+    }
+
+    const CLEARED_SEARCH: ConflictSearch = {
+      id: 'search-001',
+      status: 'clear',
+      source_entity_id: 'contact-001',
+      tenant_id: 'tenant-001',
+      created_at: '2026-03-20T10:00:00Z',
+    }
+
+    it('accepts a cleared conflict search matching the client', () => {
+      const result = validateWeld({
+        conflictSearch: CLEARED_SEARCH,
+        contactId: 'contact-001',
+        tenantId: 'tenant-001',
+      })
+      expect(result.valid).toBe(true)
+    })
+
+    it('rejects when conflict search is not found (null)', () => {
+      const result = validateWeld({
+        conflictSearch: null,
+        contactId: 'contact-001',
+        tenantId: 'tenant-001',
+      })
+      expect(result.valid).toBe(false)
+      expect(result.error).toContain('WELD FAILURE')
+      expect(result.error).toContain('not found')
+    })
+
+    it('rejects when conflict search status is "review_required" (not cleared)', () => {
+      const result = validateWeld({
+        conflictSearch: { ...CLEARED_SEARCH, status: 'review_required' },
+        contactId: 'contact-001',
+        tenantId: 'tenant-001',
+      })
+      expect(result.valid).toBe(false)
+      expect(result.error).toContain('WELD FAILURE')
+      expect(result.error).toContain('"review_required"')
+    })
+
+    it('rejects when conflict search status is "blocked"', () => {
+      const result = validateWeld({
+        conflictSearch: { ...CLEARED_SEARCH, status: 'blocked' },
+        contactId: 'contact-001',
+        tenantId: 'tenant-001',
+      })
+      expect(result.valid).toBe(false)
+      expect(result.error).toContain('must be "clear"')
+    })
+
+    it('rejects when conflict search belongs to a different client', () => {
+      const result = validateWeld({
+        conflictSearch: { ...CLEARED_SEARCH, source_entity_id: 'contact-999' },
+        contactId: 'contact-001',
+        tenantId: 'tenant-001',
+      })
+      expect(result.valid).toBe(false)
+      expect(result.error).toContain('WELD FAILURE')
+      expect(result.error).toContain('contact-999')
+      expect(result.error).toContain('contact-001')
+    })
+
+    it('rejects when conflict search tenant does not match', () => {
+      const result = validateWeld({
+        conflictSearch: { ...CLEARED_SEARCH, tenant_id: 'other-tenant' },
+        contactId: 'contact-001',
+        tenantId: 'tenant-001',
+      })
+      expect(result.valid).toBe(false)
+      expect(result.error).toContain('tenant mismatch')
+    })
+
+    it('stores conflict_cleared_at from the search created_at', () => {
+      const search = CLEARED_SEARCH
+      // Simulate what the RPC does: anchor cleared_at from search.created_at
+      const genesisRecord = {
+        conflict_search_id: search.id,
+        conflict_cleared_at: search.created_at,
+      }
+      expect(genesisRecord.conflict_search_id).toBe('search-001')
+      expect(genesisRecord.conflict_cleared_at).toBe('2026-03-20T10:00:00Z')
+    })
+
+    it('genesis payload includes cleared_at in conflict_check section', () => {
+      const payload = buildTestPayload()
+      // Directive 032 adds cleared_at to the conflict_check section
+      const enrichedPayload = {
+        ...payload,
+        conflict_check: {
+          ...payload.conflict_check,
+          cleared_at: '2026-03-20T10:00:00Z',
+        },
+      }
+      const hash = computeGenesisHash(enrichedPayload as any)
+      expect(hash).toMatch(/^[0-9a-f]{64}$/)
+      expect(enrichedPayload.conflict_check.cleared_at).toBe('2026-03-20T10:00:00Z')
+    })
+
+    it('weld report: cleared search + payload hash = verified weld', () => {
+      const search = CLEARED_SEARCH
+      const weld = validateWeld({
+        conflictSearch: search,
+        contactId: 'contact-001',
+        tenantId: 'tenant-001',
+      })
+
+      const payload = buildTestPayload()
+      const hash = computeGenesisHash(payload)
+
+      console.log(`
+  ══════════════════════════════════════════════
+  DIRECTIVE 032: CONFLICT-TO-GENESIS WELD
+  ══════════════════════════════════════════════
+  Search ID:        ${search.id}
+  Status:           ${search.status.toUpperCase()}
+  Client:           ${search.source_entity_id}
+  Cleared At:       ${search.created_at}
+  Weld Valid:       ${weld.valid ? 'YES' : 'NO'}
+  Genesis Hash:     ${hash.slice(0, 16)}...
+  ──────────────────────────────────────────────
+  WELD STATUS: VERIFIED ✓
+  ══════════════════════════════════════════════
+      `)
+
+      expect(weld.valid).toBe(true)
+      expect(hash).toHaveLength(64)
     })
   })
 })

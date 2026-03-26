@@ -8,7 +8,7 @@
  * Usage:
  *   export const GET = withPlatformAdmin(async (request, ctx) => {
  *     const tenantId = ctx.params.id
- *     // ... business logic only — auth, rate-limit, error handling all handled
+ *     // ... business logic only  -  auth, rate-limit, error handling all handled
  *     return NextResponse.json({ data: ... })
  *   })
  */
@@ -56,14 +56,14 @@ export function withPlatformAdmin(handler: AdminRouteHandler) {
     request: Request,
     routeContext?: { params?: Promise<Record<string, string>> },
   ): Promise<NextResponse | Response> {
-    // 1. Rate limit — before any auth to prevent DoS
+    // 1. Rate limit  -  before any auth to prevent DoS
     const rateLimitResponse = checkAdminRateLimit(request)
     if (rateLimitResponse) return rateLimitResponse
 
     // 2. Wrap in request ID context for log correlation
     return withRequestId(async () => {
       try {
-        // 3. Authenticate — throws PlatformAdminError(403) on failure
+        // 3. Authenticate  -  throws PlatformAdminError(403) on failure
         const adminCtx = await requirePlatformAdmin(request)
 
         // 4. Extract request metadata for audit logging

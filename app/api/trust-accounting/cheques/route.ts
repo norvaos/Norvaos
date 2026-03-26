@@ -1,6 +1,6 @@
 /**
- * GET  /api/trust-accounting/cheques — List cheques
- * POST /api/trust-accounting/cheques — Create a cheque
+ * GET  /api/trust-accounting/cheques  -  List cheques
+ * POST /api/trust-accounting/cheques  -  Create a cheque
  */
 
 import { NextRequest, NextResponse } from 'next/server'

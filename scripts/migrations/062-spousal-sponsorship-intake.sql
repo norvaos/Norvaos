@@ -7,16 +7,16 @@
 -- ircc_stream_forms tables (created in migration 057).
 --
 -- Forms seeded:
---   IMM1295E  — Sponsorship Application
---   IMM0008E  — Application for Permanent Residence (Generic)
---   IMM5406E  — Additional Family Information
---   IMM5532E  — Relationship Information & Sponsorship Evaluation
---   IMM5669E  — Schedule A — Background/Declaration
---   IMM5476E  — Use of a Representative
---   IMM1283   — Financial Evaluation
---   IMM5562   — Supplementary Information
---   IMM5533   — Document Checklist (Common-Law)
---   IMM5589   — Document Checklist (Married)
+--   IMM1295E   -  Sponsorship Application
+--   IMM0008E   -  Application for Permanent Residence (Generic)
+--   IMM5406E   -  Additional Family Information
+--   IMM5532E   -  Relationship Information & Sponsorship Evaluation
+--   IMM5669E   -  Schedule A  -  Background/Declaration
+--   IMM5476E   -  Use of a Representative
+--   IMM1283    -  Financial Evaluation
+--   IMM5562    -  Supplementary Information
+--   IMM5533    -  Document Checklist (Common-Law)
+--   IMM5589    -  Document Checklist (Married)
 -- ═══════════════════════════════════════════════════════════════════════════════
 
 DO $$
@@ -103,7 +103,7 @@ BEGIN
        'This form is used by Canadian citizens or permanent residents to sponsor their spouse, common-law partner, or conjugal partner for permanent residence in Canada.',
        'seed/IMM1295E.pdf', 'IMM1295E.pdf', 0, 'seed-placeholder-1295', false, 'scanned'),
 
-      (f_0008, v_tenant.tenant_id, 'IMM0008E', 'Application for Permanent Residence — Generic',
+      (f_0008, v_tenant.tenant_id, 'IMM0008E', 'Application for Permanent Residence  -  Generic',
        'Generic application form for permanent residence in Canada. Collects personal details, passport information, contact details, and language abilities of the principal applicant.',
        'seed/IMM0008E.pdf', 'IMM0008E.pdf', 0, 'seed-placeholder-0008', false, 'scanned'),
 
@@ -115,7 +115,7 @@ BEGIN
        'Documents the history and genuineness of the relationship between the sponsor and the applicant. Includes how you met, relationship timeline, and cohabitation details.',
        'seed/IMM5532E.pdf', 'IMM5532E.pdf', 0, 'seed-placeholder-5532', false, 'scanned'),
 
-      (f_5669, v_tenant.tenant_id, 'IMM5669E', 'Schedule A — Background/Declaration',
+      (f_5669, v_tenant.tenant_id, 'IMM5669E', 'Schedule A  -  Background/Declaration',
        'Background questions about education, employment, memberships, military service, and security-related questions. All applicants aged 18+ must complete this form.',
        'seed/IMM5669E.pdf', 'IMM5669E.pdf', 0, 'seed-placeholder-5669', false, 'scanned'),
 
@@ -127,15 +127,15 @@ BEGIN
        'Evaluates the sponsor''s financial ability to support the sponsored person. Includes income for the past 3 years, assets, liabilities, and current sponsorship obligations.',
        'seed/IMM1283.pdf', 'IMM1283.pdf', 0, 'seed-placeholder-1283', false, 'scanned'),
 
-      (f_5562, v_tenant.tenant_id, 'IMM5562', 'Supplementary Information — Your Travels',
+      (f_5562, v_tenant.tenant_id, 'IMM5562', 'Supplementary Information  -  Your Travels',
        'Provides space for additional information that could not be included in other forms, such as travel history and supplementary declarations.',
        'seed/IMM5562.pdf', 'IMM5562.pdf', 0, 'seed-placeholder-5562', false, 'scanned'),
 
-      (f_5533, v_tenant.tenant_id, 'IMM5533', 'Document Checklist — Sponsor and Common-Law Partner',
+      (f_5533, v_tenant.tenant_id, 'IMM5533', 'Document Checklist  -  Sponsor and Common-Law Partner',
        'Checklist of required documents for sponsoring a common-law partner. Review this list to ensure your application is complete.',
        'seed/IMM5533.pdf', 'IMM5533.pdf', 0, 'seed-placeholder-5533', false, 'scanned'),
 
-      (f_5589, v_tenant.tenant_id, 'IMM5589', 'Document Checklist — Spouse',
+      (f_5589, v_tenant.tenant_id, 'IMM5589', 'Document Checklist  -  Spouse',
        'Checklist of required documents for sponsoring a married spouse. Review this list to ensure your application is complete.',
        'seed/IMM5589.pdf', 'IMM5589.pdf', 0, 'seed-placeholder-5589', false, 'scanned');
 
@@ -168,15 +168,15 @@ BEGIN
 
     INSERT INTO ircc_form_sections (id, tenant_id, form_id, section_key, title, description, sort_order) VALUES
       (s_sponsor_personal, v_tenant.tenant_id, f_1295, 'sponsor_personal',
-       'Sponsor — Personal Details',
+       'Sponsor  -  Personal Details',
        'Enter the personal information of the sponsor (the Canadian citizen or permanent resident). All fields must match your government-issued ID.',
        1),
       (s_sponsor_status, v_tenant.tenant_id, f_1295, 'sponsor_status',
-       'Sponsor — Immigration Status',
+       'Sponsor  -  Immigration Status',
        'Provide details about your Canadian citizenship or permanent residence status.',
        2),
       (s_sponsor_eligibility, v_tenant.tenant_id, f_1295, 'sponsor_eligibility',
-       'Sponsor — Eligibility & Declaration',
+       'Sponsor  -  Eligibility & Declaration',
        'Answer these questions honestly. They determine your eligibility to sponsor. Providing false information can lead to your application being refused or criminal charges.',
        3);
 
@@ -188,19 +188,19 @@ BEGIN
 
     INSERT INTO ircc_form_sections (id, tenant_id, form_id, section_key, title, description, sort_order) VALUES
       (s_applicant_personal, v_tenant.tenant_id, f_0008, 'applicant_personal',
-       'Applicant — Personal Details',
+       'Applicant  -  Personal Details',
        'Enter the personal information of the person being sponsored (the applicant). All names must match the passport or travel document exactly.',
        1),
       (s_applicant_passport, v_tenant.tenant_id, f_0008, 'applicant_passport',
-       'Applicant — Passport & Travel Document',
+       'Applicant  -  Passport & Travel Document',
        'Provide your passport or travel document details. Make sure all information matches your physical document.',
        2),
       (s_applicant_contact, v_tenant.tenant_id, f_0008, 'applicant_contact',
-       'Applicant — Contact Information',
+       'Applicant  -  Contact Information',
        'Provide your current mailing and residential addresses, phone numbers, and email address. IRCC will use this information to contact you about your application.',
        3),
       (s_applicant_language, v_tenant.tenant_id, f_0008, 'applicant_language',
-       'Applicant — Language Abilities',
+       'Applicant  -  Language Abilities',
        'Indicate your ability to communicate in English and/or French.',
        4);
 
@@ -211,15 +211,15 @@ BEGIN
 
     INSERT INTO ircc_form_sections (id, tenant_id, form_id, section_key, title, description, sort_order) VALUES
       (s_family_spouse, v_tenant.tenant_id, f_5406, 'family_spouse',
-       'Family — Spouse / Partner',
+       'Family  -  Spouse / Partner',
        'Provide details about your current spouse or common-law partner.',
        1),
       (s_family_children, v_tenant.tenant_id, f_5406, 'family_children',
-       'Family — Children & Dependants',
+       'Family  -  Children & Dependants',
        'List ALL your children (biological, adopted, or stepchildren) whether or not they are accompanying you. Include children from all relationships.',
        2),
       (s_family_parents, v_tenant.tenant_id, f_5406, 'family_parents',
-       'Family — Parents & Siblings',
+       'Family  -  Parents & Siblings',
        'Provide details about your parents and siblings.',
        3);
 
@@ -230,15 +230,15 @@ BEGIN
 
     INSERT INTO ircc_form_sections (id, tenant_id, form_id, section_key, title, description, sort_order) VALUES
       (s_rel_type, v_tenant.tenant_id, f_5532, 'relationship_type',
-       'Relationship — Type & Status',
+       'Relationship  -  Type & Status',
        'Indicate the type of relationship between you and the sponsor. This determines which document checklist you need to complete.',
        1),
       (s_rel_history, v_tenant.tenant_id, f_5532, 'relationship_history',
-       'Relationship — How You Met & Timeline',
+       'Relationship  -  How You Met & Timeline',
        'Describe how your relationship began and developed. Be specific with dates and details. IRCC uses this to assess the genuineness of your relationship.',
        2),
       (s_rel_cohabitation, v_tenant.tenant_id, f_5532, 'relationship_cohabitation',
-       'Relationship — Living Arrangements',
+       'Relationship  -  Living Arrangements',
        'Provide details about your current and past living arrangements together. If you are not living together, explain why.',
        3);
 
@@ -249,15 +249,15 @@ BEGIN
 
     INSERT INTO ircc_form_sections (id, tenant_id, form_id, section_key, title, description, sort_order) VALUES
       (s_bg_education, v_tenant.tenant_id, f_5669, 'background_education',
-       'Background — Education History',
+       'Background  -  Education History',
        'List all post-secondary education (university, college, trade school) starting with the most recent. Include any education you are currently enrolled in.',
        1),
       (s_bg_employment, v_tenant.tenant_id, f_5669, 'background_employment',
-       'Background — Employment History (Past 10 Years)',
+       'Background  -  Employment History (Past 10 Years)',
        'List all periods of employment, self-employment, unemployment, and study for the past 10 years. Do not leave any gaps in the timeline.',
        2),
       (s_bg_security, v_tenant.tenant_id, f_5669, 'background_security',
-       'Background — Security & Declaration',
+       'Background  -  Security & Declaration',
        'Answer all background questions truthfully. These questions relate to your admissibility to Canada. Answering "Yes" does not automatically disqualify you, but providing false information will.',
        3);
 
@@ -276,11 +276,11 @@ BEGIN
 
     INSERT INTO ircc_form_sections (id, tenant_id, form_id, section_key, title, description, sort_order) VALUES
       (s_fin_income, v_tenant.tenant_id, f_1283, 'financial_income',
-       'Financial — Income & Employment',
+       'Financial  -  Income & Employment',
        'Provide your annual income for the past 3 calendar years. This should match your Notice of Assessment from the Canada Revenue Agency (CRA).',
        1),
       (s_fin_assets, v_tenant.tenant_id, f_1283, 'financial_assets',
-       'Financial — Assets, Liabilities & Obligations',
+       'Financial  -  Assets, Liabilities & Obligations',
        'List your total assets, liabilities, and any current sponsorship undertaking obligations.',
        2);
 
@@ -299,11 +299,11 @@ BEGIN
 
     INSERT INTO ircc_form_sections (id, tenant_id, form_id, section_key, title, description, sort_order) VALUES
       (s_checklist_married, v_tenant.tenant_id, f_5589, 'checklist_married',
-       'Document Checklist — Married Spouse',
+       'Document Checklist  -  Married Spouse',
        'Review the list of required documents for your spousal sponsorship application. You will need to gather and upload these documents after completing this questionnaire.',
        1),
       (s_checklist_commonlaw, v_tenant.tenant_id, f_5533, 'checklist_commonlaw',
-       'Document Checklist — Common-Law Partner',
+       'Document Checklist  -  Common-Law Partner',
        'Review the list of required documents for your common-law partner sponsorship application. Common-law partners must provide additional evidence of cohabitation for at least 12 months.',
        1);
 
@@ -320,7 +320,7 @@ BEGIN
       (v_tenant.tenant_id, f_1295, 'imm1295.sponsor.date_of_birth', 'date', 'Date of Birth', 'sponsor.date_of_birth', 'Date of Birth', 'date', true, 'Your date of birth as shown on your ID.', 'YYYY-MM-DD', s_sponsor_personal, 3, true),
       (v_tenant.tenant_id, f_1295, 'imm1295.sponsor.sex', 'select', 'Sex', 'sponsor.sex', 'Sex', 'select', true, NULL, NULL, s_sponsor_personal, 4, true),
       (v_tenant.tenant_id, f_1295, 'imm1295.sponsor.citizenship', 'country', 'Country of Citizenship', 'sponsor.citizenship', 'Country of Citizenship', 'country', true, 'If you are a Canadian citizen, select "Canada".', NULL, s_sponsor_personal, 5, true),
-      (v_tenant.tenant_id, f_1295, 'imm1295.sponsor.address_street', 'text', 'Street Address', 'sponsor.address.street_name', 'Current Residential Address — Street', 'text', true, 'Your current residential address in Canada.', 'Street number and name', s_sponsor_personal, 6, true),
+      (v_tenant.tenant_id, f_1295, 'imm1295.sponsor.address_street', 'text', 'Street Address', 'sponsor.address.street_name', 'Current Residential Address  -  Street', 'text', true, 'Your current residential address in Canada.', 'Street number and name', s_sponsor_personal, 6, true),
       (v_tenant.tenant_id, f_1295, 'imm1295.sponsor.address_city', 'text', 'City', 'sponsor.address.city', 'City', 'text', true, NULL, 'City', s_sponsor_personal, 7, true),
       (v_tenant.tenant_id, f_1295, 'imm1295.sponsor.address_province', 'text', 'Province', 'sponsor.address.province_state', 'Province / Territory', 'text', true, NULL, 'Province', s_sponsor_personal, 8, true),
       (v_tenant.tenant_id, f_1295, 'imm1295.sponsor.address_postal', 'text', 'Postal Code', 'sponsor.address.postal_code', 'Postal Code', 'text', true, 'Format: A1A 1A1', 'A1A 1A1', s_sponsor_personal, 9, true),
@@ -355,8 +355,8 @@ BEGIN
       (v_tenant.tenant_id, f_0008, 'imm0008.personal.uci', 'text', 'UCI', 'personal.uci_number', 'Unique Client Identifier (UCI)', 'text', false, 'If you have previously applied to IRCC, you may have a UCI number. Leave blank if you do not have one.', 'e.g. 1234-5678', s_applicant_personal, 3, true),
       (v_tenant.tenant_id, f_0008, 'imm0008.personal.sex', 'select', 'Sex', 'personal.sex', 'Sex', 'select', true, NULL, NULL, s_applicant_personal, 4, true),
       (v_tenant.tenant_id, f_0008, 'imm0008.personal.dob', 'date', 'Date of Birth', 'personal.date_of_birth', 'Date of Birth', 'date', true, 'Enter your date of birth.', 'YYYY-MM-DD', s_applicant_personal, 5, true),
-      (v_tenant.tenant_id, f_0008, 'imm0008.personal.pob_city', 'text', 'Place of Birth City', 'personal.place_of_birth_city', 'Place of Birth — City / Town', 'text', true, NULL, 'City or town', s_applicant_personal, 6, true),
-      (v_tenant.tenant_id, f_0008, 'imm0008.personal.pob_country', 'country', 'Place of Birth Country', 'personal.place_of_birth_country', 'Place of Birth — Country', 'country', true, NULL, NULL, s_applicant_personal, 7, true),
+      (v_tenant.tenant_id, f_0008, 'imm0008.personal.pob_city', 'text', 'Place of Birth City', 'personal.place_of_birth_city', 'Place of Birth  -  City / Town', 'text', true, NULL, 'City or town', s_applicant_personal, 6, true),
+      (v_tenant.tenant_id, f_0008, 'imm0008.personal.pob_country', 'country', 'Place of Birth Country', 'personal.place_of_birth_country', 'Place of Birth  -  Country', 'country', true, NULL, NULL, s_applicant_personal, 7, true),
       (v_tenant.tenant_id, f_0008, 'imm0008.personal.citizenship', 'country', 'Citizenship', 'personal.citizenship', 'Country of Citizenship', 'country', true, 'The country where you hold citizenship.', NULL, s_applicant_personal, 8, true),
       (v_tenant.tenant_id, f_0008, 'imm0008.personal.cor', 'country', 'Country of Residence', 'personal.current_country_of_residence', 'Current Country of Residence', 'country', true, 'The country where you currently live.', NULL, s_applicant_personal, 9, true),
       (v_tenant.tenant_id, f_0008, 'imm0008.personal.marital_status', 'select', 'Marital Status', 'marital.status', 'Current Marital Status', 'select', true, NULL, NULL, s_applicant_personal, 10, true);
@@ -370,7 +370,7 @@ BEGIN
 
     -- Contact
     INSERT INTO ircc_form_fields (tenant_id, form_id, xfa_path, xfa_field_type, suggested_label, profile_path, label, field_type, is_required, description, placeholder, section_id, sort_order, is_mapped) VALUES
-      (v_tenant.tenant_id, f_0008, 'imm0008.contact.address_street', 'text', 'Street', 'contact_info.mailing_address.street_name', 'Mailing Address — Street', 'text', true, 'This is where IRCC will send correspondence.', 'Street number and name', s_applicant_contact, 1, true),
+      (v_tenant.tenant_id, f_0008, 'imm0008.contact.address_street', 'text', 'Street', 'contact_info.mailing_address.street_name', 'Mailing Address  -  Street', 'text', true, 'This is where IRCC will send correspondence.', 'Street number and name', s_applicant_contact, 1, true),
       (v_tenant.tenant_id, f_0008, 'imm0008.contact.address_city', 'text', 'City', 'contact_info.mailing_address.city', 'City', 'text', true, NULL, 'City', s_applicant_contact, 2, true),
       (v_tenant.tenant_id, f_0008, 'imm0008.contact.address_country', 'country', 'Country', 'contact_info.mailing_address.country', 'Country', 'country', true, NULL, NULL, s_applicant_contact, 3, true),
       (v_tenant.tenant_id, f_0008, 'imm0008.contact.address_postal', 'text', 'Postal Code', 'contact_info.mailing_address.postal_code', 'Postal / ZIP Code', 'text', false, NULL, 'Postal code', s_applicant_contact, 4, true),
@@ -392,20 +392,20 @@ BEGIN
 
     -- Spouse
     INSERT INTO ircc_form_fields (tenant_id, form_id, xfa_path, xfa_field_type, suggested_label, profile_path, label, field_type, is_required, description, placeholder, section_id, sort_order, is_mapped) VALUES
-      (v_tenant.tenant_id, f_5406, 'imm5406.spouse.family_name', 'text', 'Spouse Family Name', 'family.spouse.family_name', 'Spouse — Family Name', 'text', true, NULL, 'Family name', s_family_spouse, 1, true),
-      (v_tenant.tenant_id, f_5406, 'imm5406.spouse.given_name', 'text', 'Spouse Given Name', 'family.spouse.given_name', 'Spouse — Given Name', 'text', true, NULL, 'Given name', s_family_spouse, 2, true),
-      (v_tenant.tenant_id, f_5406, 'imm5406.spouse.dob', 'date', 'Spouse DOB', 'family.spouse.date_of_birth', 'Spouse — Date of Birth', 'date', true, NULL, 'YYYY-MM-DD', s_family_spouse, 3, true),
-      (v_tenant.tenant_id, f_5406, 'imm5406.spouse.country_of_birth', 'country', 'Spouse Country of Birth', 'family.spouse.country_of_birth', 'Spouse — Country of Birth', 'country', false, NULL, NULL, s_family_spouse, 4, true),
+      (v_tenant.tenant_id, f_5406, 'imm5406.spouse.family_name', 'text', 'Spouse Family Name', 'family.spouse.family_name', 'Spouse  -  Family Name', 'text', true, NULL, 'Family name', s_family_spouse, 1, true),
+      (v_tenant.tenant_id, f_5406, 'imm5406.spouse.given_name', 'text', 'Spouse Given Name', 'family.spouse.given_name', 'Spouse  -  Given Name', 'text', true, NULL, 'Given name', s_family_spouse, 2, true),
+      (v_tenant.tenant_id, f_5406, 'imm5406.spouse.dob', 'date', 'Spouse DOB', 'family.spouse.date_of_birth', 'Spouse  -  Date of Birth', 'date', true, NULL, 'YYYY-MM-DD', s_family_spouse, 3, true),
+      (v_tenant.tenant_id, f_5406, 'imm5406.spouse.country_of_birth', 'country', 'Spouse Country of Birth', 'family.spouse.country_of_birth', 'Spouse  -  Country of Birth', 'country', false, NULL, NULL, s_family_spouse, 4, true),
       (v_tenant.tenant_id, f_5406, 'imm5406.spouse.relationship', 'text', 'Relationship', 'family.spouse.relationship', 'Relationship to You', 'text', false, 'e.g., Husband, Wife, Common-law Partner', 'Husband / Wife / Common-law Partner', s_family_spouse, 5, true);
 
     -- Parents
     INSERT INTO ircc_form_fields (tenant_id, form_id, xfa_path, xfa_field_type, suggested_label, profile_path, label, field_type, is_required, description, placeholder, section_id, sort_order, is_mapped) VALUES
-      (v_tenant.tenant_id, f_5406, 'imm5406.mother.family_name', 'text', 'Mother Family Name', 'family.mother.family_name', 'Mother — Family Name', 'text', true, 'As it appears on official documents.', 'Family name', s_family_parents, 1, true),
-      (v_tenant.tenant_id, f_5406, 'imm5406.mother.given_name', 'text', 'Mother Given Name', 'family.mother.given_name', 'Mother — Given Name', 'text', true, NULL, 'Given name', s_family_parents, 2, true),
-      (v_tenant.tenant_id, f_5406, 'imm5406.mother.dob', 'date', 'Mother DOB', 'family.mother.date_of_birth', 'Mother — Date of Birth', 'date', false, 'If unknown, enter approximate year.', 'YYYY-MM-DD', s_family_parents, 3, true),
-      (v_tenant.tenant_id, f_5406, 'imm5406.father.family_name', 'text', 'Father Family Name', 'family.father.family_name', 'Father — Family Name', 'text', true, NULL, 'Family name', s_family_parents, 4, true),
-      (v_tenant.tenant_id, f_5406, 'imm5406.father.given_name', 'text', 'Father Given Name', 'family.father.given_name', 'Father — Given Name', 'text', true, NULL, 'Given name', s_family_parents, 5, true),
-      (v_tenant.tenant_id, f_5406, 'imm5406.father.dob', 'date', 'Father DOB', 'family.father.date_of_birth', 'Father — Date of Birth', 'date', false, NULL, 'YYYY-MM-DD', s_family_parents, 6, true);
+      (v_tenant.tenant_id, f_5406, 'imm5406.mother.family_name', 'text', 'Mother Family Name', 'family.mother.family_name', 'Mother  -  Family Name', 'text', true, 'As it appears on official documents.', 'Family name', s_family_parents, 1, true),
+      (v_tenant.tenant_id, f_5406, 'imm5406.mother.given_name', 'text', 'Mother Given Name', 'family.mother.given_name', 'Mother  -  Given Name', 'text', true, NULL, 'Given name', s_family_parents, 2, true),
+      (v_tenant.tenant_id, f_5406, 'imm5406.mother.dob', 'date', 'Mother DOB', 'family.mother.date_of_birth', 'Mother  -  Date of Birth', 'date', false, 'If unknown, enter approximate year.', 'YYYY-MM-DD', s_family_parents, 3, true),
+      (v_tenant.tenant_id, f_5406, 'imm5406.father.family_name', 'text', 'Father Family Name', 'family.father.family_name', 'Father  -  Family Name', 'text', true, NULL, 'Family name', s_family_parents, 4, true),
+      (v_tenant.tenant_id, f_5406, 'imm5406.father.given_name', 'text', 'Father Given Name', 'family.father.given_name', 'Father  -  Given Name', 'text', true, NULL, 'Given name', s_family_parents, 5, true),
+      (v_tenant.tenant_id, f_5406, 'imm5406.father.dob', 'date', 'Father DOB', 'family.father.date_of_birth', 'Father  -  Date of Birth', 'date', false, NULL, 'YYYY-MM-DD', s_family_parents, 6, true);
 
 
     -- ── STEP 4: Relationship Details (IMM 5532E) ─────────────────────────────
@@ -416,7 +416,7 @@ BEGIN
       (v_tenant.tenant_id, f_5532, 'imm5532.rel.date', 'date', 'Date of Marriage / Start', 'relationship.date_of_marriage_or_start', 'Date of Marriage or Start of Relationship', 'date', true, 'For marriage: the date on your marriage certificate. For common-law: the date you began living together.', s_rel_type, 2, true, NULL);
 
     INSERT INTO ircc_form_fields (tenant_id, form_id, xfa_path, xfa_field_type, suggested_label, profile_path, label, field_type, is_required, description, placeholder, section_id, sort_order, is_mapped) VALUES
-      (v_tenant.tenant_id, f_5532, 'imm5532.rel.how_met', 'textarea', 'How Did You Meet', 'relationship.how_met', 'How did you and the sponsor first meet?', 'textarea', true, 'Be specific — include the circumstances, location, and who introduced you if applicable.', 'Describe how you first met...', s_rel_history, 1, true),
+      (v_tenant.tenant_id, f_5532, 'imm5532.rel.how_met', 'textarea', 'How Did You Meet', 'relationship.how_met', 'How did you and the sponsor first meet?', 'textarea', true, 'Be specific  -  include the circumstances, location, and who introduced you if applicable.', 'Describe how you first met...', s_rel_history, 1, true),
       (v_tenant.tenant_id, f_5532, 'imm5532.rel.where_met_city', 'text', 'Where Met City', 'relationship.where_met_city', 'City / Town Where You Met', 'text', true, NULL, 'City or town', s_rel_history, 2, true),
       (v_tenant.tenant_id, f_5532, 'imm5532.rel.where_met_country', 'country', 'Where Met Country', 'relationship.where_met_country', 'Country Where You Met', 'country', true, NULL, NULL, s_rel_history, 3, true),
       (v_tenant.tenant_id, f_5532, 'imm5532.rel.date_first_met', 'date', 'Date First Met', 'relationship.date_first_met', 'Date You First Met in Person', 'date', true, 'The very first time you met face-to-face.', 'YYYY-MM-DD', s_rel_history, 4, true),
@@ -455,20 +455,20 @@ BEGIN
       (v_tenant.tenant_id, f_5476, 'imm5476.rep.has_rep', 'boolean', 'Has Representative', 'representative.has_representative', 'Are you using an immigration representative?', 'boolean', true, 'A representative is a person who has your permission to conduct business with IRCC on your behalf.', s_rep_details, 1, true, NULL),
       (v_tenant.tenant_id, f_5476, 'imm5476.rep.type', 'select', 'Rep Type', 'representative.rep_type', 'Type of Representative', 'select', false, NULL, s_rep_details, 2, true,
        '[{"label":"Paid representative (lawyer or RCIC)","value":"paid"},{"label":"Unpaid representative (friend, family, NGO)","value":"unpaid"}]'::jsonb),
-      (v_tenant.tenant_id, f_5476, 'imm5476.rep.family_name', 'text', 'Rep Family Name', 'representative.rep_family_name', 'Representative — Family Name', 'text', false, NULL, s_rep_details, 3, true, NULL),
-      (v_tenant.tenant_id, f_5476, 'imm5476.rep.given_name', 'text', 'Rep Given Name', 'representative.rep_given_name', 'Representative — Given Name', 'text', false, NULL, s_rep_details, 4, true, NULL),
+      (v_tenant.tenant_id, f_5476, 'imm5476.rep.family_name', 'text', 'Rep Family Name', 'representative.rep_family_name', 'Representative  -  Family Name', 'text', false, NULL, s_rep_details, 3, true, NULL),
+      (v_tenant.tenant_id, f_5476, 'imm5476.rep.given_name', 'text', 'Rep Given Name', 'representative.rep_given_name', 'Representative  -  Given Name', 'text', false, NULL, s_rep_details, 4, true, NULL),
       (v_tenant.tenant_id, f_5476, 'imm5476.rep.organization', 'text', 'Organization', 'representative.rep_organization', 'Organization / Firm Name', 'text', false, NULL, s_rep_details, 5, true, NULL),
       (v_tenant.tenant_id, f_5476, 'imm5476.rep.membership_id', 'text', 'RCIC/Law Society #', 'representative.rep_membership_id', 'RCIC / Law Society Membership Number', 'text', false, 'For paid representatives, this number is required.', s_rep_details, 6, true, NULL),
-      (v_tenant.tenant_id, f_5476, 'imm5476.rep.telephone', 'text', 'Rep Phone', 'representative.rep_telephone', 'Representative — Phone Number', 'phone', false, NULL, s_rep_details, 7, true, NULL),
-      (v_tenant.tenant_id, f_5476, 'imm5476.rep.email', 'text', 'Rep Email', 'representative.rep_email', 'Representative — Email', 'email', false, NULL, s_rep_details, 8, true, NULL);
+      (v_tenant.tenant_id, f_5476, 'imm5476.rep.telephone', 'text', 'Rep Phone', 'representative.rep_telephone', 'Representative  -  Phone Number', 'phone', false, NULL, s_rep_details, 7, true, NULL),
+      (v_tenant.tenant_id, f_5476, 'imm5476.rep.email', 'text', 'Rep Email', 'representative.rep_email', 'Representative  -  Email', 'email', false, NULL, s_rep_details, 8, true, NULL);
 
 
     -- ── STEP 7: Financial (IMM 1283) ─────────────────────────────────────────
 
     INSERT INTO ircc_form_fields (tenant_id, form_id, xfa_path, xfa_field_type, suggested_label, profile_path, label, field_type, is_required, description, placeholder, section_id, sort_order, is_mapped) VALUES
-      (v_tenant.tenant_id, f_1283, 'imm1283.income.year1', 'number', 'Income Year 1', 'financial.income_year1', 'Total Income — Most Recent Tax Year (CAD)', 'number', true, 'As reported on your Notice of Assessment (NOA) from CRA. This is your Line 15000 (Total Income).', '0.00', s_fin_income, 1, true),
-      (v_tenant.tenant_id, f_1283, 'imm1283.income.year2', 'number', 'Income Year 2', 'financial.income_year2', 'Total Income — Second Most Recent Tax Year (CAD)', 'number', true, 'Line 15000 from your NOA for the year before last.', '0.00', s_fin_income, 2, true),
-      (v_tenant.tenant_id, f_1283, 'imm1283.income.year3', 'number', 'Income Year 3', 'financial.income_year3', 'Total Income — Third Most Recent Tax Year (CAD)', 'number', true, 'Line 15000 from your NOA for two years ago.', '0.00', s_fin_income, 3, true),
+      (v_tenant.tenant_id, f_1283, 'imm1283.income.year1', 'number', 'Income Year 1', 'financial.income_year1', 'Total Income  -  Most Recent Tax Year (CAD)', 'number', true, 'As reported on your Notice of Assessment (NOA) from CRA. This is your Line 15000 (Total Income).', '0.00', s_fin_income, 1, true),
+      (v_tenant.tenant_id, f_1283, 'imm1283.income.year2', 'number', 'Income Year 2', 'financial.income_year2', 'Total Income  -  Second Most Recent Tax Year (CAD)', 'number', true, 'Line 15000 from your NOA for the year before last.', '0.00', s_fin_income, 2, true),
+      (v_tenant.tenant_id, f_1283, 'imm1283.income.year3', 'number', 'Income Year 3', 'financial.income_year3', 'Total Income  -  Third Most Recent Tax Year (CAD)', 'number', true, 'Line 15000 from your NOA for two years ago.', '0.00', s_fin_income, 3, true),
       (v_tenant.tenant_id, f_1283, 'imm1283.fin.dependants', 'number', 'Number of Dependants', 'financial.number_of_dependants', 'Total Number of Dependants', 'number', true, 'Include yourself, your spouse/partner, and any children or other dependants.', '0', s_fin_income, 4, true);
 
     INSERT INTO ircc_form_fields (tenant_id, form_id, xfa_path, xfa_field_type, suggested_label, profile_path, label, field_type, is_required, description, placeholder, section_id, sort_order, is_mapped) VALUES
@@ -488,7 +488,7 @@ BEGIN
 
     -- Married checklist items (IMM 5589)
     INSERT INTO ircc_form_fields (tenant_id, form_id, xfa_path, xfa_field_type, suggested_label, profile_path, label, field_type, is_required, description, section_id, sort_order, is_mapped, show_when) VALUES
-      (v_tenant.tenant_id, f_5589, 'imm5589.checklist.marriage_cert', 'boolean', 'Marriage Certificate', 'checklist.marriage_certificate', 'Marriage Certificate — Certified true copy', 'boolean', true, 'Must be an official document issued by a civil authority or religious institution.', s_checklist_married, 1, true,
+      (v_tenant.tenant_id, f_5589, 'imm5589.checklist.marriage_cert', 'boolean', 'Marriage Certificate', 'checklist.marriage_certificate', 'Marriage Certificate  -  Certified true copy', 'boolean', true, 'Must be an official document issued by a civil authority or religious institution.', s_checklist_married, 1, true,
        '{"profile_path":"relationship.type","operator":"equals","value":"married"}'::jsonb),
       (v_tenant.tenant_id, f_5589, 'imm5589.checklist.proof_termination', 'boolean', 'Proof of Termination', 'checklist.proof_termination', 'Proof of termination of previous relationships (if applicable)', 'boolean', false, 'Divorce certificate, death certificate, or annulment documents for any previous marriage(s).', s_checklist_married, 2, true,
        '{"profile_path":"relationship.type","operator":"equals","value":"married"}'::jsonb),

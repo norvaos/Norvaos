@@ -158,7 +158,7 @@ BEGIN
     v_caller_tenant, v_trust_account_id, p_matter_id, v_govt_total_cents,
     'Immigration, Refugees and Citizenship Canada (IRCC)',
     '[Government Fee Disbursement] Filing fees for ' || COALESCE(v_matter.title, 'Matter'),
-    'Government filing fees — Reserved for IRCC submission',
+    'Government filing fees  -  Reserved for IRCC submission',
     'credit_card',
     v_payment_ref,
     'disbursement',
@@ -258,7 +258,7 @@ BEGIN
          updated_at = NOW()
    WHERE id = v_disb_request.id;
 
-  -- ── Record the trust transaction (disbursement — negative amount) ───────
+  -- ── Record the trust transaction (disbursement  -  negative amount) ───────
   INSERT INTO trust_transactions (
     tenant_id, trust_account_id, matter_id,
     transaction_type, amount_cents, description,
@@ -268,7 +268,7 @@ BEGIN
   ) VALUES (
     v_caller_tenant, v_disb_request.trust_account_id, p_matter_id,
     'disbursement', -v_disb_request.amount_cents,
-    '[Norva Ledger] Government Fee Disbursement — IRCC filing fees',
+    '[Norva Ledger] Government Fee Disbursement  -  IRCC filing fees',
     'Government filing fees paid to IRCC',
     'credit_card',
     v_disb_request.reference_number,

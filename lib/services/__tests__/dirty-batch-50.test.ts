@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Directive 009 / 011C — 50-Document "Dirty Batch" Classification Test
+ * Directive 009 / 011C  -  50-Document "Dirty Batch" Classification Test
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Tests the Tier 1 filename classifier against 50 documents with realistic,
@@ -188,7 +188,7 @@ describe('Directive 009/011C: 50-Document Dirty Batch', () => {
     }
 
     console.log(`\n  ══════════════════════════════════════════════`)
-    console.log(`  DIRECTIVE 011C — 50-DOCUMENT DIRTY BATCH REPORT`)
+    console.log(`  DIRECTIVE 011C  -  50-DOCUMENT DIRTY BATCH REPORT`)
     console.log(`  ══════════════════════════════════════════════`)
     console.log(`  Total documents:     ${DIRTY_BATCH.length}`)
     console.log(`  Tier 1 classified:   ${classified}`)
@@ -240,7 +240,7 @@ describe('Directive 009/011C: 50-Document Dirty Batch', () => {
       console.log(`\n  ALL 50 DOCUMENTS CORRECTLY CLASSIFIED ✓`)
     }
 
-    // This test always passes — it's for reporting
+    // This test always passes  -  it's for reporting
     expect(true).toBe(true)
   })
 })

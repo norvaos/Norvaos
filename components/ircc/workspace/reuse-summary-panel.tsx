@@ -1,12 +1,12 @@
 'use client'
 
 /**
- * ReuseSummaryPanel — Shows reuse summary and review gates for cross-form
+ * ReuseSummaryPanel  -  Shows reuse summary and review gates for cross-form
  * and cross-matter data import.
  *
  * Features:
- * 1. "Pre-fill from Other Forms" button — triggers cross-form prefill
- * 2. "Import from Client Profile" button — triggers canonical import
+ * 1. "Pre-fill from Other Forms" button  -  triggers cross-form prefill
+ * 2. "Import from Client Profile" button  -  triggers canonical import
  * 3. Shows last prefill timestamp and source
  * 4. Lists fields that were imported with their source
  * 5. Highlights semi_stable fields needing review (amber)
@@ -410,12 +410,12 @@ export function ReuseSummaryPanel({
                     </p>
                     {field.category === 'semi_stable' && (
                       <p className="text-[10px] text-amber-600 mt-0.5">
-                        Imported — please confirm this value is still current
+                        Imported  -  please confirm this value is still current
                       </p>
                     )}
                     {field.category === 'matter_specific' && (
                       <p className="text-[10px] text-muted-foreground mt-0.5">
-                        Skipped — enter manually for this matter
+                        Skipped  -  enter manually for this matter
                       </p>
                     )}
                   </div>

@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * CustomFieldsPanel — Renders a dynamic form from a matter type's JSON schema.
+ * CustomFieldsPanel  -  Renders a dynamic form from a matter type's JSON schema.
  *
  * Reads the active schema from `matter_type_schema` and the saved values from
  * `matter_custom_data`. Fields are rendered based on the JSON schema `type`

@@ -80,7 +80,7 @@ export const frontDeskCancelNoShowAction: ActionDefinition<FrontDeskCancelNoShow
       },
       activity: {
         activityType,
-        title: `${actionLabel} — ${input.reason}`,
+        title: `${actionLabel}  -  ${input.reason}`,
         description: `Appointment on ${appointment.appointment_date} at ${appointment.start_time} marked as ${actionLabel.toLowerCase()}`,
         metadata: {
           appointment_id: input.appointmentId,

@@ -43,7 +43,7 @@ export function LeadAiInsightsCard({
   isGenerating = false,
   isAccepting = false,
 }: LeadAiInsightsCardProps) {
-  // The table is flat — one row per AI analysis. Show the latest analysis.
+  // The table is flat  -  one row per AI analysis. Show the latest analysis.
   const latestInsight = insights.length > 0 ? insights[0] : null
   const isAccepted = !!latestInsight?.accepted_at
 
@@ -237,7 +237,7 @@ function JsonListDisplay({ value }: { value: unknown }) {
 // ─── Confidence Bar ──────────────────────────────────────────────────────────
 
 function ConfidenceBar({ scores }: { scores: unknown }) {
-  // confidence_scores is a Json field — could be { overall: 0.85, ... } or a number
+  // confidence_scores is a Json field  -  could be { overall: 0.85, ... } or a number
   let overall: number | null = null
 
   if (typeof scores === 'number') {

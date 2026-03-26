@@ -1,6 +1,6 @@
 # Core Enforcement Specification v1.0
 
-> **Status**: Active — FROZEN (see Section 10)
+> **Status**: Active  -  FROZEN (see Section 10)
 > **Version**: `1.4.0`
 > **Last updated**: 2026-03-17
 > **Constant**: `CORE_ENFORCEMENT_SPEC_VERSION` in `lib/config/version.ts`
@@ -335,7 +335,7 @@ sensitive surfaces from `docs/enforcement/sensitive-surfaces.json` and:
 3. If intersection is non-empty, **requires enforcement test updates**:
    - At least one enforcement test file must be modified, OR
    - A waiver entry was added to `docs/enforcement/waivers.md`
-4. Spec changes alone are NOT sufficient — tests are mandatory
+4. Spec changes alone are NOT sufficient  -  tests are mandatory
 5. There is no commit-message bypass. The only alternative to tests
    is a waiver entry, which itself requires CODEOWNERS approval.
 

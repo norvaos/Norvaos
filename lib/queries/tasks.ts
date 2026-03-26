@@ -324,7 +324,7 @@ export function useAllTasks(tenantId: string) {
         .eq('tenant_id', tenantId)
         .eq('is_deleted', false)
         .order('created_at', { ascending: false })
-        .limit(1000) // Safety cap — use useTasks() with pagination instead
+        .limit(1000) // Safety cap  -  use useTasks() with pagination instead
 
       if (error) throw error
       return data as Task[]
@@ -358,7 +358,7 @@ export function useTaskDocumentCounts(tenantId: string, taskIds?: string[]) {
       return counts
     },
     enabled: !!tenantId && !!taskIds && taskIds.length > 0,
-    staleTime: 3 * 60 * 1000, // 3 minutes — doc counts don't change frequently
+    staleTime: 3 * 60 * 1000, // 3 minutes  -  doc counts don't change frequently
   })
 }
 

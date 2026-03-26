@@ -19,7 +19,7 @@ import { IMPORT_REVERTED_STATUS } from '@/lib/utils/matter-status'
  * Auth: Bearer token matching CRON_SECRET env var (or skip for dev).
  */
 async function handlePost(request: Request) {
-  // Auth check — fail-closed: reject if CRON_SECRET is unset
+  // Auth check  -  fail-closed: reject if CRON_SECRET is unset
   const cronSecret = process.env['CRON_SECRET']
   if (!cronSecret) {
     return NextResponse.json({ error: 'Server misconfigured: CRON_SECRET not set' }, { status: 500 })
@@ -53,7 +53,7 @@ async function handlePost(request: Request) {
       stats.tenant_count++
 
       try {
-        // 2. Get all practice areas for this tenant (enabled or not — snapshot all)
+        // 2. Get all practice areas for this tenant (enabled or not  -  snapshot all)
         const { data: practiceAreas, error: paErr } = await supabase
           .from('practice_areas')
           .select('id')
@@ -77,7 +77,7 @@ async function handlePost(request: Request) {
           try {
             const snapshot = await computeSnapshot(supabase, tenant.id, paId, todayStr)
 
-            // Plain INSERT — the unique index on
+            // Plain INSERT  -  the unique index on
             // (tenant_id, snapshot_date, COALESCE(practice_area_id, '00000000-...'))
             // prevents duplicates. If a conflict occurs (re-run), Postgres raises 23505
             // which we treat as a no-op for idempotency.
@@ -86,7 +86,7 @@ async function handlePost(request: Request) {
               .insert(snapshot)
 
             if (insertErr) {
-              // 23505 = unique_violation — expected on re-run, skip silently
+              // 23505 = unique_violation  -  expected on re-run, skip silently
               if (insertErr.code === '23505') {
                 continue
               }
@@ -166,7 +166,7 @@ async function computeSnapshot(supabase: any, tenantId: string, practiceAreaId: 
 
   if (matterIds !== null) {
     if (matterIds.length === 0) {
-      // No matters for this practice area — all zeros
+      // No matters for this practice area  -  all zeros
       return buildEmptySnapshot(tenantId, snapshotDate, practiceAreaId)
     }
     billedQuery = billedQuery.in('matter_id', matterIds)

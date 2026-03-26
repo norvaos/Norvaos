@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------
-// Module N — Performance, Reliability, and Operational Quality
+// Module N  -  Performance, Reliability, and Operational Quality
 // Pure utility functions for the IRCC Forms Engine.
 // No database or framework dependencies.
 // ---------------------------------------------------------------------------

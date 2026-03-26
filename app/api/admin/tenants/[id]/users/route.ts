@@ -6,13 +6,13 @@ import { withTiming } from '@/lib/middleware/request-timing'
 /**
  * GET /api/admin/tenants/[id]/users
  *
- * Platform-admin ONLY — list users for a tenant.
+ * Platform-admin ONLY  -  list users for a tenant.
  * Rate-limited: 30 req/min per IP.
  *
  * Query params:
- *   ?search=john     — filter by name or email (case-insensitive)
- *   &page=1          — 1-based page number
- *   &per_page=25     — results per page (max 100)
+ *   ?search=john      -  filter by name or email (case-insensitive)
+ *   &page=1           -  1-based page number
+ *   &per_page=25      -  results per page (max 100)
  */
 const handleGet = withPlatformAdmin(async (request, { params }) => {
   const tenantId = params.id

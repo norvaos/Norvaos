@@ -1,5 +1,5 @@
 /**
- * Compliance Examination Snapshot Service — Directive 004, Pillar 1
+ * Compliance Examination Snapshot Service  -  Directive 004, Pillar 1
  *
  * Generates Law Society examination-ready compliance snapshots that verify
  * audit chain integrity and produce immutable reports. Each snapshot captures

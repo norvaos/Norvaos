@@ -1,7 +1,7 @@
 /**
  * POST /api/matters/[id]/ghost-writer
  *
- * Ghost-Writer — AI generates a response draft for an inbound email
+ * Ghost-Writer  -  AI generates a response draft for an inbound email
  * before the lawyer opens the thread.
  *
  * GET  /api/matters/[id]/ghost-writer?threadId=xxx

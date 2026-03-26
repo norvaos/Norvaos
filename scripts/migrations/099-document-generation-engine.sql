@@ -1,5 +1,5 @@
 -- ============================================================================
--- Migration 099: Document Generation Engine — Phase 6
+-- Migration 099: Document Generation Engine  -  Phase 6
 -- ============================================================================
 -- Creates 15 tables for the document generation & correspondence automation
 -- system. Includes RLS policies, performance indexes, and redline columns
@@ -130,7 +130,7 @@ CREATE TABLE IF NOT EXISTS document_template_mappings (
   default_value         TEXT,
   format_rule           TEXT,
   fallback_rule         TEXT,
-  -- Redline 2: No silent truncation — max_length per mapping
+  -- Redline 2: No silent truncation  -  max_length per mapping
   max_length            INT,
   sort_order            INT NOT NULL DEFAULT 0,
   created_at            TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -320,7 +320,7 @@ CREATE TABLE IF NOT EXISTS document_artifacts (
 
 ALTER TABLE document_artifacts ENABLE ROW LEVEL SECURITY;
 
--- SELECT + INSERT only — artifacts are immutable
+-- SELECT + INSERT only  -  artifacts are immutable
 DROP POLICY IF EXISTS document_artifacts_select ON document_artifacts;
 CREATE POLICY document_artifacts_select ON document_artifacts
   FOR SELECT
@@ -360,7 +360,7 @@ CREATE TABLE IF NOT EXISTS document_instance_fields (
 
 ALTER TABLE document_instance_fields ENABLE ROW LEVEL SECURITY;
 
--- SELECT + INSERT only — fields are frozen at generation time
+-- SELECT + INSERT only  -  fields are frozen at generation time
 DROP POLICY IF EXISTS document_instance_fields_select ON document_instance_fields;
 CREATE POLICY document_instance_fields_select ON document_instance_fields
   FOR SELECT
@@ -481,7 +481,7 @@ CREATE TABLE IF NOT EXISTS document_signer_events (
 
 ALTER TABLE document_signer_events ENABLE ROW LEVEL SECURITY;
 
--- SELECT + INSERT only — immutable event log
+-- SELECT + INSERT only  -  immutable event log
 DROP POLICY IF EXISTS document_signer_events_select ON document_signer_events;
 CREATE POLICY document_signer_events_select ON document_signer_events
   FOR SELECT
@@ -511,7 +511,7 @@ CREATE TABLE IF NOT EXISTS document_status_events (
 
 ALTER TABLE document_status_events ENABLE ROW LEVEL SECURITY;
 
--- SELECT + INSERT only — immutable event log
+-- SELECT + INSERT only  -  immutable event log
 DROP POLICY IF EXISTS document_status_events_select ON document_status_events;
 CREATE POLICY document_status_events_select ON document_status_events
   FOR SELECT
@@ -539,7 +539,7 @@ CREATE TABLE IF NOT EXISTS document_template_audit_log (
 
 ALTER TABLE document_template_audit_log ENABLE ROW LEVEL SECURITY;
 
--- SELECT + INSERT only — immutable audit log
+-- SELECT + INSERT only  -  immutable audit log
 DROP POLICY IF EXISTS document_template_audit_log_select ON document_template_audit_log;
 CREATE POLICY document_template_audit_log_select ON document_template_audit_log
   FOR SELECT

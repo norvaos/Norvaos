@@ -609,7 +609,7 @@ async function handlePost(
 
     // 5. Meeting-to-Matter Auto-Link: create calendar_event on the matter timeline
     const meetingLabel = meeting_type === 'video' ? 'Video Call' : meeting_type === 'phone' ? 'Phone Call' : 'In-Person Meeting'
-    const eventTitle = `${meetingLabel} — ${guestName || 'Client'}`
+    const eventTitle = `${meetingLabel}  -  ${guestName || 'Client'}`
 
     // Build UTC ISO timestamps from local date + time in booking page timezone
     const startIso = new Date(`${date}T${time}:00`).toISOString()
@@ -633,14 +633,14 @@ async function handlePost(
       is_client_visible: true,
     }).select('id').single()
 
-    // 6. Send Global Ping — create notification for the legal team
+    // 6. Send Global Ping  -  create notification for the legal team
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const notificationPromise = (admin as any).from('notifications').insert({
       tenant_id: link.tenant_id,
       user_id: page.user_id,
       type: 'booking_created',
       title: `New Booking: ${guestName || 'Client'}`,
-      message: `${meetingLabel} on ${date} at ${time} — booked via client portal`,
+      message: `${meetingLabel} on ${date} at ${time}  -  booked via client portal`,
       entity_type: 'appointment',
       entity_id: appointment.id,
       is_read: false,
@@ -653,7 +653,7 @@ async function handlePost(
           tenant_id: link.tenant_id,
           user_id: page.user_id,
           activity_type: 'booking_created',
-          title: `Portal Booking: ${guestName} — ${page.title}`,
+          title: `Portal Booking: ${guestName}  -  ${page.title}`,
           entity_type: 'contact',
           entity_id: link.contact_id,
           metadata: {

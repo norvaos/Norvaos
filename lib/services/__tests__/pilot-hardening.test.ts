@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Directives 026 / 027 / 029 — Pilot Launch Hardening Tests
+ * Directives 026 / 027 / 029  -  Pilot Launch Hardening Tests
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Tests:
@@ -14,7 +14,7 @@ import { createHash } from 'crypto'
 
 // ─── Test Suite 1: Compliance Override Validation (Directive 026) ────────────
 
-describe('Directive 026: Compliance Override — Emergency Override Log', () => {
+describe('Directive 026: Compliance Override  -  Emergency Override Log', () => {
 
   // Helper: simulate override validation logic
   function validateOverride(params: {
@@ -50,7 +50,7 @@ describe('Directive 026: Compliance Override — Emergency Override Log', () => 
 
   it('accepts valid Partner override with 50+ char justification', () => {
     const result = validateOverride({
-      justification: 'Client has pending IRCC extension — document will be renewed within 30 days of processing.',
+      justification: 'Client has pending IRCC extension  -  document will be renewed within 30 days of processing.',
       partnerPin: '1234',
       userRole: 'partner',
     })
@@ -98,7 +98,7 @@ describe('Directive 026: Compliance Override — Emergency Override Log', () => 
 
   it('hashes are deterministic and 64-char hex', () => {
     const hashes = hashOverride(
-      'Test justification for hashing verification purposes — must be over 50 chars.',
+      'Test justification for hashing verification purposes  -  must be over 50 chars.',
       '1234',
       'matter-001',
     )
@@ -108,7 +108,7 @@ describe('Directive 026: Compliance Override — Emergency Override Log', () => 
 
     // Deterministic
     const hashes2 = hashOverride(
-      'Test justification for hashing verification purposes — must be over 50 chars.',
+      'Test justification for hashing verification purposes  -  must be over 50 chars.',
       '1234',
       'matter-001',
     )
@@ -131,9 +131,9 @@ describe('Directive 026: Compliance Override — Emergency Override Log', () => 
 
 // ─── Test Suite 2: PII Scrub Verification (Directive 029) ───────────────────
 
-describe('Directive 029: PII Scrub — Data Minimisation After Atomic Transfer', () => {
+describe('Directive 029: PII Scrub  -  Data Minimisation After Atomic Transfer', () => {
 
-  const REDACTED = '[REDACTED — See Matter Record]'
+  const REDACTED = '[REDACTED  -  See Matter Record]'
 
   const PII_FIELDS = [
     'first_name', 'last_name', 'email', 'phone',
@@ -241,7 +241,7 @@ describe('Directive 029: PII Scrub — Data Minimisation After Atomic Transfer',
 
 // ─── Test Suite 3: Firm Sovereignty / Genesis Zero (Directive 027) ──────────
 
-describe('Directive 027: Genesis Zero — Firm Sovereignty Hash Chain', () => {
+describe('Directive 027: Genesis Zero  -  Firm Sovereignty Hash Chain', () => {
 
   function buildGenesisZeroPayload(firmName: string, snapshot: Record<string, number>) {
     return {
@@ -320,7 +320,7 @@ describe('Directive 027: Genesis Zero — Firm Sovereignty Hash Chain', () => {
 
 // ─── Combined Directive Report ──────────────────────────────────────────────
 
-describe('Directives 026/027/029 — Pilot Launch Report', () => {
+describe('Directives 026/027/029  -  Pilot Launch Report', () => {
   it('generates pilot hardening summary', () => {
     const report = {
       directive_026: {
@@ -345,7 +345,7 @@ describe('Directives 026/027/029 — Pilot Launch Report', () => {
 
     console.log(`
   ══════════════════════════════════════════════
-  NORVA SOVEREIGN — PILOT LAUNCH HARDENING
+  NORVA SOVEREIGN  -  PILOT LAUNCH HARDENING
   ══════════════════════════════════════════════
   D026: Emergency Override     → ${report.directive_026.emergency_override}
     Partner PIN:               REQUIRED

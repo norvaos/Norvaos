@@ -16,7 +16,7 @@ export const frontDeskStartShiftAction: ActionDefinition<FrontDeskStartShiftInpu
   allowedSources: ['front_desk'],
   entityType: 'shift',
 
-  // Placeholder — real shift ID extracted from result.data.shiftId by action executor
+  // Placeholder  -  real shift ID extracted from result.data.shiftId by action executor
   getEntityId: () => 'shift',
 
   async execute({ tenantId, userId, supabase }) {

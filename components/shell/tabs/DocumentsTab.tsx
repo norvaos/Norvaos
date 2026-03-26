@@ -1,18 +1,18 @@
 'use client'
 
 /**
- * DocumentsTab — Zone D tab #2
+ * DocumentsTab  -  Zone D tab #2
  *
  * Replaces the bare DocumentSlotPanel with an enhanced layout:
- *   Left sidebar  — collapsible category folder tree (~250 px)
- *   Right content — slot cards with upload, review, version history,
+ *   Left sidebar   -  collapsible category folder tree (~250 px)
+ *   Right content  -  slot cards with upload, review, version history,
  *                   share, and document-bundle actions
- *   Top bar       — progress summary (X of Y documents uploaded)
+ *   Top bar        -  progress summary (X of Y documents uploaded)
  *
  * DB findings (via Supabase MCP, 2026-03-17):
- *   • document_slots  — no expiry_date column  → expiry tracking SKIPPED
- *   • document_versions — no expiry_date column → expiry tracking SKIPPED
- *   • matter_types — no document_naming_template column → auto-naming SKIPPED
+ *   • document_slots   -  no expiry_date column  → expiry tracking SKIPPED
+ *   • document_versions  -  no expiry_date column → expiry tracking SKIPPED
+ *   • matter_types  -  no document_naming_template column → auto-naming SKIPPED
  *   • matter.matter_number exists → used in suggested filenames (manual only)
  */
 
@@ -144,7 +144,7 @@ function getExpiryBadge(expiryDate: string | null) {
   return null // No badge needed if >30 days away
 }
 
-// ─── CategoryNode — collapsible folder in the sidebar ────────────────────────
+// ─── CategoryNode  -  collapsible folder in the sidebar ────────────────────────
 
 function CategoryNode({
   category,
@@ -230,7 +230,7 @@ function CategoryNode({
   )
 }
 
-// ─── SlotCard — individual document slot card ─────────────────────────────────
+// ─── SlotCard  -  individual document slot card ─────────────────────────────────
 
 function SlotCard({
   slot,
@@ -445,7 +445,7 @@ function SlotCard({
             }
             title={
               sharedState
-                ? 'Shared with client — click to unshare'
+                ? 'Shared with client  -  click to unshare'
                 : 'Share with client via portal'
             }
           >
@@ -1010,7 +1010,7 @@ export function DocumentsTab({
 
       {/* ── Toolbar ────────────────────────────────────────────────────────── */}
       <div className="border-b bg-card px-4 py-2 flex items-center gap-2 shrink-0">
-        {/* Bundle — view */}
+        {/* Bundle  -  view */}
         <Button
           variant="ghost"
           size="sm"
@@ -1026,7 +1026,7 @@ export function DocumentsTab({
           )}
         </Button>
 
-        {/* Bundle — download */}
+        {/* Bundle  -  download */}
         <Button
           variant="outline"
           size="sm"
@@ -1121,7 +1121,7 @@ export function DocumentsTab({
       {/* ── Main body: sidebar + content ───────────────────────────────────── */}
       <div className="flex flex-1 min-h-0 overflow-hidden">
 
-        {/* Left sidebar — folder tree */}
+        {/* Left sidebar  -  folder tree */}
         <div className="w-[250px] shrink-0 border-r overflow-y-auto bg-sidebar/30 p-2 space-y-1">
           {/* "All" item */}
           <button

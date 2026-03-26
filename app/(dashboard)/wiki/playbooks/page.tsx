@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * Playbooks Listing — dedicated page for browsing and managing playbooks.
+ * Playbooks Listing  -  dedicated page for browsing and managing playbooks.
  *
  * Features:
  * - Category filter sidebar (shared with wiki)

@@ -1,6 +1,6 @@
 -- Migration 085: Matter Form Command Centre Integration
 -- Adds columns to matters to link pipeline (from matter type), fee template,
--- and follow-up staff — all sourced from settings, never hardcoded.
+-- and follow-up staff  -  all sourced from settings, never hardcoded.
 
 -- 1. Matter stage pipeline: which pipeline (from matter_stage_pipelines) is active
 --    for this matter. Derived from matter_type + user selection at creation.

@@ -7,7 +7,7 @@ Immutable record of all directive implementations. Each entry records what was b
 ## Directive 004: The Compliance Lockdown
 **Status:** COMPLETE (2026-03-25)
 
-### Migration 200 — Immutable Trust Ledger Audit
+### Migration 200  -  Immutable Trust Ledger Audit
 - SHA-256 hash chain on trust_audit_log (TRUST_AUDIT_GENESIS_BLOCK_v1 seed)
 - trust_audit_verify_chain() verification function
 - reason_for_change column on trust_transactions (mandatory)
@@ -15,21 +15,21 @@ Immutable record of all directive implementations. Each entry records what was b
 - rpc_generate_compliance_snapshot RPC
 - **ACKNOWLEDGED: Migration 200 is complete and verified.**
 
-### Migration 201 — Automated Three-Way Reconciliation
+### Migration 201  -  Automated Three-Way Reconciliation
 - reconciliation_discrepancies table with auto-lock triggers
 - Disbursement lockdown on discrepancy detection
 - Auto-unlock when all discrepancies resolved
 - rpc_auto_reconcile RPC (full 7-step automated workflow)
 - reconciliation_schedule table for cron scheduling
 
-### Migration 202 — PIPEDA Data Sovereignty
+### Migration 202  -  PIPEDA Data Sovereignty
 - data_sovereignty_log (append-only, immutable)
 - pii_access_registry with 12 seeded PII column definitions
 - pii_decryption_log for decrypt audit
 - norva_decrypt_audited() function
 - v_pii_encryption_status view
 
-### Migration 203 — Deadline Shield
+### Migration 203  -  Deadline Shield
 - is_shielded, shield_reason columns on matter_deadlines
 - ircc_deadline_rules table with 14 IRCC rules seeded
 - shield_deadline_guard() trigger (prevents deletion of shielded deadlines)
@@ -56,7 +56,7 @@ Immutable record of all directive implementations. Each entry records what was b
 
 ---
 
-## Directive 005.1 — Trust Ledger "Immutable Foundation"
+## Directive 005.1  -  Trust Ledger "Immutable Foundation"
 
 **Status:** COMPLETE
 **Date:** 2026-03-25
@@ -75,8 +75,8 @@ Immutable record of all directive implementations. Each entry records what was b
 
 ### Compliance guarantees
 
-- **INSERT-only enforcement**: DB triggers + RLS — no UPDATE/DELETE policies exist
-- **Transactional integrity**: Audit trigger fires AFTER INSERT on `trust_transactions`; if audit fails, the transaction rolls back — zero ghost-money
+- **INSERT-only enforcement**: DB triggers + RLS  -  no UPDATE/DELETE policies exist
+- **Transactional integrity**: Audit trigger fires AFTER INSERT on `trust_transactions`; if audit fails, the transaction rolls back  -  zero ghost-money
 - **Tamper detection**: SHA-256 hash of all critical fields stored per audit entry
 - **Balance continuity**: `verify_trust_ledger_audit_integrity()` checks hash + balance chain
 - **Tenant isolation**: RLS policy `tenant_id = auth.uid()` on all rows
@@ -93,11 +93,11 @@ trust_transactions INSERT
 
 ---
 
-## Directive 005.2 — Global Conflict Check Engine
+## Directive 005.2  -  Global Conflict Check Engine
 
 **Status:** IN PROGRESS (2026-03-25)
 
-### Migration 204 — Global Conflict Engine
+### Migration 204  -  Global Conflict Engine
 - search_contacts_fuzzy RPC (pg_trgm, threshold 0.3)
 - search_leads_fuzzy RPC
 - search_matters_by_party RPC
@@ -107,7 +107,7 @@ trust_transactions INSERT
 
 ---
 
-## Directive 005.3 — Compliance "Kill Switch"
+## Directive 005.3  -  Compliance "Kill Switch"
 
 **Status:** COMPLETE
 **Date:** 2026-03-25
@@ -117,9 +117,9 @@ trust_transactions INSERT
 | Artefact | Location |
 |----------|----------|
 | `CriticalComplianceError` class | `lib/supabase/region-guard.ts` |
-| `enforceRegionCompliance()` — boot-level check | `lib/supabase/region-guard.ts` |
-| `detectSupabaseRegion()` — parses pooler/env | `lib/supabase/region-guard.ts` |
-| `getRegionStatus()` — non-throwing for dashboard | `lib/supabase/region-guard.ts` |
+| `enforceRegionCompliance()`  -  boot-level check | `lib/supabase/region-guard.ts` |
+| `detectSupabaseRegion()`  -  parses pooler/env | `lib/supabase/region-guard.ts` |
+| `getRegionStatus()`  -  non-throwing for dashboard | `lib/supabase/region-guard.ts` |
 | Module-level enforcement in server.ts | `lib/supabase/server.ts` |
 | Module-level enforcement in admin.ts | `lib/supabase/admin.ts` |
 
@@ -133,7 +133,7 @@ trust_transactions INSERT
 
 ---
 
-## Directive 005.4 — Document Vault Zero-Knowledge Preview
+## Directive 005.4  -  Document Vault Zero-Knowledge Preview
 
 **Status:** COMPLETE
 **Date:** 2026-03-25
@@ -152,12 +152,12 @@ trust_transactions INSERT
 - **No permanent URLs**: Every document access generates a 60-second TTL signed URL via Supabase Storage
 - **Zero client exposure**: Signed URLs are consumed server-side only; client never sees the storage URL
 - **Every access logged**: SENTINEL `PDF_VAULT_ACCESS` event with document_id, file_name, TTL, timestamp
-- **No caching**: `Cache-Control: private, no-store, max-age=0` — browser cannot cache document content
+- **No caching**: `Cache-Control: private, no-store, max-age=0`  -  browser cannot cache document content
 - **Graceful fallback**: If signed URL generation fails, falls back to server proxy (still authenticated + logged)
 
 ---
 
-## Directive 006 — In-House Compliance Dashboard
+## Directive 006  -  In-House Compliance Dashboard
 
 **Status:** COMPLETE
 **Date:** 2026-03-25
@@ -171,10 +171,10 @@ trust_transactions INSERT
 
 ### Health checks displayed
 
-1. **Region Lock** — Confirms connection is in `ca-central-1` (via `getRegionStatus()`)
-2. **Encryption Status** — Samples PII columns, verifies ciphertext format (`iv:authTag:ciphertext`)
-3. **Audit Parity** — Compares `trust_transactions` count vs `trust_ledger_audit` count (delta must be 0)
-4. **SENTINEL Summary** — 24-hour event breakdown by severity (breach/critical/warning/info) and type
+1. **Region Lock**  -  Confirms connection is in `ca-central-1` (via `getRegionStatus()`)
+2. **Encryption Status**  -  Samples PII columns, verifies ciphertext format (`iv:authTag:ciphertext`)
+3. **Audit Parity**  -  Compares `trust_transactions` count vs `trust_ledger_audit` count (delta must be 0)
+4. **SENTINEL Summary**  -  24-hour event breakdown by severity (breach/critical/warning/info) and type
 
 ### Features
 
@@ -185,14 +185,14 @@ trust_transactions INSERT
 
 ---
 
-## Directive 007 — Automated "Disaster" Recovery Test
+## Directive 007  -  Automated "Disaster" Recovery Test
 
 **Status:** IN PROGRESS (2026-03-25)
 - e2e/disaster-recovery-audit.spec.ts (6 suites)
 
 ---
 
-## Directive 008 — System-Wide Telemetry
+## Directive 008  -  System-Wide Telemetry
 
 **Status:** COMPLETE
 **Date:** 2026-03-25
@@ -202,10 +202,10 @@ trust_transactions INSERT
 | Artefact | Location |
 |----------|----------|
 | Enhanced `beforeSend` with NorvaOS event classification | `sentry.server.config.ts` |
-| `reportRLSViolation()` — RLS failure reporter | `lib/monitoring/error-reporter.ts` |
-| `reportConflictFailure()` — conflict engine reporter | `lib/monitoring/error-reporter.ts` |
-| `reportTrustError()` — trust accounting reporter | `lib/monitoring/error-reporter.ts` |
-| `reportComplianceViolation()` — PIPEDA reporter | `lib/monitoring/error-reporter.ts` |
+| `reportRLSViolation()`  -  RLS failure reporter | `lib/monitoring/error-reporter.ts` |
+| `reportConflictFailure()`  -  conflict engine reporter | `lib/monitoring/error-reporter.ts` |
+| `reportTrustError()`  -  trust accounting reporter | `lib/monitoring/error-reporter.ts` |
+| `reportComplianceViolation()`  -  PIPEDA reporter | `lib/monitoring/error-reporter.ts` |
 | SENTINEL API guard wired to Sentry | `lib/middleware/sentinel-api-guard.ts` |
 
 ### Event classification (Sentry tags)
@@ -228,7 +228,7 @@ trust_transactions INSERT
 
 ---
 
-## Directive 009 — Smart Document Precision Benchmarking
+## Directive 009  -  Smart Document Precision Benchmarking
 
 **Status:** IN PROGRESS (2026-03-25)
 - Document classifier benchmark tests
@@ -238,12 +238,12 @@ trust_transactions INSERT
 
 ---
 
-## Directive 012 — SaaS "High-Velocity" Optimization
+## Directive 012  -  SaaS "High-Velocity" Optimization
 
 **Status:** COMPLETE
 **Date:** 2026-03-25
 
-### 12.1 — Optimistic UI + Realtime Dashboard Sync
+### 12.1  -  Optimistic UI + Realtime Dashboard Sync
 
 | Artefact | Location |
 |----------|----------|
@@ -255,28 +255,28 @@ trust_transactions INSERT
 
 #### Guarantees
 - **Zero-flicker uploads**: `onMutate` injects optimistic document entry; UI updates instantly before server round-trip
-- **Automatic rollback**: `onError` restores previous cache state — no stale optimistic data persists on failure
+- **Automatic rollback**: `onError` restores previous cache state  -  no stale optimistic data persists on failure
 - **Live dashboard sync**: Supabase Realtime broadcast + postgres_changes invalidate document-slots, readiness, and matter-dashboard caches
 - **Cross-tab consistency**: BroadcastChannel propagates `document:uploaded` events to all open tabs
 
-### 12.2 — Zero-Noise Notification Engine (Smart Batching)
+### 12.2  -  Zero-Noise Notification Engine (Smart Batching)
 
 | Artefact | Location |
 |----------|----------|
-| `checkAndNotifyReadiness()` — category-aware readiness check | `lib/services/matter-readiness-notifier.ts` |
+| `checkAndNotifyReadiness()`  -  category-aware readiness check | `lib/services/matter-readiness-notifier.ts` |
 | `document_uploaded` channels suppressed | `lib/services/notification-engine.ts` |
 | `matter_ready_for_review` notification type | `lib/services/notification-engine.ts` |
 | Upload route wired to readiness check | `app/api/documents/upload/route.ts` |
 
 #### Guarantees
-- **Single alert per milestone**: Lawyers receive one `matter_ready_for_review` notification when all Identity + Financial required slots are filled — not one per document
+- **Single alert per milestone**: Lawyers receive one `matter_ready_for_review` notification when all Identity + Financial required slots are filled  -  not one per document
 - **1-hour deduplication**: Prevents duplicate alerts within a 60-minute window
 - **All channels**: `matter_ready_for_review` fires on in-app, email, and push simultaneously
 - **Per-document noise eliminated**: `document_uploaded` default channels set to `false` across all delivery methods
 
 ---
 
-## Directive 016 — "Emerald Flow" Dashboard UI
+## Directive 016  -  "Emerald Flow" Dashboard UI
 
 **Status:** COMPLETE
 **Date:** 2026-03-25
@@ -328,7 +328,7 @@ Document classification → `broadcastDocumentStatus()` → Supabase Realtime `d
 
 ---
 
-## Directive 016.1 — "Sovereign Sparkle" & Guard
+## Directive 016.1  -  "Sovereign Sparkle" & Guard
 
 **Status:** COMPLETE
 **Date:** 2026-03-25
@@ -356,7 +356,7 @@ Document classification → `broadcastDocumentStatus()` → Supabase Realtime `d
 1. User clicks "Activate Matter"
 2. `fn_generate_matter_genesis_block` RPC called
 3. Matter status updated to `active`
-4. **Sovereign Confetti** burst: `canvas-confetti` with Emerald Green (#50C878) + Sovereign Gold (#D4AF37) palette — triple burst (left, right, centre starburst)
+4. **Sovereign Confetti** burst: `canvas-confetti` with Emerald Green (#50C878) + Sovereign Gold (#D4AF37) palette  -  triple burst (left, right, centre starburst)
 5. Lock icon dissolves → Sovereign Sparkle animates in → "Matter Sealed"
 6. All caches invalidated (genesis-block, readiness, matters)
 
@@ -379,7 +379,7 @@ Document classification → `broadcastDocumentStatus()` → Supabase Realtime `d
 
 ---
 
-## Directive 019 — "Sovereign Summary" Dashboard
+## Directive 019  -  "Sovereign Summary" Dashboard
 
 **Status:** COMPLETE
 **Date:** 2026-03-26
@@ -396,18 +396,18 @@ Document classification → `broadcastDocumentStatus()` → Supabase Realtime `d
 ### Data Hardening Integrity Widget (Compliance Dashboard)
 
 Displays 4 real-time metrics on `/admin/compliance`:
-- **Gaps Closed** — required document slots that reached `accepted` status (with progress bar)
-- **Inconsistencies Pre-empted** — SENTINEL events for OCR_MISMATCH, CONTRADICTION_DETECTED, FIELD_VERIFICATION_MISMATCH, DATA_CORRECTION
-- **Genesis Blocks Sealed** — count of sealed genesis blocks (compliant vs total)
-- **Document Integrity** — verified vs tampered document counts
+- **Gaps Closed**  -  required document slots that reached `accepted` status (with progress bar)
+- **Inconsistencies Pre-empted**  -  SENTINEL events for OCR_MISMATCH, CONTRADICTION_DETECTED, FIELD_VERIFICATION_MISMATCH, DATA_CORRECTION
+- **Genesis Blocks Sealed**  -  count of sealed genesis blocks (compliant vs total)
+- **Document Integrity**  -  verified vs tampered document counts
 
 ### Pre-Flight Checklist (Directive 019 Hard-Gate)
 
 Before the "Sovereign Sparkle" can trigger, a modal displays three hard-gate checks:
 
-1. **Identity: 100% Match** — Passport vs. Intake data. Queries `identity_verifications` for the primary contact; requires `status = 'verified'` with `confidence_score >= 80`
-2. **History: 0 Days Unaccounted** — Complete immigration timeline. Queries `matter_immigration.questionnaire_pct` (must be 100%) and `field_verifications` for unverified history fields (must be 0)
-3. **Trust: Hash Chain Intact** — Immutable ledger parity. Compares `trust_transactions` count vs `trust_ledger_audit` count (delta must be 0)
+1. **Identity: 100% Match**  -  Passport vs. Intake data. Queries `identity_verifications` for the primary contact; requires `status = 'verified'` with `confidence_score >= 80`
+2. **History: 0 Days Unaccounted**  -  Complete immigration timeline. Queries `matter_immigration.questionnaire_pct` (must be 100%) and `field_verifications` for unverified history fields (must be 0)
+3. **Trust: Hash Chain Intact**  -  Immutable ledger parity. Compares `trust_transactions` count vs `trust_ledger_audit` count (delta must be 0)
 
 Only after all three green checks appear does the "Generate Genesis Block" button become active inside the modal.
 
@@ -421,7 +421,7 @@ Only after all three green checks appear does the "Generate Genesis Block" butto
 
 ---
 
-## Directive 020 — "Matrix Manifesto" Integration
+## Directive 020  -  "Matrix Manifesto" Integration
 
 **Status:** COMPLETE
 **Date:** 2026-03-26
@@ -430,7 +430,7 @@ Only after all three green checks appear does the "Generate Genesis Block" butto
 
 | Artefact | Location |
 |----------|----------|
-| `useFirmHealth()` hook — aggregate compliance polling | `lib/hooks/use-firm-health.ts` |
+| `useFirmHealth()` hook  -  aggregate compliance polling | `lib/hooks/use-firm-health.ts` |
 | `.sovereign-pulse-amber` CSS animation | `app/globals.css` |
 | `.sovereign-pulse-red` CSS animation | `app/globals.css` |
 | Sidebar pulse integration | `components/layout/sidebar.tsx` |
@@ -443,13 +443,13 @@ Only after all three green checks appear does the "Generate Genesis Block" butto
 
 ### Sovereign Pulse Animations
 
-- `sovereign-pulse-amber`: 2.5s ease-in-out infinite — soft amber box-shadow glow on sidebar when firm risk is medium
-- `sovereign-pulse-red`: 1.8s ease-in-out infinite — urgent red box-shadow glow when firm risk is high/critical
+- `sovereign-pulse-amber`: 2.5s ease-in-out infinite  -  soft amber box-shadow glow on sidebar when firm risk is medium
+- `sovereign-pulse-red`: 1.8s ease-in-out infinite  -  urgent red box-shadow glow when firm risk is high/critical
 - Applied to the sidebar `<aside>` element conditionally based on `useFirmHealth()` state
 
 ---
 
-## Directive 022 — "LSO-Ready" Forensic Export
+## Directive 022  -  "LSO-Ready" Forensic Export
 
 **Status:** COMPLETE
 **Date:** 2026-03-26
@@ -476,12 +476,12 @@ Only after all three green checks appear does the "Generate Genesis Block" butto
 - If matter status is `closed_won`, `closed_lost`, or `closed`, Section 5 is appended to the PDF
 - **Zero-Balance Verification**: Checks `running_balance_cents` on the last trust transaction
 - If `trust_balance === 0`: Closing Certificate issued with full compliance stamp (emerald)
-- If `trust_balance !== 0`: **COMPLIANCE FAILURE** — red alert: "Residual Trust Funds Detected" — certificate NOT issued
+- If `trust_balance !== 0`: **COMPLIANCE FAILURE**  -  red alert: "Residual Trust Funds Detected"  -  certificate NOT issued
 - SENTINEL logs closing certificate status: `ISSUED` or `BLOCKED_RESIDUAL_FUNDS`
 
 ### Global Expiry Dashboard
 
-- `/admin/global-expiry` — Principal Lawyer view of all clients sorted by "Days to Expiry"
+- `/admin/global-expiry`  -  Principal Lawyer view of all clients sorted by "Days to Expiry"
 - Colour heatmap: >180 days (Grey), 90-180 days (Amber Pulse), <90 days (Sovereign Red)
 - Summary cards showing counts per colour band
 - Each row: contact name, document type, expiry date, days remaining, linked matter number
@@ -496,7 +496,7 @@ Only after all three green checks appear does the "Generate Genesis Block" butto
 
 ---
 
-## Directive 025 — "Firm-Wide Oversight" Dashboard
+## Directive 025  -  "Firm-Wide Oversight" Dashboard
 
 **Status:** COMPLETE
 **Date:** 2026-03-26
@@ -510,8 +510,8 @@ Only after all three green checks appear does the "Generate Genesis Block" butto
 
 ### Oversight Command Widget
 
-- `/admin/firm-oversight` — "5-Second Health Check" for the Principal Lawyer
-- **Matrix Grid**: Two columns — "Hardened" (Genesis Sealed) vs "Soft" (In-Progress)
+- `/admin/firm-oversight`  -  "5-Second Health Check" for the Principal Lawyer
+- **Matrix Grid**: Two columns  -  "Hardened" (Genesis Sealed) vs "Soft" (In-Progress)
 - Summary cards: Total Active, Hardened (emerald), Soft (amber), Integrity Breaches (red)
 - Each matter card shows: matter_number, title, status, genesis hash, trust balance, integrity status
 
@@ -537,7 +537,7 @@ Only after all three green checks appear does the "Generate Genesis Block" butto
 
 ---
 
-## Directive 026 — "Pilot Launch" Hardening
+## Directive 026  -  "Pilot Launch" Hardening
 
 **Status:** COMPLETE
 **Date:** 2026-03-26
@@ -566,7 +566,7 @@ Only after all three green checks appear does the "Generate Genesis Block" butto
 
 ### Emergency Override (Partner PIN)
 
-- POST `/api/admin/emergency-override` — requires Partner/Admin role + 6+ digit PIN
+- POST `/api/admin/emergency-override`  -  requires Partner/Admin role + 6+ digit PIN
 - Supported override types: `TRUST_OVERDRAFT`, `GENESIS_BYPASS`, `DEADLINE_OVERRIDE`, `CLOSING_OVERRIDE`
 - HMAC-SHA256 hash of override action generated and logged
 - Failed PIN attempts logged to SENTINEL as `EMERGENCY_OVERRIDE_DENIED` (critical severity)
@@ -581,7 +581,7 @@ Only after all three green checks appear does the "Generate Genesis Block" butto
   - `email_encrypted` → null
   - `phone_encrypted` → null
   - `custom_intake_data` → `{ _ghosted: true, _ghosted_at: timestamp }`
-- Real data lives on the contact and matter — the lead record becomes a "ghost"
+- Real data lives on the contact and matter  -  the lead record becomes a "ghost"
 - Non-fatal: scrub failure does not block conversion
 
 ### "Battle-Ready" Scorecard
@@ -595,7 +595,7 @@ Only after all three green checks appear does the "Generate Genesis Block" butto
 
 ---
 
-## Directive 029 — "Norva Sovereign Academy" (Pilot Finalization)
+## Directive 029  -  "Norva Sovereign Academy" (Pilot Finalization)
 
 **Status:** COMPLETE
 **Date:** 2026-03-26
@@ -612,9 +612,9 @@ Only after all three green checks appear does the "Generate Genesis Block" butto
 
 ### Academy Modules
 
-1. **Module 1: The Fortress Foundations** — RLS, immutable ledgers, HMAC hash chains, PIPEDA enforcement
-2. **Module 2: Intake to Genesis — The Breeze** — Lead intake, OCR, conflict scan, readiness, genesis activation
-3. **Module 3: Sovereign Oversight — The Shield** — Compliance dashboard, audit simulation, emergency overrides, expiry sentinel
+1. **Module 1: The Fortress Foundations**  -  RLS, immutable ledgers, HMAC hash chains, PIPEDA enforcement
+2. **Module 2: Intake to Genesis  -  The Breeze**  -  Lead intake, OCR, conflict scan, readiness, genesis activation
+3. **Module 3: Sovereign Oversight  -  The Shield**  -  Compliance dashboard, audit simulation, emergency overrides, expiry sentinel
 
 ### Certification Flow
 
@@ -632,7 +632,7 @@ Only after all three green checks appear does the "Generate Genesis Block" butto
 
 ---
 
-## Directive 030 — "Norva Sovereign Ignition" (Pilot Deployment)
+## Directive 030  -  "Norva Sovereign Ignition" (Pilot Deployment)
 
 **Status:** COMPLETE
 **Date:** 2026-03-26
@@ -657,7 +657,7 @@ Steps:
 
 ### Continuity Sequence (02:00 AM Cron)
 
-`POST /api/cron/continuity-sequence` — protected by CRON_SECRET bearer token
+`POST /api/cron/continuity-sequence`  -  protected by CRON_SECRET bearer token
 
 Nightly checks across all active tenants:
 1. **Address history gaps**: Scans all active matters for timeline discontinuities
@@ -665,7 +665,7 @@ Nightly checks across all active tenants:
 3. **Stale matters**: Detects active matters with no updates in 7+ days
 4. **Shadow matter triggers**: Processes pending prospect triggers
 
-### Norva Sovereign Manifesto — FINAL STATUS
+### Norva Sovereign Manifesto  -  FINAL STATUS
 
 | Module | Status | Security Level |
 |--------|--------|---------------|
@@ -677,7 +677,7 @@ Nightly checks across all active tenants:
 
 ---
 
-## Directive 031 — ToS "Hard-Gate" Integration
+## Directive 031  -  ToS "Hard-Gate" Integration
 
 **Status:** COMPLETE
 **Date:** 2026-03-26
@@ -687,14 +687,14 @@ Nightly checks across all active tenants:
 | Artefact | Location |
 |----------|----------|
 | ToS Acceptance Modal component | `components/admin/tos-acceptance-modal.tsx` |
-| `useTosAcceptance()` hook — checks acceptance status | `components/admin/tos-acceptance-modal.tsx` |
-| `useAcceptTos()` mutation — generates hash + stores Block 0 | `components/admin/tos-acceptance-modal.tsx` |
+| `useTosAcceptance()` hook  -  checks acceptance status | `components/admin/tos-acceptance-modal.tsx` |
+| `useAcceptTos()` mutation  -  generates hash + stores Block 0 | `components/admin/tos-acceptance-modal.tsx` |
 
 ### ToS Hard-Gate Logic
 
 1. Before Norva Sovereign Ignition, the ToS modal **must** be displayed
 2. "Accept and Seal" button is **disabled for 10 seconds** (countdown timer) to force scroll-through
-3. User must also **scroll to the bottom** of the document — both conditions required
+3. User must also **scroll to the bottom** of the document  -  both conditions required
 4. On accept → SHA-256 hash generated from `user_id + timestamp + tos_version`
 5. Hash is generated client-side via `crypto.subtle.digest('SHA-256', ...)`
 
@@ -702,7 +702,7 @@ Nightly checks across all active tenants:
 
 - Stored in `firm_global_audit_ledger` as event type `TOS_ACCEPTED`
 - Block 0 entry with details: `tos_version`, `accepted_by`, `accepted_at`, `signature_hash`, `block_number: 0`, `mathematical_finality: true`
-- Immutable — cannot be modified or deleted (append-only ledger)
+- Immutable  -  cannot be modified or deleted (append-only ledger)
 
 ### ToS Sections (Version 1.0.0)
 
@@ -721,3 +721,145 @@ Nightly checks across all active tenants:
 - `!hasScrolled` → "Scroll to bottom required" indicator
 - Both conditions met → emerald "Accept and Seal" button activates
 - After acceptance → signature hash displayed with Sparkles icon
+
+---
+
+## Session A: "Prestige" Architect  -  Glass Fortress & Ignition Ceremony
+
+**Status:** COMPLETE
+**Date:** 2026-03-26
+
+### 1. Glass Fortress Dashboard (Workspace Mastery)
+
+| Artefact | Location |
+|----------|----------|
+| Glass Fortress Matrix component | `components/dashboard/glass-fortress-matrix.tsx` |
+| Glassmorphism CSS (bento card, heatmap pulse, gold aura) | `app/globals.css` |
+| Wired into main dashboard | `app/(dashboard)/page.tsx` (lazy-loaded) |
+
+#### "Bento-Box" Glassmorphism
+
+- `bg-white/[0.04] backdrop-blur-xl` frosted glass surfaces
+- 0.05 opacity emerald borders (`border-emerald-500/15`)
+- Rounded-2xl  -  no sharp edges, every card is polished jade
+- Smooth hover transitions: `translateY(-4px) scale(1.01)` + emerald glow shadow
+
+#### Norva Sovereign Matrix
+
+- Displays all active matters in a bento grid with real-time data
+- **Firm Hash Card**: HMAC-SHA256 Global Firm Hash computed client-side from all genesis hashes + tenant_id
+- **Health Pulse Card**: Real-time compliance status from `useFirmHealth()` with gap closure progress bar
+- Auto-refreshes every 30 seconds
+
+#### Micro-Audit Trace (500ms Hover)
+
+- When user hovers over a sealed matter card for 500ms:
+  - `bg-black/70 backdrop-blur-md` overlay fades in
+  - Genesis Hash displayed with `Fingerprint` icon (emerald)
+  - Visual hash-chain connector (gradient line with `Link2` icon)
+  - Global Firm Hash displayed with `Hash` icon (violet)
+  - Demonstrates cryptographic linkage between matter and firm chain
+
+#### High-Fidelity SVG Readiness Ring
+
+- SVG circular gauge with animated stroke-dasharray/stroke-dashoffset
+- Colour-coded: red (≤34), amber (40-69), green (70-89), emerald (90-99), emerald+gold-glow (100)
+- **Heat-Map Red**: `glass-heatmap-pulse` animation for locked matters (≤34)
+- **Gold Aura**: `glass-gold-aura` animation for perfect-score matters (100)
+- 700ms ease-out transition on score changes
+
+### 2. Ignition Ceremony (/ignite)
+
+| Artefact | Location |
+|----------|----------|
+| Ignite page | `app/(dashboard)/ignite/page.tsx` |
+| Ignite CSS (shimmer, floating particles) | `app/globals.css` |
+
+#### The Ritual Experience
+
+- **Dark-mode**: Full-screen `bg-black` with `from-emerald-950/20 via-transparent to-violet-950/20` gradient
+- **Floating particles**: 20 ambient dots with `float-particle` animation (8-20s cycles)
+- **Typewriter effect**: Custom `useTypewriter()` hook  -  30ms per character, line-by-line reveal of 19-line manifesto
+- Key lines highlighted: "This is not software" (amber), "This is a Digital Constitution" (amber), "The math is perfect" (emerald)
+
+#### Liquid Progress "Intent-Lock" Button
+
+- User must **hold the button for 3 seconds** (the Intent-Lock)
+- Liquid fill progresses left-to-right via `linear-gradient` with dynamic `${progress}%` breakpoint
+- 60fps progress update (16ms interval)
+- Button scales `0.98` while held, border transitions to amber
+- Button disabled until typewriter completes  -  forces reading the manifesto
+
+#### 3D Sovereign Confetti
+
+- 4-wave confetti sequence using `canvas-confetti`:
+  1. Left burst (60 particles, spread 80)
+  2. Right burst (150ms delay, 60 particles)
+  3. Centre starburst (400ms delay, 100 particles, star shapes, 360° spread)
+  4. Gold rain from top (700ms delay, 80 particles, gravity 1.2)
+- Palette: Emerald Green (#50C878), Sovereign Gold (#D4AF37), Sovereign Silver (#C0C0C0)
+- **Haptic vibration**: `navigator.vibrate([100, 50, 200, 50, 100])` on mobile/trackpad
+
+#### Ignition Hash
+
+- SHA-256 hash of `IGNITION:${userId}:${timestamp}:${TOS_VERSION}` via `crypto.subtle.digest`
+- Stored in `firm_global_audit_ledger` as event type `SOVEREIGN_IGNITION` with `block_number: 0`
+- Hash displayed post-ignition in `font-mono text-white/20`
+
+### Mastery Verification
+
+| Layer | Metric | Status |
+|-------|--------|--------|
+| Visuals | Glassmorphism Bento UI | ✅ High-Prestige Professionalism |
+| Integrity | Conflict-Genesis Weld (Micro-Audit Trace) | ✅ Mathematical Finality |
+| Speed | <100ms Atomic Transfer (Liquid Button) | ✅ The "Breeze" Experience |
+| Security | Partner-PIN Override (Directive 026) | ✅ The "Shield" Enforcement |
+| Reward | 3D Sovereign Sparkle (4-wave confetti) | ✅ The "Prestige" Reward |
+
+### TSC: 0 errors ✅
+
+---
+
+## ComplianceOnboardingTour  -  Guided Product Tour
+
+**Status:** COMPLETE
+**Date:** 2026-03-26
+
+### What was built
+
+| Artefact | Location |
+|----------|----------|
+| ComplianceOnboardingTour component + provider | `components/onboarding/compliance-onboarding-tour.tsx` |
+| `useTour()` hook for external access | `components/onboarding/compliance-onboarding-tour.tsx` |
+| Tour bullet stagger animation | `app/globals.css` (`@keyframes fadeSlideIn`) |
+| Wired into dashboard layout | `app/(dashboard)/layout.tsx` |
+
+### Tour Stops (7)
+
+| # | Stop | What it explains |
+|---|------|-----------------|
+| 1 | Welcome to the Fortress | RLS, SHA-256, PIPEDA, SENTINEL overview |
+| 2 | The Sovereign Matrix | Glass Fortress dashboard, Micro-Audit Trace, Firm Hash |
+| 3 | Readiness Score & Shield Domains | 5 domains, emerald glow, heat-map pulse |
+| 4 | Pre-Flight & Genesis Block | 3-check hard-gate, Sovereign Confetti, immutable seal |
+| 5 | Immutable Trust Ledger | Append-only, overdraft prevention, zero-balance closing |
+| 6 | Compliance Dashboard & Audit Simulation | Region lock, encryption, parity, LSO simulation |
+| 7 | Academy & Sovereign Ignition | 3 modules, certification badge, hold-to-ignite ceremony |
+
+### Activation Logic
+
+- **Auto-trigger**: On first login when `user_metadata.onboarding_tour_completed` is not set
+- **1.5-second delay**: Dashboard renders before overlay appears
+- **Navigation**: Steps with `href` auto-navigate the user to the relevant page
+- **Skip / Complete**: Both paths set `onboarding_tour_completed: true` + `onboarding_tour_completed_at` in user metadata
+- **Re-trigger**: `useTour().startTour()` can be called from Academy or settings
+
+### Sovereign-Styled UI
+
+- **Glassmorphism card**: `bg-slate-900/90 backdrop-blur-2xl` with `border-white/[0.08]`, `rounded-3xl`
+- **Step indicator**: Animated dots  -  current step is 6px emerald, completed are 3px emerald/40, upcoming are white/10
+- **Detail bullets**: Staggered `fadeSlideIn` animation (0.08s delay per bullet) with accent-coloured check icons
+- **Progress bar**: Emerald gradient, smooth 500ms transition
+- **Navigation**: Ghost "Back"/"Skip" buttons, emerald "Next" button, gold "Complete Tour" on final step
+
+### TSC: 0 errors ✅

@@ -5,7 +5,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { ConciergeShell } from '@/components/front-desk/ConciergeShell'
 
 /**
- * Front Desk Layout — Directive 32.0 ConciergeShell
+ * Front Desk Layout  -  Directive 32.0 ConciergeShell
  *
  * Rule #10: Front Desk Mode is a separate locked interface.
  *           Own route group, no sidebar, enforced by middleware AND server.
@@ -83,7 +83,7 @@ export default async function FrontDeskLayout({
     redirect('/')
   }
 
-  // Check feature flag — reads from the top-level feature_flags column,
+  // Check feature flag  -  reads from the top-level feature_flags column,
   // NOT settings.feature_flags (which is a different, nested key).
   const { data: tenant } = await admin
     .from('tenants')

@@ -1,5 +1,5 @@
 /**
- * Front Desk Isolation — Regression Test
+ * Front Desk Isolation  -  Regression Test
  *
  * Ensures the front desk console cannot access restricted surfaces,
  * bypass the action executor, or leak sensitive data.

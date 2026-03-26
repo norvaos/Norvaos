@@ -11,7 +11,7 @@ import { withTiming } from '@/lib/middleware/request-timing'
  *
  * Logs non-action events to front_desk_events for KPI computation.
  * These are lightweight telemetry events (queue views, searches, idle gaps,
- * heartbeats) — NOT action state changes.
+ * heartbeats)  -  NOT action state changes.
  *
  * All state-changing actions still go through /api/actions/[actionType].
  * This endpoint is ONLY for passive observation events.

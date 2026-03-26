@@ -51,7 +51,7 @@ describe('Front Desk KPI Definitions', () => {
   })
 })
 
-describe('evaluateThreshold — higher_is_better', () => {
+describe('evaluateThreshold  -  higher_is_better', () => {
   const def: KpiDefinition = {
     key: 'test_higher',
     label: 'Test Higher',
@@ -85,7 +85,7 @@ describe('evaluateThreshold — higher_is_better', () => {
   })
 })
 
-describe('evaluateThreshold — lower_is_better', () => {
+describe('evaluateThreshold  -  lower_is_better', () => {
   const def: KpiDefinition = {
     key: 'test_lower',
     label: 'Test Lower',
@@ -119,7 +119,7 @@ describe('evaluateThreshold — lower_is_better', () => {
   })
 })
 
-describe('evaluateThreshold — real KPI definitions', () => {
+describe('evaluateThreshold  -  real KPI definitions', () => {
   it('total_actions: 50 is green, 25 is amber, 5 is red', () => {
     const def = getKpiDefinition('total_actions')!
     expect(evaluateThreshold(50, def)).toBe('green')
@@ -197,7 +197,7 @@ describe('buildKpiValues', () => {
     const result = buildKpiValues({})
     const avgResponse = result.find((k) => k.key === 'checkin_response_avg')
     expect(avgResponse?.color).toBe('grey')
-    expect(avgResponse?.displayValue).toBe('—')
+    expect(avgResponse?.displayValue).toBe(' - ')
   })
 
   it('formats time values correctly', () => {

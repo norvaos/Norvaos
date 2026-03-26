@@ -1,8 +1,8 @@
 -- ============================================================
 -- 123-matter-rule-snapshots.sql
--- Immutable rule versioning snapshots — captures the 6 rule
+-- Immutable rule versioning snapshots  -  captures the 6 rule
 -- objects from a matter's matter_type at the moment of creation.
--- Agent 4 of 6 — Rule Versioning Snapshots
+-- Agent 4 of 6  -  Rule Versioning Snapshots
 -- ============================================================
 
 CREATE TABLE IF NOT EXISTS matter_rule_snapshots (

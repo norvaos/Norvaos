@@ -1,5 +1,5 @@
 /**
- * LedgerGuard Middleware — Fiduciary Gate (Directive 20.0 Technical Handover)
+ * LedgerGuard Middleware  -  Fiduciary Gate (Directive 20.0 Technical Handover)
  *
  * Enforces: Any manual edit to a Trust Account balance without a corresponding
  * 'Reason Code' must be blocked and logged to the Sentinel Chain-of-Custody.

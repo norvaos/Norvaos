@@ -5,7 +5,7 @@
 --
 -- Problem: Migration 043 added USING + WITH CHECK to matters, contacts, leads,
 -- activities, and dob_lockouts. ~30+ other tenant-scoped tables only have USING
--- policies — they prevent cross-tenant reads but allow inserts/updates with a
+-- policies  -  they prevent cross-tenant reads but allow inserts/updates with a
 -- wrong tenant_id.
 --
 -- Fix: Apply USING + WITH CHECK to ALL tenant-scoped tables. Uses the cached
@@ -60,12 +60,12 @@ DECLARE
   ];
 BEGIN
   FOR t IN SELECT unnest(tables_to_harden) LOOP
-    -- Skip if table doesn't exist (defensive — some tables may not exist in all envs)
+    -- Skip if table doesn't exist (defensive  -  some tables may not exist in all envs)
     IF NOT EXISTS (
       SELECT 1 FROM information_schema.tables
       WHERE table_schema = 'public' AND table_name = t
     ) THEN
-      RAISE NOTICE 'Skipping % — table does not exist', t;
+      RAISE NOTICE 'Skipping %  -  table does not exist', t;
       CONTINUE;
     END IF;
 
@@ -74,7 +74,7 @@ BEGIN
       SELECT 1 FROM information_schema.columns
       WHERE table_schema = 'public' AND table_name = t AND column_name = 'tenant_id'
     ) THEN
-      RAISE NOTICE 'Skipping % — no tenant_id column', t;
+      RAISE NOTICE 'Skipping %  -  no tenant_id column', t;
       CONTINUE;
     END IF;
 

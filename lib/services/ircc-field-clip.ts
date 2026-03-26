@@ -18,7 +18,7 @@ export interface ClipField {
   key: string
   /** Human-readable label matching IRCC portal field labels */
   label: string
-  /** The value to copy — formatted for IRCC portal */
+  /** The value to copy  -  formatted for IRCC portal */
   value: string
   /** Whether this field has a value */
   filled: boolean
@@ -70,26 +70,26 @@ function formatAddress(addr: Partial<IRCCAddress> | undefined): string {
 function formatAddressFields(prefix: string, label: string, addr: Partial<IRCCAddress> | undefined, formRef: string): ClipField[] {
   if (!addr) return [f(`${prefix}_full`, label, '', formRef)]
   return [
-    f(`${prefix}_unit`, `${label} — Unit/Apt`, addr.apt_unit, formRef),
-    f(`${prefix}_street_num`, `${label} — Street No.`, addr.street_number, formRef),
-    f(`${prefix}_street_name`, `${label} — Street Name`, addr.street_name, formRef),
-    f(`${prefix}_city`, `${label} — City/Town`, addr.city, formRef),
-    f(`${prefix}_province`, `${label} — Province/State`, addr.province_state, formRef),
-    f(`${prefix}_postal`, `${label} — Postal Code`, addr.postal_code, formRef),
-    f(`${prefix}_country`, `${label} — Country`, addr.country, formRef),
+    f(`${prefix}_unit`, `${label}  -  Unit/Apt`, addr.apt_unit, formRef),
+    f(`${prefix}_street_num`, `${label}  -  Street No.`, addr.street_number, formRef),
+    f(`${prefix}_street_name`, `${label}  -  Street Name`, addr.street_name, formRef),
+    f(`${prefix}_city`, `${label}  -  City/Town`, addr.city, formRef),
+    f(`${prefix}_province`, `${label}  -  Province/State`, addr.province_state, formRef),
+    f(`${prefix}_postal`, `${label}  -  Postal Code`, addr.postal_code, formRef),
+    f(`${prefix}_country`, `${label}  -  Country`, addr.country, formRef),
   ]
 }
 
 function formatFamilyMember(prefix: string, label: string, member: Partial<IRCCFamilyMember> | undefined, formRef: string): ClipField[] {
   if (!member) return []
   return [
-    f(`${prefix}_family_name`, `${label} — Family Name`, member.family_name, formRef),
-    f(`${prefix}_given_name`, `${label} — Given Name`, member.given_name, formRef),
-    f(`${prefix}_dob`, `${label} — Date of Birth`, formatDate(member.date_of_birth), formRef),
-    f(`${prefix}_birth_country`, `${label} — Country of Birth`, member.country_of_birth, formRef),
-    f(`${prefix}_marital`, `${label} — Marital Status`, member.marital_status, formRef),
-    f(`${prefix}_occupation`, `${label} — Occupation`, member.occupation, formRef),
-    f(`${prefix}_address`, `${label} — Address`, member.address, formRef),
+    f(`${prefix}_family_name`, `${label}  -  Family Name`, member.family_name, formRef),
+    f(`${prefix}_given_name`, `${label}  -  Given Name`, member.given_name, formRef),
+    f(`${prefix}_dob`, `${label}  -  Date of Birth`, formatDate(member.date_of_birth), formRef),
+    f(`${prefix}_birth_country`, `${label}  -  Country of Birth`, member.country_of_birth, formRef),
+    f(`${prefix}_marital`, `${label}  -  Marital Status`, member.marital_status, formRef),
+    f(`${prefix}_occupation`, `${label}  -  Occupation`, member.occupation, formRef),
+    f(`${prefix}_address`, `${label}  -  Address`, member.address, formRef),
   ].filter(fld => fld.value !== '')
 }
 
@@ -201,13 +201,13 @@ export function buildClipSections(profile: IRCCProfile): ClipSection[] {
     f('edu_highest_level',  'Highest Level',      profile.education.highest_level, 'IMM 5257 §9'),
     f('edu_total_years',    'Total Years',         profile.education.total_years, 'IMM 5257 §9'),
     ...(profile.education.history ?? []).flatMap((entry, i) => [
-      f(`edu_${i}_institution`, `Education ${i + 1} — Institution`,   entry.institution, 'IMM 5257 §9'),
-      f(`edu_${i}_field`,       `Education ${i + 1} — Field of Study`, entry.field_of_study, 'IMM 5257 §9'),
-      f(`edu_${i}_diploma`,     `Education ${i + 1} — Diploma/Degree`, entry.diploma_degree, 'IMM 5257 §9'),
-      f(`edu_${i}_from`,        `Education ${i + 1} — From`,          formatDate(entry.from_date), 'IMM 5257 §9'),
-      f(`edu_${i}_to`,          `Education ${i + 1} — To`,            formatDate(entry.to_date), 'IMM 5257 §9'),
-      f(`edu_${i}_city`,        `Education ${i + 1} — City`,          entry.city, 'IMM 5257 §9'),
-      f(`edu_${i}_country`,     `Education ${i + 1} — Country`,       entry.country, 'IMM 5257 §9'),
+      f(`edu_${i}_institution`, `Education ${i + 1}  -  Institution`,   entry.institution, 'IMM 5257 §9'),
+      f(`edu_${i}_field`,       `Education ${i + 1}  -  Field of Study`, entry.field_of_study, 'IMM 5257 §9'),
+      f(`edu_${i}_diploma`,     `Education ${i + 1}  -  Diploma/Degree`, entry.diploma_degree, 'IMM 5257 §9'),
+      f(`edu_${i}_from`,        `Education ${i + 1}  -  From`,          formatDate(entry.from_date), 'IMM 5257 §9'),
+      f(`edu_${i}_to`,          `Education ${i + 1}  -  To`,            formatDate(entry.to_date), 'IMM 5257 §9'),
+      f(`edu_${i}_city`,        `Education ${i + 1}  -  City`,          entry.city, 'IMM 5257 §9'),
+      f(`edu_${i}_country`,     `Education ${i + 1}  -  Country`,       entry.country, 'IMM 5257 §9'),
     ]),
   ]
   sections.push(makeSection('education', 'Education', 'graduation-cap', 'IMM 5257 §9', education))
@@ -216,13 +216,13 @@ export function buildClipSections(profile: IRCCProfile): ClipSection[] {
   const employment: ClipField[] = [
     f('emp_current', 'Current Occupation', profile.employment.current_occupation, 'IMM 5257 §10'),
     ...(profile.employment.history ?? []).flatMap((entry, i) => [
-      f(`emp_${i}_employer`, `Employment ${i + 1} — Employer`,  entry.employer, 'IMM 5257 §10'),
-      f(`emp_${i}_title`,    `Employment ${i + 1} — Title`,     entry.title, 'IMM 5257 §10'),
-      f(`emp_${i}_type`,     `Employment ${i + 1} — Type`,      entry.activity_type, 'IMM 5257 §10'),
-      f(`emp_${i}_from`,     `Employment ${i + 1} — From`,      formatDate(entry.from_date), 'IMM 5257 §10'),
-      f(`emp_${i}_to`,       `Employment ${i + 1} — To`,        formatDate(entry.to_date), 'IMM 5257 §10'),
-      f(`emp_${i}_city`,     `Employment ${i + 1} — City`,      entry.city, 'IMM 5257 §10'),
-      f(`emp_${i}_country`,  `Employment ${i + 1} — Country`,   entry.country, 'IMM 5257 §10'),
+      f(`emp_${i}_employer`, `Employment ${i + 1}  -  Employer`,  entry.employer, 'IMM 5257 §10'),
+      f(`emp_${i}_title`,    `Employment ${i + 1}  -  Title`,     entry.title, 'IMM 5257 §10'),
+      f(`emp_${i}_type`,     `Employment ${i + 1}  -  Type`,      entry.activity_type, 'IMM 5257 §10'),
+      f(`emp_${i}_from`,     `Employment ${i + 1}  -  From`,      formatDate(entry.from_date), 'IMM 5257 §10'),
+      f(`emp_${i}_to`,       `Employment ${i + 1}  -  To`,        formatDate(entry.to_date), 'IMM 5257 §10'),
+      f(`emp_${i}_city`,     `Employment ${i + 1}  -  City`,      entry.city, 'IMM 5257 §10'),
+      f(`emp_${i}_country`,  `Employment ${i + 1}  -  Country`,   entry.country, 'IMM 5257 §10'),
     ]),
   ]
   sections.push(makeSection('employment', 'Employment', 'briefcase', 'IMM 5257 §10', employment))
@@ -277,10 +277,10 @@ export interface DefaultChecklistItem {
  * Used to seed ircc_submission_checklist when a matter's SBS tab is first opened.
  */
 export const DEFAULT_SUBMISSION_CHECKLIST: DefaultChecklistItem[] = [
-  { item_key: 'imm5257_upload',      label: 'IMM 5257 — Application Form',           category: 'form',       sort_order: 1,  is_required: true },
-  { item_key: 'imm5645_upload',      label: 'IMM 5645 — Family Information',          category: 'form',       sort_order: 2,  is_required: true },
-  { item_key: 'imm5406_upload',      label: 'IMM 5406 — Additional Family',           category: 'form',       sort_order: 3,  is_required: false },
-  { item_key: 'imm5476_upload',      label: 'IMM 5476 — Use of Representative',       category: 'form',       sort_order: 4,  is_required: true },
+  { item_key: 'imm5257_upload',      label: 'IMM 5257  -  Application Form',           category: 'form',       sort_order: 1,  is_required: true },
+  { item_key: 'imm5645_upload',      label: 'IMM 5645  -  Family Information',          category: 'form',       sort_order: 2,  is_required: true },
+  { item_key: 'imm5406_upload',      label: 'IMM 5406  -  Additional Family',           category: 'form',       sort_order: 3,  is_required: false },
+  { item_key: 'imm5476_upload',      label: 'IMM 5476  -  Use of Representative',       category: 'form',       sort_order: 4,  is_required: true },
   { item_key: 'passport_copy',       label: 'Passport Bio Page Copy',                  category: 'document',   sort_order: 10, is_required: true },
   { item_key: 'photo_upload',        label: 'Digital Photo (35mm x 45mm)',              category: 'document',   sort_order: 11, is_required: true },
   { item_key: 'travel_history',      label: 'Travel History / Entry Stamps',           category: 'document',   sort_order: 12, is_required: false },

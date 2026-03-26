@@ -1,14 +1,14 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Entity Recognition Queries — The Mirror Pattern
+ * Entity Recognition Queries  -  The Mirror Pattern
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Hooks that power Contact-thinking in the Command Centre:
  *
- *   usePreviousSponsors  — Given a contact, find sponsors from their past matters
- *   useContactMatters    — Given a contact, find all their linked matters
- *   useLinkContactToLead — Mutation: set lead.contact_id and persist the link
- *   useLinkSponsorToLead — Mutation: store sponsor_contact_id in lead.custom_fields
+ *   usePreviousSponsors   -  Given a contact, find sponsors from their past matters
+ *   useContactMatters     -  Given a contact, find all their linked matters
+ *   useLinkContactToLead  -  Mutation: set lead.contact_id and persist the link
+ *   useLinkSponsorToLead  -  Mutation: store sponsor_contact_id in lead.custom_fields
  */
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
@@ -134,7 +134,7 @@ export function usePreviousSponsors(contactId: string | null | undefined) {
 // ─── Link Contact to Lead ───────────────────────────────────────────────────
 
 /**
- * Set lead.contact_id — links an existing contact (or newly created one)
+ * Set lead.contact_id  -  links an existing contact (or newly created one)
  * as the principal applicant for this lead.
  */
 export function useLinkContactToLead() {

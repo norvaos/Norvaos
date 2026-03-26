@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------
-// Canadian Visitor Visa Invitation Form — Constants
+// Canadian Visitor Visa Invitation Form  -  Constants
 // ---------------------------------------------------------------------------
 
 export const CANADIAN_PROVINCES = [

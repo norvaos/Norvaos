@@ -5,9 +5,9 @@
  *
  * Executes the 3-step onboarding sequence when a matter is officially "Retained":
  *
- *   1. Fee Snapshot — Lock the fees and tax at retainer time (Layer 4)
- *   2. Portal Birth — Create client portal account + send welcome email
- *   3. Blueprint Injection — Load the 12-slot document checklist
+ *   1. Fee Snapshot  -  Lock the fees and tax at retainer time (Layer 4)
+ *   2. Portal Birth  -  Create client portal account + send welcome email
+ *   3. Blueprint Injection  -  Load the 12-slot document checklist
  *
  * Each step is executed independently and tracked in the `onboarding_runs` table.
  * Failures in one step do not block the others.
@@ -417,7 +417,7 @@ async function executeBlueprintInjection(
     .order('sort_order', { ascending: true })
 
   if (!templates || templates.length === 0) {
-    // No blueprint defined — try generic slots
+    // No blueprint defined  -  try generic slots
     const defaultSlots = getDefaultDocumentSlots()
     const slotsToInsert = defaultSlots.map((slot, idx) => ({
       tenant_id: tenantId,

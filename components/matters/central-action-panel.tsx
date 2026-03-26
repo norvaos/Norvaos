@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * CentralActionPanel — Shows one primary next action + 1-2 secondary quick actions.
+ * CentralActionPanel  -  Shows one primary next action + 1-2 secondary quick actions.
  *
  * The primary action is computed from `readinessData.nextAction` and `intakeStatus`.
  * Secondary actions are context-dependent (contradictions, pending review, missing fields, etc.).
@@ -187,7 +187,7 @@ function computePrimaryAction(
     }
   }
 
-  // Deficiency outstanding — specific action based on what's blocking
+  // Deficiency outstanding  -  specific action based on what's blocking
   if (intakeStatus === 'deficiency_outstanding') {
     // Contradictions are the primary deficiency
     if (readinessData.contradictions.blockingCount > 0 && !readinessData.contradictions.overridden) {
@@ -207,7 +207,7 @@ function computePrimaryAction(
         onClick: () => onNavigateToSection('documents'),
       }
     }
-    // General deficiency — direct to review
+    // General deficiency  -  direct to review
     return {
       key: 'resolve_deficiency',
       label: 'Review Deficiencies',

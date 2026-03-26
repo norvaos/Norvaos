@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * useSeedRequirements — Auto-seed matter_checklist_items when caseTypeId changes.
+ * useSeedRequirements  -  Auto-seed matter_checklist_items when caseTypeId changes.
  *
  * Watches the case type (processing stream) and, if no checklist items exist yet,
  * calls useInitializeChecklist to bulk-copy from checklist_templates.

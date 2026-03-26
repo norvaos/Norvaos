@@ -79,7 +79,7 @@ export const markContactedAction: ActionDefinition<MarkContactedInput, MarkConta
       newState: updatedLead as Record<string, unknown> | null,
       activity: {
         activityType: 'lead_contacted',
-        title: `Lead contacted — ${input.outcome}`,
+        title: `Lead contacted  -  ${input.outcome}`,
         description: input.callNotes,
         metadata: {
           outcome: input.outcome,

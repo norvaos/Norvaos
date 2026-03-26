@@ -23,10 +23,10 @@ interface NotifyBody {
  * Sends a "rejected-item-nudge" transactional email to the client
  * after a lawyer rejects field(s) or document(s) during verification.
  *
- * This is fire-and-forget — the rejection has already been saved via the
+ * This is fire-and-forget  -  the rejection has already been saved via the
  * parent /verify endpoint. This just handles the email notification.
  *
- * Permission: form_packs:create (Lawyer/Admin only — same as verify)
+ * Permission: form_packs:create (Lawyer/Admin only  -  same as verify)
  */
 async function handlePost(
   request: NextRequest,
@@ -126,7 +126,7 @@ async function handlePost(
       )
     }
     console.error('[verify/notify] error:', error)
-    // Non-fatal — return 200 even if email fails since the rejection was already saved
+    // Non-fatal  -  return 200 even if email fails since the rejection was already saved
     return NextResponse.json({
       success: true,
       notified: false,

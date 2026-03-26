@@ -1,5 +1,5 @@
 /**
- * GET /api/analytics/conversion — UTM source → revenue attribution
+ * GET /api/analytics/conversion  -  UTM source → revenue attribution
  *
  * Performs a server-side JOIN (via two lean queries) to keep the client
  * payload under 20 columns. Returns aggregated conversion and revenue
@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
       ? (searchParams.get('group_by') as 'source' | 'medium' | 'campaign')
       : 'source'
 
-    // ── Query 1: Leads with UTM data (12 columns — lean fragment) ──────────
+    // ── Query 1: Leads with UTM data (12 columns  -  lean fragment) ──────────
     let leadsQuery = supabase
       .from('leads')
       .select(
@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // ── Query 2: Matters with revenue data (6 columns — lean fragment) ─────
+    // ── Query 2: Matters with revenue data (6 columns  -  lean fragment) ─────
     // Only fetch matters that correspond to converted leads.
     const convertedMatterIds = (leads ?? [])
       .filter((l) => l.converted_matter_id)

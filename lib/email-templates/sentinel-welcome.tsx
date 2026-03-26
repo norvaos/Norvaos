@@ -14,7 +14,7 @@ import {
 import { render } from '@react-email/components'
 
 /**
- * Directive 26.2 — Sentinel-Handshake Welcome Email
+ * Directive 26.2  -  Sentinel-Handshake Welcome Email
  *
  * Global 15 localised welcome email sent when a client contact is first
  * linked to a matter. Contains a Safe-Link that initiates the Biometric
@@ -39,7 +39,7 @@ interface SentinelWelcomeEmailProps {
   englishBody: string
   /** The Safe-Link URL (portal link with biometric handshake) */
   safeLink: string
-  /** Client's preferred language label (e.g. "اردو — Urdu") */
+  /** Client's preferred language label (e.g. "اردو  -  Urdu") */
   languageLabel: string
   /** Text direction for localised content */
   dir: 'ltr' | 'rtl'

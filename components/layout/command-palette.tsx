@@ -36,7 +36,7 @@ import {
 } from 'lucide-react'
 
 // ---------------------------------------------------------------------------
-// Debounce hook — 150ms for near-instant feel
+// Debounce hook  -  150ms for near-instant feel
 // ---------------------------------------------------------------------------
 function useDebounce(value: string, delay: number) {
   const [debouncedValue, setDebouncedValue] = useState(value)
@@ -68,7 +68,7 @@ export function CommandPalette() {
     }
   }, [open, initialQuery])
 
-  // Directive 36.2: Cross-locale resolution — if user types "پاسپورٹ" (Urdu),
+  // Directive 36.2: Cross-locale resolution  -  if user types "پاسپورٹ" (Urdu),
   // resolve to English equivalents ("Passport Number", "Passport Expiry Date")
   // and search with the first English match instead of the raw non-English term.
   const { englishTerms } = useCrossLocaleSearch(debouncedQuery, 80)
@@ -76,10 +76,10 @@ export function CommandPalette() {
     ? englishTerms[0] // Use the first English canonical match
     : debouncedQuery
 
-  // Single RPC call via TanStack Query — replaces 4 parallel client queries
+  // Single RPC call via TanStack Query  -  replaces 4 parallel client queries
   const { data: results, isFetching } = useGlobalSearch(effectiveQuery)
 
-  // Directive 36.3: Wiki search — Universal Library (locale-agnostic).
+  // Directive 36.3: Wiki search  -  Universal Library (locale-agnostic).
   // Always searches English content regardless of Globe locale setting.
   // Uses the raw debouncedQuery AND effectiveQuery to cast the widest net.
   const { data: wikiResults, isFetching: wikiFetching } = useWikiSearch(effectiveQuery)
@@ -228,7 +228,7 @@ export function CommandPalette() {
               </CommandGroup>
             )}
 
-            {/* Knowledge Base — Universal Library (locale-agnostic, Directive 36.3) */}
+            {/* Knowledge Base  -  Universal Library (locale-agnostic, Directive 36.3) */}
             {wiki.length > 0 && (
               <CommandGroup heading={t('nav.knowledgeBase' as any)}>
                 {wiki.map((w) => (
@@ -253,7 +253,7 @@ export function CommandPalette() {
                       <span className="text-xs text-muted-foreground truncate">
                         {w.category_name ? `${w.category_name} · ` : ''}
                         {w.item_type === 'playbook' ? t('common.playbook' as any) : t('common.snippet' as any)}
-                        {w.description ? ` — ${w.description.slice(0, 80)}` : ''}
+                        {w.description ? `  -  ${w.description.slice(0, 80)}` : ''}
                       </span>
                     </div>
                   </CommandItem>

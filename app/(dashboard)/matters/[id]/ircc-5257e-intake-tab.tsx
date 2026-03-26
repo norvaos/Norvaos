@@ -201,7 +201,7 @@ export function IRCC5257EIntakeTab({ matterId, contactId, tenantId }: IRCC5257EI
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-base font-semibold">IMM 5257E — Temporary Resident Visa</h3>
+            <h3 className="text-base font-semibold">IMM 5257E  -  Temporary Resident Visa</h3>
             <p className="text-sm text-muted-foreground">
               Collecting all required information for IMM 5257E application
             </p>
@@ -353,7 +353,7 @@ export function IRCC5257EIntakeTab({ matterId, contactId, tenantId }: IRCC5257EI
         <div className="mb-4 rounded-full bg-indigo-50 p-4">
           <ClipboardList className="h-8 w-8 text-indigo-500" />
         </div>
-        <h3 className="text-lg font-semibold">IMM 5257E — Temporary Resident Visa</h3>
+        <h3 className="text-lg font-semibold">IMM 5257E  -  Temporary Resident Visa</h3>
         <p className="mt-1 max-w-lg text-sm text-muted-foreground">
           Collect all required client information for the IMM 5257E application.
           Includes personal details, identity documents, language, contact info,

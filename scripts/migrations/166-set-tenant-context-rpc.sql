@@ -1,5 +1,5 @@
 -- =============================================================================
--- Migration 166 — set_tenant_context() RPC
+-- Migration 166  -  set_tenant_context() RPC
 -- =============================================================================
 --
 -- Exposes a thin wrapper around PostgreSQL's set_config() so the application

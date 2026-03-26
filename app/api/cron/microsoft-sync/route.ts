@@ -21,7 +21,7 @@ const MAX_ERROR_COUNT = 10
  * 15 minutes) or manually.
  */
 async function handlePost(request: Request) {
-  // Auth check — fail-closed: reject if CRON_SECRET is unset
+  // Auth check  -  fail-closed: reject if CRON_SECRET is unset
   const cronSecret = process.env['CRON_SECRET']
   if (!cronSecret) {
     return NextResponse.json({ error: 'Server misconfigured: CRON_SECRET not set' }, { status: 500 })
@@ -133,7 +133,7 @@ async function handlePost(request: Request) {
           try {
             await associateEmailToMatter(admin, thread.id)
           } catch {
-            // Non-blocking — association failures should not stop the cron
+            // Non-blocking  -  association failures should not stop the cron
           }
         }
       }

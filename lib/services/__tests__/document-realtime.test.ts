@@ -1,33 +1,27 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-const mockSend = vi.fn()
-const mockRemoveChannel = vi.fn()
-const mockChannel = { send: mockSend }
-const mockCreateAdminClient = vi.fn(() => ({
-  channel: vi.fn(() => mockChannel),
-  removeChannel: mockRemoveChannel,
-}))
-
+// vi.mock factories are hoisted  -  use inline functions (no top-level variable refs)
 vi.mock('@/lib/supabase/admin', () => ({
-  createAdminClient: mockCreateAdminClient,
+  createAdminClient: vi.fn(() => ({
+    channel: vi.fn(() => ({ send: vi.fn().mockResolvedValue(undefined) })),
+    removeChannel: vi.fn(),
+  })),
 }))
-
-const mockLogInfo = vi.fn()
-const mockLogWarn = vi.fn()
 
 vi.mock('@/lib/utils/logger', () => ({
   log: {
-    info: mockLogInfo,
-    warn: mockLogWarn,
+    info: vi.fn(),
+    warn: vi.fn(),
   },
 }))
 
 import { broadcastDocumentStatus } from '../document-realtime'
+import { createAdminClient } from '@/lib/supabase/admin'
+import { log } from '@/lib/utils/logger'
 
 describe('broadcastDocumentStatus', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    mockSend.mockResolvedValue(undefined)
   })
 
   it('sends broadcast on correct channel', async () => {
@@ -42,10 +36,11 @@ describe('broadcastDocumentStatus', () => {
 
     await broadcastDocumentStatus(event)
 
-    const adminClient = mockCreateAdminClient.mock.results[0].value
+    const adminClient = vi.mocked(createAdminClient).mock.results[0]?.value
     expect(adminClient.channel).toHaveBeenCalledWith('documents:matter-42')
 
-    expect(mockSend).toHaveBeenCalledWith({
+    const mockChannel = adminClient.channel.mock.results[0]?.value
+    expect(mockChannel.send).toHaveBeenCalledWith({
       type: 'broadcast',
       event: 'document_status_changed',
       payload: {
@@ -58,11 +53,17 @@ describe('broadcastDocumentStatus', () => {
       },
     })
 
-    expect(mockRemoveChannel).toHaveBeenCalledWith(mockChannel)
+    expect(adminClient.removeChannel).toHaveBeenCalledWith(mockChannel)
   })
 
   it('handles errors gracefully', async () => {
-    mockSend.mockRejectedValue(new Error('network failure'))
+    // Override send to reject for this test
+    vi.mocked(createAdminClient).mockReturnValueOnce({
+      channel: vi.fn(() => ({
+        send: vi.fn().mockRejectedValue(new Error('network failure')),
+      })),
+      removeChannel: vi.fn(),
+    } as any)
 
     const event = {
       documentId: 'doc-2',
@@ -75,7 +76,7 @@ describe('broadcastDocumentStatus', () => {
 
     await expect(broadcastDocumentStatus(event)).resolves.toBeUndefined()
 
-    expect(mockLogWarn).toHaveBeenCalledWith(
+    expect(log.warn).toHaveBeenCalledWith(
       '[document-realtime] Broadcast failed',
       expect.objectContaining({
         matterId: 'matter-99',
@@ -96,7 +97,10 @@ describe('broadcastDocumentStatus', () => {
 
     await broadcastDocumentStatus(event)
 
-    expect(mockSend).toHaveBeenCalledWith(
+    const adminClient = vi.mocked(createAdminClient).mock.results[0]?.value
+    const mockChannel = adminClient.channel.mock.results[0]?.value
+
+    expect(mockChannel.send).toHaveBeenCalledWith(
       expect.objectContaining({
         payload: expect.objectContaining({
           category: null,

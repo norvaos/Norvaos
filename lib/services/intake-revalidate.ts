@@ -1,5 +1,5 @@
 // ============================================================================
-// Universal Enforcement Engine — Shared Intake Revalidation
+// Universal Enforcement Engine  -  Shared Intake Revalidation
 // Extracted from validate-intake/route.ts so that save-intake, people CRUD,
 // and any future mutation that touches intake data can trigger a single
 // consistent revalidation + risk-score refresh.
@@ -229,7 +229,7 @@ export async function revalidateIntake(
     console.error('[REVALIDATE] Failed to update intake:', updateErr)
   }
 
-  // 8. Regenerate document slots — deterministic recomputation from current Core Data
+  // 8. Regenerate document slots  -  deterministic recomputation from current Core Data
   try {
     // Fetch matter_type_id and case_type_id for slot generation scope
     const { data: matterRow } = await supabase
@@ -257,7 +257,7 @@ export async function revalidateIntake(
         caseTypeId,
       })
 
-      // 8b. Regenerate form instances — same deterministic recomputation for forms
+      // 8b. Regenerate form instances  -  same deterministic recomputation for forms
       await regenerateFormInstances({
         supabase,
         tenantId: intake.tenant_id,
@@ -267,7 +267,7 @@ export async function revalidateIntake(
       })
     }
   } catch (err) {
-    // Non-blocking — slot/form regeneration failure should not fail intake revalidation
+    // Non-blocking  -  slot/form regeneration failure should not fail intake revalidation
     console.error('[REVALIDATE] Failed to regenerate document slots/form instances:', err)
   }
 
@@ -380,7 +380,7 @@ export async function revalidateIntake(
       }
     }
   } catch (err) {
-    // Non-blocking — immigration sequence control failure should not fail revalidation
+    // Non-blocking  -  immigration sequence control failure should not fail revalidation
     console.error('[REVALIDATE] Immigration sequence control error:', err)
   }
 

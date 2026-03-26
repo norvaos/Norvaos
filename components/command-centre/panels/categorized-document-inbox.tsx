@@ -274,7 +274,7 @@ export function CategorizedDocumentInbox() {
                             </p>
                           </div>
 
-                          {/* Action buttons — visible on hover */}
+                          {/* Action buttons  -  visible on hover */}
                           <div className="shrink-0 flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
                             <button
                               type="button"

@@ -6,7 +6,7 @@ export const metadata: Metadata = {
 }
 
 /**
- * Kiosk Layout — fullscreen, no sidebar, touch-optimised.
+ * Kiosk Layout  -  fullscreen, no sidebar, touch-optimised.
  *
  * Rule #7: Kiosk token security is strict.
  * Rule #10: No app navigation exposed.

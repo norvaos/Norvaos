@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * PDF Preview — TanStack Query Hooks
+ * PDF Preview  -  TanStack Query Hooks
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Hooks for the live PDF preview in the immigration funnel workspace.

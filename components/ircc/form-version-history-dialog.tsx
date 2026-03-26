@@ -33,7 +33,7 @@ export function FormVersionHistoryDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <History className="h-4 w-4" />
-            Version History — {formCode}
+            Version History  -  {formCode}
           </DialogTitle>
           <DialogDescription>
             Each version is archived when the form PDF is replaced with a newer upload.

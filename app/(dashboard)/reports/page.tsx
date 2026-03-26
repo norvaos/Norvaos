@@ -535,7 +535,7 @@ export default function ReportsPage() {
       </section>
 
       {/* ══════════════════════════════════════════════════════════════════════
-          REVENUE SECTION — gated by billing:view
+          REVENUE SECTION  -  gated by billing:view
          ══════════════════════════════════════════════════════════════════════ */}
       <RequirePermission entity="billing" action="view" variant="inline">
         <RevenueSection

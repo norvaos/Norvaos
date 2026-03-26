@@ -306,7 +306,7 @@ export default function BookingsPage() {
             <p className="text-xs text-green-600">
               {lastCalendarSync
                 ? `Last synced: ${new Date(lastCalendarSync).toLocaleString()}`
-                : 'Initial sync pending — will happen automatically on next booking page load.'}
+                : 'Initial sync pending  -  will happen automatically on next booking page load.'}
               {' '}Busy times are automatically blocked in booking availability.
             </p>
           </div>
@@ -528,7 +528,7 @@ export default function BookingsPage() {
                     {filteredAppointments.map((apt) => {
                       const lawyerName = (apt.user_first_name || apt.user_last_name)
                         ? `${apt.user_first_name ?? ''} ${apt.user_last_name ?? ''}`.trim()
-                        : '—'
+                        : ' - '
                       const statusColor = STATUS_COLOR_MAP[apt.status] ?? '#6b7280'
 
                       return (

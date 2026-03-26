@@ -1,4 +1,4 @@
-// ── NorvaOS i18n — Public API ──────────────────────────────────────────────
+// ── NorvaOS i18n  -  Public API ──────────────────────────────────────────────
 // Single import point for all i18n functionality
 
 export { I18nProvider, useI18n } from './i18n-provider'

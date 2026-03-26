@@ -1,5 +1,5 @@
 /**
- * POST /api/ocr/scan-id — ID Document Scanner
+ * POST /api/ocr/scan-id  -  ID Document Scanner
  *
  * Accepts a base64-encoded image of a government ID (driver's licence,
  * passport, PR card) and extracts structured fields using OCR.space API.
@@ -11,7 +11,7 @@
  *   - Document number
  *   - Expiry date
  *
- * Security: Server-side only — the OCR API key never touches the client.
+ * Security: Server-side only  -  the OCR API key never touches the client.
  */
 
 import { NextRequest, NextResponse } from 'next/server'

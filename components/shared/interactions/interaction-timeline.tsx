@@ -128,7 +128,7 @@ export function InteractionTimeline({ contactId, matterId, tenantId }: Interacti
     })
   }, [allActivities])
 
-  // Expand/collapse state — default: first non-empty group expanded
+  // Expand/collapse state  -  default: first non-empty group expanded
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>(() => {
     const initial: Record<string, boolean> = {}
     let firstSet = false

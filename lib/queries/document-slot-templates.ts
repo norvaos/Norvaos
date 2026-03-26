@@ -210,7 +210,7 @@ export function useUpdateDocumentSlotTemplate() {
     }) => {
       const supabase = createClient()
 
-      // Never update slot_slug — it's stable after creation
+      // Never update slot_slug  -  it's stable after creation
       const { data, error } = await supabase
         .from('document_slot_templates')
         .update({

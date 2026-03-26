@@ -54,7 +54,7 @@ export function GlobalExpiryDashboard() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Shield className="h-5 w-5 text-emerald-500" />
-          <h2 className="text-lg font-semibold">Sentinel Pulse — Global Expiry Dashboard</h2>
+          <h2 className="text-lg font-semibold">Sentinel Pulse  -  Global Expiry Dashboard</h2>
         </div>
         {data?.scanned_at && (
           <p className="text-xs text-muted-foreground">
@@ -74,7 +74,7 @@ export function GlobalExpiryDashboard() {
       {entries.length === 0 ? (
         <div className="flex items-center gap-2 rounded-lg border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/30 px-4 py-8 justify-center">
           <CheckCircle2 className="h-5 w-5 text-emerald-500" />
-          <p className="text-sm text-emerald-700 dark:text-emerald-300">No upcoming expiries detected — all clients secure</p>
+          <p className="text-sm text-emerald-700 dark:text-emerald-300">No upcoming expiries detected  -  all clients secure</p>
         </div>
       ) : (
         <div className="space-y-1.5">
@@ -97,7 +97,7 @@ export function GlobalExpiryDashboard() {
                   <div className="min-w-0">
                     <p className="text-sm font-medium truncate">{entry.contact_name}</p>
                     <p className="text-xs text-muted-foreground">
-                      {formatDocType(entry.document_type)} — expires {entry.expiry_date}
+                      {formatDocType(entry.document_type)}  -  expires {entry.expiry_date}
                     </p>
                   </div>
                 </div>

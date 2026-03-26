@@ -219,7 +219,7 @@ function extractApplicationNumber(text: string): string | null {
   return fallback?.[1]?.toUpperCase() ?? null
 }
 
-/** Extract name — looks for common patterns in IRCC/ID documents */
+/** Extract name  -  looks for common patterns in IRCC/ID documents */
 function extractName(text: string): string | null {
   return extractAfterLabel(text,
     'applicant name', 'name of applicant', 'principal applicant', 'full name',
@@ -310,7 +310,7 @@ function extractPassport(text: string): Record<string, string | number | null> {
     ? `${familyName}, ${givenName}`
     : extractAfterLabel(text, 'full name', 'name') ?? (givenName || familyName)
 
-  // Try to extract from MRZ (Machine Readable Zone) — bottom of passport
+  // Try to extract from MRZ (Machine Readable Zone)  -  bottom of passport
   const mrzMatch = text.match(/P[<A-Z]{1,3}([A-Z]+)<<([A-Z]+)/i)
   const mrzSurname = mrzMatch?.[1]?.replace(/</g, ' ').trim() ?? null
   const mrzGiven = mrzMatch?.[2]?.replace(/</g, ' ').trim() ?? null
@@ -441,7 +441,7 @@ function extractCourtOrder(text: string): Record<string, string | number | null>
       ?? (text.toLowerCase().includes('custody') ? 'custody'
         : text.toLowerCase().includes('support') ? 'support'
         : text.toLowerCase().includes('restraining') ? 'restraining order' : null),
-    key_terms: null, // Too complex for regex — leave for manual review
+    key_terms: null, // Too complex for regex  -  leave for manual review
   }
 }
 
@@ -468,7 +468,7 @@ function extractGeneral(text: string): Record<string, string | number | null> {
   const refPatterns = ['reference', 'ref no', 'file no', 'case no', 'number']
 
   return {
-    document_type: 'Unknown — please review',
+    document_type: 'Unknown  -  please review',
     names: extractAfterLabel(text, ...namePatterns),
     dates: extractDate(text, ...datePatterns),
     reference_numbers: extractAfterLabel(text, ...refPatterns),
@@ -571,7 +571,7 @@ async function aiExtractFields(
   regexFields: Record<string, string | number | null>,
 ): Promise<Record<string, string | number | null>> {
   const apiKey = process.env.ANTHROPIC_API_KEY
-  if (!apiKey) return regexFields // No API key — regex only
+  if (!apiKey) return regexFields // No API key  -  regex only
 
   const fieldSchema = FIELD_SCHEMAS[docType] || FIELD_SCHEMAS.general!
   const nullFields = Object.entries(regexFields)
@@ -585,7 +585,7 @@ async function aiExtractFields(
     const response = await client.messages.create({
       model: 'claude-haiku-4-5-20251001',
       max_tokens: 512,
-      system: `You are a document field extractor for a Canadian immigration law firm. Extract structured data from OCR text. Return ONLY valid JSON with the requested fields. For dates use YYYY-MM-DD. For fields you cannot find, use null. NEVER fabricate data — if uncertain, use null. Mask sensitive data: SIN → ***-***-XXX (last 3), bank account → ****XXXX (last 4).`,
+      system: `You are a document field extractor for a Canadian immigration law firm. Extract structured data from OCR text. Return ONLY valid JSON with the requested fields. For dates use YYYY-MM-DD. For fields you cannot find, use null. NEVER fabricate data  -  if uncertain, use null. Mask sensitive data: SIN → ***-***-XXX (last 3), bank account → ****XXXX (last 4).`,
       messages: [
         {
           role: 'user',
@@ -670,7 +670,7 @@ async function handlePost(request: NextRequest) {
       )
     }
 
-    // Step 1: OCR — extract raw text
+    // Step 1: OCR  -  extract raw text
     const rawText = await ocrExtractText(apiKey, base64, file.type)
 
     // Step 2: Detect document type
@@ -680,7 +680,7 @@ async function handlePost(request: NextRequest) {
     const extractor = EXTRACTORS[docType]
     const regexFields = extractor(rawText)
 
-    // Step 3b: AI Enhancement — if regex missed fields, Claude fills gaps
+    // Step 3b: AI Enhancement  -  if regex missed fields, Claude fills gaps
     const regexConfidence = computeConfidence(regexFields, docType)
     let extractedFields = regexFields
     let extractionMethod: 'regex' | 'regex+ai' = 'regex'

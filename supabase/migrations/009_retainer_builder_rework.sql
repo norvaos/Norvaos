@@ -1,5 +1,5 @@
 -- ============================================================================
--- Migration 009: Retainer Builder Rework — Lead-Level Retainer Flow
+-- Migration 009: Retainer Builder Rework  -  Lead-Level Retainer Flow
 --
 -- Enables building, sending, and tracking retainer agreements at the LEAD level
 -- (before matter conversion). Extends lead_retainer_packages with fee line items,

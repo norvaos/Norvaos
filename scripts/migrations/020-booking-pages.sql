@@ -2,7 +2,7 @@
 -- Calendly-like booking system: booking pages, date overrides, appointments
 
 -- ╔════════════════════════════════════════════════════════════════════════════╗
--- ║  1. booking_pages — configures each public booking page                  ║
+-- ║  1. booking_pages  -  configures each public booking page                  ║
 -- ╚════════════════════════════════════════════════════════════════════════════╝
 
 CREATE TABLE IF NOT EXISTS booking_pages (
@@ -59,7 +59,7 @@ CREATE TRIGGER set_booking_pages_updated_at
 
 
 -- ╔════════════════════════════════════════════════════════════════════════════╗
--- ║  2. booking_page_overrides — date-specific availability overrides        ║
+-- ║  2. booking_page_overrides  -  date-specific availability overrides        ║
 -- ╚════════════════════════════════════════════════════════════════════════════╝
 
 CREATE TABLE IF NOT EXISTS booking_page_overrides (
@@ -95,7 +95,7 @@ CREATE POLICY "booking_overrides_public_read" ON booking_page_overrides
 
 
 -- ╔════════════════════════════════════════════════════════════════════════════╗
--- ║  3. appointments — booked appointment records                            ║
+-- ║  3. appointments  -  booked appointment records                            ║
 -- ╚════════════════════════════════════════════════════════════════════════════╝
 
 CREATE TABLE IF NOT EXISTS appointments (
@@ -141,6 +141,6 @@ CREATE POLICY "appointments_tenant_access" ON appointments
 CREATE POLICY "appointments_public_insert" ON appointments
   FOR INSERT WITH CHECK (true);
 
--- Anonymous users: can read their own appointments (by email — for confirmation page)
+-- Anonymous users: can read their own appointments (by email  -  for confirmation page)
 CREATE POLICY "appointments_public_read" ON appointments
   FOR SELECT USING (true);

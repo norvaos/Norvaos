@@ -1,5 +1,5 @@
 /**
- * Internal API: Sovereignty event logging — Directive 004, Pillar 3
+ * Internal API: Sovereignty event logging  -  Directive 004, Pillar 3
  *
  * POST-only endpoint called from Edge middleware (fire-and-forget)
  * to log PIPEDA data sovereignty check results.

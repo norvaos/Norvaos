@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Seed IRCC Forms — Migrate hardcoded data into DB tables
+ * Seed IRCC Forms  -  Migrate hardcoded data into DB tables
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * One-time migration script that seeds all form definitions from the hardcoded
@@ -103,7 +103,7 @@ interface SeedFormDef {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// FORM DEFINITIONS — All hardcoded data consolidated here
+// FORM DEFINITIONS  -  All hardcoded data consolidated here
 // ═══════════════════════════════════════════════════════════════════════════════
 
 // ── Helper: Marital status options (reused across forms) ────────────────────
@@ -118,13 +118,13 @@ const MARITAL_STATUS_OPTIONS = [
   { label: 'Annulled', value: 'annulled' },
 ]
 
-// ── IMM 5257E — Application for Temporary Resident Visa ─────────────────────
+// ── IMM 5257E  -  Application for Temporary Resident Visa ─────────────────────
 // Combines base IMM5257 sections + IMM5257E extended sections into one form.
 // XFA maps from IMM5257E_XFA_MAP in xfa-filler.ts.
 
 const IMM5257E_FORM: SeedFormDef = {
   form_code: 'IMM5257E',
-  form_name: 'IMM 5257E — Application for Temporary Resident Visa',
+  form_name: 'IMM 5257E  -  Application for Temporary Resident Visa',
   description: 'Main visitor visa application form covering personal details, passport, contact info, visit details, education, employment, and background.',
   storage_path: 'ircc-forms/IMM5257E.pdf',
   file_name: 'IMM5257E.pdf',
@@ -235,11 +235,11 @@ const IMM5257E_FORM: SeedFormDef = {
           sort_order: 7,
           readiness_section: 'Personal Details (Page 1)',
         },
-        // Date of Birth — 3 XFA fields (date split)
+        // Date of Birth  -  3 XFA fields (date split)
         {
           xfa_path: 'Page1.PersonalDetails.DOBYear',
           profile_path: 'personal.date_of_birth',
-          label: 'Date of Birth — Year',
+          label: 'Date of Birth  -  Year',
           field_type: 'date',
           is_required: true,
           sort_order: 8,
@@ -249,7 +249,7 @@ const IMM5257E_FORM: SeedFormDef = {
         {
           xfa_path: 'Page1.PersonalDetails.DOBMonth',
           profile_path: 'personal.date_of_birth',
-          label: 'Date of Birth — Month',
+          label: 'Date of Birth  -  Month',
           field_type: 'date',
           is_required: false,
           sort_order: 9,
@@ -258,7 +258,7 @@ const IMM5257E_FORM: SeedFormDef = {
         {
           xfa_path: 'Page1.PersonalDetails.DOBDay',
           profile_path: 'personal.date_of_birth',
-          label: 'Date of Birth — Day',
+          label: 'Date of Birth  -  Day',
           field_type: 'date',
           is_required: false,
           sort_order: 10,
@@ -267,7 +267,7 @@ const IMM5257E_FORM: SeedFormDef = {
         {
           xfa_path: 'Page1.PersonalDetails.PlaceBirthCity',
           profile_path: 'personal.place_of_birth_city',
-          label: 'Place of Birth — City',
+          label: 'Place of Birth  -  City',
           field_type: 'text',
           is_required: true,
           sort_order: 11,
@@ -277,7 +277,7 @@ const IMM5257E_FORM: SeedFormDef = {
         {
           xfa_path: 'Page1.PersonalDetails.PlaceBirthCountry',
           profile_path: 'personal.place_of_birth_country',
-          label: 'Place of Birth — Country',
+          label: 'Place of Birth  -  Country',
           field_type: 'country',
           is_required: true,
           sort_order: 12,
@@ -316,7 +316,7 @@ const IMM5257E_FORM: SeedFormDef = {
         {
           xfa_path: 'Page1.PersonalDetails.CORDates.FromYr',
           profile_path: 'personal.cor_from_date',
-          label: 'Current Country of Residence — From Year',
+          label: 'Current Country of Residence  -  From Year',
           field_type: 'date',
           is_required: false,
           sort_order: 16,
@@ -325,7 +325,7 @@ const IMM5257E_FORM: SeedFormDef = {
         {
           xfa_path: 'Page1.PersonalDetails.CORDates.FromMM',
           profile_path: 'personal.cor_from_date',
-          label: 'Current Country of Residence — From Month',
+          label: 'Current Country of Residence  -  From Month',
           field_type: 'date',
           is_required: false,
           sort_order: 17,
@@ -334,7 +334,7 @@ const IMM5257E_FORM: SeedFormDef = {
         {
           xfa_path: 'Page1.PersonalDetails.CORDates.FromDD',
           profile_path: 'personal.cor_from_date',
-          label: 'Current Country of Residence — From Day',
+          label: 'Current Country of Residence  -  From Day',
           field_type: 'date',
           is_required: false,
           sort_order: 18,
@@ -343,7 +343,7 @@ const IMM5257E_FORM: SeedFormDef = {
         {
           xfa_path: 'Page1.PersonalDetails.CORDates.ToYr',
           profile_path: 'personal.cor_to_date',
-          label: 'Current Country of Residence — To Year',
+          label: 'Current Country of Residence  -  To Year',
           field_type: 'date',
           is_required: false,
           sort_order: 19,
@@ -352,7 +352,7 @@ const IMM5257E_FORM: SeedFormDef = {
         {
           xfa_path: 'Page1.PersonalDetails.CORDates.ToMM',
           profile_path: 'personal.cor_to_date',
-          label: 'Current Country of Residence — To Month',
+          label: 'Current Country of Residence  -  To Month',
           field_type: 'date',
           is_required: false,
           sort_order: 20,
@@ -361,7 +361,7 @@ const IMM5257E_FORM: SeedFormDef = {
         {
           xfa_path: 'Page1.PersonalDetails.CORDates.ToDD',
           profile_path: 'personal.cor_to_date',
-          label: 'Current Country of Residence — To Day',
+          label: 'Current Country of Residence  -  To Day',
           field_type: 'date',
           is_required: false,
           sort_order: 21,
@@ -399,7 +399,7 @@ const IMM5257E_FORM: SeedFormDef = {
         {
           xfa_path: 'Page1.PersonalDetails.CWADates.FromYr',
           profile_path: 'personal.cwa_from_date',
-          label: 'Country Where Applying — From Year',
+          label: 'Country Where Applying  -  From Year',
           field_type: 'date',
           is_required: false,
           sort_order: 25,
@@ -408,7 +408,7 @@ const IMM5257E_FORM: SeedFormDef = {
         {
           xfa_path: 'Page1.PersonalDetails.CWADates.FromMM',
           profile_path: 'personal.cwa_from_date',
-          label: 'Country Where Applying — From Month',
+          label: 'Country Where Applying  -  From Month',
           field_type: 'date',
           is_required: false,
           sort_order: 26,
@@ -417,7 +417,7 @@ const IMM5257E_FORM: SeedFormDef = {
         {
           xfa_path: 'Page1.PersonalDetails.CWADates.FromDD',
           profile_path: 'personal.cwa_from_date',
-          label: 'Country Where Applying — From Day',
+          label: 'Country Where Applying  -  From Day',
           field_type: 'date',
           is_required: false,
           sort_order: 27,
@@ -426,7 +426,7 @@ const IMM5257E_FORM: SeedFormDef = {
         {
           xfa_path: 'Page1.PersonalDetails.CWADates.ToYr',
           profile_path: 'personal.cwa_to_date',
-          label: 'Country Where Applying — To Year',
+          label: 'Country Where Applying  -  To Year',
           field_type: 'date',
           is_required: false,
           sort_order: 28,
@@ -435,7 +435,7 @@ const IMM5257E_FORM: SeedFormDef = {
         {
           xfa_path: 'Page1.PersonalDetails.CWADates.ToMM',
           profile_path: 'personal.cwa_to_date',
-          label: 'Country Where Applying — To Month',
+          label: 'Country Where Applying  -  To Month',
           field_type: 'date',
           is_required: false,
           sort_order: 29,
@@ -444,7 +444,7 @@ const IMM5257E_FORM: SeedFormDef = {
         {
           xfa_path: 'Page1.PersonalDetails.CWADates.ToDD',
           profile_path: 'personal.cwa_to_date',
-          label: 'Country Where Applying — To Day',
+          label: 'Country Where Applying  -  To Day',
           field_type: 'date',
           is_required: false,
           sort_order: 30,
@@ -528,7 +528,7 @@ const IMM5257E_FORM: SeedFormDef = {
         {
           xfa_path: 'Page1.MaritalStatus.SectionA.MarriageDate.FromYr',
           profile_path: 'marital.date_of_current_relationship',
-          label: 'Marriage/Relationship Date — Year',
+          label: 'Marriage/Relationship Date  -  Year',
           field_type: 'date',
           is_required: false,
           sort_order: 2,
@@ -538,7 +538,7 @@ const IMM5257E_FORM: SeedFormDef = {
         {
           xfa_path: 'Page1.MaritalStatus.SectionA.MarriageDate.FromMM',
           profile_path: 'marital.date_of_current_relationship',
-          label: 'Marriage/Relationship Date — Month',
+          label: 'Marriage/Relationship Date  -  Month',
           field_type: 'date',
           is_required: false,
           sort_order: 3,
@@ -547,7 +547,7 @@ const IMM5257E_FORM: SeedFormDef = {
         {
           xfa_path: 'Page1.MaritalStatus.SectionA.MarriageDate.FromDD',
           profile_path: 'marital.date_of_current_relationship',
-          label: 'Marriage/Relationship Date — Day',
+          label: 'Marriage/Relationship Date  -  Day',
           field_type: 'date',
           is_required: false,
           sort_order: 4,
@@ -610,7 +610,7 @@ const IMM5257E_FORM: SeedFormDef = {
         {
           xfa_path: 'Page2.MaritalStatus.SectionA.PMFamilyName',
           profile_path: 'marital.previous_spouse_family_name',
-          label: 'Previous Spouse — Family Name',
+          label: 'Previous Spouse  -  Family Name',
           field_type: 'text',
           is_required: false,
           sort_order: 2,
@@ -619,7 +619,7 @@ const IMM5257E_FORM: SeedFormDef = {
         {
           xfa_path: 'Page2.MaritalStatus.SectionA.GivenName.PMGivenName',
           profile_path: 'marital.previous_spouse_given_name',
-          label: 'Previous Spouse — Given Name',
+          label: 'Previous Spouse  -  Given Name',
           field_type: 'text',
           is_required: false,
           sort_order: 3,
@@ -628,7 +628,7 @@ const IMM5257E_FORM: SeedFormDef = {
         {
           xfa_path: 'Page2.MaritalStatus.SectionA.PrevSpouseDOB.DOBYear',
           profile_path: 'marital.previous_spouse_dob',
-          label: 'Previous Spouse DOB — Year',
+          label: 'Previous Spouse DOB  -  Year',
           field_type: 'date',
           is_required: false,
           sort_order: 4,
@@ -638,7 +638,7 @@ const IMM5257E_FORM: SeedFormDef = {
         {
           xfa_path: 'Page2.MaritalStatus.SectionA.PrevSpouseDOB.DOBMonth',
           profile_path: 'marital.previous_spouse_dob',
-          label: 'Previous Spouse DOB — Month',
+          label: 'Previous Spouse DOB  -  Month',
           field_type: 'date',
           is_required: false,
           sort_order: 5,
@@ -647,7 +647,7 @@ const IMM5257E_FORM: SeedFormDef = {
         {
           xfa_path: 'Page2.MaritalStatus.SectionA.PrevSpouseDOB.DOBDay',
           profile_path: 'marital.previous_spouse_dob',
-          label: 'Previous Spouse DOB — Day',
+          label: 'Previous Spouse DOB  -  Day',
           field_type: 'date',
           is_required: false,
           sort_order: 6,
@@ -670,7 +670,7 @@ const IMM5257E_FORM: SeedFormDef = {
         {
           xfa_path: 'Page2.MaritalStatus.SectionA.PreviouslyMarriedDates.FromYr',
           profile_path: 'marital.previous_relationship_from_date',
-          label: 'Previous Relationship — From Year',
+          label: 'Previous Relationship  -  From Year',
           field_type: 'date',
           is_required: false,
           sort_order: 8,
@@ -680,7 +680,7 @@ const IMM5257E_FORM: SeedFormDef = {
         {
           xfa_path: 'Page2.MaritalStatus.SectionA.PreviouslyMarriedDates.FromMM',
           profile_path: 'marital.previous_relationship_from_date',
-          label: 'Previous Relationship — From Month',
+          label: 'Previous Relationship  -  From Month',
           field_type: 'date',
           is_required: false,
           sort_order: 9,
@@ -689,7 +689,7 @@ const IMM5257E_FORM: SeedFormDef = {
         {
           xfa_path: 'Page2.MaritalStatus.SectionA.PreviouslyMarriedDates.FromDD',
           profile_path: 'marital.previous_relationship_from_date',
-          label: 'Previous Relationship — From Day',
+          label: 'Previous Relationship  -  From Day',
           field_type: 'date',
           is_required: false,
           sort_order: 10,
@@ -698,7 +698,7 @@ const IMM5257E_FORM: SeedFormDef = {
         {
           xfa_path: 'Page2.MaritalStatus.SectionA.PreviouslyMarriedDates.ToYr',
           profile_path: 'marital.previous_relationship_to_date',
-          label: 'Previous Relationship — To Year',
+          label: 'Previous Relationship  -  To Year',
           field_type: 'date',
           is_required: false,
           sort_order: 11,
@@ -707,7 +707,7 @@ const IMM5257E_FORM: SeedFormDef = {
         {
           xfa_path: 'Page2.MaritalStatus.SectionA.PreviouslyMarriedDates.ToMM',
           profile_path: 'marital.previous_relationship_to_date',
-          label: 'Previous Relationship — To Month',
+          label: 'Previous Relationship  -  To Month',
           field_type: 'date',
           is_required: false,
           sort_order: 12,
@@ -716,7 +716,7 @@ const IMM5257E_FORM: SeedFormDef = {
         {
           xfa_path: 'Page2.MaritalStatus.SectionA.PreviouslyMarriedDates.ToDD',
           profile_path: 'marital.previous_relationship_to_date',
-          label: 'Previous Relationship — To Day',
+          label: 'Previous Relationship  -  To Day',
           field_type: 'date',
           is_required: false,
           sort_order: 13,
@@ -824,7 +824,7 @@ const IMM5257E_FORM: SeedFormDef = {
         {
           xfa_path: 'Page2.MaritalStatus.SectionA.Passport.IssueYYYY',
           profile_path: 'passport.issue_date',
-          label: 'Passport Issue Date — Year',
+          label: 'Passport Issue Date  -  Year',
           field_type: 'date',
           is_required: true,
           sort_order: 3,
@@ -834,7 +834,7 @@ const IMM5257E_FORM: SeedFormDef = {
         {
           xfa_path: 'Page2.MaritalStatus.SectionA.Passport.IssueMM',
           profile_path: 'passport.issue_date',
-          label: 'Passport Issue Date — Month',
+          label: 'Passport Issue Date  -  Month',
           field_type: 'date',
           is_required: false,
           sort_order: 4,
@@ -843,7 +843,7 @@ const IMM5257E_FORM: SeedFormDef = {
         {
           xfa_path: 'Page2.MaritalStatus.SectionA.Passport.IssueDD',
           profile_path: 'passport.issue_date',
-          label: 'Passport Issue Date — Day',
+          label: 'Passport Issue Date  -  Day',
           field_type: 'date',
           is_required: false,
           sort_order: 5,
@@ -852,7 +852,7 @@ const IMM5257E_FORM: SeedFormDef = {
         {
           xfa_path: 'Page2.MaritalStatus.SectionA.Passport.expiryYYYY',
           profile_path: 'passport.expiry_date',
-          label: 'Passport Expiry Date — Year',
+          label: 'Passport Expiry Date  -  Year',
           field_type: 'date',
           is_required: true,
           sort_order: 6,
@@ -862,7 +862,7 @@ const IMM5257E_FORM: SeedFormDef = {
         {
           xfa_path: 'Page2.MaritalStatus.SectionA.Passport.expiryMM',
           profile_path: 'passport.expiry_date',
-          label: 'Passport Expiry Date — Month',
+          label: 'Passport Expiry Date  -  Month',
           field_type: 'date',
           is_required: false,
           sort_order: 7,
@@ -871,7 +871,7 @@ const IMM5257E_FORM: SeedFormDef = {
         {
           xfa_path: 'Page2.MaritalStatus.SectionA.Passport.expiryDD',
           profile_path: 'passport.expiry_date',
-          label: 'Passport Expiry Date — Day',
+          label: 'Passport Expiry Date  -  Day',
           field_type: 'date',
           is_required: false,
           sort_order: 8,
@@ -898,7 +898,7 @@ const IMM5257E_FORM: SeedFormDef = {
         {
           xfa_path: 'Page2.natID.natIDdocs.DocNum.DocNum',
           profile_path: 'passport.national_id_number',
-          label: 'National ID — Document Number',
+          label: 'National ID  -  Document Number',
           field_type: 'text',
           is_required: false,
           sort_order: 2,
@@ -907,7 +907,7 @@ const IMM5257E_FORM: SeedFormDef = {
         {
           xfa_path: 'Page2.natID.natIDdocs.CountryofIssue.CountryofIssue',
           profile_path: 'passport.national_id_country',
-          label: 'National ID — Country of Issue',
+          label: 'National ID  -  Country of Issue',
           field_type: 'country',
           is_required: false,
           sort_order: 3,
@@ -916,7 +916,7 @@ const IMM5257E_FORM: SeedFormDef = {
         {
           xfa_path: 'Page2.natID.natIDdocs.IssueDate.IssueDate',
           profile_path: 'passport.national_id_issue_date',
-          label: 'National ID — Date of Issue',
+          label: 'National ID  -  Date of Issue',
           field_type: 'date',
           is_required: false,
           sort_order: 4,
@@ -925,7 +925,7 @@ const IMM5257E_FORM: SeedFormDef = {
         {
           xfa_path: 'Page2.natID.natIDdocs.ExpiryDate',
           profile_path: 'passport.national_id_expiry_date',
-          label: 'National ID — Date of Expiry',
+          label: 'National ID  -  Date of Expiry',
           field_type: 'date',
           is_required: false,
           sort_order: 5,
@@ -943,7 +943,7 @@ const IMM5257E_FORM: SeedFormDef = {
         {
           xfa_path: 'Page2.USCard.usCarddocs.DocNum.DocNum',
           profile_path: 'passport.us_pr_card_number',
-          label: 'US PR Card — Document Number',
+          label: 'US PR Card  -  Document Number',
           field_type: 'text',
           is_required: false,
           sort_order: 7,
@@ -952,7 +952,7 @@ const IMM5257E_FORM: SeedFormDef = {
         {
           xfa_path: 'Page2.USCard.usCarddocs.ExpiryDate',
           profile_path: 'passport.us_pr_card_expiry_date',
-          label: 'US PR Card — Date of Expiry',
+          label: 'US PR Card  -  Date of Expiry',
           field_type: 'date',
           is_required: false,
           sort_order: 8,
@@ -970,7 +970,7 @@ const IMM5257E_FORM: SeedFormDef = {
         {
           xfa_path: 'Page2.ContactInformation.contact.AddressRow1.POBox.POBox',
           profile_path: 'contact_info.mailing_address.po_box',
-          label: 'Mailing Address — P.O. Box',
+          label: 'Mailing Address  -  P.O. Box',
           field_type: 'text',
           is_required: false,
           sort_order: 1,
@@ -978,7 +978,7 @@ const IMM5257E_FORM: SeedFormDef = {
         {
           xfa_path: 'Page2.ContactInformation.contact.AddressRow1.Apt.AptUnit',
           profile_path: 'contact_info.mailing_address.apt_unit',
-          label: 'Mailing Address — Apt / Unit',
+          label: 'Mailing Address  -  Apt / Unit',
           field_type: 'text',
           is_required: false,
           sort_order: 2,
@@ -986,7 +986,7 @@ const IMM5257E_FORM: SeedFormDef = {
         {
           xfa_path: 'Page2.ContactInformation.contact.AddressRow1.StreetNum.StreetNum',
           profile_path: 'contact_info.mailing_address.street_number',
-          label: 'Mailing Address — Street Number',
+          label: 'Mailing Address  -  Street Number',
           field_type: 'text',
           is_required: true,
           sort_order: 3,
@@ -994,7 +994,7 @@ const IMM5257E_FORM: SeedFormDef = {
         {
           xfa_path: 'Page2.ContactInformation.contact.AddressRow1.Streetname.Streetname',
           profile_path: 'contact_info.mailing_address.street_name',
-          label: 'Mailing Address — Street Name',
+          label: 'Mailing Address  -  Street Name',
           field_type: 'text',
           is_required: true,
           sort_order: 4,
@@ -1003,7 +1003,7 @@ const IMM5257E_FORM: SeedFormDef = {
         {
           xfa_path: 'Page2.ContactInformation.contact.AddressRow2.CityTow.CityTown',
           profile_path: 'contact_info.mailing_address.city',
-          label: 'Mailing Address — City',
+          label: 'Mailing Address  -  City',
           field_type: 'text',
           is_required: true,
           sort_order: 5,
@@ -1012,7 +1012,7 @@ const IMM5257E_FORM: SeedFormDef = {
         {
           xfa_path: 'Page2.ContactInformation.contact.AddressRow2.Country.Country',
           profile_path: 'contact_info.mailing_address.country',
-          label: 'Mailing Address — Country',
+          label: 'Mailing Address  -  Country',
           field_type: 'country',
           is_required: true,
           sort_order: 6,
@@ -1020,7 +1020,7 @@ const IMM5257E_FORM: SeedFormDef = {
         {
           xfa_path: 'Page2.ContactInformation.contact.AddressRow2.ProvinceState.ProvinceState',
           profile_path: 'contact_info.mailing_address.province_state',
-          label: 'Mailing Address — Province / State',
+          label: 'Mailing Address  -  Province / State',
           field_type: 'text',
           is_required: false,
           sort_order: 7,
@@ -1028,7 +1028,7 @@ const IMM5257E_FORM: SeedFormDef = {
         {
           xfa_path: 'Page2.ContactInformation.contact.AddressRow2.PostalCode.PostalCode',
           profile_path: 'contact_info.mailing_address.postal_code',
-          label: 'Mailing Address — Postal Code',
+          label: 'Mailing Address  -  Postal Code',
           field_type: 'text',
           is_required: false,
           sort_order: 8,
@@ -1036,7 +1036,7 @@ const IMM5257E_FORM: SeedFormDef = {
         {
           xfa_path: 'Page2.ContactInformation.contact.AddressRow2.District',
           profile_path: 'contact_info.mailing_address.district',
-          label: 'Mailing Address — District',
+          label: 'Mailing Address  -  District',
           field_type: 'text',
           is_required: false,
           sort_order: 9,
@@ -1055,7 +1055,7 @@ const IMM5257E_FORM: SeedFormDef = {
         {
           xfa_path: 'Page2.ContactInformation.contact.ResidentialAddressRow1.StreetNum.StreetNum',
           profile_path: 'contact_info.residential_address.street_number',
-          label: 'Residential — Street Number',
+          label: 'Residential  -  Street Number',
           field_type: 'text',
           is_required: false,
           sort_order: 11,
@@ -1064,7 +1064,7 @@ const IMM5257E_FORM: SeedFormDef = {
         {
           xfa_path: 'Page2.ContactInformation.contact.ResidentialAddressRow1.StreetName.Streetname',
           profile_path: 'contact_info.residential_address.street_name',
-          label: 'Residential — Street Name',
+          label: 'Residential  -  Street Name',
           field_type: 'text',
           is_required: false,
           sort_order: 12,
@@ -1073,7 +1073,7 @@ const IMM5257E_FORM: SeedFormDef = {
         {
           xfa_path: 'Page2.ContactInformation.contact.ResidentialAddressRow1.AptUnit.AptUnit',
           profile_path: 'contact_info.residential_address.apt_unit',
-          label: 'Residential — Apt/Unit',
+          label: 'Residential  -  Apt/Unit',
           field_type: 'text',
           is_required: false,
           sort_order: 13,
@@ -1082,7 +1082,7 @@ const IMM5257E_FORM: SeedFormDef = {
         {
           xfa_path: 'Page2.ContactInformation.contact.ResidentialAddressRow1.CityTown.CityTown',
           profile_path: 'contact_info.residential_address.city',
-          label: 'Residential — City / Town',
+          label: 'Residential  -  City / Town',
           field_type: 'text',
           is_required: false,
           sort_order: 14,
@@ -1091,7 +1091,7 @@ const IMM5257E_FORM: SeedFormDef = {
         {
           xfa_path: 'Page2.ContactInformation.contact.ResidentialAddressRow2.Country.Country',
           profile_path: 'contact_info.residential_address.country',
-          label: 'Residential — Country',
+          label: 'Residential  -  Country',
           field_type: 'country',
           is_required: false,
           sort_order: 15,
@@ -1100,7 +1100,7 @@ const IMM5257E_FORM: SeedFormDef = {
         {
           xfa_path: 'Page2.ContactInformation.contact.ResidentialAddressRow2.ProvinceState.ProvinceState',
           profile_path: 'contact_info.residential_address.province_state',
-          label: 'Residential — Province / State',
+          label: 'Residential  -  Province / State',
           field_type: 'text',
           is_required: false,
           sort_order: 16,
@@ -1109,7 +1109,7 @@ const IMM5257E_FORM: SeedFormDef = {
         {
           xfa_path: 'Page2.ContactInformation.contact.ResidentialAddressRow2.PostalCode.PostalCode',
           profile_path: 'contact_info.residential_address.postal_code',
-          label: 'Residential — Postal Code',
+          label: 'Residential  -  Postal Code',
           field_type: 'text',
           is_required: false,
           sort_order: 17,
@@ -1118,7 +1118,7 @@ const IMM5257E_FORM: SeedFormDef = {
         {
           xfa_path: 'Page2.ContactInformation.contact.ResidentialAddressRow2.District',
           profile_path: 'contact_info.residential_address.district',
-          label: 'Residential — District',
+          label: 'Residential  -  District',
           field_type: 'text',
           is_required: false,
           sort_order: 18,
@@ -1192,7 +1192,7 @@ const IMM5257E_FORM: SeedFormDef = {
         {
           xfa_path: 'Page3.DetailsOfVisit.PurposeRow1.HowLongStay.StayDates.FromYr',
           profile_path: 'visit.from_date',
-          label: 'From Date — Year',
+          label: 'From Date  -  Year',
           field_type: 'date',
           is_required: true,
           sort_order: 3,
@@ -1202,7 +1202,7 @@ const IMM5257E_FORM: SeedFormDef = {
         {
           xfa_path: 'Page3.DetailsOfVisit.PurposeRow1.HowLongStay.StayDates.FromMM',
           profile_path: 'visit.from_date',
-          label: 'From Date — Month',
+          label: 'From Date  -  Month',
           field_type: 'date',
           is_required: false,
           sort_order: 4,
@@ -1211,7 +1211,7 @@ const IMM5257E_FORM: SeedFormDef = {
         {
           xfa_path: 'Page3.DetailsOfVisit.PurposeRow1.HowLongStay.StayDates.FromDD',
           profile_path: 'visit.from_date',
-          label: 'From Date — Day',
+          label: 'From Date  -  Day',
           field_type: 'date',
           is_required: false,
           sort_order: 5,
@@ -1220,7 +1220,7 @@ const IMM5257E_FORM: SeedFormDef = {
         {
           xfa_path: 'Page3.DetailsOfVisit.PurposeRow1.HowLongStay.StayDates.ToYr',
           profile_path: 'visit.to_date',
-          label: 'To Date — Year',
+          label: 'To Date  -  Year',
           field_type: 'date',
           is_required: true,
           sort_order: 6,
@@ -1230,7 +1230,7 @@ const IMM5257E_FORM: SeedFormDef = {
         {
           xfa_path: 'Page3.DetailsOfVisit.PurposeRow1.HowLongStay.StayDates.ToMM',
           profile_path: 'visit.to_date',
-          label: 'To Date — Month',
+          label: 'To Date  -  Month',
           field_type: 'date',
           is_required: false,
           sort_order: 7,
@@ -1239,7 +1239,7 @@ const IMM5257E_FORM: SeedFormDef = {
         {
           xfa_path: 'Page3.DetailsOfVisit.PurposeRow1.HowLongStay.StayDates.ToDD',
           profile_path: 'visit.to_date',
-          label: 'To Date — Day',
+          label: 'To Date  -  Day',
           field_type: 'date',
           is_required: false,
           sort_order: 8,
@@ -1365,7 +1365,7 @@ const IMM5257E_FORM: SeedFormDef = {
         {
           xfa_path: 'Page3.BackgroundInfo.Details.MedicalDetails',
           profile_path: 'background.physical_mental_disorder_details',
-          label: 'Medical Condition — Details',
+          label: 'Medical Condition  -  Details',
           field_type: 'textarea',
           is_required: false,
           sort_order: 2,
@@ -1401,7 +1401,7 @@ const IMM5257E_FORM: SeedFormDef = {
         {
           xfa_path: 'Page3.BackgroundInfo2.Details.refusedDetails',
           profile_path: 'background.refused_visa_details',
-          label: 'Visa/Criminal Record — Details',
+          label: 'Visa/Criminal Record  -  Details',
           field_type: 'textarea',
           is_required: false,
           sort_order: 6,
@@ -1418,7 +1418,7 @@ const IMM5257E_FORM: SeedFormDef = {
         {
           xfa_path: 'Page3.PageWrapper.BackgroundInfo3.details',
           profile_path: 'background.deported_details',
-          label: 'Deportation — Details',
+          label: 'Deportation  -  Details',
           field_type: 'textarea',
           is_required: false,
           sort_order: 8,
@@ -1445,7 +1445,7 @@ const IMM5257E_FORM: SeedFormDef = {
         {
           xfa_path: 'Page3.PageWrapper.Military.militaryServiceDetails',
           profile_path: 'background.military_service_details',
-          label: 'Military Service — Details',
+          label: 'Military Service  -  Details',
           field_type: 'textarea',
           is_required: false,
           sort_order: 11,
@@ -1495,11 +1495,11 @@ const IMM5257E_FORM: SeedFormDef = {
   array_maps: [], // IMM5257E has inline array handling (PCR, contacts, education, employment) via code
 }
 
-// ── IMM 5406 — Additional Family Information ─────────────────────────────────
+// ── IMM 5406  -  Additional Family Information ─────────────────────────────────
 
 const IMM5406_FORM: SeedFormDef = {
   form_code: 'IMM5406',
-  form_name: 'IMM 5406 — Additional Family Information',
+  form_name: 'IMM 5406  -  Additional Family Information',
   description: 'Family information form covering applicant, spouse, parents, children, and siblings.',
   storage_path: 'ircc-forms/IMM5406.pdf',
   file_name: 'IMM5406.pdf',
@@ -1534,9 +1534,9 @@ const IMM5406_FORM: SeedFormDef = {
       sort_order: 2,
       merge_into: 'marital_status', // Merges with IMM5257E marital_status
       fields: [
-        { xfa_path: 'SectionA.SectionAinfo.Spouse.PaddedEntry.PersonalData[0].Row.FamilyName', profile_path: 'marital.spouse_family_name', label: 'Spouse — Family Name', field_type: 'text', is_required: false, sort_order: 1, max_length: 60, readiness_section: 'Spouse (Section A)', required_condition: { when_path: 'marital.status', equals: ['married', 'common_law'] } },
-        { xfa_path: 'SectionA.SectionAinfo.Spouse.PaddedEntry.PersonalData[0].Row.GivenNames', profile_path: 'marital.spouse_given_name', label: 'Spouse — Given Name', field_type: 'text', is_required: false, sort_order: 2, max_length: 60, readiness_section: 'Spouse (Section A)', required_condition: { when_path: 'marital.status', equals: ['married', 'common_law'] } },
-        { xfa_path: 'SectionA.SectionAinfo.Spouse.PaddedEntry.PersonalData[0].Row.DOB', profile_path: 'marital.spouse_date_of_birth', label: 'Spouse — Date of Birth', field_type: 'date', is_required: false, sort_order: 3, readiness_section: 'Spouse (Section A)', required_condition: { when_path: 'marital.status', equals: ['married', 'common_law'] } },
+        { xfa_path: 'SectionA.SectionAinfo.Spouse.PaddedEntry.PersonalData[0].Row.FamilyName', profile_path: 'marital.spouse_family_name', label: 'Spouse  -  Family Name', field_type: 'text', is_required: false, sort_order: 1, max_length: 60, readiness_section: 'Spouse (Section A)', required_condition: { when_path: 'marital.status', equals: ['married', 'common_law'] } },
+        { xfa_path: 'SectionA.SectionAinfo.Spouse.PaddedEntry.PersonalData[0].Row.GivenNames', profile_path: 'marital.spouse_given_name', label: 'Spouse  -  Given Name', field_type: 'text', is_required: false, sort_order: 2, max_length: 60, readiness_section: 'Spouse (Section A)', required_condition: { when_path: 'marital.status', equals: ['married', 'common_law'] } },
+        { xfa_path: 'SectionA.SectionAinfo.Spouse.PaddedEntry.PersonalData[0].Row.DOB', profile_path: 'marital.spouse_date_of_birth', label: 'Spouse  -  Date of Birth', field_type: 'date', is_required: false, sort_order: 3, readiness_section: 'Spouse (Section A)', required_condition: { when_path: 'marital.status', equals: ['married', 'common_law'] } },
       ],
     },
     // ── Section A: Mother ─────────────────────────────────────────────
@@ -1546,12 +1546,12 @@ const IMM5406_FORM: SeedFormDef = {
       description: 'Details of your mother.',
       sort_order: 3,
       fields: [
-        { xfa_path: 'SectionA.SectionAinfo.Parent1.PaddedEntry.PersonalData[0].Row.FamilyName', profile_path: 'family.mother.family_name', label: 'Mother — Family Name', field_type: 'text', is_required: true, sort_order: 1, max_length: 60, readiness_section: 'Mother (Section A)' },
-        { xfa_path: 'SectionA.SectionAinfo.Parent1.PaddedEntry.PersonalData[0].Row.GivenNames', profile_path: 'family.mother.given_name', label: 'Mother — Given Name', field_type: 'text', is_required: true, sort_order: 2, max_length: 60, readiness_section: 'Mother (Section A)' },
-        { xfa_path: 'SectionA.SectionAinfo.Parent1.PaddedEntry.PersonalData[0].Row.DOB', profile_path: 'family.mother.date_of_birth', label: 'Mother — Date of Birth', field_type: 'date', is_required: true, sort_order: 3, readiness_section: 'Mother (Section A)' },
-        { xfa_path: 'SectionA.SectionAinfo.Parent1.PaddedEntry.PersonalData[1].Row.COB', profile_path: 'family.mother.country_of_birth', label: 'Mother — Country of Birth', field_type: 'country', is_required: false, sort_order: 4, max_length: 40 },
-        { xfa_path: 'SectionA.SectionAinfo.Parent1.PaddedEntry.PersonalData[1].Row.Address', profile_path: 'family.mother.address', label: 'Mother — Address', field_type: 'text', is_required: false, sort_order: 5, max_length: 120 },
-        { xfa_path: 'SectionA.SectionAinfo.Parent1.PaddedEntry.PersonalData[1].Row.MaritalStatus', profile_path: 'family.mother.marital_status', label: 'Mother — Marital Status', field_type: 'select', is_required: false, sort_order: 6, options: MARITAL_STATUS_OPTIONS, max_length: 30 },
+        { xfa_path: 'SectionA.SectionAinfo.Parent1.PaddedEntry.PersonalData[0].Row.FamilyName', profile_path: 'family.mother.family_name', label: 'Mother  -  Family Name', field_type: 'text', is_required: true, sort_order: 1, max_length: 60, readiness_section: 'Mother (Section A)' },
+        { xfa_path: 'SectionA.SectionAinfo.Parent1.PaddedEntry.PersonalData[0].Row.GivenNames', profile_path: 'family.mother.given_name', label: 'Mother  -  Given Name', field_type: 'text', is_required: true, sort_order: 2, max_length: 60, readiness_section: 'Mother (Section A)' },
+        { xfa_path: 'SectionA.SectionAinfo.Parent1.PaddedEntry.PersonalData[0].Row.DOB', profile_path: 'family.mother.date_of_birth', label: 'Mother  -  Date of Birth', field_type: 'date', is_required: true, sort_order: 3, readiness_section: 'Mother (Section A)' },
+        { xfa_path: 'SectionA.SectionAinfo.Parent1.PaddedEntry.PersonalData[1].Row.COB', profile_path: 'family.mother.country_of_birth', label: 'Mother  -  Country of Birth', field_type: 'country', is_required: false, sort_order: 4, max_length: 40 },
+        { xfa_path: 'SectionA.SectionAinfo.Parent1.PaddedEntry.PersonalData[1].Row.Address', profile_path: 'family.mother.address', label: 'Mother  -  Address', field_type: 'text', is_required: false, sort_order: 5, max_length: 120 },
+        { xfa_path: 'SectionA.SectionAinfo.Parent1.PaddedEntry.PersonalData[1].Row.MaritalStatus', profile_path: 'family.mother.marital_status', label: 'Mother  -  Marital Status', field_type: 'select', is_required: false, sort_order: 6, options: MARITAL_STATUS_OPTIONS, max_length: 30 },
       ],
     },
     // ── Section A: Father ─────────────────────────────────────────────
@@ -1561,12 +1561,12 @@ const IMM5406_FORM: SeedFormDef = {
       description: 'Details of your father.',
       sort_order: 4,
       fields: [
-        { xfa_path: 'SectionA.SectionAinfo.Parent2.PaddedEntry.PersonalData[0].Row.FamilyName', profile_path: 'family.father.family_name', label: 'Father — Family Name', field_type: 'text', is_required: true, sort_order: 1, max_length: 60, readiness_section: 'Father (Section A)' },
-        { xfa_path: 'SectionA.SectionAinfo.Parent2.PaddedEntry.PersonalData[0].Row.GivenNames', profile_path: 'family.father.given_name', label: 'Father — Given Name', field_type: 'text', is_required: true, sort_order: 2, max_length: 60, readiness_section: 'Father (Section A)' },
-        { xfa_path: 'SectionA.SectionAinfo.Parent2.PaddedEntry.PersonalData[0].Row.DOB', profile_path: 'family.father.date_of_birth', label: 'Father — Date of Birth', field_type: 'date', is_required: true, sort_order: 3, readiness_section: 'Father (Section A)' },
-        { xfa_path: 'SectionA.SectionAinfo.Parent2.PaddedEntry.PersonalData[1].Row.COB', profile_path: 'family.father.country_of_birth', label: 'Father — Country of Birth', field_type: 'country', is_required: false, sort_order: 4, max_length: 40 },
-        { xfa_path: 'SectionA.SectionAinfo.Parent2.PaddedEntry.PersonalData[1].Row.Address', profile_path: 'family.father.address', label: 'Father — Address', field_type: 'text', is_required: false, sort_order: 5, max_length: 120 },
-        { xfa_path: 'SectionA.SectionAinfo.Parent2.PaddedEntry.PersonalData[1].Row.MaritalStatus', profile_path: 'family.father.marital_status', label: 'Father — Marital Status', field_type: 'select', is_required: false, sort_order: 6, options: MARITAL_STATUS_OPTIONS, max_length: 30 },
+        { xfa_path: 'SectionA.SectionAinfo.Parent2.PaddedEntry.PersonalData[0].Row.FamilyName', profile_path: 'family.father.family_name', label: 'Father  -  Family Name', field_type: 'text', is_required: true, sort_order: 1, max_length: 60, readiness_section: 'Father (Section A)' },
+        { xfa_path: 'SectionA.SectionAinfo.Parent2.PaddedEntry.PersonalData[0].Row.GivenNames', profile_path: 'family.father.given_name', label: 'Father  -  Given Name', field_type: 'text', is_required: true, sort_order: 2, max_length: 60, readiness_section: 'Father (Section A)' },
+        { xfa_path: 'SectionA.SectionAinfo.Parent2.PaddedEntry.PersonalData[0].Row.DOB', profile_path: 'family.father.date_of_birth', label: 'Father  -  Date of Birth', field_type: 'date', is_required: true, sort_order: 3, readiness_section: 'Father (Section A)' },
+        { xfa_path: 'SectionA.SectionAinfo.Parent2.PaddedEntry.PersonalData[1].Row.COB', profile_path: 'family.father.country_of_birth', label: 'Father  -  Country of Birth', field_type: 'country', is_required: false, sort_order: 4, max_length: 40 },
+        { xfa_path: 'SectionA.SectionAinfo.Parent2.PaddedEntry.PersonalData[1].Row.Address', profile_path: 'family.father.address', label: 'Father  -  Address', field_type: 'text', is_required: false, sort_order: 5, max_length: 120 },
+        { xfa_path: 'SectionA.SectionAinfo.Parent2.PaddedEntry.PersonalData[1].Row.MaritalStatus', profile_path: 'family.father.marital_status', label: 'Father  -  Marital Status', field_type: 'select', is_required: false, sort_order: 6, options: MARITAL_STATUS_OPTIONS, max_length: 30 },
       ],
     },
     // ── Section B: Children ───────────────────────────────────────────
@@ -1634,11 +1634,11 @@ const IMM5406_FORM: SeedFormDef = {
   ],
 }
 
-// ── IMM 5476E — Use of a Representative ──────────────────────────────────────
+// ── IMM 5476E  -  Use of a Representative ──────────────────────────────────────
 
 const IMM5476E_FORM: SeedFormDef = {
   form_code: 'IMM5476E',
-  form_name: 'IMM 5476E — Use of a Representative',
+  form_name: 'IMM 5476E  -  Use of a Representative',
   description: 'Authorization form for a representative to act on behalf of the applicant.',
   storage_path: 'ircc-forms/IMM5476E.pdf',
   file_name: 'IMM5476E.pdf',
@@ -1667,28 +1667,28 @@ const IMM5476E_FORM: SeedFormDef = {
       description: 'Representative identification and signature.',
       sort_order: 2,
       fields: [
-        { xfa_path: 'Page1.SectionB.familyName', profile_path: null, label: 'Representative — Family Name', field_type: 'text', is_required: false, sort_order: 1, is_meta_field: true, meta_field_key: '__rep_family_name' },
-        { xfa_path: 'Page1.SectionB.givenName', profile_path: null, label: 'Representative — Given Name', field_type: 'text', is_required: false, sort_order: 2, is_meta_field: true, meta_field_key: '__rep_given_name' },
-        { xfa_path: 'Page1.SectionB.question8.signatrureApplicant[0]', profile_path: null, label: 'Representative — Signature', field_type: 'text', is_required: false, sort_order: 3, is_meta_field: true, meta_field_key: '__rep_signature' },
-        { xfa_path: 'Page1.SectionB.question8.dateSigned[0]', profile_path: null, label: 'Representative — Signed Date', field_type: 'date', is_required: false, sort_order: 4, is_meta_field: true, meta_field_key: '__rep_signed_date' },
-        { xfa_path: 'Page1.sectionD.familyName', profile_path: null, label: 'New Rep — Family Name', field_type: 'text', is_required: false, sort_order: 5, is_meta_field: true, meta_field_key: '__rep_d_family_name' },
-        { xfa_path: 'Page1.sectionD.givenName', profile_path: null, label: 'New Rep — Given Name', field_type: 'text', is_required: false, sort_order: 6, is_meta_field: true, meta_field_key: '__rep_d_given_name' },
-        { xfa_path: 'Page1.sectionD.signatrureApplicant', profile_path: null, label: 'New Rep — Signature', field_type: 'text', is_required: false, sort_order: 7, is_meta_field: true, meta_field_key: '__rep_d_signature' },
-        { xfa_path: 'Page1.sectionD.dateApplicantSigned', profile_path: null, label: 'New Rep — Signed Date', field_type: 'date', is_required: false, sort_order: 8, is_meta_field: true, meta_field_key: '__rep_d_signed_date' },
+        { xfa_path: 'Page1.SectionB.familyName', profile_path: null, label: 'Representative  -  Family Name', field_type: 'text', is_required: false, sort_order: 1, is_meta_field: true, meta_field_key: '__rep_family_name' },
+        { xfa_path: 'Page1.SectionB.givenName', profile_path: null, label: 'Representative  -  Given Name', field_type: 'text', is_required: false, sort_order: 2, is_meta_field: true, meta_field_key: '__rep_given_name' },
+        { xfa_path: 'Page1.SectionB.question8.signatrureApplicant[0]', profile_path: null, label: 'Representative  -  Signature', field_type: 'text', is_required: false, sort_order: 3, is_meta_field: true, meta_field_key: '__rep_signature' },
+        { xfa_path: 'Page1.SectionB.question8.dateSigned[0]', profile_path: null, label: 'Representative  -  Signed Date', field_type: 'date', is_required: false, sort_order: 4, is_meta_field: true, meta_field_key: '__rep_signed_date' },
+        { xfa_path: 'Page1.sectionD.familyName', profile_path: null, label: 'New Rep  -  Family Name', field_type: 'text', is_required: false, sort_order: 5, is_meta_field: true, meta_field_key: '__rep_d_family_name' },
+        { xfa_path: 'Page1.sectionD.givenName', profile_path: null, label: 'New Rep  -  Given Name', field_type: 'text', is_required: false, sort_order: 6, is_meta_field: true, meta_field_key: '__rep_d_given_name' },
+        { xfa_path: 'Page1.sectionD.signatrureApplicant', profile_path: null, label: 'New Rep  -  Signature', field_type: 'text', is_required: false, sort_order: 7, is_meta_field: true, meta_field_key: '__rep_d_signature' },
+        { xfa_path: 'Page1.sectionD.dateApplicantSigned', profile_path: null, label: 'New Rep  -  Signed Date', field_type: 'date', is_required: false, sort_order: 8, is_meta_field: true, meta_field_key: '__rep_d_signed_date' },
       ],
     },
   ],
   array_maps: [],
 }
 
-// ── IMM 5257 Schedule 1 — Background/Declaration ─────────────────────────────
+// ── IMM 5257 Schedule 1  -  Background/Declaration ─────────────────────────────
 // Companion form to IMM5257E. Covers background declarations, military service,
 // organizational affiliations, government positions, and travel history.
 // XFA root: Schedule1, 91 fields mapped from PDF.
 
 const IMM5257_SCHEDULE1_FORM: SeedFormDef = {
   form_code: 'IMM5257B',
-  form_name: 'IMM 5257 — Schedule 1 (Background/Declaration)',
+  form_name: 'IMM 5257  -  Schedule 1 (Background/Declaration)',
   description: 'Schedule 1 companion to IMM5257E. Covers detailed background declarations, military service history, organizational affiliations, government positions, and previous travel to Canada.',
   storage_path: 'ircc-forms/IMM5257B.pdf',
   file_name: 'IMM5257B.pdf',
@@ -1707,9 +1707,9 @@ const IMM5257_SCHEDULE1_FORM: SeedFormDef = {
       fields: [
         { xfa_path: 'Schedule1.page1.subNo1.Table1.Row1.familyName', profile_path: 'personal.family_name', label: 'Family Name', field_type: 'text', is_required: true, sort_order: 1, max_length: 60 },
         { xfa_path: 'Schedule1.page1.subNo1.Table1.Row1.givenName', profile_path: 'personal.given_name', label: 'Given Name(s)', field_type: 'text', is_required: true, sort_order: 2, max_length: 60 },
-        { xfa_path: 'Schedule1.page1.subNo2.dateBox.DBYear', profile_path: 'personal.date_of_birth', label: 'Date of Birth — Year', field_type: 'date', is_required: true, sort_order: 3, date_split: 'year' },
-        { xfa_path: 'Schedule1.page1.subNo2.dateBox.DBMonth', profile_path: 'personal.date_of_birth', label: 'Date of Birth — Month', field_type: 'date', is_required: false, sort_order: 4, date_split: 'month' },
-        { xfa_path: 'Schedule1.page1.subNo2.dateBox.DBDay', profile_path: 'personal.date_of_birth', label: 'Date of Birth — Day', field_type: 'date', is_required: false, sort_order: 5, date_split: 'day' },
+        { xfa_path: 'Schedule1.page1.subNo2.dateBox.DBYear', profile_path: 'personal.date_of_birth', label: 'Date of Birth  -  Year', field_type: 'date', is_required: true, sort_order: 3, date_split: 'year' },
+        { xfa_path: 'Schedule1.page1.subNo2.dateBox.DBMonth', profile_path: 'personal.date_of_birth', label: 'Date of Birth  -  Month', field_type: 'date', is_required: false, sort_order: 4, date_split: 'month' },
+        { xfa_path: 'Schedule1.page1.subNo2.dateBox.DBDay', profile_path: 'personal.date_of_birth', label: 'Date of Birth  -  Day', field_type: 'date', is_required: false, sort_order: 5, date_split: 'day' },
         { xfa_path: 'Schedule1.page1.subNo2.UCI', profile_path: 'personal.uci_number', label: 'UCI Number', field_type: 'text', is_required: false, sort_order: 6, max_length: 20 },
         { xfa_path: 'Schedule1.page1.subIndicate.applicant', profile_path: 'schedule1.applicant_type', label: 'Applicant or Spouse/Common-Law', field_type: 'select', is_required: true, sort_order: 7, options: [{ label: 'Applicant', value: 'applicant' }, { label: 'Spouse / Common-Law Partner', value: 'spouse' }] },
       ],
@@ -1722,7 +1722,7 @@ const IMM5257_SCHEDULE1_FORM: SeedFormDef = {
       sort_order: 2,
       fields: [
         { xfa_path: 'Schedule1.page1.MilitaryServiceheader.Yes', profile_path: 'background.military_service', label: 'Military Service?', field_type: 'boolean', is_required: true, sort_order: 1, value_format: { boolean_true: '1', boolean_false: '0' } },
-        // Repeater rows — questionnaire-only, mapped via array_maps
+        // Repeater rows  -  questionnaire-only, mapped via array_maps
         { xfa_path: '__questionnaire_only__military_history', profile_path: 'background.military_history', label: 'Military Service History', field_type: 'repeater', is_required: false, sort_order: 2,
           show_when: { profile_path: 'background.military_service', operator: 'is_truthy' } },
       ],
@@ -1787,7 +1787,7 @@ const IMM5257_SCHEDULE1_FORM: SeedFormDef = {
     },
   ],
   array_maps: [
-    // Military Service History — repeating rows
+    // Military Service History  -  repeating rows
     {
       profile_path: 'background.military_history',
       xfa_base_path: 'Schedule1.page1.Table1',
@@ -1872,14 +1872,14 @@ const IMM5257_SCHEDULE1_FORM: SeedFormDef = {
   ],
 }
 
-// ── IMM 5562E — Supplementary Travel Document ────────────────────────────────
+// ── IMM 5562E  -  Supplementary Travel Document ────────────────────────────────
 // Simple form for travel document application. Heavy reuse of personal data
 // from IMM5257E. Primarily covers travel history sections A, B, and C.
 // XFA root: IMM_5562, 27 user-facing fields.
 
 const IMM5562E_FORM: SeedFormDef = {
   form_code: 'IMM5562E',
-  form_name: 'IMM 5562E — Supplementary Travel Document',
+  form_name: 'IMM 5562E  -  Supplementary Travel Document',
   description: 'Supplementary travel document form. Covers applicant identification and detailed travel history in three sections (A, B, C).',
   storage_path: 'ircc-forms/IMM5562E.pdf',
   file_name: 'IMM5562E.pdf',
@@ -1903,7 +1903,7 @@ const IMM5562E_FORM: SeedFormDef = {
     // ── Section 2A: Travel History (Section A) ──────────────────────────
     {
       section_key: 'travel_section_a',
-      title: 'Travel History — Section A',
+      title: 'Travel History  -  Section A',
       description: 'List your travel history for Section A.',
       sort_order: 2,
       fields: [
@@ -1914,7 +1914,7 @@ const IMM5562E_FORM: SeedFormDef = {
     // ── Section 2B: Travel History (Section B) ──────────────────────────
     {
       section_key: 'travel_section_b',
-      title: 'Travel History — Section B',
+      title: 'Travel History  -  Section B',
       description: 'List your travel history for Section B.',
       sort_order: 3,
       fields: [
@@ -1925,7 +1925,7 @@ const IMM5562E_FORM: SeedFormDef = {
     // ── Section 2C: Travel History (Section C / Other) ───────────────────
     {
       section_key: 'travel_section_c',
-      title: 'Travel History — Section C (Other)',
+      title: 'Travel History  -  Section C (Other)',
       description: 'Additional travel history.',
       sort_order: 4,
       fields: [
@@ -1993,14 +1993,14 @@ const IMM5562E_FORM: SeedFormDef = {
   ],
 }
 
-// ── IMM 1294E — Application for Study Permit ─────────────────────────────────
+// ── IMM 1294E  -  Application for Study Permit ─────────────────────────────────
 // Study permit application. Heavy reuse of personal/passport/contact from IMM5257E.
 // New domain: study_program.* for institution, DLI, program, costs.
 // XFA root: form1, 259 fields (many shared with IMM5257E XFA structure).
 
 const IMM1294E_FORM: SeedFormDef = {
   form_code: 'IMM1294E',
-  form_name: 'IMM 1294E — Application for Study Permit',
+  form_name: 'IMM 1294E  -  Application for Study Permit',
   description: 'Study permit application. Covers personal details, passport, contact information, study program details, financial support, education history, employment history, and background declarations.',
   storage_path: 'ircc-forms/IMM1294E.pdf',
   file_name: 'IMM1294E.pdf',
@@ -2022,11 +2022,11 @@ const IMM1294E_FORM: SeedFormDef = {
         { xfa_path: 'form1.Page1.PersonalDetails.Name.FamilyName', profile_path: 'personal.family_name', label: 'Family Name', field_type: 'text', is_required: true, sort_order: 3, max_length: 60 },
         { xfa_path: 'form1.Page1.PersonalDetails.Name.GivenName', profile_path: 'personal.given_name', label: 'Given Name(s)', field_type: 'text', is_required: true, sort_order: 4, max_length: 60 },
         { xfa_path: 'form1.Page1.PersonalDetails.Sex.Sex', profile_path: 'personal.sex', label: 'Sex', field_type: 'select', is_required: true, sort_order: 5, options: [{ label: 'Male', value: 'male' }, { label: 'Female', value: 'female' }, { label: 'Other', value: 'other' }] },
-        { xfa_path: 'form1.Page1.PersonalDetails.DOBYear', profile_path: 'personal.date_of_birth', label: 'Date of Birth — Year', field_type: 'date', is_required: true, sort_order: 6, date_split: 'year' },
-        { xfa_path: 'form1.Page1.PersonalDetails.DOBMonth', profile_path: 'personal.date_of_birth', label: 'Date of Birth — Month', field_type: 'date', is_required: false, sort_order: 7, date_split: 'month' },
-        { xfa_path: 'form1.Page1.PersonalDetails.DOBDay', profile_path: 'personal.date_of_birth', label: 'Date of Birth — Day', field_type: 'date', is_required: false, sort_order: 8, date_split: 'day' },
-        { xfa_path: 'form1.Page1.PersonalDetails.PlaceBirthCity', profile_path: 'personal.place_of_birth_city', label: 'Place of Birth — City', field_type: 'text', is_required: true, sort_order: 9, max_length: 40 },
-        { xfa_path: 'form1.Page1.PersonalDetails.PlaceBirthCountry', profile_path: 'personal.place_of_birth_country', label: 'Place of Birth — Country', field_type: 'country', is_required: true, sort_order: 10 },
+        { xfa_path: 'form1.Page1.PersonalDetails.DOBYear', profile_path: 'personal.date_of_birth', label: 'Date of Birth  -  Year', field_type: 'date', is_required: true, sort_order: 6, date_split: 'year' },
+        { xfa_path: 'form1.Page1.PersonalDetails.DOBMonth', profile_path: 'personal.date_of_birth', label: 'Date of Birth  -  Month', field_type: 'date', is_required: false, sort_order: 7, date_split: 'month' },
+        { xfa_path: 'form1.Page1.PersonalDetails.DOBDay', profile_path: 'personal.date_of_birth', label: 'Date of Birth  -  Day', field_type: 'date', is_required: false, sort_order: 8, date_split: 'day' },
+        { xfa_path: 'form1.Page1.PersonalDetails.PlaceBirthCity', profile_path: 'personal.place_of_birth_city', label: 'Place of Birth  -  City', field_type: 'text', is_required: true, sort_order: 9, max_length: 40 },
+        { xfa_path: 'form1.Page1.PersonalDetails.PlaceBirthCountry', profile_path: 'personal.place_of_birth_country', label: 'Place of Birth  -  Country', field_type: 'country', is_required: true, sort_order: 10 },
         { xfa_path: 'form1.Page1.PersonalDetails.Citizenship.Citizenship', profile_path: 'personal.citizenship', label: 'Citizenship', field_type: 'country', is_required: true, sort_order: 11 },
         { xfa_path: 'form1.Page1.PersonalDetails.CurrentCOR.Row2.Country', profile_path: 'personal.current_country_of_residence', label: 'Current Country of Residence', field_type: 'country', is_required: true, sort_order: 12 },
         { xfa_path: 'form1.Page1.PersonalDetails.CurrentCOR.Row2.Status', profile_path: 'personal.residence_status', label: 'Immigration Status', field_type: 'text', is_required: false, sort_order: 13 },
@@ -2043,9 +2043,9 @@ const IMM1294E_FORM: SeedFormDef = {
       sort_order: 2,
       fields: [
         { xfa_path: 'form1.Page1.MaritalStatus.SectionA.MaritalStatus', profile_path: 'marital.status', label: 'Current Marital Status', field_type: 'select', is_required: true, sort_order: 1, options: MARITAL_STATUS_OPTIONS },
-        { xfa_path: 'form1.Page1.MaritalStatus.SectionA.MarriageDate.FromYr', profile_path: 'marital.date_of_current_relationship', label: 'Marriage Date — Year', field_type: 'date', is_required: false, sort_order: 2, date_split: 'year', show_when: { profile_path: 'marital.status', operator: 'equals', value: 'married' } },
-        { xfa_path: 'form1.Page1.MaritalStatus.SectionA.MarriageDate.FromMM', profile_path: 'marital.date_of_current_relationship', label: 'Marriage Date — Month', field_type: 'date', is_required: false, sort_order: 3, date_split: 'month', show_when: { profile_path: 'marital.status', operator: 'equals', value: 'married' } },
-        { xfa_path: 'form1.Page1.MaritalStatus.SectionA.MarriageDate.FromDD', profile_path: 'marital.date_of_current_relationship', label: 'Marriage Date — Day', field_type: 'date', is_required: false, sort_order: 4, date_split: 'day', show_when: { profile_path: 'marital.status', operator: 'equals', value: 'married' } },
+        { xfa_path: 'form1.Page1.MaritalStatus.SectionA.MarriageDate.FromYr', profile_path: 'marital.date_of_current_relationship', label: 'Marriage Date  -  Year', field_type: 'date', is_required: false, sort_order: 2, date_split: 'year', show_when: { profile_path: 'marital.status', operator: 'equals', value: 'married' } },
+        { xfa_path: 'form1.Page1.MaritalStatus.SectionA.MarriageDate.FromMM', profile_path: 'marital.date_of_current_relationship', label: 'Marriage Date  -  Month', field_type: 'date', is_required: false, sort_order: 3, date_split: 'month', show_when: { profile_path: 'marital.status', operator: 'equals', value: 'married' } },
+        { xfa_path: 'form1.Page1.MaritalStatus.SectionA.MarriageDate.FromDD', profile_path: 'marital.date_of_current_relationship', label: 'Marriage Date  -  Day', field_type: 'date', is_required: false, sort_order: 4, date_split: 'day', show_when: { profile_path: 'marital.status', operator: 'equals', value: 'married' } },
         { xfa_path: 'form1.Page1.MaritalStatus.SectionA.FamilyName', profile_path: 'marital.spouse_family_name', label: 'Spouse Family Name', field_type: 'text', is_required: false, sort_order: 5, max_length: 60, show_when: { profile_path: 'marital.status', operator: 'equals', value: 'married' } },
         { xfa_path: 'form1.Page1.MaritalStatus.SectionA.GivenName', profile_path: 'marital.spouse_given_name', label: 'Spouse Given Name', field_type: 'text', is_required: false, sort_order: 6, max_length: 60, show_when: { profile_path: 'marital.status', operator: 'equals', value: 'married' } },
       ],
@@ -2070,12 +2070,12 @@ const IMM1294E_FORM: SeedFormDef = {
       fields: [
         { xfa_path: 'form1.Page2.MaritalStatus.SectionA.Passport.PassportNum.PassportNum', profile_path: 'passport.number', label: 'Passport Number', field_type: 'text', is_required: true, sort_order: 1, max_length: 20 },
         { xfa_path: 'form1.Page2.MaritalStatus.SectionA.Passport.CountryofIssue.CountryofIssue', profile_path: 'passport.country_of_issue', label: 'Country of Issue', field_type: 'country', is_required: true, sort_order: 2 },
-        { xfa_path: 'form1.Page2.MaritalStatus.SectionA.Passport.IssueYYYY', profile_path: 'passport.issue_date', label: 'Issue Date — Year', field_type: 'date', is_required: true, sort_order: 3, date_split: 'year' },
-        { xfa_path: 'form1.Page2.MaritalStatus.SectionA.Passport.IssueMM', profile_path: 'passport.issue_date', label: 'Issue Date — Month', field_type: 'date', is_required: false, sort_order: 4, date_split: 'month' },
-        { xfa_path: 'form1.Page2.MaritalStatus.SectionA.Passport.IssueDD', profile_path: 'passport.issue_date', label: 'Issue Date — Day', field_type: 'date', is_required: false, sort_order: 5, date_split: 'day' },
-        { xfa_path: 'form1.Page2.MaritalStatus.SectionA.Passport.expiryYYYY', profile_path: 'passport.expiry_date', label: 'Expiry Date — Year', field_type: 'date', is_required: true, sort_order: 6, date_split: 'year' },
-        { xfa_path: 'form1.Page2.MaritalStatus.SectionA.Passport.expiryMM', profile_path: 'passport.expiry_date', label: 'Expiry Date — Month', field_type: 'date', is_required: false, sort_order: 7, date_split: 'month' },
-        { xfa_path: 'form1.Page2.MaritalStatus.SectionA.Passport.expiryDD', profile_path: 'passport.expiry_date', label: 'Expiry Date — Day', field_type: 'date', is_required: false, sort_order: 8, date_split: 'day' },
+        { xfa_path: 'form1.Page2.MaritalStatus.SectionA.Passport.IssueYYYY', profile_path: 'passport.issue_date', label: 'Issue Date  -  Year', field_type: 'date', is_required: true, sort_order: 3, date_split: 'year' },
+        { xfa_path: 'form1.Page2.MaritalStatus.SectionA.Passport.IssueMM', profile_path: 'passport.issue_date', label: 'Issue Date  -  Month', field_type: 'date', is_required: false, sort_order: 4, date_split: 'month' },
+        { xfa_path: 'form1.Page2.MaritalStatus.SectionA.Passport.IssueDD', profile_path: 'passport.issue_date', label: 'Issue Date  -  Day', field_type: 'date', is_required: false, sort_order: 5, date_split: 'day' },
+        { xfa_path: 'form1.Page2.MaritalStatus.SectionA.Passport.expiryYYYY', profile_path: 'passport.expiry_date', label: 'Expiry Date  -  Year', field_type: 'date', is_required: true, sort_order: 6, date_split: 'year' },
+        { xfa_path: 'form1.Page2.MaritalStatus.SectionA.Passport.expiryMM', profile_path: 'passport.expiry_date', label: 'Expiry Date  -  Month', field_type: 'date', is_required: false, sort_order: 7, date_split: 'month' },
+        { xfa_path: 'form1.Page2.MaritalStatus.SectionA.Passport.expiryDD', profile_path: 'passport.expiry_date', label: 'Expiry Date  -  Day', field_type: 'date', is_required: false, sort_order: 8, date_split: 'day' },
       ],
     },
     // ── Section 5: Contact Information ───────────────────────────────────
@@ -2109,9 +2109,9 @@ const IMM1294E_FORM: SeedFormDef = {
         { xfa_path: 'form1.Page3.DetailsOfStudy.PurposeRow1.schoolName.Level', profile_path: 'study_program.level', label: 'Level of Study', field_type: 'select', is_required: true, sort_order: 4, options: [
           { label: 'Secondary', value: 'secondary' },
           { label: 'Post-Secondary (non-university)', value: 'post_secondary' },
-          { label: 'University — Undergraduate', value: 'undergraduate' },
-          { label: 'University — Graduate (Masters)', value: 'masters' },
-          { label: 'University — Doctorate / PhD', value: 'doctorate' },
+          { label: 'University  -  Undergraduate', value: 'undergraduate' },
+          { label: 'University  -  Graduate (Masters)', value: 'masters' },
+          { label: 'University  -  Doctorate / PhD', value: 'doctorate' },
           { label: 'Language Studies', value: 'language' },
           { label: 'Other', value: 'other' },
         ] },
@@ -2231,14 +2231,14 @@ const IMM1294E_FORM: SeedFormDef = {
   ],
 }
 
-// ── IMM 5645E — Family Information ───────────────────────────────────────────
+// ── IMM 5645E  -  Family Information ───────────────────────────────────────────
 // Family information form with Sections A (parents/spouse), B (children dep),
 // and C (children not accompanying). Heavy reuse of family.* domain from IMM5406.
 // XFA root: IMM_5645, 59 user-facing fields.
 
 const IMM5645E_FORM: SeedFormDef = {
   form_code: 'IMM5645E',
-  form_name: 'IMM 5645E — Family Information',
+  form_name: 'IMM 5645E  -  Family Information',
   description: 'Family information form covering applicant details, spouse, parents (Section A), dependent children (Section B), and non-accompanying children (Section C).',
   storage_path: 'ircc-forms/IMM5645E.pdf',
   file_name: 'IMM5645E.pdf',
@@ -2251,7 +2251,7 @@ const IMM5645E_FORM: SeedFormDef = {
     // ── Section A: Applicant + Spouse + Parents ─────────────────────────
     {
       section_key: 'section_a_applicant',
-      title: 'Section A — Applicant Details',
+      title: 'Section A  -  Applicant Details',
       description: 'Applicant personal details for family information form.',
       sort_order: 1,
       fields: [
@@ -2266,7 +2266,7 @@ const IMM5645E_FORM: SeedFormDef = {
     },
     {
       section_key: 'section_a_spouse',
-      title: 'Section A — Spouse / Common-Law Partner',
+      title: 'Section A  -  Spouse / Common-Law Partner',
       description: 'Spouse or common-law partner details. Reuses family domain from IMM5406.',
       sort_order: 2,
       fields: [
@@ -2282,7 +2282,7 @@ const IMM5645E_FORM: SeedFormDef = {
     },
     {
       section_key: 'section_a_mother',
-      title: 'Section A — Mother',
+      title: 'Section A  -  Mother',
       description: 'Mother details. Reuses family.mother.* from IMM5406.',
       sort_order: 3,
       fields: [
@@ -2298,7 +2298,7 @@ const IMM5645E_FORM: SeedFormDef = {
     },
     {
       section_key: 'section_a_father',
-      title: 'Section A — Father',
+      title: 'Section A  -  Father',
       description: 'Father details. Reuses family.father.* from IMM5406.',
       sort_order: 4,
       fields: [
@@ -2315,7 +2315,7 @@ const IMM5645E_FORM: SeedFormDef = {
     // ── Section B: Dependent Children ───────────────────────────────────
     {
       section_key: 'section_b_children',
-      title: 'Section B — Dependent Children',
+      title: 'Section B  -  Dependent Children',
       description: 'Children who are accompanying the applicant.',
       sort_order: 5,
       fields: [
@@ -2325,7 +2325,7 @@ const IMM5645E_FORM: SeedFormDef = {
     // ── Section C: Non-Accompanying Children ────────────────────────────
     {
       section_key: 'section_c_children',
-      title: 'Section C — Children Not Accompanying',
+      title: 'Section C  -  Children Not Accompanying',
       description: 'Children who are NOT accompanying the applicant.',
       sort_order: 6,
       fields: [
@@ -2349,7 +2349,7 @@ const IMM5645E_FORM: SeedFormDef = {
     },
   ],
   array_maps: [
-    // Section B — Dependent children
+    // Section B  -  Dependent children
     {
       profile_path: 'family.dependent_children',
       xfa_base_path: 'IMM_5645.SectionB',
@@ -2366,7 +2366,7 @@ const IMM5645E_FORM: SeedFormDef = {
         accompanying: 'ChildYes',
       },
     },
-    // Section C — Non-accompanying children
+    // Section C  -  Non-accompanying children
     {
       profile_path: 'family.non_accompanying_children',
       xfa_base_path: 'SectionC',
@@ -2386,13 +2386,13 @@ const IMM5645E_FORM: SeedFormDef = {
   ],
 }
 
-// ── IMM 5710E — Application to Change Conditions / Extend Stay / Work Permit ──
+// ── IMM 5710E  -  Application to Change Conditions / Extend Stay / Work Permit ──
 // Work permit application with new sponsor.* domain for employer/sponsor details.
 // XFA root: form1, 251 fields. Heavy reuse of personal/passport/contact from IMM5257E.
 
 const IMM5710E_FORM: SeedFormDef = {
   form_code: 'IMM5710E',
-  form_name: 'IMM 5710E — Application to Change Conditions, Extend Stay, or Remain in Canada',
+  form_name: 'IMM 5710E  -  Application to Change Conditions, Extend Stay, or Remain in Canada',
   description: 'Work permit and stay extension application. Covers applicant details, sponsor/employer information, work details, education, employment history, and background declarations.',
   storage_path: 'ircc-forms/IMM5710E.pdf',
   file_name: 'IMM5710E.pdf',
@@ -2414,11 +2414,11 @@ const IMM5710E_FORM: SeedFormDef = {
         { xfa_path: 'form1.Page1.PersonalDetails.Name.FamilyName', profile_path: 'personal.family_name', label: 'Family Name', field_type: 'text', is_required: true, sort_order: 3, max_length: 60 },
         { xfa_path: 'form1.Page1.PersonalDetails.Name.GivenName', profile_path: 'personal.given_name', label: 'Given Name(s)', field_type: 'text', is_required: true, sort_order: 4, max_length: 60 },
         { xfa_path: 'form1.Page1.PersonalDetails.q3-4-5.sex.Sex', profile_path: 'personal.sex', label: 'Sex', field_type: 'select', is_required: true, sort_order: 5, options: [{ label: 'Male', value: 'male' }, { label: 'Female', value: 'female' }, { label: 'Other', value: 'other' }] },
-        { xfa_path: 'form1.Page1.PersonalDetails.q3-4-5.dob.DOBYear', profile_path: 'personal.date_of_birth', label: 'Date of Birth — Year', field_type: 'date', is_required: true, sort_order: 6, date_split: 'year' },
-        { xfa_path: 'form1.Page1.PersonalDetails.q3-4-5.dob.DOBMonth', profile_path: 'personal.date_of_birth', label: 'Date of Birth — Month', field_type: 'date', is_required: false, sort_order: 7, date_split: 'month' },
-        { xfa_path: 'form1.Page1.PersonalDetails.q3-4-5.dob.DOBDay', profile_path: 'personal.date_of_birth', label: 'Date of Birth — Day', field_type: 'date', is_required: false, sort_order: 8, date_split: 'day' },
-        { xfa_path: 'form1.Page1.PersonalDetails.q3-4-5.pob.PlaceBirthCity', profile_path: 'personal.place_of_birth_city', label: 'Place of Birth — City', field_type: 'text', is_required: true, sort_order: 9, max_length: 40 },
-        { xfa_path: 'form1.Page1.PersonalDetails.q3-4-5.pob.PlaceBirthCountry', profile_path: 'personal.place_of_birth_country', label: 'Place of Birth — Country', field_type: 'country', is_required: true, sort_order: 10 },
+        { xfa_path: 'form1.Page1.PersonalDetails.q3-4-5.dob.DOBYear', profile_path: 'personal.date_of_birth', label: 'Date of Birth  -  Year', field_type: 'date', is_required: true, sort_order: 6, date_split: 'year' },
+        { xfa_path: 'form1.Page1.PersonalDetails.q3-4-5.dob.DOBMonth', profile_path: 'personal.date_of_birth', label: 'Date of Birth  -  Month', field_type: 'date', is_required: false, sort_order: 7, date_split: 'month' },
+        { xfa_path: 'form1.Page1.PersonalDetails.q3-4-5.dob.DOBDay', profile_path: 'personal.date_of_birth', label: 'Date of Birth  -  Day', field_type: 'date', is_required: false, sort_order: 8, date_split: 'day' },
+        { xfa_path: 'form1.Page1.PersonalDetails.q3-4-5.pob.PlaceBirthCity', profile_path: 'personal.place_of_birth_city', label: 'Place of Birth  -  City', field_type: 'text', is_required: true, sort_order: 9, max_length: 40 },
+        { xfa_path: 'form1.Page1.PersonalDetails.q3-4-5.pob.PlaceBirthCountry', profile_path: 'personal.place_of_birth_country', label: 'Place of Birth  -  Country', field_type: 'country', is_required: true, sort_order: 10 },
         { xfa_path: 'form1.Page1.PersonalDetails.Citizenship.Citizenship', profile_path: 'personal.citizenship', label: 'Citizenship', field_type: 'country', is_required: true, sort_order: 11 },
         { xfa_path: 'form1.Page1.PersonalDetails.CurrentCOR.CurrentCOR.Row2.Country', profile_path: 'personal.current_country_of_residence', label: 'Country of Residence', field_type: 'country', is_required: true, sort_order: 12 },
         { xfa_path: 'form1.Page1.PersonalDetails.CurrentCOR.CurrentCOR.Row2.Status', profile_path: 'personal.residence_status', label: 'Immigration Status', field_type: 'text', is_required: false, sort_order: 13 },
@@ -2446,9 +2446,9 @@ const IMM5710E_FORM: SeedFormDef = {
       sort_order: 3,
       fields: [
         { xfa_path: 'form1.Page1.MaritalStatus.Current.MaritalStatus', profile_path: 'marital.status', label: 'Current Marital Status', field_type: 'select', is_required: true, sort_order: 1, options: MARITAL_STATUS_OPTIONS },
-        { xfa_path: 'form1.Page1.MaritalStatus.Current.b.MarriageDate.FromYr', profile_path: 'marital.date_of_current_relationship', label: 'Marriage Date — Year', field_type: 'date', is_required: false, sort_order: 2, date_split: 'year', show_when: { profile_path: 'marital.status', operator: 'equals', value: 'married' } },
-        { xfa_path: 'form1.Page1.MaritalStatus.Current.b.MarriageDate.FromMM', profile_path: 'marital.date_of_current_relationship', label: 'Marriage Date — Month', field_type: 'date', is_required: false, sort_order: 3, date_split: 'month', show_when: { profile_path: 'marital.status', operator: 'equals', value: 'married' } },
-        { xfa_path: 'form1.Page1.MaritalStatus.Current.b.MarriageDate.FromDD', profile_path: 'marital.date_of_current_relationship', label: 'Marriage Date — Day', field_type: 'date', is_required: false, sort_order: 4, date_split: 'day', show_when: { profile_path: 'marital.status', operator: 'equals', value: 'married' } },
+        { xfa_path: 'form1.Page1.MaritalStatus.Current.b.MarriageDate.FromYr', profile_path: 'marital.date_of_current_relationship', label: 'Marriage Date  -  Year', field_type: 'date', is_required: false, sort_order: 2, date_split: 'year', show_when: { profile_path: 'marital.status', operator: 'equals', value: 'married' } },
+        { xfa_path: 'form1.Page1.MaritalStatus.Current.b.MarriageDate.FromMM', profile_path: 'marital.date_of_current_relationship', label: 'Marriage Date  -  Month', field_type: 'date', is_required: false, sort_order: 3, date_split: 'month', show_when: { profile_path: 'marital.status', operator: 'equals', value: 'married' } },
+        { xfa_path: 'form1.Page1.MaritalStatus.Current.b.MarriageDate.FromDD', profile_path: 'marital.date_of_current_relationship', label: 'Marriage Date  -  Day', field_type: 'date', is_required: false, sort_order: 4, date_split: 'day', show_when: { profile_path: 'marital.status', operator: 'equals', value: 'married' } },
         { xfa_path: 'form1.Page1.MaritalStatus.Current.c.FamilyName', profile_path: 'marital.spouse_family_name', label: 'Spouse Family Name', field_type: 'text', is_required: false, sort_order: 5, max_length: 60, show_when: { profile_path: 'marital.status', operator: 'equals', value: 'married' } },
         { xfa_path: 'form1.Page1.MaritalStatus.Current.c.GivenName', profile_path: 'marital.spouse_given_name', label: 'Spouse Given Name', field_type: 'text', is_required: false, sort_order: 6, max_length: 60, show_when: { profile_path: 'marital.status', operator: 'equals', value: 'married' } },
       ],
@@ -2473,12 +2473,12 @@ const IMM5710E_FORM: SeedFormDef = {
       fields: [
         { xfa_path: 'form1.Page2.Passport.PassportNum', profile_path: 'passport.number', label: 'Passport Number', field_type: 'text', is_required: true, sort_order: 1, max_length: 20 },
         { xfa_path: 'form1.Page2.Passport.CountryofIssue', profile_path: 'passport.country_of_issue', label: 'Country of Issue', field_type: 'country', is_required: true, sort_order: 2 },
-        { xfa_path: 'form1.Page2.Passport.Issue.YYYY', profile_path: 'passport.issue_date', label: 'Issue Date — Year', field_type: 'date', is_required: true, sort_order: 3, date_split: 'year' },
-        { xfa_path: 'form1.Page2.Passport.Issue.MM', profile_path: 'passport.issue_date', label: 'Issue Date — Month', field_type: 'date', is_required: false, sort_order: 4, date_split: 'month' },
-        { xfa_path: 'form1.Page2.Passport.Issue.DD', profile_path: 'passport.issue_date', label: 'Issue Date — Day', field_type: 'date', is_required: false, sort_order: 5, date_split: 'day' },
-        { xfa_path: 'form1.Page2.Passport.Expiry.YYYY', profile_path: 'passport.expiry_date', label: 'Expiry Date — Year', field_type: 'date', is_required: true, sort_order: 6, date_split: 'year' },
-        { xfa_path: 'form1.Page2.Passport.Expiry.MM', profile_path: 'passport.expiry_date', label: 'Expiry Date — Month', field_type: 'date', is_required: false, sort_order: 7, date_split: 'month' },
-        { xfa_path: 'form1.Page2.Passport.Expiry.DD', profile_path: 'passport.expiry_date', label: 'Expiry Date — Day', field_type: 'date', is_required: false, sort_order: 8, date_split: 'day' },
+        { xfa_path: 'form1.Page2.Passport.Issue.YYYY', profile_path: 'passport.issue_date', label: 'Issue Date  -  Year', field_type: 'date', is_required: true, sort_order: 3, date_split: 'year' },
+        { xfa_path: 'form1.Page2.Passport.Issue.MM', profile_path: 'passport.issue_date', label: 'Issue Date  -  Month', field_type: 'date', is_required: false, sort_order: 4, date_split: 'month' },
+        { xfa_path: 'form1.Page2.Passport.Issue.DD', profile_path: 'passport.issue_date', label: 'Issue Date  -  Day', field_type: 'date', is_required: false, sort_order: 5, date_split: 'day' },
+        { xfa_path: 'form1.Page2.Passport.Expiry.YYYY', profile_path: 'passport.expiry_date', label: 'Expiry Date  -  Year', field_type: 'date', is_required: true, sort_order: 6, date_split: 'year' },
+        { xfa_path: 'form1.Page2.Passport.Expiry.MM', profile_path: 'passport.expiry_date', label: 'Expiry Date  -  Month', field_type: 'date', is_required: false, sort_order: 7, date_split: 'month' },
+        { xfa_path: 'form1.Page2.Passport.Expiry.DD', profile_path: 'passport.expiry_date', label: 'Expiry Date  -  Day', field_type: 'date', is_required: false, sort_order: 8, date_split: 'day' },
       ],
     },
     // ── Section 6: Contact Information ──────────────────────────────────
@@ -2588,7 +2588,7 @@ const IMM5710E_FORM: SeedFormDef = {
     },
   ],
   array_maps: [
-    // Employment history (3 static rows in PDF — split across pages)
+    // Employment history (3 static rows in PDF  -  split across pages)
     {
       profile_path: 'employment.history',
       xfa_base_path: 'form1.Page3.Employment',
@@ -2623,13 +2623,13 @@ const ALL_FORMS: SeedFormDef[] = [
 ]
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// SEEDER — Insert all data into DB
+// SEEDER  -  Insert all data into DB
 // ═══════════════════════════════════════════════════════════════════════════════
 
 async function seedForms() {
-  console.log('🌱 IRCC Form Seeder — Starting...\n')
+  console.log('🌱 IRCC Form Seeder  -  Starting...\n')
 
-  // 1. Get tenant ID — accepts TENANT_ID env var, otherwise uses first tenant
+  // 1. Get tenant ID  -  accepts TENANT_ID env var, otherwise uses first tenant
   const forceTenantId = process.env.TENANT_ID
   const { data: tenants, error: tenantError } = await supabase
     .from('tenants')
@@ -2668,7 +2668,7 @@ async function seedForms() {
 
   for (const formDef of ALL_FORMS) {
     if (existingCodes.has(formDef.form_code)) {
-      console.log(`⏭️  Skipping ${formDef.form_code} — already exists`)
+      console.log(`⏭️  Skipping ${formDef.form_code}  -  already exists`)
       continue
     }
 

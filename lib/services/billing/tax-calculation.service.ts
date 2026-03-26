@@ -1,5 +1,5 @@
 // ============================================================================
-// Tax Calculation Service — live tax calculation for the invoice builder
+// Tax Calculation Service  -  live tax calculation for the invoice builder
 // ============================================================================
 // Used in the invoice builder UI before finalization to show real-time tax
 // breakdowns.  After finalization, tax amounts are stored on line items by
@@ -108,7 +108,7 @@ export async function calculateTaxBreakdown(
 
     const code = taxCodeMap.get(line.tax_code_id)
     if (!code) {
-      // Tax code not found or inactive — treat as zero
+      // Tax code not found or inactive  -  treat as zero
       breakdown.push({
         line_id: line.line_id ?? null,
         taxable_amount_cents: line.amount_cents,

@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Wave 6 — Automation Visibility & Settings Alignment Tests
+ * Wave 6  -  Automation Visibility & Settings Alignment Tests
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Validates:
@@ -295,7 +295,7 @@ describe('Auto-Complete Triggers in Milestone Definitions', () => {
         }
       }
     }
-    expect(manualOnlyCount, 'All tasks have auto-complete — no manual tasks').toBeGreaterThan(3)
+    expect(manualOnlyCount, 'All tasks have auto-complete  -  no manual tasks').toBeGreaterThan(3)
   })
 })
 

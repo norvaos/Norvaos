@@ -95,7 +95,7 @@ export async function linkOneDriveFile(
       file_name: item.name,
       file_type: item.file?.mimeType || null,
       file_size: item.size || null,
-      storage_path: '', // No local storage — linked by reference
+      storage_path: '', // No local storage  -  linked by reference
       external_id: item.id,
       external_provider: 'microsoft_onedrive',
       onedrive_item_id: item.id,
@@ -197,7 +197,7 @@ export async function ensureNorvaOSRootFolder(
       .eq('id', connectionId)
     return existing.id
   } catch (err) {
-    // 404 means folder doesn't exist — proceed to create
+    // 404 means folder doesn't exist  -  proceed to create
     if (err instanceof GraphError && err.status === 404) {
       console.log('[onedrive] NorvaOS folder not found (404), will create it')
     } else {
@@ -587,7 +587,7 @@ export async function syncMatterFoldersToOneDrive(
       dbToOneDrive.set(folder.id, oneDriveFolderId)
     } catch (err) {
       console.warn(`[onedrive-sync] Failed to create OneDrive subfolder "${folder.name}":`, err)
-      // Continue with other folders — partial sync is better than none
+      // Continue with other folders  -  partial sync is better than none
     }
   }
 }
@@ -726,7 +726,7 @@ export async function migrateLeadDocumentsToOneDrive(
 
         // Skip files larger than 4MB (simple upload limit)
         if (buffer.length > 4 * 1024 * 1024) {
-          console.warn(`[doc-migration] Skipping "${doc.file_name}" — exceeds 4MB simple upload limit (${(buffer.length / 1024 / 1024).toFixed(1)}MB)`)
+          console.warn(`[doc-migration] Skipping "${doc.file_name}"  -  exceeds 4MB simple upload limit (${(buffer.length / 1024 / 1024).toFixed(1)}MB)`)
           continue
         }
 

@@ -1,5 +1,5 @@
 -- ============================================================================
--- Migration 201: Compliance Lockdown — Three-Way Trust Reconciliation
+-- Migration 201: Compliance Lockdown  -  Three-Way Trust Reconciliation
 -- ============================================================================
 -- Directive 004, Pillar 2: Automated Three-Way Trust Reconciliation with
 -- Disbursement Lockdown.
@@ -92,7 +92,7 @@ BEGIN
   IF NEW.status = 'open' THEN
     UPDATE trust_bank_accounts
     SET disbursements_locked = true,
-        lock_reason = 'Three-way reconciliation discrepancy detected — disbursements frozen until resolved. Discrepancy ID: ' || NEW.id::text,
+        lock_reason = 'Three-way reconciliation discrepancy detected  -  disbursements frozen until resolved. Discrepancy ID: ' || NEW.id::text,
         locked_at = now()
     WHERE id = NEW.trust_account_id;
   END IF;

@@ -1,5 +1,5 @@
 -- =============================================================================
--- Migration 173 — SENTINEL Hardened Immutability Guard
+-- Migration 173  -  SENTINEL Hardened Immutability Guard
 -- =============================================================================
 --
 -- Upgrades the immutability guard from migration 161 to be resistant to
@@ -7,7 +7,7 @@
 -- key, the database engine itself will refuse to alter audit history.
 --
 -- Defence layers:
---   1. SECURITY DEFINER trigger function — runs as the definer, not the caller
+--   1. SECURITY DEFINER trigger function  -  runs as the definer, not the caller
 --   2. Explicitly blocks service_role from UPDATE/DELETE
 --   3. Event trigger to prevent DROP TRIGGER on sentinel_audit_log
 --   4. TRUNCATE protection via REVOKE
@@ -26,7 +26,7 @@ SET search_path = public
 AS $$
 BEGIN
   -- This trigger fires BEFORE UPDATE OR DELETE on sentinel_audit_log.
-  -- It blocks ALL callers — including service_role, superadmin, and
+  -- It blocks ALL callers  -  including service_role, superadmin, and
   -- any future role that might be created.
   --
   -- The ONLY way to bypass this is to DROP the trigger first,
@@ -69,7 +69,7 @@ REVOKE TRUNCATE ON sentinel_audit_log FROM anon;
 REVOKE TRUNCATE ON sentinel_audit_log FROM service_role;
 
 
--- ── 4. Event trigger — prevent DROP TRIGGER on sentinel_audit_log ───────────
+-- ── 4. Event trigger  -  prevent DROP TRIGGER on sentinel_audit_log ───────────
 -- This is the nuclear option: even if an attacker has service_role,
 -- they cannot silently drop the immutability trigger.
 --

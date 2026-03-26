@@ -1,27 +1,27 @@
 -- ═══════════════════════════════════════════════════════════════════════════════
--- Migration 075: Lead Intake Automation — NorvaOS Phase 1
+-- Migration 075: Lead Intake Automation  -  NorvaOS Phase 1
 -- ═══════════════════════════════════════════════════════════════════════════════
 --
 -- Creates the lead-to-retainer intake automation foundation:
---   1.  lead_stage_history          — relational audit trail (not JSONB)
---   2.  lead_intake_profiles        — structured intake data
---   3.  lead_qualification_decisions — qualification outcomes
---   4.  lead_consultations          — consultation lifecycle
---   5.  lead_retainer_packages      — retainer status tracking
---   6.  lead_milestone_groups       — workflow milestone groups
---   7.  lead_milestone_tasks        — tasks within milestone groups
---   8.  lead_communication_events   — first-class communication objects
---   9.  lead_closure_records        — closure audit
---   10. lead_reopen_records         — reopen audit
---   11. workspace_workflow_config   — workspace-level workflow configuration
---   12. lead_ai_insights            — AI analysis results (assistive only)
---   13. lead_workflow_executions    — idempotency ledger
+--   1.  lead_stage_history           -  relational audit trail (not JSONB)
+--   2.  lead_intake_profiles         -  structured intake data
+--   3.  lead_qualification_decisions  -  qualification outcomes
+--   4.  lead_consultations           -  consultation lifecycle
+--   5.  lead_retainer_packages       -  retainer status tracking
+--   6.  lead_milestone_groups        -  workflow milestone groups
+--   7.  lead_milestone_tasks         -  tasks within milestone groups
+--   8.  lead_communication_events    -  first-class communication objects
+--   9.  lead_closure_records         -  closure audit
+--   10. lead_reopen_records          -  reopen audit
+--   11. workspace_workflow_config    -  workspace-level workflow configuration
+--   12. lead_ai_insights             -  AI analysis results (assistive only)
+--   13. lead_workflow_executions     -  idempotency ledger
 --
 -- Plus: leads table extensions, matters table extension, 3 reporting views.
 -- All tables include tenant_id with RLS policies.
 -- ═══════════════════════════════════════════════════════════════════════════════
 
--- ─── 0. Extend leads table (derived summary fields — recalculator only) ──────
+-- ─── 0. Extend leads table (derived summary fields  -  recalculator only) ──────
 
 ALTER TABLE leads ADD COLUMN IF NOT EXISTS current_stage text;
 ALTER TABLE leads ADD COLUMN IF NOT EXISTS assigned_intake_staff_id uuid REFERENCES users(id);
@@ -63,7 +63,7 @@ ALTER TABLE matters ADD COLUMN IF NOT EXISTS originating_lead_id uuid REFERENCES
 CREATE INDEX IF NOT EXISTS idx_matters_originating_lead ON matters(originating_lead_id) WHERE originating_lead_id IS NOT NULL;
 
 -- ═══════════════════════════════════════════════════════════════════════════════
--- 1. lead_stage_history — relational stage audit trail
+-- 1. lead_stage_history  -  relational stage audit trail
 -- ═══════════════════════════════════════════════════════════════════════════════
 
 CREATE TABLE IF NOT EXISTS lead_stage_history (
@@ -92,7 +92,7 @@ CREATE POLICY lead_stage_history_tenant_isolation ON lead_stage_history
   USING (tenant_id = get_current_tenant_id());
 
 -- ═══════════════════════════════════════════════════════════════════════════════
--- 2. lead_intake_profiles — structured intake data per lead
+-- 2. lead_intake_profiles  -  structured intake data per lead
 -- ═══════════════════════════════════════════════════════════════════════════════
 
 CREATE TABLE IF NOT EXISTS lead_intake_profiles (
@@ -129,7 +129,7 @@ ALTER TABLE leads
   ADD CONSTRAINT fk_leads_intake_profile FOREIGN KEY (intake_profile_id) REFERENCES lead_intake_profiles(id);
 
 -- ═══════════════════════════════════════════════════════════════════════════════
--- 3. lead_qualification_decisions — qualification outcomes
+-- 3. lead_qualification_decisions  -  qualification outcomes
 -- ═══════════════════════════════════════════════════════════════════════════════
 
 CREATE TABLE IF NOT EXISTS lead_qualification_decisions (
@@ -156,7 +156,7 @@ CREATE POLICY lead_qualification_decisions_tenant_isolation ON lead_qualificatio
   USING (tenant_id = get_current_tenant_id());
 
 -- ═══════════════════════════════════════════════════════════════════════════════
--- 4. lead_consultations — consultation lifecycle
+-- 4. lead_consultations  -  consultation lifecycle
 -- ═══════════════════════════════════════════════════════════════════════════════
 
 CREATE TABLE IF NOT EXISTS lead_consultations (
@@ -193,7 +193,7 @@ CREATE POLICY lead_consultations_tenant_isolation ON lead_consultations
   USING (tenant_id = get_current_tenant_id());
 
 -- ═══════════════════════════════════════════════════════════════════════════════
--- 5. lead_retainer_packages — retainer status tracking
+-- 5. lead_retainer_packages  -  retainer status tracking
 -- ═══════════════════════════════════════════════════════════════════════════════
 
 CREATE TABLE IF NOT EXISTS lead_retainer_packages (
@@ -228,7 +228,7 @@ CREATE POLICY lead_retainer_packages_tenant_isolation ON lead_retainer_packages
   USING (tenant_id = get_current_tenant_id());
 
 -- ═══════════════════════════════════════════════════════════════════════════════
--- 6. lead_milestone_groups — workflow milestone groups
+-- 6. lead_milestone_groups  -  workflow milestone groups
 -- ═══════════════════════════════════════════════════════════════════════════════
 
 CREATE TABLE IF NOT EXISTS lead_milestone_groups (
@@ -265,7 +265,7 @@ CREATE POLICY lead_milestone_groups_tenant_isolation ON lead_milestone_groups
   USING (tenant_id = get_current_tenant_id());
 
 -- ═══════════════════════════════════════════════════════════════════════════════
--- 7. lead_milestone_tasks — tasks within milestone groups
+-- 7. lead_milestone_tasks  -  tasks within milestone groups
 -- ═══════════════════════════════════════════════════════════════════════════════
 
 CREATE TABLE IF NOT EXISTS lead_milestone_tasks (
@@ -309,7 +309,7 @@ CREATE POLICY lead_milestone_tasks_tenant_isolation ON lead_milestone_tasks
   USING (tenant_id = get_current_tenant_id());
 
 -- ═══════════════════════════════════════════════════════════════════════════════
--- 8. lead_communication_events — first-class communication objects
+-- 8. lead_communication_events  -  first-class communication objects
 -- ═══════════════════════════════════════════════════════════════════════════════
 
 CREATE TABLE IF NOT EXISTS lead_communication_events (
@@ -360,7 +360,7 @@ ALTER TABLE lead_milestone_tasks
     FOREIGN KEY (linked_communication_event_id) REFERENCES lead_communication_events(id);
 
 -- ═══════════════════════════════════════════════════════════════════════════════
--- 9. lead_closure_records — closure audit
+-- 9. lead_closure_records  -  closure audit
 -- ═══════════════════════════════════════════════════════════════════════════════
 
 CREATE TABLE IF NOT EXISTS lead_closure_records (
@@ -392,7 +392,7 @@ ALTER TABLE leads
   ADD CONSTRAINT fk_leads_closure_record FOREIGN KEY (closure_record_id) REFERENCES lead_closure_records(id);
 
 -- ═══════════════════════════════════════════════════════════════════════════════
--- 10. lead_reopen_records — reopen audit
+-- 10. lead_reopen_records  -  reopen audit
 -- ═══════════════════════════════════════════════════════════════════════════════
 
 CREATE TABLE IF NOT EXISTS lead_reopen_records (
@@ -418,7 +418,7 @@ CREATE POLICY lead_reopen_records_tenant_isolation ON lead_reopen_records
   USING (tenant_id = get_current_tenant_id());
 
 -- ═══════════════════════════════════════════════════════════════════════════════
--- 11. workspace_workflow_config — workspace-level workflow configuration
+-- 11. workspace_workflow_config  -  workspace-level workflow configuration
 -- ═══════════════════════════════════════════════════════════════════════════════
 
 CREATE TABLE IF NOT EXISTS workspace_workflow_config (
@@ -474,7 +474,7 @@ CREATE POLICY workspace_workflow_config_tenant_isolation ON workspace_workflow_c
   USING (tenant_id = get_current_tenant_id());
 
 -- ═══════════════════════════════════════════════════════════════════════════════
--- 12. lead_ai_insights — AI analysis results (assistive only)
+-- 12. lead_ai_insights  -  AI analysis results (assistive only)
 -- ═══════════════════════════════════════════════════════════════════════════════
 
 CREATE TABLE IF NOT EXISTS lead_ai_insights (
@@ -507,7 +507,7 @@ CREATE POLICY lead_ai_insights_tenant_isolation ON lead_ai_insights
   USING (tenant_id = get_current_tenant_id());
 
 -- ═══════════════════════════════════════════════════════════════════════════════
--- 13. lead_workflow_executions — idempotency ledger
+-- 13. lead_workflow_executions  -  idempotency ledger
 -- ═══════════════════════════════════════════════════════════════════════════════
 
 CREATE TABLE IF NOT EXISTS lead_workflow_executions (
@@ -537,7 +537,7 @@ CREATE POLICY lead_workflow_executions_tenant_isolation ON lead_workflow_executi
 -- Reporting Views
 -- ═══════════════════════════════════════════════════════════════════════════════
 
--- View: Lead funnel summary — stage counts + conversion rates
+-- View: Lead funnel summary  -  stage counts + conversion rates
 CREATE OR REPLACE VIEW v_lead_funnel_summary AS
 SELECT
   h.tenant_id,
@@ -568,7 +568,7 @@ SELECT
 FROM lead_stage_history h
 GROUP BY h.tenant_id, h.to_stage;
 
--- View: Lead stage duration — average time per stage
+-- View: Lead stage duration  -  average time per stage
 CREATE OR REPLACE VIEW v_lead_stage_duration AS
 SELECT
   h1.tenant_id,
@@ -595,7 +595,7 @@ SELECT
 FROM lead_stage_history h1
 GROUP BY h1.tenant_id, h1.to_stage;
 
--- View: Lead source attribution — leads and conversions by source
+-- View: Lead source attribution  -  leads and conversions by source
 CREATE OR REPLACE VIEW v_lead_source_attribution AS
 SELECT
   l.tenant_id,

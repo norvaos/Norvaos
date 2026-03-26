@@ -4,7 +4,7 @@
  * Admin-Core Language Toggle (Directive 18.0)
  *
  * Bilingual English/French toggle for the lawyer/staff UI.
- * Restricted to en/fr only — the Canadian bilingual standard.
+ * Restricted to en/fr only  -  the Canadian bilingual standard.
  *
  * Role-gated: Only renders for staff users. Hidden from client views.
  * System actions (Delete Matter, Invite User, Trust Deposit) are

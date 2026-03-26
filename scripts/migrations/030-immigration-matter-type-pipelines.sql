@@ -6,7 +6,7 @@
 -- create pipelines/stages for them (only Real Estate got those).
 -- This migration fills the gap so the unified Matter Types
 -- settings page shows pipelines + document templates.
--- All inserts are ON CONFLICT DO NOTHING — safe to re-run.
+-- All inserts are ON CONFLICT DO NOTHING  -  safe to re-run.
 -- ============================================================
 
 BEGIN;
@@ -22,7 +22,7 @@ BEGIN
   -- Resolve the first tenant
   SELECT id INTO v_tenant_id FROM tenants ORDER BY created_at LIMIT 1;
   IF v_tenant_id IS NULL THEN
-    RAISE NOTICE '[030] No tenant found — skipping.';
+    RAISE NOTICE '[030] No tenant found  -  skipping.';
     RETURN;
   END IF;
 
@@ -30,7 +30,7 @@ BEGIN
   SELECT id INTO v_imm_pa_id FROM practice_areas
    WHERE tenant_id = v_tenant_id AND name = 'Immigration';
   IF v_imm_pa_id IS NULL THEN
-    RAISE NOTICE '[030] No Immigration practice area found — skipping.';
+    RAISE NOTICE '[030] No Immigration practice area found  -  skipping.';
     RETURN;
   END IF;
 
@@ -69,15 +69,15 @@ BEGIN
       (v_tenant_id, v_mt_id, 'Applicant Passport', 'applicant_passport', 'identity', 'any', TRUE, '{"application/pdf","image/jpeg","image/png"}', 2),
       (v_tenant_id, v_mt_id, 'Marriage Certificate', 'marriage_certificate', 'identity', 'any', TRUE, '{"application/pdf","image/jpeg","image/png"}', 3),
       (v_tenant_id, v_mt_id, 'Sponsor PR Card / Citizenship', 'sponsor_pr_card_citizenship', 'identity', 'any', TRUE, '{"application/pdf","image/jpeg","image/png"}', 4),
-      (v_tenant_id, v_mt_id, 'Digital Photos — IRCC Specs', 'digital_photos_ircc_specs', 'identity', 'any', TRUE, '{"image/jpeg","image/png"}', 5),
+      (v_tenant_id, v_mt_id, 'Digital Photos  -  IRCC Specs', 'digital_photos_ircc_specs', 'identity', 'any', TRUE, '{"image/jpeg","image/png"}', 5),
       (v_tenant_id, v_mt_id, 'Relationship Photos (timeline)', 'relationship_photos_timeline', 'relationship', 'any', TRUE, '{"image/jpeg","image/png"}', 6),
       (v_tenant_id, v_mt_id, 'Chat / Communication History', 'chat_communication_history', 'relationship', 'any', TRUE, '{"application/pdf","image/jpeg","image/png"}', 7),
       (v_tenant_id, v_mt_id, 'Joint Financial Documents', 'joint_financial_documents', 'relationship', 'any', FALSE, '{"application/pdf","image/jpeg","image/png"}', 8),
       (v_tenant_id, v_mt_id, 'Statutory Declarations from Third Parties', 'statutory_declarations_from_third_parties', 'relationship', 'any', TRUE, '{"application/pdf"}', 9),
       (v_tenant_id, v_mt_id, 'Sponsor Tax Returns / NOA (3 years)', 'sponsor_tax_returns_noa_3_years', 'financial', 'any', TRUE, '{"application/pdf","image/jpeg","image/png"}', 10),
       (v_tenant_id, v_mt_id, 'Sponsor Employment Letter', 'sponsor_employment_letter', 'financial', 'any', TRUE, '{"application/pdf"}', 11),
-      (v_tenant_id, v_mt_id, 'Police Clearance — Sponsor', 'police_clearance_sponsor', 'background', 'any', TRUE, '{"application/pdf","image/jpeg","image/png"}', 12),
-      (v_tenant_id, v_mt_id, 'Police Clearance — Applicant', 'police_clearance_applicant', 'background', 'any', TRUE, '{"application/pdf","image/jpeg","image/png"}', 13),
+      (v_tenant_id, v_mt_id, 'Police Clearance  -  Sponsor', 'police_clearance_sponsor', 'background', 'any', TRUE, '{"application/pdf","image/jpeg","image/png"}', 12),
+      (v_tenant_id, v_mt_id, 'Police Clearance  -  Applicant', 'police_clearance_applicant', 'background', 'any', TRUE, '{"application/pdf","image/jpeg","image/png"}', 13),
       (v_tenant_id, v_mt_id, 'Medical Exam Results (IME)', 'medical_exam_results_ime', 'medical', 'any', TRUE, '{"application/pdf"}', 14)
     ON CONFLICT DO NOTHING;
   END IF;
@@ -110,7 +110,7 @@ BEGIN
 
     INSERT INTO document_slot_templates (tenant_id, matter_type_id, slot_name, slot_slug, category, person_role_scope, is_required, accepted_file_types, sort_order) VALUES
       (v_tenant_id, v_mt_id, 'Passport (all pages)', 'passport_all_pages', 'identity', 'any', TRUE, '{"application/pdf","image/jpeg","image/png"}', 1),
-      (v_tenant_id, v_mt_id, 'Digital Photos — IRCC Specs', 'digital_photos_ircc_specs', 'identity', 'any', TRUE, '{"image/jpeg","image/png"}', 2),
+      (v_tenant_id, v_mt_id, 'Digital Photos  -  IRCC Specs', 'digital_photos_ircc_specs', 'identity', 'any', TRUE, '{"image/jpeg","image/png"}', 2),
       (v_tenant_id, v_mt_id, 'Job Offer Letter', 'job_offer_letter', 'employment', 'any', TRUE, '{"application/pdf"}', 3),
       (v_tenant_id, v_mt_id, 'LMIA Approval Letter', 'lmia_approval_letter', 'employment', 'any', FALSE, '{"application/pdf"}', 4),
       (v_tenant_id, v_mt_id, 'Employment Contract', 'employment_contract', 'employment', 'any', TRUE, '{"application/pdf"}', 5),
@@ -150,7 +150,7 @@ BEGIN
 
     INSERT INTO document_slot_templates (tenant_id, matter_type_id, slot_name, slot_slug, category, person_role_scope, is_required, accepted_file_types, sort_order) VALUES
       (v_tenant_id, v_mt_id, 'Passport (all pages)', 'passport_all_pages', 'identity', 'any', TRUE, '{"application/pdf","image/jpeg","image/png"}', 1),
-      (v_tenant_id, v_mt_id, 'Digital Photos — IRCC Specs', 'digital_photos_ircc_specs', 'identity', 'any', TRUE, '{"image/jpeg","image/png"}', 2),
+      (v_tenant_id, v_mt_id, 'Digital Photos  -  IRCC Specs', 'digital_photos_ircc_specs', 'identity', 'any', TRUE, '{"image/jpeg","image/png"}', 2),
       (v_tenant_id, v_mt_id, 'Letter of Acceptance (DLI)', 'letter_of_acceptance_dli', 'education', 'any', TRUE, '{"application/pdf"}', 3),
       (v_tenant_id, v_mt_id, 'Transcripts & Diplomas', 'transcripts_diplomas', 'education', 'any', TRUE, '{"application/pdf","image/jpeg","image/png"}', 4),
       (v_tenant_id, v_mt_id, 'Proof of Funds (tuition + living)', 'proof_of_funds_tuition_living', 'financial', 'any', TRUE, '{"application/pdf","image/jpeg","image/png"}', 5),
@@ -193,7 +193,7 @@ BEGIN
     INSERT INTO document_slot_templates (tenant_id, matter_type_id, slot_name, slot_slug, category, person_role_scope, is_required, accepted_file_types, sort_order) VALUES
       (v_tenant_id, v_mt_id, 'Passport (all pages)', 'passport_all_pages', 'identity', 'any', TRUE, '{"application/pdf","image/jpeg","image/png"}', 1),
       (v_tenant_id, v_mt_id, 'Birth Certificate', 'birth_certificate', 'identity', 'any', TRUE, '{"application/pdf","image/jpeg","image/png"}', 2),
-      (v_tenant_id, v_mt_id, 'Digital Photos — IRCC Specs', 'digital_photos_ircc_specs', 'identity', 'any', TRUE, '{"image/jpeg","image/png"}', 3),
+      (v_tenant_id, v_mt_id, 'Digital Photos  -  IRCC Specs', 'digital_photos_ircc_specs', 'identity', 'any', TRUE, '{"image/jpeg","image/png"}', 3),
       (v_tenant_id, v_mt_id, 'IELTS / CELPIP Results', 'ielts_celpip_results', 'language', 'any', TRUE, '{"application/pdf","image/jpeg","image/png"}', 4),
       (v_tenant_id, v_mt_id, 'ECA Report (WES/IQAS)', 'eca_report_wes_iqas', 'education', 'any', TRUE, '{"application/pdf"}', 5),
       (v_tenant_id, v_mt_id, 'University Transcripts', 'university_transcripts', 'education', 'any', TRUE, '{"application/pdf","image/jpeg","image/png"}', 6),
@@ -236,7 +236,7 @@ BEGIN
 
     INSERT INTO document_slot_templates (tenant_id, matter_type_id, slot_name, slot_slug, category, person_role_scope, is_required, accepted_file_types, sort_order) VALUES
       (v_tenant_id, v_mt_id, 'Passport / Travel Documents', 'passport_travel_documents', 'identity', 'any', TRUE, '{"application/pdf","image/jpeg","image/png"}', 1),
-      (v_tenant_id, v_mt_id, 'Digital Photos — IRCC Specs', 'digital_photos_ircc_specs', 'identity', 'any', TRUE, '{"image/jpeg","image/png"}', 2),
+      (v_tenant_id, v_mt_id, 'Digital Photos  -  IRCC Specs', 'digital_photos_ircc_specs', 'identity', 'any', TRUE, '{"image/jpeg","image/png"}', 2),
       (v_tenant_id, v_mt_id, 'Basis of Claim (BOC) Form', 'basis_of_claim_boc_form', 'legal', 'any', TRUE, '{"application/pdf"}', 3),
       (v_tenant_id, v_mt_id, 'Personal Narrative / Declaration', 'personal_narrative_declaration', 'legal', 'any', TRUE, '{"application/pdf"}', 4),
       (v_tenant_id, v_mt_id, 'Country Condition Evidence', 'country_condition_evidence', 'legal', 'any', TRUE, '{"application/pdf"}', 5),
@@ -273,7 +273,7 @@ BEGIN
 
     INSERT INTO document_slot_templates (tenant_id, matter_type_id, slot_name, slot_slug, category, person_role_scope, is_required, accepted_file_types, sort_order) VALUES
       (v_tenant_id, v_mt_id, 'Passport (bio page + stamps)', 'passport_bio_page_stamps', 'identity', 'any', TRUE, '{"application/pdf","image/jpeg","image/png"}', 1),
-      (v_tenant_id, v_mt_id, 'Digital Photos — IRCC Specs', 'digital_photos_ircc_specs', 'identity', 'any', TRUE, '{"image/jpeg","image/png"}', 2),
+      (v_tenant_id, v_mt_id, 'Digital Photos  -  IRCC Specs', 'digital_photos_ircc_specs', 'identity', 'any', TRUE, '{"image/jpeg","image/png"}', 2),
       (v_tenant_id, v_mt_id, 'Invitation Letter', 'invitation_letter', 'travel', 'any', FALSE, '{"application/pdf"}', 3),
       (v_tenant_id, v_mt_id, 'Travel Itinerary', 'travel_itinerary', 'travel', 'any', FALSE, '{"application/pdf"}', 4),
       (v_tenant_id, v_mt_id, 'Proof of Funds', 'proof_of_funds', 'financial', 'any', TRUE, '{"application/pdf","image/jpeg","image/png"}', 5),
@@ -311,7 +311,7 @@ BEGIN
     INSERT INTO document_slot_templates (tenant_id, matter_type_id, slot_name, slot_slug, category, person_role_scope, is_required, accepted_file_types, sort_order) VALUES
       (v_tenant_id, v_mt_id, 'PR Card (front and back)', 'pr_card_front_and_back', 'identity', 'any', TRUE, '{"application/pdf","image/jpeg","image/png"}', 1),
       (v_tenant_id, v_mt_id, 'Passport (all pages)', 'passport_all_pages', 'identity', 'any', TRUE, '{"application/pdf","image/jpeg","image/png"}', 2),
-      (v_tenant_id, v_mt_id, 'Digital Photos — IRCC Specs', 'digital_photos_ircc_specs', 'identity', 'any', TRUE, '{"image/jpeg","image/png"}', 3),
+      (v_tenant_id, v_mt_id, 'Digital Photos  -  IRCC Specs', 'digital_photos_ircc_specs', 'identity', 'any', TRUE, '{"image/jpeg","image/png"}', 3),
       (v_tenant_id, v_mt_id, 'Tax Returns / NOA (5 years)', 'tax_returns_noa_5_years', 'financial', 'any', TRUE, '{"application/pdf"}', 4),
       (v_tenant_id, v_mt_id, 'Physical Presence Calculator', 'physical_presence_calculator', 'other', 'any', TRUE, '{"application/pdf","image/jpeg","image/png"}', 5),
       (v_tenant_id, v_mt_id, 'Travel History (5 years)', 'travel_history_5_years', 'travel', 'any', TRUE, '{"application/pdf","image/jpeg","image/png"}', 6),

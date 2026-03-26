@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * First-Mile Onboarding — Compliance Setup
+ * First-Mile Onboarding  -  Compliance Setup
  *
  * Distraction-free, mandatory setup. No sidebar, no header.
  * User selects their province → Law Society auto-resolves → tax defaults set.
@@ -91,7 +91,7 @@ function SuccessState({ body, tax }: { body: RegulatoryBodyDef; tax: { rate: num
       <div className="mx-auto max-w-sm rounded-lg border border-emerald-200 bg-emerald-50/80 p-4 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-300">
         <div className="flex items-center justify-center gap-2 text-sm font-semibold text-emerald-800">
           <ShieldCheck className="h-5 w-5" />
-          {body.name} — Compliance Active
+          {body.name}  -  Compliance Active
         </div>
       </div>
 
@@ -136,7 +136,7 @@ export default function ComplianceSetupPage() {
         throw new Error((body as { error?: string }).error ?? 'Failed to save')
       }
 
-      // 2. Create sample lead (non-blocking — fire and forget errors)
+      // 2. Create sample lead (non-blocking  -  fire and forget errors)
       try {
         await fetch('/api/setup/sample-lead', { method: 'POST' })
       } catch {
@@ -238,7 +238,7 @@ export default function ComplianceSetupPage() {
                 </p>
                 <p className="text-xs text-emerald-700 leading-relaxed">
                   {resolved.scope === 'federal'
-                    ? 'Federal regulatory body — applies across all provinces'
+                    ? 'Federal regulatory body  -  applies across all provinces'
                     : resolved.description}
                 </p>
               </div>

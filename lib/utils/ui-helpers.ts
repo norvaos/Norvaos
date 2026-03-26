@@ -1,5 +1,5 @@
 /**
- * UI Helpers — Scroll-and-Glow, Deep Linking, Field Focus
+ * UI Helpers  -  Scroll-and-Glow, Deep Linking, Field Focus
  *
  * Used by the Compliance Diagnostic Modal to navigate users directly
  * to the specific field that needs attention.
@@ -26,7 +26,7 @@ export function scrollToField(
     // 1. Smooth scroll to centre of viewport
     element.scrollIntoView({ behavior: 'smooth', block: 'center' })
 
-    // 2. Visual glow — amber ring pulse
+    // 2. Visual glow  -  amber ring pulse
     element.classList.add(
       'ring-4',
       'ring-amber-400',

@@ -1,5 +1,5 @@
 /**
- * GET /api/analytics/aged-receivables — Aged receivables report
+ * GET /api/analytics/aged-receivables  -  Aged receivables report
  */
 
 import { NextRequest, NextResponse } from 'next/server'

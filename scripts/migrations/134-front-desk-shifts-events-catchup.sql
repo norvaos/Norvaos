@@ -1,5 +1,5 @@
 -- ============================================================================
--- Migration 134: Front Desk Shifts & Events — catch-up
+-- Migration 134: Front Desk Shifts & Events  -  catch-up
 -- ============================================================================
 -- Migration 050 was written but never applied to production.
 -- Migrations 053+ assumed the tables existed (added shift_id column to
@@ -65,7 +65,7 @@ END $$;
 -- ─── 2. front_desk_events ────────────────────────────────────────────────────
 -- Lightweight event log for non-action events used in KPI computation.
 -- Examples: search_submitted, queue_viewed, idle_gap, heartbeat.
--- Immutable — no UPDATE or DELETE permitted.
+-- Immutable  -  no UPDATE or DELETE permitted.
 
 CREATE TABLE IF NOT EXISTS front_desk_events (
   id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),

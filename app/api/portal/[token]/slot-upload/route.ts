@@ -6,7 +6,7 @@ import { withTiming } from '@/lib/middleware/request-timing'
 import { validatePortalToken, PortalAuthError } from '@/lib/services/portal-auth'
 import { dispatchNotification } from '@/lib/services/notification-engine'
 
-// 30 requests per minute per IP — prevents brute-force token enumeration
+// 30 requests per minute per IP  -  prevents brute-force token enumeration
 const tokenLookupLimiter = createRateLimiter({ windowMs: 60_000, maxRequests: 30 })
 
 /**
@@ -14,7 +14,7 @@ const tokenLookupLimiter = createRateLimiter({ windowMs: 60_000, maxRequests: 30
  *
  * Portal-based document upload into a specific document slot.
  * Uses the same versioning RPC as staff uploads but operates via
- * admin client (no user session — security via token validation).
+ * admin client (no user session  -  security via token validation).
  *
  * Enforces: file type, file size, slot ownership, no overwrite of accepted docs.
  */
@@ -124,7 +124,7 @@ async function handlePost(
       matterNumber: matterRow?.matter_number ?? null,
       slotSlug: slot.slot_slug,
       personRole: slot.person_role,
-      versionNumber: 0, // provisional — corrected after RPC
+      versionNumber: 0, // provisional  -  corrected after RPC
       originalExtension: fileExt,
     })
 
@@ -261,7 +261,7 @@ async function handlePost(
         })
       }
     } catch (e) {
-      // Non-blocking — don't fail the upload if notification fails
+      // Non-blocking  -  don't fail the upload if notification fails
       console.error('[slot-upload] Notification dispatch failed:', e)
     }
 

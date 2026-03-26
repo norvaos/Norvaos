@@ -1,5 +1,5 @@
 // ============================================================================
-// Trust Application Service — billing side of the trust firewall
+// Trust Application Service  -  billing side of the trust firewall
 // ============================================================================
 // The trust firewall permits billing to READ trust_bank_accounts and
 // trust_holds, and WRITE invoice_trust_allocations only.  Billing is

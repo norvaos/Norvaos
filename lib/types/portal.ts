@@ -1,8 +1,8 @@
 /**
- * Portal types — shared between portal API routes and components.
+ * Portal types  -  shared between portal API routes and components.
  */
 
-// ── Analytics event types (locked taxonomy — 20 events) ────────────────────────
+// ── Analytics event types (locked taxonomy  -  20 events) ────────────────────────
 
 export type PortalEventType =
   | 'portal_opened'
@@ -100,7 +100,7 @@ export interface PortalSectionCounts {
     totalForms?: number
     /** Number of forms with status='completed' */
     completedForms?: number
-    /** Names of incomplete forms (e.g., "IMM 5257 — Visitor Visa") */
+    /** Names of incomplete forms (e.g., "IMM 5257  -  Visitor Visa") */
     incompleteFormNames?: string[]
   }
   payment: {

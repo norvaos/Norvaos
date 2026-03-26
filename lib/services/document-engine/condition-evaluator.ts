@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Document Engine — Condition Evaluator (Pure Function Engine)
+ * Document Engine  -  Condition Evaluator (Pure Function Engine)
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Evaluates conditional sections/clauses based on resolved field values.

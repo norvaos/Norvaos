@@ -1,10 +1,10 @@
 -- Migration 016: Smart Immigration Intake Forms
 -- Creates 5 comprehensive multi-step intake forms for immigration practice:
---   1. Express Entry Assessment — CRS scoring questionnaire
---   2. Spousal Sponsorship Intake — Relationship & eligibility info
---   3. Work Permit Application Intake — Employer & work details
---   4. Study Permit Application Intake — School & study plan
---   5. Family Reunification Intake — Parent/grandparent sponsorship
+--   1. Express Entry Assessment  -  CRS scoring questionnaire
+--   2. Spousal Sponsorship Intake  -  Relationship & eligibility info
+--   3. Work Permit Application Intake  -  Employer & work details
+--   4. Study Permit Application Intake  -  School & study plan
+--   5. Family Reunification Intake  -  Parent/grandparent sponsorship
 --
 -- Each form uses multi-step wizard sections, conditional fields, file uploads,
 -- contact mapping, and auto-lead creation via the Immigration Lead Pipeline.
@@ -40,7 +40,7 @@ BEGIN
     LIMIT 1;
 
   IF v_user_id IS NULL THEN
-    RAISE NOTICE 'No user found for tenant — skipping seed';
+    RAISE NOTICE 'No user found for tenant  -  skipping seed';
     RETURN;
   END IF;
 
@@ -69,7 +69,7 @@ BEGIN
       {"id":"ee_spouse_coming","field_type":"select","label":"Will your spouse/partner accompany you to Canada?","is_required":true,"sort_order":8,"section_id":"sec_ee_personal","condition":{"field_id":"ee_spouse_canadian","operator":"equals","value":"no"},"options":[{"label":"Yes","value":"yes"},{"label":"No","value":"no"}]},
 
       {"id":"ee_education_level","field_type":"select","label":"Highest Level of Education","is_required":true,"sort_order":9,"section_id":"sec_ee_education","options":[{"label":"Less than High School","value":"less_than_hs"},{"label":"High School Diploma","value":"high_school"},{"label":"One-Year Post-Secondary","value":"one_year_post"},{"label":"Two-Year Post-Secondary","value":"two_year_post"},{"label":"Three-Year or More Post-Secondary (Bachelor''s)","value":"bachelors"},{"label":"Two or More Post-Secondary Credentials","value":"two_or_more"},{"label":"Master''s Degree","value":"masters"},{"label":"Doctoral Degree (PhD)","value":"phd"}]},
-      {"id":"ee_education_canada","field_type":"select","label":"Was any of your education completed in Canada?","is_required":true,"sort_order":10,"section_id":"sec_ee_education","options":[{"label":"No","value":"no"},{"label":"Yes — 1-year credential","value":"1_year"},{"label":"Yes — 2-year credential","value":"2_year"},{"label":"Yes — 3+ year credential or Master''s/PhD","value":"3_plus_year"}]},
+      {"id":"ee_education_canada","field_type":"select","label":"Was any of your education completed in Canada?","is_required":true,"sort_order":10,"section_id":"sec_ee_education","options":[{"label":"No","value":"no"},{"label":"Yes  -  1-year credential","value":"1_year"},{"label":"Yes  -  2-year credential","value":"2_year"},{"label":"Yes  -  3+ year credential or Master''s/PhD","value":"3_plus_year"}]},
       {"id":"ee_eca_completed","field_type":"select","label":"Have you completed an Educational Credential Assessment (ECA)?","is_required":true,"sort_order":11,"section_id":"sec_ee_education","options":[{"label":"Yes","value":"yes"},{"label":"No","value":"no"},{"label":"In Progress","value":"in_progress"}]},
       {"id":"ee_eca_organization","field_type":"select","label":"ECA Assessing Organization","sort_order":12,"section_id":"sec_ee_education","condition":{"field_id":"ee_eca_completed","operator":"equals","value":"yes"},"options":[{"label":"WES","value":"wes"},{"label":"IQAS","value":"iqas"},{"label":"CES","value":"ces"},{"label":"MCC","value":"mcc"},{"label":"PEBC","value":"pebc"}]},
 
@@ -83,19 +83,19 @@ BEGIN
       {"id":"ee_celpip_reading","field_type":"number","label":"CELPIP Reading Score","placeholder":"e.g. 9","sort_order":20,"section_id":"sec_ee_language","condition":{"field_id":"ee_english_test","operator":"equals","value":"celpip"}},
       {"id":"ee_celpip_writing","field_type":"number","label":"CELPIP Writing Score","placeholder":"e.g. 10","sort_order":21,"section_id":"sec_ee_language","condition":{"field_id":"ee_english_test","operator":"equals","value":"celpip"}},
       {"id":"ee_celpip_speaking","field_type":"number","label":"CELPIP Speaking Score","placeholder":"e.g. 10","sort_order":22,"section_id":"sec_ee_language","condition":{"field_id":"ee_english_test","operator":"equals","value":"celpip"}},
-      {"id":"ee_second_lang","field_type":"select","label":"Do you have second official language test scores?","sort_order":23,"section_id":"sec_ee_language","options":[{"label":"No","value":"no"},{"label":"Yes — French (TEF/TCF)","value":"french"},{"label":"Yes — English","value":"english"}]},
+      {"id":"ee_second_lang","field_type":"select","label":"Do you have second official language test scores?","sort_order":23,"section_id":"sec_ee_language","options":[{"label":"No","value":"no"},{"label":"Yes  -  French (TEF/TCF)","value":"french"},{"label":"Yes  -  English","value":"english"}]},
 
       {"id":"ee_work_experience_canada","field_type":"select","label":"Years of Skilled Work Experience in Canada","is_required":true,"sort_order":24,"section_id":"sec_ee_work","options":[{"label":"None","value":"0"},{"label":"1 year","value":"1"},{"label":"2 years","value":"2"},{"label":"3 years","value":"3"},{"label":"4 years","value":"4"},{"label":"5+ years","value":"5_plus"}]},
       {"id":"ee_work_experience_foreign","field_type":"select","label":"Years of Skilled Work Experience Outside Canada","is_required":true,"sort_order":25,"section_id":"sec_ee_work","options":[{"label":"None","value":"0"},{"label":"1-2 years","value":"1_2"},{"label":"3-4 years","value":"3_4"},{"label":"5+ years","value":"5_plus"}]},
-      {"id":"ee_noc_code","field_type":"text","label":"Primary Occupation NOC Code (if known)","placeholder":"e.g. 21232 — Software Developer","sort_order":26,"section_id":"sec_ee_work"},
-      {"id":"ee_job_offer","field_type":"select","label":"Do you have a valid Canadian job offer?","is_required":true,"sort_order":27,"section_id":"sec_ee_work","options":[{"label":"No","value":"no"},{"label":"Yes — TEER 0 (Senior Management)","value":"teer_0"},{"label":"Yes — TEER 1/2/3","value":"teer_123"},{"label":"Yes — LMIA supported","value":"lmia"}]},
-      {"id":"ee_pnp_nomination","field_type":"select","label":"Do you have a Provincial Nominee Program (PNP) nomination?","is_required":true,"sort_order":28,"section_id":"sec_ee_work","options":[{"label":"No","value":"no"},{"label":"Yes","value":"yes"},{"label":"Applied — Awaiting","value":"applied"}]},
+      {"id":"ee_noc_code","field_type":"text","label":"Primary Occupation NOC Code (if known)","placeholder":"e.g. 21232  -  Software Developer","sort_order":26,"section_id":"sec_ee_work"},
+      {"id":"ee_job_offer","field_type":"select","label":"Do you have a valid Canadian job offer?","is_required":true,"sort_order":27,"section_id":"sec_ee_work","options":[{"label":"No","value":"no"},{"label":"Yes  -  TEER 0 (Senior Management)","value":"teer_0"},{"label":"Yes  -  TEER 1/2/3","value":"teer_123"},{"label":"Yes  -  LMIA supported","value":"lmia"}]},
+      {"id":"ee_pnp_nomination","field_type":"select","label":"Do you have a Provincial Nominee Program (PNP) nomination?","is_required":true,"sort_order":28,"section_id":"sec_ee_work","options":[{"label":"No","value":"no"},{"label":"Yes","value":"yes"},{"label":"Applied  -  Awaiting","value":"applied"}]},
       {"id":"ee_pnp_province","field_type":"select","label":"Which province nominated you?","sort_order":29,"section_id":"sec_ee_work","condition":{"field_id":"ee_pnp_nomination","operator":"equals","value":"yes"},"allow_other":true,"options":[{"label":"Ontario (OINP)","value":"ontario"},{"label":"British Columbia (BCPNP)","value":"bc"},{"label":"Alberta (AINP)","value":"alberta"},{"label":"Saskatchewan (SINP)","value":"sask"},{"label":"Manitoba (MPNP)","value":"manitoba"},{"label":"Nova Scotia (NSNP)","value":"nova_scotia"},{"label":"New Brunswick (NBPNP)","value":"new_brunswick"}]},
 
       {"id":"ee_canadian_relative","field_type":"select","label":"Do you have a sibling who is a Canadian citizen or PR?","sort_order":30,"section_id":"sec_ee_additional","options":[{"label":"No","value":"no"},{"label":"Yes","value":"yes"}]},
       {"id":"ee_previous_refusal","field_type":"boolean","label":"Have you ever been refused a Canadian visa or immigration application?","sort_order":31,"section_id":"sec_ee_additional"},
       {"id":"ee_refusal_details","field_type":"textarea","label":"Refusal Details","placeholder":"Date, type of application, and reason if known","sort_order":32,"section_id":"sec_ee_additional","condition":{"field_id":"ee_previous_refusal","operator":"is_truthy"}},
-      {"id":"ee_current_status_canada","field_type":"select","label":"Are you currently in Canada?","is_required":true,"sort_order":33,"section_id":"sec_ee_additional","options":[{"label":"No — Outside Canada","value":"outside"},{"label":"Yes — On Work Permit","value":"work_permit"},{"label":"Yes — On Study Permit","value":"study_permit"},{"label":"Yes — On Visitor Status","value":"visitor"},{"label":"Yes — PR / Citizen","value":"pr_citizen"}]},
+      {"id":"ee_current_status_canada","field_type":"select","label":"Are you currently in Canada?","is_required":true,"sort_order":33,"section_id":"sec_ee_additional","options":[{"label":"No  -  Outside Canada","value":"outside"},{"label":"Yes  -  On Work Permit","value":"work_permit"},{"label":"Yes  -  On Study Permit","value":"study_permit"},{"label":"Yes  -  On Visitor Status","value":"visitor"},{"label":"Yes  -  PR / Citizen","value":"pr_citizen"}]},
       {"id":"ee_passport_copy","field_type":"file","label":"Passport Bio Page (optional)","description":"Upload a scan of your passport bio page for our assessment","sort_order":34,"accept":".pdf,.jpg,.jpeg,.png","section_id":"sec_ee_additional"},
       {"id":"ee_additional_notes","field_type":"textarea","label":"Anything else you''d like us to know?","placeholder":"Additional details about your case, timeline, or questions...","sort_order":35,"mapping":"notes","section_id":"sec_ee_additional"},
       {"id":"ee_consent","field_type":"boolean","label":"I confirm the above information is accurate and I consent to being contacted about my assessment","is_required":true,"sort_order":36,"section_id":"sec_ee_additional"}
@@ -144,15 +144,15 @@ BEGIN
       {"id":"sp_applicant_dob","field_type":"date","label":"Applicant''s Date of Birth","is_required":true,"sort_order":12,"section_id":"sec_sp_applicant"},
       {"id":"sp_applicant_citizenship","field_type":"select","label":"Applicant''s Country of Citizenship","is_required":true,"sort_order":13,"allow_other":true,"section_id":"sec_sp_applicant","options":[{"label":"India","value":"india"},{"label":"Philippines","value":"philippines"},{"label":"China","value":"china"},{"label":"Pakistan","value":"pakistan"},{"label":"Nigeria","value":"nigeria"},{"label":"Mexico","value":"mexico"},{"label":"Brazil","value":"brazil"}]},
       {"id":"sp_applicant_country","field_type":"select","label":"Applicant''s Country of Residence","is_required":true,"sort_order":14,"allow_other":true,"section_id":"sec_sp_applicant","options":[{"label":"Same as citizenship","value":"same"},{"label":"Canada","value":"canada"},{"label":"United States","value":"usa"},{"label":"United Kingdom","value":"uk"},{"label":"UAE","value":"uae"}]},
-      {"id":"sp_applicant_in_canada","field_type":"select","label":"Is the applicant currently in Canada?","is_required":true,"sort_order":15,"section_id":"sec_sp_applicant","options":[{"label":"No — Apply Outland","value":"outland"},{"label":"Yes — Apply Inland","value":"inland"}]},
+      {"id":"sp_applicant_in_canada","field_type":"select","label":"Is the applicant currently in Canada?","is_required":true,"sort_order":15,"section_id":"sec_sp_applicant","options":[{"label":"No  -  Apply Outland","value":"outland"},{"label":"Yes  -  Apply Inland","value":"inland"}]},
       {"id":"sp_applicant_status_canada","field_type":"select","label":"Applicant''s current status in Canada","sort_order":16,"section_id":"sec_sp_applicant","condition":{"field_id":"sp_applicant_in_canada","operator":"equals","value":"inland"},"options":[{"label":"Visitor","value":"visitor"},{"label":"Worker","value":"worker"},{"label":"Student","value":"student"},{"label":"Status expired / undocumented","value":"expired"}]},
 
       {"id":"sp_relationship_type","field_type":"select","label":"Relationship Type","is_required":true,"sort_order":17,"section_id":"sec_sp_relationship","options":[{"label":"Legally Married","value":"married"},{"label":"Common-Law Partner (12+ months cohabitation)","value":"common_law"},{"label":"Conjugal Partner (unable to live together)","value":"conjugal"}]},
       {"id":"sp_marriage_date","field_type":"date","label":"Date of Marriage or Start of Common-Law","is_required":true,"sort_order":18,"section_id":"sec_sp_relationship"},
       {"id":"sp_how_met","field_type":"select","label":"How Did You Meet?","is_required":true,"sort_order":19,"allow_other":true,"section_id":"sec_sp_relationship","options":[{"label":"In Person","value":"in_person"},{"label":"Online Dating","value":"online"},{"label":"Through Family/Friends","value":"family_friends"},{"label":"Social Media","value":"social_media"},{"label":"Work/School","value":"work_school"}]},
       {"id":"sp_met_in_person","field_type":"boolean","label":"Have you met in person?","is_required":true,"sort_order":20,"section_id":"sec_sp_relationship"},
-      {"id":"sp_times_met","field_type":"text","label":"How many times and where have you met in person?","placeholder":"e.g. 5 times — visited India in 2023, 2024; spouse visited Canada in 2024","sort_order":21,"section_id":"sec_sp_relationship","condition":{"field_id":"sp_met_in_person","operator":"is_truthy"}},
-      {"id":"sp_children_together","field_type":"select","label":"Do you have children together?","sort_order":22,"section_id":"sec_sp_relationship","options":[{"label":"No","value":"no"},{"label":"Yes — 1 child","value":"1"},{"label":"Yes — 2 children","value":"2"},{"label":"Yes — 3+ children","value":"3_plus"}]},
+      {"id":"sp_times_met","field_type":"text","label":"How many times and where have you met in person?","placeholder":"e.g. 5 times  -  visited India in 2023, 2024; spouse visited Canada in 2024","sort_order":21,"section_id":"sec_sp_relationship","condition":{"field_id":"sp_met_in_person","operator":"is_truthy"}},
+      {"id":"sp_children_together","field_type":"select","label":"Do you have children together?","sort_order":22,"section_id":"sec_sp_relationship","options":[{"label":"No","value":"no"},{"label":"Yes  -  1 child","value":"1"},{"label":"Yes  -  2 children","value":"2"},{"label":"Yes  -  3+ children","value":"3_plus"}]},
       {"id":"sp_relationship_summary","field_type":"textarea","label":"Brief Relationship Timeline","placeholder":"Describe your relationship from how you met to the present...","is_required":true,"sort_order":23,"section_id":"sec_sp_relationship"},
 
       {"id":"sp_marriage_cert","field_type":"file","label":"Marriage Certificate / Common-Law Declaration","description":"Upload your marriage certificate or statutory declaration of common-law union","is_required":true,"sort_order":24,"accept":".pdf,.jpg,.jpeg,.png","section_id":"sec_sp_documents"},
@@ -168,7 +168,7 @@ BEGIN
       'sections', jsonb_build_array(
         jsonb_build_object('id', 'sec_sp_sponsor', 'title', 'Sponsor Information', 'description', 'Details about the Canadian citizen or permanent resident who will be sponsoring.', 'sort_order', 0),
         jsonb_build_object('id', 'sec_sp_applicant', 'title', 'Applicant Information', 'description', 'Details about the person being sponsored (the foreign national).', 'sort_order', 1),
-        jsonb_build_object('id', 'sec_sp_relationship', 'title', 'Relationship Details', 'description', 'Information about your relationship — genuineness is a key factor in sponsorship applications.', 'sort_order', 2),
+        jsonb_build_object('id', 'sec_sp_relationship', 'title', 'Relationship Details', 'description', 'Information about your relationship  -  genuineness is a key factor in sponsorship applications.', 'sort_order', 2),
         jsonb_build_object('id', 'sec_sp_documents', 'title', 'Documents & Final Details', 'description', 'Upload key documents and provide any additional information.', 'sort_order', 3)
       )
     ),
@@ -200,7 +200,7 @@ BEGIN
       {"id":"wp_current_status","field_type":"select","label":"Current Immigration Status in Canada","sort_order":7,"section_id":"sec_wp_personal","condition":{"field_id":"wp_current_location","operator":"equals","value":"in_canada"},"options":[{"label":"Study Permit","value":"study_permit"},{"label":"Work Permit","value":"work_permit"},{"label":"Visitor","value":"visitor"},{"label":"Implied Status","value":"implied"},{"label":"No Valid Status","value":"no_status"}]},
       {"id":"wp_status_expiry","field_type":"date","label":"Current Status Expiry Date","sort_order":8,"section_id":"sec_wp_personal","condition":{"field_id":"wp_current_location","operator":"equals","value":"in_canada"}},
 
-      {"id":"wp_permit_type","field_type":"select","label":"Type of Work Permit Needed","is_required":true,"sort_order":9,"section_id":"sec_wp_work","options":[{"label":"Employer-Specific (LMIA-Based)","value":"lmia_based"},{"label":"Employer-Specific (LMIA-Exempt)","value":"lmia_exempt"},{"label":"Open Work Permit","value":"open"},{"label":"Post-Graduation Work Permit (PGWP)","value":"pgwp"},{"label":"Intra-Company Transfer","value":"ict"},{"label":"Not Sure — Need Consultation","value":"not_sure"}]},
+      {"id":"wp_permit_type","field_type":"select","label":"Type of Work Permit Needed","is_required":true,"sort_order":9,"section_id":"sec_wp_work","options":[{"label":"Employer-Specific (LMIA-Based)","value":"lmia_based"},{"label":"Employer-Specific (LMIA-Exempt)","value":"lmia_exempt"},{"label":"Open Work Permit","value":"open"},{"label":"Post-Graduation Work Permit (PGWP)","value":"pgwp"},{"label":"Intra-Company Transfer","value":"ict"},{"label":"Not Sure  -  Need Consultation","value":"not_sure"}]},
       {"id":"wp_employer_name","field_type":"text","label":"Canadian Employer Name","placeholder":"Name of the company offering employment","is_required":true,"sort_order":10,"section_id":"sec_wp_work","condition":{"field_id":"wp_permit_type","operator":"in","value":["lmia_based","lmia_exempt","ict"]}},
       {"id":"wp_employer_address","field_type":"textarea","label":"Employer''s Address","placeholder":"Full business address in Canada","sort_order":11,"section_id":"sec_wp_work","condition":{"field_id":"wp_permit_type","operator":"in","value":["lmia_based","lmia_exempt","ict"]}},
       {"id":"wp_job_title","field_type":"text","label":"Job Title","placeholder":"e.g. Software Developer, Marketing Manager","is_required":true,"sort_order":12,"section_id":"sec_wp_work","condition":{"field_id":"wp_permit_type","operator":"in","value":["lmia_based","lmia_exempt","ict"]}},
@@ -262,7 +262,7 @@ BEGIN
       {"id":"st_program_level","field_type":"select","label":"Program Level","is_required":true,"sort_order":11,"section_id":"sec_st_program","options":[{"label":"ESL / Language Course","value":"esl"},{"label":"Certificate / Diploma","value":"certificate"},{"label":"Bachelor''s Degree","value":"bachelors"},{"label":"Post-Graduate Diploma","value":"pg_diploma"},{"label":"Master''s Degree","value":"masters"},{"label":"PhD / Doctoral","value":"phd"}]},
       {"id":"st_program_duration","field_type":"select","label":"Program Duration","is_required":true,"sort_order":12,"section_id":"sec_st_program","options":[{"label":"Less than 6 months","value":"less_6m"},{"label":"6 months – 1 year","value":"6m_1y"},{"label":"1 – 2 years","value":"1_2y"},{"label":"2 – 4 years","value":"2_4y"},{"label":"4+ years","value":"4_plus"}]},
       {"id":"st_start_date","field_type":"date","label":"Program Start Date","is_required":true,"sort_order":13,"section_id":"sec_st_program"},
-      {"id":"st_loa_received","field_type":"select","label":"Have you received your Letter of Acceptance (LOA)?","is_required":true,"sort_order":14,"section_id":"sec_st_program","options":[{"label":"Yes","value":"yes"},{"label":"No — Applied, waiting","value":"applied"},{"label":"No — Haven''t applied yet","value":"not_applied"}]},
+      {"id":"st_loa_received","field_type":"select","label":"Have you received your Letter of Acceptance (LOA)?","is_required":true,"sort_order":14,"section_id":"sec_st_program","options":[{"label":"Yes","value":"yes"},{"label":"No  -  Applied, waiting","value":"applied"},{"label":"No  -  Haven''t applied yet","value":"not_applied"}]},
       {"id":"st_coop","field_type":"select","label":"Does the program include a co-op or internship?","sort_order":15,"section_id":"sec_st_program","options":[{"label":"Yes","value":"yes"},{"label":"No","value":"no"},{"label":"Not sure","value":"not_sure"}]},
 
       {"id":"st_tuition_paid","field_type":"select","label":"Have you paid tuition?","is_required":true,"sort_order":16,"section_id":"sec_st_financial","options":[{"label":"Full tuition paid","value":"full"},{"label":"Partial deposit paid","value":"partial"},{"label":"Not yet paid","value":"not_paid"}]},
@@ -299,7 +299,7 @@ BEGIN
 
 
   -- =========================================================================
-  -- FORM 5: Family Reunification — Parent & Grandparent Sponsorship
+  -- FORM 5: Family Reunification  -  Parent & Grandparent Sponsorship
   -- =========================================================================
   INSERT INTO intake_forms (
     tenant_id, name, slug, description, fields, settings,
@@ -320,21 +320,21 @@ BEGIN
       {"id":"pg_sponsor_address","field_type":"textarea","label":"Your Address in Canada","placeholder":"Full address including city and province","is_required":true,"sort_order":6,"section_id":"sec_pg_sponsor"},
       {"id":"pg_sponsor_household_size","field_type":"select","label":"Total Household Size (including yourself)","is_required":true,"sort_order":7,"section_id":"sec_pg_sponsor","options":[{"label":"1","value":"1"},{"label":"2","value":"2"},{"label":"3","value":"3"},{"label":"4","value":"4"},{"label":"5","value":"5"},{"label":"6+","value":"6_plus"}]},
 
-      {"id":"pg_income_year1","field_type":"text","label":"Your Total Income — Most Recent Tax Year (CAD)","placeholder":"e.g. $65,000","is_required":true,"sort_order":8,"section_id":"sec_pg_income"},
-      {"id":"pg_income_year2","field_type":"text","label":"Your Total Income — 2nd Most Recent Tax Year (CAD)","placeholder":"e.g. $60,000","is_required":true,"sort_order":9,"section_id":"sec_pg_income"},
-      {"id":"pg_income_year3","field_type":"text","label":"Your Total Income — 3rd Most Recent Tax Year (CAD)","placeholder":"e.g. $55,000","is_required":true,"sort_order":10,"section_id":"sec_pg_income"},
+      {"id":"pg_income_year1","field_type":"text","label":"Your Total Income  -  Most Recent Tax Year (CAD)","placeholder":"e.g. $65,000","is_required":true,"sort_order":8,"section_id":"sec_pg_income"},
+      {"id":"pg_income_year2","field_type":"text","label":"Your Total Income  -  2nd Most Recent Tax Year (CAD)","placeholder":"e.g. $60,000","is_required":true,"sort_order":9,"section_id":"sec_pg_income"},
+      {"id":"pg_income_year3","field_type":"text","label":"Your Total Income  -  3rd Most Recent Tax Year (CAD)","placeholder":"e.g. $55,000","is_required":true,"sort_order":10,"section_id":"sec_pg_income"},
       {"id":"pg_income_source","field_type":"select","label":"Primary Source of Income","is_required":true,"sort_order":11,"section_id":"sec_pg_income","options":[{"label":"Employment","value":"employment"},{"label":"Self-Employment","value":"self_employment"},{"label":"Combination","value":"combination"},{"label":"Other","value":"other"}]},
-      {"id":"pg_cosigner","field_type":"select","label":"Will anyone co-sign the sponsorship undertaking?","sort_order":12,"section_id":"sec_pg_income","options":[{"label":"No","value":"no"},{"label":"Yes — My Spouse/Partner","value":"spouse"}]},
+      {"id":"pg_cosigner","field_type":"select","label":"Will anyone co-sign the sponsorship undertaking?","sort_order":12,"section_id":"sec_pg_income","options":[{"label":"No","value":"no"},{"label":"Yes  -  My Spouse/Partner","value":"spouse"}]},
       {"id":"pg_cosigner_income","field_type":"text","label":"Co-signer''s Annual Income (CAD)","placeholder":"e.g. $45,000","sort_order":13,"section_id":"sec_pg_income","condition":{"field_id":"pg_cosigner","operator":"equals","value":"spouse"}},
 
-      {"id":"pg_pathway","field_type":"select","label":"Which pathway are you interested in?","is_required":true,"sort_order":14,"section_id":"sec_pg_parents","options":[{"label":"PGP (Permanent Residence Sponsorship)","value":"pgp"},{"label":"Super Visa (10-Year Multi-Entry Visitor Visa)","value":"super_visa"},{"label":"Both — Advise which is better","value":"both"}]},
+      {"id":"pg_pathway","field_type":"select","label":"Which pathway are you interested in?","is_required":true,"sort_order":14,"section_id":"sec_pg_parents","options":[{"label":"PGP (Permanent Residence Sponsorship)","value":"pgp"},{"label":"Super Visa (10-Year Multi-Entry Visitor Visa)","value":"super_visa"},{"label":"Both  -  Advise which is better","value":"both"}]},
       {"id":"pg_parent_count","field_type":"select","label":"How many parents/grandparents do you wish to sponsor?","is_required":true,"sort_order":15,"section_id":"sec_pg_parents","options":[{"label":"1","value":"1"},{"label":"2","value":"2"},{"label":"3","value":"3"},{"label":"4","value":"4"}]},
-      {"id":"pg_parent1_name","field_type":"text","label":"Parent/Grandparent 1 — Full Name","is_required":true,"sort_order":16,"section_id":"sec_pg_parents"},
+      {"id":"pg_parent1_name","field_type":"text","label":"Parent/Grandparent 1  -  Full Name","is_required":true,"sort_order":16,"section_id":"sec_pg_parents"},
       {"id":"pg_parent1_relation","field_type":"select","label":"Relationship to You","is_required":true,"sort_order":17,"section_id":"sec_pg_parents","options":[{"label":"Mother","value":"mother"},{"label":"Father","value":"father"},{"label":"Grandmother","value":"grandmother"},{"label":"Grandfather","value":"grandfather"}]},
       {"id":"pg_parent1_dob","field_type":"date","label":"Date of Birth","is_required":true,"sort_order":18,"section_id":"sec_pg_parents"},
       {"id":"pg_parent1_country","field_type":"select","label":"Country of Residence","is_required":true,"sort_order":19,"allow_other":true,"section_id":"sec_pg_parents","options":[{"label":"India","value":"india"},{"label":"China","value":"china"},{"label":"Philippines","value":"philippines"},{"label":"Pakistan","value":"pakistan"},{"label":"Sri Lanka","value":"sri_lanka"},{"label":"Iran","value":"iran"}]},
       {"id":"pg_parent1_health","field_type":"select","label":"General Health Status","sort_order":20,"section_id":"sec_pg_parents","options":[{"label":"Good Health","value":"good"},{"label":"Minor Health Issues","value":"minor"},{"label":"Significant Health Conditions","value":"significant"}]},
-      {"id":"pg_parent2_name","field_type":"text","label":"Parent/Grandparent 2 — Full Name","sort_order":21,"section_id":"sec_pg_parents","condition":{"field_id":"pg_parent_count","operator":"in","value":["2","3","4"]}},
+      {"id":"pg_parent2_name","field_type":"text","label":"Parent/Grandparent 2  -  Full Name","sort_order":21,"section_id":"sec_pg_parents","condition":{"field_id":"pg_parent_count","operator":"in","value":["2","3","4"]}},
       {"id":"pg_parent2_relation","field_type":"select","label":"Relationship to You","sort_order":22,"section_id":"sec_pg_parents","condition":{"field_id":"pg_parent_count","operator":"in","value":["2","3","4"]},"options":[{"label":"Mother","value":"mother"},{"label":"Father","value":"father"},{"label":"Grandmother","value":"grandmother"},{"label":"Grandfather","value":"grandfather"}]},
       {"id":"pg_parent2_dob","field_type":"date","label":"Date of Birth","sort_order":23,"section_id":"sec_pg_parents","condition":{"field_id":"pg_parent_count","operator":"in","value":["2","3","4"]}},
 
@@ -347,7 +347,7 @@ BEGIN
       {"id":"pg_consent","field_type":"boolean","label":"I confirm the information provided is accurate and consent to being contacted","is_required":true,"sort_order":30,"section_id":"sec_pg_docs"}
     ]'::jsonb,
     jsonb_build_object(
-      'success_message', 'Thank you for your Parent & Grandparent sponsorship intake! Our team will review your eligibility — particularly your income requirements — and reach out within 2-3 business days.',
+      'success_message', 'Thank you for your Parent & Grandparent sponsorship intake! Our team will review your eligibility  -  particularly your income requirements  -  and reach out within 2-3 business days.',
       'sections', jsonb_build_array(
         jsonb_build_object('id', 'sec_pg_sponsor', 'title', 'Sponsor Information', 'description', 'Your personal details as the Canadian sponsor.', 'sort_order', 0),
         jsonb_build_object('id', 'sec_pg_income', 'title', 'Income & Financial Requirements', 'description', 'PGP requires meeting minimum income thresholds for 3 consecutive years.', 'sort_order', 1),

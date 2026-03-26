@@ -15,8 +15,8 @@ import { advanceLeadStage } from '@/lib/services/lead-stage-engine'
  * Body: FormData with:
  *   - retainerPackageId: string (required)
  *   - leadId: string (required)
- *   - verificationCode: string (required — must match code printed on retainer PDF)
- *   - file: File (optional — scanned signed document)
+ *   - verificationCode: string (required  -  must match code printed on retainer PDF)
+ *   - file: File (optional  -  scanned signed document)
  */
 export async function POST(request: NextRequest) {
   try {
@@ -95,7 +95,7 @@ export async function POST(request: NextRequest) {
         )
       }
 
-      // Store the storage path — generate signed URLs on demand when viewing
+      // Store the storage path  -  generate signed URLs on demand when viewing
       signedDocUrl = storagePath
     }
 
@@ -158,7 +158,7 @@ export async function POST(request: NextRequest) {
       updated_at: new Date().toISOString(),
     }
 
-    // Also sync legacy pipeline stage — find "Retainer Signed" or similar stage
+    // Also sync legacy pipeline stage  -  find "Retainer Signed" or similar stage
     try {
       const { data: currentLead } = await supabase
         .from('leads')
@@ -193,7 +193,7 @@ export async function POST(request: NextRequest) {
 
     // Auto-convert lead to matter if payment was already received
     // Both signed retainer + payment are required. Since retainer is now signed,
-    // attempt conversion — gates will block if payment isn't received yet.
+    // attempt conversion  -  gates will block if payment isn't received yet.
     // Gate overrides: skip conflict_cleared and intake_complete since user confirmed
     // paper signing (these should have been set during consultation outcome).
     let matterId: string | null = null
@@ -232,7 +232,7 @@ export async function POST(request: NextRequest) {
             .single()
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const mtData = mt as any
-          if (mtData?.name) matterTitle = `${matterTitle} — ${mtData.name}`
+          if (mtData?.name) matterTitle = `${matterTitle}  -  ${mtData.name}`
         }
 
         const convResult = await convertLeadToMatter({
@@ -281,7 +281,7 @@ export async function POST(request: NextRequest) {
       matterNumber,
       conversionError,
       message: matterId
-        ? `Retainer signed — Matter ${matterNumber} created`
+        ? `Retainer signed  -  Matter ${matterNumber} created`
         : 'Retainer marked as signed on paper',
     })
   } catch (err) {

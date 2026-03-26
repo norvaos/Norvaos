@@ -18,7 +18,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
  *
  * Returns 202 { success: true, job_id, status: 'pending', retry_count }
  *
- * Sprint 6, Week 3 — 2026-03-17
+ * Sprint 6, Week 3  -  2026-03-17
  */
 async function handlePost(
   _request: Request,
@@ -53,7 +53,7 @@ async function handlePost(
       )
     }
 
-    // 3. Fetch the job — must belong to this matter
+    // 3. Fetch the job  -  must belong to this matter
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: job, error: jobErr } = await (admin as any)
       .from('form_generation_log')
@@ -81,7 +81,7 @@ async function handlePost(
 
     if (currentStatus === 'processing') {
       return NextResponse.json(
-        { error: 'Job is currently processing — wait for completion or timeout' },
+        { error: 'Job is currently processing  -  wait for completion or timeout' },
         { status: 409 }
       )
     }

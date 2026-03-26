@@ -9,7 +9,7 @@ import { decryptPdf } from '@/lib/ircc/pdf-encryption'
 /**
  * POST /api/matters/[id]/vault-unlock
  *
- * Encrypted PDF Vault — Only the assigned lawyer or admin can unlock
+ * Encrypted PDF Vault  -  Only the assigned lawyer or admin can unlock
  * a form pack PDF for download.
  *
  * For encrypted PDFs: downloads, decrypts with the matter's vault key,
@@ -117,7 +117,7 @@ async function handlePost(
 
       if (!vaultKeyRow?.encryption_key) {
         return NextResponse.json(
-          { error: 'Vault key not found — cannot decrypt' },
+          { error: 'Vault key not found  -  cannot decrypt' },
           { status: 500 },
         )
       }

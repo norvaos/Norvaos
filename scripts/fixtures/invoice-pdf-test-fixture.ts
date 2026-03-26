@@ -27,9 +27,9 @@ const FIXTURE_ID = 'fixture-inv-pdf-20260301-pagination-test'
 const lineItems = [
   // Standard entries
   { description: 'Initial consultation and case review', quantity: 2, unit_price: 35000, amount: 70000 },
-  { description: 'Preparation of Form IMM 1344 — Application for PR', quantity: 1, unit_price: 50000, amount: 50000 },
+  { description: 'Preparation of Form IMM 1344  -  Application for PR', quantity: 1, unit_price: 50000, amount: 50000 },
   { description: 'Document review: passport, birth certificate, diplomas', quantity: 3, unit_price: 15000, amount: 45000 },
-  { description: 'Translation coordination — Mandarin to English (certified)', quantity: 5, unit_price: 12000, amount: 60000 },
+  { description: 'Translation coordination  -  Mandarin to English (certified)', quantity: 5, unit_price: 12000, amount: 60000 },
 
   // Entries with special characters: quotes, commas
   { description: 'Review of "Confirmation of Permanent Residence" letter, including addendum', quantity: 1, unit_price: 25000, amount: 25000 },
@@ -38,10 +38,10 @@ const lineItems = [
   { description: 'Legal research: "inadmissibility grounds" under IRPA s.34–42', quantity: 4, unit_price: 30000, amount: 120000 },
 
   // Non-ASCII characters
-  { description: 'Client meeting — café discussion re: Résumé & Déclaration', quantity: 1.5, unit_price: 35000, amount: 52500 },
+  { description: 'Client meeting  -  café discussion re: Résumé & Déclaration', quantity: 1.5, unit_price: 35000, amount: 52500 },
   { description: 'Überprüfung der Dokumente für Einwanderungsantrag', quantity: 1, unit_price: 28000, amount: 28000 },
-  { description: 'Préparation du dossier — programme fédéral des travailleurs qualifiés', quantity: 2, unit_price: 40000, amount: 80000 },
-  { description: 'Análisis de elegibilidad — Express Entry CRS cálculo', quantity: 1, unit_price: 22000, amount: 22000 },
+  { description: 'Préparation du dossier  -  programme fédéral des travailleurs qualifiés', quantity: 2, unit_price: 40000, amount: 80000 },
+  { description: 'Análisis de elegibilidad  -  Express Entry CRS cálculo', quantity: 1, unit_price: 22000, amount: 22000 },
 
   // Long descriptions that test truncation
   { description: 'Comprehensive review of all supporting documentation submitted by the principal applicant and accompanying family members including educational credentials assessment reports and employment reference letters from previous employers', quantity: 1, unit_price: 75000, amount: 75000 },
@@ -50,7 +50,7 @@ const lineItems = [
   // Regular entries to fill up
   { description: 'Phone conference with IRCC call centre', quantity: 0.5, unit_price: 35000, amount: 17500 },
   { description: 'Drafting submission letter', quantity: 3, unit_price: 35000, amount: 105000 },
-  { description: 'Police certificate coordination — RCMP', quantity: 1, unit_price: 8500, amount: 8500 },
+  { description: 'Police certificate coordination  -  RCMP', quantity: 1, unit_price: 8500, amount: 8500 },
   { description: 'Medical exam follow-up correspondence', quantity: 2, unit_price: 15000, amount: 30000 },
   { description: 'Provincial nomination program review', quantity: 1.5, unit_price: 35000, amount: 52500 },
   { description: 'Labour market impact assessment analysis', quantity: 2, unit_price: 35000, amount: 70000 },
@@ -60,7 +60,7 @@ const lineItems = [
   { description: 'Common-law partnership documentation prep', quantity: 1, unit_price: 25000, amount: 25000 },
   { description: 'Biometrics appointment scheduling assistance', quantity: 0.5, unit_price: 15000, amount: 7500 },
   { description: 'Express Entry profile creation & submission', quantity: 1, unit_price: 45000, amount: 45000 },
-  { description: 'CRS score optimization — education & language', quantity: 2, unit_price: 35000, amount: 70000 },
+  { description: 'CRS score optimization  -  education & language', quantity: 2, unit_price: 35000, amount: 70000 },
   { description: 'IRCC webform submission & correspondence', quantity: 3, unit_price: 15000, amount: 45000 },
   { description: 'Judicial review assessment (Federal Court)', quantity: 1, unit_price: 85000, amount: 85000 },
   { description: 'Humanitarian & compassionate grounds memo', quantity: 4, unit_price: 35000, amount: 140000 },
@@ -71,7 +71,7 @@ const lineItems = [
 // ── Totals ───────────────────────────────────────────────────────────────────
 
 const subtotal = lineItems.reduce((sum, li) => sum + li.amount, 0)
-const taxAmount = 0 // Zero tax — must still display
+const taxAmount = 0 // Zero tax  -  must still display
 const totalAmount = subtotal + taxAmount
 const amountPaid = 75000 // $750.00 partial payment
 
@@ -90,7 +90,7 @@ const fixtureData: InvoicePdfData = {
     phone: '+1 (416) 555-0199',
     address: '45 Spadina Avenue, Unit 12\nToronto, ON M5V 2H1',
   },
-  matterTitle: 'García-López — Federal Skilled Worker PR Application',
+  matterTitle: 'García-López  -  Federal Skilled Worker PR Application',
   matterNumber: 'MAT-2026-0042',
   lineItems,
   subtotal,

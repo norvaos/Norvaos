@@ -6,7 +6,7 @@
 --   SELECT stripe_invoice_id, COUNT(*) FROM billing_invoices
 --   WHERE stripe_invoice_id IS NOT NULL
 --   GROUP BY stripe_invoice_id HAVING COUNT(*) > 1;
---   Result: 0 rows — no duplicates. UNIQUE constraint safe to apply.
+--   Result: 0 rows  -  no duplicates. UNIQUE constraint safe to apply.
 --   Total billing_invoices rows: 0.
 
 -- ─── A. stripe_processed_events ──────────────────────────────────────────────

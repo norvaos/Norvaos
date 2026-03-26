@@ -1,4 +1,4 @@
-# Demo Environment — NorvaOS
+# Demo Environment  -  NorvaOS
 
 > **WARNING: All demo data is synthetic. Never use real client data. Never run these scripts against a production tenant.**
 
@@ -10,8 +10,8 @@ This directory contains tooling to create, seed, and reset a NorvaOS demo enviro
 
 | Requirement | Notes |
 |-------------|-------|
-| A demo tenant record in Supabase | Created via Supabase dashboard — requires a row in the `tenants` table with `id` containing the word "demo" |
-| Supabase service role key | Bypasses RLS — treat as a secret, never commit |
+| A demo tenant record in Supabase | Created via Supabase dashboard  -  requires a row in the `tenants` table with `id` containing the word "demo" |
+| Supabase service role key | Bypasses RLS  -  treat as a secret, never commit |
 | `ts-node` or `tsx` available | `pnpm add -D ts-node` if not present |
 
 ## Environment Variables
@@ -97,8 +97,8 @@ Exit code `0` = pass, `1` = one or more failures.
 
 ## Data Safety Controls
 
-- All emails: `@example.com` only — blocked by script validation
-- All phones: `555-xxxx` format — blocked by script validation
+- All emails: `@example.com` only  -  blocked by script validation
+- All phones: `555-xxxx` format  -  blocked by script validation
 - All matter numbers: `DEMO-YYYY-NNNN` format
 - All descriptions: contain "synthetic data" disclaimer
 - Tenant ID guard: script exits if `DEMO_TENANT_ID` doesn't contain "demo"
@@ -107,14 +107,14 @@ Exit code `0` = pass, `1` = one or more failures.
 ## Known Limitations
 
 1. Demo tenant must be pre-created in Supabase dashboard (no automation for tenant creation)
-2. In-memory deduplication only — if seed runs twice without reset, duplicate rows will be inserted
-3. Calendar events use hard-coded location strings — does not reflect real office addresses
+2. In-memory deduplication only  -  if seed runs twice without reset, duplicate rows will be inserted
+3. Calendar events use hard-coded location strings  -  does not reflect real office addresses
 4. Time entries reference matters by position, not by practice area logic
 5. No demo documents, document templates, or email threads are seeded
 
 ## Security Notes
 
-- The service role key bypasses RLS — it has full database access
+- The service role key bypasses RLS  -  it has full database access
 - Never commit `.env.demo` or expose the service role key
-- These scripts are for internal sales use only — not for client-facing environments
-- The verify script does not guarantee 100% isolation — it checks the most common failure patterns
+- These scripts are for internal sales use only  -  not for client-facing environments
+- The verify script does not guarantee 100% isolation  -  it checks the most common failure patterns

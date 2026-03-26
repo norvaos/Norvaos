@@ -22,7 +22,7 @@ const LAWYER_ROLE = {
     contacts: { view: true, create: true, edit: true, delete: false },
     matters: { view: true, create: true, edit: true, delete: false },
     tasks: { view: true, create: true, edit: true, delete: true },
-    // billing is intentionally ABSENT — Lawyer has NO billing:view
+    // billing is intentionally ABSENT  -  Lawyer has NO billing:view
   },
   is_system: true,
 }

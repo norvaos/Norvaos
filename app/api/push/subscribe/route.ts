@@ -14,7 +14,7 @@ import type { Json } from '@/lib/types/database'
 async function handlePost(request: Request) {
   try {
     const { userId, supabase } = await authenticateRequest()
-    // No requirePermission — self-service push subscription for authenticated users
+    // No requirePermission  -  self-service push subscription for authenticated users
 
     const body = await request.json()
     const { subscription } = body as {

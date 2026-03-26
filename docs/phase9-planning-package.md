@@ -1,7 +1,7 @@
-# Phase 9 — Planning Package
+# Phase 9  -  Planning Package
 
 **Prepared:** 2026-03-15
-**Status:** Pending approval — no implementation until approved
+**Status:** Pending approval  -  no implementation until approved
 
 ---
 
@@ -9,7 +9,7 @@
 
 ### Objective
 
-**Phase 9: Revenue Operations — Invoice Lifecycle Automation and Billing Cron Infrastructure**
+**Phase 9: Revenue Operations  -  Invoice Lifecycle Automation and Billing Cron Infrastructure**
 
 Complete the invoice-to-collection revenue loop by adding invoice email dispatch, automated reminders, overdue detection, aging recalculation, payment receipts, client statements, and notification wiring for all billing events.
 
@@ -23,27 +23,27 @@ The billing UI, time tracking page, collections panel, and analytics dashboard a
 
 | Item | Description |
 |---|---|
-| Invoice email dispatch | `POST /api/invoices/[id]/send` — generates PDF, emails to billing contact via Resend, updates status to `sent`, logs to `audit_logs` |
-| Invoice reminder cron | `/api/cron/invoice-reminders` — sends reminder emails for unpaid invoices past due date, respects `reminder_count` and configurable intervals |
-| Overdue detection cron | `/api/cron/overdue-detection` — transitions `sent`/`viewed` invoices past `due_date` to `overdue`, dispatches notification |
-| Aging recalculation cron | `/api/cron/aging-recalculation` — recalculates `aging_bucket` for all unpaid invoices based on days past due |
-| Payment receipt generation | `POST /api/invoices/[id]/receipt` — generates receipt PDF and optionally emails to billing contact |
-| Client statement endpoint | `GET /api/contacts/[id]/statement` — consolidated statement across all matters for a contact |
+| Invoice email dispatch | `POST /api/invoices/[id]/send`  -  generates PDF, emails to billing contact via Resend, updates status to `sent`, logs to `audit_logs` |
+| Invoice reminder cron | `/api/cron/invoice-reminders`  -  sends reminder emails for unpaid invoices past due date, respects `reminder_count` and configurable intervals |
+| Overdue detection cron | `/api/cron/overdue-detection`  -  transitions `sent`/`viewed` invoices past `due_date` to `overdue`, dispatches notification |
+| Aging recalculation cron | `/api/cron/aging-recalculation`  -  recalculates `aging_bucket` for all unpaid invoices based on days past due |
+| Payment receipt generation | `POST /api/invoices/[id]/receipt`  -  generates receipt PDF and optionally emails to billing contact |
+| Client statement endpoint | `GET /api/contacts/[id]/statement`  -  consolidated statement across all matters for a contact |
 | Notification wiring | Wire `dispatchNotification()` for billing events: `invoice_sent`, `invoice_overdue`, `payment_received`, `payment_plan_created`, `write_off_approved` |
-| Invoice batch send | `POST /api/invoices/batch-send` — send multiple draft invoices in one operation |
+| Invoice batch send | `POST /api/invoices/batch-send`  -  send multiple draft invoices in one operation |
 | Vercel cron registration | Add 3 new cron entries to `vercel.json` |
 
 ### Out-of-Scope
 
 | Item | Reason |
 |---|---|
-| Stripe payment link generation | Requires Stripe product/price setup per invoice — deferred to Phase 10 |
-| Recurring invoices | Subscription billing engine — deferred |
-| Dunning escalation workflow (demand letters, external collection referral) | Requires legal template system — deferred |
-| SMS notifications for billing events | No SMS provider integrated — deferred |
+| Stripe payment link generation | Requires Stripe product/price setup per invoice  -  deferred to Phase 10 |
+| Recurring invoices | Subscription billing engine  -  deferred |
+| Dunning escalation workflow (demand letters, external collection referral) | Requires legal template system  -  deferred |
+| SMS notifications for billing events | No SMS provider integrated  -  deferred |
 | Multi-currency support | Not needed for single-tenant Canadian firm |
 | Invoice approval workflow | Firm currently has single-approver model; not requested |
-| Email inbound/outbound via Microsoft Graph | Remains blocked on Azure App Registration — separate carve-out |
+| Email inbound/outbound via Microsoft Graph | Remains blocked on Azure App Registration  -  separate carve-out |
 | QuickBooks sync | Remains deferred per Phase 7/8 boundary |
 | Bank feed reconciliation | Remains deferred |
 | Time entry approval workflow | No firm requirement stated |
@@ -68,7 +68,7 @@ The billing UI, time tracking page, collections panel, and analytics dashboard a
 | Cron job timeout (Vercel 10s limit on hobby, 60s on pro) | Low | Long-running aging recalculation | Process in batches of 100 invoices per invocation |
 | Invoice PDF generation failure blocks send | Low | Email sent without attachment | Fail the send; do not email without PDF |
 | Reminder spam if cron runs multiple times | Medium | Client receives duplicate reminders | Idempotency: check `last_reminder_at` before sending; minimum 24h gap |
-| Aging cron overwrites manual aging override | Low | Incorrect bucket after manual correction | No manual override exists — aging is always computed |
+| Aging cron overwrites manual aging override | Low | Incorrect bucket after manual correction | No manual override exists  -  aging is always computed |
 
 ### Success Criteria
 
@@ -93,7 +93,7 @@ The billing UI, time tracking page, collections panel, and analytics dashboard a
 8. All cron endpoints require `Authorization: Bearer CRON_SECRET` header
 9. Payment receipt PDF includes firm name, invoice number, amount paid, payment method, date
 10. Client statement includes all matters, all invoices, all payments, trust balance, outstanding total
-11. Paid invoices remain immutable (Phase 8 trigger still enforced — no regression)
+11. Paid invoices remain immutable (Phase 8 trigger still enforced  -  no regression)
 12. All new routes have RBAC via `requirePermission()`
 13. All new routes log via structured logger with tenant context
 14. All new routes report errors to Sentry via `reportError()`
@@ -106,11 +106,11 @@ No data migration required. All new columns use defaults. Existing invoices will
 
 | Change | Type | Details |
 |---|---|---|
-| `invoices.last_reminder_at` | New column | `TIMESTAMPTZ DEFAULT NULL` — tracks last reminder sent |
-| `invoices.reminder_count` | New column | `INTEGER DEFAULT 0` — number of reminders sent |
-| `invoices.sent_at` | New column | `TIMESTAMPTZ DEFAULT NULL` — when invoice was emailed |
-| `invoices.sent_to_email` | New column | `TEXT DEFAULT NULL` — recipient email address |
-| `invoices.receipt_sent_at` | New column | `TIMESTAMPTZ DEFAULT NULL` — when receipt was emailed |
+| `invoices.last_reminder_at` | New column | `TIMESTAMPTZ DEFAULT NULL`  -  tracks last reminder sent |
+| `invoices.reminder_count` | New column | `INTEGER DEFAULT 0`  -  number of reminders sent |
+| `invoices.sent_at` | New column | `TIMESTAMPTZ DEFAULT NULL`  -  when invoice was emailed |
+| `invoices.sent_to_email` | New column | `TEXT DEFAULT NULL`  -  recipient email address |
+| `invoices.receipt_sent_at` | New column | `TIMESTAMPTZ DEFAULT NULL`  -  when receipt was emailed |
 
 ### Permissions, RLS, Audit, Restore, Observability Changes
 
@@ -164,7 +164,7 @@ No new pages. Existing pages affected:
 |---|---|
 | `app/(dashboard)/billing/page.tsx` | Add "Send Invoice" button to invoice row actions, add "Send Receipt" button after recording payment |
 | `app/(dashboard)/billing/page.tsx` | Add "Batch Send" button for selected draft invoices |
-| Portal billing view | No change — portal already displays invoice status |
+| Portal billing view | No change  -  portal already displays invoice status |
 
 ### Portal Surfaces
 
@@ -203,7 +203,7 @@ No portal changes. Portal reads invoice status which will now reflect `sent`/`ov
 | `GET /api/cron/overdue-detection` | `CRON_SECRET` bearer token | N/A (system) | Processes all tenants | Logs via structured logger | Does not modify paid invoices | N/A | `log.info()`, Sentry on failure |
 | `GET /api/cron/invoice-reminders` | `CRON_SECRET` bearer token | N/A (system) | Processes all tenants, emails scoped per tenant | Logs via structured logger | Does not modify paid invoices | N/A | `log.info()`, Sentry on failure |
 | `GET /api/cron/aging-recalculation` | `CRON_SECRET` bearer token | N/A (system) | Processes all tenants | Logs via structured logger | Only updates `aging_bucket` and `aging_updated_at` (allowed fields per Phase 8 immutability trigger) | N/A | `log.info()`, Sentry on failure |
-| `invoices` new columns | RLS (existing) | Existing policies | Existing `tenant_id` USING/WITH CHECK | N/A | `sent_at`, `sent_to_email`, `receipt_sent_at` are metadata — immutability trigger allows `updated_at` and notes on paid invoices; new columns must be added to the allowed-fields list | N/A | N/A |
+| `invoices` new columns | RLS (existing) | Existing policies | Existing `tenant_id` USING/WITH CHECK | N/A | `sent_at`, `sent_to_email`, `receipt_sent_at` are metadata  -  immutability trigger allows `updated_at` and notes on paid invoices; new columns must be added to the allowed-fields list | N/A | N/A |
 
 ### Critical Immutability Consideration
 
@@ -219,10 +219,10 @@ The Phase 8 `prevent_paid_invoice_mutation()` trigger locks specific columns on 
 
 | Test | Method | Expected Result |
 |---|---|---|
-| Invoice send — happy path | `POST /api/invoices/[id]/send` with valid draft invoice | 200, status → `sent`, `sent_at` populated, email delivered, audit log created |
-| Invoice send — paid invoice rejected | `POST /api/invoices/[id]/send` with paid invoice | 400, status unchanged |
-| Invoice send — wrong tenant | `POST /api/invoices/[id]/send` with invoice from different tenant | 404 (RLS returns no rows) |
-| Invoice send — insufficient permission | Call with `billing:view` role (not `billing:edit`) | 403 |
+| Invoice send  -  happy path | `POST /api/invoices/[id]/send` with valid draft invoice | 200, status → `sent`, `sent_at` populated, email delivered, audit log created |
+| Invoice send  -  paid invoice rejected | `POST /api/invoices/[id]/send` with paid invoice | 400, status unchanged |
+| Invoice send  -  wrong tenant | `POST /api/invoices/[id]/send` with invoice from different tenant | 404 (RLS returns no rows) |
+| Invoice send  -  insufficient permission | Call with `billing:view` role (not `billing:edit`) | 403 |
 | Receipt send | `POST /api/invoices/[id]/receipt` after payment recorded | 200, `receipt_sent_at` populated, email delivered |
 | Batch send | `POST /api/invoices/batch-send` with 3 draft invoices | 200, all 3 transition to `sent` |
 | Client statement | `GET /api/contacts/[id]/statement` | 200, returns matters + invoices + payments + trust balance |
@@ -278,9 +278,9 @@ The Phase 8 `prevent_paid_invoice_mutation()` trigger locks specific columns on 
 
 | Data | Cleanup |
 |---|---|
-| Test invoices created during proof | Delete via SQL (temporarily disable immutability trigger, delete, re-enable) — same pattern as Phase 8 restore test |
+| Test invoices created during proof | Delete via SQL (temporarily disable immutability trigger, delete, re-enable)  -  same pattern as Phase 8 restore test |
 | Test notification records | Delete from `notifications` where title matches test pattern |
-| Test audit log entries | Audit logs are immutable by design — test entries remain (tagged with `[TEST]` prefix in metadata) |
+| Test audit log entries | Audit logs are immutable by design  -  test entries remain (tagged with `[TEST]` prefix in metadata) |
 
 ---
 
@@ -288,7 +288,7 @@ The Phase 8 `prevent_paid_invoice_mutation()` trigger locks specific columns on 
 
 ### Schema Plan
 
-**Migration 105 — Invoice Lifecycle Columns and Trigger Update:**
+**Migration 105  -  Invoice Lifecycle Columns and Trigger Update:**
 
 ```sql
 -- Add lifecycle tracking columns
@@ -385,17 +385,17 @@ Errors:   401
 
 ### UI Flow Changes
 
-**Billing page — invoice row actions:**
+**Billing page  -  invoice row actions:**
 
 Current: `Mark Sent` (manually changes status)
 New: `Send Invoice` (emails PDF, transitions status, logs audit) replaces `Mark Sent` for draft invoices
 
-**Billing page — after recording payment:**
+**Billing page  -  after recording payment:**
 
 Current: Dialog closes
 New: Dialog closes → toast with "Send Receipt?" action button → clicking triggers `POST /api/invoices/[id]/receipt`
 
-**Billing page — batch operations:**
+**Billing page  -  batch operations:**
 
 Current: None
 New: Checkbox selection on draft invoices → "Send Selected" button → progress indicator → result summary toast
@@ -416,7 +416,7 @@ New: Checkbox selection on draft invoices → "Send Selected" button → progres
 
 | Scenario | Action |
 |---|---|
-| Migration 105 causes issues | Corrective migration 106: revert trigger function to Phase 8 version. New columns are nullable — can remain without harm. |
+| Migration 105 causes issues | Corrective migration 106: revert trigger function to Phase 8 version. New columns are nullable  -  can remain without harm. |
 | Invoice send route has bugs | Disable "Send Invoice" button in UI by reverting UI change. Backend route can remain deployed (unused). |
 | Cron jobs misbehave | Remove cron entries from `vercel.json` and redeploy. Cron endpoints remain but are not called. |
 | Full Phase 9 rollback | Vercel instant rollback to pre-Phase-9 deployment. New columns remain in DB (harmless). Trigger function reverted via corrective migration. |
@@ -429,28 +429,28 @@ New: Checkbox selection on draft invoices → "Send Selected" button → progres
 | `vercel.json` cron changes | Take effect on next deployment |
 | `CRON_SECRET` env var | Must be set in Vercel before cron jobs fire |
 | Resend API key | Already configured (used by existing email service) |
-| Zero downtime | Yes — ALTER TABLE ADD COLUMN is non-blocking in PostgreSQL |
+| Zero downtime | Yes  -  ALTER TABLE ADD COLUMN is non-blocking in PostgreSQL |
 
 ### Post-Deploy Smoke Test List
 
-- [ ] `POST /api/invoices/[id]/send` with a draft test invoice — email received
-- [ ] `POST /api/invoices/[id]/send` with a paid invoice — 400 returned
-- [ ] `POST /api/invoices/[id]/receipt` after recording test payment — receipt email received
-- [ ] `GET /api/contacts/[id]/statement` — returns valid statement JSON
-- [ ] `GET /api/cron/overdue-detection` with valid `CRON_SECRET` — 200 returned
-- [ ] `GET /api/cron/overdue-detection` with invalid secret — 401 returned
-- [ ] `GET /api/cron/invoice-reminders` — 200, logs show processing count
-- [ ] `GET /api/cron/aging-recalculation` — 200, aging buckets correct
-- [ ] Billing page — "Send Invoice" button visible on draft invoices
-- [ ] Billing page — "Send Receipt" option after recording payment
-- [ ] Sentry — verify cron job errors reported (trigger intentional test error)
-- [ ] Structured logs — verify cron entries appear with `cron_name` field
+- [ ] `POST /api/invoices/[id]/send` with a draft test invoice  -  email received
+- [ ] `POST /api/invoices/[id]/send` with a paid invoice  -  400 returned
+- [ ] `POST /api/invoices/[id]/receipt` after recording test payment  -  receipt email received
+- [ ] `GET /api/contacts/[id]/statement`  -  returns valid statement JSON
+- [ ] `GET /api/cron/overdue-detection` with valid `CRON_SECRET`  -  200 returned
+- [ ] `GET /api/cron/overdue-detection` with invalid secret  -  401 returned
+- [ ] `GET /api/cron/invoice-reminders`  -  200, logs show processing count
+- [ ] `GET /api/cron/aging-recalculation`  -  200, aging buckets correct
+- [ ] Billing page  -  "Send Invoice" button visible on draft invoices
+- [ ] Billing page  -  "Send Receipt" option after recording payment
+- [ ] Sentry  -  verify cron job errors reported (trigger intentional test error)
+- [ ] Structured logs  -  verify cron entries appear with `cron_name` field
 
 ---
 
 ## 6. Execution Plan
 
-### Phase 9A — Schema and Infrastructure (Day 1)
+### Phase 9A  -  Schema and Infrastructure (Day 1)
 
 **What:** Migration 105, cron auth helper, invoice email service
 
@@ -465,7 +465,7 @@ New: Checkbox selection on draft invoices → "Send Selected" button → progres
 
 **Why first:** All subsequent work depends on the schema being updated and the email/cron infrastructure being available.
 
-### Phase 9B — API Routes and Cron Jobs (Days 2-3)
+### Phase 9B  -  API Routes and Cron Jobs (Days 2-3)
 
 **What:** All 7 new API endpoints
 
@@ -484,7 +484,7 @@ New: Checkbox selection on draft invoices → "Send Selected" button → progres
 
 **Why second:** Routes are the core deliverable. They must be tested independently before wiring to UI.
 
-### Phase 9C — UI Wiring and Proof Pack (Day 4)
+### Phase 9C  -  UI Wiring and Proof Pack (Day 4)
 
 **What:** UI button changes, proof pack execution
 

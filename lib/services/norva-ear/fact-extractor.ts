@@ -188,7 +188,7 @@ export async function extractFacts(
       }
     }
 
-    // Parse JSON from response — handle markdown code blocks
+    // Parse JSON from response  -  handle markdown code blocks
     let jsonStr = textBlock.text.trim()
     const jsonMatch = jsonStr.match(/```(?:json)?\s*([\s\S]*?)```/)
     if (jsonMatch) {

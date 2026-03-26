@@ -1,14 +1,14 @@
 -- ============================================================================
 -- Migration 094: Matter-Scoped Access Control
 -- ============================================================================
--- LOCKED IMPLEMENTATION — matter-scoped access and restricted-matter rules
+-- LOCKED IMPLEMENTATION  -  matter-scoped access and restricted-matter rules
 -- must NOT be weakened.
 --
 -- Creates:
---   1. user_supervision — supervisor ↔ supervisee relationships
---   2. break_glass_access_grants — time-limited emergency access (max 72h)
---   3. matter_delegations — delegated matter access with expiry
---   4. check_matter_access() — core 9-path access control function
+--   1. user_supervision  -  supervisor ↔ supervisee relationships
+--   2. break_glass_access_grants  -  time-limited emergency access (max 72h)
+--   3. matter_delegations  -  delegated matter access with expiry
+--   4. check_matter_access()  -  core 9-path access control function
 --   5. RLS policy updates on matters and matter-linked tables
 --   6. Performance indexes
 --
@@ -118,7 +118,7 @@ ALTER TABLE audit_logs
   ADD COLUMN IF NOT EXISTS ip_address TEXT,
   ADD COLUMN IF NOT EXISTS user_agent TEXT;
 
--- ─── 5. check_matter_access() — CORE ACCESS CONTROL ─────────────────────────
+-- ─── 5. check_matter_access()  -  CORE ACCESS CONTROL ─────────────────────────
 -- LOCKED: This function implements the 9-path access model.
 -- Do NOT weaken any path. All 9 paths must remain intact.
 
@@ -310,7 +310,7 @@ BEGIN
       SELECT 1 FROM information_schema.tables
       WHERE table_schema = 'public' AND table_name = t
     ) THEN
-      RAISE NOTICE 'Skipping % — table does not exist', t;
+      RAISE NOTICE 'Skipping %  -  table does not exist', t;
       CONTINUE;
     END IF;
 
@@ -319,7 +319,7 @@ BEGIN
       SELECT 1 FROM information_schema.columns
       WHERE table_schema = 'public' AND table_name = t AND column_name = 'matter_id'
     ) THEN
-      RAISE NOTICE 'Skipping % — no matter_id column', t;
+      RAISE NOTICE 'Skipping %  -  no matter_id column', t;
       CONTINUE;
     END IF;
 

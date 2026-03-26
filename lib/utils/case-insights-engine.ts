@@ -1,7 +1,7 @@
 // ============================================================================
 // Smart Case Insights Engine
 // Rule-based analysis of immigration case health, readiness, and risk factors.
-// Pure functions — no React, no Supabase, no external API calls.
+// Pure functions  -  no React, no Supabase, no external API calls.
 // ============================================================================
 
 import { differenceInDays, isPast, isToday } from 'date-fns'
@@ -75,7 +75,7 @@ export interface DocumentSlotSummary {
   created_at: string
 }
 
-/** V2 input — uses document_slots instead of checklist items */
+/** V2 input  -  uses document_slots instead of checklist items */
 export interface CaseDataV2 {
   immigration: MatterImmigration
   documentSlots: DocumentSlotSummary[]
@@ -248,7 +248,7 @@ function analyzeDocuments(items: MatterChecklistItem[]): Insight[] {
         id: `doc-missing-${item.id}`,
         severity: 'warning',
         category: 'document',
-        title: `${item.document_name} — not yet requested`,
+        title: `${item.document_name}  -  not yet requested`,
         description: 'Required document has not been requested from the client.',
         action: 'Request this document from the client',
       })
@@ -262,7 +262,7 @@ function analyzeDocuments(items: MatterChecklistItem[]): Insight[] {
           id: `doc-overdue-${item.id}`,
           severity: 'critical',
           category: 'document',
-          title: `${item.document_name} — overdue`,
+          title: `${item.document_name}  -  overdue`,
           description: `Requested ${daysSince} days ago but not yet received.`,
           action: 'Follow up with client on this document',
         })
@@ -271,7 +271,7 @@ function analyzeDocuments(items: MatterChecklistItem[]): Insight[] {
           id: `doc-pending-${item.id}`,
           severity: 'warning',
           category: 'document',
-          title: `${item.document_name} — pending ${daysSince} days`,
+          title: `${item.document_name}  -  pending ${daysSince} days`,
           description: `Requested ${daysSince} days ago, still awaiting receipt.`,
           action: 'Consider sending a reminder to the client',
         })
@@ -299,7 +299,7 @@ function analyzeDeadlines(deadlines: MatterDeadline[]): Insight[] {
         id: `deadline-overdue-${deadline.id}`,
         severity: 'critical',
         category: 'deadline',
-        title: `${deadline.title} — ${Math.abs(days)} days overdue`,
+        title: `${deadline.title}  -  ${Math.abs(days)} days overdue`,
         description: `This deadline was due on ${formatShortDate(deadline.due_date)} and has not been completed.`,
         action: 'Address immediately or mark as complete',
       })
@@ -308,7 +308,7 @@ function analyzeDeadlines(deadlines: MatterDeadline[]): Insight[] {
         id: `deadline-urgent-${deadline.id}`,
         severity: 'warning',
         category: 'deadline',
-        title: `${deadline.title} — ${days === 0 ? 'due today' : `${days} days remaining`}`,
+        title: `${deadline.title}  -  ${days === 0 ? 'due today' : `${days} days remaining`}`,
         description: `Due on ${formatShortDate(deadline.due_date)}.`,
         action: 'Prioritize completion this week',
       })
@@ -546,7 +546,7 @@ export function analyzeCrsCompetitiveness(immigration: MatterImmigration): CrsAn
     status = 'needs_improvement'
   }
 
-  // Quick wins — check which boosters aren't being used
+  // Quick wins  -  check which boosters aren't being used
   const quickWins: CrsAnalysis['quickWins'] = []
 
   if (!immigration.provincial_nominee_program) {
@@ -609,7 +609,7 @@ function generateRecommendations(data: CaseData): Insight[] {
   const insights: Insight[] = []
   const { immigration, checklistItems, stages } = data
 
-  // All docs approved — success
+  // All docs approved  -  success
   const requiredItems = checklistItems.filter((i) => i.is_required)
   if (requiredItems.length > 0 && requiredItems.every((i) => i.status === 'approved')) {
     insights.push({
@@ -652,7 +652,7 @@ function generateRecommendations(data: CaseData): Insight[] {
   const pathwayInsight = analyzeStrongestPathway(immigration)
   if (pathwayInsight) insights.push(pathwayInsight)
 
-  // Stage duration tracking — average comparison
+  // Stage duration tracking  -  average comparison
   if (immigration.current_stage_id && stages.length > 0) {
     const stageHistory = (Array.isArray(immigration.stage_history) ? immigration.stage_history : []) as Array<{
       stage_id: string; stage_name: string; entered_at: string; exited_at?: string
@@ -759,10 +759,10 @@ function analyzeStrongestPathway(immigration: MatterImmigration): Insight | null
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// V2 — Document-slot-based analysis
+// V2  -  Document-slot-based analysis
 // ═══════════════════════════════════════════════════════════════════════════════
 
-/** V2 entry point — uses document_slots instead of checklist items */
+/** V2 entry point  -  uses document_slots instead of checklist items */
 export function analyzeCaseInsightsV2(data: CaseDataV2): CaseInsights {
   const readiness = analyzeReadinessV2(data)
   const crsAnalysis = analyzeCrsCompetitiveness(data.immigration)
@@ -858,7 +858,7 @@ function analyzeDocumentsV2(slots: DocumentSlotSummary[]): Insight[] {
   for (const slot of slots) {
     if (!slot.is_required) continue
 
-    // Empty required document — not yet uploaded
+    // Empty required document  -  not yet uploaded
     if (slot.status === 'empty') {
       const daysSinceCreated = differenceInDays(today, new Date(slot.created_at))
 
@@ -868,7 +868,7 @@ function analyzeDocumentsV2(slots: DocumentSlotSummary[]): Insight[] {
           id: `doc-empty-critical-${slot.id}`,
           severity: 'critical',
           category: 'document',
-          title: `${slot.slot_name} — not uploaded (${daysSinceCreated} days)`,
+          title: `${slot.slot_name}  -  not uploaded (${daysSinceCreated} days)`,
           description: `Required document has not been uploaded for over ${daysSinceCreated} days since the slot was created.`,
           action: 'Urgently request this document from the client',
         })
@@ -877,7 +877,7 @@ function analyzeDocumentsV2(slots: DocumentSlotSummary[]): Insight[] {
           id: `doc-empty-${slot.id}`,
           severity: 'warning',
           category: 'document',
-          title: `${slot.slot_name} — not yet uploaded`,
+          title: `${slot.slot_name}  -  not yet uploaded`,
           description: 'Required document has not been uploaded by the client.',
           action: 'Request this document from the client',
         })
@@ -890,7 +890,7 @@ function analyzeDocumentsV2(slots: DocumentSlotSummary[]): Insight[] {
         id: `doc-reupload-${slot.id}`,
         severity: 'warning',
         category: 'document',
-        title: `${slot.slot_name} — re-upload requested`,
+        title: `${slot.slot_name}  -  re-upload requested`,
         description: 'This document was reviewed and requires a new upload from the client.',
         action: 'Follow up with client to upload a corrected document',
       })
@@ -902,7 +902,7 @@ function analyzeDocumentsV2(slots: DocumentSlotSummary[]): Insight[] {
         id: `doc-rejected-${slot.id}`,
         severity: 'critical',
         category: 'document',
-        title: `${slot.slot_name} — rejected`,
+        title: `${slot.slot_name}  -  rejected`,
         description: 'This required document was rejected during review. A replacement is needed.',
         action: 'Contact client to provide the correct document',
       })
@@ -970,7 +970,7 @@ function generateRecommendationsV2(data: CaseDataV2): Insight[] {
   const insights: Insight[] = []
   const { immigration, documentSlots, stages } = data
 
-  // All required docs accepted — success
+  // All required docs accepted  -  success
   const requiredSlots = documentSlots.filter((s) => s.is_required)
   if (requiredSlots.length > 0 && requiredSlots.every((s) => s.status === 'accepted')) {
     insights.push({

@@ -81,7 +81,7 @@ export async function rollbackBatch(
 
         // Mark rolled-back imported matters with 'import_reverted' so they are
         // distinguishable from legitimately closed matters (closed_won / closed_lost).
-        // Only matters imported in this specific batch are affected — matched by id
+        // Only matters imported in this specific batch are affected  -  matched by id
         // from import_records where target_entity_type = 'matters'.
         if (entityType === 'matters') {
           const revertedAt = new Date().toISOString()

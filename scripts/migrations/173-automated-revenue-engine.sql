@@ -149,7 +149,7 @@ BEGIN
     LIMIT 1;
   END IF;
 
-  -- No template found — nothing to inject
+  -- No template found  -  nothing to inject
   IF v_template IS NULL THEN
     RETURN NEW;
   END IF;

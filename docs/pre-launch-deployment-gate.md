@@ -1,17 +1,17 @@
-# NorvaOS — Pre-Launch Deployment Gate
+# NorvaOS  -  Pre-Launch Deployment Gate
 
 **Document type:** Mandatory deployment verification checklist
 **Completed by:** Deployment owner (the person with access to the production deployment platform and Stripe dashboard)
 **Required before:** Any production traffic is accepted
 **Date issued:** 2026-03-16
 
-This checklist has no partial credit. Every item must be confirmed with an exact observed value. "I think it's set" is not confirmation. "Confirmed — value begins sk_live_" is confirmation.
+This checklist has no partial credit. Every item must be confirmed with an exact observed value. "I think it's set" is not confirmation. "Confirmed  -  value begins sk_live_" is confirmation.
 
 ---
 
-## Gate A — Stripe Configuration
+## Gate A  -  Stripe Configuration
 
-### A1 — STRIPE_SECRET_KEY (server-side)
+### A1  -  STRIPE_SECRET_KEY (server-side)
 
 **Where to check:** Production deployment platform → Environment variables
 
@@ -26,7 +26,7 @@ This checklist has no partial credit. Every item must be confirmed with an exact
 
 ---
 
-### A2 — NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY (client-side)
+### A2  -  NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY (client-side)
 
 **Where to check:** Production deployment platform → Environment variables
 
@@ -41,7 +41,7 @@ This checklist has no partial credit. Every item must be confirmed with an exact
 
 ---
 
-### A3 — STRIPE_WEBHOOK_SECRET (webhook replay protection)
+### A3  -  STRIPE_WEBHOOK_SECRET (webhook replay protection)
 
 **Where to check:** Production deployment platform → Environment variables
 
@@ -58,7 +58,7 @@ This checklist has no partial credit. Every item must be confirmed with an exact
 
 ---
 
-### A4 — Stripe Webhook Endpoint URL
+### A4  -  Stripe Webhook Endpoint URL
 
 **Where to check:** Stripe dashboard → Developers → Webhooks → endpoint list
 
@@ -76,9 +76,9 @@ This checklist has no partial credit. Every item must be confirmed with an exact
 
 ---
 
-## Gate B — Application URL
+## Gate B  -  Application URL
 
-### B1 — NEXT_PUBLIC_APP_URL
+### B1  -  NEXT_PUBLIC_APP_URL
 
 **Where to check:** Production deployment platform → Environment variables
 
@@ -94,13 +94,13 @@ This checklist has no partial credit. Every item must be confirmed with an exact
 
 ---
 
-## Gate C — Migration Verification in Production Database
+## Gate C  -  Migration Verification in Production Database
 
 All four migrations must be confirmed applied in the production Supabase project.
 
 **Where to check:** Run these queries in the Supabase dashboard SQL editor for the production project (`https://supabase.com/dashboard/project/ztsjvsutlrfisnrwdwfl/sql`).
 
-### C1 — Migration 107 (billing module)
+### C1  -  Migration 107 (billing module)
 
 ```sql
 SELECT
@@ -121,7 +121,7 @@ SELECT
 
 ---
 
-### C2 — Migration 108 (Stripe idempotency)
+### C2  -  Migration 108 (Stripe idempotency)
 
 ```sql
 SELECT
@@ -142,7 +142,7 @@ SELECT
 
 ---
 
-### C3 — Migration 109 (payment plan instalments)
+### C3  -  Migration 109 (payment plan instalments)
 
 ```sql
 SELECT
@@ -165,7 +165,7 @@ SELECT
 
 ---
 
-### C4 — Migration 110 (tenant onboarding)
+### C4  -  Migration 110 (tenant onboarding)
 
 ```sql
 SELECT
@@ -194,21 +194,21 @@ SELECT
 
 ---
 
-## Gate D — Final Confirmation
+## Gate D  -  Final Confirmation
 
 This gate requires the deployment owner to sign off on all preceding gates.
 
 | Gate | Status |
 |------|--------|
-| A1 — STRIPE_SECRET_KEY live-mode | |
-| A2 — NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY live-mode | |
-| A3 — STRIPE_WEBHOOK_SECRET real signing secret | |
-| A4 — Stripe webhook endpoint → production URL | |
-| B1 — NEXT_PUBLIC_APP_URL production HTTPS URL | |
-| C1 — Migration 107 applied | |
-| C2 — Migration 108 applied | |
-| C3 — Migration 109 applied | |
-| C4 — Migration 110 applied | |
+| A1  -  STRIPE_SECRET_KEY live-mode | |
+| A2  -  NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY live-mode | |
+| A3  -  STRIPE_WEBHOOK_SECRET real signing secret | |
+| A4  -  Stripe webhook endpoint → production URL | |
+| B1  -  NEXT_PUBLIC_APP_URL production HTTPS URL | |
+| C1  -  Migration 107 applied | |
+| C2  -  Migration 108 applied | |
+| C3  -  Migration 109 applied | |
+| C4  -  Migration 110 applied | |
 
 **Launch is authorised when all 9 rows above show PASS.**
 
@@ -221,18 +221,18 @@ These two TypeScript defects exist and should be resolved in a follow-on patch. 
 | ID | File | Line | Defect | Affected surface |
 |----|------|------|--------|-----------------|
 | DEF-LC-001 | `app/api/import/upload/route.ts` | 98 | `Json` type used but not imported from `@/lib/types/database` | Import/upload functionality |
-| DEF-LC-002 | `lib/services/notifications/email-delivery-adapter.ts` | 162 | `resend.emails.send()` called with `html`/`text` fields, but current Resend SDK requires either `html` or a `template` object — type conflict | Email notification delivery |
+| DEF-LC-002 | `lib/services/notifications/email-delivery-adapter.ts` | 162 | `resend.emails.send()` called with `html`/`text` fields, but current Resend SDK requires either `html` or a `template` object  -  type conflict | Email notification delivery |
 
 These do not gate launch of billing or payment surfaces. They must be resolved before the import and email notification surfaces are used in production.
 
 ---
 
-## Deferred Items (not launch gates — recorded for the record)
+## Deferred Items (not launch gates  -  recorded for the record)
 
 | Item | Status | Reopen trigger |
 |------|--------|----------------|
-| Team 3 P1b — GHL/Clio token refresh hardening (RISK-002) | Deferred 2026-03-16 | Enable GHL or Clio for any production tenant |
-| Team 3 M3 — Demo environment | Deferred 2026-03-16 | Decision to stand up live demo for sales |
+| Team 3 P1b  -  GHL/Clio token refresh hardening (RISK-002) | Deferred 2026-03-16 | Enable GHL or Clio for any production tenant |
+| Team 3 M3  -  Demo environment | Deferred 2026-03-16 | Decision to stand up live demo for sales |
 
 ---
 

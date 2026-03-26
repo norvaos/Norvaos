@@ -1,5 +1,5 @@
 /**
- * Cross-Locale Search Index — Directive 36.2: Enable Cross-Locale Search
+ * Cross-Locale Search Index  -  Directive 36.2: Enable Cross-Locale Search
  *
  * Builds an inverted index from ALL 15 dictionaries so that a search for
  * "Passport" matches regardless of the active locale. Without this, when
@@ -40,7 +40,7 @@ let _indexPromise: Promise<InvertedIndex> | null = null
 
 /**
  * Build (once) the inverted index from all 15 dictionaries.
- * Lazy-loaded and cached — subsequent calls return the same index.
+ * Lazy-loaded and cached  -  subsequent calls return the same index.
  */
 export async function getInvertedIndex(): Promise<InvertedIndex> {
   if (_index) return _index
@@ -133,7 +133,7 @@ export async function crossLocaleSearch(query: string): Promise<CrossLocaleEntry
  * Checks a candidate string against both the raw query AND the English
  * equivalents of the query (resolved from any locale dictionary).
  *
- * Use in `.filter()` chains — e.g., document search, status filters.
+ * Use in `.filter()` chains  -  e.g., document search, status filters.
  *
  * @param query    - The user's search input (any language)
  * @param candidate - The string to match against (usually English DB value)

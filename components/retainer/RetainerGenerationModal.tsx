@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * RetainerGenerationModal — 6-Step Retainer Generation Flow
+ * RetainerGenerationModal  -  6-Step Retainer Generation Flow
  *
  * Step 1: Matter Type + Billing Structure
  * Step 2: Scope of Services
@@ -394,19 +394,19 @@ export function RetainerGenerationModal({
 
     if (billingType === 'flat_fee' && flatFeeAmount) {
       items.push({
-        description: `${matterType?.name ?? 'Legal'} — Flat Fee`,
+        description: `${matterType?.name ?? 'Legal'}  -  Flat Fee`,
         quantity: 1,
         amount: parseFloat(flatFeeAmount),
       })
     } else if (billingType === 'hourly' && hourlyRate && estimatedHours) {
       items.push({
-        description: 'Legal Services — Hourly',
+        description: 'Legal Services  -  Hourly',
         quantity: parseFloat(estimatedHours),
         amount: parseFloat(hourlyRate),
       })
     } else if (billingType === 'contingency' && contingencyPct) {
       items.push({
-        description: `Contingency Fee — ${contingencyPct}%`,
+        description: `Contingency Fee  -  ${contingencyPct}%`,
         quantity: 1,
         amount: 0, // Contingency: amount TBD at resolution
       })
@@ -1084,7 +1084,7 @@ function Step4ClientDetails({
               </p>
             </div>
 
-            {/* Polyglot Disclosure — Urdu (Directive 15.1) */}
+            {/* Polyglot Disclosure  -  Urdu (Directive 15.1) */}
             <div className="flex items-start gap-3">
               <Checkbox
                 id="urdu-disclosure"
@@ -1174,7 +1174,7 @@ function Step5Preview({
         {/* Header */}
         <div className="text-center space-y-1">
           <h2 className="text-base font-bold text-primary">RETAINER AGREEMENT</h2>
-          <p className="text-muted-foreground">Draft — {new Date().toLocaleDateString('en-CA', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+          <p className="text-muted-foreground">Draft  -  {new Date().toLocaleDateString('en-CA', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
         </div>
 
         <Separator />
@@ -1183,7 +1183,7 @@ function Step5Preview({
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-0.5">
             <p className="font-semibold text-muted-foreground uppercase tracking-wide text-[10px]">Client</p>
-            <p className="font-medium">{clientInfo?.name ?? '—'}</p>
+            <p className="font-medium">{clientInfo?.name ?? ' - '}</p>
             {clientInfo?.email && <p className="text-muted-foreground">{clientInfo.email}</p>}
             {clientInfo?.address && <p className="text-muted-foreground">{clientInfo.address}</p>}
           </div>

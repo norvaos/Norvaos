@@ -421,7 +421,7 @@ function ProfessionalCredentialsCard({ userId, currentSettings }: ProfentialsCre
 
             <Separator className="my-2" />
             <p className="text-sm font-medium text-muted-foreground">
-              Representative Contact — used on Use of Representative forms (IMM5476E)
+              Representative Contact  -  used on Use of Representative forms (IMM5476E)
             </p>
             <div className="grid gap-4 sm:grid-cols-2">
               <FormField

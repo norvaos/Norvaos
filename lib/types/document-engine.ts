@@ -1,12 +1,12 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * NorvaOS Document Generation Engine — Domain Types
+ * NorvaOS Document Generation Engine  -  Domain Types
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Types for the template body schema, field resolution, condition evaluation,
  * render pipeline, and state transitions.
  *
- * These types describe the JSONB structures and engine interfaces — NOT database
+ * These types describe the JSONB structures and engine interfaces  -  NOT database
  * row types (those live in database.ts).
  */
 
@@ -173,7 +173,7 @@ export interface ConditionEvaluation {
 // FIELD RESOLUTION
 // ═══════════════════════════════════════════════════════════════════════════════
 
-/** Data context passed to the field resolver — pre-fetched, no DB access */
+/** Data context passed to the field resolver  -  pre-fetched, no DB access */
 export interface FieldResolutionContext {
   matter: Record<string, unknown>
   contact: Record<string, unknown>
@@ -245,7 +245,7 @@ export const VALID_INSTANCE_TRANSITIONS: Record<string, string[]> = {
   approved:          ['sent', 'voided', 'superseded'],
   sent:              ['partially_signed', 'signed', 'declined', 'voided', 'expired', 'superseded'],
   partially_signed:  ['signed', 'declined', 'voided', 'superseded'],
-  // Terminal states — no transitions out
+  // Terminal states  -  no transitions out
   signed:            ['superseded'],
   declined:          [],
   voided:            [],

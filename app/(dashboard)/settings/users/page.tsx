@@ -257,7 +257,7 @@ export default function SettingsUsersPage() {
     enabled: !!tenant,
   })
 
-  // Pending invitations — filter out expired ones so they don't linger
+  // Pending invitations  -  filter out expired ones so they don't linger
   const { data: pendingInvites } = useQuery({
     queryKey: ['settings', 'invites', tenant?.id],
     queryFn: async () => {
@@ -314,9 +314,11 @@ export default function SettingsUsersPage() {
     },
     onError: (error: any) => {
       if (error.code === 'SEAT_LIMIT_REACHED') {
-        norvaToast('seat_limit', error.reason === 'PENDING_INVITE_CAP'
-          ? `You have ${error.pending_invites} active invitations. Revoke unused ones first.`
-          : `Your firm has ${error.active_user_count} of ${error.max_users} seats in use.`)
+        if (error.reason === 'PENDING_INVITE_CAP') {
+          norvaToast('seat_limit', `Too many pending invitations. You have ${error.pending_invites} active invitations. Revoke unused ones first.`)
+        } else {
+          norvaToast('seat_limit', `Seat limit reached. Your firm has ${error.active_user_count} of ${error.max_users} seats in use.`)
+        }
       } else {
         norvaToast('save_failed', error.message)
       }
@@ -567,6 +569,7 @@ export default function SettingsUsersPage() {
             {tenant && (
               <span className="ml-1">
                 Your plan allows {tenant.max_users} active {tenant.max_users === 1 ? 'user' : 'users'}.
+                {' '}Pending invitations do not consume seats.
               </span>
             )}
           </p>
@@ -664,7 +667,7 @@ export default function SettingsUsersPage() {
         </div>
       )}
 
-      {/* Pending Invites — only non-expired */}
+      {/* Pending Invites  -  only non-expired */}
       {pendingInvites && pendingInvites.length > 0 && (
         <div className="space-y-3">
           <h3 className="text-lg font-semibold flex items-center gap-2">
@@ -759,6 +762,11 @@ export default function SettingsUsersPage() {
                 <DialogTitle>Send Invite Email</DialogTitle>
                 <DialogDescription>
                   The user will receive an email with a link to set up their account.
+                  {tenant && (
+                    <span className="block mt-1 text-xs">
+                      Only active users count toward your {tenant.max_users}-seat limit.
+                    </span>
+                  )}
                 </DialogDescription>
               </DialogHeader>
               <Form {...inviteForm}>
@@ -881,7 +889,7 @@ export default function SettingsUsersPage() {
                   </Select>
                 </div>
                 <p className="text-xs text-slate-500 bg-slate-50 rounded-md px-3 py-2">
-                  A temporary password will be generated. Share it with the user — they will be forced to change it on first login.
+                  A temporary password will be generated. Share it with the user  -  they will be forced to change it on first login.
                 </p>
               </div>
               <DialogFooter>

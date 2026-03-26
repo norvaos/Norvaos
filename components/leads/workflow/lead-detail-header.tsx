@@ -21,7 +21,7 @@ import { isTerminalStage, isClosedStage, LEAD_STAGES } from '@/lib/config/lead-w
 import { RiskBadge } from '@/components/matters/risk-badge'
 import type { Lead, Contact } from './lead-workflow-types'
 
-// ─── Temperature → Risk Level mapping (Team TRUST — ComplianceDomain) ──────
+// ─── Temperature → Risk Level mapping (Team TRUST  -  ComplianceDomain) ──────
 
 function temperatureToRiskLevel(temperature: string | null | undefined): string {
   switch (temperature) {
@@ -105,7 +105,7 @@ export function LeadDetailHeader({
           <Badge variant="outline" size="xs" className={tempBadge.className}>
             {tempBadge.label}
           </Badge>
-          {/* Pulsing Amber Risk Badge — Compliance Domain (Team TRUST) */}
+          {/* Pulsing Amber Risk Badge  -  Compliance Domain (Team TRUST) */}
           <RiskBadge
             level={temperatureToRiskLevel(lead.temperature)}
             score={lead.readiness_score ?? 60}

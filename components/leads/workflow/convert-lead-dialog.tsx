@@ -77,15 +77,15 @@ function ContactPreviewPanel({ contact }: ContactPreviewProps) {
 
   const rows: { key: string; icon: React.ElementType; label: string; value: string; sensitive?: boolean }[] = []
 
-  // Name — always visible
+  // Name  -  always visible
   rows.push({ key: 'name', icon: User, label: 'Name', value: fullName })
 
-  // Email — masked by default
+  // Email  -  masked by default
   if (contact.email_primary) {
     rows.push({ key: 'email', icon: Mail, label: 'Email', value: contact.email_primary, sensitive: true })
   }
 
-  // Phone — masked by default
+  // Phone  -  masked by default
   if (contact.phone_primary) {
     rows.push({ key: 'phone', icon: Phone, label: 'Phone', value: contact.phone_primary, sensitive: true })
   }
@@ -95,17 +95,17 @@ function ContactPreviewPanel({ contact }: ContactPreviewProps) {
     rows.push({ key: 'nationality', icon: Globe, label: 'Nationality', value: contact.nationality })
   }
 
-  // Date of birth — masked
+  // Date of birth  -  masked
   if (contact.date_of_birth) {
     rows.push({ key: 'dob', icon: Calendar, label: 'Date of Birth', value: contact.date_of_birth, sensitive: true })
   }
 
-  // UCI — always masked
+  // UCI  -  always masked
   if (immData.uci) {
     rows.push({ key: 'uci', icon: Fingerprint, label: 'UCI', value: immData.uci, sensitive: true })
   }
 
-  // Passport — always masked
+  // Passport  -  always masked
   if (immData.passport_number) {
     rows.push({ key: 'passport', icon: Shield, label: 'Passport', value: immData.passport_number, sensitive: true })
   }
@@ -270,7 +270,7 @@ export function ConvertLeadDialog({
             <SentinelErrorBanner message={conversionError} />
           )}
 
-          {/* Contact Preview Panel — PII-masked */}
+          {/* Contact Preview Panel  -  PII-masked */}
           {contact && (
             <ContactPreviewPanel contact={contact} />
           )}
@@ -321,7 +321,7 @@ export function ConvertLeadDialog({
             )}
           </div>
 
-          {/* Matter creation form — only shown when gates pass */}
+          {/* Matter creation form  -  only shown when gates pass */}
           {canConvert && (
             <div className="space-y-4 border-t pt-4">
               <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">

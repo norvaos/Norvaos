@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Trust Deposit → Lead Conversion Bridge — Unit Tests
+ * Trust Deposit → Lead Conversion Bridge  -  Unit Tests
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Proves:
@@ -340,7 +340,7 @@ describe('convertLeadOnTrustDeposit', () => {
       expect(mockedConvert).toHaveBeenCalledWith(
         expect.objectContaining({
           matterData: expect.objectContaining({
-            title: 'Zia Waseer — Immigration',
+            title: 'Zia Waseer  -  Immigration',
           }),
         }),
       )

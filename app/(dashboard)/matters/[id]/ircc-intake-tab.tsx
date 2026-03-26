@@ -35,7 +35,7 @@ import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// IRCC Intake Tab — Single Source of Truth
+// IRCC Intake Tab  -  Single Source of Truth
 // ═══════════════════════════════════════════════════════════════════════════════
 //
 // All forms and questions come from ONE place:
@@ -95,7 +95,7 @@ export function IRCCIntakeTab({ matterId, contactId, tenantId, matterTypeId, ini
   useEffect(() => {
     if (!initialProfilePath || !contactId || isLoading) return
     if (!session && !createSession.isPending && hasFormsConfigured) {
-      // No session yet — start one automatically so the user can save answers
+      // No session yet  -  start one automatically so the user can save answers
       createSession.mutateAsync({
         tenant_id: tenantId,
         contact_id: contactId,
@@ -406,7 +406,7 @@ export function IRCCIntakeTab({ matterId, contactId, tenantId, matterTypeId, ini
           </CardContent>
         </Card>
 
-        {/* Inline Profile Summary — always visible when completed */}
+        {/* Inline Profile Summary  -  always visible when completed */}
         {!showQuestionnaire && existingProfile && (
           <div className="space-y-3">
             <div className="flex items-center justify-between">
@@ -462,7 +462,7 @@ export function IRCCIntakeTab({ matterId, contactId, tenantId, matterTypeId, ini
         <h3 className="text-lg font-semibold">IRCC Smart Intake</h3>
         <p className="mt-1 max-w-lg text-sm text-muted-foreground">
           Collect all required client information for the immigration application.
-          Questions are pulled from {formCodes.join(' + ')} — no duplicates.
+          Questions are pulled from {formCodes.join(' + ')}  -  no duplicates.
         </p>
 
         <div className="mt-6 space-y-3">

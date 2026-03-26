@@ -1,6 +1,6 @@
 /**
- * GET   /api/document-engine/instances/[id] — Get instance with full details
- * PATCH /api/document-engine/instances/[id] — Status transitions & actions
+ * GET   /api/document-engine/instances/[id]  -  Get instance with full details
+ * PATCH /api/document-engine/instances/[id]  -  Status transitions & actions
  */
 
 import { NextRequest, NextResponse } from 'next/server'

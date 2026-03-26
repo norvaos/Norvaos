@@ -1,5 +1,5 @@
 /**
- * Compliance Override Query Hooks — Directive 026
+ * Compliance Override Query Hooks  -  Directive 026
  */
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
@@ -53,7 +53,7 @@ export function useLogComplianceOverride() {
     },
     onSuccess: (_data, params) => {
       qc.invalidateQueries({ queryKey: overrideKeys.matter(params.matterId) })
-      toast.success('Norva Compliance Override logged — Genesis amendment recorded')
+      toast.success('Norva Compliance Override logged  -  Genesis amendment recorded')
     },
     onError: (error) => {
       toast.error(error instanceof Error ? error.message : 'Failed to log override')

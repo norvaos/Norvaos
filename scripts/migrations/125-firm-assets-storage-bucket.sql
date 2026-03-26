@@ -4,7 +4,7 @@
 -- Bucket is public so logo URLs can be embedded in emails and portal pages.
 --
 -- Run manually in Supabase dashboard SQL editor.
--- 2026-03-17 — Agent 2 (Onboarding Wizard)
+-- 2026-03-17  -  Agent 2 (Onboarding Wizard)
 
 -- ── 1. Create bucket (idempotent) ───────────────────────────────────────────
 INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)

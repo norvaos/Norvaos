@@ -2,8 +2,8 @@
  * Comprehensive tests for the Immigration Intake Status Engine.
  *
  * Covers both exported symbols:
- *   1. computeStatus()  — pure state-machine function
- *   2. syncImmigrationIntakeStatus() — DB-backed orchestrator
+ *   1. computeStatus()   -  pure state-machine function
+ *   2. syncImmigrationIntakeStatus()  -  DB-backed orchestrator
  *
  * State machine under test:
  *   not_issued -> issued -> client_in_progress -> review_required ->
@@ -137,14 +137,14 @@ beforeEach(() => {
 })
 
 // ═══════════════════════════════════════════════════════════════════════════
-// computeStatus — Pure function tests
+// computeStatus  -  Pure function tests
 // ═══════════════════════════════════════════════════════════════════════════
 
 describe('computeStatus', () => {
   // ── filed: terminal lock ────────────────────────────────────────────────
 
   describe('filed (terminal)', () => {
-    it('never downgrades past filed — returns filed immediately', () => {
+    it('never downgrades past filed  -  returns filed immediately', () => {
       const result = computeStatus({
         intake: makeIntake({ immigration_intake_status: 'filed' }),
         documentSlots: [],
@@ -525,7 +525,7 @@ describe('computeStatus', () => {
           ...makeSlots([{ slug: 'passport', status: 'pending_review' }]),
           // Active slot with upload
           ...makeSlots([{ slug: 'birth_cert', status: 'pending_review' }]),
-          // Inactive slot — should be ignored
+          // Inactive slot  -  should be ignored
           { slot_slug: 'extra', status: 'empty', is_required: true, is_active: false, person_id: null, person_role: null },
         ],
         formPackVersions: [],
@@ -657,7 +657,7 @@ describe('computeStatus', () => {
           contradiction_flags: [
             { key: 'x', severity: 'blocking', message: 'bad' },
           ],
-          // No override — but deficiency check requires status past issued/not_issued
+          // No override  -  but deficiency check requires status past issued/not_issued
           immigration_intake_status: 'not_issued', // deficiency skipped for not_issued
         }),
         documentSlots: makeSlots([
@@ -1110,7 +1110,7 @@ describe('computeStatus', () => {
 })
 
 // ═══════════════════════════════════════════════════════════════════════════
-// syncImmigrationIntakeStatus — DB orchestrator tests
+// syncImmigrationIntakeStatus  -  DB orchestrator tests
 // ═══════════════════════════════════════════════════════════════════════════
 
 describe('syncImmigrationIntakeStatus', () => {

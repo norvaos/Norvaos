@@ -1,4 +1,4 @@
--- Migration 188: Vault Drops & Claim Engine — Directive 40.0 §2
+-- Migration 188: Vault Drops & Claim Engine  -  Directive 40.0 §2
 --
 -- Creates the vault_drops orphan index table and the claim function
 -- that moves quarantined documents into a matter's archive when
@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS vault_drops (
   created_at        TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
--- No RLS needed — this is a public quarantine table accessed by service role only
+-- No RLS needed  -  this is a public quarantine table accessed by service role only
 -- Admin client bypasses RLS. The claim function runs with SECURITY DEFINER.
 
 CREATE INDEX IF NOT EXISTS idx_vault_drops_session ON vault_drops (temp_session_id);

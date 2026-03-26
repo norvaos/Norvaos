@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * PortalMatterSummary — Top card showing matter info, concrete outstanding counts
+ * PortalMatterSummary  -  Top card showing matter info, concrete outstanding counts
  * (primary signal), a thin progress bar (secondary), and last-updated timestamp.
  */
 
@@ -99,7 +99,7 @@ export function PortalMatterSummary({
         )}
       </div>
 
-      {/* Concrete outstanding counts — PRIMARY signal */}
+      {/* Concrete outstanding counts  -  PRIMARY signal */}
       <div className="mt-3">
         {allSubmitted ? (
           <p className="text-sm font-medium text-green-700">
@@ -112,7 +112,7 @@ export function PortalMatterSummary({
         ) : null}
       </div>
 
-      {/* Thin progress bar — SECONDARY signal */}
+      {/* Thin progress bar  -  SECONDARY signal */}
       {sections && sections.documents.total > 0 && !allSubmitted && (
         <div className="mt-2.5 flex items-center gap-2">
           <div className="flex-1 h-1.5 rounded-full bg-slate-100 overflow-hidden">

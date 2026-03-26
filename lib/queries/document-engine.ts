@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Document Engine — React Query Hooks
+ * Document Engine  -  React Query Hooks
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Query key factory, fetch hooks, and mutations with surgical invalidation.

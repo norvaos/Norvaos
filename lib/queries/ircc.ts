@@ -235,7 +235,7 @@ export function useUpdateIRCCProfile() {
       /** When provided, readiness cache is invalidated immediately after save */
       matterId?: string
       /**
-       * Who made this change — a user UUID for staff edits, or 'portal' for
+       * Who made this change  -  a user UUID for staff edits, or 'portal' for
        * client portal submissions. When omitted, history is not recorded.
        */
       changedBy?: string
@@ -263,7 +263,7 @@ export function useUpdateIRCCProfile() {
 
       if (error) throw error
 
-      // Record which fields changed (fire-and-forget — non-blocking)
+      // Record which fields changed (fire-and-forget  -  non-blocking)
       if (changedBy && existing?.tenant_id) {
         const oldFlat = flattenObject(existingData)
         const newFlat = flattenObject(mergedData as Record<string, unknown>)
@@ -337,7 +337,7 @@ export function useUpdateIRCCProfile() {
             }
           }
         } catch {
-          // Non-fatal — contacts.immigration_data is the primary during transition
+          // Non-fatal  -  contacts.immigration_data is the primary during transition
         }
       }
 

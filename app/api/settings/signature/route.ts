@@ -105,7 +105,7 @@ async function handlePut(request: Request) {
       )
     }
 
-    // Deterministic storage path — upsert overwrites previous
+    // Deterministic storage path  -  upsert overwrites previous
     const storagePath = `${auth.tenantId}/signatures/${auth.userId}.png`
 
     const { error: uploadError } = await admin.storage
@@ -122,7 +122,7 @@ async function handlePut(request: Request) {
       )
     }
 
-    // Update users.settings JSONB — merge signature metadata
+    // Update users.settings JSONB  -  merge signature metadata
     const { data: currentUser } = await admin
       .from('users')
       .select('settings')
@@ -190,7 +190,7 @@ async function handleDelete() {
     const signature = settings.signature as Record<string, unknown> | undefined
 
     if (signature?.storage_path) {
-      // Remove file from storage (ignore errors — file may already be gone)
+      // Remove file from storage (ignore errors  -  file may already be gone)
       await admin.storage
         .from('documents')
         .remove([signature.storage_path as string])

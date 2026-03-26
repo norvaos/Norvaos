@@ -29,13 +29,13 @@ export function CoreDataSummaryPanel({ matterId }: CoreDataSummaryPanelProps) {
     )
   }
 
-  // No intake record yet — show prompt
+  // No intake record yet  -  show prompt
   if (!intake) {
     return (
       <div className="flex items-center gap-3 py-2 px-3 rounded-md bg-amber-50/50 border border-dashed border-amber-200">
         <Shield className="size-4 text-amber-500" />
         <span className="text-sm text-amber-700">
-          Core Data Card not started — switch to the Core Data tab to begin intake.
+          Core Data Card not started  -  switch to the Core Data tab to begin intake.
         </span>
       </div>
     )

@@ -10,14 +10,14 @@ type Matter = Database['public']['Tables']['matters']['Row']
 type MatterInsert = Database['public']['Tables']['matters']['Insert']
 type MatterUpdate = Database['public']['Tables']['matters']['Update']
 
-// ─── Lean Column Fragment (19 cols — max 20) ────────────────────────────────
+// ─── Lean Column Fragment (19 cols  -  max 20) ────────────────────────────────
 // Only the columns needed by the matter list table + kanban card.
 // Dropped: tenant_id, originating_lawyer_id, date_closed, estimated_value,
 //          total_billed, total_paid, updated_at
 export const MATTER_LIST_COLUMNS =
   'id, title, matter_number, status, priority, practice_area_id, matter_type_id, matter_type, pipeline_id, stage_id, stage_entered_at, responsible_lawyer_id, date_opened, risk_level, intake_status, created_at, case_type_id, billing_type, trust_balance' as const
 
-// ─── Detail Column Fragment (20 cols — max 20) ─────────────────────────────
+// ─── Detail Column Fragment (20 cols  -  max 20) ─────────────────────────────
 // Only the columns needed by the matter detail view.
 // Adds total_billed, total_paid, readiness_score/breakdown over list columns.
 // Dropped: created_at, intake_status (both available from list-query cache).
@@ -98,7 +98,7 @@ export function useMatters(params: MatterListParams) {
   })
 }
 
-/** Standalone fetch for a single matter — can be used in queryFn or prefetch. */
+/** Standalone fetch for a single matter  -  can be used in queryFn or prefetch. */
 export async function fetchMatterDetail(id: string): Promise<Matter> {
   const supabase = createClient()
   const { data, error } = await supabase
@@ -129,7 +129,7 @@ export function useMatter(id: string) {
     queryKey: matterKeys.detail(id),
     queryFn: () => fetchMatterDetail(id),
     enabled: !!id,
-    staleTime: 1000 * 60 * 2, // 2 min — cached data shows instantly (e.g. header context) while revalidating
+    staleTime: 1000 * 60 * 2, // 2 min  -  cached data shows instantly (e.g. header context) while revalidating
   })
 }
 
@@ -147,7 +147,7 @@ export function useCreateMatter() {
       // initial_matter_stage_id is a creation-time param: seeds matter_stage_state
       // but is NOT stored on matters itself. The API reads it from the body.
       initial_matter_stage_id?: string | null
-      // Fee snapshot fields — handled by the API route, not stored via MatterInsert type yet
+      // Fee snapshot fields  -  handled by the API route, not stored via MatterInsert type yet
       applicant_location?: string | null
       client_province?: string | null
       tax_rate?: number | null

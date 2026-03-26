@@ -1,5 +1,5 @@
 // ============================================================================
-// Payment Allocation Service — record and void payments (Billing Module)
+// Payment Allocation Service  -  record and void payments (Billing Module)
 // ============================================================================
 // Manages the payments table for billing.  The trg_payments_recalculate
 // trigger fires after INSERT/UPDATE/DELETE on payments and calls
@@ -13,7 +13,7 @@
 //     create a negative amount_paid (DB trigger trg_invoices_sync_payment_status
 //     re-evaluates status after recalculation).
 //   • Trust payments should also cancel the related trust allocation via
-//     trust-application.service.ts (caller responsibility — this service
+//     trust-application.service.ts (caller responsibility  -  this service
 //     handles the payments table only).
 // ============================================================================
 
@@ -164,7 +164,7 @@ export interface VoidPaymentInput {
  * Void a payment.
  *
  * Marks the payment voided_at / voided_by / void_reason and sets amount to 0
- * (soft-void pattern — the record is preserved for audit).  The
+ * (soft-void pattern  -  the record is preserved for audit).  The
  * trg_payments_recalculate trigger fires and updates invoice totals.
  *
  * If the invoice was 'paid' before the void, the trigger will demote status

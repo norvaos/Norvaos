@@ -184,7 +184,7 @@ export default function ComplianceDashboard() {
             Compliance Health Dashboard
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Directive 006 — Real-time &quot;Legal Grade&quot; system health
+            Directive 006  -  Real-time &quot;Legal Grade&quot; system health
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -390,7 +390,7 @@ export default function ComplianceDashboard() {
                 Simulate LSO Examination
               </CardTitle>
               <CardDescription>
-                Directive 026 — Run a full integrity check on every active matter and generate a Battle-Ready scorecard
+                Directive 026  -  Run a full integrity check on every active matter and generate a Battle-Ready scorecard
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -433,8 +433,8 @@ export default function ComplianceDashboard() {
                             : 'text-red-700 dark:text-red-400'
                         }`}>
                           {simulationResult.overallVerdict === 'BATTLE_READY'
-                            ? 'BATTLE-READY — All checks passed'
-                            : 'ISSUES FOUND — Review required'}
+                            ? 'BATTLE-READY  -  All checks passed'
+                            : 'ISSUES FOUND  -  Review required'}
                         </p>
                         <p className="text-sm text-muted-foreground">
                           Simulation ID: {simulationResult.simulationId.slice(0, 8)}... | {format(new Date(simulationResult.executedAt), 'PPpp')}

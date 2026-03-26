@@ -2,13 +2,13 @@
  * Tests for lib/services/deficiency-engine.ts
  *
  * Covers:
- *   validateDeficiencyCreate — required fields, min lengths, valid enum values
- *   shouldSetChronicFlag — threshold at 3
- *   hasBlockingDeficiencies — open / in_progress / reopened vs resolved / closed
- *   computeReopenTransition — counter increment, chronic trigger, timestamps
- *   computeResolveTransition — status and timestamp correctness
+ *   validateDeficiencyCreate  -  required fields, min lengths, valid enum values
+ *   shouldSetChronicFlag  -  threshold at 3
+ *   hasBlockingDeficiencies  -  open / in_progress / reopened vs resolved / closed
+ *   computeReopenTransition  -  counter increment, chronic trigger, timestamps
+ *   computeResolveTransition  -  status and timestamp correctness
  *
- * Sprint 6, Week 1 — 2026-03-17
+ * Sprint 6, Week 1  -  2026-03-17
  */
 
 import { describe, it, expect } from 'vitest'

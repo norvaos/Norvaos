@@ -1,9 +1,9 @@
 -- ═══════════════════════════════════════════════════════════════════════════════
--- Migration 178 — IRCC Submission Checklist
+-- Migration 178  -  IRCC Submission Checklist
 -- ═══════════════════════════════════════════════════════════════════════════════
 -- Tracks per-matter submission state as lawyers push data to the IRCC portal.
 -- Each row = one checklist item (form upload, fee payment, photo, etc.)
--- Status syncs globally — visible in matter shell, side-by-side engine, and reports.
+-- Status syncs globally  -  visible in matter shell, side-by-side engine, and reports.
 
 -- ── Table ────────────────────────────────────────────────────────────────────
 
@@ -72,4 +72,4 @@ CREATE TRIGGER trg_ircc_sub_checklist_updated_at
 -- These are the standard items for a TRV (Temporary Resident Visa) submission.
 -- The API will clone these into each matter when the SBS tab is first opened.
 
--- No static seed — items are created dynamically per matter based on form pack type.
+-- No static seed  -  items are created dynamically per matter based on form pack type.

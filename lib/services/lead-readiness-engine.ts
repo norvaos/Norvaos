@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Lead Readiness Engine — "Score Before You Convert"
+ * Lead Readiness Engine  -  "Score Before You Convert"
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Calls the fn_calculate_lead_readiness RPC to compute a 0-100% readiness

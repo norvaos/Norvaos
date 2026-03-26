@@ -6,10 +6,10 @@
  * through the same query layer the app uses.
  *
  * Strategy:
- *   1. Structural assertions on migration 033 — proves has_billing_view()
+ *   1. Structural assertions on migration 033  -  proves has_billing_view()
  *      exists, all 3 billing table policies reference it, and old
  *      tenant-only policies are explicitly dropped.
- *   2. Mocked query harness — calls checkBillingPermission (the server-side
+ *   2. Mocked query harness  -  calls checkBillingPermission (the server-side
  *      enforcement function) with mock Supabase clients simulating different
  *      roles. This mirrors what has_billing_view() does at the DB level.
  *
@@ -70,7 +70,7 @@ function makeMockSupabase(opts: { userExists: boolean; role: RoleData | null }) 
 
 // ── Import checkBillingPermission after mocks ───────────────────────────────
 
-// We import the actual function — it uses Supabase queries internally,
+// We import the actual function  -  it uses Supabase queries internally,
 // which we intercept via the mock factory above.
 // Note: checkBillingPermission takes a supabase client as parameter,
 // so we can pass our mock directly without vi.mock().
@@ -157,7 +157,7 @@ describe('RLS – Structural: migration 033 billing policies', () => {
 })
 
 // ═══════════════════════════════════════════════════════════════════════════
-// Section B: Mocked query harness — checkBillingPermission
+// Section B: Mocked query harness  -  checkBillingPermission
 // ═══════════════════════════════════════════════════════════════════════════
 
 describe('RLS – Mocked query harness: checkBillingPermission', () => {

@@ -1,7 +1,7 @@
 /**
  * Invoice Email Service
  * Handles sending invoice PDFs, payment receipts, and reminder emails to clients.
- * Non-blocking: all errors caught internally — never throws.
+ * Non-blocking: all errors caught internally  -  never throws.
  */
 
 import { Resend } from 'resend'
@@ -175,7 +175,7 @@ export async function sendInvoiceEmail(
     const { error: sendError } = await resend.emails.send({
       from: getFromAddress(tenant.name),
       to: [recipientEmail],
-      subject: `Invoice ${invoice.invoice_number} — ${totalFormatted} from ${tenant.name}`,
+      subject: `Invoice ${invoice.invoice_number}  -  ${totalFormatted} from ${tenant.name}`,
       html: `
         <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 600px; margin: 0 auto;">
           <h2 style="color: #1a1a1a;">Invoice ${invoice.invoice_number}</h2>
@@ -448,7 +448,7 @@ export async function sendReminderEmail(
     const { error: sendError } = await resend.emails.send({
       from: getFromAddress(tenant.name),
       to: [recipientEmail],
-      subject: `Payment Reminder — Invoice ${invoice.invoice_number} (${amountFormatted} outstanding)`,
+      subject: `Payment Reminder  -  Invoice ${invoice.invoice_number} (${amountFormatted} outstanding)`,
       html: `
         <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 600px; margin: 0 auto;">
           <h2 style="color: #1a1a1a;">Payment Reminder</h2>
@@ -461,7 +461,7 @@ export async function sendReminderEmail(
           </table>
           <p>Please arrange payment at your earliest convenience. If you have already made this payment, please disregard this notice.</p>
           <hr style="border: none; border-top: 1px solid #eee; margin: 24px 0;">
-          <p style="color: #999; font-size: 12px;">${tenant.name} — Reminder ${reminderNum}</p>
+          <p style="color: #999; font-size: 12px;">${tenant.name}  -  Reminder ${reminderNum}</p>
         </div>
       `,
       text: `Payment Reminder from ${tenant.name}\n\nInvoice ${invoice.invoice_number}\nAmount Due: ${amountFormatted}\nDue Date: ${invoice.due_date}\n\nPlease arrange payment at your earliest convenience.`,

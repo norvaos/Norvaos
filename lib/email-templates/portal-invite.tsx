@@ -47,7 +47,7 @@ export function PortalInviteEmail({
   return (
     <Html lang={locale}>
       <Head />
-      <Preview>{tr.subject} — {matterReference}</Preview>
+      <Preview>{tr.subject}  -  {matterReference}</Preview>
       <Body style={bodyStyle}>
         <Container style={containerStyle}>
           {/* Header */}
@@ -146,7 +146,7 @@ export async function renderPortalInviteEmail(
   const tr = getPortalInviteStrings(locale)
 
   const html = await render(<PortalInviteEmail {...props} />)
-  const subject = `${tr.subject} — ${props.matterReference}`
+  const subject = `${tr.subject}  -  ${props.matterReference}`
 
   const text = [
     tr.greeting(props.clientFirstName) + ',',

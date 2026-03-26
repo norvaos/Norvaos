@@ -1,5 +1,5 @@
 /**
- * GET /api/analytics/trust-compliance — Trust compliance dashboard
+ * GET /api/analytics/trust-compliance  -  Trust compliance dashboard
  */
 
 import { NextResponse } from 'next/server'

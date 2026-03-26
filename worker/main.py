@@ -1,11 +1,11 @@
 """
-NorvaOS Python Worker — FastAPI sidecar for PDF processing.
+NorvaOS Python Worker  -  FastAPI sidecar for PDF processing.
 
 Endpoints:
-  GET  /health       — Health check
-  POST /scan-xfa     — Extract XFA field data from a PDF
-  POST /fill-xfa     — Fill XFA fields in a PDF and return the filled PDF
-  POST /render-preview — Render PDF page(s) to PNG images
+  GET  /health        -  Health check
+  POST /scan-xfa      -  Extract XFA field data from a PDF
+  POST /fill-xfa      -  Fill XFA fields in a PDF and return the filled PDF
+  POST /render-preview  -  Render PDF page(s) to PNG images
 
 Authentication:
   All POST endpoints require X-Worker-Key header matching WORKER_SECRET env var.
@@ -65,7 +65,7 @@ async def auth_and_timeout_middleware(request: Request, call_next):
     if request.method == 'POST':
         worker_key = request.headers.get('X-Worker-Key', '')
         if not WORKER_SECRET:
-            logger.error('WORKER_SECRET env var not set — rejecting all requests')
+            logger.error('WORKER_SECRET env var not set  -  rejecting all requests')
             return JSONResponse(
                 status_code=500,
                 content={'error': 'Worker misconfigured: WORKER_SECRET not set'},
@@ -91,7 +91,7 @@ async def auth_and_timeout_middleware(request: Request, call_next):
         )
 
     elapsed_ms = (time.monotonic() - start) * 1000
-    logger.info('%s %s — %d (%.0fms)', request.method, request.url.path, response.status_code, elapsed_ms)
+    logger.info('%s %s  -  %d (%.0fms)', request.method, request.url.path, response.status_code, elapsed_ms)
     return response
 
 

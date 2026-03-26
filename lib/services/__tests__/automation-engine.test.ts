@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Automation Engine — Comprehensive Tests
+ * Automation Engine  -  Comprehensive Tests
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Proves:
@@ -8,11 +8,11 @@
  * - Early return on DB error, empty rules, or zero matches
  * - matchesTriggerConfig: stage_change (to/from_stage_id, to_stage_name), deadline (days_before),
  *   checklist_item_approved (category), case_type_id, matter_type_id scoping
- * - Action: create_task — idempotency skip, happy path insert, error propagation
- * - Action: create_deadline — happy path insert, error propagation
- * - Action: log_activity — happy path insert, error propagation
- * - Action: send_notification — responsible_lawyer, originating_lawyer, all, no recipients, matter not found
- * - Action: send_client_email — happy path, no primary contact, sendClientEmail throws
+ * - Action: create_task  -  idempotency skip, happy path insert, error propagation
+ * - Action: create_deadline  -  happy path insert, error propagation
+ * - Action: log_activity  -  happy path insert, error propagation
+ * - Action: send_notification  -  responsible_lawyer, originating_lawyer, all, no recipients, matter not found
+ * - Action: send_client_email  -  happy path, no primary contact, sendClientEmail throws
  * - Unsupported action type falls through to default branch
  * - Rule execution errors are caught and logged (console.error), not thrown
  */
@@ -101,7 +101,7 @@ function makeRule(overrides: Record<string, unknown> = {}) {
 const OK = { data: null, error: null }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// processAutomationTrigger — top-level flow
+// processAutomationTrigger  -  top-level flow
 // ═══════════════════════════════════════════════════════════════════════════════
 
 describe('processAutomationTrigger', () => {
@@ -201,7 +201,7 @@ describe('processAutomationTrigger', () => {
 })
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// matchesTriggerConfig — tested indirectly via processAutomationTrigger
+// matchesTriggerConfig  -  tested indirectly via processAutomationTrigger
 // ═══════════════════════════════════════════════════════════════════════════════
 
 describe('matchesTriggerConfig (via processAutomationTrigger)', () => {
@@ -387,7 +387,7 @@ describe('matchesTriggerConfig (via processAutomationTrigger)', () => {
 })
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// executeRuleActions — action: create_task
+// executeRuleActions  -  action: create_task
 // ═══════════════════════════════════════════════════════════════════════════════
 
 describe('action: create_task', () => {
@@ -497,7 +497,7 @@ describe('action: create_task', () => {
 })
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// executeRuleActions — action: create_deadline
+// executeRuleActions  -  action: create_deadline
 // ═══════════════════════════════════════════════════════════════════════════════
 
 describe('action: create_deadline', () => {
@@ -575,7 +575,7 @@ describe('action: create_deadline', () => {
 })
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// executeRuleActions — action: log_activity
+// executeRuleActions  -  action: log_activity
 // ═══════════════════════════════════════════════════════════════════════════════
 
 describe('action: log_activity', () => {
@@ -653,7 +653,7 @@ describe('action: log_activity', () => {
 })
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// executeRuleActions — action: send_notification
+// executeRuleActions  -  action: send_notification
 // ═══════════════════════════════════════════════════════════════════════════════
 
 describe('action: send_notification', () => {
@@ -844,7 +844,7 @@ describe('action: send_notification', () => {
 })
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// executeRuleActions — action: send_client_email
+// executeRuleActions  -  action: send_client_email
 // ═══════════════════════════════════════════════════════════════════════════════
 
 describe('action: send_client_email', () => {
@@ -1017,7 +1017,7 @@ describe('action: send_client_email', () => {
 })
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// executeRuleActions — unsupported action type (default branch)
+// executeRuleActions  -  unsupported action type (default branch)
 // ═══════════════════════════════════════════════════════════════════════════════
 
 describe('unsupported action type', () => {
@@ -1050,7 +1050,7 @@ describe('unsupported action type', () => {
 })
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// Multiple rules — executes all matching, skips non-matching
+// Multiple rules  -  executes all matching, skips non-matching
 // ═══════════════════════════════════════════════════════════════════════════════
 
 describe('multiple rules processing', () => {

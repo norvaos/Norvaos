@@ -88,7 +88,7 @@ interface AdvanceFailure {
   success: false
   error: string
   failedRules?: string[]
-  /** Per-condition results (including passed conditions) — for structured 422 response. */
+  /** Per-condition results (including passed conditions)  -  for structured 422 response. */
   conditions?: GateConditionResult[]
 }
 
@@ -867,7 +867,7 @@ export async function getEffectiveGatingRules(
   // to allow initial consult / intake call stage work without blocking.
   if (stageSortOrder !== undefined && stageSortOrder < 2) return []
 
-  // No explicit rules — check if matter type has enforcement enabled
+  // No explicit rules  -  check if matter type has enforcement enabled
   const { data: matter } = await supabase
     .from('matters')
     .select('matter_type_id')
@@ -1024,7 +1024,7 @@ async function notifyStageChange(
       })
     }
   } catch {
-    // Notifications are non-blocking — never fail the stage advance
+    // Notifications are non-blocking  -  never fail the stage advance
   }
 }
 
@@ -1074,7 +1074,7 @@ async function autoInitializeChecklist(
 
     await supabase.from('matter_checklist_items').insert(items)
   } catch {
-    // Non-blocking — checklist init failure shouldn't block stage advance
+    // Non-blocking  -  checklist init failure shouldn't block stage advance
   }
 }
 
@@ -1085,7 +1085,7 @@ async function autoInitializeChecklist(
  * Looks up active workflow_templates where trigger_stage_id matches,
  * then creates tasks from each template's task_template_id.
  * Uses idempotent insert to avoid duplicates if stage is revisited.
- * Non-blocking — failures never break stage advancement.
+ * Non-blocking  -  failures never break stage advancement.
  */
 async function applyStageWorkflowTemplates(
   supabase: SupabaseClient<Database>,
@@ -1130,7 +1130,7 @@ async function applyStageWorkflowTemplates(
               }
 
               // Idempotent insert via source_template_item_id unique index
-              // ON CONFLICT DO NOTHING — if task already exists for this
+              // ON CONFLICT DO NOTHING  -  if task already exists for this
               // template item + matter, the insert silently skips
               const { data: inserted } = await supabase
                 .from('tasks')
@@ -1184,7 +1184,7 @@ async function applyStageWorkflowTemplates(
             dueDate.setDate(dueDate.getDate() + (binding.days_offset ?? 0))
 
             // Idempotent insert via (matter_id, deadline_type_id) WHERE auto_generated=TRUE
-            // ON CONFLICT DO NOTHING — if deadline already exists, silently skip
+            // ON CONFLICT DO NOTHING  -  if deadline already exists, silently skip
             const { data: inserted } = await supabase
               .from('matter_deadlines')
               .insert({
@@ -1236,7 +1236,7 @@ async function applyStageWorkflowTemplates(
       }
     }
   } catch (err) {
-    // Non-blocking — workflow auto-creation failure must never break stage advance
+    // Non-blocking  -  workflow auto-creation failure must never break stage advance
     console.error('[stage-engine] applyStageWorkflowTemplates failed:', err)
   }
 }

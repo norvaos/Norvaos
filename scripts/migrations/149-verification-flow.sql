@@ -1,5 +1,5 @@
 -- ═══════════════════════════════════════════════════════════════════════════════
--- Migration 149: Verification Flow — Field & Document Locking
+-- Migration 149: Verification Flow  -  Field & Document Locking
 --
 -- Adds verification_status + rejection_reason to field_verifications and
 -- document_slots so lawyers can verify or reject individual fields/documents.
@@ -40,7 +40,7 @@ CREATE INDEX IF NOT EXISTS idx_document_slots_verification
   WHERE verification_status IS NOT NULL;
 
 -- ── Add new activity types for the verification flow ─────────────────────────
--- (activity_type is a VARCHAR(30), no enum constraint — just documenting)
+-- (activity_type is a VARCHAR(30), no enum constraint  -  just documenting)
 -- New types: field_verified, field_rejected, document_verified, document_rejected
 
 COMMIT;

@@ -76,7 +76,7 @@ export function MoveFormDialog({
   const handleMoveClick = async (targetId: string, targetName: string) => {
     if (!form || !streamFormId || moving) return
 
-    // Check impact — count active matters using this template
+    // Check impact  -  count active matters using this template
     try {
       const result = await checkImpact.mutateAsync({ templateId: streamFormId })
       if (result.activeMatterCount > 0) {
@@ -135,7 +135,7 @@ export function MoveFormDialog({
                   </p>
                   <p className="text-sm text-amber-700">
                     This form template is used by <strong>{impactCount}</strong> active matter{impactCount !== 1 ? 's' : ''}.
-                    Existing matters are unaffected — only new matters created after this change will use the updated assignment.
+                    Existing matters are unaffected  -  only new matters created after this change will use the updated assignment.
                   </p>
                 </div>
               </div>

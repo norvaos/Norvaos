@@ -72,7 +72,7 @@ export function useVitalityData(matterId: string) {
       ? Math.round(readiness.domains.reduce((sum, d) => sum + d.weighted, 0))
       : score
 
-    // Domain breakdown — ReadinessDomain has: name, score, weight, weighted, detail
+    // Domain breakdown  -  ReadinessDomain has: name, score, weight, weighted, detail
     const domains = readiness?.domains?.map(d => ({
       key: d.name,
       label: d.name,
@@ -203,7 +203,7 @@ export function useVitalityData(matterId: string) {
       currentStageId,
       currentStageName: currentIdx >= 0 ? sortedStages[currentIdx]?.name ?? null : null,
       stageEnteredAt,
-      timeInStage: stageEnteredAt ? formatDuration(stageEnteredAt) : '—',
+      timeInStage: stageEnteredAt ? formatDuration(stageEnteredAt) : ' - ',
       stages: sortedStages,
       pipelineProgress,
       recentTransitions: [],

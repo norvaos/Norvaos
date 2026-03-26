@@ -38,7 +38,7 @@ async function main() {
   }
 
   if (!forms || forms.length === 0) {
-    console.log('No forms in DB — seed has NOT been run')
+    console.log('No forms in DB  -  seed has NOT been run')
     return
   }
 

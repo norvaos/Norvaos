@@ -30,7 +30,7 @@ BEGIN
     EXECUTE format('ALTER TABLE front_desk_events DROP CONSTRAINT %I', v_constraint);
     RAISE NOTICE '[135] Dropped constraint: %', v_constraint;
   ELSE
-    RAISE NOTICE '[135] No event_type CHECK constraint found — skipping drop.';
+    RAISE NOTICE '[135] No event_type CHECK constraint found  -  skipping drop.';
   END IF;
 END $$;
 

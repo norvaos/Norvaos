@@ -115,7 +115,7 @@ export function ReopenLeadDialog({
             />
           </div>
 
-          {/* Task strategy — button group */}
+          {/* Task strategy  -  button group */}
           <div className="space-y-2">
             <Label className="text-xs">Task Strategy</Label>
             <div className="space-y-1.5">

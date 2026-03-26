@@ -72,7 +72,7 @@ export function useCheckinRealtime(
         .subscribe()
     } catch (err) {
       // WebSocket may fail in insecure contexts (e.g. HTTP in dev).
-      // Degrade gracefully — check-in events still arrive via polling.
+      // Degrade gracefully  -  check-in events still arrive via polling.
       console.warn('[useCheckinRealtime] Subscription failed:', err)
     }
 

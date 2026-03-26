@@ -1,17 +1,17 @@
 'use client'
 
 /**
- * Retainer Generation — 4-Gate Pre-check Service
+ * Retainer Generation  -  4-Gate Pre-check Service
  *
  * Evaluates four prerequisite gates before allowing the retainer generation
  * modal to open. All gates are checked in parallel and the result is returned
  * as a structured object so the UI can surface specific failures.
  *
  * Gates:
- *   1. Conflict clear     — no open conflict_scans with score > 0 for contacts on this matter
- *   2. Matter type set    — matter.matter_type_id is not null
- *   3. Billing structure  — matter.billing_type is not null
- *   4. Lawyer assigned    — matter.responsible_lawyer_id is not null
+ *   1. Conflict clear      -  no open conflict_scans with score > 0 for contacts on this matter
+ *   2. Matter type set     -  matter.matter_type_id is not null
+ *   3. Billing structure   -  matter.billing_type is not null
+ *   4. Lawyer assigned     -  matter.responsible_lawyer_id is not null
  */
 
 import type { SupabaseClient } from '@supabase/supabase-js'
@@ -74,7 +74,7 @@ export async function checkRetainerGates(
     }
   }
 
-  // ── 2. Gate 1 — Conflict check ────────────────────────────────────────────
+  // ── 2. Gate 1  -  Conflict check ────────────────────────────────────────────
   // Check for open conflict_scans with score > 0 linked to contacts on this matter.
   // We check matter_contacts join to conflict_scans.
   const conflictGatePromise = (async (): Promise<RetainerGate> => {
@@ -88,7 +88,7 @@ export async function checkRetainerGates(
       const contactIds = (matterContacts ?? []).map(mc => mc.contact_id).filter(Boolean) as string[]
 
       if (contactIds.length === 0) {
-        // No contacts linked — treat as passed (no conflicts possible)
+        // No contacts linked  -  treat as passed (no conflicts possible)
         return makePassedGate(GATE_CONFLICT, 'Conflict Clear')
       }
 
@@ -101,7 +101,7 @@ export async function checkRetainerGates(
         .limit(1)
 
       if (conflictErr) {
-        // Soft fail — let it through if the table doesn't exist yet
+        // Soft fail  -  let it through if the table doesn't exist yet
         return makePassedGate(GATE_CONFLICT, 'Conflict Clear')
       }
 
@@ -130,7 +130,7 @@ export async function checkRetainerGates(
     }
   })()
 
-  // ── 3. Gate 2 — Matter type set ───────────────────────────────────────────
+  // ── 3. Gate 2  -  Matter type set ───────────────────────────────────────────
   const matterTypeGate: RetainerGate = matter.matter_type_id
     ? makePassedGate(GATE_MTYPE, 'Matter Type Set')
     : makeFailedGate(GATE_MTYPE, 'Matter Type Set', {
@@ -147,7 +147,7 @@ export async function checkRetainerGates(
         }],
       })
 
-  // ── 4. Gate 3 — Billing structure ─────────────────────────────────────────
+  // ── 4. Gate 3  -  Billing structure ─────────────────────────────────────────
   const billingGate: RetainerGate = matter.billing_type
     ? makePassedGate(GATE_BILLING, 'Billing Structure Confirmed')
     : makeFailedGate(GATE_BILLING, 'Billing Structure Confirmed', {
@@ -164,7 +164,7 @@ export async function checkRetainerGates(
         }],
       })
 
-  // ── 5. Gate 4 — Lawyer assigned ───────────────────────────────────────────
+  // ── 5. Gate 4  -  Lawyer assigned ───────────────────────────────────────────
   const lawyerGate: RetainerGate = matter.responsible_lawyer_id
     ? makePassedGate(GATE_LAWYER, 'Lawyer Assigned')
     : makeFailedGate(GATE_LAWYER, 'Lawyer Assigned', {

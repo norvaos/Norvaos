@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * DB-Driven XFA Form Filler — Server Only
+ * DB-Driven XFA Form Filler  -  Server Only
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * This file contains the server-only code for filling XFA PDFs via the
@@ -54,12 +54,12 @@ function resolveMetaFieldValue(
     case '__rep_d_given_name':
       return representativeName ? repGiven : null
 
-    // Phone type indicator — "1" means international/other (non-NA number)
+    // Phone type indicator  -  "1" means international/other (non-NA number)
     // Used to activate the ActualNumber display path in IRCC XFA forms
     case '__phone_intl_flag':
       return '1'
 
-    // Consent checkbox — always "1" (agreed) on a generated form
+    // Consent checkbox  -  always "1" (agreed) on a generated form
     case '__consent_yes':
       return '1'
 
@@ -158,7 +158,7 @@ export async function fillXFAFormFromDB(
       { timeoutMs: 30_000 },
     )
 
-    // Note: barcode embedding is handled inside the worker — if barcodeData was
+    // Note: barcode embedding is handled inside the worker  -  if barcodeData was
     // provided, the worker will attempt to embed it. We assume success unless
     // the worker throws.
     const barcodeEmbedded = !!barcodeData

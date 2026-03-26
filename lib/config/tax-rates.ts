@@ -2,7 +2,7 @@
  * Canadian tax rates for legal services.
  *
  * Notes:
- * - PST/RST does NOT apply to legal services in BC, SK, or MB — only GST.
+ * - PST/RST does NOT apply to legal services in BC, SK, or MB  -  only GST.
  * - Quebec charges GST + QST (combined 14.975%).
  * - Nova Scotia HST changed to 14% effective 1 April 2025.
  * - Government fees (e.g. IRCC filing fees) are always tax-exempt.
@@ -46,7 +46,7 @@ export const PROVINCE_OPTIONS = Object.entries(CANADIAN_TAX_RATES)
   .sort((a, b) => a.name.localeCompare(b.name))
 
 /**
- * Place of Supply Tax Resolution — Excise Tax Act, Part IX
+ * Place of Supply Tax Resolution  -  Excise Tax Act, Part IX
  *
  * For legal services, tax is based on the client's province of residence
  * (place of supply), NOT the firm's location. This function resolves the

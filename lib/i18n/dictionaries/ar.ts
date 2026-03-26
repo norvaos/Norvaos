@@ -1,5 +1,5 @@
 /**
- * العربية (ar) — Arabic dictionary.
+ * العربية (ar)  -  Arabic dictionary.
  * RTL-aware. For Arabic-speaking clients (Middle East, North Africa).
  */
 
@@ -69,7 +69,7 @@ export const ar: Partial<Record<DictionaryKey, string>> = {
   'dashboard.deadline_today': 'Today',
   'dashboard.deadline_1_day': '1 day',
   'dashboard.deadline_days': '{days} days',
-  'dashboard.deadlines_14_days': 'Deadlines — Next 14 Days',
+  'dashboard.deadlines_14_days': 'Deadlines  -  Next 14 Days',
   'dashboard.no_deadlines_14': 'No deadlines in the next 14 days',
   'dashboard.no_deadlines_14_desc': 'Typed deadlines on matters will appear here.',
   'dashboard.unknown_matter': 'Unknown matter',
@@ -98,12 +98,12 @@ export const ar: Partial<Record<DictionaryKey, string>> = {
   'common.save': 'حفظ',
   'common.view': 'عرض',
 
-  // ── التوجيه 41.0 — تسميات الهوية والخزنة ──────────────────────────────
+  // ── التوجيه 41.0  -  تسميات الهوية والخزنة ──────────────────────────────
   'contact.badge.retained_client': 'موكل محتفظ به',
   'contact.badge.prospective_lead': 'عميل محتمل',
   'contact.badge.contact': 'جهة اتصال',
   'contact.command_centre': 'مركز القيادة',
-  'contact.command_centre_red_alert': 'درجة الجاهزية منخفضة للغاية — يلزم اهتمام فوري',
+  'contact.command_centre_red_alert': 'درجة الجاهزية منخفضة للغاية  -  يلزم اهتمام فوري',
   'contact.intake_funnel': 'قمع القبول',
   'contact.intake_progress': 'تقدم القبول',
   'contact.matter_readiness': 'جاهزية القضية',
@@ -116,13 +116,13 @@ export const ar: Partial<Record<DictionaryKey, string>> = {
   'vault.title': 'خزنة نورفا',
   'vault.empty': 'خزنة نورفا فارغة',
   'vault.empty_description': 'لم يتم تحميل أي مستندات لجهة الاتصال هذه.',
-  'vault.sentinel_eye': 'عين الحارس — عرض والتحقق',
+  'vault.sentinel_eye': 'عين الحارس  -  عرض والتحقق',
   'vault.file_tampered': 'تحذير: تم التلاعب بالملف',
   'vault.sha256_verified': 'تم التحقق بـ SHA-256',
   'vault.hash_pending': 'التجزئة معلقة',
   'vault.integrity_alert': 'تنبيه السلامة',
   'vault.untracked': 'غير متتبع',
-  'vault.no_preview': 'المعاينة غير متاحة — عنوان الملف مفقود',
+  'vault.no_preview': 'المعاينة غير متاحة  -  عنوان الملف مفقود',
 
   'legal.retainer_title': 'اتفاقية التوكيل القانوني',
   'legal.retainer_intro': 'تحدد هذه الاتفاقية شروط الخدمات القانونية المقدمة.',
@@ -207,12 +207,12 @@ export const ar: Partial<Record<DictionaryKey, string>> = {
   'status.days_remaining': '{days} يوم متبقي',
   'status.verified': 'تم التحقق',
   'status.expiry_label': 'تاريخ الانتهاء',
-  'status.sentinel_tamper_title': 'تنبيه الحارس — تم اكتشاف تلاعب',
+  'status.sentinel_tamper_title': 'تنبيه الحارس  -  تم اكتشاف تلاعب',
   'status.sentinel_tamper_body': 'عدم تطابق في تجزئة المستند. تم تعديل هذا المستند خارج نظام نوروا.',
-  'status.vault_verified_title': 'خزنة نوروا — تم التحقق من السلامة',
+  'status.vault_verified_title': 'خزنة نوروا  -  تم التحقق من السلامة',
   'status.vault_verified_body': 'هذا المستند مقفل بالتجزئة في خزنة نوروا. سيتم اكتشاف أي تلاعب.',
 
-  // ── Leads Command Centre (Directive 40.0 — Sovereign Layer) ─────────────
+  // ── Leads Command Centre (Directive 40.0  -  Sovereign Layer) ─────────────
   'leads.title': 'العملاء المحتملون',
   'leads.add_lead': 'إضافة عميل محتمل',
   'leads.import': 'استيراد',
@@ -335,7 +335,7 @@ export const ar: Partial<Record<DictionaryKey, string>> = {
   'form.notes_placeholder': 'Add any additional notes about this contact...',
   'form.create_contact': 'Create Contact',
   'form.save_changes': 'Save Changes',
-  'form.review_required_ocr': 'Review Required — OCR could not extract',
+  'form.review_required_ocr': 'Review Required  -  OCR could not extract',
   'form.section_basic_info': 'Basic Information',
   'form.section_contact_details': 'Contact Details',
   'form.section_address': 'Address',

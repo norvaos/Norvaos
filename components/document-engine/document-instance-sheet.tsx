@@ -245,7 +245,7 @@ export function DocumentInstanceSheet({
                       <div key={e.id as string} className="text-xs text-muted-foreground border-l-2 border-gray-200 pl-3 py-1">
                         <span className="font-medium text-foreground">{e.event_type as string}</span>
                         {Boolean(e.from_status) && Boolean(e.to_status) && (
-                          <span> — {e.from_status as string} → {e.to_status as string}</span>
+                          <span>  -  {e.from_status as string} → {e.to_status as string}</span>
                         )}
                         <br />
                         <span>{new Date(e.performed_at as string).toLocaleString()}</span>

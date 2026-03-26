@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Document Extractor Precision Benchmarking — Directive 009
+ * Document Extractor Precision Benchmarking  -  Directive 009
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Tests field extraction accuracy for the regex-based document extractor
@@ -193,7 +193,7 @@ const EXTRACTOR_GROUND_TRUTH: ExtractorGroundTruth[] = [
 
   // ── IRCC Decision Letter ────────────────────────────────────────────────
   {
-    label: 'IRCC Decision — Approved',
+    label: 'IRCC Decision  -  Approved',
     ocrText: [
       'Immigration, Refugees and Citizenship Canada',
       'IRCC Decision',
@@ -240,7 +240,7 @@ const EXTRACTOR_GROUND_TRUTH: ExtractorGroundTruth[] = [
     },
   },
 
-  // ── Tax Document — T4 ──────────────────────────────────────────────────
+  // ── Tax Document  -  T4 ──────────────────────────────────────────────────
   {
     label: 'T4 Tax Slip',
     ocrText: [
@@ -375,7 +375,7 @@ function compareExtractedFields(
 
 // ─── Tests ──────────────────────────────────────────────────────────────────
 
-describe('Directive 009 — Document Extractor Precision Benchmark', () => {
+describe('Directive 009  -  Document Extractor Precision Benchmark', () => {
   // ── Document Type Detection ───────────────────────────────────────────
 
   describe('Document Type Detection', () => {
@@ -438,7 +438,7 @@ describe('Directive 009 — Document Extractor Precision Benchmark', () => {
       const metrics = calculateExtractionMetrics(allResults)
 
       console.log('\n╔══════════════════════════════════════════════════════════╗')
-      console.log('║  Document Extractor — Aggregate Metrics (regex-only)     ║')
+      console.log('║  Document Extractor  -  Aggregate Metrics (regex-only)     ║')
       console.log('╠══════════════════════════════════════════════════════════╣')
       console.log(`║  Total fields:        ${metrics.totalFields}`)
       console.log(`║  Correct:             ${metrics.correctFields}`)
@@ -539,7 +539,7 @@ describe('Directive 009 — Document Extractor Precision Benchmark', () => {
   describe('Detailed Extraction Report', () => {
     it('should log a per-document extraction report', () => {
       console.log('\n┌─────────────────────────────────────────────────────────────────┐')
-      console.log('│  Document Extractor — Per-Document Report                        │')
+      console.log('│  Document Extractor  -  Per-Document Report                        │')
       console.log('├──────────────────────────────┬──────────────┬──────────┬─────────┤')
       console.log('│  Document                    │  Detected    │  Fields  │  Conf   │')
       console.log('├──────────────────────────────┼──────────────┼──────────┼─────────┤')

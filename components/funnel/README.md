@@ -1,10 +1,10 @@
-# IRCC Forms Funnel — Architecture & Form Library
+# IRCC Forms Funnel  -  Architecture & Form Library
 
 ## Overview
 
 The Split-Pane Funnel renders IRCC immigration forms in a two-column workspace:
-- **Left pane**: `IntakePanel` — accordion-based questionnaire with section progress
-- **Right pane**: `LivePdfPreview` — real-time PDF preview synced to intake data
+- **Left pane**: `IntakePanel`  -  accordion-based questionnaire with section progress
+- **Right pane**: `LivePdfPreview`  -  real-time PDF preview synced to intake data
 
 Data flows from the IntakePanel through `useStreamForms` into the LivePdfPreview. When the user edits a field, the React form state is flattened into a JSON payload and sent to the Python XFA sidecar (`worker/services/xfa_filler.py`) for PDF generation.
 

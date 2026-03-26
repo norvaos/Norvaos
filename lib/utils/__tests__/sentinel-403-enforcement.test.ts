@@ -13,12 +13,49 @@ import { makeMockSupabase, type TableOverrides } from './helpers/supabase-mock'
 
 // ── Mocks ──────────────────────────────────────────────────────────────────
 
-// Mock the admin client — tenant-guard.ts calls createAdminClient() internally
+// Mock the region guard to prevent CriticalComplianceError at module load
+vi.mock('@/lib/supabase/region-guard', () => ({
+  enforceRegionCompliance: vi.fn(),
+  CriticalComplianceError: class CriticalComplianceError extends Error {
+    constructor(msg: string) { super(msg); this.name = 'CriticalComplianceError' }
+  },
+}))
+
+// Mock the Supabase server client (imported by auth.ts)
+vi.mock('@/lib/supabase/server', () => ({
+  createServerSupabaseClient: vi.fn(),
+  createClient: vi.fn(),
+}))
+
+// Mock next/headers (imported by auth.ts)
+vi.mock('next/headers', () => ({
+  cookies: vi.fn().mockResolvedValue({ get: vi.fn(), set: vi.fn(), getAll: vi.fn().mockReturnValue([]) }),
+}))
+
+// Mock cache service (imported by auth.ts)
+vi.mock('@/lib/services/cache', () => ({
+  getJson: vi.fn().mockResolvedValue(null),
+  setJson: vi.fn().mockResolvedValue(undefined),
+  cacheKey: vi.fn((...args: string[]) => args.join(':')),
+}))
+
+// Mock request-timing (imported by auth.ts)
+vi.mock('@/lib/middleware/request-timing', () => ({
+  incrementDbCalls: vi.fn(),
+}))
+
+// Mock error-reporter (imported by sentinel-api-guard.ts)
+vi.mock('@/lib/monitoring/error-reporter', () => ({
+  reportRLSViolation: vi.fn(),
+  reportError: vi.fn(),
+}))
+
+// Mock the admin client  -  tenant-guard.ts calls createAdminClient() internally
 vi.mock('@/lib/supabase/admin', () => ({
   createAdminClient: vi.fn(),
 }))
 
-// Mock sentinel audit logger — sentinel-api-guard.ts calls logSentinelEvent
+// Mock sentinel audit logger  -  sentinel-api-guard.ts calls logSentinelEvent
 vi.mock('@/lib/services/sentinel-audit', () => ({
   logSentinelEvent: vi.fn().mockResolvedValue(undefined),
 }))
@@ -189,7 +226,7 @@ describe('SENTINEL – fetchWithTenantGuard', () => {
   })
 
   it('throws 403 TenantViolationError when record belongs to different tenant', async () => {
-    // Record exists but belongs to TENANT_B — need rpc stub for audit log
+    // Record exists but belongs to TENANT_B  -  need rpc stub for audit log
     const baseMock = makeMockSupabase({
       matters: {
         single: {

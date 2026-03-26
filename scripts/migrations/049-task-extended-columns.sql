@@ -4,27 +4,27 @@
 
 BEGIN;
 
--- 1. task_type — classifies the kind of work (call, review, follow_up, etc.)
+-- 1. task_type  -  classifies the kind of work (call, review, follow_up, etc.)
 ALTER TABLE tasks
   ADD COLUMN IF NOT EXISTS task_type text NOT NULL DEFAULT 'other';
 
--- 2. category — client_facing / internal / administrative
+-- 2. category  -  client_facing / internal / administrative
 ALTER TABLE tasks
   ADD COLUMN IF NOT EXISTS category text NOT NULL DEFAULT 'internal';
 
--- 3. is_billable — whether the task counts toward billing
+-- 3. is_billable  -  whether the task counts toward billing
 ALTER TABLE tasks
   ADD COLUMN IF NOT EXISTS is_billable boolean NOT NULL DEFAULT false;
 
--- 4. visibility — who can see the task (everyone / assigned_only / team)
+-- 4. visibility  -  who can see the task (everyone / assigned_only / team)
 ALTER TABLE tasks
   ADD COLUMN IF NOT EXISTS visibility text NOT NULL DEFAULT 'everyone';
 
--- 5. reminder_date — optional date to trigger a reminder
+-- 5. reminder_date  -  optional date to trigger a reminder
 ALTER TABLE tasks
   ADD COLUMN IF NOT EXISTS reminder_date date;
 
--- 6. completion_note — optional note added when task is completed
+-- 6. completion_note  -  optional note added when task is completed
 ALTER TABLE tasks
   ADD COLUMN IF NOT EXISTS completion_note text;
 

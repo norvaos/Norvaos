@@ -1,16 +1,16 @@
 -- ============================================================================
--- Migration 023: Universal Enforcement Engine — Phase A
+-- Migration 023: Universal Enforcement Engine  -  Phase A
 -- Core Data Card + Risk Index + Matter People
 -- ============================================================================
 -- This migration establishes the foundation layer of the UEE:
---   1. matter_intake  — Core Data Card with strategic variables + risk scoring
---   2. matter_people  — Full structured people model per matter
+--   1. matter_intake   -  Core Data Card with strategic variables + risk scoring
+--   2. matter_people   -  Full structured people model per matter
 --   3. Denormalized columns on matters for list-view queries
 --   4. Enforcement flag on matter_types
 --   5. Sync trigger to keep denormalized data consistent
 -- ============================================================================
 
--- ─── 1. ALTER matter_types — add enforcement flag ────────────────────────────
+-- ─── 1. ALTER matter_types  -  add enforcement flag ────────────────────────────
 
 ALTER TABLE matter_types
   ADD COLUMN IF NOT EXISTS enforcement_enabled BOOLEAN NOT NULL DEFAULT true;
@@ -18,7 +18,7 @@ ALTER TABLE matter_types
 COMMENT ON COLUMN matter_types.enforcement_enabled IS
   'When true, the UEE validates intake completion, risk scoring, and stage gating for matters of this type.';
 
--- ─── 2. ALTER matters — add denormalized intake_status + risk_level ──────────
+-- ─── 2. ALTER matters  -  add denormalized intake_status + risk_level ──────────
 
 ALTER TABLE matters
   ADD COLUMN IF NOT EXISTS intake_status TEXT NOT NULL DEFAULT 'not_applicable',

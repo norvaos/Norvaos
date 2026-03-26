@@ -20,7 +20,7 @@
 -- Strategy: UPDATE existing rows (preserves IDs → preserves
 -- lead.stage_id FK references).  INSERT only the new
 -- "Follow-Up Active" stage.
--- Safe to re-run — all operations are idempotent.
+-- Safe to re-run  -  all operations are idempotent.
 -- ============================================================
 
 DO $$
@@ -35,13 +35,13 @@ BEGIN
    LIMIT 1;
 
   IF v_pip_id IS NULL THEN
-    RAISE NOTICE '[143] No "Core Intake & Retainer Pipeline" found — skipping.';
+    RAISE NOTICE '[143] No "Core Intake & Retainer Pipeline" found  -  skipping.';
     RETURN;
   END IF;
 
   RAISE NOTICE '[143] Rebuilding stages for pipeline % (tenant %)', v_pip_id, v_tenant_id;
 
-  -- ── 1. New Inquiry — keep name, update values ─────────────
+  -- ── 1. New Inquiry  -  keep name, update values ─────────────
   UPDATE pipeline_stages SET
     sort_order      = 1,
     win_probability = 5,
@@ -49,7 +49,7 @@ BEGIN
     rotting_days    = 1,
     is_win_stage    = false,
     is_lost_stage   = false,
-    description     = 'A new enquiry has arrived and has not yet been contacted. Assign immediately — leads go cold within hours.'
+    description     = 'A new enquiry has arrived and has not yet been contacted. Assign immediately  -  leads go cold within hours.'
   WHERE pipeline_id = v_pip_id AND name = 'New Inquiry';
 
   -- ── 2. Contact Attempted → Contacted ────────────────────
@@ -89,7 +89,7 @@ BEGIN
   WHERE pipeline_id = v_pip_id AND name = 'Consultation Booked';
 
   -- ── 5. Consultation Completed → Appointment Completed ───
-  -- (may have a leading space — use TRIM or LIKE)
+  -- (may have a leading space  -  use TRIM or LIKE)
   UPDATE pipeline_stages SET
     name            = 'Appointment Completed',
     sort_order      = 5,
@@ -101,7 +101,7 @@ BEGIN
     description     = 'Consultation completed. Lawyer assessing eligibility and preparing retainer proposal. Record outcome in Command Centre.'
   WHERE pipeline_id = v_pip_id AND TRIM(name) = 'Consultation Completed';
 
-  -- ── 6. Retainer Sent — fix leading space, update values ──
+  -- ── 6. Retainer Sent  -  fix leading space, update values ──
   UPDATE pipeline_stages SET
     name            = 'Retainer Sent',
     sort_order      = 6,
@@ -118,7 +118,7 @@ BEGIN
     (tenant_id, pipeline_id, name, sort_order, win_probability, color, rotting_days, is_win_stage, is_lost_stage, description)
   VALUES
     (v_tenant_id, v_pip_id, 'Follow-Up Active', 7, 42, '#eab308', 7, false, false,
-     'Client is considering — has questions or needs more time. Maintain warm contact. Schedule a follow-up call within 5 days.')
+     'Client is considering  -  has questions or needs more time. Maintain warm contact. Schedule a follow-up call within 5 days.')
   ON CONFLICT DO NOTHING;
 
   -- If already exists with different values, update it
@@ -129,10 +129,10 @@ BEGIN
     rotting_days    = 7,
     is_win_stage    = false,
     is_lost_stage   = false,
-    description     = 'Client is considering — has questions or needs more time. Maintain warm contact. Schedule a follow-up call within 5 days.'
+    description     = 'Client is considering  -  has questions or needs more time. Maintain warm contact. Schedule a follow-up call within 5 days.'
   WHERE pipeline_id = v_pip_id AND name = 'Follow-Up Active';
 
-  -- ── 8. Retainer Signed – Payment Pending — fix space/sort ─
+  -- ── 8. Retainer Signed – Payment Pending  -  fix space/sort ─
   UPDATE pipeline_stages SET
     name            = 'Retainer Signed – Payment Pending',
     sort_order      = 8,
@@ -141,7 +141,7 @@ BEGIN
     rotting_days    = 3,
     is_win_stage    = false,
     is_lost_stage   = false,
-    description     = 'Retainer signed but payment not received. Collect immediately — do not begin legal work until payment confirmed.'
+    description     = 'Retainer signed but payment not received. Collect immediately  -  do not begin legal work until payment confirmed.'
   WHERE pipeline_id = v_pip_id AND TRIM(name) = 'Retainer Signed – Payment Pending';
 
   -- ── 9. Retained – Active Matter ─────────────────────────
@@ -152,10 +152,10 @@ BEGIN
     rotting_days    = NULL,
     is_win_stage    = true,
     is_lost_stage   = false,
-    description     = 'Client fully retained — retainer signed AND payment received. Lead auto-converts to an active matter. Legal work may begin.'
+    description     = 'Client fully retained  -  retainer signed AND payment received. Lead auto-converts to an active matter. Legal work may begin.'
   WHERE pipeline_id = v_pip_id AND name = 'Retained – Active Matter';
 
-  -- ── 10-13. Closed (lost) stages — update sort orders ─────
+  -- ── 10-13. Closed (lost) stages  -  update sort orders ─────
   UPDATE pipeline_stages SET sort_order = 10, win_probability = 0, color = '#9ca3af',
     is_win_stage = false, is_lost_stage = true, rotting_days = NULL,
     description = 'Client became unresponsive. After 3 unanswered attempts across 2 channels, close as no response.'

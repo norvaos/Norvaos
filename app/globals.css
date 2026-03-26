@@ -187,7 +187,7 @@
   50% { opacity: 0.8; transform: scale(1.05); }
 }
 
-/* ── Red-35 Pulse — Directive 41.2 Conflict Alert ─────────────────────────── */
+/* ── Red-35 Pulse  -  Directive 41.2 Conflict Alert ─────────────────────────── */
 @keyframes pulse-red-35 {
   0%, 100% { opacity: 0.35; box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
   50% { opacity: 1; box-shadow: 0 0 12px 4px rgba(239, 68, 68, 0.25); }
@@ -201,7 +201,7 @@
  * Directive 016: "Emerald Flow" Dashboard Animations
  * ═══════════════════════════════════════════════════════════════════════════ */
 
-/* ── Emerald Pulse — Readiness < 35% critical heartbeat ──────────────────── */
+/* ── Emerald Pulse  -  Readiness < 35% critical heartbeat ──────────────────── */
 @keyframes emerald-pulse-critical {
   0%, 100% {
     box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.25), 0 0 0 0 rgba(239, 68, 68, 0.15);
@@ -217,13 +217,13 @@
   animation: emerald-pulse-critical 2s ease-in-out infinite;
 }
 
-/* ── Emerald Glow — Readiness Ring at 100% shield compliance ─────────────── */
+/* ── Emerald Glow  -  Readiness Ring at 100% shield compliance ─────────────── */
 @keyframes emerald-glow {
   0%, 100% { opacity: 0.5; transform: scale(1); }
   50% { opacity: 1; transform: scale(1.08); }
 }
 
-/* ── Sovereign Sparkle — Chain-Lock dissolve on genesis block ─────────────── */
+/* ── Sovereign Sparkle  -  Chain-Lock dissolve on genesis block ─────────────── */
 @keyframes sovereign-sparkle {
   0% { opacity: 0; transform: scale(0.3) rotate(-30deg); filter: blur(4px); }
   40% { opacity: 1; transform: scale(1.15) rotate(5deg); filter: blur(0); }
@@ -245,7 +245,7 @@
   animation: chain-lock-dissolve 0.5s ease-out forwards;
 }
 
-/* ── Directive 020: Sovereign Pulse Amber — Firm-Level Risk Indicator ─────── */
+/* ── Directive 020: Sovereign Pulse Amber  -  Firm-Level Risk Indicator ─────── */
 
 @keyframes sovereign-pulse-amber {
   0%, 100% {
@@ -285,7 +285,7 @@
   animation: sovereign-pulse-red 1.8s ease-in-out infinite;
 }
 
-/* ── Directive 029: Sovereign Certified — Gold Sparkle Avatar Border ────── */
+/* ── Directive 029: Sovereign Certified  -  Gold Sparkle Avatar Border ────── */
 
 @keyframes gold-sparkle-border {
   0%, 100% {
@@ -313,7 +313,7 @@
   animation: gold-sparkle-border 3s ease-in-out infinite;
 }
 
-/* ── IRON-CANVAS: Directive 25.0 — Layout Drift Prevention ───────────────── */
+/* ── IRON-CANVAS: Directive 25.0  -  Layout Drift Prevention ───────────────── */
 
 /*
  * 1. Recursive-RTL Cascade
@@ -370,7 +370,7 @@ html[dir="rtl"] [data-intake-portal] {
   cursor: help;
 }
 
-/* Badge overflow guard — prevent badges from breaking layout */
+/* Badge overflow guard  -  prevent badges from breaking layout */
 html[dir="rtl"] [class*="Badge"],
 html[dir="rtl"] [data-slot="badge"] {
   direction: inherit;
@@ -378,7 +378,7 @@ html[dir="rtl"] [data-slot="badge"] {
 }
 
 /*
- * 2b. Nastaliq Script Containment — Directive 25.0 + 32.0 Stress-Test
+ * 2b. Nastaliq Script Containment  -  Directive 25.0 + 32.0 Stress-Test
  * Urdu Nastaliq / Farsi Naskh have ~2.0 line-height vs Latin 1.5.
  * Without explicit height caps, Nastaliq pushes Action Trident off-screen.
  * Zero-overflow guarantee on mobile viewports for all 15 languages.
@@ -437,7 +437,7 @@ canvas[data-signature-pad] {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
- * Nastaliq & Arabic Script — Sovereign Cutover (Team VELOCITY)
+ * Nastaliq & Arabic Script  -  Sovereign Cutover (Team VELOCITY)
  *
  * Noto Nastaliq Urdu: loaded from Google Fonts CDN in layout.tsx
  * Noto Sans Arabic: loaded alongside for Arabic/Farsi
@@ -465,12 +465,12 @@ canvas[data-signature-pad] {
   line-height: 1.8;
 }
 
-/* RTL container rules — ensure correct reading direction */
+/* RTL container rules  -  ensure correct reading direction */
 [dir="rtl"] {
   text-align: right;
 }
 
-/* Fact-Anchor source text — uses locale-specific font */
+/* Fact-Anchor source text  -  uses locale-specific font */
 .fact-anchor-source[data-locale="ur"] {
   font-family: 'Noto Nastaliq Urdu', 'Jameel Noori Nastaleeq', serif;
   line-height: 2.2;
@@ -484,7 +484,7 @@ canvas[data-signature-pad] {
   font-size: 1.05em;
 }
 
-/* Hindi / Bengali / Punjabi — system fallbacks (well-supported) */
+/* Hindi / Bengali / Punjabi  -  system fallbacks (well-supported) */
 [lang="hi"],
 [lang="bn"],
 [lang="pa"],
@@ -495,14 +495,14 @@ canvas[data-signature-pad] {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
- * IRON-CANVAS: Directive 36.1 — GPU-Accelerated Shadows
+ * IRON-CANVAS: Directive 36.1  -  GPU-Accelerated Shadows
  *
  * All dropdowns, inputs, and interactive surfaces in the Command Centre
  * use GPU-composited shadows via will-change + translateZ(0) for 60fps
  * snap-resize transitions between 4K and mobile viewports.
  * ═══════════════════════════════════════════════════════════════════════════ */
 
-/* Base Iron Canvas shadow — subtle depth for inputs and selects */
+/* Base Iron Canvas shadow  -  subtle depth for inputs and selects */
 .iron-shadow {
   box-shadow:
     0 1px 2px 0 rgba(0, 0, 0, 0.05),
@@ -518,7 +518,7 @@ canvas[data-signature-pad] {
     0 4px 6px -1px rgba(0, 0, 0, 0.04);
 }
 
-/* Elevated Iron Canvas — dropdowns, popovers, floating panels */
+/* Elevated Iron Canvas  -  dropdowns, popovers, floating panels */
 .iron-shadow-elevated {
   box-shadow:
     0 4px 6px -1px rgba(0, 0, 0, 0.07),
@@ -528,7 +528,7 @@ canvas[data-signature-pad] {
   transform: translateZ(0);
 }
 
-/* Card Iron Canvas — kanban cards, summary cards */
+/* Card Iron Canvas  -  kanban cards, summary cards */
 .iron-shadow-card {
   box-shadow:
     0 1px 3px 0 rgba(0, 0, 0, 0.06),
@@ -563,7 +563,7 @@ canvas[data-signature-pad] {
     0 1px 3px 0 rgba(0, 0, 0, 0.06);
 }
 
-/* Popover content — elevated Iron Canvas shadow */
+/* Popover content  -  elevated Iron Canvas shadow */
 [data-leads-command] [data-radix-popper-content-wrapper] > * {
   box-shadow:
     0 4px 6px -1px rgba(0, 0, 0, 0.07),
@@ -571,5 +571,149 @@ canvas[data-signature-pad] {
     0 0 0 1px rgba(0, 0, 0, 0.03) !important;
   will-change: transform;
   transform: translateZ(0);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * Directive 002: Norva Sovereign Palette  -  Glass Fortress Design System
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* Norva Sovereign Palette */
+  --norva-emerald-primary: #10b981;
+  --norva-emerald-glow: rgba(16, 185, 129, 0.15);
+  --norva-gold-accent: #f59e0b;
+  --norva-void-black: #050505;
+  --norva-glass-border: rgba(255, 255, 255, 0.08);
+  --norva-glass-surface: rgba(255, 255, 255, 0.03);
+}
+
+/* 1. The Glass Fortress Card (Bento-Box Style) */
+.norva-workspace-card {
+  background: var(--norva-glass-surface);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--norva-glass-border);
+  border-radius: 24px;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+  overflow: hidden;
+}
+
+.norva-workspace-card:hover {
+  border-color: rgba(16, 185, 129, 0.4);
+  background: rgba(255, 255, 255, 0.05);
+  transform: translateY(-4px) scale(1.01);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4),
+              0 0 15px var(--norva-emerald-glow);
+}
+
+/* 2. The Sovereign Integrity Pulse (For Sidebar/Navigation) */
+.sovereign-pulse-amber-nav {
+  box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4);
+  animation: pulse-amber-nav 2s infinite;
+  border-left: 3px solid var(--norva-gold-accent);
+}
+
+@keyframes pulse-amber-nav {
+  0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
+  70% { box-shadow: 0 0 0 15px rgba(245, 158, 11, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+}
+
+/* 3. The Gold Sparkle "Certified" Avatar */
+.norva-certified-glow {
+  position: relative;
+  padding: 2px;
+  background: linear-gradient(135deg, #f59e0b, #fbbf24, #f59e0b);
+  background-size: 200% 200%;
+  border-radius: 50%;
+  animation: norva-shimmer 3s linear infinite;
+}
+
+@keyframes norva-shimmer {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
+/* 4. The Genesis Activation Button (Liquid Fill) */
+.btn-sovereign-ignite {
+  background: linear-gradient(90deg, #064e3b 0%, #10b981 100%);
+  color: white;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border: none;
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.btn-sovereign-ignite::after {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: 0.5s;
+}
+
+.btn-sovereign-ignite:hover::after {
+  left: 100%;
+}
+
+/* ── Glass Fortress: Matter Card State Animations ──────────────────────── */
+
+/* Heatmap pulse for locked matters (readiness ≤ 34) */
+@keyframes glass-heatmap {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0), 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    border-color: rgba(239, 68, 68, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 12px 4px rgba(239, 68, 68, 0.1), 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    border-color: rgba(239, 68, 68, 0.4);
+  }
+}
+
+.glass-heatmap-pulse {
+  animation: glass-heatmap 2s ease-in-out infinite;
+}
+
+/* Gold aura for perfect-score (100) matters */
+@keyframes glass-gold-aura {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(212, 175, 55, 0), 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  }
+  50% {
+    box-shadow: 0 0 20px 8px rgba(212, 175, 55, 0.12), 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  }
+}
+
+.glass-gold-aura {
+  animation: glass-gold-aura 3s ease-in-out infinite;
+}
+
+/* Shimmer effect for ignite button */
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.animate-shimmer {
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+/* Tour detail bullet stagger animation */
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateX(-8px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* Floating particles for ignite page */
+@keyframes float-particle {
+  0%, 100% { transform: translateY(0) translateX(0); opacity: 0.3; }
+  25% { transform: translateY(-20px) translateX(10px); opacity: 0.6; }
+  50% { transform: translateY(-10px) translateX(-5px); opacity: 0.4; }
+  75% { transform: translateY(-30px) translateX(15px); opacity: 0.5; }
 }
 

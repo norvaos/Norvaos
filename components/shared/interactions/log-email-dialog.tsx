@@ -79,7 +79,7 @@ export function LogEmailDialog({
     const title = `Email ${direction === 'sent' ? 'sent to' : 'received from'} ${contactName}`
     const descParts: string[] = [`Subject: ${subject}`]
     if (notes) descParts.push(notes)
-    const description = descParts.join(' — ')
+    const description = descParts.join('  -  ')
 
     try {
       await createActivity.mutateAsync({

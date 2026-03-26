@@ -131,14 +131,14 @@ export function Workspace() {
     return mt ? CRS_MATTER_TYPE_PATTERNS.test(mt.name) : false
   }, [lead?.matter_type_id, allMatterTypes])
 
-  // Matter workspace — enhanced panels for Phase 4
+  // Matter workspace  -  enhanced panels for Phase 4
   if (entityType === 'matter') {
     return (
       <div className="max-w-5xl mx-auto px-4 py-6 space-y-6">
-        {/* Compliance Pulse — Directive 41.3 (persistent compliance matrix) */}
+        {/* Compliance Pulse  -  Directive 41.3 (persistent compliance matrix) */}
         <CompliancePulse />
 
-        {/* Client Profile — demographics collected at intake */}
+        {/* Client Profile  -  demographics collected at intake */}
         <ClientProfilePanel />
 
         {/* Matter Status + Risk (side by side) */}
@@ -147,7 +147,7 @@ export function Workspace() {
           <RiskPanel />
         </div>
 
-        {/* Regulatory Status — LSO/CICC Compliance (Directive 41.2) */}
+        {/* Regulatory Status  -  LSO/CICC Compliance (Directive 41.2) */}
         <RegulatorySidebar />
 
         {/* Communications + Documents (side by side) */}
@@ -173,10 +173,10 @@ export function Workspace() {
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-6 space-y-6">
-      {/* Compliance Pulse — Directive 41.3 (persistent compliance matrix) */}
+      {/* Compliance Pulse  -  Directive 41.3 (persistent compliance matrix) */}
       <CompliancePulse />
 
-      {/* Entity Recognition — Contact-thinking: link Principal + Sponsor */}
+      {/* Entity Recognition  -  Contact-thinking: link Principal + Sponsor */}
       <EntityRecognitionCard
         lead={lead}
         entityId={entityId}
@@ -197,10 +197,10 @@ export function Workspace() {
       {/* Interactive Intake Wizard */}
       <IntakeWizardPanel />
 
-      {/* Client Profile — demographics collected at lead/intake stage */}
+      {/* Client Profile  -  demographics collected at lead/intake stage */}
       <ClientProfilePanel />
 
-      {/* CRS Calculator — only for point-based programs (Express Entry, PNP) */}
+      {/* CRS Calculator  -  only for point-based programs (Express Entry, PNP) */}
       {showCrsCalculator && <CrsCalculatorPanel />}
 
       {/* Screening + Documents (side by side) */}
@@ -209,7 +209,7 @@ export function Workspace() {
         <DocumentPanelSwitcher />
       </div>
 
-      {/* Regulatory Status — LSO/CICC Compliance (Directive 41.2) */}
+      {/* Regulatory Status  -  LSO/CICC Compliance (Directive 41.2) */}
       <RegulatorySidebar />
 
       {/* Notes + Call Log (side by side) */}
@@ -224,14 +224,14 @@ export function Workspace() {
         <AppointmentPanel />
       </div>
 
-      {/* Retainer Builder — visible once matter type is selected, hidden for closed/declined leads */}
+      {/* Retainer Builder  -  visible once matter type is selected, hidden for closed/declined leads */}
       {lead?.matter_type_id && !['closed_no_response', 'closed_retainer_not_signed', 'closed_client_declined', 'closed_not_a_fit', 'converted'].includes(lead?.current_stage ?? '') && (
         <div id="retainer-builder-section">
           <RetainerBuilder />
         </div>
       )}
 
-      {/* Retainer guidance — shown when no matter type is set yet (new leads) */}
+      {/* Retainer guidance  -  shown when no matter type is set yet (new leads) */}
       {!lead?.matter_type_id && !isConverted && !['closed_no_response', 'closed_retainer_not_signed', 'closed_client_declined', 'closed_not_a_fit'].includes(lead?.current_stage ?? '') && (
         <Card className="border-dashed border-slate-300 bg-slate-50/50">
           <CardContent className="py-6 flex flex-col items-center text-center gap-2">
@@ -340,7 +340,7 @@ function CoreDataCard({ lead, entityId, tenantId, users, practiceAreas, isConver
     800
   )
 
-  // Watch for changes — skip fields in skipWatchRef
+  // Watch for changes  -  skip fields in skipWatchRef
   useEffect(() => {
     const subscription = watch((value, { name }) => {
       if (name && value[name] !== undefined) {
@@ -357,7 +357,7 @@ function CoreDataCard({ lead, entityId, tenantId, users, practiceAreas, isConver
   const watchedPracticeAreaId = watch('practice_area_id')
   const watchedMatterTypeId = watch('matter_type_id')
 
-  // Matter types — filtered by practice area when selected, all types when not
+  // Matter types  -  filtered by practice area when selected, all types when not
   const { data: matterTypes } = useMatterTypes(tenantId, watchedPracticeAreaId || undefined)
 
   // Handle matter type change: auto-populate immigration intelligence from matter_type_config
@@ -484,7 +484,7 @@ function CoreDataCard({ lead, entityId, tenantId, users, practiceAreas, isConver
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-          {/* Practice Area — always first */}
+          {/* Practice Area  -  always first */}
           <div className="space-y-1.5">
             <Label className="text-xs text-slate-500 flex items-center gap-1">
               <Briefcase className="h-3 w-3" />
@@ -508,7 +508,7 @@ function CoreDataCard({ lead, entityId, tenantId, users, practiceAreas, isConver
             </Select>
           </div>
 
-          {/* Matter Type — the key field that drives all automation */}
+          {/* Matter Type  -  the key field that drives all automation */}
           <div className="space-y-1.5">
             <Label className="text-xs text-slate-500 flex items-center gap-1">
               <FileText className="h-3 w-3" />
@@ -589,7 +589,7 @@ function CoreDataCard({ lead, entityId, tenantId, users, practiceAreas, isConver
             </Select>
           </div>
 
-          {/* Source — read from lead (set at front desk intake); editable if needed */}
+          {/* Source  -  read from lead (set at front desk intake); editable if needed */}
           <div className="space-y-1.5">
             <Label className="text-xs text-slate-500 flex items-center gap-1">
               <Radio className="h-3 w-3" />
@@ -689,7 +689,7 @@ function CoreDataCard({ lead, entityId, tenantId, users, practiceAreas, isConver
           </p>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
 
-            {/* Client Location — drives JR deadlines (15d inland / 60d outside) */}
+            {/* Client Location  -  drives JR deadlines (15d inland / 60d outside) */}
             <div className="space-y-1.5">
               <Label className="text-xs text-slate-500 flex items-center gap-1">
                 <MapPin className="h-3 w-3" />
@@ -707,7 +707,7 @@ function CoreDataCard({ lead, entityId, tenantId, users, practiceAreas, isConver
                   <SelectItem value="inland">
                     <span className="flex items-center gap-2">
                       <span className="h-2 w-2 rounded-full bg-blue-500 shrink-0" />
-                      Inland — Inside Canada
+                      Inland  -  Inside Canada
                     </span>
                   </SelectItem>
                   <SelectItem value="outside">
@@ -773,7 +773,7 @@ function CoreDataCard({ lead, entityId, tenantId, users, practiceAreas, isConver
                   <SelectItem value="protected_person">Protected Person</SelectItem>
                   <SelectItem value="no_status">No Status / Undocumented</SelectItem>
                   <SelectItem value="implied_status">Implied Status</SelectItem>
-                  <SelectItem value="abrod">Abroad — Never Entered</SelectItem>
+                  <SelectItem value="abrod">Abroad  -  Never Entered</SelectItem>
                   <SelectItem value="other">Other</SelectItem>
                 </SelectContent>
               </Select>
@@ -795,7 +795,7 @@ function CoreDataCard({ lead, entityId, tenantId, users, practiceAreas, isConver
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="no">No</SelectItem>
-                  <SelectItem value="yes">Yes — has refusal history</SelectItem>
+                  <SelectItem value="yes">Yes  -  has refusal history</SelectItem>
                   <SelectItem value="unknown">Unknown / Not Asked</SelectItem>
                 </SelectContent>
               </Select>
@@ -817,8 +817,8 @@ function CoreDataCard({ lead, entityId, tenantId, users, practiceAreas, isConver
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="no">No</SelectItem>
-                  <SelectItem value="yes">Yes — criminal/security record</SelectItem>
-                  <SelectItem value="possible">Possible — needs review</SelectItem>
+                  <SelectItem value="yes">Yes  -  criminal/security record</SelectItem>
+                  <SelectItem value="possible">Possible  -  needs review</SelectItem>
                   <SelectItem value="unknown">Unknown / Not Asked</SelectItem>
                 </SelectContent>
               </Select>
@@ -840,13 +840,13 @@ function CoreDataCard({ lead, entityId, tenantId, users, practiceAreas, isConver
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="no">No</SelectItem>
-                  <SelectItem value="yes">Yes — s.40 finding / ban active</SelectItem>
-                  <SelectItem value="possible">Possible — needs review</SelectItem>
+                  <SelectItem value="yes">Yes  -  s.40 finding / ban active</SelectItem>
+                  <SelectItem value="possible">Possible  -  needs review</SelectItem>
                   <SelectItem value="unknown">Unknown / Not Asked</SelectItem>
                 </SelectContent>
               </Select>
               {watch('has_misrepresentation') === 'yes' && (
-                <p className="text-[10px] text-red-600 font-medium">⚠ 5-year ban applies — verify expiry</p>
+                <p className="text-[10px] text-red-600 font-medium">⚠ 5-year ban applies  -  verify expiry</p>
               )}
             </div>
 
@@ -863,7 +863,7 @@ function CoreDataCard({ lead, entityId, tenantId, users, practiceAreas, isConver
             <div className="mt-4 pt-4 border-t border-slate-100">
               <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wide mb-2 flex items-center gap-1.5">
                 <BadgeInfo className="h-3 w-3" />
-                {selectedMt.name} — Programme Intelligence
+                {selectedMt.name}  -  Programme Intelligence
               </p>
               <div className="rounded-lg border border-indigo-100 bg-indigo-50/40 px-3 py-2.5 space-y-1.5">
                 {mtConfig.program_category && (
@@ -923,7 +923,7 @@ function EntityRecognitionCard({ lead, entityId, tenantId, isConverted }: Entity
   const { data: principalContact } = useContactById(contactId)
   const { data: sponsorContact } = useContactById(isJoint ? sponsorContactId : undefined)
 
-  // Previous sponsors — auto-suggest when Joint is selected
+  // Previous sponsors  -  auto-suggest when Joint is selected
   const { data: previousSponsors, isLoading: sponsorsLoading } = usePreviousSponsors(
     isJoint ? contactId : undefined
   )
@@ -1128,7 +1128,7 @@ function ContactProfileSummary({ contact, editing, onToggleEdit, isConverted, ro
 
       {editing ? (
         <p className="text-[10px] text-amber-600 mb-2">
-          Editing enabled — changes here will be synced to the global profile via &quot;Sync to Profile&quot; (Phase 2).
+          Editing enabled  -  changes here will be synced to the global profile via &quot;Sync to Profile&quot; (Phase 2).
         </p>
       ) : (
         <div className="grid grid-cols-2 gap-x-4 gap-y-1">
@@ -1139,7 +1139,7 @@ function ContactProfileSummary({ contact, editing, onToggleEdit, isConverted, ro
             </div>
           ))}
           {fields.length === 0 && (
-            <p className="text-[10px] text-slate-400 col-span-2">No profile data yet — details will populate from the Client Profile panel.</p>
+            <p className="text-[10px] text-slate-400 col-span-2">No profile data yet  -  details will populate from the Client Profile panel.</p>
           )}
         </div>
       )}

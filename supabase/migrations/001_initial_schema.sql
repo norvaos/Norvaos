@@ -323,7 +323,7 @@ CREATE TABLE pipeline_stages (
     is_win_stage    BOOLEAN DEFAULT FALSE,
     is_lost_stage   BOOLEAN DEFAULT FALSE,
     
-    -- Probability (Pipedrive inspired) — likelihood of conversion at this stage
+    -- Probability (Pipedrive inspired)  -  likelihood of conversion at this stage
     win_probability INTEGER DEFAULT 0 CHECK (win_probability >= 0 AND win_probability <= 100),
     
     -- Automation on entering this stage
@@ -1745,7 +1745,7 @@ ALTER TABLE tenants ENABLE ROW LEVEL SECURITY;
 CREATE POLICY tenant_isolation_tenants ON tenants
     USING (id = (SELECT tenant_id FROM users WHERE auth_user_id = auth.uid()));
 
--- Child/junction tables without direct tenant_id — isolate via parent FK
+-- Child/junction tables without direct tenant_id  -  isolate via parent FK
 ALTER TABLE contact_relationships ENABLE ROW LEVEL SECURITY;
 CREATE POLICY tenant_isolation_contact_relationships ON contact_relationships
     USING (contact_id_a IN (SELECT id FROM contacts WHERE tenant_id = (SELECT tenant_id FROM users WHERE auth_user_id = auth.uid())));

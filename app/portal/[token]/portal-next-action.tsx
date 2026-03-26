@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * PortalNextAction — 8-level priority waterfall panel.
+ * PortalNextAction  -  8-level priority waterfall panel.
  * Shows the single most important thing the client needs to do next.
  * Color-coded: RED (immediate action), AMBER (action needed), BLUE (info), GREEN (all clear).
  */
@@ -72,7 +72,7 @@ export function PortalNextActionPanel({
       setReviewContext(data.reviewContext)
       onSummaryLoaded?.(data)
     } catch {
-      // Fail silently — next action is non-critical
+      // Fail silently  -  next action is non-critical
     } finally {
       setLoading(false)
     }
@@ -105,7 +105,7 @@ export function PortalNextActionPanel({
 
   if (!action) return null
 
-  // ── Awaiting review — enhanced green state ──────────────────────────────
+  // ── Awaiting review  -  enhanced green state ──────────────────────────────
 
   if (action.type === 'awaiting_review') {
     const lastSubmittedAt = reviewContext?.lastSubmittedAt
@@ -240,7 +240,7 @@ function formatActionMessage(
         documentName: ctx.documentName ?? 'document',
       })
     case 'payment_overdue':
-      return t(tr.next_action_payment_overdue ?? 'Retainer payment overdue — {amount} outstanding', {
+      return t(tr.next_action_payment_overdue ?? 'Retainer payment overdue  -  {amount} outstanding', {
         amount: `$${((ctx.amount ?? 0) / 100).toLocaleString()}`,
       })
     case 'missing_document':

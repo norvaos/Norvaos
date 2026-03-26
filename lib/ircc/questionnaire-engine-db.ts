@@ -533,7 +533,7 @@ function improveSectionTitle(title: string): string {
 
 /**
  * Build a client-facing questionnaire from DB fields where is_client_visible = true.
- * This is the dynamic questionnaire path — no hardcoded FORM_REGISTRY needed.
+ * This is the dynamic questionnaire path  -  no hardcoded FORM_REGISTRY needed.
  *
  * Includes runtime filtering for:
  * - System/junk fields (buttons, links, signatures, UI controls)
@@ -601,7 +601,7 @@ export async function buildClientQuestionnaireFromDB(
   for (const field of rawFields) {
     // Curated fields (with label or profile_path from seed script) bypass junk filtering
     const isCurated = !!field.label || !!field.profile_path
-    // Skip junk fields (buttons, links, signatures, UI controls) — only for raw XFA imports
+    // Skip junk fields (buttons, links, signatures, UI controls)  -  only for raw XFA imports
     if (!isCurated && isClientJunkField(field.xfa_path, field.suggested_label)) continue
 
     // Handle yes/no radio pairs
@@ -1008,7 +1008,7 @@ export async function computePerFormProgress(
   for (const field of fields) {
     // Curated fields (with profile_path from seed script) bypass junk filtering
     const isCurated = !!field.profile_path
-    // Skip junk fields — only for raw XFA imports
+    // Skip junk fields  -  only for raw XFA imports
     if (!isCurated && isClientJunkField(field.xfa_path, field.suggested_label)) continue
 
     // Handle radio pairs: skip .no, include .yes (but use parent path)

@@ -138,7 +138,7 @@ export const frontDeskCompleteTaskAction: ActionDefinition<FrontDeskCompleteTask
       },
       activity: {
         activityType: 'task_completed_front_desk',
-        title: `Task completed — ${input.outcomeCode.replace(/_/g, ' ')}`,
+        title: `Task completed  -  ${input.outcomeCode.replace(/_/g, ' ')}`,
         description: input.notes,
         metadata: {
           task_id: input.taskId,

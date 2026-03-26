@@ -103,7 +103,7 @@ export const logCallAction: ActionDefinition<LogCallInput, LogCallResult> = {
       },
       activity: {
         activityType: 'call_logged',
-        title: `Call logged — ${input.direction} ${input.outcome}`,
+        title: `Call logged  -  ${input.direction} ${input.outcome}`,
         description: input.notes,
         metadata: {
           direction: input.direction,

@@ -306,7 +306,7 @@ export const KanbanCard = memo(function KanbanCard({
           </Tooltip>
         )}
 
-        {/* Next follow-up (hidden when deferred — show reactivation badge instead) */}
+        {/* Next follow-up (hidden when deferred  -  show reactivation badge instead) */}
         {showFollowUp && lead.next_follow_up && !isDeferred && (
           <Tooltip>
             <TooltipTrigger asChild>

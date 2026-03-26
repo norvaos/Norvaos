@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * IRCC Form Pack — React Query Hooks
+ * IRCC Form Pack  -  React Query Hooks
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Client-side data fetching and mutations for the IRCC Forms tab.
@@ -21,7 +21,7 @@ import type {
   PackReadiness,
   PackType,
 } from '@/lib/types/form-packs'
-// IRCCProfile import removed — DB readiness uses Record<string, unknown>
+// IRCCProfile import removed  -  DB readiness uses Record<string, unknown>
 import { computePackReadinessFromDB } from '@/lib/ircc/xfa-filler-db'
 
 // ── Query Keys ────────────────────────────────────────────────────────────────
@@ -116,7 +116,7 @@ export function usePackReadiness(contactId: string | null, packType: PackType) {
         .maybeSingle()
 
       if (!dbForm) {
-        // No DB form found — return empty readiness
+        // No DB form found  -  return empty readiness
         return {
           overall_pct: 0,
           fields: { total: 0, filled: 0, missing: [] },
@@ -249,7 +249,7 @@ export function useApproveFormPack() {
       queryClient.invalidateQueries({
         queryKey: formPackKeys.artifacts(variables.packVersionId),
       })
-      toast.success('Form pack approved — final PDF generated')
+      toast.success('Form pack approved  -  final PDF generated')
     },
     onError: (error) => {
       toast.error(`Approval failed: ${error.message}`)
@@ -304,7 +304,7 @@ export function useExportFormPack() {
 
 /**
  * Log a view/download/print access event.
- * Lightweight — no PDF generation, just audit trail.
+ * Lightweight  -  no PDF generation, just audit trail.
  */
 export function useLogFormAccess() {
   return useMutation({
@@ -327,14 +327,14 @@ export function useLogFormAccess() {
       })
 
       if (!res.ok) {
-        // Don't throw for access logging — it's non-critical
+        // Don't throw for access logging  -  it's non-critical
         console.error('[form-packs] Failed to log access:', res.status)
         return null
       }
 
       return res.json()
     },
-    // No toast for access logging — it's transparent to the user
+    // No toast for access logging  -  it's transparent to the user
   })
 }
 
@@ -342,7 +342,7 @@ export function useLogFormAccess() {
 
 /**
  * Get a signed download URL for a specific artifact (draft or final).
- * This does NOT go through the Action Executor — it's a direct storage call.
+ * This does NOT go through the Action Executor  -  it's a direct storage call.
  * Use useLogFormAccess() separately to record the access event.
  */
 export function useFormPackArtifactUrl() {

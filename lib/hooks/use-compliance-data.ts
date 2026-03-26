@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * Shared Compliance Data Hooks — Directive 41.3
+ * Shared Compliance Data Hooks  -  Directive 41.3
  *
  * Extracted from regulatory-sidebar.tsx so that both the detailed
  * RegulatorySidebar and the compact CompliancePulse can consume
@@ -206,7 +206,7 @@ export function useRetainerAgreement(
   })
 }
 
-/** KYC check — does the contact have a verified identity_verification? */
+/** KYC check  -  does the contact have a verified identity_verification? */
 export function useKycStatus(contactId: string | null, tenantId: string) {
   return useQuery({
     queryKey: ['compliance-kyc', contactId],

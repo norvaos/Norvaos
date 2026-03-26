@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Retainer Generation — 4-Gate Pre-check Service — Unit Tests
+ * Retainer Generation  -  4-Gate Pre-check Service  -  Unit Tests
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Proves:
@@ -101,7 +101,7 @@ describe('checkRetainerGates', () => {
 
   // ── Gate 1: Conflict Clear ────────────────────────────────────────────────
 
-  describe('gate 1 — conflict clear', () => {
+  describe('gate 1  -  conflict clear', () => {
     it('passes when no contacts are linked to the matter', async () => {
       const supabase = createMockSupabase({
         matters: { selectData: fullyConfiguredMatter() },
@@ -185,7 +185,7 @@ describe('checkRetainerGates', () => {
 
   // ── Gate 2: Matter Type Set ───────────────────────────────────────────────
 
-  describe('gate 2 — matter type set', () => {
+  describe('gate 2  -  matter type set', () => {
     it('passes when matter_type_id is set', async () => {
       const supabase = createMockSupabase({
         matters: { selectData: fullyConfiguredMatter() },
@@ -215,7 +215,7 @@ describe('checkRetainerGates', () => {
 
   // ── Gate 3: Billing Structure ─────────────────────────────────────────────
 
-  describe('gate 3 — billing structure', () => {
+  describe('gate 3  -  billing structure', () => {
     it('passes when billing_type is set', async () => {
       const supabase = createMockSupabase({
         matters: { selectData: fullyConfiguredMatter() },
@@ -258,7 +258,7 @@ describe('checkRetainerGates', () => {
 
   // ── Gate 4: Lawyer Assigned ───────────────────────────────────────────────
 
-  describe('gate 4 — lawyer assigned', () => {
+  describe('gate 4  -  lawyer assigned', () => {
     it('passes when responsible_lawyer_id is set', async () => {
       const supabase = createMockSupabase({
         matters: { selectData: fullyConfiguredMatter() },

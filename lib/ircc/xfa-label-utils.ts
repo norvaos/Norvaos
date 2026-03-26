@@ -1,5 +1,5 @@
 // ============================================================================
-// XFA Label Utilities — Derive client-friendly labels from XFA paths
+// XFA Label Utilities  -  Derive client-friendly labels from XFA paths
 // ============================================================================
 // Shared by:
 //   - questionnaire-engine-db.ts (portal display)
@@ -18,7 +18,7 @@ export function humanizeSegment(segment: string): string {
     .replace(/^./, (c) => c.toUpperCase())
 }
 
-/** Labels that are too generic to use — need path-derived context */
+/** Labels that are too generic to use  -  need path-derived context */
 const GENERIC_LABELS = new Set([
   'Yes', 'No', 'Other', 'Text Field', 'Text Field1', 'Text Field2',
   'Text Field3', 'Text Field4', 'Text Field5',
@@ -171,7 +171,7 @@ const PATH_PATTERN_OVERRIDES: Array<{ pattern: RegExp; label: string }> = [
   { pattern: /DetailsOfVisit.*Purpose/i, label: 'Purpose of your visit to Canada' },
   { pattern: /DetailsOfVisit.*Funds/i, label: 'Funds available for your trip (in Canadian dollars)' },
 
-  // ── IMM5710E — Details of Work ──────────────────────────────────────────
+  // ── IMM5710E  -  Details of Work ──────────────────────────────────────────
   { pattern: /DetailsOfWork.*NOCCode/i, label: 'National Occupation Classification (NOC) Code' },
   { pattern: /DetailsOfWork.*LMIA/i, label: 'LMIA Number' },
   { pattern: /DetailsOfWork.*Employer/i, label: 'Name of employer offering you work' },
@@ -184,7 +184,7 @@ const PATH_PATTERN_OVERRIDES: Array<{ pattern: RegExp; label: string }> = [
   { pattern: /DetailsOfWork.*PostalCode/i, label: "Employer's postal code" },
   { pattern: /DetailsOfWork.*Country/i, label: 'Country where you will work' },
 
-  // ── IMM5710E — Coming Into Canada ────────────────────────────────────────
+  // ── IMM5710E  -  Coming Into Canada ────────────────────────────────────────
   { pattern: /ComingIntoCda.*PortOfEntry/i, label: 'Port of entry into Canada' },
   { pattern: /ComingIntoCda.*DateExpArrive/i, label: 'Expected date of arrival in Canada' },
   { pattern: /ComingIntoCda.*ArrivalYr/i, label: 'Expected arrival date' },
@@ -193,12 +193,12 @@ const PATH_PATTERN_OVERRIDES: Array<{ pattern: RegExp; label: string }> = [
   { pattern: /ComingIntoCda.*TransportType/i, label: 'Mode of transportation into Canada' },
   { pattern: /ComingIntoCda.*VehicleNum/i, label: 'Flight / vessel number' },
 
-  // ── IMM5710E — U.S. Green Card ───────────────────────────────────────────
+  // ── IMM5710E  -  U.S. Green Card ───────────────────────────────────────────
   { pattern: /USCard.*CardNum/i, label: 'U.S. Permanent Resident Card (Green Card) number' },
   { pattern: /USCard.*Expiry/i, label: 'Green Card expiry date' },
   { pattern: /USCard.*IssueDate/i, label: 'Green Card issue date' },
 
-  // ── IMM5710E — National Identity Document ────────────────────────────────
+  // ── IMM5710E  -  National Identity Document ────────────────────────────────
   { pattern: /natID.*IDNum/i, label: 'National Identity Document number' },
   { pattern: /natID.*Num/i, label: 'National Identity Document number' },
   { pattern: /natID.*Country/i, label: 'Country that issued your national identity document' },
@@ -263,7 +263,7 @@ const SEGMENT_OVERRIDES: Record<string, string> = {
   Employer: 'Name of your employer',
   JobTitle: 'Job title or position',
 
-  // Date fields — readable fallback when no section context is available
+  // Date fields  -  readable fallback when no section context is available
   FromDate: 'Start date',
   ToDate: 'End date',
   FromYr: 'Start date',
@@ -365,7 +365,7 @@ const SEGMENT_OVERRIDES: Record<string, string> = {
   MarriageInPerson: 'Were you married in person?',
   Accompanying: 'Is this person accompanying you to Canada?',
 
-  // ── IMM5710E — Work Permit Specific ─────────────────────────────────────
+  // ── IMM5710E  -  Work Permit Specific ─────────────────────────────────────
   NOCCode: 'National Occupation Classification (NOC) Code',
   LMIANum: 'LMIA Number',
   LMIANumber: 'LMIA Number',
@@ -558,11 +558,11 @@ const PROFILE_PATH_OVERRIDES: Record<string, string> = {
  * Derive a client-friendly display label from an XFA field's metadata.
  *
  * Resolution order:
- *   1. `adminLabel` — custom label set by the firm admin (highest priority)
- *   2. Profile path override — matched against PROFILE_PATH_OVERRIDES (if profilePath provided)
- *   3. Path-pattern match — context-aware labels (e.g. Residency+FromYr → "When did you start living there?")
- *   4. `suggestedLabel` — auto-generated from scanner (if not generic)
- *   5. Segment override — last XFA segment matched against known mappings
+ *   1. `adminLabel`  -  custom label set by the firm admin (highest priority)
+ *   2. Profile path override  -  matched against PROFILE_PATH_OVERRIDES (if profilePath provided)
+ *   3. Path-pattern match  -  context-aware labels (e.g. Residency+FromYr → "When did you start living there?")
+ *   4. `suggestedLabel`  -  auto-generated from scanner (if not generic)
+ *   5. Segment override  -  last XFA segment matched against known mappings
  *   6. Humanized XFA path as fallback
  *
  * @param xfaPath - Full XFA path, e.g. "Part1.SponsorDetails.q1.FamilyName"

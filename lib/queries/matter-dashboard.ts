@@ -120,7 +120,7 @@ export function useMatterDashboard(matterId: string) {
             .single()
 
           if (mcError) {
-            // PGRST116 = no rows — not an error, just no primary contact
+            // PGRST116 = no rows  -  not an error, just no primary contact
             if (mcError.code === 'PGRST116') return null
             throw mcError
           }
@@ -160,7 +160,7 @@ export function useMatterDashboard(matterId: string) {
           return data ?? { running_balance_cents: 0 }
         },
         enabled: !!matterId,
-        staleTime: 1000 * 30, // 30 sec — money data stays fresh
+        staleTime: 1000 * 30, // 30 sec  -  money data stays fresh
       },
 
       // 4. Last 5 trust transactions (lean: 5 cols, 5 rows max)
@@ -179,7 +179,7 @@ export function useMatterDashboard(matterId: string) {
           return (data ?? []) as DashboardTrustTransaction[]
         },
         enabled: !!matterId,
-        staleTime: 1000 * 30, // 30 sec — money data stays fresh
+        staleTime: 1000 * 30, // 30 sec  -  money data stays fresh
       },
 
       // 5. Empty / pending document slots
@@ -314,7 +314,7 @@ export function prefetchMatterFull(queryClient: QueryClient, matterId: string) {
           .single()
 
         if (mcError) {
-          // PGRST116 = no rows — not an error, just no primary contact
+          // PGRST116 = no rows  -  not an error, just no primary contact
           if (mcError.code === 'PGRST116') return null
           throw mcError
         }

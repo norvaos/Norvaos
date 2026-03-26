@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Document Engine — Instance Service
+ * Document Engine  -  Instance Service
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Document instance lifecycle: generate, regenerate, approve, send, void.
@@ -119,7 +119,7 @@ export async function generateInstance(
     }
   }
 
-  // ── REDLINE 2: No silent truncation — max_length enforcement ────────────────
+  // ── REDLINE 2: No silent truncation  -  max_length enforcement ────────────────
   const oversizedFields: string[] = []
   for (const mapping of mappings) {
     if (mapping.max_length && mapping.max_length > 0) {
@@ -148,7 +148,7 @@ export async function generateInstance(
   }))
 
   // 5. Render document
-  const documentTitle = `${template.name} — ${fieldContext.contact.full_name ?? 'Unknown'}`
+  const documentTitle = `${template.name}  -  ${fieldContext.contact.full_name ?? 'Unknown'}`
 
   let renderResult: RenderResult
   try {
@@ -283,7 +283,7 @@ export async function regenerateInstance(
   }
 
   if (instance.status === 'draft') {
-    // Re-render in place — same instance, new artifact
+    // Re-render in place  -  same instance, new artifact
     return regenerateDraft(supabase, instance as DocumentInstanceRow, params)
   }
 

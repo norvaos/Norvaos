@@ -3,22 +3,22 @@
  * ═══════════════════════════════════════════════════════════
  *
  * These tests actually call the route handlers with mocked Supabase
- * and auth, verifying real business logic paths — not just source strings.
+ * and auth, verifying real business logic paths  -  not just source strings.
  *
  * Pattern: vi.hoisted → vi.mock → import handlers → test
  *
  * Tested routes:
- *   A. PATCH /status   — closed→active guard, idempotency, audit
- *   B. PATCH /features — optimistic locking, merge semantics
- *   C. POST /deactivate — last-admin guard, idempotency
- *   D. POST /reactivate — seat-limit pre-check, idempotency
+ *   A. PATCH /status    -  closed→active guard, idempotency, audit
+ *   B. PATCH /features  -  optimistic locking, merge semantics
+ *   C. POST /deactivate  -  last-admin guard, idempotency
+ *   D. POST /reactivate  -  seat-limit pre-check, idempotency
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { NextResponse } from 'next/server'
 
 // ═══════════════════════════════════════════════════════════════════════════
-// Hoisted mocks — must be before vi.mock calls
+// Hoisted mocks  -  must be before vi.mock calls
 // ═══════════════════════════════════════════════════════════════════════════
 
 const mocks = vi.hoisted(() => {
@@ -112,7 +112,7 @@ function routeCtx(params: Record<string, string>) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// Setup — reset mocks and configure default auth
+// Setup  -  reset mocks and configure default auth
 // ═══════════════════════════════════════════════════════════════════════════
 
 beforeEach(() => {
@@ -130,7 +130,7 @@ beforeEach(() => {
 })
 
 // ═══════════════════════════════════════════════════════════════════════════
-// A. PATCH /api/admin/tenants/[id]/status — tenant lifecycle
+// A. PATCH /api/admin/tenants/[id]/status  -  tenant lifecycle
 // ═══════════════════════════════════════════════════════════════════════════
 
 describe('PATCH /api/admin/tenants/[id]/status', () => {
@@ -240,7 +240,7 @@ describe('PATCH /api/admin/tenants/[id]/status', () => {
 })
 
 // ═══════════════════════════════════════════════════════════════════════════
-// B. PATCH /api/admin/tenants/[id]/features — optimistic locking
+// B. PATCH /api/admin/tenants/[id]/features  -  optimistic locking
 // ═══════════════════════════════════════════════════════════════════════════
 
 describe('PATCH /api/admin/tenants/[id]/features', () => {
@@ -276,7 +276,7 @@ describe('PATCH /api/admin/tenants/[id]/features', () => {
     expect(body.current.updated_at).toBe('2024-06-02T00:00:00.000Z')
   })
 
-  it('merges flags (not replaces) on success — existing keys preserved', async () => {
+  it('merges flags (not replaces) on success  -  existing keys preserved', async () => {
     mocks.createAdminClient.mockReturnValue(
       makeMockSupabase({
         tenants: {
@@ -352,7 +352,7 @@ describe('PATCH /api/admin/tenants/[id]/features', () => {
 })
 
 // ═══════════════════════════════════════════════════════════════════════════
-// C. POST /api/admin/tenants/[id]/users/[userId]/deactivate — last-admin guard
+// C. POST /api/admin/tenants/[id]/users/[userId]/deactivate  -  last-admin guard
 // ═══════════════════════════════════════════════════════════════════════════
 
 describe('POST /api/admin/tenants/[id]/users/[userId]/deactivate', () => {
@@ -366,7 +366,7 @@ describe('POST /api/admin/tenants/[id]/users/[userId]/deactivate', () => {
             data: { id: USER_ID, email: 'admin@test.com', is_active: true, role_id: ROLE_ID },
             error: null,
           },
-          count: 1, // only 1 active admin — the one being deactivated
+          count: 1, // only 1 active admin  -  the one being deactivated
         },
         roles: {
           single: { data: { name: 'Admin' }, error: null },
@@ -415,7 +415,7 @@ describe('POST /api/admin/tenants/[id]/users/[userId]/deactivate', () => {
             data: { id: USER_ID, email: 'user@test.com', is_active: true, role_id: ROLE_ID },
             error: null,
           },
-          count: 5, // multiple admins — safe to deactivate one
+          count: 5, // multiple admins  -  safe to deactivate one
         },
         roles: {
           single: { data: { name: 'Admin' }, error: null },
@@ -446,7 +446,7 @@ describe('POST /api/admin/tenants/[id]/users/[userId]/deactivate', () => {
 })
 
 // ═══════════════════════════════════════════════════════════════════════════
-// D. POST /api/admin/tenants/[id]/users/[userId]/reactivate — seat-limit
+// D. POST /api/admin/tenants/[id]/users/[userId]/reactivate  -  seat-limit
 // ═══════════════════════════════════════════════════════════════════════════
 
 describe('POST /api/admin/tenants/[id]/users/[userId]/reactivate', () => {

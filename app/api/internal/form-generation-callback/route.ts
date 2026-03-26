@@ -7,17 +7,17 @@ import { createAdminClient } from '@/lib/supabase/admin'
  * Internal callback endpoint called by the Python sidecar after form generation
  * completes (success or failure). Updates form_generation_log status.
  *
- * This endpoint is internal — it is not exposed to the browser. It is called
+ * This endpoint is internal  -  it is not exposed to the browser. It is called
  * server-to-server from the Python sidecar.
  *
  * Auth: X-Worker-Key header must match WORKER_SECRET env var.
  *
  * Body: {
- *   job_id:      string         — form_generation_log.id
+ *   job_id:      string          -  form_generation_log.id
  *   status:      'completed' | 'failed'
- *   output_path: string | null  — storage path of generated PDF (completed only)
+ *   output_path: string | null   -  storage path of generated PDF (completed only)
  *   page_count:  number | null
- *   error:       string | null  — error message (failed only)
+ *   error:       string | null   -  error message (failed only)
  * }
  */
 export async function POST(request: Request) {

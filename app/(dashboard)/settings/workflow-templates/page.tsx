@@ -516,7 +516,7 @@ function WorkflowDialog({
               )}
             />
 
-            {/* Pipeline — shown when matter type selected */}
+            {/* Pipeline  -  shown when matter type selected */}
             {selectedMatterTypeId && pipelines && pipelines.length > 0 && (
               <FormField
                 control={form.control}
@@ -556,7 +556,7 @@ function WorkflowDialog({
               />
             )}
 
-            {/* Trigger Stage — shown when pipeline selected */}
+            {/* Trigger Stage  -  shown when pipeline selected */}
             {selectedPipelineId && stages && stages.length > 0 && (
               <FormField
                 control={form.control}
@@ -630,7 +630,7 @@ function WorkflowDialog({
               )}
             />
 
-            {/* Deadline Types (junction — only available when editing) */}
+            {/* Deadline Types (junction  -  only available when editing) */}
             {editing ? (
               <DeadlineBindingsSection
                 workflowTemplateId={editing.id}

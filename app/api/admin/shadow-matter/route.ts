@@ -49,7 +49,7 @@ async function handlePost(request: Request) {
       matter_number: result.matter_number,
       cloned_addresses: result.cloned_addresses,
       cloned_personal: result.cloned_personal,
-      message: 'Shadow matter initialised — Atomic Transfer complete',
+      message: 'Shadow matter initialised  -  Atomic Transfer complete',
     })
   } catch (error) {
     if (error instanceof AuthError) {

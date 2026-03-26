@@ -109,7 +109,7 @@ export async function sendEmailViaProvider(
 
     // If replying to a thread, use the reply endpoint for thread continuity
     if (options.replyToMessageId) {
-      // Reply to existing message — preserves conversation threading
+      // Reply to existing message  -  preserves conversation threading
       await graphFetch(connectionId, admin, `me/messages/${options.replyToMessageId}/reply`, {
         method: 'POST',
         body: {
@@ -136,7 +136,7 @@ export async function sendEmailViaProvider(
     if (options.matterId) {
       await admin.from('email_send_events').insert({
         tenant_id: account.tenant_id,
-        // We don't have the synced message_id yet — it will appear on next sync
+        // We don't have the synced message_id yet  -  it will appear on next sync
         // For now, use a placeholder that references the send event
         message_id: null as unknown as string, // Will be linked on next sync
         email_account_id: accountId,

@@ -9,7 +9,7 @@ import { z } from 'zod'
 // ── POST /api/billing/invoices/[id]/lines ─────────────────────────────────────
 // Add a line item to a draft invoice.
 // The DB trigger trg_line_items_draft_only blocks writes on non-draft invoices
-// at the database layer — this is the app-layer guard.
+// at the database layer  -  this is the app-layer guard.
 
 const lineItemSchema = z.object({
   description: z.string().min(1),

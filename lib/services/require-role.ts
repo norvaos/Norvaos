@@ -1,11 +1,11 @@
 /**
  * Server-side permission enforcement utility.
  *
- * Uses the pre-fetched role from AuthContext — ZERO additional DB calls.
+ * Uses the pre-fetched role from AuthContext  -  ZERO additional DB calls.
  * authenticateRequest() resolves the user's role + permissions once;
  * this function simply reads from that context.
  *
- * Throws AuthError on failure — use in try/catch in route handlers.
+ * Throws AuthError on failure  -  use in try/catch in route handlers.
  *
  * Usage in API routes:
  *   const auth = await authenticateRequest()
@@ -26,7 +26,7 @@ export interface UserRole {
  * Throws AuthError (403) if the user lacks the permission.
  * Returns the user's role object on success.
  *
- * ZERO DB calls — reads from auth.role pre-populated by authenticateRequest().
+ * ZERO DB calls  -  reads from auth.role pre-populated by authenticateRequest().
  */
 export function requirePermission(
   auth: AuthContext,

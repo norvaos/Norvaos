@@ -1,12 +1,12 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Conflict Check Alpha — "No Dirty Data Becomes a Matter"
+ * Conflict Check Alpha  -  "No Dirty Data Becomes a Matter"
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Pre-conversion conflict detection that searches same-tenant contacts
  * by email and passport number.
  *
- * Sentinel Guard: The RPC is SECURITY DEFINER with tenant isolation —
+ * Sentinel Guard: The RPC is SECURITY DEFINER with tenant isolation  - 
  * it NEVER reveals data from another tenant. Returns only "Conflict Detected"
  * with the matched field name, never the other tenant's details.
  */

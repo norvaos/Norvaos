@@ -1,5 +1,5 @@
 -- ============================================================
--- Migration 010: Phase 2 — Enforcement Engine & Automation Core
+-- Migration 010: Phase 2  -  Enforcement Engine & Automation Core
 -- ============================================================
 -- Adds gating rules, stage history for generic system,
 -- automation execution logging, and seeds gating config.

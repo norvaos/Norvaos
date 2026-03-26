@@ -2,7 +2,7 @@
 
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * IRCC Forms Tab — Form Pack Generation & Management UI
+ * IRCC Forms Tab  -  Form Pack Generation & Management UI
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Single-page tab component for the matter detail page.
@@ -263,7 +263,7 @@ export function IRCCFormsTab({ matterId, contactId, tenantId, caseTypeId }: IRCC
                       <span className="font-mono text-xs text-muted-foreground">
                         {field.section}
                       </span>
-                      <span className="text-muted-foreground">—</span>
+                      <span className="text-muted-foreground"> - </span>
                       <span>{field.label}</span>
                     </div>
                   ))}
@@ -328,7 +328,7 @@ export function IRCCFormsTab({ matterId, contactId, tenantId, caseTypeId }: IRCC
           ) : (
             <>
               <FileText className="h-4 w-4" />
-              Generate {(availableForms.find((f) => f.formCode === selectedPackType)?.label ?? selectedPackType).split('—')[0].trim()} Draft
+              Generate {(availableForms.find((f) => f.formCode === selectedPackType)?.label ?? selectedPackType).split(' - ')[0].trim()} Draft
             </>
           )}
         </Button>
@@ -667,7 +667,7 @@ function ReviewSummary({ snapshot }: { snapshot: Record<string, unknown> }) {
       {/* Personal */}
       <div className="space-y-1">
         <h4 className="text-xs font-semibold uppercase text-muted-foreground">Personal</h4>
-        <ReviewRow label="Name" value={`${personal?.family_name ?? '—'}, ${personal?.given_name ?? '—'}`} />
+        <ReviewRow label="Name" value={`${personal?.family_name ?? ' - '}, ${personal?.given_name ?? ' - '}`} />
         <ReviewRow label="DOB" value={personal?.date_of_birth as string} />
         <ReviewRow label="Citizenship" value={personal?.citizenship as string} />
         <ReviewRow label="Country of Birth" value={personal?.place_of_birth_country as string} />
@@ -697,11 +697,11 @@ function ReviewSummary({ snapshot }: { snapshot: Record<string, unknown> }) {
         <ReviewRow label="Siblings" value={String(siblingCount)} />
         <ReviewRow
           label="Mother"
-          value={family?.mother ? `${(family.mother as Record<string, unknown>).family_name ?? '—'}, ${(family.mother as Record<string, unknown>).given_name ?? '—'}` : '—'}
+          value={family?.mother ? `${(family.mother as Record<string, unknown>).family_name ?? ' - '}, ${(family.mother as Record<string, unknown>).given_name ?? ' - '}` : ' - '}
         />
         <ReviewRow
           label="Father"
-          value={family?.father ? `${(family.father as Record<string, unknown>).family_name ?? '—'}, ${(family.father as Record<string, unknown>).given_name ?? '—'}` : '—'}
+          value={family?.father ? `${(family.father as Record<string, unknown>).family_name ?? ' - '}, ${(family.father as Record<string, unknown>).given_name ?? ' - '}` : ' - '}
         />
       </div>
     </div>
@@ -712,7 +712,7 @@ function ReviewRow({ label, value }: { label: string; value: string | undefined 
   return (
     <div className="flex justify-between text-sm">
       <span className="text-muted-foreground">{label}</span>
-      <span className="font-medium">{value || '—'}</span>
+      <span className="font-medium">{value || ' - '}</span>
     </div>
   )
 }

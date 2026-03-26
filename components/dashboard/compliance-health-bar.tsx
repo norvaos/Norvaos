@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * ComplianceHealthBar — Directive 41.3, Item 1B
+ * ComplianceHealthBar  -  Directive 41.3, Item 1B
  *
  * Firm-wide compliance health widget for the main dashboard.
  * Shows percentage of active matters with verified IDs, conflict checks, etc.
@@ -130,7 +130,7 @@ export function ComplianceHealthBar() {
   }
 
   if (!data || data.totalMatters === 0) {
-    return null // No active matters — don't show the bar
+    return null // No active matters  -  don't show the bar
   }
 
   const pct = (num: number) =>

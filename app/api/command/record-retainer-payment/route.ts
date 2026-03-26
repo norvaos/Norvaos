@@ -93,7 +93,7 @@ async function handlePost(request: Request) {
     }
 
     // Any payment received on a signed/sent retainer → advance to fully_retained
-    // (the firm has accepted funds — conversion will be triggered)
+    // (the firm has accepted funds  -  conversion will be triggered)
     if (retainerPkg.status === 'signed' || retainerPkg.status === 'sent') {
       updatePayload.status = 'fully_retained'
     }
@@ -132,7 +132,7 @@ async function handlePost(request: Request) {
     await admin.from('activities').insert({
       tenant_id: tenantId,
       activity_type: 'retainer_payment_recorded',
-      title: `Payment recorded: ${amountFormatted}${!isFullyPaid ? ` (balance: ${balanceFormatted})` : ' — paid in full'}`,
+      title: `Payment recorded: ${amountFormatted}${!isFullyPaid ? ` (balance: ${balanceFormatted})` : '  -  paid in full'}`,
       description: [
         `Payment: ${amountFormatted} via ${paymentMethod}`,
         reference ? `Reference: ${reference}` : null,
@@ -161,7 +161,7 @@ async function handlePost(request: Request) {
 
     // ── Auto-convert lead to matter on any payment ─────────────────
     // Conversion triggers as soon as any payment is received (partial or full).
-    // The firm has accepted funds — the lead becomes a matter.
+    // The firm has accepted funds  -  the lead becomes a matter.
     let matterId: string | null = null
     let matterNumber: string | null = null
     let conversionError: string | null = null
@@ -198,7 +198,7 @@ async function handlePost(request: Request) {
               .eq('id', lead.matter_type_id)
               .single()
             if (mt?.name) {
-              matterTitle = `${matterTitle} — ${mt.name}`
+              matterTitle = `${matterTitle}  -  ${mt.name}`
             }
           }
 
@@ -207,7 +207,7 @@ async function handlePost(request: Request) {
           const billingType = (retainerPkg as any).billing_type || 'flat_fee'
 
           // Execute conversion using admin client to bypass RLS on matters INSERT.
-          // Skip conflict_cleared and intake_complete gates — the user has
+          // Skip conflict_cleared and intake_complete gates  -  the user has
           // already gone through consultation + retainer flow and explicitly
           // recorded payment. These gates should have been satisfied during
           // the consultation outcome step.

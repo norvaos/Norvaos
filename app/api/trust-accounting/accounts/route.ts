@@ -1,6 +1,6 @@
 /**
- * GET  /api/trust-accounting/accounts — List trust bank accounts
- * POST /api/trust-accounting/accounts — Create a new trust bank account
+ * GET  /api/trust-accounting/accounts  -  List trust bank accounts
+ * POST /api/trust-accounting/accounts  -  Create a new trust bank account
  */
 
 import { NextRequest, NextResponse } from 'next/server'

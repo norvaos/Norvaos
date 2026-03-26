@@ -1,4 +1,4 @@
--- Migration 190: Fix claim_vault_drops column mismatch — Handshake Audit Hotfix
+-- Migration 190: Fix claim_vault_drops column mismatch  -  Handshake Audit Hotfix
 --
 -- The original claim function (Migration 188) referenced columns that
 -- don't exist on the documents table: display_name, mime_type, source.

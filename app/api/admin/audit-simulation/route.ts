@@ -8,7 +8,7 @@ import { logSentinelEvent } from '@/lib/services/sentinel-audit'
 /**
  * POST /api/admin/audit-simulation
  *
- * Directive 026 — "Simulate LSO Examination"
+ * Directive 026  -  "Simulate LSO Examination"
  *
  * Runs a 100% integrity check on all ledger hashes and generates a
  * Mock Audit Report for every active matter. Returns JSON with per-matter

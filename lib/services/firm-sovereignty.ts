@@ -1,7 +1,7 @@
 /**
- * Firm Sovereignty Service — Directive 027
+ * Firm Sovereignty Service  -  Directive 027
  *
- * "Genesis Zero" — the firm's birth certificate. Once initialized,
+ * "Genesis Zero"  -  the firm's birth certificate. Once initialized,
  * the Sovereign Red Pulse is armed and any database drift triggers alerts.
  */
 

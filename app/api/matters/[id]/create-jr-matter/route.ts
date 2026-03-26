@@ -35,7 +35,7 @@ async function handlePost(
     const body = await request.json().catch(() => ({}))
     const { matter_type_id: bodyMatterTypeId } = body as { matter_type_id?: string }
 
-    // Use admin client to bypass RLS — auth already verified above
+    // Use admin client to bypass RLS  -  auth already verified above
     const admin = createAdminClient()
 
     // 3. Verify source matter belongs to tenant
@@ -92,7 +92,7 @@ async function handlePost(
       .maybeSingle()
 
     // 6. Create the JR matter via SECURITY DEFINER function
-    // This replaces the previous createAdminClient() bypass — the function
+    // This replaces the previous createAdminClient() bypass  -  the function
     // validates role and source matter access internally, then inserts with
     // elevated privileges in a controlled way.
     const { data: newMatterJson, error: rpcErr } = await admin
@@ -142,7 +142,7 @@ async function handlePost(
       .eq('item_type', 'refusal')
       .eq('status', 'actioned')
 
-    // 10. Log refusal_actions row (best-effort — needs correspondence_id)
+    // 10. Log refusal_actions row (best-effort  -  needs correspondence_id)
     const { data: refusalCorr } = await admin
       .from('ircc_correspondence')
       .select('id')

@@ -28,9 +28,9 @@ export interface KpiDefinition {
   unit: string
   /** Target value (green threshold) */
   target: number
-  /** Amber threshold — value at which color changes from green to amber */
+  /** Amber threshold  -  value at which color changes from green to amber */
   amberThreshold: number
-  /** Red threshold — value at which color changes from amber to red */
+  /** Red threshold  -  value at which color changes from amber to red */
   redThreshold: number
   /** Whether higher or lower values are better */
   direction: KpiDirection
@@ -312,7 +312,7 @@ export function buildKpiValues(
  * Format a KPI value for display.
  */
 function formatKpiValue(value: number | null, def: KpiDefinition): string {
-  if (value == null) return '—'
+  if (value == null) return ' - '
 
   if (def.unit === 'min' && value >= 60) {
     const hours = Math.floor(value / 60)

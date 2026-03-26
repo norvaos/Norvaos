@@ -1,7 +1,7 @@
 /**
  * GET /api/matters/[id]/drift-check
  *
- * Drift-Blocker — Check if there are unacknowledged case law alerts
+ * Drift-Blocker  -  Check if there are unacknowledged case law alerts
  * that should block AI draft approval for this matter.
  *
  * POST /api/matters/[id]/drift-check

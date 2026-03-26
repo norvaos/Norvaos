@@ -12,7 +12,7 @@ interface NowStripProps {
 }
 
 export function NowStrip({ userId }: NowStripProps) {
-  // Own the active shift query here — don't rely on parent prop drilling.
+  // Own the active shift query here  -  don't rely on parent prop drilling.
   // This ensures invalidation immediately re-renders this component.
   const { data: activeShift } = useFrontDeskActiveShift(userId)
   const { tenant } = useTenant()
@@ -43,7 +43,7 @@ export function NowStrip({ userId }: NowStripProps) {
       return data
     },
     onSuccess: (result) => {
-      // Optimistic update — flip the UI immediately before the refetch completes
+      // Optimistic update  -  flip the UI immediately before the refetch completes
       const shiftData = result?.data
       if (shiftData?.shiftId) {
         queryClient.setQueryData(frontDeskKeys.activeShift(userId), {
@@ -72,7 +72,7 @@ export function NowStrip({ userId }: NowStripProps) {
       return data
     },
     onSuccess: () => {
-      // Optimistic clear — remove shift from cache immediately
+      // Optimistic clear  -  remove shift from cache immediately
       queryClient.setQueryData(frontDeskKeys.activeShift(userId), null)
       toast.success('Shift ended')
       setShowEndDialog(false)
@@ -95,7 +95,7 @@ export function NowStrip({ userId }: NowStripProps) {
       return res.json()
     },
     onSuccess: () => {
-      toast.success('Lunch break started — enjoy! You have 1 hour.')
+      toast.success('Lunch break started  -  enjoy! You have 1 hour.')
       setShowEndDialog(false)
       queryClient.invalidateQueries({ queryKey: frontDeskKeys.all })
     },

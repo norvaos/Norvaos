@@ -323,7 +323,7 @@ describe('checkBillingPermission', () => {
 
       const sb = mockSupabase({ data: null })
 
-      // Should NOT throw — logBillingDenied swallows errors
+      // Should NOT throw  -  logBillingDenied swallows errors
       await expect(
         checkBillingPermission(sb, USER_ID, TENANT_ID),
       ).resolves.toEqual({ allowed: false, roleName: null })

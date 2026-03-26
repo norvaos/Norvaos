@@ -15,7 +15,7 @@
  *
  * Entity types synced:
  *   - notes → activities table (Norva Timeline)
- *   - documents → documents table (metadata only — file download TBD)
+ *   - documents → documents table (metadata only  -  file download TBD)
  *   - trust_line_items → trust_transactions (Norva Ledger)
  */
 
@@ -82,7 +82,7 @@ export async function startDeltaSyncSession(
   const expiresAt = new Date()
   expiresAt.setDate(expiresAt.getDate() + durationDays)
 
-  // Initialize watermarks to "now" — only sync items created AFTER migration start
+  // Initialize watermarks to "now"  -  only sync items created AFTER migration start
   const watermarks: Record<string, string> = {}
   for (const et of entityTypes) {
     watermarks[et] = new Date().toISOString()

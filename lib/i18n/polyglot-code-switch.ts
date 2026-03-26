@@ -1,5 +1,5 @@
 /**
- * Polyglot Code-Switch — Directive 15.0 Protocol 3
+ * Polyglot Code-Switch  -  Directive 15.0 Protocol 3
  *
  * Neural Translation Layer for Norva Ear that handles code-switching.
  *
@@ -232,6 +232,6 @@ export function buildBilingualFactAnchor(
     // Display: show original with English translation if non-English
     displayQuote: isEnglish
       ? originalQuote
-      : `"${originalQuote}" — [${englishQuote}]`,
+      : `"${originalQuote}"  -  [${englishQuote}]`,
   }
 }

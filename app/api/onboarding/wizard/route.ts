@@ -8,7 +8,7 @@ import type { WizardAnswers, TenantOnboardingWizardRow, TypedOnboardingWizardRow
  * GET /api/onboarding/wizard
  *
  * Returns the tenant's onboarding wizard row.
- * Creates a blank draft row (mode=draft, step=0) on first call — idempotent.
+ * Creates a blank draft row (mode=draft, step=0) on first call  -  idempotent.
  */
 async function handleGet() {
   try {
@@ -26,7 +26,7 @@ async function handleGet() {
       return NextResponse.json({ wizard: existing as TenantOnboardingWizardRow })
     }
 
-    // First access — seed a blank draft
+    // First access  -  seed a blank draft
     const { data: created, error } = await admin
       .from('tenant_onboarding_wizard')
       .insert({ tenant_id: auth.tenantId, mode: 'draft', status: 'draft', current_step: 0, answers: {} as never } as never)
@@ -48,12 +48,12 @@ async function handleGet() {
  * PUT /api/onboarding/wizard
  *
  * Saves wizard progress (partial answers + current step).
- * Idempotent — safe to call on every step navigation.
+ * Idempotent  -  safe to call on every step navigation.
  *
  * Body:
- *   current_step: number          — 0-based step index the user just completed
- *   step_key:     string          — answers key (e.g. "firmProfile")
- *   step_data:    WizardAnswers[key] — the step's collected data
+ *   current_step: number           -  0-based step index the user just completed
+ *   step_key:     string           -  answers key (e.g. "firmProfile")
+ *   step_data:    WizardAnswers[key]  -  the step's collected data
  *   mode?:        'custom' | 'default'
  */
 async function handlePut(request: Request) {

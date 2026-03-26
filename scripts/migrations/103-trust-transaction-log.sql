@@ -1,5 +1,5 @@
 -- ============================================================================
--- Migration 102: Trust Transaction Log — Append-Only Financial Event Log
+-- Migration 102: Trust Transaction Log  -  Append-Only Financial Event Log
 -- ============================================================================
 -- Creates an immutable, append-only transaction log for trust accounting.
 -- Every financial event (deposit, disbursement, transfer, hold, reconciliation)
@@ -63,7 +63,7 @@ ALTER TABLE trust_transaction_log ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "trust_transaction_log_tenant_isolation" ON trust_transaction_log
   FOR ALL USING (tenant_id = (SELECT tenant_id FROM users WHERE auth_user_id = auth.uid()));
 
--- Immutability triggers — NO UPDATE, NO DELETE
+-- Immutability triggers  -  NO UPDATE, NO DELETE
 CREATE OR REPLACE FUNCTION trust_transaction_log_immutable()
 RETURNS TRIGGER AS $$
 BEGIN

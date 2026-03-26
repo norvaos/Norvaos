@@ -5,10 +5,10 @@ import { checkMatterAccess } from '@/lib/services/matter-access'
 import { withTiming } from '@/lib/middleware/request-timing'
 import { reportError } from '@/lib/monitoring/error-reporter'
 
-// Statuses that are not client-visible — exclude from statement data
+// Statuses that are not client-visible  -  exclude from statement data
 const NON_CLIENT_VISIBLE_STATUSES = ['draft', 'finalized']
 
-// Terminal/cancelled statuses — exclude from outstanding balance calculation
+// Terminal/cancelled statuses  -  exclude from outstanding balance calculation
 const EXCLUDED_FROM_OUTSTANDING = ['void', 'written_off', 'cancelled']
 
 async function handleGet(
@@ -108,7 +108,7 @@ async function handleGet(
       matters = matterData ?? []
     }
 
-    // Fetch trust balance — scoped to authorized matters only
+    // Fetch trust balance  -  scoped to authorized matters only
     let trustBalance = 0
     const { data: trustAccounts } = await supabase
       .from('trust_bank_accounts')
@@ -129,7 +129,7 @@ async function handleGet(
       }
     }
 
-    // Compute totals — exclude void/written_off/cancelled from outstanding calculation
+    // Compute totals  -  exclude void/written_off/cancelled from outstanding calculation
     const outstandingEligible = authorizedInvoices.filter(
       (inv) => !EXCLUDED_FROM_OUTSTANDING.includes(inv.status ?? '')
     )

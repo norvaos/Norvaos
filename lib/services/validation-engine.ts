@@ -1,5 +1,5 @@
 // ============================================================================
-// Universal Enforcement Engine — Validation Engine
+// Universal Enforcement Engine  -  Validation Engine
 // Pure TypeScript module. No database dependency.
 // Takes structured data as input, returns hard-stops + red-flags.
 // ============================================================================
@@ -57,7 +57,7 @@ export interface ValidationResult {
 const INVALID_IN_CANADA_STATUSES = ['expired', 'unknown', 'no_status']
 const MARRIED_STATUSES = ['married', 'common_law']
 
-// Jurisdiction enforcement — fail loud for unsupported jurisdictions
+// Jurisdiction enforcement  -  fail loud for unsupported jurisdictions
 import { ENABLED_JURISDICTIONS } from '@/lib/config/jurisdictions'
 
 // ─── Hard-Stop Rules ─────────────────────────────────────────────────────────
@@ -65,7 +65,7 @@ import { ENABLED_JURISDICTIONS } from '@/lib/config/jurisdictions'
 function checkHardStops(input: ValidationInput): ValidationIssue[] {
   const issues: ValidationIssue[] = []
 
-  // Jurisdiction gate — unsupported jurisdictions produce a hard stop
+  // Jurisdiction gate  -  unsupported jurisdictions produce a hard stop
   if (input.intake.jurisdiction && !ENABLED_JURISDICTIONS.includes(input.intake.jurisdiction)) {
     issues.push({
       code: 'UNSUPPORTED_JURISDICTION',
@@ -140,7 +140,7 @@ function checkHardStops(input: ValidationInput): ValidationIssue[] {
     }
   }
 
-  // 5. CRIMINAL_NO_DETAILS — applies to ALL people
+  // 5. CRIMINAL_NO_DETAILS  -  applies to ALL people
   for (const person of input.people) {
     if (person.criminal_charges && (!person.criminal_details || person.criminal_details.trim() === '')) {
       issues.push({
@@ -225,7 +225,7 @@ function checkRedFlags(input: ValidationInput): ValidationIssue[] {
     })
   }
 
-  // 5. INADMISSIBILITY_NO_DETAILS — check all people
+  // 5. INADMISSIBILITY_NO_DETAILS  -  check all people
   for (const person of input.people) {
     if (person.inadmissibility_flag && (!person.inadmissibility_details || person.inadmissibility_details.trim() === '')) {
       issues.push({
@@ -239,7 +239,7 @@ function checkRedFlags(input: ValidationInput): ValidationIssue[] {
     }
   }
 
-  // 6. STATUS_EXPIRY_APPROACHING — check if status expires within 90 days
+  // 6. STATUS_EXPIRY_APPROACHING  -  check if status expires within 90 days
   const now = new Date()
   const ninetyDaysFromNow = new Date(now.getTime() + 90 * 24 * 60 * 60 * 1000)
   for (const person of input.people) {

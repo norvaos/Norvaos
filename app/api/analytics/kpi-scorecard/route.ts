@@ -1,5 +1,5 @@
 /**
- * GET /api/analytics/kpi-scorecard — Firm KPI scorecard
+ * GET /api/analytics/kpi-scorecard  -  Firm KPI scorecard
  */
 
 import { NextRequest, NextResponse } from 'next/server'

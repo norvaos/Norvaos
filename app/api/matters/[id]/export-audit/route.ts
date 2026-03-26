@@ -16,7 +16,7 @@ import { createHmac } from 'crypto'
  *   1. Genesis Block (compliance seal, 3-pillar breakdown, SHA-256)
  *   2. Immutable Trust Ledger (all trust_transactions + audit chain)
  *   3. Conflict Justification (scan results + decision + lawyer notes)
- *   4. Closing Certificate (if matter is closed — zero-balance verification)
+ *   4. Closing Certificate (if matter is closed  -  zero-balance verification)
  *
  * Forensic Footer: Every page includes the Global Firm Hash and Matter Genesis Hash.
  * The PDF is password-protected with the matter number as the password.
@@ -160,7 +160,7 @@ async function handleGet(
       })
     }
 
-    // ── Forensic Footer — stamped on every page ────────────────────
+    // ── Forensic Footer  -  stamped on every page ────────────────────
     function drawForensicFooter() {
       const footerY = 25
       const footerSize = 6
@@ -208,9 +208,9 @@ async function handleGet(
 
     // ── Cover Header ────────────────────────────────────────────────
 
-    drawText('NORVAOS — LSO COMPLIANCE FORENSIC AUDIT EXPORT', margin, y, { font: fontBold, size: headerSize, color: purple })
+    drawText('NORVAOS  -  LSO COMPLIANCE FORENSIC AUDIT EXPORT', margin, y, { font: fontBold, size: headerSize, color: purple })
     y -= lineHeight * 1.5
-    drawText(`Matter: ${matter.matter_number} — ${matter.title}`, margin, y, { size: subheaderSize, font: fontBold })
+    drawText(`Matter: ${matter.matter_number}  -  ${matter.title}`, margin, y, { size: subheaderSize, font: fontBold })
     y -= lineHeight
     drawText(`Status: ${matter.status?.toUpperCase()}`, margin, y, { color: matter.status === 'active' ? emerald : isClosed ? red : gray })
     y -= lineHeight
@@ -227,7 +227,7 @@ async function handleGet(
 
     // ── Section 1: Genesis Block ────────────────────────────────────
 
-    drawText('SECTION 1: GENESIS BLOCK — SOVEREIGN BIRTH CERTIFICATE', margin, y, { font: fontBold, size: subheaderSize, color: purple })
+    drawText('SECTION 1: GENESIS BLOCK  -  SOVEREIGN BIRTH CERTIFICATE', margin, y, { font: fontBold, size: subheaderSize, color: purple })
     y -= lineHeight * 1.5
 
     if (genesis) {
@@ -235,13 +235,13 @@ async function handleGet(
       y -= lineHeight
       drawText(`Generated At: ${genesis.generated_at}`, margin, y)
       y -= lineHeight
-      drawText(`Compliant: ${genesis.is_compliant ? 'YES — All 3 pillars met' : 'NO — See notes'}`, margin, y, { color: genesis.is_compliant ? emerald : red })
+      drawText(`Compliant: ${genesis.is_compliant ? 'YES  -  All 3 pillars met' : 'NO  -  See notes'}`, margin, y, { color: genesis.is_compliant ? emerald : red })
       y -= lineHeight
       drawText(`Compliance Notes: ${genesis.compliance_notes ?? 'None'}`, margin, y)
       y -= lineHeight * 1.5
 
       // Conflict pillar
-      drawText('Pillar 1 — Conflict Check:', margin, y, { font: fontBold })
+      drawText('Pillar 1  -  Conflict Check:', margin, y, { font: fontBold })
       y -= lineHeight
       drawText(`  Scan ID: ${genesis.conflict_scan_id ?? 'N/A'}`, margin, y)
       y -= lineHeight
@@ -254,7 +254,7 @@ async function handleGet(
 
       // KYC pillar
       newPageIfNeeded(6)
-      drawText('Pillar 2 — KYC Identity Verification:', margin, y, { font: fontBold })
+      drawText('Pillar 2  -  KYC Identity Verification:', margin, y, { font: fontBold })
       y -= lineHeight
       drawText(`  Status: ${genesis.kyc_status ?? 'N/A'}`, margin, y)
       y -= lineHeight
@@ -264,7 +264,7 @@ async function handleGet(
       y -= lineHeight * 1.5
 
       // Retainer pillar
-      drawText('Pillar 3 — Retainer Agreement:', margin, y, { font: fontBold })
+      drawText('Pillar 3  -  Retainer Agreement:', margin, y, { font: fontBold })
       y -= lineHeight
       drawText(`  Status: ${genesis.retainer_status ?? 'N/A'}`, margin, y)
       y -= lineHeight
@@ -398,7 +398,7 @@ async function handleGet(
       drawHr()
       y -= lineHeight
 
-      drawText('SECTION 5: CLOSING CERTIFICATE — LSO RULE 3.7', margin, y, { font: fontBold, size: subheaderSize, color: isZeroBalance ? emerald : red })
+      drawText('SECTION 5: CLOSING CERTIFICATE  -  LSO RULE 3.7', margin, y, { font: fontBold, size: subheaderSize, color: isZeroBalance ? emerald : red })
       y -= lineHeight * 1.5
 
       drawText('Zero-Balance Verification:', margin, y, { font: fontBold })
@@ -407,7 +407,7 @@ async function handleGet(
       const balanceDisplay = `$${(Math.abs(trustBalance) / 100).toFixed(2)}`
 
       if (isZeroBalance) {
-        drawText('STATUS: VERIFIED — Trust account balance is $0.00', margin + 10, y, { color: emerald, font: fontBold })
+        drawText('STATUS: VERIFIED  -  Trust account balance is $0.00', margin + 10, y, { color: emerald, font: fontBold })
         y -= lineHeight
         drawText('All trust funds have been properly disbursed or returned to the client.', margin + 10, y, { color: gray })
         y -= lineHeight

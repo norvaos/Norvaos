@@ -75,7 +75,7 @@ function getRiskLevelDisplay(
 // ─── Component ──────────────────────────────────────────────────────
 
 /**
- * Risk Panel — displays risk score from intake and any risk flags.
+ * Risk Panel  -  displays risk score from intake and any risk flags.
  * Override history tracked through workflow_actions audit trail.
  */
 export function RiskPanel() {

@@ -9,7 +9,7 @@ import { logSentinelEvent } from '@/lib/services/sentinel-audit'
 /**
  * POST /api/documents/verify-integrity
  *
- * Vault Hashing Tamper Detection — Downloads a document from storage,
+ * Vault Hashing Tamper Detection  -  Downloads a document from storage,
  * recomputes its SHA-256, and compares against the stored content_hash.
  * If the hashes don't match, fires a CRITICAL SENTINEL alert.
  *
@@ -58,7 +58,7 @@ async function handlePost(request: Request) {
       return NextResponse.json({
         status: 'unchecked',
         documentId,
-        message: 'Document stored externally — cannot verify integrity',
+        message: 'Document stored externally  -  cannot verify integrity',
       })
     }
 
@@ -73,7 +73,7 @@ async function handlePost(request: Request) {
       return NextResponse.json({
         status: 'missing',
         documentId,
-        message: 'File not found in storage — may have been deleted externally',
+        message: 'File not found in storage  -  may have been deleted externally',
       })
     }
 

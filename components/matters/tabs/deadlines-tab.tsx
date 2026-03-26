@@ -124,7 +124,7 @@ export function DeadlinesTab({
                       <SelectValue placeholder="Select type (optional)" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="__none__">— None —</SelectItem>
+                      <SelectItem value="__none__"> -  None  - </SelectItem>
                       {deadlineTypes?.map((dt) => (
                         <SelectItem key={dt.id} value={dt.id}>
                           <div className="flex items-center gap-2">

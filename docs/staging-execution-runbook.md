@@ -1,4 +1,4 @@
-# Staging Execution Runbook — Phase 1 Lead Intake Automation
+# Staging Execution Runbook  -  Phase 1 Lead Intake Automation
 
 ## Prerequisites
 
@@ -102,11 +102,11 @@ git push origin main
 ```
 
 The CI/CD pipeline will execute in order:
-1. `build` — lint, type-check, build
-2. `deploy-staging` — deploy to Vercel staging
-3. `migrate-staging` — check + apply pending migrations
-4. `validate-staging` — run staging API validation script
-5. `deploy-production` — (blocked by manual approval gate)
+1. `build`  -  lint, type-check, build
+2. `deploy-staging`  -  deploy to Vercel staging
+3. `migrate-staging`  -  check + apply pending migrations
+4. `validate-staging`  -  run staging API validation script
+5. `deploy-production`  -  (blocked by manual approval gate)
 
 Monitor at: GitHub → Actions → CI/CD workflow run
 
@@ -213,14 +213,14 @@ After all validation areas pass:
 | Enforcement spec | v1.3.0, 34 surfaces, version-synced | |
 | Staging deploy | Vercel staging live | |
 | Migrations | All applied, no errors | |
-| API validation — E2E | All scenarios pass | |
-| API validation — Permissions | All 4 roles correct | |
-| API validation — Tenant isolation | Zero cross-tenant leaks | |
-| API validation — Conversion | Gates enforce, idempotent | |
-| API validation — Cron | Auth enforced, idempotent | |
-| API validation — Close/Reopen | Full lifecycle correct | |
-| API validation — Multi-user | No corruption under concurrency | |
-| API validation — Performance | All under threshold | |
+| API validation  -  E2E | All scenarios pass | |
+| API validation  -  Permissions | All 4 roles correct | |
+| API validation  -  Tenant isolation | Zero cross-tenant leaks | |
+| API validation  -  Conversion | Gates enforce, idempotent | |
+| API validation  -  Cron | Auth enforced, idempotent | |
+| API validation  -  Close/Reopen | Full lifecycle correct | |
+| API validation  -  Multi-user | No corruption under concurrency | |
+| API validation  -  Performance | All under threshold | |
 | UI walkthrough | All checklist items verified | |
 
 **GO** = All gates pass, zero critical failures.

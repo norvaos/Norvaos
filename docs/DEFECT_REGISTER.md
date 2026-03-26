@@ -1,7 +1,7 @@
 # NorvaOS Defect Register
 
 **Register opened:** 2026-03-18  
-**Status:** ACTIVE — Defect Stabilization Pass  
+**Status:** ACTIVE  -  Defect Stabilization Pass  
 **Release posture:** Deployed. Hardened. Not approved for operational release.  
 **Production build:** `447d0c8`  
 
@@ -23,7 +23,7 @@
 
 ---
 
-### DEF-001 — Form generation callback: no tenant isolation on job update
+### DEF-001  -  Form generation callback: no tenant isolation on job update
 
 | Field | Value |
 |---|---|
@@ -43,7 +43,7 @@
 
 ---
 
-### DEF-002 — Booking page intake: slug lookup missing tenant filter
+### DEF-002  -  Booking page intake: slug lookup missing tenant filter
 
 | Field | Value |
 |---|---|
@@ -67,13 +67,13 @@
 
 ---
 
-### DEF-003 — Generate-form: sidecar URL dispatched without protocol validation
+### DEF-003  -  Generate-form: sidecar URL dispatched without protocol validation
 
 | Field | Value |
 |---|---|
 | **Issue ID** | DEF-003 |
 | **Module** | Form Generation |
-| **Exact defect** | `POST /api/matters/[id]/generate-form` reads `PYTHON_SIDECAR_URL` from env and dispatches a form generation payload to `${sidecarUrl}/generate-form` without validating the URL is well-formed or uses HTTPS. If `PYTHON_SIDECAR_URL` is set to an attacker-controlled or misconfigured value, the payload — which includes `job_id`, `callback_url`, `field_overrides`, and `matter_id` — is sent to an arbitrary endpoint. |
+| **Exact defect** | `POST /api/matters/[id]/generate-form` reads `PYTHON_SIDECAR_URL` from env and dispatches a form generation payload to `${sidecarUrl}/generate-form` without validating the URL is well-formed or uses HTTPS. If `PYTHON_SIDECAR_URL` is set to an attacker-controlled or misconfigured value, the payload  -  which includes `job_id`, `callback_url`, `field_overrides`, and `matter_id`  -  is sent to an arbitrary endpoint. |
 | **Steps to reproduce** | 1. Set `PYTHON_SIDECAR_URL=http://attacker.example.com` in environment. 2. POST to `/api/matters/<id>/generate-form`. 3. Observe full job payload including sensitive field data posted to attacker server. |
 | **Expected result** | Route validates `PYTHON_SIDECAR_URL` is a syntactically valid HTTPS URL before dispatching. HTTP and relative URLs are rejected at startup or at dispatch time. |
 | **Actual result** | Line 168 of `app/api/matters/[id]/generate-form/route.ts` sends the payload to the raw env value without any protocol or hostname check. |
@@ -87,20 +87,20 @@
 
 ---
 
-### DEF-004 — Job worker: sidecar URL dispatched without protocol validation
+### DEF-004  -  Job worker: sidecar URL dispatched without protocol validation
 
 | Field | Value |
 |---|---|
 | **Issue ID** | DEF-004 |
 | **Module** | Background Job Worker |
 | **Exact defect** | Same class of defect as DEF-003. `GET /api/internal/job-worker` re-dispatches stalled or pending jobs to `PYTHON_SIDECAR_URL` without URL validation. |
-| **Steps to reproduce** | Same as DEF-003 — misconfigured or malicious `PYTHON_SIDECAR_URL` causes job payloads to be sent to arbitrary endpoints on retry. |
+| **Steps to reproduce** | Same as DEF-003  -  misconfigured or malicious `PYTHON_SIDECAR_URL` causes job payloads to be sent to arbitrary endpoints on retry. |
 | **Expected result** | URL validated before dispatch. |
 | **Actual result** | Raw env value used at line 141 of `app/api/internal/job-worker/route.ts`. |
 | **Severity** | **High** |
 | **Affected role** | Internal worker (WORKER_SECRET bearer) |
 | **Affected route / component** | `app/api/internal/job-worker/route.ts` lines 130–150 |
-| **Root cause** | Same as DEF-003 — no URL validation on sidecar dispatch path. |
+| **Root cause** | Same as DEF-003  -  no URL validation on sidecar dispatch path. |
 | **Fix owner** | Dev |
 | **ETA** | Sprint 7 Day 2 |
 | **Retest evidence** | Pending fix |
@@ -111,15 +111,15 @@
 
 ---
 
-### DEF-005 — Matter close: blocker check is non-atomic (race condition)
+### DEF-005  -  Matter close: blocker check is non-atomic (race condition)
 
 | Field | Value |
 |---|---|
 | **Issue ID** | DEF-005 |
 | **Module** | Matter Lifecycle |
-| **Exact defect** | `POST /api/matters/[id]/close` fetches open deficiencies, trust balance, and risk flags in parallel, then — if all pass — executes the close update. These are two separate DB round-trips with no locking between them. A concurrent request (e.g., a second tab or automated process) could resolve a blocker between the check and the close, or two simultaneous close requests could both pass the guard. |
+| **Exact defect** | `POST /api/matters/[id]/close` fetches open deficiencies, trust balance, and risk flags in parallel, then  -  if all pass  -  executes the close update. These are two separate DB round-trips with no locking between them. A concurrent request (e.g., a second tab or automated process) could resolve a blocker between the check and the close, or two simultaneous close requests could both pass the guard. |
 | **Steps to reproduce** | 1. Send two simultaneous POST requests to `/api/matters/<id>/close` with valid body. 2. Both may pass the blocker check before either commits. 3. Both attempt to update `matters.status` to closed. |
-| **Expected result** | Close operation is atomic — guard check and status update occur in a single DB transaction or the update includes a `WHERE status = 'active'` guard that makes the second write a no-op. |
+| **Expected result** | Close operation is atomic  -  guard check and status update occur in a single DB transaction or the update includes a `WHERE status = 'active'` guard that makes the second write a no-op. |
 | **Actual result** | Two-phase check-then-update pattern at lines 70–177 of `app/api/matters/[id]/close/route.ts`. No optimistic lock or transaction wrapping. |
 | **Severity** | **Medium** |
 | **Affected role** | Lawyer, Admin |
@@ -131,14 +131,14 @@
 
 ---
 
-### DEF-006 — Deficiency creation allowed on closed matters
+### DEF-006  -  Deficiency creation allowed on closed matters
 
 | Field | Value |
 |---|---|
 | **Issue ID** | DEF-006 |
 | **Module** | Matter Lifecycle / Deficiencies |
 | **Exact defect** | `POST /api/matters/[id]/deficiencies` verifies the matter belongs to the tenant but does not check whether the matter is already closed. A user can create a deficiency on a `closed_won`, `closed_lost`, or `closed_withdrawn` matter, mutating a record that should be immutable after closure. |
-| **Steps to reproduce** | 1. Close a matter (`status = closed_won`). 2. POST to `/api/matters/<closed_matter_id>/deficiencies` with valid body. 3. Observe deficiency created successfully — status 201. |
+| **Steps to reproduce** | 1. Close a matter (`status = closed_won`). 2. POST to `/api/matters/<closed_matter_id>/deficiencies` with valid body. 3. Observe deficiency created successfully  -  status 201. |
 | **Expected result** | Route returns 409 Conflict if matter status is any closed variant. Closed matters are immutable. |
 | **Actual result** | No status check in deficiency creation path. Deficiency is created on closed matter. |
 | **Severity** | **Medium** |
@@ -151,7 +151,7 @@
 
 ---
 
-### DEF-007 — Required document slots not enforced at matter close
+### DEF-007  -  Required document slots not enforced at matter close
 
 | Field | Value |
 |---|---|
@@ -171,19 +171,19 @@
 
 ---
 
-### DEF-008 — Public form submission: orphaned contact/lead on file upload failure
+### DEF-008  -  Public form submission: orphaned contact/lead on file upload failure
 
 | Field | Value |
 |---|---|
 | **Issue ID** | DEF-008 |
 | **Module** | Public Intake / Forms |
 | **Exact defect** | `POST /api/forms/[slug]/submit` creates a contact and optionally a lead record before attempting file uploads. If file upload fails, the route returns 500 but the contact and lead records are already committed to the database. The partial submission leaves orphaned CRM records with no associated files. |
-| **Steps to reproduce** | 1. Submit a form with file attachments when Supabase Storage is unavailable or quota exceeded. 2. Observe a 500 response. 3. Query the contacts table — a contact record for the submitter exists. |
+| **Steps to reproduce** | 1. Submit a form with file attachments when Supabase Storage is unavailable or quota exceeded. 2. Observe a 500 response. 3. Query the contacts table  -  a contact record for the submitter exists. |
 | **Expected result** | File uploads are attempted before contact/lead creation, or the entire operation is wrapped in a transaction that rolls back on any failure. |
 | **Actual result** | Contact created at lines 184–274, lead created at lines 302–345, file upload attempted at lines 131–158. Failure at upload leaves contact + lead with no linked files. |
 | **Severity** | **Medium** |
 | **Affected role** | Unauthenticated public submitter |
-| **Affected route / component** | `app/api/forms/[slug]/submit/route.ts` — ordering of contact creation vs file upload |
+| **Affected route / component** | `app/api/forms/[slug]/submit/route.ts`  -  ordering of contact creation vs file upload |
 | **Root cause** | Incorrect operation order; no transactional rollback on partial failure. |
 | **Fix owner** | Dev |
 | **ETA** | Sprint 7 Day 3 |
@@ -191,14 +191,14 @@
 
 ---
 
-### DEF-009 — Portal client upload: null contact_id not validated
+### DEF-009  -  Portal client upload: null contact_id not validated
 
 | Field | Value |
 |---|---|
 | **Issue ID** | DEF-009 |
 | **Module** | Client Portal |
 | **Exact defect** | `POST /api/portal/[token]/client-upload` derives `contact_id` from the portal link record returned by `validatePortalToken()`. If `contact_id` is null in the link record, it is inserted into the documents table without a null check, creating a document row with `contact_id = null`. |
-| **Steps to reproduce** | 1. Create a portal link where `contact_id` is null (e.g., matter-only link with no contact association). 2. Upload a document via the portal. 3. Observe document inserted with null contact_id — FK constraint may or may not fire depending on schema. |
+| **Steps to reproduce** | 1. Create a portal link where `contact_id` is null (e.g., matter-only link with no contact association). 2. Upload a document via the portal. 3. Observe document inserted with null contact_id  -  FK constraint may or may not fire depending on schema. |
 | **Expected result** | Route returns 422 if portal link has no contact_id and the upload requires one, or explicitly allows null and handles downstream gracefully. |
 | **Actual result** | No null check at line 148 of `app/api/portal/[token]/client-upload/route.ts`. Insert proceeds with null contact_id. |
 | **Severity** | **Medium** |
@@ -211,14 +211,14 @@
 
 ---
 
-### DEF-010 — Matter creation: workflow kit activation failure leaves matter stageless
+### DEF-010  -  Matter creation: workflow kit activation failure leaves matter stageless
 
 | Field | Value |
 |---|---|
 | **Issue ID** | DEF-010 |
 | **Module** | Matter Lifecycle / Workflow |
-| **Exact defect** | `POST /api/matters` calls `activateWorkflowKit()` after creating the matter record. If kit activation fails, the error is logged as non-fatal and the matter is returned as created. The matter exists in the database with no `current_stage_id` set, meaning all downstream stage advance, gating, and close operations operate on a stageless matter — undefined behaviour throughout the lifecycle. |
-| **Steps to reproduce** | 1. Create a matter with a valid `matter_stage_pipeline_id` pointing to a pipeline with a misconfigured initial stage. 2. `activateWorkflowKit()` throws or returns an error. 3. Observe the matter is created (201 response) but has no stage state. 4. Attempt to advance the stage — undefined behaviour. |
+| **Exact defect** | `POST /api/matters` calls `activateWorkflowKit()` after creating the matter record. If kit activation fails, the error is logged as non-fatal and the matter is returned as created. The matter exists in the database with no `current_stage_id` set, meaning all downstream stage advance, gating, and close operations operate on a stageless matter  -  undefined behaviour throughout the lifecycle. |
+| **Steps to reproduce** | 1. Create a matter with a valid `matter_stage_pipeline_id` pointing to a pipeline with a misconfigured initial stage. 2. `activateWorkflowKit()` throws or returns an error. 3. Observe the matter is created (201 response) but has no stage state. 4. Attempt to advance the stage  -  undefined behaviour. |
 | **Expected result** | If kit activation fails, the matter creation is rolled back (or the matter is immediately marked as requiring manual intervention). A matter must never be created without a valid initial stage. |
 | **Actual result** | Lines 157–160 of `app/api/matters/route.ts` log the error and continue. Matter exists with no stage. |
 | **Severity** | **Medium** |
@@ -235,7 +235,7 @@
 
 ---
 
-### DEF-011 — Trust accounting: no pre-insert account existence check
+### DEF-011  -  Trust accounting: no pre-insert account existence check
 
 | Field | Value |
 |---|---|
@@ -255,7 +255,7 @@
 
 ---
 
-### DEF-012 — Matter close: no terminal-stage gate before closure
+### DEF-012  -  Matter close: no terminal-stage gate before closure
 
 | Field | Value |
 |---|---|
@@ -279,18 +279,18 @@
 
 | ID | Title | Severity | Status | Fixed in | Retested |
 |---|---|---|---|---|---|
-| DEF-001 | Callback no tenant isolation | Release Blocker | OPEN | — | — |
-| DEF-002 | Booking slug no tenant filter | Release Blocker | OPEN | — | — |
-| DEF-003 | Generate-form sidecar URL unvalidated | High | OPEN | — | — |
-| DEF-004 | Job-worker sidecar URL unvalidated | High | OPEN | — | — |
-| DEF-005 | Close matter non-atomic blocker check | Medium | OPEN | — | — |
-| DEF-006 | Deficiency on closed matter | Medium | OPEN | — | — |
-| DEF-007 | Required slots not enforced at close | Medium | OPEN | — | — |
-| DEF-008 | Orphaned contact on file upload failure | Medium | OPEN | — | — |
-| DEF-009 | Portal upload null contact_id | Medium | OPEN | — | — |
-| DEF-010 | Stageless matter on kit activation failure | Medium | OPEN | — | — |
-| DEF-011 | Trust accounting weak account permission | Low | OPEN | — | — |
-| DEF-012 | No terminal-stage gate at close | Low | OPEN | — | — |
+| DEF-001 | Callback no tenant isolation | Release Blocker | OPEN |  -  |  -  |
+| DEF-002 | Booking slug no tenant filter | Release Blocker | OPEN |  -  |  -  |
+| DEF-003 | Generate-form sidecar URL unvalidated | High | OPEN |  -  |  -  |
+| DEF-004 | Job-worker sidecar URL unvalidated | High | OPEN |  -  |  -  |
+| DEF-005 | Close matter non-atomic blocker check | Medium | OPEN |  -  |  -  |
+| DEF-006 | Deficiency on closed matter | Medium | OPEN |  -  |  -  |
+| DEF-007 | Required slots not enforced at close | Medium | OPEN |  -  |  -  |
+| DEF-008 | Orphaned contact on file upload failure | Medium | OPEN |  -  |  -  |
+| DEF-009 | Portal upload null contact_id | Medium | OPEN |  -  |  -  |
+| DEF-010 | Stageless matter on kit activation failure | Medium | OPEN |  -  |  -  |
+| DEF-011 | Trust accounting weak account permission | Low | OPEN |  -  |  -  |
+| DEF-012 | No terminal-stage gate at close | Low | OPEN |  -  |  -  |
 
 ---
 

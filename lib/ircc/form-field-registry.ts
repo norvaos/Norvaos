@@ -1,5 +1,5 @@
 /**
- * @deprecated — LEGACY Form Field Registry.
+ * @deprecated  -  LEGACY Form Field Registry.
  *
  * All form data is now managed via the DB (ircc_forms, ircc_form_sections,
  * ircc_form_fields tables). No forms or fields are hardcoded here.

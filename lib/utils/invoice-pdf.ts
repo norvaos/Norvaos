@@ -5,7 +5,7 @@
  *
  * Guardrails:
  * - All free-text fields sanitized: control chars (U+0000-U+001F except \n)
- *   and zero-width chars stripped. NO transliteration — full Unicode via
+ *   and zero-width chars stripped. NO transliteration  -  full Unicode via
  *   embedded Inter font.
  * - Pagination: auto-adds new pages when content overflows
  * - A4 page format (595x842pt)
@@ -25,6 +25,8 @@ import {
 } from 'pdf-lib'
 import fontkit from '@pdf-lib/fontkit'
 import { formatDateWithFormat } from '@/lib/utils/formatters'
+import type { SovereignBranding } from '@/lib/utils/sovereign-header'
+import { drawSovereignHeader, drawSovereignFooter } from '@/lib/utils/sovereign-header'
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -82,6 +84,9 @@ export interface InvoicePdfData {
   currency?: string // default: 'CAD'
   /** Tenant's preferred date format token, e.g. "DD/MM/YYYY". Passed from API route. */
   dateFormat?: string | null
+
+  /** Directive 033: Sovereign branding  -  if provided, uses branded letterhead header/footer */
+  branding?: SovereignBranding | null
 }
 
 // ── Constants ────────────────────────────────────────────────────────────────
@@ -133,7 +138,7 @@ function getBoldFontBytes(): Buffer {
 /**
  * Sanitize free-text for PDF rendering.
  * Only strips control chars and zero-width chars.
- * NO transliteration — the embedded Inter font handles full Unicode.
+ * NO transliteration  -  the embedded Inter font handles full Unicode.
  */
 function sanitize(text: string | null | undefined): string {
   if (!text) return ''
@@ -339,7 +344,7 @@ class PdfPageManager {
     this.yPos -= points
   }
 
-  /** Finalize — draw page number on the last page */
+  /** Finalize  -  draw page number on the last page */
   finalize(): void {
     this.drawPageNumber()
   }
@@ -377,42 +382,67 @@ export async function generateInvoicePdf(data: InvoicePdfData): Promise<Uint8Arr
   const firstPage = doc.addPage([PAGE_WIDTH, PAGE_HEIGHT])
   const pm = new PdfPageManager(doc, firstPage, font, fontBold)
 
-  // ── 1. Firm Header ─────────────────────────────────────────
+  // ── 1. Firm Header (Directive 033: Sovereign Brand Injection) ─────────────
 
-  pm.drawText(sanitize(data.firmName), {
-    font: fontBold,
-    size: FONT_TITLE,
-    color: COLOR_PRIMARY,
-  })
-  pm.moveDown(22)
+  if (data.branding) {
+    // Use Sovereign Letterhead header
+    const headerY = await drawSovereignHeader(doc, firstPage, data.branding, { regular: font, bold: fontBold })
 
-  if (data.firmAddress) {
-    const addressLines = sanitize(data.firmAddress).split('\n')
-    for (const line of addressLines) {
-      pm.drawText(line, { size: FONT_BODY, color: COLOR_MID })
-      pm.moveDown(LINE_HEIGHT)
+    // "INVOICE" label right-aligned at top
+    firstPage.drawText('INVOICE', {
+      x: PAGE_WIDTH - MARGIN_RIGHT - fontBold.widthOfTextAtSize('INVOICE', 24),
+      y: PAGE_HEIGHT - MARGIN_TOP,
+      size: 24,
+      font: fontBold,
+      color: COLOR_PRIMARY,
+    })
+
+    firstPage.drawText(`#${sanitize(data.invoiceNumber)}`, {
+      x: PAGE_WIDTH - MARGIN_RIGHT - fontBold.widthOfTextAtSize(`#${sanitize(data.invoiceNumber)}`, FONT_HEADING),
+      y: PAGE_HEIGHT - MARGIN_TOP - 28,
+      size: FONT_HEADING,
+      font: fontBold,
+      color: COLOR_DARK,
+    })
+
+    pm.y = headerY
+  } else {
+    // Legacy header (no branding)
+    pm.drawText(sanitize(data.firmName), {
+      font: fontBold,
+      size: FONT_TITLE,
+      color: COLOR_PRIMARY,
+    })
+    pm.moveDown(22)
+
+    if (data.firmAddress) {
+      const addressLines = sanitize(data.firmAddress).split('\n')
+      for (const line of addressLines) {
+        pm.drawText(line, { size: FONT_BODY, color: COLOR_MID })
+        pm.moveDown(LINE_HEIGHT)
+      }
     }
+
+    // "INVOICE" label right-aligned
+    pm.y = PAGE_HEIGHT - MARGIN_TOP
+    pm.drawTextRight('INVOICE', {
+      font: fontBold,
+      size: 24,
+      color: COLOR_PRIMARY,
+    })
+
+    pm.y = PAGE_HEIGHT - MARGIN_TOP - 28
+    pm.drawTextRight(`#${sanitize(data.invoiceNumber)}`, {
+      font: fontBold,
+      size: FONT_HEADING,
+      color: COLOR_DARK,
+    })
+
+    // Reset y to below header
+    pm.y = PAGE_HEIGHT - MARGIN_TOP - (data.firmAddress ? 22 + sanitize(data.firmAddress).split('\n').length * LINE_HEIGHT : 22) - 15
+    pm.drawLine()
+    pm.moveDown(20)
   }
-
-  // "INVOICE" label right-aligned
-  pm.y = PAGE_HEIGHT - MARGIN_TOP
-  pm.drawTextRight('INVOICE', {
-    font: fontBold,
-    size: 24,
-    color: COLOR_PRIMARY,
-  })
-
-  pm.y = PAGE_HEIGHT - MARGIN_TOP - 28
-  pm.drawTextRight(`#${sanitize(data.invoiceNumber)}`, {
-    font: fontBold,
-    size: FONT_HEADING,
-    color: COLOR_DARK,
-  })
-
-  // Reset y to below header
-  pm.y = PAGE_HEIGHT - MARGIN_TOP - (data.firmAddress ? 22 + sanitize(data.firmAddress).split('\n').length * LINE_HEIGHT : 22) - 15
-  pm.drawLine()
-  pm.moveDown(20)
 
   // ── 2. Invoice Metadata + Bill-To ──────────────────────────
 
@@ -631,13 +661,18 @@ export async function generateInvoicePdf(data: InvoicePdfData): Promise<Uint8Arr
   pm.drawLine({ color: COLOR_LIGHT })
   pm.moveDown(12)
 
-  const footerText = `Generated by NorvaOS \u2014 ${sanitize(data.firmName)}`
-  const footerWidth = font.widthOfTextAtSize(footerText, FONT_SMALL)
-  pm.drawText(footerText, {
-    size: FONT_SMALL,
-    color: COLOR_LIGHT,
-    x: (PAGE_WIDTH - footerWidth) / 2,
-  })
+  // Directive 033: Sovereign footer (with legal disclaimer) or legacy footer
+  if (data.branding) {
+    drawSovereignFooter(pm.page, data.branding, { regular: font, bold: fontBold })
+  } else {
+    const footerText = `Generated by NorvaOS \u2014 ${sanitize(data.firmName)}`
+    const footerWidth = font.widthOfTextAtSize(footerText, FONT_SMALL)
+    pm.drawText(footerText, {
+      size: FONT_SMALL,
+      color: COLOR_LIGHT,
+      x: (PAGE_WIDTH - footerWidth) / 2,
+    })
+  }
 
   // Finalize (page numbers)
   pm.finalize()

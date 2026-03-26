@@ -16,7 +16,7 @@ import { createClient } from '@supabase/supabase-js'
  *   - Results cached for 5 minutes (Cache-Control)
  *
  * Query params:
- *   - tenant: tenant slug (required — identifies the firm)
+ *   - tenant: tenant slug (required  -  identifies the firm)
  */
 
 const CACHE_MAX_AGE = 300 // 5 minutes
@@ -29,7 +29,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'Missing tenant parameter' }, { status: 400 })
   }
 
-  // Build a service-role client (server-side only — key is never sent to browser)
+  // Build a service-role client (server-side only  -  key is never sent to browser)
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!,

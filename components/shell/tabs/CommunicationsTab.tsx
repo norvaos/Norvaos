@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * CommunicationsTab — Zone D tab #7
+ * CommunicationsTab  -  Zone D tab #7
  *
  * Wired to the `communications` table (exists in DB).
  * Lists all communications for the matter, with a Sheet to create new ones.
@@ -224,7 +224,7 @@ export function CommunicationsTab({ matterId, tenantId }: CommunicationsTabProps
             {comms.map(comm => {
               const dateStr = comm.created_at
                 ? format(new Date(comm.created_at), 'MMM d')
-                : '—'
+                : ' - '
               const channelLabel = comm.channel
                 ? comm.channel.charAt(0).toUpperCase() + comm.channel.slice(1)
                 : 'Email'
@@ -310,7 +310,7 @@ export function CommunicationsTab({ matterId, tenantId }: CommunicationsTabProps
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="__none__">— No specific person —</SelectItem>
+                        <SelectItem value="__none__"> -  No specific person  - </SelectItem>
                         {(people ?? []).map(p => (
                           <SelectItem key={p.id} value={p.id}>
                             {p.first_name} {p.last_name}
@@ -356,7 +356,7 @@ export function CommunicationsTab({ matterId, tenantId }: CommunicationsTabProps
                   <FormItem>
                     <FormLabel>Subject</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g. Document Request — Passport Copy" {...field} />
+                      <Input placeholder="e.g. Document Request  -  Passport Copy" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

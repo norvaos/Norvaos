@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Enhanced Conflict Check — 3-Way Auto-Audit (Directive 5.5)
+ * Enhanced Conflict Check  -  3-Way Auto-Audit (Directive 5.5)
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Before auto-converting a Lead to a Matter via trust deposit, run a 3-way

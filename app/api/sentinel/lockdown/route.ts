@@ -7,7 +7,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 /**
  * POST /api/sentinel/lockdown
  *
- * Emergency Kill-Switch — Directive 2.4
+ * Emergency Kill-Switch  -  Directive 2.4
  *
  * Invokes sentinel_emergency_lockdown() RPC which:
  * 1. Counts recent DOCUMENT_TAMPER (or other) events from a user within a window
@@ -15,10 +15,10 @@ import { createAdminClient } from '@/lib/supabase/admin'
  *    logs EMERGENCY_LOCKDOWN breach event
  *
  * Body: {
- *   userId: string         — Target user to evaluate
- *   eventType?: string     — Event type to check (default: 'DOCUMENT_TAMPER')
- *   threshold?: number     — Event count threshold (default: 3)
- *   windowMinutes?: number — Lookback window in minutes (default: 60)
+ *   userId: string          -  Target user to evaluate
+ *   eventType?: string      -  Event type to check (default: 'DOCUMENT_TAMPER')
+ *   threshold?: number      -  Event count threshold (default: 3)
+ *   windowMinutes?: number  -  Lookback window in minutes (default: 60)
  * }
  *
  * GET /api/sentinel/lockdown

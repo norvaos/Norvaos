@@ -4,7 +4,7 @@ import { extractFacts } from '@/lib/services/norva-ear/fact-extractor'
 import { translateTranscript, detectLanguage } from '@/lib/services/norva-ear/transcript-translator'
 import type { NorvaEarLanguageCode } from '@/lib/i18n/config'
 
-// ── POST — Start a new Norva Ear session ─────────────────────────────────────
+// ── POST  -  Start a new Norva Ear session ─────────────────────────────────────
 
 export async function POST(
   request: Request,
@@ -25,7 +25,7 @@ export async function POST(
       consentMethod?: 'verbal' | 'written' | 'digital' | 'pre_authorized'
     }
 
-    // Consent Guard — refuse if consent not indicated
+    // Consent Guard  -  refuse if consent not indicated
     if (!consentMethod) {
       return NextResponse.json(
         { error: 'Consent Guard: Recording consent must be obtained before starting a Norva Ear session.' },
@@ -68,7 +68,7 @@ export async function POST(
   }
 }
 
-// ── PATCH — Submit transcript for processing ─────────────────────────────────
+// ── PATCH  -  Submit transcript for processing ─────────────────────────────────
 
 export async function PATCH(
   request: Request,
@@ -116,7 +116,7 @@ export async function PATCH(
     // Extract facts from English version (translated or original)
     const extraction = await extractFacts(translation.englishTranslation)
 
-    // Update session with results — store both original and translation
+    // Update session with results  -  store both original and translation
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: session, error: finalError } = await (supabase as any)
       .from('norva_ear_sessions')
@@ -156,7 +156,7 @@ export async function PATCH(
   }
 }
 
-// ── GET — List sessions for this matter ──────────────────────────────────────
+// ── GET  -  List sessions for this matter ──────────────────────────────────────
 
 export async function GET(
   _request: Request,

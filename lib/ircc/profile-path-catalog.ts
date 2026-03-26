@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Profile Path Catalog — Autocomplete data for IRCC field mapping
+ * Profile Path Catalog  -  Autocomplete data for IRCC field mapping
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Provides a catalog of all known profile paths that can be mapped to

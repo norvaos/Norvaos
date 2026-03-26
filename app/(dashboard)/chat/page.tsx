@@ -37,7 +37,7 @@ export default function ChatPage() {
 
   const handleChannelCreated = useCallback(
     (newChannelId: string) => {
-      // Set the channel by ID — the channel list will refetch and show it
+      // Set the channel by ID  -  the channel list will refetch and show it
       setSelectedChannel({
         id: newChannelId,
         tenant_id: tenantId,

@@ -2,7 +2,7 @@
  * Canonical matter status definitions for NorvaOS.
  *
  * All matter queries that filter "live/normal/business matters" MUST use
- * ACTIVE_MATTER_STATUSES or VISIBLE_MATTER_STATUSES — never hardcode status
+ * ACTIVE_MATTER_STATUSES or VISIBLE_MATTER_STATUSES  -  never hardcode status
  * strings in query call sites.
  *
  * Source of truth for real values: lib/utils/constants.ts → MATTER_STATUSES
@@ -14,7 +14,7 @@ export const ACTIVE_MATTER_STATUSES = ['intake', 'active', 'on_hold'] as const
 
 /**
  * All statuses that should appear in normal business views.
- * Excludes 'import_reverted' — reverted import artifacts must never surface
+ * Excludes 'import_reverted'  -  reverted import artifacts must never surface
  * in business-facing UIs or reports.
  */
 export const VISIBLE_MATTER_STATUSES = [
@@ -36,7 +36,7 @@ export const CLOSED_MATTER_STATUSES = ['closed_won', 'closed_lost'] as const
 export const IMPORT_REVERTED_STATUS = 'import_reverted' as const
 
 /**
- * Returns true if a matter status represents a real business matter —
+ * Returns true if a matter status represents a real business matter  - 
  * not an import artifact or reverted record.
  */
 export function isBusinessMatter(status: string): boolean {

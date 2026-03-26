@@ -8,13 +8,13 @@ import { getRegionStatus } from '@/lib/supabase/region-guard'
 /**
  * GET /api/admin/compliance-health
  *
- * Directive 006 — "In-House" Compliance Dashboard API
+ * Directive 006  -  "In-House" Compliance Dashboard API
  *
  * Returns real-time health checks for:
- *   1. Region Lock — verifying ca-central-1
- *   2. Encryption Status — sampling PII columns for ciphertext
- *   3. Audit Parity — comparing trust_transactions vs trust_ledger_audit counts
- *   4. Sentinel Summary — recent security events
+ *   1. Region Lock  -  verifying ca-central-1
+ *   2. Encryption Status  -  sampling PII columns for ciphertext
+ *   3. Audit Parity  -  comparing trust_transactions vs trust_ledger_audit counts
+ *   4. Sentinel Summary  -  recent security events
  */
 async function handleGet() {
   try {
@@ -190,7 +190,7 @@ async function checkAuditParity(
       details: {
         error: txnErr?.message || auditErr?.message,
       },
-      message: 'Could not verify audit parity (table may not exist yet — run migration 200)',
+      message: 'Could not verify audit parity (table may not exist yet  -  run migration 200)',
     }
   }
 
@@ -269,7 +269,7 @@ async function checkHardeningIntegrity(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const from = (table: string) => (admin as any).from(table)
 
-  // 1. Gaps Closed — count of document slots that went from 'empty' to 'accepted'
+  // 1. Gaps Closed  -  count of document slots that went from 'empty' to 'accepted'
   //    (slots with current_version > 0 and status = 'accepted' are closed gaps)
   const { count: gapsClosed } = await from('document_slots')
     .select('id', { count: 'exact', head: true })
@@ -285,7 +285,7 @@ async function checkHardeningIntegrity(
     .eq('is_required', true)
     .eq('is_active', true)
 
-  // 3. Inconsistencies Pre-empted — SENTINEL events where OCR/manual mismatch was flagged
+  // 3. Inconsistencies Pre-empted  -  SENTINEL events where OCR/manual mismatch was flagged
   //    Look for OCR_MISMATCH, CONTRADICTION_DETECTED, FIELD_VERIFICATION_MISMATCH events
   const { count: inconsistenciesPreempted } = await from('sentinel_audit_log')
     .select('id', { count: 'exact', head: true })

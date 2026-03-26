@@ -223,7 +223,7 @@ export function SendDocumentRequestDialog({
 
             {effectiveSlots.length > 0 && (
               <>
-                {/* Toggle — show accepted when visible */}
+                {/* Toggle  -  show accepted when visible */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Checkbox

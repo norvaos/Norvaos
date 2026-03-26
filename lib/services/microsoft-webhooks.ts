@@ -80,7 +80,7 @@ export async function createOneDriveSubscription(
     await graphFetch(connectionId, adminClient, `subscriptions/${subscription.id}`, {
       method: 'DELETE',
     }).catch(() => {
-      // Swallow — the Graph subscription will expire on its own
+      // Swallow  -  the Graph subscription will expire on its own
     })
     throw new Error(`Failed to store webhook subscription: ${dbError.message}`)
   }
@@ -151,17 +151,17 @@ export async function deleteSubscription(
  * Validate an incoming webhook notification.
  *
  * Two scenarios:
- * 1. **Validation request** — Graph sends a `validationToken` query param when
+ * 1. **Validation request**  -  Graph sends a `validationToken` query param when
  *    the subscription is first created. Return `{ valid: true }` and echo the
  *    token back as `text/plain`.
- * 2. **Change notification** — Graph sends a POST body with `clientState`.
+ * 2. **Change notification**  -  Graph sends a POST body with `clientState`.
  *    Verify it matches a known stored secret.
  */
 export function validateNotification(
   clientState: string,
   validationToken?: string
 ): { valid: boolean; subscriptionId?: string } {
-  // Validation handshake — Graph is confirming the endpoint exists
+  // Validation handshake  -  Graph is confirming the endpoint exists
   if (validationToken) {
     return { valid: true }
   }
@@ -217,7 +217,7 @@ export async function processChangeNotification(
 
   try {
     if (resource.includes('drive') || resource.includes('files')) {
-      // OneDrive change — calendar and tasks may also need refreshing since
+      // OneDrive change  -  calendar and tasks may also need refreshing since
       // the subscription is on the drive root. Trigger both pull syncs.
       await Promise.allSettled([
         syncCalendarPull(connectionId, adminClient),

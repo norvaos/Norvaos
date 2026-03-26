@@ -76,9 +76,9 @@ const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
 // ─── Component ──────────────────────────────────────────────────────
 
 /**
- * Matter Status Panel — shows pipeline progress and SLA countdown.
+ * Matter Status Panel  -  shows pipeline progress and SLA countdown.
  *
- * Rule #19: No N+1 — consolidated queries.
+ * Rule #19: No N+1  -  consolidated queries.
  */
 export function MatterStatusPanel() {
   const { entityId, tenantId, entityType } = useCommandCentre()

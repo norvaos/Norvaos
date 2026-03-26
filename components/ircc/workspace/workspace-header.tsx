@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * WorkspaceHeader — Sticky top identity bar.
+ * WorkspaceHeader  -  Sticky top identity bar.
  *
  * Always visible. Shows UCI, Application Number, Stream, responsible lawyer.
  * Copy actions for UCI and App# without leaving the page.
@@ -80,7 +80,7 @@ function IdentityCell({
   value: string | null | undefined
   copyable?: boolean
 }) {
-  const display = value ?? '—'
+  const display = value ?? ' - '
   const hasValue = !!value
 
   return (

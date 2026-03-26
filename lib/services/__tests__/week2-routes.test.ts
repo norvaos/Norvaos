@@ -1,20 +1,20 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Week 2 Route Integration Tests — Sprint 6, Week 2
+ * Week 2 Route Integration Tests  -  Sprint 6, Week 2
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Tests the business-rule enforcement of the following Sprint 6 Week 2 features:
  *
- *   1. Close route guards    — 4 blockers, multi-blocker 422 response
- *   2. Confirm-submission    — validation, role gate
- *   3. Handle-refusal        — role gate, validation, JR deadline computation
- *   4. Form generation log   — idempotency key uniqueness, job lifecycle
+ *   1. Close route guards     -  4 blockers, multi-blocker 422 response
+ *   2. Confirm-submission     -  validation, role gate
+ *   3. Handle-refusal         -  role gate, validation, JR deadline computation
+ *   4. Form generation log    -  idempotency key uniqueness, job lifecycle
  *
  * These tests operate at the service / engine layer, using the same mock
  * Supabase pattern as exception-workflow.test.ts. Pure business-rule
  * assertions: no HTTP server required.
  *
- * Sprint 6, Week 2 — 2026-03-17
+ * Sprint 6, Week 2  -  2026-03-17
  */
 
 import { describe, it, expect } from 'vitest'
@@ -54,7 +54,7 @@ function evaluateCloseBlockers(opts: {
   if (opts.trust_balance_cents !== 0) {
     blockers.push({
       type:    'unreconciled_trust',
-      message: 'Trust transactions are not reconciled — outstanding balance must be cleared before closing',
+      message: 'Trust transactions are not reconciled  -  outstanding balance must be cleared before closing',
     })
   }
 
@@ -71,7 +71,7 @@ function evaluateCloseBlockers(opts: {
 describe('close route guards', () => {
   it('returns no blockers when all guards pass', () => {
     const blockers = evaluateCloseBlockers({
-      closed_reason:         'Matter completed successfully — permanent residency granted.',
+      closed_reason:         'Matter completed successfully  -  permanent residency granted.',
       open_deficiency_count: 0,
       trust_balance_cents:   0,
       open_risk_flag_count:  0,
@@ -113,7 +113,7 @@ describe('close route guards', () => {
 
   it('blocks when open deficiencies exist', () => {
     const blockers = evaluateCloseBlockers({
-      closed_reason:         'Matter completed successfully — all work is done here now.',
+      closed_reason:         'Matter completed successfully  -  all work is done here now.',
       open_deficiency_count: 2,
       trust_balance_cents:   0,
       open_risk_flag_count:  0,
@@ -125,7 +125,7 @@ describe('close route guards', () => {
 
   it('blocks when trust balance is non-zero', () => {
     const blockers = evaluateCloseBlockers({
-      closed_reason:         'Matter completed successfully — all work is done here now.',
+      closed_reason:         'Matter completed successfully  -  all work is done here now.',
       open_deficiency_count: 0,
       trust_balance_cents:   50000,
       open_risk_flag_count:  0,
@@ -135,7 +135,7 @@ describe('close route guards', () => {
 
   it('blocks when open risk flags exist', () => {
     const blockers = evaluateCloseBlockers({
-      closed_reason:         'Matter completed successfully — all work is done here now.',
+      closed_reason:         'Matter completed successfully  -  all work is done here now.',
       open_deficiency_count: 0,
       trust_balance_cents:   0,
       open_risk_flag_count:  1,
@@ -318,7 +318,7 @@ describe('form generation log: idempotency key uniqueness', () => {
    *   UNIQUE (matter_id, form_template_id, generation_key)
    *
    * Two jobs with the same (matter_id, form_template_id, generation_key) are
-   * the same job — the second request returns the existing row.
+   * the same job  -  the second request returns the existing row.
    *
    * Two jobs with different generation_keys are different jobs even for the
    * same (matter_id, form_template_id).

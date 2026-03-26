@@ -1,22 +1,22 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Week 3 — Background Job Reliability Tests
+ * Week 3  -  Background Job Reliability Tests
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Tests the form generation job reliability pipeline:
  *
- *   1. sidecar_unavailable  — worker marks job failed after timeout threshold
+ *   1. sidecar_unavailable   -  worker marks job failed after timeout threshold
  *                             OR retries if within retry window
- *   2. delayed_callback     — job stays pending until callback arrives
- *   3. duplicate_callback   — second callback on same job_id is idempotent
- *   4. retry_execution      — manual retry resets status, increments retry_count,
+ *   2. delayed_callback      -  job stays pending until callback arrives
+ *   3. duplicate_callback    -  second callback on same job_id is idempotent
+ *   4. retry_execution       -  manual retry resets status, increments retry_count,
  *                             re-dispatches to sidecar
- *   5. retry_limit          — jobs with retry_count >= 3 are timed out, not retried
+ *   5. retry_limit           -  jobs with retry_count >= 3 are timed out, not retried
  *
- * Mock strategy: pure business-logic layer — no HTTP server.
+ * Mock strategy: pure business-logic layer  -  no HTTP server.
  * We extract and test the state-machine rules directly.
  *
- * Sprint 6, Week 3 — 2026-03-17
+ * Sprint 6, Week 3  -  2026-03-17
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest'
@@ -110,7 +110,7 @@ function applyCallback(
   // In practice the DB update is always applied (Supabase does not throw on no-op).
   // We return null only when the job is already in an identical terminal state.
   if (job.status === 'completed' && callbackStatus === 'completed') {
-    return null // Already done — no-op
+    return null // Already done  -  no-op
   }
 
   const update: Partial<FormGenerationJob> = {
@@ -139,7 +139,7 @@ function canManualRetry(status: JobStatus): { allowed: boolean; statusCode: numb
   if (status === 'processing') {
     return { allowed: false, statusCode: 409, reason: 'Job is currently processing' }
   }
-  // pending or failed — allowed
+  // pending or failed  -  allowed
   return { allowed: true, statusCode: 202 }
 }
 
@@ -152,7 +152,7 @@ function applyManualRetry(job: FormGenerationJob, now: string): Partial<FormGene
     retry_count:           (job.retry_count ?? 0) + 1,
     error_message:         null,
     processing_started_at: null,
-    // completed_at stays — not cleared (resume from previous failure context)
+    // completed_at stays  -  not cleared (resume from previous failure context)
   }
 }
 
@@ -272,7 +272,7 @@ describe('duplicate_callback', () => {
     const job = makeJob({ status: 'completed', output_path: 'storage/output.pdf' })
     const now = new Date().toISOString()
 
-    // A failed callback on a completed job is NOT a duplicate — it is an inconsistency.
+    // A failed callback on a completed job is NOT a duplicate  -  it is an inconsistency.
     // Our function does not block it at the logic layer (the DB UPDATE .eq('id', ...) would apply).
     const update = applyCallback(job, 'failed', now, null, null, 'Late error')
     expect(update).not.toBeNull()
@@ -554,12 +554,12 @@ describe('createAdminClient mock integration', () => {
       return update
     }
 
-    // First callback — already applied (job is completed)
+    // First callback  -  already applied (job is completed)
     const firstResult = callbackProcessor(completedJob, 'completed')
     expect(firstResult).toBeNull()
     expect(updateCallCount).toBe(0)
 
-    // Second callback — same outcome
+    // Second callback  -  same outcome
     const secondResult = callbackProcessor(completedJob, 'completed')
     expect(secondResult).toBeNull()
     expect(updateCallCount).toBe(0)

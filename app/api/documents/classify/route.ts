@@ -1,5 +1,5 @@
 /**
- * POST /api/documents/classify — Classify a document by filename + optional text
+ * POST /api/documents/classify  -  Classify a document by filename + optional text
  *
  * Used by the import bridge and delta-sync to auto-tag documents.
  * Also available for on-demand reclassification from the UI.

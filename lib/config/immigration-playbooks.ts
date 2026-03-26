@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Immigration Playbooks — Sequence Control Configuration
+ * Immigration Playbooks  -  Sequence Control Configuration
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Code-defined playbook for each immigration matter type. Determines:
@@ -167,7 +167,7 @@ export interface ImmigrationPlaybook {
   /** Which contradiction checks to run */
   contradictionRules: ContradictionRuleKey[]
 
-  // ── Readiness Matrix (optional — only defined for matrix-enabled streams) ──
+  // ── Readiness Matrix (optional  -  only defined for matrix-enabled streams) ──
 
   /** Per-field questionnaire rules for the readiness matrix */
   questionnaireFieldRules?: QuestionnaireFieldRule[]
@@ -341,11 +341,11 @@ const SPOUSAL_SPONSORSHIP: ImmigrationPlaybook = {
   ],
 
   lawyerReviewTriggers: [
-    { key: 'prior_refusal_detected', condition_field: 'prior_refusals', condition_source: 'immigration', condition_operator: 'truthy', message: 'Prior refusal detected — lawyer review required' },
-    { key: 'criminal_record_detected', condition_field: 'has_criminal_record', condition_source: 'immigration', condition_operator: 'truthy', message: 'Criminal record disclosed — lawyer review required' },
-    { key: 'inadmissibility_flagged', condition_field: 'inadmissibility_flag', condition_source: 'people', condition_operator: 'truthy', message: 'Inadmissibility flagged — lawyer review required' },
-    { key: 'previous_marriage_detected', condition_field: 'previous_marriage', condition_source: 'people', condition_operator: 'truthy', message: 'Previous marriage detected — lawyer review recommended for relationship timeline' },
-    { key: 'age_gap_large', condition_field: 'marital.age_gap_years', condition_source: 'immigration', condition_operator: 'gt', condition_value: 15, message: 'Large age gap between sponsor and applicant — lawyer review recommended' },
+    { key: 'prior_refusal_detected', condition_field: 'prior_refusals', condition_source: 'immigration', condition_operator: 'truthy', message: 'Prior refusal detected  -  lawyer review required' },
+    { key: 'criminal_record_detected', condition_field: 'has_criminal_record', condition_source: 'immigration', condition_operator: 'truthy', message: 'Criminal record disclosed  -  lawyer review required' },
+    { key: 'inadmissibility_flagged', condition_field: 'inadmissibility_flag', condition_source: 'people', condition_operator: 'truthy', message: 'Inadmissibility flagged  -  lawyer review required' },
+    { key: 'previous_marriage_detected', condition_field: 'previous_marriage', condition_source: 'people', condition_operator: 'truthy', message: 'Previous marriage detected  -  lawyer review recommended for relationship timeline' },
+    { key: 'age_gap_large', condition_field: 'marital.age_gap_years', condition_source: 'immigration', condition_operator: 'gt', condition_value: 15, message: 'Large age gap between sponsor and applicant  -  lawyer review recommended' },
   ],
 }
 
@@ -451,12 +451,12 @@ const WORK_PERMIT: ImmigrationPlaybook = {
   ],
 
   lawyerReviewTriggers: [
-    { key: 'prior_refusal_detected', condition_field: 'prior_refusals', condition_source: 'immigration', condition_operator: 'truthy', message: 'Prior refusal detected — lawyer review recommended' },
-    { key: 'criminal_record_detected', condition_field: 'has_criminal_record', condition_source: 'immigration', condition_operator: 'truthy', message: 'Criminal record disclosed — lawyer review required' },
-    { key: 'inadmissibility_flagged', condition_field: 'inadmissibility_flag', condition_source: 'people', condition_operator: 'truthy', message: 'Inadmissibility flagged — lawyer review required' },
-    { key: 'lmia_exempt_claimed', condition_field: 'lmia_exempt', condition_source: 'immigration', condition_operator: 'truthy', message: 'LMIA exemption claimed — lawyer review recommended' },
-    { key: 'open_work_permit_requested', condition_field: 'open_work_permit', condition_source: 'immigration', condition_operator: 'truthy', message: 'Open work permit requested — lawyer review recommended' },
-    { key: 'employer_compliance_issue', condition_field: 'employer_compliance_flag', condition_source: 'immigration', condition_operator: 'truthy', message: 'Employer compliance issue flagged — lawyer review required' },
+    { key: 'prior_refusal_detected', condition_field: 'prior_refusals', condition_source: 'immigration', condition_operator: 'truthy', message: 'Prior refusal detected  -  lawyer review recommended' },
+    { key: 'criminal_record_detected', condition_field: 'has_criminal_record', condition_source: 'immigration', condition_operator: 'truthy', message: 'Criminal record disclosed  -  lawyer review required' },
+    { key: 'inadmissibility_flagged', condition_field: 'inadmissibility_flag', condition_source: 'people', condition_operator: 'truthy', message: 'Inadmissibility flagged  -  lawyer review required' },
+    { key: 'lmia_exempt_claimed', condition_field: 'lmia_exempt', condition_source: 'immigration', condition_operator: 'truthy', message: 'LMIA exemption claimed  -  lawyer review recommended' },
+    { key: 'open_work_permit_requested', condition_field: 'open_work_permit', condition_source: 'immigration', condition_operator: 'truthy', message: 'Open work permit requested  -  lawyer review recommended' },
+    { key: 'employer_compliance_issue', condition_field: 'employer_compliance_flag', condition_source: 'immigration', condition_operator: 'truthy', message: 'Employer compliance issue flagged  -  lawyer review required' },
   ],
 }
 
@@ -555,10 +555,10 @@ const STUDY_PERMIT: ImmigrationPlaybook = {
   ],
 
   lawyerReviewTriggers: [
-    { key: 'prior_refusal_detected', condition_field: 'prior_refusals', condition_source: 'immigration', condition_operator: 'truthy', message: 'Prior refusal detected — lawyer review recommended' },
-    { key: 'criminal_record_detected', condition_field: 'has_criminal_record', condition_source: 'immigration', condition_operator: 'truthy', message: 'Criminal record disclosed — lawyer review required' },
-    { key: 'inadmissibility_flagged', condition_field: 'inadmissibility_flag', condition_source: 'people', condition_operator: 'truthy', message: 'Inadmissibility flagged — lawyer review required' },
-    { key: 'study_gap_detected', condition_field: 'study.gap_in_studies', condition_source: 'immigration', condition_operator: 'truthy', message: 'Gap in studies detected — lawyer review recommended' },
+    { key: 'prior_refusal_detected', condition_field: 'prior_refusals', condition_source: 'immigration', condition_operator: 'truthy', message: 'Prior refusal detected  -  lawyer review recommended' },
+    { key: 'criminal_record_detected', condition_field: 'has_criminal_record', condition_source: 'immigration', condition_operator: 'truthy', message: 'Criminal record disclosed  -  lawyer review required' },
+    { key: 'inadmissibility_flagged', condition_field: 'inadmissibility_flag', condition_source: 'people', condition_operator: 'truthy', message: 'Inadmissibility flagged  -  lawyer review required' },
+    { key: 'study_gap_detected', condition_field: 'study.gap_in_studies', condition_source: 'immigration', condition_operator: 'truthy', message: 'Gap in studies detected  -  lawyer review recommended' },
   ],
 }
 
@@ -681,13 +681,13 @@ const PR_EXPRESS_ENTRY: ImmigrationPlaybook = {
   ],
 
   lawyerReviewTriggers: [
-    { key: 'prior_refusal_detected', condition_field: 'prior_refusals', condition_source: 'immigration', condition_operator: 'truthy', message: 'Prior refusal detected — lawyer review recommended' },
-    { key: 'criminal_record_detected', condition_field: 'has_criminal_record', condition_source: 'immigration', condition_operator: 'truthy', message: 'Criminal record disclosed — lawyer review required' },
-    { key: 'inadmissibility_flagged', condition_field: 'inadmissibility_flag', condition_source: 'people', condition_operator: 'truthy', message: 'Inadmissibility flagged — lawyer review required' },
-    { key: 'low_crs_score', condition_field: 'crs_score', condition_source: 'immigration', condition_operator: 'lt', condition_value: 470, message: 'CRS score below 470 — lawyer review recommended to explore options' },
-    { key: 'previous_pr_application', condition_field: 'previous_pr_application', condition_source: 'immigration', condition_operator: 'truthy', message: 'Previous PR application on file — lawyer review recommended' },
-    { key: 'provincial_nominee', condition_field: 'pnp_nomination', condition_source: 'immigration', condition_operator: 'truthy', message: 'Provincial nominee program — lawyer review recommended' },
-    { key: 'spousal_open_work_permit', condition_field: 'open_work_permit', condition_source: 'immigration', condition_operator: 'truthy', message: 'Spousal open work permit requested — lawyer review recommended' },
+    { key: 'prior_refusal_detected', condition_field: 'prior_refusals', condition_source: 'immigration', condition_operator: 'truthy', message: 'Prior refusal detected  -  lawyer review recommended' },
+    { key: 'criminal_record_detected', condition_field: 'has_criminal_record', condition_source: 'immigration', condition_operator: 'truthy', message: 'Criminal record disclosed  -  lawyer review required' },
+    { key: 'inadmissibility_flagged', condition_field: 'inadmissibility_flag', condition_source: 'people', condition_operator: 'truthy', message: 'Inadmissibility flagged  -  lawyer review required' },
+    { key: 'low_crs_score', condition_field: 'crs_score', condition_source: 'immigration', condition_operator: 'lt', condition_value: 470, message: 'CRS score below 470  -  lawyer review recommended to explore options' },
+    { key: 'previous_pr_application', condition_field: 'previous_pr_application', condition_source: 'immigration', condition_operator: 'truthy', message: 'Previous PR application on file  -  lawyer review recommended' },
+    { key: 'provincial_nominee', condition_field: 'pnp_nomination', condition_source: 'immigration', condition_operator: 'truthy', message: 'Provincial nominee program  -  lawyer review recommended' },
+    { key: 'spousal_open_work_permit', condition_field: 'open_work_permit', condition_source: 'immigration', condition_operator: 'truthy', message: 'Spousal open work permit requested  -  lawyer review recommended' },
   ],
 }
 
@@ -792,12 +792,12 @@ const REFUGEE_HC: ImmigrationPlaybook = {
   ],
 
   lawyerReviewTriggers: [
-    { key: 'prior_refusal_detected', condition_field: 'prior_refusals', condition_source: 'immigration', condition_operator: 'truthy', message: 'Prior refusal detected — lawyer review required' },
-    { key: 'criminal_record_detected', condition_field: 'has_criminal_record', condition_source: 'immigration', condition_operator: 'truthy', message: 'Criminal record disclosed — lawyer review required' },
-    { key: 'inadmissibility_flagged', condition_field: 'inadmissibility_flag', condition_source: 'people', condition_operator: 'truthy', message: 'Inadmissibility flagged — lawyer review required' },
-    { key: 'separated_family_members', condition_field: 'separated_family_members', condition_source: 'immigration', condition_operator: 'truthy', message: 'Separated family members — lawyer review required' },
-    { key: 'detention_history', condition_field: 'detention_history', condition_source: 'immigration', condition_operator: 'truthy', message: 'Detention history — lawyer review required' },
-    { key: 'expedited_hearing', condition_field: 'expedited_hearing', condition_source: 'immigration', condition_operator: 'truthy', message: 'Expedited hearing scheduled — lawyer review required' },
+    { key: 'prior_refusal_detected', condition_field: 'prior_refusals', condition_source: 'immigration', condition_operator: 'truthy', message: 'Prior refusal detected  -  lawyer review required' },
+    { key: 'criminal_record_detected', condition_field: 'has_criminal_record', condition_source: 'immigration', condition_operator: 'truthy', message: 'Criminal record disclosed  -  lawyer review required' },
+    { key: 'inadmissibility_flagged', condition_field: 'inadmissibility_flag', condition_source: 'people', condition_operator: 'truthy', message: 'Inadmissibility flagged  -  lawyer review required' },
+    { key: 'separated_family_members', condition_field: 'separated_family_members', condition_source: 'immigration', condition_operator: 'truthy', message: 'Separated family members  -  lawyer review required' },
+    { key: 'detention_history', condition_field: 'detention_history', condition_source: 'immigration', condition_operator: 'truthy', message: 'Detention history  -  lawyer review required' },
+    { key: 'expedited_hearing', condition_field: 'expedited_hearing', condition_source: 'immigration', condition_operator: 'truthy', message: 'Expedited hearing scheduled  -  lawyer review required' },
   ],
 }
 
@@ -886,9 +886,9 @@ const VISITOR_VISA: ImmigrationPlaybook = {
   ],
 
   lawyerReviewTriggers: [
-    { key: 'prior_refusal_detected', condition_field: 'prior_refusals', condition_source: 'immigration', condition_operator: 'truthy', message: 'Prior refusal detected — lawyer review recommended' },
-    { key: 'criminal_record_detected', condition_field: 'has_criminal_record', condition_source: 'immigration', condition_operator: 'truthy', message: 'Criminal record disclosed — lawyer review required' },
-    { key: 'inadmissibility_flagged', condition_field: 'inadmissibility_flag', condition_source: 'people', condition_operator: 'truthy', message: 'Inadmissibility flagged — lawyer review required' },
+    { key: 'prior_refusal_detected', condition_field: 'prior_refusals', condition_source: 'immigration', condition_operator: 'truthy', message: 'Prior refusal detected  -  lawyer review recommended' },
+    { key: 'criminal_record_detected', condition_field: 'has_criminal_record', condition_source: 'immigration', condition_operator: 'truthy', message: 'Criminal record disclosed  -  lawyer review required' },
+    { key: 'inadmissibility_flagged', condition_field: 'inadmissibility_flag', condition_source: 'people', condition_operator: 'truthy', message: 'Inadmissibility flagged  -  lawyer review required' },
   ],
 }
 
@@ -981,11 +981,11 @@ const CITIZENSHIP: ImmigrationPlaybook = {
   ],
 
   lawyerReviewTriggers: [
-    { key: 'criminal_record_detected', condition_field: 'has_criminal_record', condition_source: 'immigration', condition_operator: 'truthy', message: 'Criminal record disclosed — lawyer review required' },
-    { key: 'inadmissibility_flagged', condition_field: 'inadmissibility_flag', condition_source: 'people', condition_operator: 'truthy', message: 'Inadmissibility flagged — lawyer review required' },
-    { key: 'insufficient_physical_presence', condition_field: 'physical_presence_days', condition_source: 'immigration', condition_operator: 'lt', condition_value: 1095, message: 'Physical presence below 1,095 days — lawyer review required' },
-    { key: 'tax_non_compliance', condition_field: 'tax_filing_gaps', condition_source: 'immigration', condition_operator: 'truthy', message: 'Tax filing gaps detected — lawyer review recommended' },
-    { key: 'residency_obligation_concern', condition_field: 'extended_absence', condition_source: 'immigration', condition_operator: 'truthy', message: 'Extended absence from Canada — lawyer review recommended' },
+    { key: 'criminal_record_detected', condition_field: 'has_criminal_record', condition_source: 'immigration', condition_operator: 'truthy', message: 'Criminal record disclosed  -  lawyer review required' },
+    { key: 'inadmissibility_flagged', condition_field: 'inadmissibility_flag', condition_source: 'people', condition_operator: 'truthy', message: 'Inadmissibility flagged  -  lawyer review required' },
+    { key: 'insufficient_physical_presence', condition_field: 'physical_presence_days', condition_source: 'immigration', condition_operator: 'lt', condition_value: 1095, message: 'Physical presence below 1,095 days  -  lawyer review required' },
+    { key: 'tax_non_compliance', condition_field: 'tax_filing_gaps', condition_source: 'immigration', condition_operator: 'truthy', message: 'Tax filing gaps detected  -  lawyer review recommended' },
+    { key: 'residency_obligation_concern', condition_field: 'extended_absence', condition_source: 'immigration', condition_operator: 'truthy', message: 'Extended absence from Canada  -  lawyer review recommended' },
   ],
 }
 
@@ -1088,11 +1088,11 @@ const LMIA: ImmigrationPlaybook = {
   ],
 
   lawyerReviewTriggers: [
-    { key: 'previous_lmia_refusal', condition_field: 'previous_lmia_refusal', condition_source: 'immigration', condition_operator: 'truthy', message: 'Previous LMIA refusal — lawyer review required' },
-    { key: 'wage_below_prevailing', condition_field: 'wage_below_prevailing', condition_source: 'immigration', condition_operator: 'truthy', message: 'Wage below prevailing rate — lawyer review required' },
-    { key: 'employer_compliance_flag', condition_field: 'employer_compliance_flag', condition_source: 'immigration', condition_operator: 'truthy', message: 'Employer compliance issue — lawyer review required' },
-    { key: 'high_volume_positions', condition_field: 'number_of_positions', condition_source: 'immigration', condition_operator: 'gt', condition_value: 5, message: 'High-volume positions (>5) — lawyer review recommended' },
-    { key: 'prior_non_compliance', condition_field: 'prior_non_compliance', condition_source: 'immigration', condition_operator: 'truthy', message: 'Prior non-compliance history — lawyer review required' },
+    { key: 'previous_lmia_refusal', condition_field: 'previous_lmia_refusal', condition_source: 'immigration', condition_operator: 'truthy', message: 'Previous LMIA refusal  -  lawyer review required' },
+    { key: 'wage_below_prevailing', condition_field: 'wage_below_prevailing', condition_source: 'immigration', condition_operator: 'truthy', message: 'Wage below prevailing rate  -  lawyer review required' },
+    { key: 'employer_compliance_flag', condition_field: 'employer_compliance_flag', condition_source: 'immigration', condition_operator: 'truthy', message: 'Employer compliance issue  -  lawyer review required' },
+    { key: 'high_volume_positions', condition_field: 'number_of_positions', condition_source: 'immigration', condition_operator: 'gt', condition_value: 5, message: 'High-volume positions (>5)  -  lawyer review recommended' },
+    { key: 'prior_non_compliance', condition_field: 'prior_non_compliance', condition_source: 'immigration', condition_operator: 'truthy', message: 'Prior non-compliance history  -  lawyer review required' },
   ],
 }
 

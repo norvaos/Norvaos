@@ -1,14 +1,14 @@
 /**
- * IRCC Forms Engine — Cross-Matter Reuse Service
+ * IRCC Forms Engine  -  Cross-Matter Reuse Service
  *
  * Imports answers from a contact's canonical profile into a new matter's
  * form instances. Uses REUSE_CATEGORY_MAP to classify each field:
  *
  *   - stable:          auto-import without review (e.g. DOB, place of birth)
  *   - semi_stable:     import but flag for review (e.g. marital status, passport)
- *   - matter_specific: skip entirely — user must enter manually
+ *   - matter_specific: skip entirely  -  user must enter manually
  *
- * Pure logic module — all database operations are injected via the combined
+ * Pure logic module  -  all database operations are injected via the combined
  * PrefillDataAccess & AnswerEngineDataAccess interface.
  */
 

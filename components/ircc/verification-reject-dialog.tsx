@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * VerificationRejectDialog — Modal for lawyers to reject fields/documents
+ * VerificationRejectDialog  -  Modal for lawyers to reject fields/documents
  * during the verification flow.
  *
  * Features:
@@ -111,7 +111,7 @@ export function VerificationRejectDialog({
         })
       }
 
-      toast.success('Item rejected — client will be notified.')
+      toast.success('Item rejected  -  client will be notified.')
       onOpenChange(false)
       onRejected?.()
     } catch (err) {

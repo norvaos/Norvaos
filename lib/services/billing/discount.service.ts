@@ -1,12 +1,12 @@
 // ============================================================================
-// Discount Service — adjustments (discounts, write-downs, write-offs)
+// Discount Service  -  adjustments (discounts, write-downs, write-offs)
 // ============================================================================
 // Manages invoice_adjustments.  Three distinct operations:
 //
-//   discount   — reduce the invoice amount as a goodwill gesture or fee
+//   discount    -  reduce the invoice amount as a goodwill gesture or fee
 //                reduction; requires approval above threshold
-//   write_down — partial reduction of uncollectable amount; requires approval
-//   write_off  — full write-off of outstanding balance; dual-user segregation
+//   write_down  -  partial reduction of uncollectable amount; requires approval
+//   write_off   -  full write-off of outstanding balance; dual-user segregation
 //                enforced by DB trigger (requester ≠ approver)
 //
 // All amounts are in cents (INTEGER).
@@ -78,7 +78,7 @@ export async function checkAdjustmentApproval(
     .maybeSingle()
 
   if (!threshold) {
-    // No threshold configured — no approval required
+    // No threshold configured  -  no approval required
     return { requiresApproval: false, thresholdAmountCents: null }
   }
 
@@ -145,7 +145,7 @@ export async function applyAdjustment(
 
   // InvoiceAdjustmentInsert maps to the DB schema; use the fields that exist.
   // Some legacy fields (amount_cents, description, requested_by) differ from the
-  // generated type — cast to any to allow the insert without a schema mismatch.
+  // generated type  -  cast to any to allow the insert without a schema mismatch.
   /* eslint-disable @typescript-eslint/no-explicit-any */
   const insertPayload: any = {
     tenant_id: tenantId,
@@ -223,7 +223,7 @@ export async function approveAdjustment(
     .eq('approval_status', 'pending')
 
   if (error) {
-    // DB trigger may raise segregation violation — surface the message directly
+    // DB trigger may raise segregation violation  -  surface the message directly
     return { success: false, error: error.message }
   }
 

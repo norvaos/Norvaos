@@ -1,5 +1,5 @@
 -- ============================================================================
--- Migration 024: UEE Phase A Hardening — Pre-Phase B Gate
+-- Migration 024: UEE Phase A Hardening  -  Pre-Phase B Gate
 -- ============================================================================
 -- Structural hardening items:
 --   A. Audit log immutability (trigger + granular RLS)
@@ -77,7 +77,7 @@ BEGIN
          OR (NEW.risk_override_at IS DISTINCT FROM OLD.risk_override_at) THEN
         RAISE EXCEPTION 'Cannot modify data fields on a locked intake record. Only lock/unlock operations are permitted.';
       END IF;
-      -- Pure lock field change — allowed
+      -- Pure lock field change  -  allowed
       RETURN NEW;
     ELSE
       RAISE EXCEPTION 'Intake record is locked. Unlock it before making changes.';

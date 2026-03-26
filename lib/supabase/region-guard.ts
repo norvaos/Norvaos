@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════
- * Region Guard — Directive 005.3 "Compliance Kill Switch"
+ * Region Guard  -  Directive 005.3 "Compliance Kill Switch"
  * ═══════════════════════════════════════════════════════════════════════════
  *
  * Validates that the Supabase connection resolves to the verified
@@ -25,7 +25,7 @@ export class CriticalComplianceError extends Error {
 
 const REQUIRED_REGION = 'ca-central-1'
 
-/** Cached verification result — null means not yet checked. */
+/** Cached verification result  -  null means not yet checked. */
 let _verified: boolean | null = null
 let _detectedRegion: string | null = null
 
@@ -40,7 +40,7 @@ let _detectedRegion: string | null = null
  * We also accept an explicit SUPABASE_REGION env var as authoritative.
  */
 export function detectSupabaseRegion(): string | null {
-  // 1. Explicit override — most reliable
+  // 1. Explicit override  -  most reliable
   const explicit = process.env.SUPABASE_REGION
   if (explicit) return explicit.toLowerCase()
 
@@ -94,7 +94,7 @@ export function enforceRegionCompliance(): {
   if (!region) {
     // No region detected
     if (isDev) {
-      // Dev/local — warn but allow
+      // Dev/local  -  warn but allow
       console.warn(
         '[RegionGuard] WARNING: Could not detect Supabase region. ' +
         'Set SUPABASE_REGION=ca-central-1 in .env to suppress this warning.',
@@ -103,7 +103,7 @@ export function enforceRegionCompliance(): {
       return { region: null, verified: true, environment: 'development' }
     }
 
-    // Production with no region — BLOCK
+    // Production with no region  -  BLOCK
     _verified = false
     throw new CriticalComplianceError(
       'Could not verify database region. ' +
@@ -115,7 +115,7 @@ export function enforceRegionCompliance(): {
   if (region !== REQUIRED_REGION) {
     _verified = false
     throw new CriticalComplianceError(
-      `Database region is "${region}" — expected "${REQUIRED_REGION}". ` +
+      `Database region is "${region}"  -  expected "${REQUIRED_REGION}". ` +
       'All NorvaOS data must reside in Canada (ca-central-1) per PIPEDA compliance. ' +
       'Refusing to start. Contact infrastructure team.',
     )

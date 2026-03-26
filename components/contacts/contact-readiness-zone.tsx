@@ -1,12 +1,12 @@
 'use client'
 
 /**
- * ContactReadinessZone — Directive 41.0 Readiness Decoupling
+ * ContactReadinessZone  -  Directive 41.0 Readiness Decoupling
  *
- * For Leads: Shows "Intake Completion" (0-100) — how much of the intake
+ * For Leads: Shows "Intake Completion" (0-100)  -  how much of the intake
  * pipeline is complete (ID 20%, basic info 20%, payment 60%).
  *
- * For Clients (with a matter): Shows "Legal Success Probability" (0-100) —
+ * For Clients (with a matter): Shows "Legal Success Probability" (0-100)  - 
  * the existing matter readiness score ("Red 35" scenario).
  */
 
@@ -233,7 +233,7 @@ function IntakeBar({ label, pct }: { label: string; pct: number }) {
 
 // ── Legal Success Probability Gauge (for Clients) ─────────────────────────────
 
-/** Colour helpers — mirrors readiness-zone.tsx scoreColour */
+/** Colour helpers  -  mirrors readiness-zone.tsx scoreColour */
 function gaugeColour(score: number) {
   if (score >= 95) return { stroke: '#d4af37', text: 'text-yellow-600', bg: 'bg-yellow-500', ring: 'stroke-yellow-200', gold: true }
   if (score >= 85) return { stroke: '#22c55e', text: 'text-green-600', bg: 'bg-green-500', ring: 'stroke-green-100', gold: false }
@@ -377,7 +377,7 @@ function ClientReadinessView({ matterId }: { matterId: string }) {
                   </Badge>
                 </TooltipTrigger>
                 <TooltipContent>
-                  {draftingReady ? 'Drafting ready — score above 70' : 'Drafting blocked — score below 70'}
+                  {draftingReady ? 'Drafting ready  -  score above 70' : 'Drafting blocked  -  score below 70'}
                 </TooltipContent>
               </Tooltip>
 
@@ -397,7 +397,7 @@ function ClientReadinessView({ matterId }: { matterId: string }) {
                   </Badge>
                 </TooltipTrigger>
                 <TooltipContent>
-                  {filingReady ? 'Filing ready — score above 90' : 'Filing blocked — score below 90'}
+                  {filingReady ? 'Filing ready  -  score above 90' : 'Filing blocked  -  score below 90'}
                 </TooltipContent>
               </Tooltip>
             </div>
@@ -442,7 +442,7 @@ function ClientReadinessView({ matterId }: { matterId: string }) {
                 </div>
               </TooltipTrigger>
               <TooltipContent side="bottom" className="text-xs max-w-xs">
-                <p className="font-medium">{domain.name} — {domain.score}% (weight: {Math.round(domain.weight * 100)}%)</p>
+                <p className="font-medium">{domain.name}  -  {domain.score}% (weight: {Math.round(domain.weight * 100)}%)</p>
                 <p className="text-muted-foreground">{domain.detail}</p>
               </TooltipContent>
             </Tooltip>

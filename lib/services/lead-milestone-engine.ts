@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Lead Milestone Engine — Milestone/Task Orchestration
+ * Lead Milestone Engine  -  Milestone/Task Orchestration
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Creates milestone groups and tasks on stage entry (from registry definitions).

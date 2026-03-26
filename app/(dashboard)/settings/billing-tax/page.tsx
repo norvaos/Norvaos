@@ -160,7 +160,7 @@ function BillingTaxContent() {
                             <td className="py-1.5 text-right">
                               {code.is_default ? (
                                 <Badge variant="default" className="text-xs">Default</Badge>
-                              ) : '—'}
+                              ) : ' - '}
                             </td>
                           </tr>
                         ))

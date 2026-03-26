@@ -1,10 +1,10 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Wave 6 — Pure Function Tests: Lead Workflow Helpers
+ * Wave 6  -  Pure Function Tests: Lead Workflow Helpers
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Tests all presentation helper functions. These are pure functions with no
- * React/hooks dependencies — the fastest and most reliable tests in the suite.
+ * React/hooks dependencies  -  the fastest and most reliable tests in the suite.
  *
  * Covers: stage colours, labels, pipeline ordering, terminal banners, channel
  * helpers, direction config, actor display, task status, completion badges,
@@ -110,12 +110,12 @@ describe('isStageAtOrPast', () => {
     expect(isStageAtOrPast(LEAD_STAGES.NEW_INQUIRY, LEAD_STAGES.CONSULTATION_BOOKED)).toBe(false)
   })
 
-  it('returns true for terminal (closed) stages — they are past everything', () => {
+  it('returns true for terminal (closed) stages  -  they are past everything', () => {
     expect(isStageAtOrPast(LEAD_STAGES.CLOSED_NO_RESPONSE, LEAD_STAGES.NEW_INQUIRY)).toBe(true)
     expect(isStageAtOrPast(LEAD_STAGES.CLOSED_NO_RESPONSE, LEAD_STAGES.RETAINED_ACTIVE_MATTER)).toBe(true)
   })
 
-  it('returns true for converted stage — it is past everything', () => {
+  it('returns true for converted stage  -  it is past everything', () => {
     expect(isStageAtOrPast(LEAD_STAGES.CONVERTED, LEAD_STAGES.NEW_INQUIRY)).toBe(true)
   })
 

@@ -1,11 +1,11 @@
 'use client'
 
 /**
- * PortalIRCCForms — Form-based IRCC portal questionnaire.
+ * PortalIRCCForms  -  Form-based IRCC portal questionnaire.
  *
  * Two views:
- *   1. Form List — shows all configured forms as cards with per-form progress
- *   2. Form Questionnaire — single-form questionnaire (delegates to PortalFormQuestionnaire)
+ *   1. Form List  -  shows all configured forms as cards with per-form progress
+ *   2. Form Questionnaire  -  single-form questionnaire (delegates to PortalFormQuestionnaire)
  *
  * Replaces the old PortalIRCCQuestionnaire which merged all forms into one mixed flow.
  * Updated: form-level completion check, normalized display codes, per-form readOnly.
@@ -305,7 +305,7 @@ export function PortalIRCCForms({
         </p>
       )}
 
-      {/* All completed — Edit request section */}
+      {/* All completed  -  Edit request section */}
       {allCompleted && (
         <div className="border-t border-slate-200 pt-4">
           {/* Completed banner */}
@@ -410,7 +410,7 @@ function FormCard({
   const statusConfig = isCompleted
     ? { icon: '✓', label: 'Completed', className: 'bg-green-50 text-green-700 border-green-200' }
     : isInProgress
-      ? { icon: '●', label: `In Progress — ${form.progress_percent}%`, className: 'bg-blue-50 text-blue-700 border-blue-200' }
+      ? { icon: '●', label: `In Progress  -  ${form.progress_percent}%`, className: 'bg-blue-50 text-blue-700 border-blue-200' }
       : { icon: '○', label: 'Not Started', className: 'bg-slate-50 text-slate-500 border-slate-200' }
 
   // Action button

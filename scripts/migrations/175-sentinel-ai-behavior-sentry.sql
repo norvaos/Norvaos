@@ -1,21 +1,21 @@
 -- =============================================================================
--- Migration 175 — SENTINEL AI-Behavior Sentry
+-- Migration 175  -  SENTINEL AI-Behavior Sentry
 -- =============================================================================
 --
 -- Detects and responds to anomalous PII access patterns that indicate
 -- automated exfiltration (AI attacker, compromised session, rogue script).
 --
 -- Defence layers:
---   1. sentinel_pii_rate_check() — callable function that checks if a
+--   1. sentinel_pii_rate_check()  -  callable function that checks if a
 --      user/IP has exceeded the PII reveal threshold (50 reveals in 60s)
---   2. sentinel_lock_tenant() — emergency function that disables a user
+--   2. sentinel_lock_tenant()  -  emergency function that disables a user
 --      and logs a BREACH-severity event
---   3. sentinel_sentry_trigger — AFTER INSERT trigger on sentinel_audit_log
+--   3. sentinel_sentry_trigger  -  AFTER INSERT trigger on sentinel_audit_log
 --      that auto-fires the rate check on every DATA_MASKING_BYPASS event
 --
 -- Performance: The trigger only fires on DATA_MASKING_BYPASS events
 -- (filtered by WHEN clause). The rate check is a simple COUNT with
--- an indexed timestamp filter — sub-millisecond.
+-- an indexed timestamp filter  -  sub-millisecond.
 --
 -- Depends on: migration 161 (sentinel_audit_log), migration 174 (hash chain)
 -- =============================================================================
@@ -135,7 +135,7 @@ COMMENT ON FUNCTION sentinel_lock_user(UUID, TEXT) IS
   'when excessive PII reveals are detected.';
 
 
--- ── 3. Sentry trigger — auto-fires on PII reveal events ────────────────────
+-- ── 3. Sentry trigger  -  auto-fires on PII reveal events ────────────────────
 
 CREATE OR REPLACE FUNCTION sentinel_sentry_on_pii_reveal()
 RETURNS TRIGGER
@@ -174,7 +174,7 @@ BEGIN
     );
   END IF;
 
-  -- AFTER INSERT trigger — always return NEW
+  -- AFTER INSERT trigger  -  always return NEW
   RETURN NEW;
 END;
 $$;

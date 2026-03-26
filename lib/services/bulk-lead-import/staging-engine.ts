@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Bulk Lead Import — Staging Engine (The Sandbox Builder)
+ * Bulk Lead Import  -  Staging Engine (The Sandbox Builder)
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Writes parsed rows to lead_import_staging, then runs the Intelligent
@@ -28,7 +28,7 @@ interface StagingEngineParams {
 
 /**
  * Write all parsed rows to lead_import_staging with validation_status = 'pending'.
- * Fast operation — no gatekeeper calls yet.
+ * Fast operation  -  no gatekeeper calls yet.
  */
 export async function writeToStaging(params: StagingEngineParams): Promise<void> {
   const { supabase, tenantId, batchId, rows, sourceTag, campaignTag } = params
@@ -173,7 +173,7 @@ export async function runGatekeeperOnStaging(params: {
     }
   }
 
-  // 4. Jurisdiction matching (deduplicated — only unique raw values)
+  // 4. Jurisdiction matching (deduplicated  -  only unique raw values)
   const uniqueJurisdictions = new Set<string>()
   for (const row of stagingRows) {
     if (row.raw_jurisdiction) uniqueJurisdictions.add(row.raw_jurisdiction)

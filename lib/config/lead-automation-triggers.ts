@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Lead Automation Trigger Registry — Declarative Configuration
+ * Lead Automation Trigger Registry  -  Declarative Configuration
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Centralized registry of all lead automation triggers. Each trigger defines:
@@ -11,9 +11,9 @@
  *   - Whether it's system-controlled (cannot be disabled) or workspace-configurable
  *
  * Three-tier resolution:
- *   1. System defaults (from this registry) — always present, never editable
- *   2. Workspace settings (from lead_automation_settings) — enable/disable, channel control
- *   3. Workspace template overrides (from lead_message_templates) — custom message content
+ *   1. System defaults (from this registry)  -  always present, never editable
+ *   2. Workspace settings (from lead_automation_settings)  -  enable/disable, channel control
+ *   3. Workspace template overrides (from lead_message_templates)  -  custom message content
  *
  * This registry is the single source of truth for what automations exist.
  * The template engine reads from this registry to resolve system defaults.
@@ -80,7 +80,7 @@ const FOLLOWUP_MERGE_FIELDS: MergeFieldDef[] = [
 
 const CLOSURE_MERGE_FIELDS: MergeFieldDef[] = [
   { key: '{{closure.reason}}', label: 'Closure Reason', sampleValue: 'No response after outreach cadence' },
-  { key: '{{closure.stage}}', label: 'Closure Stage', sampleValue: 'Closed — No Response' },
+  { key: '{{closure.stage}}', label: 'Closure Stage', sampleValue: 'Closed  -  No Response' },
   { key: '{{closure.idle_days}}', label: 'Idle Days', sampleValue: '15' },
 ]
 
@@ -105,7 +105,7 @@ export const LEAD_AUTOMATION_TRIGGERS: Record<string, AutomationTriggerDef> = {
     availableMergeFields: [...COMMON_MERGE_FIELDS, ...CONSULTATION_MERGE_FIELDS],
     systemDefaultTemplates: {
       email: {
-        subject: 'Reminder: Your consultation is tomorrow — {{consultation.date}}',
+        subject: 'Reminder: Your consultation is tomorrow  -  {{consultation.date}}',
         body: 'Hi {{contact.name}},\n\nThis is a reminder that your consultation with {{consultation.lawyer}} is scheduled for {{consultation.date}} at {{consultation.time}}.\n\nIf you need to reschedule, please contact us as soon as possible.\n\nBest regards,\n{{firm.name}}',
       },
       sms: {
@@ -131,7 +131,7 @@ export const LEAD_AUTOMATION_TRIGGERS: Record<string, AutomationTriggerDef> = {
     availableMergeFields: [...COMMON_MERGE_FIELDS, ...CONSULTATION_MERGE_FIELDS],
     systemDefaultTemplates: {
       email: {
-        subject: 'Your consultation is in 2 hours — {{consultation.time}}',
+        subject: 'Your consultation is in 2 hours  -  {{consultation.time}}',
         body: 'Hi {{contact.name}},\n\nJust a quick reminder that your consultation with {{consultation.lawyer}} is coming up in 2 hours at {{consultation.time}}.\n\nWe look forward to speaking with you.\n\nBest regards,\n{{firm.name}}',
       },
       sms: {
@@ -140,7 +140,7 @@ export const LEAD_AUTOMATION_TRIGGERS: Record<string, AutomationTriggerDef> = {
       },
       system_reminder: {
         subject: 'Consultation reminder (2h before)',
-        body: 'Consultation with {{contact.name}} starts at {{consultation.time}} — 2 hours from now',
+        body: 'Consultation with {{contact.name}} starts at {{consultation.time}}  -  2 hours from now',
       },
     },
     isSystemControlled: false,
@@ -162,7 +162,7 @@ export const LEAD_AUTOMATION_TRIGGERS: Record<string, AutomationTriggerDef> = {
     availableMergeFields: [...COMMON_MERGE_FIELDS, ...CONSULTATION_MERGE_FIELDS, ...FOLLOWUP_MERGE_FIELDS],
     systemDefaultTemplates: {
       email: {
-        subject: 'We missed you — reschedule your consultation?',
+        subject: 'We missed you  -  reschedule your consultation?',
         body: 'Hi {{contact.name}},\n\nWe noticed you weren\'t able to make your scheduled consultation. We understand things come up.\n\nWe\'d love to help you reschedule. This is follow-up {{followup.step}} of {{followup.total_steps}}.\n\nPlease contact us at your earliest convenience.\n\nBest regards,\n{{firm.name}}',
       },
       sms: {
@@ -171,7 +171,7 @@ export const LEAD_AUTOMATION_TRIGGERS: Record<string, AutomationTriggerDef> = {
       },
       system_reminder: {
         subject: 'No-show follow-up #{{followup.step}} due',
-        body: 'Follow-up #{{followup.step}} is due for consultation no-show — {{contact.name}}',
+        body: 'Follow-up #{{followup.step}} is due for consultation no-show  -  {{contact.name}}',
       },
     },
     isSystemControlled: false,
@@ -222,7 +222,7 @@ export const LEAD_AUTOMATION_TRIGGERS: Record<string, AutomationTriggerDef> = {
       },
       system_reminder: {
         subject: 'Retainer follow-up #{{followup.step}} due',
-        body: 'Retainer follow-up #{{followup.step}} due for {{contact.name}} — sent {{retainer.sent_date}}',
+        body: 'Retainer follow-up #{{followup.step}} due for {{contact.name}}  -  sent {{retainer.sent_date}}',
       },
     },
     isSystemControlled: false,
@@ -239,7 +239,7 @@ export const LEAD_AUTOMATION_TRIGGERS: Record<string, AutomationTriggerDef> = {
     availableMergeFields: [...COMMON_MERGE_FIELDS, ...RETAINER_MERGE_FIELDS, ...FOLLOWUP_MERGE_FIELDS],
     systemDefaultTemplates: {
       email: {
-        subject: 'Payment reminder: {{retainer.type}} — {{firm.name}}',
+        subject: 'Payment reminder: {{retainer.type}}  -  {{firm.name}}',
         body: 'Hi {{contact.name}},\n\nThank you for signing your retainer agreement. We\'re following up regarding the outstanding payment of {{retainer.fee}}.\n\nPlease arrange payment at your earliest convenience so we can get started on your matter.\n\nBest regards,\n{{firm.name}}',
       },
       sms: {
@@ -248,7 +248,7 @@ export const LEAD_AUTOMATION_TRIGGERS: Record<string, AutomationTriggerDef> = {
       },
       system_reminder: {
         subject: 'Payment follow-up #{{followup.step}} due',
-        body: 'Payment follow-up #{{followup.step}} due for {{contact.name}} — retainer signed, payment pending',
+        body: 'Payment follow-up #{{followup.step}} due for {{contact.name}}  -  retainer signed, payment pending',
       },
     },
     isSystemControlled: false,
@@ -272,7 +272,7 @@ export const LEAD_AUTOMATION_TRIGGERS: Record<string, AutomationTriggerDef> = {
       },
       in_app: {
         subject: 'Lead auto-closed: no response',
-        body: 'Lead for {{contact.name}} auto-closed after {{closure.idle_days}} idle days — contact cadence exhausted',
+        body: 'Lead for {{contact.name}} auto-closed after {{closure.idle_days}} idle days  -  contact cadence exhausted',
       },
     },
     isSystemControlled: false,
@@ -289,12 +289,12 @@ export const LEAD_AUTOMATION_TRIGGERS: Record<string, AutomationTriggerDef> = {
     availableMergeFields: [...COMMON_MERGE_FIELDS, ...CLOSURE_MERGE_FIELDS, ...RETAINER_MERGE_FIELDS],
     systemDefaultTemplates: {
       email: {
-        subject: 'Your retainer with {{firm.name}} — file closing notice',
+        subject: 'Your retainer with {{firm.name}}  -  file closing notice',
         body: 'Hi {{contact.name}},\n\nWe sent you a retainer agreement on {{retainer.sent_date}} and followed up several times. As we haven\'t received a signed retainer, we\'re closing your file.\n\nIf you\'d like to proceed at a later date, please reach out and we\'ll be happy to assist.\n\nBest regards,\n{{firm.name}}',
       },
       in_app: {
         subject: 'Lead auto-closed: retainer not signed',
-        body: 'Lead for {{contact.name}} auto-closed after {{closure.idle_days}} idle days — retainer follow-up cadence exhausted',
+        body: 'Lead for {{contact.name}} auto-closed after {{closure.idle_days}} idle days  -  retainer follow-up cadence exhausted',
       },
     },
     isSystemControlled: false,
@@ -313,7 +313,7 @@ export const LEAD_AUTOMATION_TRIGGERS: Record<string, AutomationTriggerDef> = {
     availableMergeFields: [...COMMON_MERGE_FIELDS],
     systemDefaultTemplates: {
       email: {
-        subject: 'We received your inquiry — {{firm.name}}',
+        subject: 'We received your inquiry  -  {{firm.name}}',
         body: 'Hi {{contact.name}},\n\nThank you for contacting {{firm.name}}. We\'ve received your inquiry and a member of our team will be in touch shortly.\n\nBest regards,\n{{firm.name}}',
       },
       portal_chat: {
@@ -322,7 +322,7 @@ export const LEAD_AUTOMATION_TRIGGERS: Record<string, AutomationTriggerDef> = {
       },
     },
     isSystemControlled: false,
-    isEnabledByDefault: false, // Opt-in — firms may prefer manual first contact
+    isEnabledByDefault: false, // Opt-in  -  firms may prefer manual first contact
   },
 
   qualification_complete: {
@@ -336,7 +336,7 @@ export const LEAD_AUTOMATION_TRIGGERS: Record<string, AutomationTriggerDef> = {
     systemDefaultTemplates: {
       in_app: {
         subject: 'Lead qualified',
-        body: 'Qualification decision recorded for {{contact.name}} — {{lead.stage}}',
+        body: 'Qualification decision recorded for {{contact.name}}  -  {{lead.stage}}',
       },
     },
     isSystemControlled: true,
@@ -370,7 +370,7 @@ export const LEAD_AUTOMATION_TRIGGERS: Record<string, AutomationTriggerDef> = {
     label: 'Stage Transition',
     description: 'Internal notification when a lead advances to a new stage',
     category: 'notification',
-    applicableStages: [], // All stages — empty means universal
+    applicableStages: [], // All stages  -  empty means universal
     supportedChannels: ['in_app'],
     availableMergeFields: [...COMMON_MERGE_FIELDS],
     systemDefaultTemplates: {
@@ -393,12 +393,12 @@ export const LEAD_AUTOMATION_TRIGGERS: Record<string, AutomationTriggerDef> = {
     availableMergeFields: [...COMMON_MERGE_FIELDS],
     systemDefaultTemplates: {
       email: {
-        subject: 'Welcome — your matter with {{firm.name}} is now active',
+        subject: 'Welcome  -  your matter with {{firm.name}} is now active',
         body: 'Hi {{contact.name}},\n\nWe\'re pleased to confirm that your matter with {{firm.name}} is now active. Your assigned team will be in touch with next steps.\n\nBest regards,\n{{firm.name}}',
       },
       in_app: {
         subject: 'Lead converted to matter',
-        body: '{{contact.name}} — lead successfully converted to active matter',
+        body: '{{contact.name}}  -  lead successfully converted to active matter',
       },
     },
     isSystemControlled: true,

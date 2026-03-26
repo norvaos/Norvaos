@@ -172,7 +172,7 @@ async function handlePost(
       .maybeSingle()
 
     // Backend lock: only block if per-form tracking shows ALL forms completed.
-    // Legacy sessions have status='completed' but progress.forms={} (empty) —
+    // Legacy sessions have status='completed' but progress.forms={} (empty)  - 
     // those must be allowed through so the new per-form system can populate progress.
     if (session?.status === 'completed') {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -278,7 +278,7 @@ async function handlePost(
           .eq('id', existingInstance.id)
       }
     } catch (instanceErr) {
-      // Non-fatal — the contacts.immigration_data write already succeeded.
+      // Non-fatal  -  the contacts.immigration_data write already succeeded.
       // Log for debugging but don't fail the portal save.
       console.error('[portal-ircc-form-save] Instance dual-write error (non-fatal):', instanceErr)
     }
@@ -343,7 +343,7 @@ async function handlePost(
       // engine can advance the matter correctly.
       //   - All forms completed → 100%
       //   - Partial → round(completedForms / totalForms * 100)
-      // Fire-and-forget: non-fatal if this fails — status sync below handles it.
+      // Fire-and-forget: non-fatal if this fails  -  status sync below handles it.
       const newCompletionPct = allCompleted
         ? 100
         : allFormIds.length > 0
@@ -367,7 +367,7 @@ async function handlePost(
             console.error('[portal-ircc-form-save] Status sync failed (non-fatal):', err)
           })
         } catch {
-          // Non-fatal — don't block the save response
+          // Non-fatal  -  don't block the save response
         }
       }
 
@@ -381,7 +381,7 @@ async function handlePost(
           .single()
 
         const formLabel = formInfo
-          ? `${formInfo.form_code} — ${formInfo.form_name}`
+          ? `${formInfo.form_code}  -  ${formInfo.form_name}`
           : formId
 
         admin
@@ -443,7 +443,7 @@ async function handlePost(
       })
     }
 
-    // No session (edge case) — still return success for the profile save
+    // No session (edge case)  -  still return success for the profile save
     return NextResponse.json({ success: true })
   } catch (error) {
     console.error('[portal-ircc-form-save] POST error:', error)

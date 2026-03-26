@@ -17,7 +17,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
  *   - Summary recalculation
  *
  * For automated communications, resolves templates via the template engine
- * before logging — no hardcoded message strings in this route.
+ * before logging  -  no hardcoded message strings in this route.
  *
  * Body: {
  *   channel: string,         // 'call' | 'email' | 'sms' | 'in_app' | 'portal_chat' | etc.

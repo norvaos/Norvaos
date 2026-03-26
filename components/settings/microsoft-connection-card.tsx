@@ -93,7 +93,7 @@ export function MicrosoftConnectionCard({ userId }: MicrosoftConnectionCardProps
                 {connection.microsoft_display_name && (
                   <span className="font-medium">{connection.microsoft_display_name}</span>
                 )}
-                {connection.microsoft_display_name && ' — '}
+                {connection.microsoft_display_name && '  -  '}
                 {connection.microsoft_email}
               </CardDescription>
             </div>

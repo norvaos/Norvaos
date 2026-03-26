@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * CommunicationPanel (Zone 3) — Persistent email/communication panel.
+ * CommunicationPanel (Zone 3)  -  Persistent email/communication panel.
  *
  * Shows email thread list, thread view, compose/reply, and quick action buttons.
  * Collapsible with toggle.
@@ -75,7 +75,7 @@ export function CommunicationPanel({
     setSelectedThread(null)
   }, [])
 
-  // Collapsed state — just show expand button
+  // Collapsed state  -  just show expand button
   if (collapsed) {
     return (
       <div className="w-10 shrink-0 border-l bg-card flex flex-col items-center py-2">

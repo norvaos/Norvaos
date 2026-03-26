@@ -1,5 +1,5 @@
 /**
- * Auto-Meeting Record Generator — Directive 42.0
+ * Auto-Meeting Record Generator  -  Directive 42.0
  *
  * Regulatory requirement: Every initial consultation must have a
  * meeting record auto-generated in the Norva Vault.
@@ -19,7 +19,7 @@ interface AutoMeetingRecordParams {
 
 /**
  * Creates a placeholder meeting record document in the vault.
- * The document is created as a "draft" — the lawyer fills it in during/after consultation.
+ * The document is created as a "draft"  -  the lawyer fills it in during/after consultation.
  */
 export async function createAutoMeetingRecord({
   tenantId,

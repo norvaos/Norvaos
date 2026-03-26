@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Document Engine — Workflow Engine
+ * Document Engine  -  Workflow Engine
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Evaluates workflow rules and triggers document generation or suggestions.
@@ -138,7 +138,7 @@ export async function processDocumentWorkflowTrigger(
       .limit(1)
 
     if (existingInstances && existingInstances.length > 0) {
-      // Already has an active instance — skip to avoid duplicates
+      // Already has an active instance  -  skip to avoid duplicates
       suggested++
       continue
     }
@@ -162,7 +162,7 @@ export async function processDocumentWorkflowTrigger(
       if (result.success) {
         generated++
       } else {
-        // Auto-generation failed — fall back to suggestion
+        // Auto-generation failed  -  fall back to suggestion
         suggested++
       }
     } else if (tier === 'auto_draft_with_review') {
@@ -196,7 +196,7 @@ export async function processDocumentWorkflowTrigger(
         suggested++
       }
     } else {
-      // Unknown tier — treat as suggestion
+      // Unknown tier  -  treat as suggestion
       suggested++
     }
   }
@@ -230,13 +230,13 @@ function matchesRule(
     return false
   }
 
-  // Match jurisdiction (if specified on rule — matters may not have this column)
+  // Match jurisdiction (if specified on rule  -  matters may not have this column)
   if (rule.jurisdiction_code && (matter as Record<string, unknown>).jurisdiction_code !== rule.jurisdiction_code) {
     return false
   }
 
-  // Match document family (if specified — rule targets a specific family)
-  // No additional check needed — rule.template_id already links to the family
+  // Match document family (if specified  -  rule targets a specific family)
+  // No additional check needed  -  rule.template_id already links to the family
 
   return true
 }

@@ -11,7 +11,7 @@ import {
   type ScreeningQuestion,
 } from '@/lib/utils/screening-questions'
 
-// ─── Score question IDs — rendered as a grouped grid ─────────────────────────
+// ─── Score question IDs  -  rendered as a grouped grid ─────────────────────────
 
 const SCORE_IDS = [
   'sq_lang_score_overall',
@@ -76,7 +76,7 @@ export function ScreeningAnswersPanel({
     )
   }
 
-  // Build render list — collapse the 5 score fields into one grouped row
+  // Build render list  -  collapse the 5 score fields into one grouped row
   const scoreIdsSet = new Set<string>(SCORE_IDS)
   const rendered = new Set<string>()
 
@@ -133,7 +133,7 @@ export function ScreeningAnswersPanel({
                             {SCORE_LABELS[id]}
                           </p>
                           <p className="text-sm font-semibold text-foreground">
-                            {(answers[id] as string) || '—'}
+                            {(answers[id] as string) || ' - '}
                           </p>
                         </div>
                       ))}
@@ -145,7 +145,7 @@ export function ScreeningAnswersPanel({
               rendered.add(q.id)
               const raw = answers[q.id]
               const display = getAnswerDisplay(q, raw)
-              const isUnanswered = display === '—'
+              const isUnanswered = display === ' - '
 
               return (
                 <div key={q.id} className="pt-3 first:pt-0">

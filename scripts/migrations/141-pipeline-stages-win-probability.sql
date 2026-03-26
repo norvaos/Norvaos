@@ -1,4 +1,4 @@
--- Migration 141: Lead Pipeline Stages — Win Probability, Colours, Descriptions, SLA
+-- Migration 141: Lead Pipeline Stages  -  Win Probability, Colours, Descriptions, SLA
 -- Updates all pipeline_stages rows by name to add:
 --   win_probability, color, rotting_days, description, is_win_stage, is_lost_stage
 -- Safe to re-run (uses UPDATE ... WHERE name = ...).
@@ -14,7 +14,7 @@ UPDATE pipeline_stages SET
   rotting_days    = 1,
   is_win_stage    = false,
   is_lost_stage   = false,
-  description     = 'A new inquiry has arrived and has not yet been contacted. Assign immediately — leads go cold within hours.'
+  description     = 'A new inquiry has arrived and has not yet been contacted. Assign immediately  -  leads go cold within hours.'
 WHERE name = 'New Inquiry';
 
 UPDATE pipeline_stages SET
@@ -68,7 +68,7 @@ UPDATE pipeline_stages SET
   rotting_days    = 7,
   is_win_stage    = false,
   is_lost_stage   = false,
-  description     = 'Client is considering — they have questions or need more time. Maintain warm contact. Schedule a follow-up call or meeting within 5 days.'
+  description     = 'Client is considering  -  they have questions or need more time. Maintain warm contact. Schedule a follow-up call or meeting within 5 days.'
 WHERE name = 'Follow-Up Active';
 
 UPDATE pipeline_stages SET
@@ -77,7 +77,7 @@ UPDATE pipeline_stages SET
   rotting_days    = 3,
   is_win_stage    = false,
   is_lost_stage   = false,
-  description     = 'Retainer is signed but payment has not been received. Collect payment immediately — do not begin legal work until payment is confirmed.'
+  description     = 'Retainer is signed but payment has not been received. Collect payment immediately  -  do not begin legal work until payment is confirmed.'
 WHERE name = 'Retainer Signed – Payment Pending';
 
 UPDATE pipeline_stages SET
@@ -86,7 +86,7 @@ UPDATE pipeline_stages SET
   rotting_days     = NULL,
   is_win_stage     = true,
   is_lost_stage    = false,
-  description      = 'Client is fully retained — retainer signed AND payment received. Lead auto-converts to an active matter. Legal work may begin.'
+  description      = 'Client is fully retained  -  retainer signed AND payment received. Lead auto-converts to an active matter. Legal work may begin.'
 WHERE name = 'Retained – Active Matter';
 
 -- ─────────────────────────────────────────────────────────────────────────────

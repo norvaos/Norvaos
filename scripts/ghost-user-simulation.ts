@@ -1,11 +1,11 @@
 /**
- * Ghost-User Simulation — Team COMMAND
+ * Ghost-User Simulation  -  Team COMMAND
  *
  * Spawns 100 concurrent virtual clients across the Global 15 languages.
  * Each ghost hits one of three Action Trident paths simultaneously:
  *   1. Intake Start (POST /api/matters)
- *   2. Vault Drop — 50MB encrypted PDF upload (POST /api/portal/[token]/upload-document)
- *   3. Biometric Login — Portal token validation (GET /api/portal/[token])
+ *   2. Vault Drop  -  50MB encrypted PDF upload (POST /api/portal/[token]/upload-document)
+ *   3. Biometric Login  -  Portal token validation (GET /api/portal/[token])
  *
  * Validates Migration 186 invariants after the storm:
  *   - tenants.settings.ui_version === 'v2-sovereign' (never reverts to legacy)
@@ -85,10 +85,10 @@ function generateGhostName(locale: string, id: number): string {
   return `${prefixes[locale] ?? 'Ghost'}-${id.toString().padStart(3, '0')}`
 }
 
-/** Generates a fake 50MB-ish buffer (we send 1KB for speed — the test is about concurrency, not bandwidth) */
+/** Generates a fake 50MB-ish buffer (we send 1KB for speed  -  the test is about concurrency, not bandwidth) */
 function generateFakePDF(): Blob {
   const header = '%PDF-1.4 Ghost-User Stress Test Document\n'
-  const body = 'X'.repeat(1024) // 1KB payload — sufficient for concurrency test
+  const body = 'X'.repeat(1024) // 1KB payload  -  sufficient for concurrency test
   return new Blob([header + body], { type: 'application/pdf' })
 }
 
@@ -107,7 +107,7 @@ async function ghostIntake(ghostId: number, locale: string, authToken: string): 
         'Accept-Language': locale,
       },
       body: JSON.stringify({
-        title: `${ghostName} — Stress Test Intake [${locale.toUpperCase()}]`,
+        title: `${ghostName}  -  Stress Test Intake [${locale.toUpperCase()}]`,
         description: `Ghost-User simulation #${ghostId}. Locale: ${locale}. Action: intake.`,
         priority: ghostId % 3 === 0 ? 'high' : 'medium',
       }),
@@ -137,7 +137,7 @@ async function ghostVaultDrop(ghostId: number, locale: string, portalToken: stri
     return {
       ghostId, locale, action: 'vault_drop',
       status: 'error', httpStatus: null, latencyMs: 0,
-      error: 'No portal token available — skipping vault drop',
+      error: 'No portal token available  -  skipping vault drop',
     }
   }
 
@@ -177,12 +177,12 @@ async function ghostBiometricLogin(ghostId: number, locale: string, portalToken:
     return {
       ghostId, locale, action: 'biometric_login',
       status: 'error', httpStatus: null, latencyMs: 0,
-      error: 'No portal token available — skipping biometric',
+      error: 'No portal token available  -  skipping biometric',
     }
   }
 
   try {
-    // Hit the portal page endpoint — this validates the token and returns portal data
+    // Hit the portal page endpoint  -  this validates the token and returns portal data
     const res = await fetch(`${BASE_URL}/api/portal/${portalToken}`, {
       method: 'GET',
       headers: { 'Accept-Language': locale },
@@ -218,7 +218,7 @@ async function verifyMigration186Invariants(): Promise<InvariantResult[]> {
     return [{
       check: 'DB_CONNECTION',
       status: 'FAIL',
-      detail: 'Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY — cannot verify invariants',
+      detail: 'Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY  -  cannot verify invariants',
     }]
   }
 
@@ -358,7 +358,7 @@ async function runBatch(ghosts: Array<{ id: number; locale: string; action: Acti
 function printReport(invariants: InvariantResult[]) {
   const line = '═'.repeat(72)
   console.log(`\n${line}`)
-  console.log('  GHOST-USER SIMULATION REPORT — Team COMMAND')
+  console.log('  GHOST-USER SIMULATION REPORT  -  Team COMMAND')
   console.log(`  ${new Date().toISOString()}`)
   console.log(line)
 
@@ -405,7 +405,7 @@ function printReport(invariants: InvariantResult[]) {
   }
 
   // Migration 186 invariants
-  console.log(`\n  MIGRATION 186 INVARIANTS — SOVEREIGN CUTOVER`)
+  console.log(`\n  MIGRATION 186 INVARIANTS  -  SOVEREIGN CUTOVER`)
   console.log(`  ${'─'.repeat(50)}`)
   let allPass = true
   for (const inv of invariants) {
@@ -416,11 +416,11 @@ function printReport(invariants: InvariantResult[]) {
 
   console.log(`\n${line}`)
   if (allPass && failed === 0 && errored === 0) {
-    console.log('  VERDICT: ALL CLEAR — Sovereign Cutover holds under concurrent load.')
+    console.log('  VERDICT: ALL CLEAR  -  Sovereign Cutover holds under concurrent load.')
   } else if (allPass) {
-    console.log('  VERDICT: MIGRATION INTACT — Some HTTP errors detected (expected without auth).')
+    console.log('  VERDICT: MIGRATION INTACT  -  Some HTTP errors detected (expected without auth).')
   } else {
-    console.log('  VERDICT: REGRESSION DETECTED — Migration 186 invariants FAILED.')
+    console.log('  VERDICT: REGRESSION DETECTED  -  Migration 186 invariants FAILED.')
   }
   console.log(`${line}\n`)
 
@@ -429,7 +429,7 @@ function printReport(invariants: InvariantResult[]) {
   if (failures.length > 0 && failures.length <= 20) {
     console.log('  FAILURE DETAILS (first 20):')
     for (const f of failures.slice(0, 20)) {
-      console.log(`    Ghost #${f.ghostId} [${f.locale}] ${f.action}: HTTP ${f.httpStatus} — ${f.error?.slice(0, 120)}`)
+      console.log(`    Ghost #${f.ghostId} [${f.locale}] ${f.action}: HTTP ${f.httpStatus}  -  ${f.error?.slice(0, 120)}`)
     }
     console.log()
   }
@@ -438,7 +438,7 @@ function printReport(invariants: InvariantResult[]) {
 // ── Main ─────────────────────────────────────────────────────────────────────
 
 async function main() {
-  console.log('\n  Ghost-User Simulation — Team COMMAND')
+  console.log('\n  Ghost-User Simulation  -  Team COMMAND')
   console.log(`  Target: ${BASE_URL}`)
   console.log(`  Ghosts: ${TOTAL_GHOSTS} across ${GLOBAL_15.length} languages`)
   console.log(`  Batch size: ${CONCURRENCY_BATCH} concurrent\n`)
@@ -468,14 +468,14 @@ async function main() {
       portalToken = portal[0].token
       console.log('  Portal: Found active portal token for vault/biometric tests')
     } else {
-      console.log('  Portal: No active portal tokens — vault_drop and biometric tests will be skipped')
+      console.log('  Portal: No active portal tokens  -  vault_drop and biometric tests will be skipped')
     }
   } else {
-    console.log('  Warning: No Supabase credentials — running HTTP-only smoke test')
+    console.log('  Warning: No Supabase credentials  -  running HTTP-only smoke test')
     authToken = 'ghost-simulation-token'
   }
 
-  // Build ghost roster — distribute evenly across languages and actions
+  // Build ghost roster  -  distribute evenly across languages and actions
   const ghosts: Array<{ id: number; locale: string; action: ActionType }> = []
   for (let i = 0; i < TOTAL_GHOSTS; i++) {
     const locale = GLOBAL_15[i % GLOBAL_15.length].code
@@ -494,7 +494,7 @@ async function main() {
   for (let b = 0; b < totalBatches; b++) {
     const batch = ghosts.slice(b * CONCURRENCY_BATCH, (b + 1) * CONCURRENCY_BATCH)
     const locales = [...new Set(batch.map(g => g.locale))].join(',')
-    console.log(`  Batch ${b + 1}/${totalBatches} — ${batch.length} ghosts [${locales}]`)
+    console.log(`  Batch ${b + 1}/${totalBatches}  -  ${batch.length} ghosts [${locales}]`)
     await runBatch(batch, authToken, portalToken)
   }
 

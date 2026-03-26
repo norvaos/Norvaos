@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * ADR-9 — Debug Inspector Panels
+ * ADR-9  -  Debug Inspector Panels
  *
  * Five embedded inspection panels for staff-only debugging of the IRCC Forms Engine.
  * Provides deep visibility into condition evaluation, precedence resolution,
@@ -65,12 +65,12 @@ import { evaluateConditionWithTrace } from '@/lib/ircc/condition-engine'
 // ---------------------------------------------------------------------------
 
 const PRECEDENCE_LABELS: Record<number, string> = {
-  [PrecedenceLevel.VERIFIED_MATTER_OVERRIDE]: 'L1 — Verified Matter Override',
-  [PrecedenceLevel.CURRENT_MATTER_ANSWER]: 'L2 — Current Matter Answer',
-  [PrecedenceLevel.CROSS_FORM_REUSE]: 'L3 — Cross-Form Reuse',
-  [PrecedenceLevel.VERIFIED_CANONICAL]: 'L4 — Verified Canonical',
-  [PrecedenceLevel.UNVERIFIED_CANONICAL]: 'L5 — Unverified Canonical',
-  [PrecedenceLevel.CONTACT_FALLBACK]: 'L6 — Contact Fallback',
+  [PrecedenceLevel.VERIFIED_MATTER_OVERRIDE]: 'L1  -  Verified Matter Override',
+  [PrecedenceLevel.CURRENT_MATTER_ANSWER]: 'L2  -  Current Matter Answer',
+  [PrecedenceLevel.CROSS_FORM_REUSE]: 'L3  -  Cross-Form Reuse',
+  [PrecedenceLevel.VERIFIED_CANONICAL]: 'L4  -  Verified Canonical',
+  [PrecedenceLevel.UNVERIFIED_CANONICAL]: 'L5  -  Unverified Canonical',
+  [PrecedenceLevel.CONTACT_FALLBACK]: 'L6  -  Contact Fallback',
 }
 
 // ---------------------------------------------------------------------------
@@ -87,7 +87,7 @@ function formatValue(value: unknown): string {
 
 function copyToClipboard(text: string) {
   navigator.clipboard.writeText(text).catch(() => {
-    // silent fail — non-critical
+    // silent fail  -  non-critical
   })
 }
 

@@ -43,7 +43,7 @@ interface ActionDialogProps {
 /**
  * Generic structured action dialog for Front Desk.
  *
- * Rule #12: Compliance required fields — validates minimum lengths,
+ * Rule #12: Compliance required fields  -  validates minimum lengths,
  * required fields, etc. before submission.
  *
  * Each dialog maps fields → input → validates → calls onSubmit.
@@ -91,7 +91,7 @@ export function ActionDialog({
   function handleSubmit() {
     if (!validate()) return
 
-    // Clean up values — convert empty strings to undefined, numbers
+    // Clean up values  -  convert empty strings to undefined, numbers
     const cleaned: Record<string, unknown> = {}
     for (const field of fields) {
       const val = values[field.name]

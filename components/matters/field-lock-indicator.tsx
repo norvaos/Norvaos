@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * FieldLockIndicator — Shows "Lawyer A is editing..." when a field is locked.
+ * FieldLockIndicator  -  Shows "Lawyer A is editing..." when a field is locked.
  *
  * Wraps any form field. When the field is locked by another user, it overlays
  * a semi-transparent lock indicator and disables interaction.
@@ -51,7 +51,7 @@ export function FieldLockIndicator({
 }
 
 /**
- * FieldLockBadge — Compact inline badge variant for tight layouts.
+ * FieldLockBadge  -  Compact inline badge variant for tight layouts.
  * Shows a small lock icon + name next to a field label.
  */
 export function FieldLockBadge({ lockInfo }: { lockInfo: FieldLockInfo | undefined }) {

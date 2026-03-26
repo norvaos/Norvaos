@@ -1,6 +1,6 @@
 /**
- * GET   /api/collections/payment-plans/[id] — Get a single payment plan
- * PATCH /api/collections/payment-plans/[id] — Perform an action on a payment plan
+ * GET   /api/collections/payment-plans/[id]  -  Get a single payment plan
+ * PATCH /api/collections/payment-plans/[id]  -  Perform an action on a payment plan
  *   Actions: approve, record_payment, cancel, default
  */
 

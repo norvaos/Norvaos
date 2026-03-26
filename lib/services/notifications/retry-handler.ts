@@ -9,7 +9,7 @@
  * - After max retries: log to Sentry + write to dead-letter store
  * - Dead-letter is in-memory; items are retrievable for monitoring
  *
- * Team 3 / Module 2 — Notification & Communications Adapters
+ * Team 3 / Module 2  -  Notification & Communications Adapters
  */
 
 import * as Sentry from '@sentry/nextjs'
@@ -66,7 +66,7 @@ function addToDeadLetter(item: FailedDelivery): void {
     scope.setExtra('attempt_count', item.attemptCount)
     scope.setExtra('first_failed_at', item.firstFailedAt)
     scope.setExtra('last_failed_at', item.lastFailedAt)
-    // Never pass PII in extras — only structural metadata
+    // Never pass PII in extras  -  only structural metadata
     Sentry.captureMessage(
       `Notification permanently failed after ${item.attemptCount} attempts: ${item.entityType}`,
       'error',
@@ -79,7 +79,7 @@ function addToDeadLetter(item: FailedDelivery): void {
 /**
  * Schedule a retry for a failed delivery job.
  *
- * Checks the attempt count before scheduling — if attempts >= MAX_RETRY_ATTEMPTS,
+ * Checks the attempt count before scheduling  -  if attempts >= MAX_RETRY_ATTEMPTS,
  * the item is moved to the dead-letter queue instead of retrying.
  *
  * Note: this function schedules via setTimeout (in-process). For durable
@@ -178,7 +178,7 @@ export function clearDeadLetterForTenant(tenantId: string, resolvedBy: string): 
   })
 }
 
-/** @internal — for testing only */
+/** @internal  -  for testing only */
 export function _resetDeadLetterForTesting(): void {
   deadLetterQueue.length = 0
 }

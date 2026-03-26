@@ -79,7 +79,7 @@ export function useCreateTrustAccount() {
     }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: trustKeys.accounts() })
-      toast.success('Norva Trust Ledger — Account created')
+      toast.success('Norva Trust Ledger  -  Account created')
     },
     onError: (error: Error) => {
       toast.error(error.message)
@@ -135,7 +135,7 @@ export function useRecordDeposit() {
       invoiceId?: string
       effectiveDate?: string
       notes?: string
-      /** Optional lead ID — triggers auto-conversion via Norva Ledger */
+      /** Optional lead ID  -  triggers auto-conversion via Norva Ledger */
       leadId?: string
     }) => fetchApi('/api/trust-accounting/transactions', {
       method: 'POST',

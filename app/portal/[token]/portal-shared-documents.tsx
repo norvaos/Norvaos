@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * PortalSharedDocuments — Documents shared by the firm for client viewing.
+ * PortalSharedDocuments  -  Documents shared by the firm for client viewing.
  * Shows sent/viewed timestamps. Records first view via PATCH.
  */
 
@@ -145,7 +145,7 @@ export function PortalSharedDocuments({
 
       const data = await res.json()
 
-      // Update local state immediately — set viewed timestamp
+      // Update local state immediately  -  set viewed timestamp
       if (!doc.client_viewed_at) {
         setDocuments((prev) =>
           prev.map((d) =>

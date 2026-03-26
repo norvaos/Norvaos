@@ -1,14 +1,14 @@
 /**
- * @deprecated — LEGACY PDF Filler.
+ * @deprecated  -  LEGACY PDF Filler.
  *
  * Replaced by xfa-filler-db-server.ts which reads field mappings from the DB
  * (ircc_form_fields) instead of the hardcoded form-field-registry.
  *
  * This file still imports from the deprecated form-field-registry.ts.
- * Do not add new call-sites — migrate existing consumers to the DB path.
+ * Do not add new call-sites  -  migrate existing consumers to the DB path.
  *
  * Original description:
- * IRCC PDF Filler — fills IRCC form PDFs with client profile data.
+ * IRCC PDF Filler  -  fills IRCC form PDFs with client profile data.
  * Two modes: Template mode (fillable PDF) and Summary mode (data-summary PDF).
  * Uses `pdf-lib` for all PDF operations.
  */
@@ -31,8 +31,8 @@ export interface PDFFieldMapping {
 // ── Form Titles ───────────────────────────────────────────────────────────────
 
 const FORM_TITLES: Record<string, string> = {
-  IMM5257: 'IMM 5257 — Application for Temporary Resident Visa (Visitor Visa)',
-  IMM5406: 'IMM 5406 — Additional Family Information',
+  IMM5257: 'IMM 5257  -  Application for Temporary Resident Visa (Visitor Visa)',
+  IMM5406: 'IMM 5406  -  Additional Family Information',
 }
 
 // ── Transform Helpers ─────────────────────────────────────────────────────────
@@ -83,7 +83,7 @@ function getTransformForFieldType(
       }
 
     default:
-      // text, textarea, select, country, email, phone, multi_select — as-is
+      // text, textarea, select, country, email, phone, multi_select  -  as-is
       return undefined
   }
 }
@@ -134,7 +134,7 @@ export function getFormFieldMappings(formCode: string): PDFFieldMapping[] {
  * Fill a blank IRCC PDF form with client profile data.
  * Returns the filled PDF as Uint8Array.
  *
- * Works with ANY fillable PDF — maps fields by name and skips any that
+ * Works with ANY fillable PDF  -  maps fields by name and skips any that
  * don't exist in the template. Gracefully handles missing fields.
  */
 export async function fillIRCCForm(
@@ -178,7 +178,7 @@ export async function fillIRCCForm(
           const dropdown = form.getDropdown(mapping.pdfFieldName)
           dropdown.select(stringValue)
         } catch {
-          // Field not found in PDF — skip silently
+          // Field not found in PDF  -  skip silently
           console.warn(
             `[pdf-filler] Field not found in PDF: ${mapping.pdfFieldName}`,
           )
@@ -226,7 +226,7 @@ export async function generateSummaryPdf(
 
   const sections: IRCCFormSection[] | undefined = FORM_REGISTRY[formCode]
   if (!sections) {
-    // No sections found — return a minimal PDF with an error message
+    // No sections found  -  return a minimal PDF with an error message
     const page = pdfDoc.addPage([PAGE_WIDTH, PAGE_HEIGHT])
     page.drawText(`No field definitions found for form: ${formCode}`, {
       x: MARGIN_LEFT,
@@ -395,7 +395,7 @@ export async function generateSummaryPdf(
           )
         }
       } else {
-        page.drawText('—', {
+        page.drawText(' - ', {
           x: MARGIN_LEFT + 12,
           y,
           size: 9,

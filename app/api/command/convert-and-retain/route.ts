@@ -1,6 +1,6 @@
 // ============================================================================
 // POST /api/command/convert-and-retain
-// "Open File" — Gated conversion: Lead → Matter + Kit Activation + Portal + Docs
+// "Open File"  -  Gated conversion: Lead → Matter + Kit Activation + Portal + Docs
 // All conversion gates must pass before matter creation is allowed.
 // ============================================================================
 
@@ -104,7 +104,7 @@ async function handlePost(request: Request) {
 
     // ── 1a. Pre-matter-open conflict scan ─────────────────────────
     // Re-run conflict scan every time a matter is about to be opened.
-    // Uses admin client to bypass RLS — scan must always succeed.
+    // Uses admin client to bypass RLS  -  scan must always succeed.
     if (lead.contact_id) {
       try {
         const scanResult = await runConflictScan(adminClient, {
@@ -128,7 +128,7 @@ async function handlePost(request: Request) {
           .update({ conflict_status: newStatus })
           .eq('id', leadId)
 
-        // Block immediately for hard conflicts — don't wait for gate evaluation
+        // Block immediately for hard conflicts  -  don't wait for gate evaluation
         const hardBlockStatuses = ['review_required', 'conflict_confirmed', 'blocked']
         if (hardBlockStatuses.includes(newStatus)) {
           const conflictMessages: Record<string, string> = {
@@ -148,7 +148,7 @@ async function handlePost(request: Request) {
           )
         }
       } catch (err) {
-        // Scan failed — treat as clear so conversion is never blocked by a scan error.
+        // Scan failed  -  treat as clear so conversion is never blocked by a scan error.
         // The failure is logged; a manual scan can be run from the contact profile.
         console.error('[convert-and-retain] Conflict scan failed, treating as clear:', err)
         await adminClient
@@ -299,7 +299,7 @@ async function handlePost(request: Request) {
       )
     }
 
-    // ── 4b. Financial Snapshot — "Point of No Return" Lock (Directive 41.4) ──
+    // ── 4b. Financial Snapshot  -  "Point of No Return" Lock (Directive 41.4) ──
     // Capture the tax rate, fee structure, and retainer deposit at the moment
     // of retention. This snapshot is immutable for audit purposes.
     try {
@@ -795,7 +795,7 @@ async function handlePost(request: Request) {
       tenant_id: tenantId,
       matter_id: matter.id,
       activity_type: 'file_opened',
-      title: 'File opened — matter created',
+      title: 'File opened  -  matter created',
       description: `Lead converted and matter "${matter.title}" created with full kit activation.`,
       entity_type: 'matter',
       entity_id: matter.id,

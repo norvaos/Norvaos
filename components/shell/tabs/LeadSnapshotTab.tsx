@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * Lead Snapshot Tab — "Intake History"
+ * Lead Snapshot Tab  -  "Intake History"
  *
  * Shows the lawyer all data captured during the lead intake phase,
  * migrated into matter_custom_data during conversion. This ensures
@@ -46,7 +46,7 @@ const FIELD_LABELS: Record<string, string> = {
 }
 
 function formatFieldValue(key: string, value: unknown): string {
-  if (value === null || value === undefined) return '—'
+  if (value === null || value === undefined) return ' - '
   if (typeof value === 'boolean') return value ? 'Yes' : 'No'
   if (typeof value === 'object') return JSON.stringify(value, null, 2)
   return String(value)

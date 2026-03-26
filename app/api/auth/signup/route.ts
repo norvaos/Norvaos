@@ -55,7 +55,7 @@ async function handlePost(request: Request) {
 
     const supabase = createAdminClient()
 
-    // Step 1: Resolve auth user — create fresh or reuse existing
+    // Step 1: Resolve auth user  -  create fresh or reuse existing
     // An email may already have an auth account (e.g. invited to another tenant).
     // In that case we reuse the existing auth_user_id and update their password,
     // then create a brand-new tenant for them. Each tenant is fully isolated by RLS.
@@ -85,7 +85,7 @@ async function handlePost(request: Request) {
         )
       }
 
-      // Email already has an auth account — look it up and update password
+      // Email already has an auth account  -  look it up and update password
       const { data: listData, error: listError } =
         await supabase.auth.admin.listUsers()
       if (listError) {
@@ -99,7 +99,7 @@ async function handlePost(request: Request) {
       )
       if (!existing) {
         return NextResponse.json(
-          { data: null, error: 'Account conflict — please try again or contact support.' },
+          { data: null, error: 'Account conflict  -  please try again or contact support.' },
           { status: 400 }
         )
       }
@@ -109,7 +109,7 @@ async function handlePost(request: Request) {
 
       // If the existing user is not email-confirmed, re-trigger verification
       if (!existing.email_confirmed_at) {
-        // Generate a new signup confirmation link — Supabase will send the email
+        // Generate a new signup confirmation link  -  Supabase will send the email
         await supabase.auth.admin.generateLink({
           type: 'signup',
           email,
@@ -129,7 +129,7 @@ async function handlePost(request: Request) {
     // Seat-limit exempt: signup creates a new tenant with 0 users, always passes.
     // max_users is set explicitly (non-null) because the DB trigger (enforce_max_users)
     // raises an exception when max_users IS NULL.
-    // Slug must be globally unique — append a short random suffix on collision.
+    // Slug must be globally unique  -  append a short random suffix on collision.
     const baseSlug = firmName
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')

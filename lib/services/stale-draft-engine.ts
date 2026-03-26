@@ -15,7 +15,7 @@
  *   - Compares input_snapshot against current immigration_data
  *   - Only marks stale if a field that was in the snapshot has changed
  *   - Logs activity and notifies responsible lawyer
- *   - Non-blocking — failure does not break the calling mutation
+ *   - Non-blocking  -  failure does not break the calling mutation
  */
 
 import type { SupabaseClient } from '@supabase/supabase-js'
@@ -40,7 +40,7 @@ type ChangeType = 'questionnaire_update' | 'document_change' | 'person_change'
  * Check if any active (non-superseded, non-stale) form pack versions
  * need to be marked stale due to data changes.
  *
- * Safe to call after any mutation — non-blocking on failure.
+ * Safe to call after any mutation  -  non-blocking on failure.
  */
 export async function checkAndMarkStalePacks(
   supabase: SupabaseClient<Database>,
@@ -104,7 +104,7 @@ export async function checkAndMarkStalePacks(
       }
     }
   } catch (err) {
-    // Non-blocking — log and continue
+    // Non-blocking  -  log and continue
     console.error('[STALE-DRAFT] Failed to check stale packs:', err)
   }
 
@@ -213,7 +213,7 @@ async function markStale(
  * Compare a snapshot (frozen at generation time) against the current profile.
  * Returns true if any field that existed in the snapshot now has a different value.
  *
- * Only checks fields that were captured — new fields added after generation
+ * Only checks fields that were captured  -  new fields added after generation
  * do not trigger staleness (they'll be picked up on regeneration).
  */
 function hasSnapshotDivergence(
@@ -227,7 +227,7 @@ function hasSnapshotDivergence(
   for (const [path, snapshotValue] of Object.entries(snapshotPaths)) {
     const currentValue = currentPaths[path]
 
-    // Skip null/undefined in snapshot — these weren't filled at generation time
+    // Skip null/undefined in snapshot  -  these weren't filled at generation time
     if (snapshotValue === null || snapshotValue === undefined) continue
     if (snapshotValue === '') continue
 

@@ -79,7 +79,7 @@ async function handlePost(
       return NextResponse.json({ error: result.error }, { status: 400 })
     }
 
-    // Sync immigration intake status — portal link/request now exists, so
+    // Sync immigration intake status  -  portal link/request now exists, so
     // the matter can advance from not_issued → issued automatically.
     try {
       await syncImmigrationIntakeStatus(admin, matterId, auth.userId)

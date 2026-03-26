@@ -1,12 +1,12 @@
 """
-NorvaOS Form Generation Sidecar — Sprint 6
+NorvaOS Form Generation Sidecar  -  Sprint 6
 
 Lightweight FastAPI service that handles form generation jobs dispatched
 from the Next.js generate-form route.
 
 Endpoints:
-  GET  /health          — Health check
-  POST /generate-form   — Accept a form generation job, produce PDF, callback
+  GET  /health           -  Health check
+  POST /generate-form    -  Accept a form generation job, produce PDF, callback
 
 Auth:
   POST endpoints require X-Worker-Key header matching WORKER_SECRET env var.
@@ -72,7 +72,7 @@ async def auth_middleware(request: Request, call_next):
 
     if request.method == 'POST':
         worker_key = request.headers.get('X-Worker-Key', '')
-        # X-Job-ID is a job tracking header only — it does not grant authentication.
+        # X-Job-ID is a job tracking header only  -  it does not grant authentication.
         # When WORKER_SECRET is set, every POST must supply a correct X-Worker-Key.
         # A missing or wrong key is rejected with 401; there is no bypass path.
         if WORKER_SECRET and worker_key != WORKER_SECRET:
@@ -179,7 +179,7 @@ async def generate_form(job: FormGenerationJob, request: Request):
         page_count = await loop.run_in_executor(
             None, generate_pdf_dev, job, output_path
         )
-        logger.info('Job %s completed — %s (%d pages)', job.job_id, output_path, page_count)
+        logger.info('Job %s completed  -  %s (%d pages)', job.job_id, output_path, page_count)
 
         callback_payload = {
             'job_id': job.job_id,

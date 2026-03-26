@@ -1,4 +1,4 @@
-# NorvaOS — Central Defect and Risk Register
+# NorvaOS  -  Central Defect and Risk Register
 
 **Maintained by:** Engineering leads
 **Last Updated:** 2026-03-16
@@ -21,7 +21,7 @@
 
 ---
 
-### RISK-001 — Stripe billing_invoices non-idempotent insert
+### RISK-001  -  Stripe billing_invoices non-idempotent insert
 
 | Field | Value |
 |-------|-------|
@@ -61,17 +61,17 @@ await supabase
   .upsert({ stripe_invoice_id: invoice.id, ... }, { onConflict: 'stripe_invoice_id' })
 ```
 
-**Approval required:** Yes — requires a schema migration. Must go through the standard migration approval process.
+**Approval required:** Yes  -  requires a schema migration. Must go through the standard migration approval process.
 
 ---
 
-### RISK-002 — GHL and Clio OAuth adapters have no token refresh
+### RISK-002  -  GHL and Clio OAuth adapters have no token refresh
 
 | Field | Value |
 |-------|-------|
 | **ID** | RISK-002 |
 | **Severity** | **P0** |
-| **Status** | **DEFERRED — 2026-03-16** (GHL/Clio not in launch scope) |
+| **Status** | **DEFERRED  -  2026-03-16** (GHL/Clio not in launch scope) |
 | **Production-blocking** | Not blocking immediate launch. Blocks GHL/Clio go-live when those surfaces are enabled. |
 | **Date Logged** | 2026-03-16 |
 | **Date Deferred** | 2026-03-16 |
@@ -98,17 +98,17 @@ Add a token refresh interceptor to both adapters. The interceptor should:
 4. Retry the original request once with the new token
 5. If the refresh itself fails (e.g., refresh token expired or revoked), mark the `platform_connections` row as `status = 'disconnected'` and surface a reconnection prompt to the tenant admin
 
-**Approval required:** Yes — modifies existing integration adapter files (core file edit). Requires separate controlled approval. Does not require a schema migration (the `platform_connections` table already has `refresh_token` and `expires_at` columns, per Module 1 audit).
+**Approval required:** Yes  -  modifies existing integration adapter files (core file edit). Requires separate controlled approval. Does not require a schema migration (the `platform_connections` table already has `refresh_token` and `expires_at` columns, per Module 1 audit).
 
 ---
 
-### RISK-003 — Microsoft Graph `graphFetch` has unbounded recursive retry
+### RISK-003  -  Microsoft Graph `graphFetch` has unbounded recursive retry
 
 | Field | Value |
 |-------|-------|
 | **ID** | RISK-003 |
 | **Severity** | **P0** |
-| **Status** | **CLOSED — 2026-03-16** |
+| **Status** | **CLOSED  -  2026-03-16** |
 | **Production-blocking** | Resolved |
 | **Date Logged** | 2026-03-16 |
 | **Date Closed** | 2026-03-16 |
@@ -121,9 +121,9 @@ Add a token refresh interceptor to both adapters. The interceptor should:
 The `graphFetch` helper used to make Microsoft Graph API calls implements retry logic by calling itself recursively. There is no maximum recursion depth, no attempt counter, and no circuit breaker. If Microsoft Graph returns repeated 429 (rate-limited) or 5xx responses, the function recurses indefinitely until the call stack is exhausted.
 
 **Resolution:**
-`lib/services/microsoft-graph.ts` rewritten with an iterative `while(true)` loop bounded by `MAX_GRAPH_RATE_LIMIT_RETRIES = 5` (line 239). `Retry-After` header read and honoured via `setTimeout`. Non-429 4xx responses throw `GraphError` immediately with no retry. Zero recursive calls — stack overflow is impossible by construction.
+`lib/services/microsoft-graph.ts` rewritten with an iterative `while(true)` loop bounded by `MAX_GRAPH_RATE_LIMIT_RETRIES = 5` (line 239). `Retry-After` header read and honoured via `setTimeout`. Non-429 4xx responses throw `GraphError` immediately with no retry. Zero recursive calls  -  stack overflow is impossible by construction.
 
-**Runtime proof — 2026-03-16T16:51:04Z:**
+**Runtime proof  -  2026-03-16T16:51:04Z:**
 1. Repeated 429s → `GraphError(429, "Graph API rate limit exhausted after 5 retries")` thrown on attempt 6. **PASS**
 2. `Retry-After: 2` honoured → elapsed 2001ms. **PASS**
 3. Non-429 4xx (400/401/403/404/405/422) all threw immediately at 0ms. **PASS**
@@ -133,7 +133,7 @@ The `graphFetch` helper used to make Microsoft Graph API calls implements retry 
 
 ## Closed Items
 
-### RISK-003 — Microsoft Graph `graphFetch` unbounded recursive retry ✓ CLOSED
+### RISK-003  -  Microsoft Graph `graphFetch` unbounded recursive retry ✓ CLOSED
 
 Moved above. Closed 2026-03-16. Runtime proof on record (4/4 proofs pass).
 
@@ -144,8 +144,8 @@ Moved above. Closed 2026-03-16. Runtime proof on record (4/4 proofs pass).
 | Field | Value |
 |-------|-------|
 | **Total open items** | 1 |
-| **P0 open** | 1 (RISK-001 — Stripe idempotency) |
-| **P0 deferred** | 1 (RISK-002 — GHL/Clio, not in launch scope) |
+| **P0 open** | 1 (RISK-001  -  Stripe idempotency) |
+| **P0 deferred** | 1 (RISK-002  -  GHL/Clio, not in launch scope) |
 | **P1 open** | 0 |
 | **P2 open** | 0 |
 | **P3 open** | 0 |

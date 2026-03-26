@@ -19,7 +19,7 @@ export async function POST(request: Request) {
   }
 
   const admin = createAdminClient()
-  // Cast to any — graph_webhook_subscriptions not yet in generated Database types
+  // Cast to any  -  graph_webhook_subscriptions not yet in generated Database types
   const db = admin as any
   const stats = { renewed: 0, failed: 0, deactivated: 0 }
 
@@ -40,7 +40,7 @@ export async function POST(request: Request) {
     for (const sub of expiring) {
       try {
         if (sub.error_count >= 5) {
-          // Too many errors — deactivate instead of renewing
+          // Too many errors  -  deactivate instead of renewing
           await db
             .from('graph_webhook_subscriptions')
             .update({ is_active: false, updated_at: new Date().toISOString() })

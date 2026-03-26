@@ -712,7 +712,7 @@ export function StaffWorkloadWidget({ tenantId }: WidgetProps) {
 }
 
 // ---------------------------------------------------------------------------
-// Staff Wellness Meter — Norva Wellness
+// Staff Wellness Meter  -  Norva Wellness
 // ---------------------------------------------------------------------------
 
 const WELLNESS_CONFIG = {

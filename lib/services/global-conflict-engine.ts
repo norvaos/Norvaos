@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Global Conflict Engine — Directive 005.2
+ * Global Conflict Engine  -  Directive 005.2
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Cross-entity fuzzy-match conflict detection across contacts, leads, and matters.
@@ -26,7 +26,7 @@ export interface GlobalConflictMatch {
   role?: string // for matter matches
   matter_number?: string
   matter_title?: string
-  contact_id?: string // for matter matches — the matched contact on the matter
+  contact_id?: string // for matter matches  -  the matched contact on the matter
 }
 
 export interface GlobalConflictResult {
@@ -159,7 +159,7 @@ export async function runGlobalConflictScan(
     })
 
   if (insertError) {
-    // Log but don't fail the scan — the scan result is still valid
+    // Log but don't fail the scan  -  the scan result is still valid
     console.error('[GlobalConflictEngine] Failed to persist scan result:', insertError.message)
   }
 

@@ -1,5 +1,5 @@
 -- =============================================================================
--- Migration 167 — SENTINEL Intake Bridge Guard
+-- Migration 167  -  SENTINEL Intake Bridge Guard
 -- =============================================================================
 --
 -- Zero-Trust check on Lead → Matter conversion. When a matter is INSERT'd
@@ -67,7 +67,7 @@ BEGIN
     );
 
     RAISE EXCEPTION
-      'SENTINEL-403: Intake Bridge blocked — originating lead % does not exist',
+      'SENTINEL-403: Intake Bridge blocked  -  originating lead % does not exist',
       NEW.originating_lead_id
       USING ERRCODE = '42501';
   END IF;
@@ -101,7 +101,7 @@ BEGIN
       USING ERRCODE = '42501';
   END IF;
 
-  -- Same tenant — allow
+  -- Same tenant  -  allow
   RETURN NEW;
 END;
 $$;

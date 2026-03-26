@@ -8,16 +8,16 @@ import { logSentinelEvent } from '@/lib/services/sentinel-audit'
 /**
  * POST /api/sentinel/unlock
  *
- * Admin Recovery — Directive 9.3
+ * Admin Recovery  -  Directive 9.3
  *
  * Allows a Managing Partner (admin/super_admin) to unlock a matter
  * that was hit by an Emergency Lockdown, after completing a
  * 2-factor authentication challenge.
  *
  * Body: {
- *   lockdownId: string       — ID of the lockdown to resolve
- *   confirmationCode: string — 2FA code from authenticator app
- *   reason: string           — Why the lockdown is being lifted
+ *   lockdownId: string        -  ID of the lockdown to resolve
+ *   confirmationCode: string  -  2FA code from authenticator app
+ *   reason: string            -  Why the lockdown is being lifted
  * }
  */
 async function handlePost(request: Request) {
@@ -68,7 +68,7 @@ async function handlePost(request: Request) {
     let mfaVerified = false
 
     if (totpFactor) {
-      // User has TOTP configured — verify the code
+      // User has TOTP configured  -  verify the code
       const { data: challenge } = await supabaseAuth.auth.mfa.challenge({
         factorId: totpFactor.id,
       })

@@ -18,11 +18,11 @@ Output to stdout (JSON):
   }
 
 Exit codes:
-  0 — success
-  1 — import error (PyMuPDF not installed)
-  2 — file not found
-  3 — rendering error
-  4 — invalid input
+  0  -  success
+  1  -  import error (PyMuPDF not installed)
+  2  -  file not found
+  3  -  rendering error
+  4  -  invalid input
 """
 
 import sys
@@ -40,7 +40,7 @@ def main() -> None:
         }))
         sys.exit(1)
 
-    # 2. Parse input — from file argument (preferred) or stdin fallback
+    # 2. Parse input  -  from file argument (preferred) or stdin fallback
     try:
         if len(sys.argv) >= 2:
             with open(sys.argv[1], 'r', encoding='utf-8') as fh:

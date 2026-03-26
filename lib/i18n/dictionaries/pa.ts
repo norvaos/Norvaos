@@ -1,5 +1,5 @@
 /**
- * ਪੰਜਾਬੀ (pa) — Punjabi (Gurmukhi) dictionary.
+ * ਪੰਜਾਬੀ (pa)  -  Punjabi (Gurmukhi) dictionary.
  * For Punjabi-speaking clients in the Greater Toronto / Vancouver corridor.
  */
 
@@ -69,7 +69,7 @@ export const pa: Partial<Record<DictionaryKey, string>> = {
   'dashboard.deadline_today': 'Today',
   'dashboard.deadline_1_day': '1 day',
   'dashboard.deadline_days': '{days} days',
-  'dashboard.deadlines_14_days': 'Deadlines — Next 14 Days',
+  'dashboard.deadlines_14_days': 'Deadlines  -  Next 14 Days',
   'dashboard.no_deadlines_14': 'No deadlines in the next 14 days',
   'dashboard.no_deadlines_14_desc': 'Typed deadlines on matters will appear here.',
   'dashboard.unknown_matter': 'Unknown matter',
@@ -98,12 +98,12 @@ export const pa: Partial<Record<DictionaryKey, string>> = {
   'common.save': 'ਸੇਵ ਕਰੋ',
   'common.view': 'ਵੇਖੋ',
 
-  // ── ਹਦਾਇਤ 41.0 — ਸੰਪਰਕ ਅਤੇ ਵਾਲਟ ──────────────────────────────────────
+  // ── ਹਦਾਇਤ 41.0  -  ਸੰਪਰਕ ਅਤੇ ਵਾਲਟ ──────────────────────────────────────
   'contact.badge.retained_client': 'ਬਰਕਰਾਰ ਰੱਖਿਆ ਮੁਵੱਕਿਲ',
   'contact.badge.prospective_lead': 'ਸੰਭਾਵੀ ਲੀਡ',
   'contact.badge.contact': 'ਸੰਪਰਕ',
   'contact.command_centre': 'ਕਮਾਂਡ ਸੈਂਟਰ',
-  'contact.command_centre_red_alert': 'ਤਿਆਰੀ ਸਕੋਰ ਗੰਭੀਰ ਰੂਪ ਵਿੱਚ ਘੱਟ ਹੈ — ਤੁਰੰਤ ਧਿਆਨ ਦੀ ਲੋੜ ਹੈ',
+  'contact.command_centre_red_alert': 'ਤਿਆਰੀ ਸਕੋਰ ਗੰਭੀਰ ਰੂਪ ਵਿੱਚ ਘੱਟ ਹੈ  -  ਤੁਰੰਤ ਧਿਆਨ ਦੀ ਲੋੜ ਹੈ',
   'contact.intake_funnel': 'ਇਨਟੇਕ ਫਨਲ',
   'contact.intake_progress': 'ਇਨਟੇਕ ਤਰੱਕੀ',
   'contact.matter_readiness': 'ਕੇਸ ਦੀ ਤਿਆਰੀ',
@@ -116,13 +116,13 @@ export const pa: Partial<Record<DictionaryKey, string>> = {
   'vault.title': 'Norva Vault',
   'vault.empty': 'Norva Vault ਖਾਲੀ',
   'vault.empty_description': 'ਇਸ ਸੰਪਰਕ ਲਈ ਕੋਈ ਦਸਤਾਵੇਜ਼ ਅੱਪਲੋਡ ਨਹੀਂ ਕੀਤੇ ਗਏ।',
-  'vault.sentinel_eye': 'Sentinel Eye — ਵੇਖੋ ਅਤੇ ਤਸਦੀਕ ਕਰੋ',
+  'vault.sentinel_eye': 'Sentinel Eye  -  ਵੇਖੋ ਅਤੇ ਤਸਦੀਕ ਕਰੋ',
   'vault.file_tampered': 'ਸਾਵਧਾਨ: ਫਾਈਲ ਨਾਲ ਛੇੜਛਾੜ',
   'vault.sha256_verified': 'SHA-256 ਤਸਦੀਕ ਹੋਇਆ',
   'vault.hash_pending': 'ਹੈਸ਼ ਬਕਾਇਆ',
   'vault.integrity_alert': 'ਅਖੰਡਤਾ ਚੇਤਾਵਨੀ',
   'vault.untracked': 'ਅਣਟ੍ਰੈਕਡ',
-  'vault.no_preview': 'ਪੂਰਵਦਰਸ਼ਨ ਉਪਲਬਧ ਨਹੀਂ — ਫਾਈਲ URL ਗੁੰਮ ਹੈ',
+  'vault.no_preview': 'ਪੂਰਵਦਰਸ਼ਨ ਉਪਲਬਧ ਨਹੀਂ  -  ਫਾਈਲ URL ਗੁੰਮ ਹੈ',
 
   'legal.retainer_title': 'ਕਾਨੂੰਨੀ ਸੇਵਾ ਸਮਝੌਤਾ',
   'legal.retainer_intro': 'ਇਹ ਸਮਝੌਤਾ ਪ੍ਰਦਾਨ ਕੀਤੀਆਂ ਜਾਣ ਵਾਲੀਆਂ ਕਾਨੂੰਨੀ ਸੇਵਾਵਾਂ ਦੀਆਂ ਸ਼ਰਤਾਂ ਨਿਰਧਾਰਤ ਕਰਦਾ ਹੈ।',
@@ -205,12 +205,12 @@ export const pa: Partial<Record<DictionaryKey, string>> = {
   'status.days_remaining': '{days} ਦਿਨ ਬਾਕੀ',
   'status.verified': 'ਤਸਦੀਕ ਹੋਈ',
   'status.expiry_label': 'ਮਿਆਦ',
-  'status.sentinel_tamper_title': 'ਸੈਂਟੀਨਲ ਅਲਰਟ — ਛੇੜਛਾੜ ਦਾ ਪਤਾ ਲੱਗਿਆ',
+  'status.sentinel_tamper_title': 'ਸੈਂਟੀਨਲ ਅਲਰਟ  -  ਛੇੜਛਾੜ ਦਾ ਪਤਾ ਲੱਗਿਆ',
   'status.sentinel_tamper_body': 'ਦਸਤਾਵੇਜ਼ ਹੈਸ਼ ਮੇਲ ਨਹੀਂ ਖਾਂਦੀ। ਇਹ ਦਸਤਾਵੇਜ਼ NorvaOS ਤੋਂ ਬਾਹਰ ਸੋਧਿਆ ਗਿਆ ਹੈ।',
-  'status.vault_verified_title': 'ਨੋਰਵਾ ਵਾਲਟ — ਅਖੰਡਤਾ ਤਸਦੀਕ',
+  'status.vault_verified_title': 'ਨੋਰਵਾ ਵਾਲਟ  -  ਅਖੰਡਤਾ ਤਸਦੀਕ',
   'status.vault_verified_body': 'ਇਹ ਦਸਤਾਵੇਜ਼ ਨੋਰਵਾ ਵਾਲਟ ਵਿੱਚ ਹੈਸ਼-ਲਾਕ ਹੈ। ਕਿਸੇ ਵੀ ਛੇੜਛਾੜ ਦਾ ਪਤਾ ਲਗਾਇਆ ਜਾਵੇਗਾ।',
 
-  // ── Leads Command Centre (Directive 40.0 — Sovereign Layer) ─────────────
+  // ── Leads Command Centre (Directive 40.0  -  Sovereign Layer) ─────────────
   'leads.title': 'ਲੀਡਜ਼',
   'leads.add_lead': 'ਲੀਡ ਸ਼ਾਮਲ ਕਰੋ',
   'leads.import': 'ਦਰਾਮਦ',
@@ -333,7 +333,7 @@ export const pa: Partial<Record<DictionaryKey, string>> = {
   'form.notes_placeholder': 'Add any additional notes about this contact...',
   'form.create_contact': 'Create Contact',
   'form.save_changes': 'Save Changes',
-  'form.review_required_ocr': 'Review Required — OCR could not extract',
+  'form.review_required_ocr': 'Review Required  -  OCR could not extract',
   'form.section_basic_info': 'Basic Information',
   'form.section_contact_details': 'Contact Details',
   'form.section_address': 'Address',

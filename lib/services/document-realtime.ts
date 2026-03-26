@@ -26,7 +26,7 @@ export interface DocumentStatusEvent {
  * events of type `document_status_changed`.
  *
  * This uses Supabase's Realtime Broadcast (server-side) which does not
- * require RLS — the admin client sends directly.
+ * require RLS  -  the admin client sends directly.
  */
 export async function broadcastDocumentStatus(
   event: DocumentStatusEvent

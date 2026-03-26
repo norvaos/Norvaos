@@ -8,7 +8,7 @@
 --    'closed_withdrawn' (needed by Task 3 close route)
 -- 5. Add submission confirmation columns to matter_intake
 --
--- 2026-03-17 — Sprint 6, Week 2
+-- 2026-03-17  -  Sprint 6, Week 2
 -- ============================================================================
 
 -- ─── 1. ircc_correspondence: refusal workflow columns ────────────────────────

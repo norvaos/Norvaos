@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * PortalPaymentSection — Invoice list, retainer summary, mark-as-sent,
+ * PortalPaymentSection  -  Invoice list, retainer summary, mark-as-sent,
  * e-transfer copy, and secure credit card redirect.
  *
  * Business rules (locked):
@@ -74,7 +74,7 @@ export function PortalPaymentSection({
         <RetainerFeeCard summary={data.retainerSummary} language={language} />
       )}
 
-      {/* Account Summary Card — only when invoices exist */}
+      {/* Account Summary Card  -  only when invoices exist */}
       {invoices.length === 0 ? null : (<>{/* Account Summary Card */}
       <div className="rounded-xl border border-slate-200 bg-white overflow-hidden">
         {/* Header */}
@@ -379,7 +379,7 @@ function InvoiceRow({
                     day: 'numeric',
                     year: 'numeric',
                   })
-                : '—',
+                : ' - ',
             })}
           </p>
           {!isPaidInFull && (

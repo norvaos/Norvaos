@@ -58,7 +58,7 @@ export function ClauseLibrarySheet({ open, onOpenChange }: ClauseLibrarySheetPro
   const [createOpen, setCreateOpen] = useState(false)
   const [selectedClause, setSelectedClause] = useState<Record<string, unknown> | null>(null)
 
-  // Placeholder — clause list would be fetched from an API endpoint (not yet built)
+  // Placeholder  -  clause list would be fetched from an API endpoint (not yet built)
   // For now, show a helpful empty state since clause CRUD API routes are a Phase 2 refinement
   const clauses: Record<string, unknown>[] = []
   const isLoading = false

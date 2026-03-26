@@ -18,7 +18,7 @@ const j = (v: Record<string, unknown>): Json => v as unknown as Json
  *   2. Calls the activate logic inline (same idempotency guarantees)
  *   3. Marks the wizard as default_applied
  *
- * Idempotent — safe to call more than once.
+ * Idempotent  -  safe to call more than once.
  */
 
 const DEFAULT_PRESET: WizardAnswers = {
@@ -26,7 +26,7 @@ const DEFAULT_PRESET: WizardAnswers = {
   // (a specific firm name isn't assumed here)
   practiceModel: {
     // General is seeded first (catch-all for walk-ins not yet classified).
-    // Immigration follows immediately — it is the primary practice area where
+    // Immigration follows immediately  -  it is the primary practice area where
     // all automation, pipelines, and deadline types live.
     // Both are enabled by default. Users may add more from Settings → Practice Areas
     // but no automation is seeded for those additional areas at this time.
@@ -295,7 +295,7 @@ async function handlePost() {
       }
     } catch { errors.push('roles') }
 
-    // Calendar, storage, workflow, portal, notifications, billing — batch settings update
+    // Calendar, storage, workflow, portal, notifications, billing  -  batch settings update
     try {
       const settings = await getTenantSettings()
       const flags = await getTenantFeatureFlags()

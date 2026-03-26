@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Action Executor — Central Controlled Workflow Engine
+ * Action Executor  -  Central Controlled Workflow Engine
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Every state-changing operation routes through executeAction(). This function:
@@ -141,7 +141,7 @@ export async function executeAction<TInput, TResult>(
       const lock = lockResult as { locked: boolean; existing_id: string | null } | null
 
       if (lock && !lock.locked && lock.existing_id) {
-        // Duplicate found — return immediately without executing
+        // Duplicate found  -  return immediately without executing
         log.info('[action-executor] Idempotent duplicate blocked (advisory lock)', {
           tenant_id: tenantId,
           action_type: def.type,
@@ -235,7 +235,7 @@ export async function executeAction<TInput, TResult>(
   // ── Step 7: Atomic triple-write via Postgres function (Rule #5) ──────
   // All three records (workflow_actions + audit_logs + activities) are written
   // in a single DB transaction via execute_action_atomic(). If any insert fails,
-  // the entire transaction rolls back — no orphaned records.
+  // the entire transaction rolls back  -  no orphaned records.
   let entityId = def.getEntityId(validatedInput)
 
   // For newly created entities, getEntityId returns 'new' which isn't a valid UUID.
@@ -337,7 +337,7 @@ export async function executeAction<TInput, TResult>(
     // ── ORPHAN DETECTION ──
     // Step 6 (execute) already committed business changes to the target table.
     // Step 7 (triple-write) failed, so no audit trail exists for those changes.
-    // This is a critical gap — log it durably so it can be reconciled.
+    // This is a critical gap  -  log it durably so it can be reconciled.
     log.error('[action-executor] ORPHAN: business write committed but audit trail failed', {
       tenant_id: tenantId,
       user_id: userId ?? undefined,
@@ -359,7 +359,7 @@ export async function executeAction<TInput, TResult>(
         entity_id: entityId,
         performed_by: userId,
         status: 'failed',
-        error_message: `ORPHAN: execute() succeeded but triple-write failed — ${errMsg}`,
+        error_message: `ORPHAN: execute() succeeded but triple-write failed  -  ${errMsg}`,
         previous_state: (previousState ?? null) as unknown as Json,
         new_state: (result.newState ?? null) as unknown as Json,
         source,
@@ -374,7 +374,7 @@ export async function executeAction<TInput, TResult>(
       void supabase.rpc('release_idempotency_lock', { p_idempotency_key: idempotencyKey ?? '' }).then(() => {}, () => {})
     }
 
-    // Action was executed successfully — audit trail failure should not block the user.
+    // Action was executed successfully  -  audit trail failure should not block the user.
     // The orphan has been logged for admin reconciliation.
     return {
       success: true,

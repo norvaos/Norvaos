@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * PortalInstructions — Bulleted list of matter-specific instructions.
+ * PortalInstructions  -  Bulleted list of matter-specific instructions.
  * Two-level system: matter-type defaults (pre-populated) can be overridden
  * per-matter when creating the portal link. Hidden if no instructions configured.
  */

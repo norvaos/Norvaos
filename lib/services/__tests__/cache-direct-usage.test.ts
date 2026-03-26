@@ -49,7 +49,7 @@ describe('cache – no direct Redis usage', () => {
 
     expect(
       violations,
-      `These files import @upstash/redis directly — use lib/services/cache.ts instead:\n${violations.join('\n')}`
+      `These files import @upstash/redis directly  -  use lib/services/cache.ts instead:\n${violations.join('\n')}`
     ).toEqual([])
   })
 
@@ -85,7 +85,7 @@ describe('cache – no direct Redis usage', () => {
 
     expect(
       violations,
-      `These files call redis methods directly — use lib/services/cache.ts instead:\n${violations.join('\n')}`
+      `These files call redis methods directly  -  use lib/services/cache.ts instead:\n${violations.join('\n')}`
     ).toEqual([])
   })
 })

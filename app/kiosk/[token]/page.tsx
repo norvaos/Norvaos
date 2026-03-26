@@ -9,7 +9,7 @@ interface Props {
 }
 
 /**
- * Kiosk main page — validates token server-side, then renders the client flow.
+ * Kiosk main page  -  validates token server-side, then renders the client flow.
  *
  * Rule #7: Token validation is step one in every kiosk route.
  * Rule #10: No app navigation exposed. Fullscreen, self-contained.

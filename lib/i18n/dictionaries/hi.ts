@@ -1,5 +1,5 @@
 /**
- * हिन्दी (hi) — Hindi dictionary.
+ * हिन्दी (hi)  -  Hindi dictionary.
  */
 
 import type { DictionaryKey } from './en'
@@ -70,7 +70,7 @@ export const hi: Partial<Record<DictionaryKey, string>> = {
   'dashboard.deadline_today': 'Today',
   'dashboard.deadline_1_day': '1 day',
   'dashboard.deadline_days': '{days} days',
-  'dashboard.deadlines_14_days': 'Deadlines — Next 14 Days',
+  'dashboard.deadlines_14_days': 'Deadlines  -  Next 14 Days',
   'dashboard.no_deadlines_14': 'No deadlines in the next 14 days',
   'dashboard.no_deadlines_14_desc': 'Typed deadlines on matters will appear here.',
   'dashboard.unknown_matter': 'Unknown matter',
@@ -100,12 +100,12 @@ export const hi: Partial<Record<DictionaryKey, string>> = {
   'common.save': 'सहेजें',
   'common.view': 'देखें',
 
-  // ── निर्देश 41.0 — संपर्क और वॉल्ट ──────────────────────────────────────
+  // ── निर्देश 41.0  -  संपर्क और वॉल्ट ──────────────────────────────────────
   'contact.badge.retained_client': 'बनाए रखा गया मुवक्किल',
   'contact.badge.prospective_lead': 'संभावित लीड',
   'contact.badge.contact': 'संपर्क',
   'contact.command_centre': 'कमांड सेंटर',
-  'contact.command_centre_red_alert': 'तैयारी स्कोर गंभीर रूप से कम है — तुरंत ध्यान आवश्यक',
+  'contact.command_centre_red_alert': 'तैयारी स्कोर गंभीर रूप से कम है  -  तुरंत ध्यान आवश्यक',
   'contact.intake_funnel': 'इनटेक फ़नल',
   'contact.intake_progress': 'इनटेक प्रगति',
   'contact.matter_readiness': 'मामले की तैयारी',
@@ -118,13 +118,13 @@ export const hi: Partial<Record<DictionaryKey, string>> = {
   'vault.title': 'Norva Vault',
   'vault.empty': 'Norva Vault खाली',
   'vault.empty_description': 'इस संपर्क के लिए कोई दस्तावेज़ अपलोड नहीं किए गए।',
-  'vault.sentinel_eye': 'Sentinel Eye — देखें और सत्यापित करें',
+  'vault.sentinel_eye': 'Sentinel Eye  -  देखें और सत्यापित करें',
   'vault.file_tampered': 'सावधानी: फ़ाइल में छेड़छाड़',
   'vault.sha256_verified': 'SHA-256 सत्यापित',
   'vault.hash_pending': 'हैश लंबित',
   'vault.integrity_alert': 'अखंडता चेतावनी',
   'vault.untracked': 'अनट्रैक्ड',
-  'vault.no_preview': 'पूर्वावलोकन उपलब्ध नहीं — फ़ाइल URL अनुपलब्ध',
+  'vault.no_preview': 'पूर्वावलोकन उपलब्ध नहीं  -  फ़ाइल URL अनुपलब्ध',
 
   // ── कानूनी घोषणाएँ ─────────────────────────────────────────────────────
   'legal.retainer_title': 'सेवा अनुबंध',
@@ -210,12 +210,12 @@ export const hi: Partial<Record<DictionaryKey, string>> = {
   'status.days_remaining': '{days} दिन शेष',
   'status.verified': 'सत्यापित',
   'status.expiry_label': 'समाप्ति',
-  'status.sentinel_tamper_title': 'सेंटिनल अलर्ट — छेड़छाड़ का पता चला',
+  'status.sentinel_tamper_title': 'सेंटिनल अलर्ट  -  छेड़छाड़ का पता चला',
   'status.sentinel_tamper_body': 'दस्तावेज़ हैश बेमेल। यह दस्तावेज़ NorvaOS के बाहर संशोधित किया गया है।',
-  'status.vault_verified_title': 'नोर्वा वॉल्ट — अखंडता सत्यापित',
+  'status.vault_verified_title': 'नोर्वा वॉल्ट  -  अखंडता सत्यापित',
   'status.vault_verified_body': 'यह दस्तावेज़ नोर्वा वॉल्ट में हैश-लॉक है। किसी भी छेड़छाड़ का पता लगाया जाएगा।',
 
-  // ── Leads Command Centre (Directive 40.0 — Sovereign Layer) ─────────────
+  // ── Leads Command Centre (Directive 40.0  -  Sovereign Layer) ─────────────
   'leads.title': 'लीड्स',
   'leads.add_lead': 'लीड जोड़ें',
   'leads.import': 'आयात करें',
@@ -338,7 +338,7 @@ export const hi: Partial<Record<DictionaryKey, string>> = {
   'form.notes_placeholder': 'Add any additional notes about this contact...',
   'form.create_contact': 'Create Contact',
   'form.save_changes': 'Save Changes',
-  'form.review_required_ocr': 'Review Required — OCR could not extract',
+  'form.review_required_ocr': 'Review Required  -  OCR could not extract',
   'form.section_basic_info': 'Basic Information',
   'form.section_contact_details': 'Contact Details',
   'form.section_address': 'Address',

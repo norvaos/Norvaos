@@ -1,17 +1,17 @@
 -- ============================================================================
--- Migration 028: Document Engine — Slot Model, Versioning, Review RPCs
+-- Migration 028: Document Engine  -  Slot Model, Versioning, Review RPCs
 -- ============================================================================
 -- Phase B.2: Structured document management with slot-based requirements,
 -- immutable versioning, acceptance workflows, and transactional operations.
 --
 -- Tables:
---   1. document_slot_templates — per-type definitions (what docs are needed)
---   2. document_slots — per-matter instances (denormalized, soft-deletable)
---   3. document_versions — immutable version history (SELECT + INSERT only)
+--   1. document_slot_templates  -  per-type definitions (what docs are needed)
+--   2. document_slots  -  per-matter instances (denormalized, soft-deletable)
+--   3. document_versions  -  immutable version history (SELECT + INSERT only)
 --
 -- RPCs:
---   4. upload_document_version() — atomic version creation with row locking
---   5. review_document_version() — atomic review (slot + version + audit)
+--   4. upload_document_version()  -  atomic version creation with row locking
+--   5. review_document_version()  -  atomic review (slot + version + audit)
 -- ============================================================================
 
 -- ─── 1. document_slot_templates ─────────────────────────────────────────────
@@ -168,7 +168,7 @@ CREATE TABLE IF NOT EXISTS document_versions (
 
 ALTER TABLE document_versions ENABLE ROW LEVEL SECURITY;
 
--- SELECT + INSERT only — immutable history
+-- SELECT + INSERT only  -  immutable history
 DROP POLICY IF EXISTS document_versions_select ON document_versions;
 CREATE POLICY document_versions_select ON document_versions
   FOR SELECT
@@ -179,7 +179,7 @@ CREATE POLICY document_versions_insert ON document_versions
   FOR INSERT
   WITH CHECK (tenant_id = (SELECT tenant_id FROM users WHERE auth_user_id = auth.uid()));
 
--- No UPDATE or DELETE policies — review updates go through SECURITY DEFINER RPCs
+-- No UPDATE or DELETE policies  -  review updates go through SECURITY DEFINER RPCs
 
 CREATE INDEX IF NOT EXISTS idx_doc_versions_slot ON document_versions(slot_id, version_number);
 CREATE INDEX IF NOT EXISTS idx_doc_versions_document ON document_versions(document_id);

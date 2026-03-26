@@ -1,5 +1,5 @@
 -- ═══════════════════════════════════════════════════════════════════════════════
--- Migration 073 — IRCC Form Version History
+-- Migration 073  -  IRCC Form Version History
 -- ═══════════════════════════════════════════════════════════════════════════════
 --
 -- Adds version tracking to IRCC forms so that when IRCC updates a form

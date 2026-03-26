@@ -1,6 +1,6 @@
 -- Migration 120: Add evidence (JSONB) and suggested_action (text) to matter_risk_flags
 -- Required by the 12-type risk flag auto-detection engine (lib/services/risk-flag-engine.ts)
--- Idempotent — safe to run multiple times.
+-- Idempotent  -  safe to run multiple times.
 
 ALTER TABLE matter_risk_flags
   ADD COLUMN IF NOT EXISTS evidence jsonb,

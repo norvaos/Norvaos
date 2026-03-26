@@ -69,7 +69,7 @@ interface IdentityVerificationResult {
   } | null
 }
 
-// ─── Hard-Gate Status — Directive 41.2 Compliance Checksum ──────────
+// ─── Hard-Gate Status  -  Directive 41.2 Compliance Checksum ──────────
 
 const CONFLICT_PASS_STATUSES = new Set([
   'auto_scan_complete',
@@ -323,7 +323,7 @@ export function ConversionDialog({ open, onOpenChange }: ConversionDialogProps) 
             Compliance Checksum
           </p>
           <div className="space-y-1.5">
-            {/* Jurisdiction Gate — Directive 41.4 */}
+            {/* Jurisdiction Gate  -  Directive 41.4 */}
             <div className="flex items-center gap-2">
               {gates.jurisdictionSet ? (
                 <Scale className="size-4 text-green-600" />
@@ -427,7 +427,7 @@ export function ConversionDialog({ open, onOpenChange }: ConversionDialogProps) 
             review_suggested: {
               icon: ShieldAlert, color: 'text-amber-700', bg: 'bg-amber-50', border: 'border-amber-200',
               label: 'Conflict Check: Review Suggested',
-              message: `Score ${conflictScore}/100 — minor potential matches found. Proceed with caution.`,
+              message: `Score ${conflictScore}/100  -  minor potential matches found. Proceed with caution.`,
             },
             cleared_by_lawyer: {
               icon: ShieldCheck, color: 'text-green-700', bg: 'bg-green-50', border: 'border-green-200',
@@ -442,7 +442,7 @@ export function ConversionDialog({ open, onOpenChange }: ConversionDialogProps) 
             review_required: {
               icon: ShieldAlert, color: 'text-red-700', bg: 'bg-red-50', border: 'border-red-200',
               label: 'Conflict Check: Review Required',
-              message: `Score ${conflictScore}/100 — potential conflicts detected. Blocked until reviewed.`,
+              message: `Score ${conflictScore}/100  -  potential conflicts detected. Blocked until reviewed.`,
             },
             conflict_confirmed: {
               icon: ShieldX, color: 'text-red-700', bg: 'bg-red-50', border: 'border-red-200',
@@ -583,7 +583,7 @@ export function ConversionDialog({ open, onOpenChange }: ConversionDialogProps) 
             </Select>
           </div>
 
-          {/* Retainer Deposit — Trust Account (Directive 41.4) */}
+          {/* Retainer Deposit  -  Trust Account (Directive 41.4) */}
           <div className="space-y-1.5">
             <Label className="text-sm flex items-center gap-1.5">
               <DollarSign className="h-3.5 w-3.5 text-muted-foreground" />
@@ -634,7 +634,7 @@ export function ConversionDialog({ open, onOpenChange }: ConversionDialogProps) 
           {!gatesLoading && !gates.canConvert ? (
             <div className="flex items-center gap-2 rounded-md border border-red-200 bg-red-50 px-3 py-2 animate-pulse-red-35">
               <Lock className="h-4 w-4 text-red-600" />
-              <span className="text-xs font-semibold text-red-700">Sovereign Block — Conversion Locked</span>
+              <span className="text-xs font-semibold text-red-700">Sovereign Block  -  Conversion Locked</span>
             </div>
           ) : (
             <TooltipProvider delayDuration={100}>

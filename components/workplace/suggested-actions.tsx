@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * SuggestedActions — Low-keyboard action table.
+ * SuggestedActions  -  Low-keyboard action table.
  *
  * Maps the current matter stage/state to a set of one-click actions.
  * Each action opens the appropriate dialog or panel.
@@ -108,7 +108,7 @@ function computeActions(props: SuggestedActionsProps): ActionItem[] {
     return actions
   }
 
-  // Client in progress / review required — document stage
+  // Client in progress / review required  -  document stage
   if (intakeStatus === 'client_in_progress' || intakeStatus === 'review_required') {
     const pendingDocs = readinessData?.documents?.pendingReview ?? 0
     if (pendingDocs > 0) {
@@ -234,7 +234,7 @@ function computeActions(props: SuggestedActionsProps): ActionItem[] {
     return actions
   }
 
-  // Fallback — generic view action
+  // Fallback  -  generic view action
   actions.push({
     key: 'view-details',
     icon: Eye,

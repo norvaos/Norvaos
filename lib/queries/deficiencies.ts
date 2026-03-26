@@ -1,10 +1,10 @@
 /**
- * Deficiency Query Hooks — TanStack Query hooks for the deficiency workflow.
+ * Deficiency Query Hooks  -  TanStack Query hooks for the deficiency workflow.
  *
  * Follows the exact pattern established in lib/queries/matter-types.ts.
  * All mutations call the corresponding API routes rather than Supabase directly.
  *
- * Sprint 6, Week 1 — 2026-03-17
+ * Sprint 6, Week 1  -  2026-03-17
  */
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
@@ -22,7 +22,7 @@ export const deficiencyKeys = {
 
 /**
  * Fetch all deficiencies for a matter, ordered by created_at DESC.
- * staleTime 30s — deficiencies change frequently.
+ * staleTime 30s  -  deficiencies change frequently.
  */
 export function useDeficiencies(matterId: string) {
   return useQuery({

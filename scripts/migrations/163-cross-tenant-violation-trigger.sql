@@ -1,4 +1,4 @@
--- Migration 163: Cross-Tenant Violation Trigger — Sentinel Audit Defence Layer
+-- Migration 163: Cross-Tenant Violation Trigger  -  Sentinel Audit Defence Layer
 --
 -- Supports:
 --   1. Automatic detection of RLS-bypassing cross-tenant access attempts
@@ -59,7 +59,7 @@ BEGIN
     )
   );
 
-  -- Hard deny — SQLSTATE 42501 = insufficient_privilege
+  -- Hard deny  -  SQLSTATE 42501 = insufficient_privilege
   RAISE EXCEPTION 'SENTINEL-403: Cross-tenant access denied on %.%. Your tenant: %, attempted: %',
     TG_TABLE_SCHEMA, TG_TABLE_NAME, _current_tenant_id, NEW.tenant_id
     USING ERRCODE = '42501';
@@ -74,7 +74,7 @@ COMMENT ON FUNCTION log_cross_tenant_violation()
 
 
 -- ─── 2. Helper: Attach Sentinel Trigger to Any Table ────────────────────────────
--- Idempotent — drops existing trigger first, then creates BEFORE INSERT OR UPDATE.
+-- Idempotent  -  drops existing trigger first, then creates BEFORE INSERT OR UPDATE.
 
 CREATE OR REPLACE FUNCTION attach_sentinel_trigger(p_table_name TEXT)
 RETURNS VOID

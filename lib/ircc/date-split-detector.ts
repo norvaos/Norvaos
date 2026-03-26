@@ -1,5 +1,5 @@
 // ============================================================================
-// Date-Split Detector — Group fragmented Year/Month/Day fields into unified dates
+// Date-Split Detector  -  Group fragmented Year/Month/Day fields into unified dates
 // ============================================================================
 // IRCC XFA forms split date fields into separate Year/Month/Day inputs.
 // This module detects those groups so the upload/rescan/backfill pipeline can:
@@ -95,7 +95,7 @@ export function detectDateGroups(
     for (const suffixSet of SUFFIX_SETS) {
       if (lastSegment !== suffixSet.yearSuffix) continue
 
-      // Found a year field — look for matching month and day
+      // Found a year field  -  look for matching month and day
       const monthPath = prefix + suffixSet.monthSuffix
       const monthIdx = pathIndex.get(monthPath)
       if (monthIdx === undefined) continue // No month match → not a date group
@@ -131,7 +131,7 @@ export function detectDateGroups(
       usedIndices.add(monthIdx)
       if (dayIdx !== undefined) usedIndices.add(dayIdx)
 
-      break // Found a match — stop checking suffix sets for this field
+      break // Found a match  -  stop checking suffix sets for this field
     }
   }
 

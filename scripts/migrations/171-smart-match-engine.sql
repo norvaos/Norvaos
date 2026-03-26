@@ -2,11 +2,11 @@
 -- Migration 171: Smart-Match Deposit Engine
 -- ============================================================================
 -- Three RPCs for automated trust-to-invoice reconciliation:
---   1. fn_suggest_transaction_matches — finds deposits matching open invoices
---   2. fn_apply_trust_allocation     — one-click apply with audit trail
---   3. fn_reverse_trust_allocation   — immutable offsetting entry (never deletes)
+--   1. fn_suggest_transaction_matches  -  finds deposits matching open invoices
+--   2. fn_apply_trust_allocation      -  one-click apply with audit trail
+--   3. fn_reverse_trust_allocation    -  immutable offsetting entry (never deletes)
 --
--- Principle III: Auditability — every action creates linked records.
+-- Principle III: Auditability  -  every action creates linked records.
 -- Sentinel 403 tenant isolation enforced inside each RPC via auth.uid().
 -- ============================================================================
 
@@ -267,7 +267,7 @@ BEGIN
   END IF;
 
   IF v_invoice.status IN ('paid', 'voided') THEN
-    RAISE EXCEPTION 'Invoice is already % — cannot allocate', v_invoice.status
+    RAISE EXCEPTION 'Invoice is already %  -  cannot allocate', v_invoice.status
       USING ERRCODE = 'P0409';
   END IF;
 
@@ -388,7 +388,7 @@ COMMENT ON FUNCTION fn_apply_trust_allocation IS
 -- ============================================================================
 -- 3. fn_reverse_trust_allocation(p_allocation_id UUID, p_reason TEXT)
 -- ============================================================================
--- Creates an OFFSETTING ENTRY — never deletes the original.
+-- Creates an OFFSETTING ENTRY  -  never deletes the original.
 -- Principle III: Auditability.
 -- ============================================================================
 

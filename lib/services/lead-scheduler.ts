@@ -91,7 +91,7 @@ export async function processScheduledLeadAutomations(
 
   const ctx: TenantContext = { supabase, tenantId, config, timezone, dateKey, now }
 
-  // Run sub-processors — each one handles its own errors to avoid blocking others
+  // Run sub-processors  -  each one handles its own errors to avoid blocking others
   try {
     stats.consultationReminders += await processConsultationReminders(ctx)
   } catch (e) {
@@ -498,7 +498,7 @@ async function checkAndAutoClose(
 /**
  * Finds leads in a "Deferred" stage whose next_follow_up date has passed,
  * and moves them back to "New Inquiry" (sort_order = 1 in their pipeline).
- * This is the "Time Machine" feature — client said "call me in 6 months",
+ * This is the "Time Machine" feature  -  client said "call me in 6 months",
  * we set a date, and on that date the lead reappears in the active funnel.
  */
 async function processDeferredReactivations(ctx: TenantContext): Promise<number> {
@@ -578,7 +578,7 @@ async function processDeferredReactivations(ctx: TenantContext): Promise<number>
           lead_id: lead.id,
           from_stage_id: deferredStageId,
           to_stage_id: newInquiryStage.id,
-          notes: 'Automatic reactivation — deferred date reached.',
+          notes: 'Automatic reactivation  -  deferred date reached.',
         } as any)
       }
 

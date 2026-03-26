@@ -110,7 +110,7 @@ export async function renderInternalNotificationEmail(props: InternalNotificatio
     '',
     props.actionUrl ? `View details: ${props.actionUrl}` : '',
     '',
-    `— ${props.firmName}`,
+    ` -  ${props.firmName}`,
   ]
     .filter(Boolean)
     .join('\n')

@@ -13,7 +13,7 @@
  *
  * Exit code: 0 = all checks pass (or warnings only), 1 = one or more FAIL
  *
- * Team 3 / Module 4 — Support and Implementation Tooling
+ * Team 3 / Module 4  -  Support and Implementation Tooling
  */
 
 import { createClient, SupabaseClient } from '@supabase/supabase-js'
@@ -73,13 +73,13 @@ async function checkEnvVars(): Promise<void> {
 
   // Optional but important vars
   if (!process.env.RESEND_API_KEY) {
-    warn('env_resend', 'RESEND_API_KEY is not set — email delivery will fail')
+    warn('env_resend', 'RESEND_API_KEY is not set  -  email delivery will fail')
   } else {
     pass('env_resend', 'RESEND_API_KEY is set')
   }
 
   if (!process.env.SENTRY_DSN && !process.env.NEXT_PUBLIC_SENTRY_DSN) {
-    warn('env_sentry', 'SENTRY_DSN is not set — error tracking is disabled')
+    warn('env_sentry', 'SENTRY_DSN is not set  -  error tracking is disabled')
   } else {
     pass('env_sentry', 'Sentry DSN is configured')
   }
@@ -95,7 +95,7 @@ async function checkSupabaseConnectivity(supabase: SupabaseClient): Promise<void
       .single()
 
     if (error && error.code !== 'PGRST116') {
-      // PGRST116 = no rows found — that's fine
+      // PGRST116 = no rows found  -  that's fine
       fail('supabase_connectivity', `Database query failed: ${error.message}`)
     } else {
       pass('supabase_connectivity', 'Supabase is reachable and responding')
@@ -146,7 +146,7 @@ async function checkEmailIntegration(supabase: SupabaseClient, tenantId: string)
       pass('email_integration', 'Microsoft 365 email integration is connected')
     }
   } catch {
-    warn('email_integration', 'Could not check email integration — platform_connections table may not exist or is empty')
+    warn('email_integration', 'Could not check email integration  -  platform_connections table may not exist or is empty')
   }
 }
 
@@ -170,9 +170,9 @@ async function checkStalledJobs(supabase: SupabaseClient, tenantId: string): Pro
     if (stalled === 0) {
       pass('job_queue', 'No stalled jobs (pending > 1 hour)')
     } else if (stalled <= 5) {
-      warn('job_queue', `${stalled} job(s) have been pending for over 1 hour — check worker health`)
+      warn('job_queue', `${stalled} job(s) have been pending for over 1 hour  -  check worker health`)
     } else {
-      fail('job_queue', `${stalled} stalled jobs — worker may be down`)
+      fail('job_queue', `${stalled} stalled jobs  -  worker may be down`)
     }
   } catch (err) {
     warn('job_queue', `Job queue check failed: ${err instanceof Error ? err.message : String(err)}`)
@@ -180,7 +180,7 @@ async function checkStalledJobs(supabase: SupabaseClient, tenantId: string): Pro
 }
 
 async function checkRlsActive(supabase: SupabaseClient, tenantId: string): Promise<void> {
-  // Attempt to query with a fake tenant ID — should return 0 rows if RLS is enforced
+  // Attempt to query with a fake tenant ID  -  should return 0 rows if RLS is enforced
   try {
     const fakeTenantId = '00000000-0000-0000-0000-000000000000'
     const { count } = await supabase
@@ -188,14 +188,14 @@ async function checkRlsActive(supabase: SupabaseClient, tenantId: string): Promi
       .select('*', { count: 'exact', head: true })
       .eq('tenant_id', fakeTenantId)
 
-    // With service role key, RLS is bypassed — so this checks schema only
+    // With service role key, RLS is bypassed  -  so this checks schema only
     // With anon/user key, 0 rows confirms RLS is working
     if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
-      warn('rls_check', 'Using service role key — RLS bypass is expected. Run with anon key for a true RLS check.')
+      warn('rls_check', 'Using service role key  -  RLS bypass is expected. Run with anon key for a true RLS check.')
     } else if ((count ?? 0) === 0) {
-      pass('rls_check', 'RLS is active — fake tenant query returned 0 rows')
+      pass('rls_check', 'RLS is active  -  fake tenant query returned 0 rows')
     } else {
-      fail('rls_check', `RLS may not be enforced — fake tenant query returned ${count} rows`)
+      fail('rls_check', `RLS may not be enforced  -  fake tenant query returned ${count} rows`)
     }
   } catch (err) {
     warn('rls_check', `RLS check failed: ${err instanceof Error ? err.message : String(err)}`)
@@ -207,13 +207,13 @@ async function checkRlsActive(supabase: SupabaseClient, tenantId: string): Promi
 // ─── Main ────────────────────────────────────────────────────────────────────
 
 async function main(): Promise<void> {
-  console.log('\nNorvaOS — Environment Verification')
+  console.log('\nNorvaOS  -  Environment Verification')
   console.log('═══════════════════════════════════')
 
   if (TENANT_ID) {
     console.log(`Tenant: ${TENANT_ID}`)
   } else {
-    console.log('No TENANT_ID provided — skipping tenant-scoped checks')
+    console.log('No TENANT_ID provided  -  skipping tenant-scoped checks')
   }
 
   console.log()
@@ -222,7 +222,7 @@ async function main(): Promise<void> {
   await checkEnvVars()
 
   if (!SUPABASE_URL || !SUPABASE_KEY) {
-    fail('supabase_config', 'SUPABASE_URL or key not set — cannot run database checks')
+    fail('supabase_config', 'SUPABASE_URL or key not set  -  cannot run database checks')
   } else {
     const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
       auth: { persistSession: false },
@@ -238,7 +238,7 @@ async function main(): Promise<void> {
       await checkStalledJobs(supabase, TENANT_ID)
       await checkRlsActive(supabase, TENANT_ID)
     } else {
-      skip('tenant_checks', 'No TENANT_ID — tenant-scoped checks skipped')
+      skip('tenant_checks', 'No TENANT_ID  -  tenant-scoped checks skipped')
     }
   }
 
@@ -265,10 +265,10 @@ async function main(): Promise<void> {
   console.log()
 
   if (failCount > 0) {
-    console.error(`FAILED — ${failCount} check(s) failed, ${warnCount} warning(s)`)
+    console.error(`FAILED  -  ${failCount} check(s) failed, ${warnCount} warning(s)`)
     process.exit(1)
   } else if (warnCount > 0) {
-    console.warn(`PASSED WITH WARNINGS — ${warnCount} warning(s) require attention`)
+    console.warn(`PASSED WITH WARNINGS  -  ${warnCount} warning(s) require attention`)
     process.exit(0)
   } else {
     console.log('ALL CHECKS PASSED')

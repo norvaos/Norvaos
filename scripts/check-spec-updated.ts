@@ -11,8 +11,8 @@
  * The script never reads uncommitted or untracked files.
  *
  * Exit codes:
- *   0  — PR does not touch sensitive surfaces, or it includes test updates
- *   1  — PR touches sensitive surfaces WITHOUT test coverage or waiver
+ *   0   -  PR does not touch sensitive surfaces, or it includes test updates
+ *   1   -  PR touches sensitive surfaces WITHOUT test coverage or waiver
  *
  * Policy:
  *   - Tests are MANDATORY when sensitive surfaces change.
@@ -40,7 +40,7 @@ const ROOT = resolve(__dirname, '..')
 const REGISTRY_PATH = resolve(ROOT, 'docs/enforcement/sensitive-surfaces.json')
 const WAIVERS_PATH = 'docs/enforcement/waivers.md'
 
-/** Enforcement test file patterns — these count as "test coverage". */
+/** Enforcement test file patterns  -  these count as "test coverage". */
 const ENFORCEMENT_TEST_PATTERNS = [
   'lib/utils/__tests__/enforcement-regression.test.ts',
   'lib/utils/__tests__/permission-wiring.test.ts',
@@ -207,7 +207,7 @@ function validateWaiver(changedFiles: string[], touchedSensitive: string[]): Wai
 
 function checkVersionDiscipline(changedFiles: string[]): void {
   const versionTsChanged = changedFiles.some((f) => f.endsWith('lib/config/version.ts'))
-  if (!versionTsChanged) return // No version change — nothing to check
+  if (!versionTsChanged) return // No version change  -  nothing to check
 
   const specChanged = changedFiles.some((f) => f.endsWith('docs/core-enforcement-spec-v1.md'))
   const registryChanged = changedFiles.some((f) => f.endsWith('docs/enforcement/sensitive-surfaces.json'))
@@ -344,7 +344,7 @@ function main() {
     process.exit(0)
   }
 
-  // ── FAIL — no tests, no valid waiver ──────────────────────────────────
+  // ── FAIL  -  no tests, no valid waiver ──────────────────────────────────
   console.error('  !! GATE FAILED !!')
   console.error('  ')
   console.error('  You touched sensitive enforcement surfaces but did NOT')

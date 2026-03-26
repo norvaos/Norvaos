@@ -74,7 +74,7 @@ async function handlePost(
       success: true,
       override_id: result.override_id,
       amendment_hash: result.amendment_hash,
-      message: 'Norva Compliance Override logged — Genesis amendment recorded',
+      message: 'Norva Compliance Override logged  -  Genesis amendment recorded',
     })
   } catch (error) {
     if (error instanceof AuthError) {

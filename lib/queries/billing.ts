@@ -147,7 +147,7 @@ export function useCheckFeatureAccess(tenantId: string, featureKey: string) {
         .single()
 
       if (featureError && featureError.code !== 'PGRST116') {
-        // PGRST116 = "no rows returned" — means feature not found for this tier
+        // PGRST116 = "no rows returned"  -  means feature not found for this tier
         throw featureError
       }
 

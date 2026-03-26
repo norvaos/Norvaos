@@ -80,7 +80,7 @@ export function useMatterPeople(matterId: string) {
       return (data ?? []) as unknown as MatterPersonProfile[]
     },
     enabled: !!matterId,
-    staleTime: 1000 * 60 * 2, // 2 min — profiles change during active workbench sessions
+    staleTime: 1000 * 60 * 2, // 2 min  -  profiles change during active workbench sessions
   })
 }
 
@@ -106,12 +106,12 @@ export function useMatterPersonProfile(matterId: string, personId: string) {
       return data as unknown as MatterPersonProfile
     },
     enabled: !!matterId && !!personId,
-    staleTime: 1000 * 30, // 30s — workbench needs near-real-time
+    staleTime: 1000 * 30, // 30s  -  workbench needs near-real-time
   })
 }
 
 /**
- * Sync log for a matter — shows carry-forward and sync-back history.
+ * Sync log for a matter  -  shows carry-forward and sync-back history.
  */
 export function useMatterProfileSyncLog(matterId: string) {
   const supabase = createClient()
@@ -138,7 +138,7 @@ export function useMatterProfileSyncLog(matterId: string) {
  * Update a single field (or multiple fields) in a person's profile_data.
  *
  * Merges the patch into the existing profile_data at the top level.
- * Uses profile_version for optimistic concurrency — throws if version mismatch.
+ * Uses profile_version for optimistic concurrency  -  throws if version mismatch.
  *
  * Usage:
  *   const update = useUpdateMatterPersonProfile()
@@ -172,7 +172,7 @@ export function useUpdateMatterPersonProfile() {
         }
 
       if (fetchErr || !current) throw new Error('Person profile not found')
-      if (current.is_locked) throw new Error('Profile is locked — generate a new package version to make changes')
+      if (current.is_locked) throw new Error('Profile is locked  -  generate a new package version to make changes')
       if (current.profile_version !== currentVersion) {
         throw new Error(`Version conflict: expected ${currentVersion}, found ${current.profile_version}. Reload and retry.`)
       }
@@ -358,7 +358,7 @@ export function useSyncMatterProfileToCanonical() {
           }
         }
       } catch {
-        // Non-fatal — the canonical sync already succeeded
+        // Non-fatal  -  the canonical sync already succeeded
       }
 
       return { matterId, matterPersonId, contactId }
@@ -373,7 +373,7 @@ export function useSyncMatterProfileToCanonical() {
 
 /**
  * Lock all profiles in a matter.
- * Called when a package is generated — prevents further profile edits.
+ * Called when a package is generated  -  prevents further profile edits.
  */
 export function useLockMatterProfiles() {
   const supabase = createClient()
@@ -416,7 +416,7 @@ export function getProfileValue(
 
 /**
  * Set a value at a dot-notation path in a profile, returning a new object.
- * Immutable — does not mutate the input.
+ * Immutable  -  does not mutate the input.
  * e.g. setProfileValue(profile, 'passport.number', 'XY789') → new profile
  */
 export function setProfileValue(

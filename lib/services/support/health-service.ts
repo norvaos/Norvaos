@@ -2,10 +2,10 @@
  * Health Service
  *
  * Surfaces system health indicators for admin/support use.
- * Always scoped to tenantId — never returns cross-tenant data.
- * Health checks never throw — they return degraded status on error.
+ * Always scoped to tenantId  -  never returns cross-tenant data.
+ * Health checks never throw  -  they return degraded status on error.
  *
- * Team 3 / Module 4 — Support and Implementation Tooling
+ * Team 3 / Module 4  -  Support and Implementation Tooling
  */
 
 import { createClient } from '@supabase/supabase-js'
@@ -169,7 +169,7 @@ export async function getIntegrationStatus(tenantId: string): Promise<Integratio
 /**
  * Return full system health for a tenant.
  *
- * Never throws — returns degraded/down status on error.
+ * Never throws  -  returns degraded/down status on error.
  * All checks are scoped to tenantId.
  */
 export async function getSystemHealth(tenantId: string): Promise<SystemHealthStatus> {

@@ -10,7 +10,7 @@ import { useEnabledPracticeAreas, type EnabledPracticeArea } from '@/lib/queries
  * that needs to react to the active practice area context.
  *
  * Color and name are available instantly from the Zustand store (persisted
- * to localStorage) so the UI never flashes — the query only refines them.
+ * to localStorage) so the UI never flashes  -  the query only refines them.
  */
 export function usePracticeAreaContext() {
   const filter = useUIStore((s) => s.activePracticeFilter)
@@ -36,11 +36,11 @@ export function usePracticeAreaContext() {
     isFiltered: filter !== 'all',
     /** Shortcut: true when the active practice area is Immigration */
     isImmigration: (resolvedName ?? '').toLowerCase() === 'immigration',
-    /** The UUID if filtered, undefined otherwise — pass to query hooks */
+    /** The UUID if filtered, undefined otherwise  -  pass to query hooks */
     effectiveId: filter !== 'all' ? filter : undefined,
-    /** The active practice area name, or undefined — useful for matching pipelines.practice_area (TEXT) */
+    /** The active practice area name, or undefined  -  useful for matching pipelines.practice_area (TEXT) */
     effectiveName: resolvedName,
-    /** Accent color — available instantly from store, refined by query */
+    /** Accent color  -  available instantly from store, refined by query */
     effectiveColor: activePracticeArea?.color ?? storedColor ?? undefined,
   }
 }

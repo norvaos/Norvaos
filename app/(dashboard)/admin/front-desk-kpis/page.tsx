@@ -72,8 +72,8 @@ function UserKpiSection({ user }: { user: AdminUserKpiSummary }) {
                     ? new Date(user.shifts[0].startedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
                     : ''}
                   {user.shifts[user.shifts.length - 1].endedAt
-                    ? ` — ${new Date(user.shifts[user.shifts.length - 1].endedAt!).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
-                    : ' — active'}
+                    ? `  -  ${new Date(user.shifts[user.shifts.length - 1].endedAt!).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+                    : '  -  active'}
                 </span>
               )}
             </p>

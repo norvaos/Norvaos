@@ -1,5 +1,5 @@
 -- ============================================================================
--- Migration 200: Trust Ledger Audit — Immutable Foundation (Directive 005.1)
+-- Migration 200: Trust Ledger Audit  -  Immutable Foundation (Directive 005.1)
 -- ============================================================================
 -- Creates the trust_ledger_audit table: an INSERT-only, tamper-proof audit
 -- trail for every trust balance change. A database-level trigger on
@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS trust_ledger_audit (
   -- Tamper detection
   content_hash              TEXT NOT NULL,   -- SHA-256 of critical fields
 
-  -- Timestamp — set by DB, not application
+  -- Timestamp  -  set by DB, not application
   created_at                TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
@@ -63,9 +63,9 @@ CREATE POLICY "trust_ledger_audit_tenant_insert" ON trust_ledger_audit
   FOR INSERT WITH CHECK (tenant_id = (SELECT tenant_id FROM users WHERE auth_user_id = auth.uid()));
 
 -- Service role needs full INSERT access (used by the trigger via admin context)
--- No UPDATE or DELETE policies exist — RLS blocks them entirely.
+-- No UPDATE or DELETE policies exist  -  RLS blocks them entirely.
 
--- ─── 4. Immutability triggers — prevent UPDATE and DELETE at DB level ────────
+-- ─── 4. Immutability triggers  -  prevent UPDATE and DELETE at DB level ────────
 
 CREATE OR REPLACE FUNCTION trust_ledger_audit_immutable()
 RETURNS TRIGGER AS $$
@@ -115,7 +115,7 @@ BEGIN
 
   computed_hash := encode(sha256(hash_input::BYTEA), 'hex');
 
-  -- INSERT the audit row — if this fails, the entire transaction rolls back
+  -- INSERT the audit row  -  if this fails, the entire transaction rolls back
   INSERT INTO trust_ledger_audit (
     tenant_id,
     transaction_id,
@@ -182,7 +182,7 @@ CREATE INDEX idx_trust_ledger_audit_account_date
 CREATE INDEX idx_trust_ledger_audit_hash
   ON trust_ledger_audit (content_hash);
 
--- ─── 7. Verification function — check audit chain integrity ──────────────────
+-- ─── 7. Verification function  -  check audit chain integrity ──────────────────
 
 CREATE OR REPLACE FUNCTION verify_trust_ledger_audit_integrity(
   p_tenant_id UUID,

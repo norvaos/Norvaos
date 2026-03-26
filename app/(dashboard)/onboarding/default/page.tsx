@@ -62,7 +62,7 @@ export default function DefaultSetupPage() {
 
     if (apiResult.status === 'rejected') {
       setPhase('error')
-      setErrorMsg('Network error — please check your connection and try again.')
+      setErrorMsg('Network error  -  please check your connection and try again.')
       return
     }
 
@@ -262,7 +262,7 @@ export default function DefaultSetupPage() {
 
       <div className="flex gap-3">
         <Button variant="outline" onClick={() => router.push('/')}>
-          Skip — configure manually
+          Skip  -  configure manually
         </Button>
         <Button onClick={runDefaultSetup}>
           <RefreshCw className="mr-2 h-4 w-4" />

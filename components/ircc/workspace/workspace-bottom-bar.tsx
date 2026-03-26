@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * WorkspaceBottomBar — Persistent bottom status strip.
+ * WorkspaceBottomBar  -  Persistent bottom status strip.
  *
  * Shows:
  *   - Stream type
@@ -22,7 +22,7 @@ import type { ImmigrationReadinessData } from '@/lib/queries/immigration-readine
 
 type Matter = Database['public']['Tables']['matters']['Row']
 
-// ── Processing time lookup (static reference — manually maintained) ────────────
+// ── Processing time lookup (static reference  -  manually maintained) ────────────
 // In a future phase this will be API-fed from IRCC processing times RSS/API.
 
 const PROCESSING_TIMES: Record<string, { weeks: string; updated: string }> = {
@@ -128,7 +128,7 @@ export function WorkspaceBottomBar({ matter, readinessData }: WorkspaceBottomBar
               </TooltipTrigger>
               <TooltipContent>
                 <p className="text-xs">Last updated: {processingTime.updated}</p>
-                <p className="text-xs text-muted-foreground">Source: Manual — verify at IRCC.ca</p>
+                <p className="text-xs text-muted-foreground">Source: Manual  -  verify at IRCC.ca</p>
               </TooltipContent>
             </Tooltip>
           </div>

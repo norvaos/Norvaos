@@ -42,7 +42,7 @@ export function ImportResults({ batchId, onImportAnother, onDone }: ImportResult
       document.body.removeChild(a)
       URL.revokeObjectURL(url)
     } catch {
-      // Silently fail — toast is handled by the query layer if needed
+      // Silently fail  -  toast is handled by the query layer if needed
     }
   }
 

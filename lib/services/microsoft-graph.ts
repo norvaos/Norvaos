@@ -221,7 +221,7 @@ export async function getValidAccessToken(
   try {
     tokens = await refreshAccessToken(conn.refresh_token_encrypted)
   } catch (refreshErr) {
-    // Consent revoked or token permanently invalid — mark connection inactive
+    // Consent revoked or token permanently invalid  -  mark connection inactive
     // so the UI shows "reconnect" instead of looping refresh failures.
     const errMsg = refreshErr instanceof Error ? refreshErr.message : String(refreshErr)
     const isConsentError = errMsg.includes('AADSTS65001') || errMsg.includes('AADSTS70011') || errMsg.includes('AADSTS70008')
@@ -306,7 +306,7 @@ export async function graphFetch<T = unknown>(
       body: body ? JSON.stringify(body) : undefined,
     })
 
-    // Rate limiting — bounded retry respecting Retry-After header
+    // Rate limiting  -  bounded retry respecting Retry-After header
     if (res.status === 429) {
       if (rateLimit429Count >= MAX_GRAPH_RATE_LIMIT_RETRIES) {
         throw new GraphError(

@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Lead Reporting Queries — Funnel, Attribution, and Operational Reports
+ * Lead Reporting Queries  -  Funnel, Attribution, and Operational Reports
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Service layer for report data queries. Uses the source-of-truth tables
@@ -99,7 +99,7 @@ export async function getCurrentFunnelCounts(
 
 /**
  * Count leads that have entered each stage (from stage history).
- * This gives a true funnel view — not just current state.
+ * This gives a true funnel view  -  not just current state.
  */
 export async function getStageEntryFunnel(
   supabase: SupabaseClient<Database>,

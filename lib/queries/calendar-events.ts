@@ -180,7 +180,7 @@ export function useAddEventAttendee() {
 
 // ── Contact Calendar Events ─────────────────────────────
 /**
- * Fetches calendar events linked to a specific contact —
+ * Fetches calendar events linked to a specific contact  - 
  * either via contact_id on the event or as an attendee.
  */
 export function useContactCalendarEvents(contactId: string, tenantId: string) {

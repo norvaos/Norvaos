@@ -1,13 +1,13 @@
 'use client'
 
 /**
- * Vault Drop — Instant-Hash Document Upload (Directive 33.0 §B)
+ * Vault Drop  -  Instant-Hash Document Upload (Directive 33.0 §B)
  *
  * Public-facing secure file upload. Computes SHA-256 hash client-side
  * immediately on file selection (InstantHash listener), then uploads
  * to the Norva Vault with the hash attached as integrity proof.
  *
- * No authentication required — files are held in a quarantine bucket
+ * No authentication required  -  files are held in a quarantine bucket
  * until linked to a matter by staff.
  */
 
@@ -207,7 +207,7 @@ export default function VaultDropPage() {
             Drag files here or click to browse
           </p>
           <p className="text-[10px] text-muted-foreground/50 mt-1">
-            PDF, DOC, JPG, PNG — up to 25 MB per file
+            PDF, DOC, JPG, PNG  -  up to 25 MB per file
           </p>
           <input
             ref={fileInputRef}
@@ -298,7 +298,7 @@ export default function VaultDropPage() {
                 </p>
                 {files.some(f => f.autoScan) && (
                   <p className="text-[11px] text-blue-600 dark:text-blue-400">
-                    Documents are being scanned — extracted information will auto-fill your intake forms.
+                    Documents are being scanned  -  extracted information will auto-fill your intake forms.
                   </p>
                 )}
               </div>

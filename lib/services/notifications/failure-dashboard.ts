@@ -1,13 +1,13 @@
 /**
- * Notification Failure Dashboard — Data Service
+ * Notification Failure Dashboard  -  Data Service
  *
  * Aggregates delivery tracking data into summary views for the support
  * dashboard and health monitoring surfaces.
  *
  * Reads from the in-memory delivery tracker and dead-letter queue.
- * No database reads — all data comes from the in-process tracking stores.
+ * No database reads  -  all data comes from the in-process tracking stores.
  *
- * Team 3 / Module 2 — Notification & Communications Adapters
+ * Team 3 / Module 2  -  Notification & Communications Adapters
  */
 
 import { getRecentFailures, checkAlertThreshold } from '@/lib/services/notifications/delivery-tracker'
@@ -57,7 +57,7 @@ function classifyChannelHealth(failureCount: number): ChannelHealth {
 /**
  * Return an aggregated failure summary for a tenant.
  *
- * Always scoped to `tenantId` — never returns cross-tenant data.
+ * Always scoped to `tenantId`  -  never returns cross-tenant data.
  */
 export function getNotificationFailureSummary(
   tenantId: string,

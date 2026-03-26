@@ -1,15 +1,25 @@
 /**
- * GET /api/invoices/overdue — List invoices overdue by more than N days
+ * GET /api/invoices/overdue  -  List invoices overdue by more than N days
  */
 
 import { NextRequest, NextResponse } from 'next/server'
 import { authenticateRequest, AuthError } from '@/lib/services/auth'
+import { checkBillingPermission } from '@/lib/services/billing-permission'
 import { createAdminClient } from '@/lib/supabase/admin'
 
 export async function GET(request: NextRequest) {
   try {
     const auth = await authenticateRequest()
     const admin = createAdminClient()
+
+    // ── billing:view permission check ──────────────────────────────
+    const { allowed } = await checkBillingPermission(auth.supabase, auth.userId, auth.tenantId)
+    if (!allowed) {
+      return NextResponse.json(
+        { success: false, error: 'billing:view permission required' },
+        { status: 403 },
+      )
+    }
 
     const { searchParams } = new URL(request.url)
     const matterId = searchParams.get('matterId')

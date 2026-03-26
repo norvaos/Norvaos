@@ -241,7 +241,7 @@ export function OverviewTab({
         </CardContent>
       </Card>
 
-      {/* Recent Activity — spans full width */}
+      {/* Recent Activity  -  spans full width */}
       <Card className="md:col-span-2">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-sm">

@@ -162,7 +162,7 @@ export async function GET(
         }
       }
     } catch {
-      // Non-fatal — portal still works without retainer summary
+      // Non-fatal  -  portal still works without retainer summary
     }
 
     const response: PortalBillingResponse = {

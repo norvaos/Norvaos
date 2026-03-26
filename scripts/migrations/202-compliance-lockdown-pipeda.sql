@@ -1,13 +1,13 @@
 -- ============================================================================
--- Migration 202 — PIPEDA Data Sovereignty Enforcer (Directive 004, Pillar 3)
+-- Migration 202  -  PIPEDA Data Sovereignty Enforcer (Directive 004, Pillar 3)
 -- ============================================================================
 -- Establishes the compliance infrastructure for PIPEDA data sovereignty:
---   1. data_sovereignty_log       — append-only geolocation access log
---   2. pii_access_registry        — registry of PII columns for runtime enforcement
+--   1. data_sovereignty_log        -  append-only geolocation access log
+--   2. pii_access_registry         -  registry of PII columns for runtime enforcement
 --   3. Seed data for pii_access_registry (contacts, leads, trust_bank_accounts)
---   4. v_pii_encryption_status    — encryption coverage dashboard view
---   5. pii_decryption_log         — append-only decryption audit trail
---   6. norva_decrypt_audited()    — audited wrapper around norva_decrypt
+--   4. v_pii_encryption_status     -  encryption coverage dashboard view
+--   5. pii_decryption_log          -  append-only decryption audit trail
+--   6. norva_decrypt_audited()     -  audited wrapper around norva_decrypt
 --
 -- DEPENDENCIES: pgcrypto, norva_encrypt/norva_decrypt (migration 197),
 --               contacts/leads encrypted columns (197), trust_bank_accounts (100)
@@ -16,7 +16,7 @@
 BEGIN;
 
 -- ===========================================================================
--- 1. data_sovereignty_log — append-only log of all data access with geolocation
+-- 1. data_sovereignty_log  -  append-only log of all data access with geolocation
 -- ===========================================================================
 
 CREATE TABLE IF NOT EXISTS data_sovereignty_log (
@@ -106,7 +106,7 @@ CREATE TRIGGER trg_sovereignty_log_immutable_delete
 
 
 -- ===========================================================================
--- 2. pii_access_registry — tracks which columns contain PII
+-- 2. pii_access_registry  -  tracks which columns contain PII
 -- ===========================================================================
 
 CREATE TABLE IF NOT EXISTS pii_access_registry (
@@ -138,7 +138,7 @@ COMMENT ON COLUMN pii_access_registry.requires_canadian_region IS 'Whether acces
 -- 3. Seed pii_access_registry with known PII columns
 -- ===========================================================================
 
--- contacts — columns with _encrypted counterparts are dual_write
+-- contacts  -  columns with _encrypted counterparts are dual_write
 INSERT INTO pii_access_registry (table_name, column_name, pii_category, encryption_status) VALUES
   ('contacts', 'first_name',      'name',          'dual_write'),
   ('contacts', 'last_name',       'name',          'dual_write'),
@@ -149,7 +149,7 @@ INSERT INTO pii_access_registry (table_name, column_name, pii_category, encrypti
   ('contacts', 'passport_number', 'passport',      'dual_write')
 ON CONFLICT (table_name, column_name) DO NOTHING;
 
--- leads — columns with _encrypted counterparts are dual_write
+-- leads  -  columns with _encrypted counterparts are dual_write
 INSERT INTO pii_access_registry (table_name, column_name, pii_category, encryption_status) VALUES
   ('leads', 'first_name', 'name',  'dual_write'),
   ('leads', 'last_name',  'name',  'dual_write'),
@@ -157,14 +157,14 @@ INSERT INTO pii_access_registry (table_name, column_name, pii_category, encrypti
   ('leads', 'phone',      'phone', 'dual_write')
 ON CONFLICT (table_name, column_name) DO NOTHING;
 
--- trust_bank_accounts — account_number_encrypted is stored encrypted at rest
+-- trust_bank_accounts  -  account_number_encrypted is stored encrypted at rest
 INSERT INTO pii_access_registry (table_name, column_name, pii_category, encryption_status) VALUES
   ('trust_bank_accounts', 'account_number_encrypted', 'financial', 'encrypted_only')
 ON CONFLICT (table_name, column_name) DO NOTHING;
 
 
 -- ===========================================================================
--- 4. v_pii_encryption_status — encryption coverage dashboard view
+-- 4. v_pii_encryption_status  -  encryption coverage dashboard view
 -- ===========================================================================
 
 CREATE OR REPLACE VIEW v_pii_encryption_status AS
@@ -192,7 +192,7 @@ COMMENT ON VIEW v_pii_encryption_status
 
 
 -- ===========================================================================
--- 5. pii_decryption_log — append-only decryption audit trail
+-- 5. pii_decryption_log  -  append-only decryption audit trail
 -- ===========================================================================
 
 CREATE TABLE IF NOT EXISTS pii_decryption_log (
@@ -236,7 +236,7 @@ CREATE TRIGGER trg_decryption_log_immutable_delete
 
 
 -- ===========================================================================
--- 6. norva_decrypt_audited — audited wrapper around norva_decrypt
+-- 6. norva_decrypt_audited  -  audited wrapper around norva_decrypt
 -- ===========================================================================
 
 CREATE OR REPLACE FUNCTION norva_decrypt_audited(
@@ -254,7 +254,7 @@ BEGIN
   -- Perform the actual decryption
   v_result := norva_decrypt(ciphertext, key);
 
-  -- Log the decryption event (fire-and-forget — never block the caller)
+  -- Log the decryption event (fire-and-forget  -  never block the caller)
   INSERT INTO pii_decryption_log (accessor_context, table_hint)
   VALUES (accessor_context, NULL);
 

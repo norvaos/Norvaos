@@ -152,12 +152,12 @@ export function UploadDocumentDialog({
           })
 
         if (uploadErr) {
-          // Storage might not have 'documents' bucket — try 'uploads'
+          // Storage might not have 'documents' bucket  -  try 'uploads'
           const { error: uploadErr2 } = await supabase.storage
             .from('uploads')
             .upload(storagePath, selectedFile, { cacheControl: '3600', upsert: false })
           if (uploadErr2) {
-            // Fall through — record document without actual storage upload
+            // Fall through  -  record document without actual storage upload
             console.warn('[UploadDocument] Storage upload failed:', uploadErr2.message)
           } else {
             storageBucket = 'uploads'
@@ -190,7 +190,7 @@ export function UploadDocumentDialog({
         </DialogHeader>
 
         <div className="space-y-4 py-1">
-          {/* Document Type — searchable */}
+          {/* Document Type  -  searchable */}
           <div className="space-y-1.5">
             <Label>
               Document Type <span className="text-red-500">*</span>
@@ -256,7 +256,7 @@ export function UploadDocumentDialog({
 
           {/* File Picker */}
           <div className="space-y-1.5">
-            <Label>File <span className="text-muted-foreground text-xs">(optional — records document even without file)</span></Label>
+            <Label>File <span className="text-muted-foreground text-xs">(optional  -  records document even without file)</span></Label>
             <input
               ref={fileInputRef}
               type="file"
@@ -339,7 +339,7 @@ export function UploadDocumentDialog({
             </div>
           )}
 
-          {/* File Name — auto-generated, editable */}
+          {/* File Name  -  auto-generated, editable */}
           <div className="space-y-1.5">
             <Label>
               File Name <span className="text-xs text-muted-foreground">(auto-generated)</span>
@@ -355,7 +355,7 @@ export function UploadDocumentDialog({
             )}
           </div>
 
-          {/* Related Matter — optional */}
+          {/* Related Matter  -  optional */}
           {activeMatters.length > 0 && (
             <div className="space-y-1.5">
               <Label>Related Matter <span className="text-xs text-muted-foreground">(optional)</span></Label>

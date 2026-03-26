@@ -55,7 +55,7 @@ export function getRegisteredJobTypes(): string[] {
 
 function stubHandler(jobType: string): JobHandler {
   return async (ctx) => {
-    log.warn(`Stub handler invoked — ${jobType} is not yet implemented`, {
+    log.warn(`Stub handler invoked  -  ${jobType} is not yet implemented`, {
       tenant_id: ctx.tenantId,
       job_id: ctx.jobId,
     })

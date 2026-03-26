@@ -1,10 +1,10 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Lead Workflow — Presentation Utilities
+ * Lead Workflow  -  Presentation Utilities
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Pure functions for stage colours, channel icons, actor badges, task status
- * icons, and guard formatting. No hooks, no React — just data → display mapping.
+ * icons, and guard formatting. No hooks, no React  -  just data → display mapping.
  */
 
 import {

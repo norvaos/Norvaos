@@ -139,5 +139,5 @@ if (errors > 0) {
 } else if (warnings > 0) {
   console.log(`Schema check passed with ${warnings} warning(s)`)
 } else {
-  console.log('Schema check passed — no drift detected')
+  console.log('Schema check passed  -  no drift detected')
 }

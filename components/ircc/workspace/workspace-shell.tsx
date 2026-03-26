@@ -1,13 +1,13 @@
 'use client'
 
 /**
- * WorkspaceShell — IRCC Filing Cockpit
+ * WorkspaceShell  -  IRCC Filing Cockpit
  *
  * 4-column layout:
- *   Col 1 (72px / 240px): WorkspaceNavRail  — minimisable section nav
- *   Col 2 (flex-[2]):     SourceViewer      — source document viewer
- *   Col 3 (flex-[2]):     WorkbenchPanel    — IRCC field verification
- *   Col 4 (320px):        AuditorSidebar    — live completeness engine
+ *   Col 1 (72px / 240px): WorkspaceNavRail   -  minimisable section nav
+ *   Col 2 (flex-[2]):     SourceViewer       -  source document viewer
+ *   Col 3 (flex-[2]):     WorkbenchPanel     -  IRCC field verification
+ *   Col 4 (320px):        AuditorSidebar     -  live completeness engine
  *
  * Sticky top header (UCI / App# / Stream / Lawyer)
  * Sticky bottom bar (stream + processing reference + status)
@@ -94,7 +94,7 @@ export function WorkspaceShell({
       {/* ── Main 4-Column Body ────────────────────────────────────────────── */}
       <div className="flex flex-1 min-h-0 overflow-hidden">
 
-        {/* Column 1 — Nav Rail */}
+        {/* Column 1  -  Nav Rail */}
         <WorkspaceNavRail
           activeSection={activeSection}
           onSectionChange={setActiveSection}
@@ -105,7 +105,7 @@ export function WorkspaceShell({
           documentSlots={documentSlots}
         />
 
-        {/* Column 2 — Source Viewer */}
+        {/* Column 2  -  Source Viewer */}
         <div className="flex-[2] min-w-0 border-r flex flex-col overflow-hidden">
           <SourceViewer
             matterId={matterId}
@@ -117,7 +117,7 @@ export function WorkspaceShell({
           />
         </div>
 
-        {/* Column 3 — Workbench */}
+        {/* Column 3  -  Workbench */}
         <div className="flex-[2] min-w-0 border-r flex flex-col overflow-hidden">
           <WorkbenchPanel
             matterId={matterId}
@@ -130,7 +130,7 @@ export function WorkspaceShell({
           />
         </div>
 
-        {/* Column 4 — Auditor Sidebar */}
+        {/* Column 4  -  Auditor Sidebar */}
         <div className="w-80 shrink-0 flex flex-col overflow-hidden">
           <AuditorSidebar
             matterId={matterId}

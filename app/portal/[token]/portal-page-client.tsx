@@ -1,24 +1,24 @@
 'use client'
 
 /**
- * PortalPageClient — Client dashboard workspace.
+ * PortalPageClient  -  Client dashboard workspace.
  *
  * Layout (top to bottom):
  *   Header (logo + language)
  *   MatterSummary (concrete counts primary, progress bar secondary)
- *   Timeline (vertical stage progression — if data exists)
+ *   Timeline (vertical stage progression  -  if data exists)
  *   LegalTeam (lawyer + support staff with role guidance)
  *   Instructions (two-level: matter-type defaults / per-link overrides)
  *   NextAction (8-level priority waterfall)
- *   DashboardCards (summary card grid — 7 cards)
+ *   DashboardCards (summary card grid  -  7 cards)
  *   ─── Collapsible sections ───
  *   Documents (expanded by default)
  *   SharedDocuments (firm-to-client shared docs with view tracking)
  *   Questions (expanded if IRCC, hidden otherwise)
- *   Payment (auto-expand if overdue — always visible)
- *   Tasks (collapsed by default — always visible)
+ *   Payment (auto-expand if overdue  -  always visible)
+ *   Tasks (collapsed by default  -  always visible)
  *   Messages (collapsed by default)
- *   Calendar (collapsed by default — always visible)
+ *   Calendar (collapsed by default  -  always visible)
  *   ─── Footer ───
  *   Support contact + Powered by NorvaOS
  */
@@ -114,7 +114,7 @@ interface PortalPageClientProps {
   lastUpdated: string
 }
 
-// ── Section Icons (inline SVGs — no external dependencies) ───────────────────
+// ── Section Icons (inline SVGs  -  no external dependencies) ───────────────────
 
 function DocIcon() {
   return (
@@ -289,7 +289,7 @@ export function PortalPageClient({
     }
   }, [])
 
-  // ── Live Refresh — 60s polling ──────────────────────────────────────────
+  // ── Live Refresh  -  60s polling ──────────────────────────────────────────
 
   const tokenRef = useRef(token)
   tokenRef.current = token
@@ -561,7 +561,7 @@ export function PortalPageClient({
 
       {/* ── Main content ───────────────────────────────────────────────── */}
       <main className="mx-auto max-w-3xl px-4 py-6 space-y-4">
-        {/* 1. Matter Summary — always visible */}
+        {/* 1. Matter Summary  -  always visible */}
         <PortalMatterSummary
           matterTitle={matterTitle}
           matterNumber={matterRef}
@@ -573,7 +573,7 @@ export function PortalPageClient({
           language={currentLang}
         />
 
-        {/* 2. Case Timeline — visible if timeline data exists */}
+        {/* 2. Case Timeline  -  visible if timeline data exists */}
         {hasTimeline && (
           <PortalTimeline
             token={token}
@@ -582,13 +582,13 @@ export function PortalPageClient({
           />
         )}
 
-        {/* 2b. Client Progress Tracker — stage pipeline + missing docs */}
+        {/* 2b. Client Progress Tracker  -  stage pipeline + missing docs */}
         <ClientProgressTracker
           token={token}
           accentColor={tenant.primaryColor}
         />
 
-        {/* 2c. Team Micro-Cards — high-density mobile-first lawyer + assistant */}
+        {/* 2c. Team Micro-Cards  -  high-density mobile-first lawyer + assistant */}
         {(portalInfo.lawyerName || portalInfo.supportStaffName) && (
           <PortalTeamMicroCards
             lawyer={
@@ -617,7 +617,7 @@ export function PortalPageClient({
           />
         )}
 
-        {/* 2d. Message My Team — secure mailto with matter reference */}
+        {/* 2d. Message My Team  -  secure mailto with matter reference */}
         {portalInfo.lawyerEmail && (
           <PortalMessageTeam
             lawyerEmail={portalInfo.lawyerEmail}
@@ -627,7 +627,7 @@ export function PortalPageClient({
           />
         )}
 
-        {/* 3. Legal Team — visible if lawyer OR support staff exists */}
+        {/* 3. Legal Team  -  visible if lawyer OR support staff exists */}
         {(portalInfo.lawyerName || portalInfo.supportStaffName) && (
           <PortalLegalTeam
             lawyer={
@@ -654,13 +654,13 @@ export function PortalPageClient({
           />
         )}
 
-        {/* 4. Client Instructions — visible if instructions exist */}
+        {/* 4. Client Instructions  -  visible if instructions exist */}
         <PortalInstructions
           instructions={portalInfo.instructions}
           language={currentLang}
         />
 
-        {/* 5. Next Action Panel — always visible, fetches summary data */}
+        {/* 5. Next Action Panel  -  always visible, fetches summary data */}
         <PortalNextActionPanel
           token={token}
           primaryColor={tenant.primaryColor}
@@ -669,7 +669,7 @@ export function PortalPageClient({
           onSummaryLoaded={handleSummaryLoaded}
         />
 
-        {/* 5b. Book a Consultation — prominent standalone section */}
+        {/* 5b. Book a Consultation  -  prominent standalone section */}
         <section className="rounded-2xl border border-blue-200 bg-gradient-to-br from-blue-50 to-white p-4 shadow-sm">
           <div className="flex items-center gap-2 mb-3">
             <div
@@ -694,7 +694,7 @@ export function PortalPageClient({
           />
         </section>
 
-        {/* 6. Dashboard Summary Cards — clickable grid */}
+        {/* 6. Dashboard Summary Cards  -  clickable grid */}
         <PortalDashboardCards
           sections={sectionCounts}
           hasIRCC={hasIRCC}
@@ -704,7 +704,7 @@ export function PortalPageClient({
 
         {/* ── Collapsible Sections ─────────────────────────────────────── */}
 
-        {/* 7. Documents Required — expanded by default */}
+        {/* 7. Documents Required  -  expanded by default */}
         <PortalCollapsibleSection
           sectionId="section-documents"
           title={tr.tab_documents ?? 'Documents'}
@@ -748,7 +748,7 @@ export function PortalPageClient({
           )}
         </PortalCollapsibleSection>
 
-        {/* 8. Client Upload — always visible */}
+        {/* 8. Client Upload  -  always visible */}
         <PortalCollapsibleSection
           sectionId="section-client-upload"
           title={tr.client_upload_title ?? 'Submit a Document'}
@@ -766,7 +766,7 @@ export function PortalPageClient({
           />
         </PortalCollapsibleSection>
 
-        {/* 9. Shared Documents — visible if firm has shared docs */}
+        {/* 9. Shared Documents  -  visible if firm has shared docs */}
         {hasSharedDocuments && (
           <PortalCollapsibleSection
             sectionId="section-shared-documents"
@@ -791,7 +791,7 @@ export function PortalPageClient({
           </PortalCollapsibleSection>
         )}
 
-        {/* 9. IRCC Forms — visible only if IRCC forms are configured */}
+        {/* 9. IRCC Forms  -  visible only if IRCC forms are configured */}
         {hasIRCC && (
           <PortalCollapsibleSection
             sectionId="section-questions"
@@ -819,7 +819,7 @@ export function PortalPageClient({
           </PortalCollapsibleSection>
         )}
 
-        {/* 10. Payment & Retainer — ALWAYS visible */}
+        {/* 10. Payment & Retainer  -  ALWAYS visible */}
         <PortalCollapsibleSection
           sectionId="section-payment"
           title={tr.section_payment ?? 'Payment & Retainer'}
@@ -852,7 +852,7 @@ export function PortalPageClient({
           />
         </PortalCollapsibleSection>
 
-        {/* 11. Tasks — ALWAYS visible */}
+        {/* 11. Tasks  -  ALWAYS visible */}
         <PortalCollapsibleSection
           sectionId="section-tasks"
           title={tr.tab_tasks ?? 'Action Items'}
@@ -885,7 +885,7 @@ export function PortalPageClient({
           />
         </PortalCollapsibleSection>
 
-        {/* 12. Messages — always visible */}
+        {/* 12. Messages  -  always visible */}
         <PortalCollapsibleSection
           sectionId="section-messages"
           title={tr.tab_messages ?? 'Messages'}
@@ -908,7 +908,7 @@ export function PortalPageClient({
           />
         </PortalCollapsibleSection>
 
-        {/* 13. Calendar / Upcoming Dates — ALWAYS visible */}
+        {/* 13. Calendar / Upcoming Dates  -  ALWAYS visible */}
         <PortalCollapsibleSection
           sectionId="section-calendar"
           title={tr.tab_calendar ?? 'Upcoming Dates'}

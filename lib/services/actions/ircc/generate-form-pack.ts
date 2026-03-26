@@ -67,7 +67,7 @@ export const generateFormPackAction: ActionDefinition<GenerateFormPackInput, Gen
         activityType: 'form_pack_generated',
         title: `${input.packType} draft v${result.versionNumber} generated`,
         description: result.idempotentHit
-          ? `Idempotent hit — returned existing draft v${result.versionNumber}`
+          ? `Idempotent hit  -  returned existing draft v${result.versionNumber}`
           : `Generated new draft v${result.versionNumber} (${result.validationResult.filled_count} fields filled)`,
         metadata: {
           pack_type: input.packType,

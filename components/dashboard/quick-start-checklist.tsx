@@ -67,7 +67,7 @@ export function QuickStartChecklist({
           <CardTitle className="text-base">Quick Start</CardTitle>
         </div>
         <CardDescription>
-          {completedCount} of {items.length} steps complete — get your firm set up in minutes.
+          {completedCount} of {items.length} steps complete  -  get your firm set up in minutes.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-3">

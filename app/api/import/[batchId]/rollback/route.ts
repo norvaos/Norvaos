@@ -44,7 +44,7 @@ async function handlePost(
 
     const result = await rollbackBatch(admin, auth.tenantId, batchId, auth.userId)
 
-    // Audit log — batch-level rollback event (per-matter events written by rollback-engine)
+    // Audit log  -  batch-level rollback event (per-matter events written by rollback-engine)
     logAuditServer({
       supabase: admin,
       tenantId: auth.tenantId,

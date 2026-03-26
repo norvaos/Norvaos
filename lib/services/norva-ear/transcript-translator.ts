@@ -1,5 +1,5 @@
 /**
- * Norva Ear — Neural Translation Layer (Directive 14.0, Tier 2)
+ * Norva Ear  -  Neural Translation Layer (Directive 14.0, Tier 2)
  *
  * When a consultation is conducted in a non-English language, this service:
  *   1. Preserves the original transcript verbatim
@@ -93,7 +93,7 @@ export async function translateTranscript(
     console.error('[Norva Ear Translation] ANTHROPIC_API_KEY is not set')
     return {
       original: transcript,
-      englishTranslation: '[TRANSLATION UNAVAILABLE — API key not configured]',
+      englishTranslation: '[TRANSLATION UNAVAILABLE  -  API key not configured]',
       sourceLanguage,
       sourceLanguageLabel: langLabel,
       wasTranslated: false,
@@ -112,7 +112,7 @@ RULES:
 1. Preserve all proper nouns (names, places, institutions) in their original form with English phonetic approximation in parentheses if needed.
 2. Translate legal terminology accurately using Canadian legal English equivalents.
 3. Preserve temporal references exactly (dates, time periods, deadlines).
-4. Maintain the speaker's tone and emotional register — this is critical for Humanitarian & Compassionate (H&C) assessments.
+4. Maintain the speaker's tone and emotional register  -  this is critical for Humanitarian & Compassionate (H&C) assessments.
 5. If a word or phrase has no direct English equivalent, provide the closest legal equivalent and note the original term in brackets.
 6. Mark any ambiguous passages with [TRANSLATION NOTE: ...] to flag for lawyer review.
 7. Do NOT add, remove, or paraphrase content. Translate everything faithfully.

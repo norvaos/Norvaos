@@ -1,6 +1,6 @@
 // ==========================================================
 // Edge Function: generate-retainer-pdf
-// TITAN Squad — Norva Signature Smart Document Assembler v2
+// TITAN Squad  -  Norva Signature Smart Document Assembler v2
 // Branded Retainer with Process Map + Success-Metric Footer
 // Budget: < 1.5 seconds
 // ==========================================================
@@ -420,7 +420,7 @@ Deno.serve(async (req: Request) => {
       );
     }
 
-    // 4. Finalize — link document to slot via RPC
+    // 4. Finalize  -  link document to slot via RPC
     const { data: finalResult, error: finalError } = await supabase.rpc(
       "rpc_finalize_retainer_document",
       {

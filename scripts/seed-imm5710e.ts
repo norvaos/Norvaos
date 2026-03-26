@@ -3,7 +3,7 @@
  * Seed IMM5710E Field Mappings
  * ═══════════════════════════════════════════════════════════════════════════════
  *
- * IMM5710E — Application to Change Conditions, Extend My Stay or Remain in
+ * IMM5710E  -  Application to Change Conditions, Extend My Stay or Remain in
  * Canada as a Worker
  *
  * This script maps all 279 scanned XFA fields to their corresponding profile
@@ -193,7 +193,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page1.PersonalDetails.AliasName.AliasNameIndicator.AliasNameIndicator.No',
     profile_path: 'personal.has_alias',
-    label: 'Alias Name — No',
+    label: 'Alias Name  -  No',
     field_type: 'boolean',
     is_required: false,
     value_format: { boolean_false: 'X', boolean_true: '' },
@@ -226,7 +226,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page1.PersonalDetails.q3-4-5.dob.DOBDay',
     profile_path: 'personal.date_of_birth',
-    label: 'Date of Birth — Day',
+    label: 'Date of Birth  -  Day',
     field_type: 'date',
     is_required: false,
     date_split: 'day',
@@ -235,7 +235,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page1.PersonalDetails.q3-4-5.dob.DOBMonth',
     profile_path: 'personal.date_of_birth',
-    label: 'Date of Birth — Month',
+    label: 'Date of Birth  -  Month',
     field_type: 'date',
     is_required: false,
     date_split: 'month',
@@ -255,7 +255,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page1.PersonalDetails.q3-4-5.pob.PlaceBirthCity',
     profile_path: 'personal.place_of_birth_city',
-    label: 'Place of Birth — City',
+    label: 'Place of Birth  -  City',
     field_type: 'text',
     is_required: true,
     is_client_visible: true,
@@ -263,7 +263,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page1.PersonalDetails.q3-4-5.pob.PlaceBirthCountry',
     profile_path: 'personal.place_of_birth_country',
-    label: 'Place of Birth — Country',
+    label: 'Place of Birth  -  Country',
     field_type: 'country',
     is_required: true,
     is_client_visible: true,
@@ -299,7 +299,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page1.PersonalDetails.CurrentCOR.CurrentCOR.Row2.Other',
     profile_path: 'personal.residence_status_other',
-    label: 'Immigration Status — Other (specify)',
+    label: 'Immigration Status  -  Other (specify)',
     field_type: 'text',
     is_required: false,
     is_client_visible: true,
@@ -309,7 +309,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page1.PersonalDetails.CurrentCOR.CORDates.FromYr',
     profile_path: 'personal.cor_from_date',
-    label: 'Current Country of Residence — From Year',
+    label: 'Current Country of Residence  -  From Year',
     field_type: 'date',
     is_required: false,
     date_split: 'year',
@@ -318,7 +318,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page1.PersonalDetails.CurrentCOR.CORDates.FromMM',
     profile_path: 'personal.cor_from_date',
-    label: 'Current Country of Residence — From Month',
+    label: 'Current Country of Residence  -  From Month',
     field_type: 'date',
     is_required: false,
     date_split: 'month',
@@ -327,7 +327,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page1.PersonalDetails.CurrentCOR.CORDates.FromDD',
     profile_path: 'personal.cor_from_date',
-    label: 'Current Country of Residence — From Day',
+    label: 'Current Country of Residence  -  From Day',
     field_type: 'date',
     is_required: false,
     date_split: 'day',
@@ -336,7 +336,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page1.PersonalDetails.CurrentCOR.CORDates.ToDD',
     profile_path: 'personal.cor_to_date',
-    label: 'Current Country of Residence — To Day',
+    label: 'Current Country of Residence  -  To Day',
     field_type: 'date',
     is_required: false,
     date_split: 'day',
@@ -345,7 +345,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page1.PersonalDetails.CurrentCOR.CORDates.ToYr',
     profile_path: 'personal.cor_to_date',
-    label: 'Current Country of Residence — To Year',
+    label: 'Current Country of Residence  -  To Year',
     field_type: 'date',
     is_required: false,
     date_split: 'year',
@@ -354,7 +354,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page1.PersonalDetails.CurrentCOR.CORDates.ToMM',
     profile_path: 'personal.cor_to_date',
-    label: 'Current Country of Residence — To Month',
+    label: 'Current Country of Residence  -  To Month',
     field_type: 'date',
     is_required: false,
     date_split: 'month',
@@ -365,7 +365,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page1.PersonalDetails.PrevCOR.PCRIndicator.No',
     profile_path: 'personal.has_previous_cor',
-    label: 'Previous Country of Residence — No',
+    label: 'Previous Country of Residence  -  No',
     field_type: 'boolean',
     is_required: false,
     value_format: { boolean_false: 'X', boolean_true: '' },
@@ -385,7 +385,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page1.PersonalDetails.PrevCOR.PCOR_tbl.PreviousCOR.Row2.Country',
     profile_path: 'personal.previous_cor_1_country',
-    label: 'Previous Country of Residence 1 — Country',
+    label: 'Previous Country of Residence 1  -  Country',
     field_type: 'country',
     is_required: false,
     show_when: { profile_path: 'personal.has_previous_cor', operator: 'is_truthy' },
@@ -394,7 +394,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page1.PersonalDetails.PrevCOR.PCOR_tbl.PreviousCOR.Row2.Status',
     profile_path: 'personal.previous_cor_1_status',
-    label: 'Previous Country of Residence 1 — Immigration Status',
+    label: 'Previous Country of Residence 1  -  Immigration Status',
     field_type: 'text',
     is_required: false,
     is_client_visible: true,
@@ -402,7 +402,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page1.PersonalDetails.PrevCOR.PCOR_tbl.PreviousCOR.Row2.Other',
     profile_path: 'personal.previous_cor_1_status_other',
-    label: 'Previous COR 1 — Status Other',
+    label: 'Previous COR 1  -  Status Other',
     field_type: 'text',
     is_required: false,
     is_client_visible: false,
@@ -414,7 +414,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page1.PersonalDetails.PrevCOR.PCOR_tbl.PreviousCOR.Row3.Country',
     profile_path: 'personal.previous_cor_2_country',
-    label: 'Previous Country of Residence 2 — Country',
+    label: 'Previous Country of Residence 2  -  Country',
     field_type: 'country',
     is_required: false,
     is_client_visible: true,
@@ -422,7 +422,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page1.PersonalDetails.PrevCOR.PCOR_tbl.PreviousCOR.Row3.Status',
     profile_path: 'personal.previous_cor_2_status',
-    label: 'Previous Country of Residence 2 — Immigration Status',
+    label: 'Previous Country of Residence 2  -  Immigration Status',
     field_type: 'text',
     is_required: false,
     is_client_visible: true,
@@ -430,7 +430,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page1.PersonalDetails.PrevCOR.PCOR_tbl.PreviousCOR.Row3.Other',
     profile_path: 'personal.previous_cor_2_status_other',
-    label: 'Previous COR 2 — Status Other',
+    label: 'Previous COR 2  -  Status Other',
     field_type: 'text',
     is_required: false,
     is_client_visible: false,
@@ -438,11 +438,11 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   { xfa_path: 'Page1.PersonalDetails.PrevCOR.PCOR_tbl.PreviousCOR.Row3.FromDate', profile_path: null, label: null, field_type: null, is_required: false, is_meta_field: true, is_client_visible: false },
   { xfa_path: 'Page1.PersonalDetails.PrevCOR.PCOR_tbl.PreviousCOR.Row3.ToDate', profile_path: null, label: null, field_type: null, is_required: false, is_meta_field: true, is_client_visible: false },
 
-  // Previous COR Dates — Row 1
+  // Previous COR Dates  -  Row 1
   {
     xfa_path: 'Page1.PersonalDetails.PrevCOR.PCOR_tbl.PCRDatesR1.FromYr',
     profile_path: 'personal.previous_cor_1_from_date',
-    label: 'Previous COR 1 — From Year',
+    label: 'Previous COR 1  -  From Year',
     field_type: 'date',
     is_required: false,
     date_split: 'year',
@@ -451,7 +451,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page1.PersonalDetails.PrevCOR.PCOR_tbl.PCRDatesR1.FromMM',
     profile_path: 'personal.previous_cor_1_from_date',
-    label: 'Previous COR 1 — From Month',
+    label: 'Previous COR 1  -  From Month',
     field_type: 'date',
     is_required: false,
     date_split: 'month',
@@ -460,7 +460,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page1.PersonalDetails.PrevCOR.PCOR_tbl.PCRDatesR1.FromDD',
     profile_path: 'personal.previous_cor_1_from_date',
-    label: 'Previous COR 1 — From Day',
+    label: 'Previous COR 1  -  From Day',
     field_type: 'date',
     is_required: false,
     date_split: 'day',
@@ -469,7 +469,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page1.PersonalDetails.PrevCOR.PCOR_tbl.PCRDatesR1.ToYr',
     profile_path: 'personal.previous_cor_1_to_date',
-    label: 'Previous COR 1 — To Year',
+    label: 'Previous COR 1  -  To Year',
     field_type: 'date',
     is_required: false,
     date_split: 'year',
@@ -478,7 +478,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page1.PersonalDetails.PrevCOR.PCOR_tbl.PCRDatesR1.ToMM',
     profile_path: 'personal.previous_cor_1_to_date',
-    label: 'Previous COR 1 — To Month',
+    label: 'Previous COR 1  -  To Month',
     field_type: 'date',
     is_required: false,
     date_split: 'month',
@@ -487,18 +487,18 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page1.PersonalDetails.PrevCOR.PCOR_tbl.PCRDatesR1.ToDD',
     profile_path: 'personal.previous_cor_1_to_date',
-    label: 'Previous COR 1 — To Day',
+    label: 'Previous COR 1  -  To Day',
     field_type: 'date',
     is_required: false,
     date_split: 'day',
     is_client_visible: false,
   },
 
-  // Previous COR Dates — Row 2
+  // Previous COR Dates  -  Row 2
   {
     xfa_path: 'Page1.PersonalDetails.PrevCOR.PCOR_tbl.PCRDatesR2.FromYr',
     profile_path: 'personal.previous_cor_2_from_date',
-    label: 'Previous COR 2 — From Year',
+    label: 'Previous COR 2  -  From Year',
     field_type: 'date',
     is_required: false,
     date_split: 'year',
@@ -507,7 +507,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page1.PersonalDetails.PrevCOR.PCOR_tbl.PCRDatesR2.FromMM',
     profile_path: 'personal.previous_cor_2_from_date',
-    label: 'Previous COR 2 — From Month',
+    label: 'Previous COR 2  -  From Month',
     field_type: 'date',
     is_required: false,
     date_split: 'month',
@@ -516,7 +516,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page1.PersonalDetails.PrevCOR.PCOR_tbl.PCRDatesR2.FromDD',
     profile_path: 'personal.previous_cor_2_from_date',
-    label: 'Previous COR 2 — From Day',
+    label: 'Previous COR 2  -  From Day',
     field_type: 'date',
     is_required: false,
     date_split: 'day',
@@ -525,7 +525,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page1.PersonalDetails.PrevCOR.PCOR_tbl.PCRDatesR2.ToYr',
     profile_path: 'personal.previous_cor_2_to_date',
-    label: 'Previous COR 2 — To Year',
+    label: 'Previous COR 2  -  To Year',
     field_type: 'date',
     is_required: false,
     date_split: 'year',
@@ -534,7 +534,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page1.PersonalDetails.PrevCOR.PCOR_tbl.PCRDatesR2.ToMM',
     profile_path: 'personal.previous_cor_2_to_date',
-    label: 'Previous COR 2 — To Month',
+    label: 'Previous COR 2  -  To Month',
     field_type: 'date',
     is_required: false,
     date_split: 'month',
@@ -543,7 +543,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page1.PersonalDetails.PrevCOR.PCOR_tbl.PCRDatesR2.ToDD',
     profile_path: 'personal.previous_cor_2_to_date',
-    label: 'Previous COR 2 — To Day',
+    label: 'Previous COR 2  -  To Day',
     field_type: 'date',
     is_required: false,
     date_split: 'day',
@@ -564,7 +564,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page1.MaritalStatus.Current.b.MarriageDate.FromYr',
     profile_path: 'marital.date_of_current_relationship',
-    label: 'Marriage/Relationship Date — Year',
+    label: 'Marriage/Relationship Date  -  Year',
     field_type: 'date',
     is_required: false,
     date_split: 'year',
@@ -574,7 +574,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page1.MaritalStatus.Current.b.MarriageDate.FromMM',
     profile_path: 'marital.date_of_current_relationship',
-    label: 'Marriage/Relationship Date — Month',
+    label: 'Marriage/Relationship Date  -  Month',
     field_type: 'date',
     is_required: false,
     date_split: 'month',
@@ -583,7 +583,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page1.MaritalStatus.Current.b.MarriageDate.FromDD',
     profile_path: 'marital.date_of_current_relationship',
-    label: 'Marriage/Relationship Date — Day',
+    label: 'Marriage/Relationship Date  -  Day',
     field_type: 'date',
     is_required: false,
     date_split: 'day',
@@ -610,7 +610,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page1.MaritalStatus.d.SpouseStatus.No',
     profile_path: 'marital.spouse_accompanying',
-    label: 'Spouse/Partner Accompanying — No',
+    label: 'Spouse/Partner Accompanying  -  No',
     field_type: 'boolean',
     is_required: false,
     value_format: { boolean_false: 'X', boolean_true: '' },
@@ -630,7 +630,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page2.MaritalStatus.PrevMarriage.PrevMarriedIndicator.No',
     profile_path: 'marital.was_previously_married',
-    label: 'Previously married — No',
+    label: 'Previously married  -  No',
     field_type: 'boolean',
     is_required: false,
     value_format: { boolean_false: 'X', boolean_true: '' },
@@ -652,7 +652,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page2.MaritalStatus.PrevMarriage.PMFamilyName',
     profile_path: 'marital.previous_spouse_family_name',
-    label: 'Previous Spouse — Family Name',
+    label: 'Previous Spouse  -  Family Name',
     field_type: 'text',
     is_required: false,
     show_when: { profile_path: 'marital.was_previously_married', operator: 'is_truthy' },
@@ -661,7 +661,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page2.MaritalStatus.PrevMarriage.PMGivenName',
     profile_path: 'marital.previous_spouse_given_name',
-    label: 'Previous Spouse — Given Name',
+    label: 'Previous Spouse  -  Given Name',
     field_type: 'text',
     is_required: false,
     show_when: { profile_path: 'marital.was_previously_married', operator: 'is_truthy' },
@@ -685,7 +685,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page2.MaritalStatus.PrevMarriage.PreviouslyMarriedDates.FromYr',
     profile_path: 'marital.previous_relationship_from_date',
-    label: 'Previous Relationship — From Year',
+    label: 'Previous Relationship  -  From Year',
     field_type: 'date',
     is_required: false,
     date_split: 'year',
@@ -694,7 +694,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page2.MaritalStatus.PrevMarriage.PreviouslyMarriedDates.FromMM',
     profile_path: 'marital.previous_relationship_from_date',
-    label: 'Previous Relationship — From Month',
+    label: 'Previous Relationship  -  From Month',
     field_type: 'date',
     is_required: false,
     date_split: 'month',
@@ -703,7 +703,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page2.MaritalStatus.PrevMarriage.PreviouslyMarriedDates.FromDD',
     profile_path: 'marital.previous_relationship_from_date',
-    label: 'Previous Relationship — From Day',
+    label: 'Previous Relationship  -  From Day',
     field_type: 'date',
     is_required: false,
     date_split: 'day',
@@ -712,7 +712,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page2.MaritalStatus.PrevMarriage.PreviouslyMarriedDates.ToYr',
     profile_path: 'marital.previous_relationship_to_date',
-    label: 'Previous Relationship — To Year',
+    label: 'Previous Relationship  -  To Year',
     field_type: 'date',
     is_required: false,
     date_split: 'year',
@@ -721,7 +721,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page2.MaritalStatus.PrevMarriage.PreviouslyMarriedDates.ToMM',
     profile_path: 'marital.previous_relationship_to_date',
-    label: 'Previous Relationship — To Month',
+    label: 'Previous Relationship  -  To Month',
     field_type: 'date',
     is_required: false,
     date_split: 'month',
@@ -730,7 +730,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page2.MaritalStatus.PrevMarriage.PreviouslyMarriedDates.ToDD',
     profile_path: 'marital.previous_relationship_to_date',
-    label: 'Previous Relationship — To Day',
+    label: 'Previous Relationship  -  To Day',
     field_type: 'date',
     is_required: false,
     date_split: 'day',
@@ -739,7 +739,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page2.MaritalStatus.PrevMarriage.dob.DOBDay',
     profile_path: 'marital.previous_spouse_dob',
-    label: 'Previous Spouse DOB — Day',
+    label: 'Previous Spouse DOB  -  Day',
     field_type: 'date',
     is_required: false,
     date_split: 'day',
@@ -748,7 +748,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page2.MaritalStatus.PrevMarriage.dob.DOBMonth',
     profile_path: 'marital.previous_spouse_dob',
-    label: 'Previous Spouse DOB — Month',
+    label: 'Previous Spouse DOB  -  Month',
     field_type: 'date',
     is_required: false,
     date_split: 'month',
@@ -757,7 +757,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page2.MaritalStatus.PrevMarriage.dob.DOBYear',
     profile_path: 'marital.previous_spouse_dob',
-    label: 'Previous Spouse — Date of Birth',
+    label: 'Previous Spouse  -  Date of Birth',
     field_type: 'date',
     is_required: false,
     date_split: 'year',
@@ -797,7 +797,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page2.Languages.LangTestIndicator.No',
     profile_path: 'language.has_language_test',
-    label: 'Language Test — No',
+    label: 'Language Test  -  No',
     field_type: 'boolean',
     is_required: false,
     value_format: { boolean_false: 'X', boolean_true: '' },
@@ -829,7 +829,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page2.Passport.CountryofIssue',
     profile_path: 'passport.country_of_issue',
-    label: 'Passport — Country of Issue',
+    label: 'Passport  -  Country of Issue',
     field_type: 'country',
     is_required: true,
     is_client_visible: true,
@@ -839,7 +839,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page2.Passport.Issue.YYYY',
     profile_path: 'passport.issue_date',
-    label: 'Passport Issue Date — Year',
+    label: 'Passport Issue Date  -  Year',
     field_type: 'date',
     is_required: true,
     date_split: 'year',
@@ -848,7 +848,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page2.Passport.Issue.MM',
     profile_path: 'passport.issue_date',
-    label: 'Passport Issue Date — Month',
+    label: 'Passport Issue Date  -  Month',
     field_type: 'date',
     is_required: false,
     date_split: 'month',
@@ -857,7 +857,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page2.Passport.Issue.DD',
     profile_path: 'passport.issue_date',
-    label: 'Passport Issue Date — Day',
+    label: 'Passport Issue Date  -  Day',
     field_type: 'date',
     is_required: false,
     date_split: 'day',
@@ -866,7 +866,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page2.Passport.Expiry.YYYY',
     profile_path: 'passport.expiry_date',
-    label: 'Passport Expiry Date — Year',
+    label: 'Passport Expiry Date  -  Year',
     field_type: 'date',
     is_required: true,
     date_split: 'year',
@@ -875,7 +875,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page2.Passport.Expiry.MM',
     profile_path: 'passport.expiry_date',
-    label: 'Passport Expiry Date — Month',
+    label: 'Passport Expiry Date  -  Month',
     field_type: 'date',
     is_required: false,
     date_split: 'month',
@@ -884,7 +884,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page2.Passport.Expiry.DD',
     profile_path: 'passport.expiry_date',
-    label: 'Passport Expiry Date — Day',
+    label: 'Passport Expiry Date  -  Day',
     field_type: 'date',
     is_required: false,
     date_split: 'day',
@@ -893,7 +893,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page2.Passport.TaiwanPIN.No',
     profile_path: 'passport.taiwan_pin',
-    label: 'Taiwan Personal Identification Number — No',
+    label: 'Taiwan Personal Identification Number  -  No',
     field_type: 'boolean',
     is_required: false,
     value_format: { boolean_false: 'X', boolean_true: '' },
@@ -911,7 +911,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page2.Passport.IsraelPassportIndicator.No',
     profile_path: 'passport.israel_passport',
-    label: 'Israel Passport — No',
+    label: 'Israel Passport  -  No',
     field_type: 'boolean',
     is_required: false,
     value_format: { boolean_false: 'X', boolean_true: '' },
@@ -931,7 +931,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page2.natID.q1.natIDIndicator.No',
     profile_path: 'passport.national_id_indicator',
-    label: 'National ID — No',
+    label: 'National ID  -  No',
     field_type: 'boolean',
     is_required: false,
     value_format: { boolean_false: 'X', boolean_true: '' },
@@ -949,7 +949,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page2.natID.natIDdocs.DocNum.DocNum',
     profile_path: 'passport.national_id_number',
-    label: 'National ID — Document Number',
+    label: 'National ID  -  Document Number',
     field_type: 'text',
     is_required: false,
     show_when: { profile_path: 'passport.national_id_indicator', operator: 'is_truthy' },
@@ -958,7 +958,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page2.natID.natIDdocs.CountryofIssue.CountryofIssue',
     profile_path: 'passport.national_id_country',
-    label: 'National ID — Country of Issue',
+    label: 'National ID  -  Country of Issue',
     field_type: 'country',
     is_required: false,
     show_when: { profile_path: 'passport.national_id_indicator', operator: 'is_truthy' },
@@ -967,7 +967,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page2.natID.natIDdocs.IssueDate.IssueDate',
     profile_path: 'passport.national_id_issue_date',
-    label: 'National ID — Date of Issue',
+    label: 'National ID  -  Date of Issue',
     field_type: 'date',
     is_required: false,
     show_when: { profile_path: 'passport.national_id_indicator', operator: 'is_truthy' },
@@ -976,7 +976,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page2.natID.natIDdocs.ExpiryDate',
     profile_path: 'passport.national_id_expiry_date',
-    label: 'National ID — Date of Expiry',
+    label: 'National ID  -  Date of Expiry',
     field_type: 'date',
     is_required: false,
     show_when: { profile_path: 'passport.national_id_indicator', operator: 'is_truthy' },
@@ -987,7 +987,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page2.USCard.q1.usCardIndicator.No',
     profile_path: 'passport.us_pr_card_indicator',
-    label: 'U.S. Green Card — No',
+    label: 'U.S. Green Card  -  No',
     field_type: 'boolean',
     is_required: false,
     value_format: { boolean_false: 'X', boolean_true: '' },
@@ -1005,7 +1005,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page2.USCard.usCarddocs.DocNum.DocNum',
     profile_path: 'passport.us_pr_card_number',
-    label: 'U.S. Green Card — Document Number',
+    label: 'U.S. Green Card  -  Document Number',
     field_type: 'text',
     is_required: false,
     show_when: { profile_path: 'passport.us_pr_card_indicator', operator: 'is_truthy' },
@@ -1014,7 +1014,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page2.USCard.usCarddocs.ExpiryDate',
     profile_path: 'passport.us_pr_card_expiry_date',
-    label: 'U.S. Green Card — Date of Expiry',
+    label: 'U.S. Green Card  -  Date of Expiry',
     field_type: 'date',
     is_required: false,
     show_when: { profile_path: 'passport.us_pr_card_indicator', operator: 'is_truthy' },
@@ -1026,7 +1026,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page2.ContactInformation.Mailing.AddrLine1.POBox',
     profile_path: 'contact_info.mailing_address.po_box',
-    label: 'Mailing Address — P.O. Box',
+    label: 'Mailing Address  -  P.O. Box',
     field_type: 'text',
     is_required: false,
     is_client_visible: true,
@@ -1034,7 +1034,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page2.ContactInformation.Mailing.AddrLine1.AptUnit',
     profile_path: 'contact_info.mailing_address.apt_unit',
-    label: 'Mailing Address — Apt / Unit',
+    label: 'Mailing Address  -  Apt / Unit',
     field_type: 'text',
     is_required: false,
     is_client_visible: true,
@@ -1042,7 +1042,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page2.ContactInformation.Mailing.AddrLine1.StreetNum',
     profile_path: 'contact_info.mailing_address.street_number',
-    label: 'Mailing Address — Street Number',
+    label: 'Mailing Address  -  Street Number',
     field_type: 'text',
     is_required: true,
     is_client_visible: true,
@@ -1050,7 +1050,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page2.ContactInformation.Mailing.AddrLine1.Streetname',
     profile_path: 'contact_info.mailing_address.street_name',
-    label: 'Mailing Address — Street Name',
+    label: 'Mailing Address  -  Street Name',
     field_type: 'text',
     is_required: true,
     is_client_visible: true,
@@ -1058,7 +1058,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page2.ContactInformation.Mailing.AddrLine2.City',
     profile_path: 'contact_info.mailing_address.city',
-    label: 'Mailing Address — City',
+    label: 'Mailing Address  -  City',
     field_type: 'text',
     is_required: true,
     is_client_visible: true,
@@ -1066,7 +1066,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page2.ContactInformation.Mailing.AddrLine2.Country',
     profile_path: 'contact_info.mailing_address.country',
-    label: 'Mailing Address — Country',
+    label: 'Mailing Address  -  Country',
     field_type: 'country',
     is_required: true,
     is_client_visible: true,
@@ -1074,7 +1074,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page2.ContactInformation.Mailing.AddrLine2.Prov',
     profile_path: 'contact_info.mailing_address.province_state',
-    label: 'Mailing Address — Province / State',
+    label: 'Mailing Address  -  Province / State',
     field_type: 'text',
     is_required: false,
     is_client_visible: true,
@@ -1082,7 +1082,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page2.ContactInformation.Mailing.AddrLine2.PostalCode',
     profile_path: 'contact_info.mailing_address.postal_code',
-    label: 'Mailing Address — Postal Code',
+    label: 'Mailing Address  -  Postal Code',
     field_type: 'text',
     is_required: false,
     is_client_visible: true,
@@ -1090,17 +1090,17 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page2.ContactInformation.Mailing.AddrLine2.District',
     profile_path: 'contact_info.mailing_address.district',
-    label: 'Mailing Address — District',
+    label: 'Mailing Address  -  District',
     field_type: 'text',
     is_required: false,
     is_client_visible: false,
   },
 
-  // Residential — Same as Mailing indicator
+  // Residential  -  Same as Mailing indicator
   {
     xfa_path: 'Page2.ContactInformation.Resi.SameAsAddr.SameAsMailingInd.No',
     profile_path: 'contact_info.same_as_mailing',
-    label: 'Residential same as mailing — No',
+    label: 'Residential same as mailing  -  No',
     field_type: 'boolean',
     is_required: false,
     value_format: { boolean_false: 'X', boolean_true: '' },
@@ -1120,7 +1120,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page2.ContactInformation.Resi.AddrLine1.AptUnit',
     profile_path: 'contact_info.residential_address.apt_unit',
-    label: 'Residential — Apt / Unit',
+    label: 'Residential  -  Apt / Unit',
     field_type: 'text',
     is_required: false,
     show_when: { profile_path: 'contact_info.same_as_mailing', operator: 'is_falsy' },
@@ -1129,7 +1129,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page2.ContactInformation.Resi.AddrLine1.StreetNum',
     profile_path: 'contact_info.residential_address.street_number',
-    label: 'Residential — Street Number',
+    label: 'Residential  -  Street Number',
     field_type: 'text',
     is_required: false,
     show_when: { profile_path: 'contact_info.same_as_mailing', operator: 'is_falsy' },
@@ -1138,7 +1138,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page2.ContactInformation.Resi.AddrLine1.Streetname',
     profile_path: 'contact_info.residential_address.street_name',
-    label: 'Residential — Street Name',
+    label: 'Residential  -  Street Name',
     field_type: 'text',
     is_required: false,
     show_when: { profile_path: 'contact_info.same_as_mailing', operator: 'is_falsy' },
@@ -1147,7 +1147,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page2.ContactInformation.Resi.AddrLine2.City',
     profile_path: 'contact_info.residential_address.city',
-    label: 'Residential — City',
+    label: 'Residential  -  City',
     field_type: 'text',
     is_required: false,
     show_when: { profile_path: 'contact_info.same_as_mailing', operator: 'is_falsy' },
@@ -1156,7 +1156,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page2.ContactInformation.Resi.AddrLine2.Country',
     profile_path: 'contact_info.residential_address.country',
-    label: 'Residential — Country',
+    label: 'Residential  -  Country',
     field_type: 'country',
     is_required: false,
     show_when: { profile_path: 'contact_info.same_as_mailing', operator: 'is_falsy' },
@@ -1165,7 +1165,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page2.ContactInformation.Resi.AddrLine2.Prov',
     profile_path: 'contact_info.residential_address.province_state',
-    label: 'Residential — Province / State',
+    label: 'Residential  -  Province / State',
     field_type: 'text',
     is_required: false,
     show_when: { profile_path: 'contact_info.same_as_mailing', operator: 'is_falsy' },
@@ -1174,7 +1174,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page2.ContactInformation.Resi.AddrLine2.PostalCode',
     profile_path: 'contact_info.residential_address.postal_code',
-    label: 'Residential — Postal Code',
+    label: 'Residential  -  Postal Code',
     field_type: 'text',
     is_required: false,
     show_when: { profile_path: 'contact_info.same_as_mailing', operator: 'is_falsy' },
@@ -1183,17 +1183,17 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page2.ContactInformation.Resi.AddrLine2.District',
     profile_path: 'contact_info.residential_address.district',
-    label: 'Residential — District',
+    label: 'Residential  -  District',
     field_type: 'text',
     is_required: false,
     is_client_visible: false,
   },
 
-  // Phone — Primary
+  // Phone  -  Primary
   {
     xfa_path: 'Page2.ContactInformation.q3-4.Phone.CanOtherInd.CanadaUS',
     profile_path: 'contact_info.phone_type_indicator',
-    label: 'Phone — Canada/US Number',
+    label: 'Phone  -  Canada/US Number',
     field_type: 'text',
     is_required: false,
     is_client_visible: false,
@@ -1201,7 +1201,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page2.ContactInformation.q3-4.Phone.CanOtherInd.Other',
     profile_path: 'contact_info.phone_type_indicator_other',
-    label: 'Phone — International Number',
+    label: 'Phone  -  International Number',
     field_type: 'text',
     is_required: false,
     is_client_visible: false,
@@ -1222,7 +1222,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   { xfa_path: 'Page2.ContactInformation.q3-4.Phone.NANumber.LastFive', profile_path: null, label: null, field_type: null, is_required: false, is_meta_field: true, is_client_visible: false },
   { xfa_path: 'Page2.ContactInformation.q3-4.Phone.IntlNumber.IntlNumber', profile_path: null, label: null, field_type: null, is_required: false, is_meta_field: true, is_client_visible: false },
 
-  // Phone — Alternate
+  // Phone  -  Alternate
   { xfa_path: 'Page2.ContactInformation.q3-4.AltPhone.CanOtherInd.CanadaUS', profile_path: null, label: null, field_type: null, is_required: false, is_meta_field: true, is_client_visible: false },
   { xfa_path: 'Page2.ContactInformation.q3-4.AltPhone.CanOtherInd.Other', profile_path: null, label: null, field_type: null, is_required: false, is_meta_field: true, is_client_visible: false },
   {
@@ -1295,7 +1295,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page3.ComingIntoCda.PurposeOfVisit.Other',
     profile_path: 'work.purpose_of_visit_other',
-    label: 'Purpose of Visit — Other (specify)',
+    label: 'Purpose of Visit  -  Other (specify)',
     field_type: 'text',
     is_required: false,
     is_client_visible: true,
@@ -1337,7 +1337,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page3.DetailsOfWork.Purpose.Other',
     profile_path: 'work.work_permit_type_other',
-    label: 'Work Permit Type — Other (specify)',
+    label: 'Work Permit Type  -  Other (specify)',
     field_type: 'text',
     is_required: false,
     is_client_visible: true,
@@ -1361,7 +1361,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page3.DetailsOfWork.Location.Prov',
     profile_path: 'work.work_location_province',
-    label: 'Work Location — Province',
+    label: 'Work Location  -  Province',
     field_type: 'text',
     is_required: false,
     is_client_visible: true,
@@ -1369,7 +1369,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page3.DetailsOfWork.Location.City',
     profile_path: 'work.work_location_city',
-    label: 'Work Location — City',
+    label: 'Work Location  -  City',
     field_type: 'text',
     is_required: false,
     is_client_visible: true,
@@ -1377,7 +1377,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page3.DetailsOfWork.Location.Addr',
     profile_path: 'work.work_location_address',
-    label: 'Work Location — Address',
+    label: 'Work Location  -  Address',
     field_type: 'text',
     is_required: false,
     is_client_visible: true,
@@ -1401,7 +1401,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page3.DetailsOfWork.Duration.FromDate',
     profile_path: 'work.work_from_date',
-    label: 'Work Period — From Date',
+    label: 'Work Period  -  From Date',
     field_type: 'text',
     is_required: false,
     is_client_visible: true,
@@ -1409,7 +1409,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page3.DetailsOfWork.Duration.ToDate',
     profile_path: 'work.work_to_date',
-    label: 'Work Period — To Date',
+    label: 'Work Period  -  To Date',
     field_type: 'text',
     is_required: false,
     is_client_visible: true,
@@ -1441,7 +1441,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page3.DetailsOfWork.ProvNominee.ProvNominee.No',
     profile_path: 'work.provincial_nominee',
-    label: 'Provincial Nominee — No',
+    label: 'Provincial Nominee  -  No',
     field_type: 'boolean',
     is_required: false,
     value_format: { boolean_false: 'X', boolean_true: '' },
@@ -1461,7 +1461,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page3.Education.EducationIndicator.No',
     profile_path: 'education.has_post_secondary',
-    label: 'Post-Secondary Education — No',
+    label: 'Post-Secondary Education  -  No',
     field_type: 'boolean',
     is_required: false,
     value_format: { boolean_false: 'X', boolean_true: '' },
@@ -1479,7 +1479,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page3.Education.EduLine1.From.YYYY',
     profile_path: 'education.edu1_from_year',
-    label: 'Education 1 — From Year',
+    label: 'Education 1  -  From Year',
     field_type: 'text',
     is_required: false,
     is_client_visible: true,
@@ -1487,7 +1487,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page3.Education.EduLine1.From.MM',
     profile_path: 'education.edu1_from_month',
-    label: 'Education 1 — From Month',
+    label: 'Education 1  -  From Month',
     field_type: 'text',
     is_required: false,
     is_client_visible: false,
@@ -1495,7 +1495,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page3.Education.EduLine1.FieldOfStudy',
     profile_path: 'education.edu1_field_of_study',
-    label: 'Education 1 — Field of Study',
+    label: 'Education 1  -  Field of Study',
     field_type: 'text',
     is_required: false,
     is_client_visible: true,
@@ -1503,7 +1503,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page3.Education.EduLine1.School',
     profile_path: 'education.edu1_school_name',
-    label: 'Education 1 — School / Institution Name',
+    label: 'Education 1  -  School / Institution Name',
     field_type: 'text',
     is_required: false,
     is_client_visible: true,
@@ -1511,7 +1511,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page3.Education.EduLine2.To.YYYY',
     profile_path: 'education.edu1_to_year',
-    label: 'Education 1 — To Year',
+    label: 'Education 1  -  To Year',
     field_type: 'text',
     is_required: false,
     is_client_visible: true,
@@ -1519,7 +1519,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page3.Education.EduLine2.To.MM',
     profile_path: 'education.edu1_to_month',
-    label: 'Education 1 — To Month',
+    label: 'Education 1  -  To Month',
     field_type: 'text',
     is_required: false,
     is_client_visible: false,
@@ -1527,7 +1527,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page3.Education.EduLine2.City',
     profile_path: 'education.edu1_city',
-    label: 'Education 1 — City',
+    label: 'Education 1  -  City',
     field_type: 'text',
     is_required: false,
     is_client_visible: true,
@@ -1535,7 +1535,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page3.Education.EduLine2.Country',
     profile_path: 'education.edu1_country',
-    label: 'Education 1 — Country',
+    label: 'Education 1  -  Country',
     field_type: 'country',
     is_required: false,
     is_client_visible: true,
@@ -1543,17 +1543,17 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page3.Education.EduLine2.Prov',
     profile_path: 'education.edu1_province_state',
-    label: 'Education 1 — Province / State',
+    label: 'Education 1  -  Province / State',
     field_type: 'text',
     is_required: false,
     is_client_visible: true,
   },
 
-  // ── Section: Employment History — Record 1 ────────────────────────────────
+  // ── Section: Employment History  -  Record 1 ────────────────────────────────
   {
     xfa_path: 'Page3.Employment.EmpRec1.Line1.From.YYYY',
     profile_path: 'employment.emp1_from_year',
-    label: 'Employment 1 — From Year',
+    label: 'Employment 1  -  From Year',
     field_type: 'text',
     is_required: false,
     is_client_visible: true,
@@ -1561,7 +1561,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page3.Employment.EmpRec1.Line1.From.MM',
     profile_path: 'employment.emp1_from_month',
-    label: 'Employment 1 — From Month',
+    label: 'Employment 1  -  From Month',
     field_type: 'text',
     is_required: false,
     is_client_visible: false,
@@ -1569,7 +1569,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page3.Employment.EmpRec1.Line1.Occupation',
     profile_path: 'employment.emp1_occupation',
-    label: 'Employment 1 — Occupation',
+    label: 'Employment 1  -  Occupation',
     field_type: 'text',
     is_required: false,
     is_client_visible: true,
@@ -1577,7 +1577,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page3.Employment.EmpRec1.Line1.Employer',
     profile_path: 'employment.emp1_employer',
-    label: 'Employment 1 — Employer Name',
+    label: 'Employment 1  -  Employer Name',
     field_type: 'text',
     is_required: false,
     is_client_visible: true,
@@ -1585,7 +1585,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page3.Employment.EmpRec1.Line2.To.YYYY',
     profile_path: 'employment.emp1_to_year',
-    label: 'Employment 1 — To Year',
+    label: 'Employment 1  -  To Year',
     field_type: 'text',
     is_required: false,
     is_client_visible: true,
@@ -1593,7 +1593,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page3.Employment.EmpRec1.Line2.To.MM',
     profile_path: 'employment.emp1_to_month',
-    label: 'Employment 1 — To Month',
+    label: 'Employment 1  -  To Month',
     field_type: 'text',
     is_required: false,
     is_client_visible: false,
@@ -1601,7 +1601,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page3.Employment.EmpRec1.Line2.City',
     profile_path: 'employment.emp1_city',
-    label: 'Employment 1 — City',
+    label: 'Employment 1  -  City',
     field_type: 'text',
     is_required: false,
     is_client_visible: true,
@@ -1609,7 +1609,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page3.Employment.EmpRec1.Line2.Country',
     profile_path: 'employment.emp1_country',
-    label: 'Employment 1 — Country',
+    label: 'Employment 1  -  Country',
     field_type: 'country',
     is_required: false,
     is_client_visible: true,
@@ -1617,17 +1617,17 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page3.Employment.EmpRec1.Line2.ProvState',
     profile_path: 'employment.emp1_province_state',
-    label: 'Employment 1 — Province / State',
+    label: 'Employment 1  -  Province / State',
     field_type: 'text',
     is_required: false,
     is_client_visible: true,
   },
 
-  // ── Section: Employment History — Record 2 ────────────────────────────────
+  // ── Section: Employment History  -  Record 2 ────────────────────────────────
   {
     xfa_path: 'Page4.EmpRec2.Line1.From.YYYY',
     profile_path: 'employment.emp2_from_year',
-    label: 'Employment 2 — From Year',
+    label: 'Employment 2  -  From Year',
     field_type: 'text',
     is_required: false,
     is_client_visible: true,
@@ -1635,7 +1635,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page4.EmpRec2.Line1.From.MM',
     profile_path: 'employment.emp2_from_month',
-    label: 'Employment 2 — From Month',
+    label: 'Employment 2  -  From Month',
     field_type: 'text',
     is_required: false,
     is_client_visible: false,
@@ -1643,7 +1643,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page4.EmpRec2.Line1.Occupation',
     profile_path: 'employment.emp2_occupation',
-    label: 'Employment 2 — Occupation',
+    label: 'Employment 2  -  Occupation',
     field_type: 'text',
     is_required: false,
     is_client_visible: true,
@@ -1651,7 +1651,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page4.EmpRec2.Line1.Employer',
     profile_path: 'employment.emp2_employer',
-    label: 'Employment 2 — Employer Name',
+    label: 'Employment 2  -  Employer Name',
     field_type: 'text',
     is_required: false,
     is_client_visible: true,
@@ -1659,7 +1659,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page4.EmpRec2.Line2.To.YYYY',
     profile_path: 'employment.emp2_to_year',
-    label: 'Employment 2 — To Year',
+    label: 'Employment 2  -  To Year',
     field_type: 'text',
     is_required: false,
     is_client_visible: true,
@@ -1667,7 +1667,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page4.EmpRec2.Line2.To.MM',
     profile_path: 'employment.emp2_to_month',
-    label: 'Employment 2 — To Month',
+    label: 'Employment 2  -  To Month',
     field_type: 'text',
     is_required: false,
     is_client_visible: false,
@@ -1675,7 +1675,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page4.EmpRec2.Line2.City',
     profile_path: 'employment.emp2_city',
-    label: 'Employment 2 — City',
+    label: 'Employment 2  -  City',
     field_type: 'text',
     is_required: false,
     is_client_visible: true,
@@ -1683,7 +1683,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page4.EmpRec2.Line2.Country',
     profile_path: 'employment.emp2_country',
-    label: 'Employment 2 — Country',
+    label: 'Employment 2  -  Country',
     field_type: 'country',
     is_required: false,
     is_client_visible: true,
@@ -1691,17 +1691,17 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page4.EmpRec2.Line2.ProvState',
     profile_path: 'employment.emp2_province_state',
-    label: 'Employment 2 — Province / State',
+    label: 'Employment 2  -  Province / State',
     field_type: 'text',
     is_required: false,
     is_client_visible: true,
   },
 
-  // ── Section: Employment History — Record 3 ────────────────────────────────
+  // ── Section: Employment History  -  Record 3 ────────────────────────────────
   {
     xfa_path: 'Page4.EmpRec3.Line1.From.YYYY',
     profile_path: 'employment.emp3_from_year',
-    label: 'Employment 3 — From Year',
+    label: 'Employment 3  -  From Year',
     field_type: 'text',
     is_required: false,
     is_client_visible: true,
@@ -1709,7 +1709,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page4.EmpRec3.Line1.From.MM',
     profile_path: 'employment.emp3_from_month',
-    label: 'Employment 3 — From Month',
+    label: 'Employment 3  -  From Month',
     field_type: 'text',
     is_required: false,
     is_client_visible: false,
@@ -1717,7 +1717,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page4.EmpRec3.Line1.Occupation',
     profile_path: 'employment.emp3_occupation',
-    label: 'Employment 3 — Occupation',
+    label: 'Employment 3  -  Occupation',
     field_type: 'text',
     is_required: false,
     is_client_visible: true,
@@ -1725,7 +1725,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page4.EmpRec3.Line1.Employer',
     profile_path: 'employment.emp3_employer',
-    label: 'Employment 3 — Employer Name',
+    label: 'Employment 3  -  Employer Name',
     field_type: 'text',
     is_required: false,
     is_client_visible: true,
@@ -1733,7 +1733,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page4.EmpRec3.Line2.To.YYYY',
     profile_path: 'employment.emp3_to_year',
-    label: 'Employment 3 — To Year',
+    label: 'Employment 3  -  To Year',
     field_type: 'text',
     is_required: false,
     is_client_visible: true,
@@ -1741,7 +1741,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page4.EmpRec3.Line2.To.MM',
     profile_path: 'employment.emp3_to_month',
-    label: 'Employment 3 — To Month',
+    label: 'Employment 3  -  To Month',
     field_type: 'text',
     is_required: false,
     is_client_visible: false,
@@ -1749,7 +1749,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page4.EmpRec3.Line2.City',
     profile_path: 'employment.emp3_city',
-    label: 'Employment 3 — City',
+    label: 'Employment 3  -  City',
     field_type: 'text',
     is_required: false,
     is_client_visible: true,
@@ -1757,7 +1757,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page4.EmpRec3.Line2.Country',
     profile_path: 'employment.emp3_country',
-    label: 'Employment 3 — Country',
+    label: 'Employment 3  -  Country',
     field_type: 'country',
     is_required: false,
     is_client_visible: true,
@@ -1765,7 +1765,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page4.EmpRec3.Line2.ProvState',
     profile_path: 'employment.emp3_province_state',
-    label: 'Employment 3 — Province / State',
+    label: 'Employment 3  -  Province / State',
     field_type: 'text',
     is_required: false,
     is_client_visible: true,
@@ -1778,7 +1778,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page4.BackgroundInfo.HealthQ.qANY.No',
     profile_path: 'background.physical_mental_disorder',
-    label: 'Physical/mental disorder requiring health care — No',
+    label: 'Physical/mental disorder requiring health care  -  No',
     field_type: 'boolean',
     is_required: false,
     value_format: { boolean_false: 'X', boolean_true: '' },
@@ -1796,7 +1796,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page4.BackgroundInfo.HealthQ.qBNY.No',
     profile_path: 'background.tuberculosis_contact',
-    label: 'Tuberculosis contact — No',
+    label: 'Tuberculosis contact  -  No',
     field_type: 'boolean',
     is_required: false,
     value_format: { boolean_false: 'X', boolean_true: '' },
@@ -1814,7 +1814,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page4.BackgroundInfo.HealthQ.MedicalDetails',
     profile_path: 'background.physical_mental_disorder_details',
-    label: 'Medical Condition — Details',
+    label: 'Medical Condition  -  Details',
     field_type: 'textarea',
     is_required: false,
     is_client_visible: true,
@@ -1834,7 +1834,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page4.BackgroundInfo.PrevApplied.qANY.No',
     profile_path: 'background.previously_applied',
-    label: 'Previously applied — No',
+    label: 'Previously applied  -  No',
     field_type: 'boolean',
     is_required: false,
     value_format: { boolean_false: 'X', boolean_true: '' },
@@ -1852,7 +1852,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page4.BackgroundInfo.PrevApplied.qBNY.No',
     profile_path: 'background.refused_visa',
-    label: 'Refused visa — No',
+    label: 'Refused visa  -  No',
     field_type: 'boolean',
     is_required: false,
     value_format: { boolean_false: 'X', boolean_true: '' },
@@ -1861,7 +1861,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page4.BackgroundInfo.PrevApplied.refusedDetails',
     profile_path: 'background.refused_visa_details',
-    label: 'Refused Visa / Application — Details',
+    label: 'Refused Visa / Application  -  Details',
     field_type: 'textarea',
     is_required: false,
     is_client_visible: true,
@@ -1869,7 +1869,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page4.BackgroundInfo.PrevApplied.qCNY.No',
     profile_path: 'background.overstayed_visa',
-    label: 'Overstayed visa — No',
+    label: 'Overstayed visa  -  No',
     field_type: 'boolean',
     is_required: false,
     value_format: { boolean_false: 'X', boolean_true: '' },
@@ -1889,7 +1889,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page4.BackgroundInfo.Criminal.qANY.No',
     profile_path: 'background.criminal_record',
-    label: 'Criminal record — No',
+    label: 'Criminal record  -  No',
     field_type: 'boolean',
     is_required: false,
     value_format: { boolean_false: 'X', boolean_true: '' },
@@ -1907,7 +1907,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page4.BackgroundInfo.Criminal.refusedDetails',
     profile_path: 'background.criminal_record_details',
-    label: 'Criminal Record — Details',
+    label: 'Criminal Record  -  Details',
     field_type: 'textarea',
     is_required: false,
     is_client_visible: true,
@@ -1917,7 +1917,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page4.BackgroundInfo.Military.qANY.No',
     profile_path: 'background.military_service',
-    label: 'Military service — No',
+    label: 'Military service  -  No',
     field_type: 'boolean',
     is_required: false,
     value_format: { boolean_false: 'X', boolean_true: '' },
@@ -1935,7 +1935,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page4.BackgroundInfo.Military.militaryServiceDetails',
     profile_path: 'background.military_service_details',
-    label: 'Military Service — Details',
+    label: 'Military Service  -  Details',
     field_type: 'textarea',
     is_required: false,
     is_client_visible: true,
@@ -1945,7 +1945,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page4.BackgroundInfo.Occupation.Choice.No',
     profile_path: 'background.occupation_health_required',
-    label: 'Occupation requiring health exam — No',
+    label: 'Occupation requiring health exam  -  No',
     field_type: 'boolean',
     is_required: false,
     value_format: { boolean_false: 'X', boolean_true: '' },
@@ -1965,7 +1965,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page4.BackgroundInfo.GovPosition.qGovtNY.No',
     profile_path: 'background.government_position',
-    label: 'Government position — No',
+    label: 'Government position  -  No',
     field_type: 'boolean',
     is_required: false,
     value_format: { boolean_false: 'X', boolean_true: '' },
@@ -1985,7 +1985,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page4.BackgroundInfo.Illtreatment.qWitnessNY.No',
     profile_path: 'background.witnessed_ill_treatment',
-    label: 'Witness to ill treatment — No',
+    label: 'Witness to ill treatment  -  No',
     field_type: 'boolean',
     is_required: false,
     value_format: { boolean_false: 'X', boolean_true: '' },
@@ -2007,7 +2007,7 @@ const FIELD_MAPPINGS: FieldMapping[] = [
   {
     xfa_path: 'Page4.Consent1.Signature.FutureComm.No',
     profile_path: 'consent.future_communications',
-    label: 'Future communications consent — No',
+    label: 'Future communications consent  -  No',
     field_type: 'boolean',
     is_required: false,
     value_format: { boolean_false: 'X', boolean_true: '' },
@@ -2056,7 +2056,7 @@ async function main() {
     process.exit(1)
   }
 
-  console.log(`\nForm: ${form.form_code} — ${form.form_name}`)
+  console.log(`\nForm: ${form.form_code}  -  ${form.form_name}`)
   console.log(`Form ID: ${form.id}`)
 
   // Fetch all scanned fields for this form

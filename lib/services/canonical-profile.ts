@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Canonical Profile Service — Three-Layer IRCC Data Model
+ * Canonical Profile Service  -  Three-Layer IRCC Data Model
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Implements the three-layer canonical profile system:
@@ -62,7 +62,7 @@ export interface FieldLookupResult {
 
 /**
  * Create a canonical profile for a contact. Returns the profile ID.
- * Idempotent — returns existing profile if one already exists.
+ * Idempotent  -  returns existing profile if one already exists.
  */
 export async function createCanonicalProfile(
   supabase: SupabaseClient<Database>,
@@ -244,7 +244,7 @@ export async function createSnapshot(
     }
   }
 
-  // Upsert — allows re-snapshotting the same matter
+  // Upsert  -  allows re-snapshotting the same matter
   const { data, error } = await supabase
     .from('canonical_profile_snapshots')
     .upsert(
@@ -415,7 +415,7 @@ export async function resolveConflict(
       .eq('field_key', conflict.field_key)
       .is('effective_to', null)
   }
-  // 'manual' resolution — conflict is marked resolved but no field changes
+  // 'manual' resolution  -  conflict is marked resolved but no field changes
 }
 
 // ─── Three-Layer Field Lookup ────────────────────────────────────────────────
@@ -473,7 +473,7 @@ export async function getFormFieldOverrides(
     }
   }
 
-  // Layer 3: Empty — no value found
+  // Layer 3: Empty  -  no value found
   return {
     value: null,
     source: null,

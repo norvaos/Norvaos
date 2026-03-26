@@ -17,7 +17,7 @@ export interface BillingDeniedLog {
 /**
  * Emit a structured JSON log when billing access is denied.
  *
- * This is a pure logging side-effect — it never throws and never
+ * This is a pure logging side-effect  -  it never throws and never
  * alters the return value of checkBillingPermission.
  */
 function logBillingDenied(entry: BillingDeniedLog): void {
@@ -42,7 +42,7 @@ function logBillingDenied(entry: BillingDeniedLog): void {
  * This supports observability dashboards and 403 alerting without
  * altering control flow.
  *
- * @param route — optional route identifier for structured logging (e.g. "/api/invoices/[id]/pdf")
+ * @param route  -  optional route identifier for structured logging (e.g. "/api/invoices/[id]/pdf")
  */
 export async function checkBillingPermission(
   supabase: SupabaseClient,

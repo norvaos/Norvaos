@@ -1,5 +1,5 @@
 /**
- * GET /api/portal/[token]/trust — Client portal trust account view
+ * GET /api/portal/[token]/trust  -  Client portal trust account view
  *
  * Returns client-visible trust information per the portal visibility policy:
  * - Current trust balance for the matter

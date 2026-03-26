@@ -17,7 +17,7 @@ import { generateRetainerPdf } from '@/lib/utils/retainer-pdf'
  *
  * Dynamic clauses:
  *   - High/Critical risk_level → injects Risk Disclosure clause
- *   - fee_snapshot is immutable — template changes don't affect generated PDFs
+ *   - fee_snapshot is immutable  -  template changes don't affect generated PDFs
  *
  * Returns: { success, documentId, storagePath, slotId?, signingDocumentId? }
  */
@@ -34,7 +34,7 @@ async function handlePost(
 
     const admin = createAdminClient()
 
-    // 1. Fetch matter with fee_snapshot (lean query — 20 col budget)
+    // 1. Fetch matter with fee_snapshot (lean query  -  20 col budget)
     const { data: matter, error: matterErr } = await admin
       .from('matters')
       .select('id, tenant_id, title, matter_number, matter_type_id, practice_area_id, responsible_lawyer_id, billing_type, risk_level, readiness_score, fee_snapshot, subtotal_cents, tax_amount_cents, total_amount_cents, tax_rate, tax_label, status, applicant_location, client_province, date_opened')
@@ -170,7 +170,7 @@ async function handlePost(
       practiceArea,
     }
 
-    // 8. Generate PDF (performance-critical — target < 500ms)
+    // 8. Generate PDF (performance-critical  -  target < 500ms)
     const pdfBuffer = await generateRetainerPdf(pdfData)
     const pdfGenTime = Date.now() - startTime
 
@@ -199,7 +199,7 @@ async function handlePost(
       .insert({
         tenant_id: auth.tenantId,
         matter_id: matterId,
-        file_name: `Retainer Agreement — ${clientName}.pdf`,
+        file_name: `Retainer Agreement  -  ${clientName}.pdf`,
         file_type: 'application/pdf',
         file_size: pdfBuffer.length,
         category: 'retainer',
@@ -256,7 +256,7 @@ async function handlePost(
         document_type: 'retainer_agreement',
         source_entity_type: 'matter',
         source_entity_id: matterId,
-        title: `Retainer Agreement — ${clientName}`,
+        title: `Retainer Agreement  -  ${clientName}`,
         storage_path: storagePath,
         checksum_sha256: checksum,
         file_size_bytes: pdfBuffer.length,

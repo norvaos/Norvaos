@@ -336,7 +336,7 @@ export function PortalBooking({ token, primaryColor, language = 'en' }: PortalBo
           setGuestInfo(data.guestInfo ?? { name: '', email: '', phone: '' })
         }
       } catch {
-        // Silently fail — booking just won't show
+        // Silently fail  -  booking just won't show
       } finally {
         setLoading(false)
       }

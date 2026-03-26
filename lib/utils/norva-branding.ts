@@ -1,5 +1,5 @@
 /**
- * Norva Signature Branding — centralised brand vocabulary.
+ * Norva Signature Branding  -  centralised brand vocabulary.
  *
  * All UI labels, toast messages, and feature names use these constants
  * to maintain brand consistency across the entire platform.
@@ -30,19 +30,19 @@ export const NORVA = {
     documentBridge:
       'The Norva Document Bridge securely transfers client files into your matter workspace. Every upload is versioned and tracked.',
     intelligence:
-      'Norva Intelligence uses your Wiki Playbooks and matter data to draft professional letters. Every data point is source-attributed — no hallucinations.',
+      'Norva Intelligence uses your Wiki Playbooks and matter data to draft professional letters. Every data point is source-attributed  -  no hallucinations.',
     vault:
       'The Norva Vault tracks every security event, PII access, and permission change. Full audit trail, always.',
     ledger:
       'The Norva Ledger manages trust accounting with bank-grade precision. C1 invariant: no negative client balances.',
     timeline:
-      'The Norva Timeline shows every activity, event, and change across your matter — a complete operational history.',
+      'The Norva Timeline shows every activity, event, and change across your matter  -  a complete operational history.',
     gatekeeper:
       'The Norva Gatekeeper validates incoming data at every stage. If a submission fails, it tells you exactly what\'s missing and where to fix it.',
     wiki:
-      'The Norva Knowledge Wiki stores your firm\'s playbooks, SOPs, and reusable snippets. Your shared brain — searchable in under 100ms.',
+      'The Norva Knowledge Wiki stores your firm\'s playbooks, SOPs, and reusable snippets. Your shared brain  -  searchable in under 100ms.',
     scheduler:
-      'The Norva Scheduler replaces Calendly with native booking. Availability is dynamic — tasks and events automatically block slots.',
+      'The Norva Scheduler replaces Calendly with native booking. Availability is dynamic  -  tasks and events automatically block slots.',
     sentinel:
       'The Norva Sentinel enforces 4-layer security: authentication, authorisation, tenant isolation, and data integrity.',
   },
@@ -75,7 +75,7 @@ export const NORVA_SOLUTIONS: Record<string, { title: string; action: string }> 
 // ── Actionable Toast Helper ──────────────────────────────────────────────────
 
 /**
- * norvaToast — branded error toast with guided resolution.
+ * norvaToast  -  branded error toast with guided resolution.
  *
  * Usage:
  *   import { norvaToast } from '@/lib/utils/norva-branding'
@@ -88,14 +88,14 @@ export function norvaToast(
   errorDetail?: string,
   inlineAction?: string,
 ) {
-  // Lazy import to avoid circular deps — sonner is always loaded in client
+  // Lazy import to avoid circular deps  -  sonner is always loaded in client
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { toast } = require('sonner') as typeof import('sonner')
 
   if (solutionKey && NORVA_SOLUTIONS[solutionKey]) {
     const sol = NORVA_SOLUTIONS[solutionKey]
     toast.error(sol.title, {
-      description: `${errorDetail ? errorDetail + ' — ' : ''}${sol.action}`,
+      description: `${errorDetail ? errorDetail + '  -  ' : ''}${sol.action}`,
       duration: 8000,
     })
   } else {

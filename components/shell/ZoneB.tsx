@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * ZoneB — Stage Rail
+ * ZoneB  -  Stage Rail
  *
  * Horizontal pill-based stage navigator below Zone A.
  * Current stage highlighted. Completed stages green with checkmark.
@@ -54,7 +54,7 @@ export function ZoneB({ matterId, matter }: ZoneBProps) {
   // Pre-evaluated gating errors for all stages
   const { data: gatingData } = useCheckGating(matterId, !!pipelineId)
 
-  // Immigration readiness blockers — only fetched for immigration matters
+  // Immigration readiness blockers  -  only fetched for immigration matters
   const isImmigrationMatter = !!matter.matter_type_id
   const { data: readinessData } = useImmigrationReadiness(isImmigrationMatter ? matterId : null)
 
@@ -118,7 +118,7 @@ export function ZoneB({ matterId, matter }: ZoneBProps) {
     )
   }
 
-  // No pipeline configured for this matter type — hide rail entirely
+  // No pipeline configured for this matter type  -  hide rail entirely
   if (!stages || stages.length === 0) return null
 
   // Stage history is stored as JSONB on matter_stage_state

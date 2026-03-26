@@ -1,6 +1,6 @@
 /**
- * GET   /api/trust-accounting/reconciliations/[id] — Get reconciliation with items
- * PATCH /api/trust-accounting/reconciliations/[id] — Update reconciliation (steps, complete, review)
+ * GET   /api/trust-accounting/reconciliations/[id]  -  Get reconciliation with items
+ * PATCH /api/trust-accounting/reconciliations/[id]  -  Update reconciliation (steps, complete, review)
  */
 
 import { NextRequest, NextResponse } from 'next/server'
@@ -151,7 +151,7 @@ export async function PATCH(
             tenant_id: auth.tenantId,
             reconciliation_id: id,
             item_type: 'outstanding_cheque' as const,
-            description: `Cheque #${cheque.cheque_number} — ${cheque.payee_name}`,
+            description: `Cheque #${cheque.cheque_number}  -  ${cheque.payee_name}`,
             amount_cents: cheque.amount_cents,
           })
         }

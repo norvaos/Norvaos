@@ -8,21 +8,21 @@
 -- Role names are title-case: 'Lawyer', 'Admin', 'Paralegal', 'Billing', 'Front Desk'
 --
 -- Tables restricted:
---   trust_transactions         — Billing, Admin, Lawyer
---   trust_bank_accounts        — Billing, Admin, Lawyer
---   trust_reconciliations      — Billing, Admin (if table exists)
---   trust_audit_log            — Billing, Admin (if table exists)
---   trust_holds                — Billing, Admin, Lawyer (if table exists)
---   trust_disbursement_requests— Billing, Admin, Lawyer (if table exists)
---   conflict_of_interest       — Lawyer, Admin (if table exists)
---   matter_risk_flags          — Lawyer, Paralegal, Admin
---   activities                 — partial: lawyer_note / internal_escalation /
+--   trust_transactions          -  Billing, Admin, Lawyer
+--   trust_bank_accounts         -  Billing, Admin, Lawyer
+--   trust_reconciliations       -  Billing, Admin (if table exists)
+--   trust_audit_log             -  Billing, Admin (if table exists)
+--   trust_holds                 -  Billing, Admin, Lawyer (if table exists)
+--   trust_disbursement_requests -  Billing, Admin, Lawyer (if table exists)
+--   conflict_of_interest        -  Lawyer, Admin (if table exists)
+--   matter_risk_flags           -  Lawyer, Paralegal, Admin
+--   activities                  -  partial: lawyer_note / internal_escalation /
 --                                auto_rollback_triggered rows → Lawyer, Admin only
 --
--- 2026-03-17 — Sprint 6, Week 2
+-- 2026-03-17  -  Sprint 6, Week 2
 -- ============================================================================
 
--- ─── 1. trust_transactions — SELECT: Billing, Admin, Lawyer ──────────────────
+-- ─── 1. trust_transactions  -  SELECT: Billing, Admin, Lawyer ──────────────────
 -- Migration 126 recreated SELECT as tenant-only. We now tighten it with role.
 
 DROP POLICY IF EXISTS trust_transactions_select ON trust_transactions;
@@ -38,7 +38,7 @@ COMMENT ON TABLE trust_transactions IS
   'RLS role-enforced (migration 128): SELECT requires role IN (Billing, Admin, Lawyer); '
   'INSERT requires role IN (Billing, Admin) per migration 126.';
 
--- ─── 2. trust_bank_accounts — SELECT: Billing, Admin, Lawyer ─────────────────
+-- ─── 2. trust_bank_accounts  -  SELECT: Billing, Admin, Lawyer ─────────────────
 
 DROP POLICY IF EXISTS trust_bank_accounts_select ON trust_bank_accounts;
 DROP POLICY IF EXISTS trust_bank_accounts_tenant_isolation ON trust_bank_accounts;
@@ -54,7 +54,7 @@ CREATE POLICY "trust_bank_accounts_select" ON trust_bank_accounts
 COMMENT ON TABLE trust_bank_accounts IS
   'RLS role-enforced (migration 128): SELECT requires role IN (Billing, Admin, Lawyer).';
 
--- ─── 3. trust_reconciliations — SELECT: Billing, Admin ────────────────────────
+-- ─── 3. trust_reconciliations  -  SELECT: Billing, Admin ────────────────────────
 
 DO $$
 BEGIN
@@ -77,7 +77,7 @@ BEGIN
 END
 $$;
 
--- ─── 4. trust_audit_log — SELECT: Billing, Admin ──────────────────────────────
+-- ─── 4. trust_audit_log  -  SELECT: Billing, Admin ──────────────────────────────
 
 DO $$
 BEGIN
@@ -100,7 +100,7 @@ BEGIN
 END
 $$;
 
--- ─── 5. trust_holds — SELECT: Billing, Admin, Lawyer ─────────────────────────
+-- ─── 5. trust_holds  -  SELECT: Billing, Admin, Lawyer ─────────────────────────
 
 DO $$
 BEGIN
@@ -123,7 +123,7 @@ BEGIN
 END
 $$;
 
--- ─── 6. trust_disbursement_requests — SELECT: Billing, Admin, Lawyer ─────────
+-- ─── 6. trust_disbursement_requests  -  SELECT: Billing, Admin, Lawyer ─────────
 
 DO $$
 BEGIN
@@ -146,7 +146,7 @@ BEGIN
 END
 $$;
 
--- ─── 7. conflict_of_interest — SELECT: Lawyer, Admin ─────────────────────────
+-- ─── 7. conflict_of_interest  -  SELECT: Lawyer, Admin ─────────────────────────
 
 DO $$
 BEGIN
@@ -169,7 +169,7 @@ BEGIN
 END
 $$;
 
--- ─── 8. matter_risk_flags — SELECT: Lawyer, Paralegal, Admin ─────────────────
+-- ─── 8. matter_risk_flags  -  SELECT: Lawyer, Paralegal, Admin ─────────────────
 
 DROP POLICY IF EXISTS matter_risk_flags_select ON matter_risk_flags;
 DROP POLICY IF EXISTS mrf_tenant_select ON matter_risk_flags;
@@ -184,7 +184,7 @@ CREATE POLICY "matter_risk_flags_select" ON matter_risk_flags
 COMMENT ON TABLE matter_risk_flags IS
   'RLS role-enforced (migration 128): SELECT requires role IN (Lawyer, Paralegal, Admin).';
 
--- ─── 9. activities — partial SELECT restriction ────────────────────────────────
+-- ─── 9. activities  -  partial SELECT restriction ────────────────────────────────
 -- Sensitive activity types (lawyer_note, internal_escalation,
 -- auto_rollback_triggered) are restricted to Lawyer and Admin.
 -- All other rows remain readable by any tenant member.
@@ -201,7 +201,7 @@ DROP POLICY IF EXISTS activities_tenant_select ON activities;
 DROP POLICY IF EXISTS activities_select_non_sensitive ON activities;
 DROP POLICY IF EXISTS activities_select_sensitive ON activities;
 
--- All non-sensitive activity rows — any tenant member can read
+-- All non-sensitive activity rows  -  any tenant member can read
 CREATE POLICY "activities_select_non_sensitive" ON activities
   FOR SELECT
   USING (
@@ -209,7 +209,7 @@ CREATE POLICY "activities_select_non_sensitive" ON activities
     AND activity_type NOT IN ('lawyer_note', 'internal_escalation', 'auto_rollback_triggered')
   );
 
--- Sensitive activity rows — Lawyer and Admin only
+-- Sensitive activity rows  -  Lawyer and Admin only
 CREATE POLICY "activities_select_sensitive" ON activities
   FOR SELECT
   USING (

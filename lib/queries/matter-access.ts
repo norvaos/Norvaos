@@ -228,6 +228,6 @@ export function useMatterAccessInfo(matterId: string) {
       return json.access as MatterAccessInfoResponse
     },
     enabled: !!matterId,
-    staleTime: 1000 * 60 * 2, // 2 min — access doesn't change frequently
+    staleTime: 1000 * 60 * 2, // 2 min  -  access doesn't change frequently
   })
 }

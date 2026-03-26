@@ -76,7 +76,7 @@ export async function GET(request: Request) {
             }
           }
         } catch (e) {
-          // Non-blocking — don't prevent login if welcome email fails
+          // Non-blocking  -  don't prevent login if welcome email fails
           console.error('[auth/callback] Failed to send welcome email:', e)
         }
 

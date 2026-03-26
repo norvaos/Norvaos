@@ -11,7 +11,7 @@ type TenantStatus = (typeof VALID_STATUSES)[number]
 /**
  * PATCH /api/admin/tenants/[id]/status
  *
- * Platform-admin ONLY — change a tenant's lifecycle status.
+ * Platform-admin ONLY  -  change a tenant's lifecycle status.
  * Rate-limited: 30 req/min per IP.
  *
  * Body: { status: 'active' | 'suspended' | 'closed', reason: string }

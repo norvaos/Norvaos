@@ -3,7 +3,7 @@
 -- ============================================================================
 -- Adds a junction table to assign multiple team members to a contact with roles.
 -- Replaces the single responsible_lawyer_id pattern with a flexible team model:
---   - One "primary" person (is_primary = true) — the main handler
+--   - One "primary" person (is_primary = true)  -  the main handler
 --   - Additional team members (lawyer, paralegal, clerk, support, etc.)
 -- ============================================================================
 

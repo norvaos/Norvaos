@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * IronCanvasGuard — Directive 25.0: Long-String Overflow Prevention
+ * IronCanvasGuard  -  Directive 25.0: Long-String Overflow Prevention
  *
  * Wraps any text element with truncation + hover tooltip.
  * Prevents layout drift from long legal terms in translated UI.
@@ -17,7 +17,7 @@ import type { ReactNode } from 'react'
 
 interface IronCanvasGuardProps {
   children: ReactNode
-  /** Max width in px (default: none — uses parent constraint) */
+  /** Max width in px (default: none  -  uses parent constraint) */
   maxWidth?: number
   /** Override the tooltip text (defaults to children if string) */
   title?: string

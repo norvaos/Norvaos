@@ -1,14 +1,14 @@
 // ============================================================================
-// Document Slot Engine — Slot Generation, Condition Evaluation, Auto-Rename
+// Document Slot Engine  -  Slot Generation, Condition Evaluation, Auto-Rename
 // ============================================================================
 // Core engine for the Document Engine (Phase B.2). Manages the lifecycle of
 // document slots: generation from templates, deterministic recomputation on
 // Core Data changes, structured condition evaluation, and auto-renaming.
 //
 // Public API:
-//   generateDocumentSlots()     — initial slot creation for a matter
-//   regenerateDocumentSlots()   — deterministic recomputation with change logging
-//   buildAutoRenamedPath()      — naming convention for versioned uploads
+//   generateDocumentSlots()      -  initial slot creation for a matter
+//   regenerateDocumentSlots()    -  deterministic recomputation with change logging
+//   buildAutoRenamedPath()       -  naming convention for versioned uploads
 // ============================================================================
 
 import type { SupabaseClient } from '@supabase/supabase-js'
@@ -37,7 +37,7 @@ export interface RegenerateResult {
   unchanged: number
 }
 
-// Condition operator model — stored as JSONB in document_slot_templates.conditions
+// Condition operator model  -  stored as JSONB in document_slot_templates.conditions
 export type SlotConditionOperator =
   | 'equals'
   | 'not_equals'
@@ -204,7 +204,7 @@ export function evaluateSlotCondition(
     // Guard: entries that lack the minimum shape → fail-closed
     for (const c of conditionList) {
       if (!c || typeof c !== 'object' || !('field' in c) || !('operator' in c)) {
-        const errMsg = `Malformed condition — missing field/operator: ${JSON.stringify(c)}`
+        const errMsg = `Malformed condition  -  missing field/operator: ${JSON.stringify(c)}`
         if (errorContext) {
           errorContext.errors.push({
             templateId: errorContext.templateId,
@@ -243,7 +243,7 @@ export function evaluateSlotCondition(
 
 /**
  * Compute the expected slot set from templates + current people + intake data.
- * This is the core deterministic function — same inputs always produce same outputs.
+ * This is the core deterministic function  -  same inputs always produce same outputs.
  *
  * Condition errors are collected into the `conditionErrors` array for the caller
  * to log as activity entries and notify staff. Invalid conditions → slot NOT generated.
@@ -267,7 +267,7 @@ function computeExpectedSlots(
     }
 
     if (template.person_role_scope === null) {
-      // Matter-level slot — one per matter, no person association
+      // Matter-level slot  -  one per matter, no person association
       if (!evaluateSlotCondition(template.conditions, {}, intakeData, errCtx)) continue
 
       result.push({
@@ -304,7 +304,7 @@ function computeExpectedSlots(
         })
       }
     } else {
-      // Specific role scope — one slot per person with that role
+      // Specific role scope  -  one slot per person with that role
       const matchingPeople = people.filter(
         (p) => p.person_role === template.person_role_scope
       )
@@ -334,7 +334,7 @@ function computeExpectedSlots(
 }
 
 /**
- * Unique key for a slot identity — used for diffing.
+ * Unique key for a slot identity  -  used for diffing.
  */
 function slotKey(templateId: string, personId: string | null): string {
   return `${templateId}::${personId ?? 'NULL'}`
@@ -382,7 +382,7 @@ async function logConditionErrors(
     policy: 'fail_closed_slot_not_generated',
   } as unknown as Json
 
-  // ── 1. Activity log entry — deduplicated within 24-hour window ──
+  // ── 1. Activity log entry  -  deduplicated within 24-hour window ──
   const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
 
   const { data: existingActivity } = await supabase
@@ -396,7 +396,7 @@ async function logConditionErrors(
     .maybeSingle()
 
   if (existingActivity) {
-    // Update existing — refresh description, metadata, and timestamp
+    // Update existing  -  refresh description, metadata, and timestamp
     await supabase
       .from('activities')
       .update({
@@ -406,7 +406,7 @@ async function logConditionErrors(
       })
       .eq('id', existingActivity.id)
   } else {
-    // No recent entry — insert new
+    // No recent entry  -  insert new
     await supabase.from('activities').insert({
       tenant_id: tenantId,
       matter_id: matterId,
@@ -419,7 +419,7 @@ async function logConditionErrors(
     })
   }
 
-  // ── 2. Notify responsible lawyer — deduplicated within 24-hour window ──
+  // ── 2. Notify responsible lawyer  -  deduplicated within 24-hour window ──
   const { data: matter } = await supabase
     .from('matters')
     .select('responsible_lawyer_id, title')
@@ -445,7 +445,7 @@ async function logConditionErrors(
       .maybeSingle()
 
     if (existingNotif) {
-      // Update existing notification — refresh message, mark unread again
+      // Update existing notification  -  refresh message, mark unread again
       await supabase
         .from('notifications')
         .update({
@@ -474,7 +474,7 @@ async function logConditionErrors(
 
 /**
  * Generate document slots for a matter based on templates.
- * Idempotent — uses ON CONFLICT DO NOTHING so safe to call multiple times.
+ * Idempotent  -  uses ON CONFLICT DO NOTHING so safe to call multiple times.
  *
  * Called from kit activation (workflow and immigration kits).
  */
@@ -534,13 +534,13 @@ export async function generateDocumentSlots(params: GenerateSlotsParams): Promis
     try {
       await logConditionErrors(supabase, tenantId, matterId, conditionErrors)
     } catch {
-      // Non-blocking — logging failure should not fail slot generation
+      // Non-blocking  -  logging failure should not fail slot generation
     }
   }
 
   if (expectedSlots.length === 0) return
 
-  // 5. Insert with ON CONFLICT DO NOTHING — idempotent
+  // 5. Insert with ON CONFLICT DO NOTHING  -  idempotent
   const inserts: DocumentSlotInsert[] = expectedSlots.map((slot) => ({
     tenant_id: tenantId,
     matter_id: matterId,
@@ -641,7 +641,7 @@ export async function regenerateDocumentSlots(
     try {
       await logConditionErrors(supabase, tenantId, matterId, conditionErrors)
     } catch {
-      // Non-blocking — logging failure should not fail regeneration
+      // Non-blocking  -  logging failure should not fail regeneration
     }
   }
 
@@ -662,7 +662,7 @@ export async function regenerateDocumentSlots(
   const currentActiveMap = new Map<string, (typeof currentSlotList)[number]>()
   const currentInactiveMap = new Map<string, (typeof currentSlotList)[number]>()
   for (const slot of currentSlotList) {
-    // Custom slots (no template) are not managed by regeneration — skip them
+    // Custom slots (no template) are not managed by regeneration  -  skip them
     if (!slot.slot_template_id) continue
     const key = slotKey(slot.slot_template_id, slot.person_id)
     if (slot.is_active) {
@@ -679,10 +679,10 @@ export async function regenerateDocumentSlots(
   // 7a. Expected slots not in current active set → INSERT or REACTIVATE
   for (const [key, expected] of expectedMap) {
     if (currentActiveMap.has(key)) {
-      // Already active — unchanged
+      // Already active  -  unchanged
       result.unchanged++
     } else if (currentInactiveMap.has(key)) {
-      // Exists but inactive — reactivate
+      // Exists but inactive  -  reactivate
       const existing = currentInactiveMap.get(key)!
       await supabase
         .from('document_slots')
@@ -695,7 +695,7 @@ export async function regenerateDocumentSlots(
       })
       if (expected.isRequired) newRequiredSlotNames.push(expected.slotName)
     } else {
-      // New — insert
+      // New  -  insert
       await supabase.from('document_slots').insert({
         tenant_id: tenantId,
         matter_id: matterId,
@@ -845,7 +845,7 @@ export async function regenerateDocumentSlots(
         }
       }
     } catch (err) {
-      // Non-blocking — notification failure should not fail regeneration
+      // Non-blocking  -  notification failure should not fail regeneration
       console.error('[document-slot-engine] Failed to send notification:', err)
     }
   }
@@ -910,7 +910,7 @@ export async function regenerateDocumentSlots(
           tenant_id: tenantId,
           matter_id: matterId,
           activity_type: 'document_slots_advancement_blocked',
-          title: 'Stage advancement blocked — new documents required',
+          title: 'Stage advancement blocked  -  new documents required',
           description: `${slotNames.length} new required document(s) added while matter is in "${currentStageName}". ` +
             `Forward advancement is blocked until all required documents are accepted. ` +
             `New requirements: ${slotNames.join(', ')}`,
@@ -947,7 +947,7 @@ export async function regenerateDocumentSlots(
         }
       }
     } catch (err) {
-      // Non-blocking — gating impact detection failure should not fail regeneration
+      // Non-blocking  -  gating impact detection failure should not fail regeneration
       console.error('[document-slot-engine] Gating impact detection error:', err)
     }
   }

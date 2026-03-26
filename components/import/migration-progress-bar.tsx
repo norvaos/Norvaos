@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * Migration Progress Bar — Clio-Escape Demo Widget (Directive 7.2)
+ * Migration Progress Bar  -  Clio-Escape Demo Widget (Directive 7.2)
  *
  * Dramatic real-time stats display for the onboarding demo.
  * Simulates a Clio → NorvaOS data migration with animated counters:

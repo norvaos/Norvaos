@@ -1,11 +1,11 @@
 /**
- * IRCC Forms Engine — End-to-End Scenario Tests
+ * IRCC Forms Engine  -  End-to-End Scenario Tests
  *
  * Six mandatory CTO-specified scenarios proving full client flows through
  * the engine pipeline. Uses mock DataAccess (no live database).
  *
  * Scenarios:
- *   1. Fresh Matter — Full Client Flow (partial save, resume, complete)
+ *   1. Fresh Matter  -  Full Client Flow (partial save, resume, complete)
  *   2. Cross-Form Reuse (propagation between sibling instances)
  *   3. Stale Invalidation (dependency change, visibility transitions)
  *   4. Trust Conflict (verified vs unverified overwrite guard)
@@ -266,10 +266,10 @@ function createMockValidationDataAccess(
 }
 
 // ============================================================================
-// Scenario 1: Fresh Matter — Full Client Flow
+// Scenario 1: Fresh Matter  -  Full Client Flow
 // ============================================================================
 
-describe('Scenario 1: Fresh Matter — Full Client Flow', () => {
+describe('Scenario 1: Fresh Matter  -  Full Client Flow', () => {
   let store: MockStore
   let da: AnswerEngineDataAccess
 

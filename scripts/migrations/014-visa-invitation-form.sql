@@ -36,7 +36,7 @@ BEGIN
 
   -- Skip if no tenant or user
   IF v_user_id IS NULL THEN
-    RAISE NOTICE 'No user found for tenant — skipping seed';
+    RAISE NOTICE 'No user found for tenant  -  skipping seed';
     RETURN;
   END IF;
 
@@ -48,7 +48,7 @@ BEGIN
   )
   SELECT
     v_tenant_id,
-    'Canadian Visit Visa — Invitation Letter Request',
+    'Canadian Visit Visa  -  Invitation Letter Request',
     'visa-invitation-letter',
     'Complete this form to request an invitation letter for a Canadian visitor visa. Please provide all required information and upload supporting documents.',
     '[

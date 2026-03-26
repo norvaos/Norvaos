@@ -1,19 +1,19 @@
 // ============================================================================
-// Trust Transaction Log Service — Append-Only Audit Trail
+// Trust Transaction Log Service  -  Append-Only Audit Trail
 // ============================================================================
 // Manages the immutable trust_transaction_log table. Every trust accounting
 // event (deposit, disbursement, transfer, hold change, reconciliation action,
 // etc.) is recorded here as an append-only entry with hash chaining.
 //
 // Write path: Uses admin client (bypasses RLS) so log entries are never
-// blocked by row-level security. Errors are logged but never thrown — the
+// blocked by row-level security. Errors are logged but never thrown  -  the
 // primary trust operation must not fail because of a logging issue.
 //
 // Read path: Uses the caller's RLS-scoped Supabase client so tenants can
 // only see their own log entries.
 //
 // All amounts are BIGINT (cents). Sequence numbers and hashes are set by
-// database triggers — the service does not compute them.
+// database triggers  -  the service does not compute them.
 // ============================================================================
 
 import type { SupabaseClient } from '@supabase/supabase-js'
@@ -135,7 +135,7 @@ function normalizePagination(page?: number, pageSize?: number) {
 /**
  * Append an immutable entry to the trust transaction log.
  *
- * Uses the admin client to bypass RLS — log writes must never be blocked.
+ * Uses the admin client to bypass RLS  -  log writes must never be blocked.
  * Follows fire-and-forget semantics: errors are logged to console but never
  * thrown, so the calling trust operation is never interrupted by a log failure.
  */

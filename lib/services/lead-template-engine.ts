@@ -1,16 +1,16 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Lead Template Engine — Three-Tier Template Resolution + Merge Fields
+ * Lead Template Engine  -  Three-Tier Template Resolution + Merge Fields
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Resolves automation message templates using a three-tier hierarchy:
- *   1. System defaults (from LEAD_AUTOMATION_TRIGGERS registry — always present)
- *   2. Workspace template overrides (from lead_message_templates — optional)
- *   3. Merge field substitution (from TemplateContext — applied to resolved template)
+ *   1. System defaults (from LEAD_AUTOMATION_TRIGGERS registry  -  always present)
+ *   2. Workspace template overrides (from lead_message_templates  -  optional)
+ *   3. Merge field substitution (from TemplateContext  -  applied to resolved template)
  *
  * Also provides automation enable/disable checks with practice-area scoping.
  *
- * Template resolution happens BEFORE calling logCommunicationEvent() —
+ * Template resolution happens BEFORE calling logCommunicationEvent()  - 
  * the communication engine receives already-resolved subject/body strings.
  * This keeps concerns separated: templates here, workflow there.
  */
@@ -142,7 +142,7 @@ const MERGE_FIELD_REGEX = /\{\{([a-zA-Z_][a-zA-Z0-9_.]*)\}\}/g
  * Substitute merge fields in a template string.
  *
  * Uses {{path.field}} syntax (e.g., {{contact.name}}, {{consultation.date}}).
- * Unresolved fields are left as-is (not removed) — visible in logs for debugging.
+ * Unresolved fields are left as-is (not removed)  -  visible in logs for debugging.
  *
  * @param template - Template string with {{merge.field}} placeholders
  * @param context - Data context for field resolution
@@ -223,7 +223,7 @@ export async function isAutomationEnabled(
     .maybeSingle()
 
   if (!setting) {
-    // No workspace override — use registry default
+    // No workspace override  -  use registry default
     const trigger = LEAD_AUTOMATION_TRIGGERS[triggerKey]
     return trigger?.isEnabledByDefault ?? false
   }

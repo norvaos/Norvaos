@@ -146,7 +146,7 @@ export async function syncInboundEmails(
       for (const msMsg of response.value) {
         try {
           if (msMsg['@removed']) {
-            // Message deleted — we don't hard-delete, just skip
+            // Message deleted  -  we don't hard-delete, just skip
             continue
           }
 

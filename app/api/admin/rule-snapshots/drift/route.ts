@@ -65,7 +65,7 @@ async function handleGet(_request: Request) {
       }
     }
 
-    // Fetch all snapshots for the tenant (rule_type = matter_type_config only for now —
+    // Fetch all snapshots for the tenant (rule_type = matter_type_config only for now  - 
     // the config hash is the canonical drift signal for all 6 rule types).
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: snapshots, error: snapshotErr } = await (admin as any)

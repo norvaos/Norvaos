@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * NudgeTemplateModal — template-picker dialog for the PortalStatusCard "Nudge" action.
+ * NudgeTemplateModal  -  template-picker dialog for the PortalStatusCard "Nudge" action.
  *
  * Flow:
  *  1. Lists active communication_templates (category = 'immigration') for the tenant.

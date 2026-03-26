@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * useTranslation — Convenience hook with namespace support & interpolation
+ * useTranslation  -  Convenience hook with namespace support & interpolation
  *
  * Wraps the global useI18n() context and adds:
  *   - Optional namespace prefix: useTranslation('dashboard') → t('welcome') resolves 'dashboard.welcome'
@@ -37,7 +37,7 @@ export function useTranslation(namespace?: string) {
       // Build the full dictionary key, prepending namespace if provided
       const fullKey = namespace ? `${namespace}.${key}` : key
 
-      // Look up the value — dictionary is a flat Record<string, string>
+      // Look up the value  -  dictionary is a flat Record<string, string>
       const raw = (dictionary as Record<string, string>)[fullKey]
 
       // Fall back to the key itself (never undefined)

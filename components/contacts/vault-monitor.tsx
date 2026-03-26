@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * VaultMonitor — Norva Vault integrity dashboard (Directive 41.0)
+ * VaultMonitor  -  Norva Vault integrity dashboard (Directive 41.0)
  *
  * Shows SHA-256 verification status for each document:
  *   - content_hash present + hash_verified_at → Verified (green shield)
@@ -186,7 +186,7 @@ function SentinelEyeViewer({
         'w-full max-w-[95vw] sm:max-w-4xl h-[90vh] sm:h-[85vh] flex flex-col p-0',
         isTampered && 'border-2 border-red-500 ring-4 ring-red-200',
       )}>
-        {/* Header — responsive: stacks on mobile */}
+        {/* Header  -  responsive: stacks on mobile */}
         <DialogHeader className={cn(
           'px-3 sm:px-4 py-2 sm:py-3 border-b flex-shrink-0',
           isTampered && 'bg-red-50 border-red-200',
@@ -200,7 +200,7 @@ function SentinelEyeViewer({
                 'drop-shadow-sm',
               )} />
               <DialogTitle className="text-xs sm:text-sm font-semibold truncate">
-                Sentinel Eye — {doc.file_name ?? 'Document'}
+                Sentinel Eye  -  {doc.file_name ?? 'Document'}
               </DialogTitle>
             </div>
             <div className="flex items-center gap-2 ml-7 sm:ml-0">
@@ -234,17 +234,17 @@ function SentinelEyeViewer({
             <iframe
               src={doc.file_url}
               className="w-full h-full border-0"
-              title={`Sentinel Eye — ${doc.file_name}`}
+              title={`Sentinel Eye  -  ${doc.file_name}`}
             />
           ) : (
             <div className="flex flex-col items-center justify-center h-full text-muted-foreground gap-2 p-4">
               <Eye className="size-10 sm:size-12 opacity-30" />
-              <p className="text-sm text-center">No preview available — file URL missing</p>
+              <p className="text-sm text-center">No preview available  -  file URL missing</p>
             </div>
           )}
         </div>
 
-        {/* SHA-256 Audit Footer — Directive 41.2 (sticky for mobile viewport visibility) */}
+        {/* SHA-256 Audit Footer  -  Directive 41.2 (sticky for mobile viewport visibility) */}
         <div className={cn(
           'px-3 sm:px-4 py-2 border-t flex-shrink-0 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1',
           'sticky bottom-0 z-10',
@@ -391,7 +391,7 @@ export function VaultMonitor({ contactId, tenantId, contactName }: VaultMonitorP
                 )}
               </div>
 
-              {/* Sentinel Eye — PDF Viewer trigger (high-contrast, mobile-friendly) */}
+              {/* Sentinel Eye  -  PDF Viewer trigger (high-contrast, mobile-friendly) */}
               <TooltipProvider delayDuration={100}>
                 <Tooltip>
                   <TooltipTrigger asChild>
@@ -412,7 +412,7 @@ export function VaultMonitor({ contactId, tenantId, contactName }: VaultMonitorP
                     </button>
                   </TooltipTrigger>
                   <TooltipContent side="left" className="text-xs">
-                    Sentinel Eye — View & Verify
+                    Sentinel Eye  -  View & Verify
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>

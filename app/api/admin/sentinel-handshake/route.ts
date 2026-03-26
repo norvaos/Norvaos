@@ -10,7 +10,7 @@ import { z } from 'zod'
 /**
  * POST /api/admin/sentinel-handshake
  *
- * Directive 26.2 — Trigger the Sentinel-Handshake welcome broadcast.
+ * Directive 26.2  -  Trigger the Sentinel-Handshake welcome broadcast.
  *
  * Sends a Global 15 localised welcome email with a Safe-Link to
  * the client contact. The Safe-Link initiates the Biometric Handshake
@@ -98,7 +98,7 @@ async function handlePost(request: Request) {
       }
     }
 
-    // Resolve locale — prefer explicit param, then contact.preferred_language
+    // Resolve locale  -  prefer explicit param, then contact.preferred_language
     let effectiveLocale = locale ?? 'en'
     if (!locale) {
       const { data: contact } = await (admin as any)

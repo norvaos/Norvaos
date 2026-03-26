@@ -71,7 +71,7 @@ import { SECTION_DEFINITIONS } from './case-detail-sections'
 import type { FieldVisibility, CustomFieldDef } from '@/lib/types/ircc-forms'
 import { SectionCustomFields } from '@/components/matters/section-custom-fields'
 
-// Existing components — imported lazily per section to avoid circular deps
+// Existing components  -  imported lazily per section to avoid circular deps
 import { CoreDataCardTab } from '@/components/matters/core-data-card-tab'
 import { ImmigrationDetailsPanel } from '@/components/immigration/immigration-details-panel'
 import { CaseInsightsPanel } from '@/components/immigration/case-insights-panel'
@@ -282,7 +282,7 @@ function SectionRenderer({
     case 'processing_info':
     case 'people_dependents':
     case 'risk_assessment':
-      // CoreDataCardTab is a monolithic component — render it fully
+      // CoreDataCardTab is a monolithic component  -  render it fully
       // for any core data section key. It renders all 3 sections internally.
       // We only render it once (on the first core data key we encounter)
       if (sectionKey === 'processing_info') {

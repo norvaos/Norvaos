@@ -29,7 +29,7 @@ export const frontDeskRescheduleAction: ActionDefinition<FrontDeskRescheduleInpu
   async execute({ input, tenantId, userId, supabase }) {
     if (!userId) throw new Error('User authentication required')
 
-    // 1. Verify appointment exists — try with tenant_id first, fallback without
+    // 1. Verify appointment exists  -  try with tenant_id first, fallback without
     let appointment: { id: string; appointment_date: string; start_time: string | null; contact_id: string | null; user_id: string | null } | null = null
 
     const { data: apptByTenant } = await supabase
@@ -83,7 +83,7 @@ export const frontDeskRescheduleAction: ActionDefinition<FrontDeskRescheduleInpu
       },
       activity: {
         activityType: 'appointment_rescheduled',
-        title: `Appointment rescheduled — ${input.reason}`,
+        title: `Appointment rescheduled  -  ${input.reason}`,
         description: `Moved from ${oldDate} ${oldTime} to ${input.newDate} ${input.newStartTime}`,
         metadata: {
           appointment_id: input.appointmentId,

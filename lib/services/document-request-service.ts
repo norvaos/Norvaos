@@ -1,5 +1,5 @@
 // ============================================================================
-// Document Request Service — Send structured document requests to clients
+// Document Request Service  -  Send structured document requests to clients
 // ============================================================================
 // Encapsulates the "Send Document Request" workflow:
 //   1. Resolve outstanding slots

@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * E-Sign Subsystem — Core Service
+ * E-Sign Subsystem  -  Core Service
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Defensible electronic signing service for NorvaOS.
@@ -14,15 +14,15 @@
  *   - Document-oriented: supports any document type (Phase 1: retainer only)
  *
  * Key functions:
- *   freezeDocument()              — Generate + store immutable PDF snapshot
- *   createAndSendSigningRequest() — Create request, send signing email
- *   getSigningPageData()          — Validate token, return signing page data
- *   getSourceDocument()           — Stream frozen PDF for signing page
- *   executeSignature()            — Record signature, generate signed artifact
- *   declineSignature()            — Record decline, notify lawyer
- *   cancelRequest()               — Cancel active request (lawyer action)
- *   resendRequest()               — Supersede old request, create + send new
- *   sendReminder()                — Send reminder email for active request
+ *   freezeDocument()               -  Generate + store immutable PDF snapshot
+ *   createAndSendSigningRequest()  -  Create request, send signing email
+ *   getSigningPageData()           -  Validate token, return signing page data
+ *   getSourceDocument()            -  Stream frozen PDF for signing page
+ *   executeSignature()             -  Record signature, generate signed artifact
+ *   declineSignature()             -  Record decline, notify lawyer
+ *   cancelRequest()                -  Cancel active request (lawyer action)
+ *   resendRequest()                -  Supersede old request, create + send new
+ *   sendReminder()                 -  Send reminder email for active request
  */
 
 import crypto from 'crypto'
@@ -139,7 +139,7 @@ function sha256(data: Uint8Array | Buffer): string {
 function getResend(): Resend | null {
   const apiKey = process.env.RESEND_API_KEY
   if (!apiKey) {
-    console.warn('[esign-service] RESEND_API_KEY not configured — emails will be skipped')
+    console.warn('[esign-service] RESEND_API_KEY not configured  -  emails will be skipped')
     return null
   }
   return new Resend(apiKey)
@@ -659,7 +659,7 @@ export async function createAndSendSigningRequest(
             metadata: { superseded_by_request_id: requestId },
           })
         } catch {
-          // Best-effort supersession — the unique index prevents conflicts
+          // Best-effort supersession  -  the unique index prevents conflicts
         }
       }
     }
@@ -1217,7 +1217,7 @@ export async function executeSignature(
 
       // Auto-convert lead to matter if payment was already received
       // Both signed retainer + payment are required. Since retainer is now signed,
-      // attempt conversion — gates will block if payment isn't received yet.
+      // attempt conversion  -  gates will block if payment isn't received yet.
       try {
         const { convertLeadToMatter } = await import('./lead-conversion-executor')
         const { data: leadForConvert } = await supabase
@@ -1252,7 +1252,7 @@ export async function executeSignature(
               .single()
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const mtData = mt as any
-            if (mtData?.name) matterTitle = `${matterTitle} — ${mtData.name}`
+            if (mtData?.name) matterTitle = `${matterTitle}  -  ${mtData.name}`
           }
 
           const convResult = await convertLeadToMatter({
@@ -1564,7 +1564,7 @@ export async function resendRequest(
 
 /**
  * Send a reminder email for an active signing request.
- * The token is unchanged — same signing URL.
+ * The token is unchanged  -  same signing URL.
  */
 export async function sendReminder(
   supabase: SupabaseClient<Database>,
@@ -1600,7 +1600,7 @@ export async function sendReminder(
     // look up the token. Let's store an encrypted version or handle this differently.
     //
     // DESIGN DECISION: For reminders, we generate a NEW signing request with the
-    // same document. Wait — the spec says "same token, same URL". But we only store
+    // same document. Wait  -  the spec says "same token, same URL". But we only store
     // the hash. This is a fundamental conflict.
     //
     // Resolution: The reminder must be sent by the lawyer who has access to the
@@ -1639,7 +1639,7 @@ export async function sendReminder(
           signerFirstName,
           documentTitle: docTitle,
           matterReference: '',
-          signingUrl: '', // No URL in reminder — signer should refer to original email
+          signingUrl: '', // No URL in reminder  -  signer should refer to original email
           expiresAt: req.expires_at as string,
         })
 
@@ -1695,7 +1695,7 @@ export async function sendReminder(
 interface SignatureBlock {
   imageBuffer: Buffer
   signerName: string
-  credentials?: string | null // e.g. "LSO #12345P" — shown below name
+  credentials?: string | null // e.g. "LSO #12345P"  -  shown below name
   signedAt: Date
   position: 'left' | 'right'
   label: string // e.g. "Client Signature" or "Lawyer Signature"

@@ -1,5 +1,5 @@
 -- ============================================================================
--- Migration 196 — Leads preferred_language: dedicated column + backfill
+-- Migration 196  -  Leads preferred_language: dedicated column + backfill
 -- ============================================================================
 -- Promotes preferred_language from custom_fields JSONB to a dedicated column
 -- for direct query access and portal language selection.

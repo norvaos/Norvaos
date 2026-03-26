@@ -12,7 +12,7 @@ import { withTiming } from '@/lib/middleware/request-timing'
 /**
  * GET /api/admin/tenants/[id]/rate-limit
  *
- * Platform-admin ONLY — rate-limit and denial dashboard for a tenant.
+ * Platform-admin ONLY  -  rate-limit and denial dashboard for a tenant.
  * Returns time-windowed aggregates from audit_logs.
  */
 const handleGet = withPlatformAdmin(async (_request, { params }) => {

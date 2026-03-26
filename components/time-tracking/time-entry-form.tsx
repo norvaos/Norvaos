@@ -138,7 +138,7 @@ export function TimeEntryForm({ open, onOpenChange, editEntry }: TimeEntryFormPr
               <SelectContent>
                 {(matters ?? []).map((m) => (
                   <SelectItem key={m.id} value={m.id}>
-                    {m.matter_number ? `${m.matter_number} — ` : ''}{m.title}
+                    {m.matter_number ? `${m.matter_number}  -  ` : ''}{m.title}
                   </SelectItem>
                 ))}
               </SelectContent>

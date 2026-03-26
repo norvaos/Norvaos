@@ -1,7 +1,7 @@
-# NorvaOS — Operational Readiness Package
+# NorvaOS  -  Operational Readiness Package
 
 **Date:** 2026-03-15
-**Phase:** 8 — Final Operational Readiness Review
+**Phase:** 8  -  Final Operational Readiness Review
 **Status:** All operational deliverables complete
 
 ---
@@ -26,7 +26,7 @@
 |---|---|
 | System Overview | Tech stack, 235 API routes catalogued, system boundaries |
 | Architecture Diagram | Request flow, auth chain (middleware → API → RLS) |
-| Environment Configuration | 7 public vars, 28 secrets, GitHub CI secrets — all documented |
+| Environment Configuration | 7 public vars, 28 secrets, GitHub CI secrets  -  all documented |
 | Deployment Procedures | CI/CD pipeline (7 stages + manual gate), hotfix path, Docker alt |
 | Database Operations | Migration execution (2 methods), safety rules, common queries |
 | Rollback Procedures | Vercel instant rollback, DB corrective migrations, PITR, decision matrix |
@@ -64,10 +64,10 @@
 
 | Test | Method | Result |
 |---|---|---|
-| Invoice paid immutability | Live UPDATE on paid invoice | ✅ BLOCKED — `prevent_paid_invoice_mutation()` fired |
-| Invoice paid immutability (status) | Live UPDATE on status field | ✅ BLOCKED — status also protected |
-| Audit log immutability (UPDATE) | Live UPDATE on audit_logs | ✅ BLOCKED — `prevent_audit_log_mutation()` fired |
-| Audit log immutability (DELETE) | Live DELETE on audit_logs | ✅ BLOCKED — `prevent_audit_log_mutation()` fired |
+| Invoice paid immutability | Live UPDATE on paid invoice | ✅ BLOCKED  -  `prevent_paid_invoice_mutation()` fired |
+| Invoice paid immutability (status) | Live UPDATE on status field | ✅ BLOCKED  -  status also protected |
+| Audit log immutability (UPDATE) | Live UPDATE on audit_logs | ✅ BLOCKED  -  `prevent_audit_log_mutation()` fired |
+| Audit log immutability (DELETE) | Live DELETE on audit_logs | ✅ BLOCKED  -  `prevent_audit_log_mutation()` fired |
 | Trust transaction immutability | Trigger existence verification | ✅ 4/4 triggers present (no_update, no_delete, compute_balance, after_insert_sync) |
 | Cheque post-issuance immutability | Trigger existence verification | ✅ `trg_cheques_issued_immutable` present |
 | Segregation of duties | Trigger existence verification | ✅ 3/3 present (disbursement, payment_plan, write_off) |
@@ -93,7 +93,7 @@
 
 ## 3. Monitoring & Alerting Confirmation
 
-### Sentry Integration — Implemented
+### Sentry Integration  -  Implemented
 
 **Packages installed:**
 - `@sentry/nextjs` 10.43.0
@@ -106,7 +106,7 @@
 | `sentry.client.config.ts` | Client-side: 10% trace sampling, error replay on error (100%), environment derived from `NEXT_PUBLIC_APP_URL`, release from `NEXT_PUBLIC_BUILD_SHA` |
 | `sentry.server.config.ts` | Server-side: 20% trace sampling, same environment/release derivation |
 | `sentry.edge.config.ts` | Edge runtime: minimal config, 10% trace sampling |
-| `instrumentation.ts` | Next.js instrumentation hook — loads server/edge configs at runtime, exports `onRequestError = Sentry.captureRequestError` |
+| `instrumentation.ts` | Next.js instrumentation hook  -  loads server/edge configs at runtime, exports `onRequestError = Sentry.captureRequestError` |
 
 **Existing code updated:**
 
@@ -117,10 +117,10 @@
 | `app/(dashboard)/error.tsx` | Wired to `reportError()` in useEffect |
 | `app/(dashboard)/matters/[id]/error.tsx` | Wired to `reportError()` in useEffect |
 | `app/(dashboard)/leads/[id]/error.tsx` | Wired to `reportError()` in useEffect |
-| `next.config.ts` | Wrapped with `withSentryConfig()` — silent mode, source maps uploaded then deleted, Sentry CSP connect-src added |
+| `next.config.ts` | Wrapped with `withSentryConfig()`  -  silent mode, source maps uploaded then deleted, Sentry CSP connect-src added |
 | `.env.example` | Added `NEXT_PUBLIC_SENTRY_DSN`, `SENTRY_ORG`, `SENTRY_PROJECT`, `SENTRY_AUTH_TOKEN` |
 
-**Graceful degradation:** All Sentry init files guard with `if (dsn)` — if `NEXT_PUBLIC_SENTRY_DSN` is not set, nothing initializes. Error-reporter's try/catch ensures Sentry failures never break request paths.
+**Graceful degradation:** All Sentry init files guard with `if (dsn)`  -  if `NEXT_PUBLIC_SENTRY_DSN` is not set, nothing initializes. Error-reporter's try/catch ensures Sentry failures never break request paths.
 
 ### Activation Checklist
 
@@ -129,10 +129,10 @@ To activate Sentry in production:
 1. Create a Sentry project at sentry.io (Next.js project type)
 2. Copy the DSN from Project Settings → Client Keys
 3. Add to Vercel environment variables:
-   - `NEXT_PUBLIC_SENTRY_DSN` — the DSN from step 2
-   - `SENTRY_ORG` — your Sentry organisation slug
-   - `SENTRY_PROJECT` — your Sentry project slug
-   - `SENTRY_AUTH_TOKEN` — auth token for source map uploads (Settings → Auth Tokens)
+   - `NEXT_PUBLIC_SENTRY_DSN`  -  the DSN from step 2
+   - `SENTRY_ORG`  -  your Sentry organisation slug
+   - `SENTRY_PROJECT`  -  your Sentry project slug
+   - `SENTRY_AUTH_TOKEN`  -  auth token for source map uploads (Settings → Auth Tokens)
 4. Redeploy the application
 5. Verify in Sentry dashboard that events are arriving
 
@@ -155,7 +155,7 @@ These remain active regardless of Sentry configuration:
 | # | Limitation | Impact | Mitigation | Status |
 |---|---|---|---|---|
 | 1 | Schema types are manual, not DB-generated | Type drift risk | CI schema drift check catches most drift | Reduced risk, not eliminated |
-| 2 | Email live-validation carve-out (3 scenarios) | Inbound email association, ambiguous resolution, reply with sender identity not production-tested | Code-side work done; blocked on Azure App Registration | Open — not a Phase 8 item |
+| 2 | Email live-validation carve-out (3 scenarios) | Inbound email association, ambiguous resolution, reply with sender identity not production-tested | Code-side work done; blocked on Azure App Registration | Open  -  not a Phase 8 item |
 | 3 | Migrations are forward-only | No automatic rollback | Corrective migrations; always test on staging first | By design |
 | 4 | Python sidecar required for XFA PDFs | XFA PDF processing unavailable if sidecar is down | Circuit breaker with 30s recovery; non-XFA features unaffected | Acceptable |
 | 5 | Bank feed integration not implemented | No automatic bank transaction import | Manual reconciliation via trust accounting UI | Future phase |
@@ -184,9 +184,9 @@ These remain active regardless of Sentry configuration:
 
 All three operational readiness deliverables have been completed:
 
-- ✅ Production runbook — 16-section comprehensive runbook covering deployment, rollback, incident response, backup/recovery, security controls, scaling, and operational checklists
-- ✅ Restore test — Live trigger functional tests against production database, baseline inventory of 212 tables / 112 triggers / 820 indexes / 700 FK constraints, recovery time estimates documented
-- ✅ Monitoring & alerting — Sentry SDK integrated into all error boundaries and error-reporter abstraction, 3 config files (client/server/edge), graceful degradation, activation checklist provided
+- ✅ Production runbook  -  16-section comprehensive runbook covering deployment, rollback, incident response, backup/recovery, security controls, scaling, and operational checklists
+- ✅ Restore test  -  Live trigger functional tests against production database, baseline inventory of 212 tables / 112 triggers / 820 indexes / 700 FK constraints, recovery time estimates documented
+- ✅ Monitoring & alerting  -  Sentry SDK integrated into all error boundaries and error-reporter abstraction, 3 config files (client/server/edge), graceful degradation, activation checklist provided
 
 **Requesting final production readiness review and Phase 8 closure.**
 

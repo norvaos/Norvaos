@@ -33,7 +33,7 @@ describe('CSV Export – formula injection defence', () => {
     // Because the sanitised value "'=SUM(1,1)" contains a comma (from
     // the formula arguments), escapeCell will also wrap it in double-quotes.
     const nameCell = cells[1][0]
-    // After CSV quoting: "=SUM(1  — but we need the raw cell. Let's verify
+    // After CSV quoting: "=SUM(1   -  but we need the raw cell. Let's verify
     // on the raw CSV string instead for precision.
     expect(csv).toContain("\"'=SUM(1,1)\"")
   })

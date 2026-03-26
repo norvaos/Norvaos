@@ -45,6 +45,9 @@ import {
   PiggyBank,
   ClipboardList,
   Video,
+  Lock,
+  Fingerprint,
+  ShieldCheck,
 } from 'lucide-react'
 import { NorvaLogo } from '@/components/landing/norva-logo'
 import { DashboardSlideshow } from '@/components/landing/dashboard-slideshow'
@@ -77,9 +80,7 @@ export default async function LandingPage() {
             <div className="hidden items-center gap-8 md:flex">
               <a href="#platform" className="text-sm font-medium text-gray-900 transition-colors hover:text-black">Platform</a>
               <a href="#features" className="text-sm font-medium text-gray-900 transition-colors hover:text-black">Features</a>
-              <a href="#billing" className="text-sm font-medium text-gray-900 transition-colors hover:text-black">Billing</a>
-              <a href="#trust" className="text-sm font-medium text-gray-900 transition-colors hover:text-black">Trust</a>
-              <a href="#appointments" className="text-sm font-medium text-gray-900 transition-colors hover:text-black">Scheduling</a>
+              <a href="#privacy-standard" className="text-sm font-medium text-gray-900 transition-colors hover:text-black">Security</a>
               <Link href="/help" target="_blank" className="text-sm font-medium text-gray-900 transition-colors hover:text-black">Help</Link>
             </div>
             <div className="flex items-center gap-3">
@@ -197,7 +198,7 @@ export default async function LandingPage() {
         </div>
       </section>
 
-      {/* Document Intelligence — Hero Feature */}
+      {/* Document Intelligence  -  Hero Feature */}
       <section id="documents" className="py-24 sm:py-32">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="grid grid-cols-1 items-center gap-16 lg:grid-cols-2">
@@ -578,7 +579,7 @@ export default async function LandingPage() {
           </div>
 
           <div className="mt-16 grid grid-cols-1 gap-8 lg:grid-cols-3">
-            {/* Pillar 1 — Intake */}
+            {/* Pillar 1  -  Intake */}
             <div className="relative overflow-hidden rounded-2xl border border-indigo-200 bg-gradient-to-b from-indigo-50 to-white p-8 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg">
               <div className="absolute top-0 left-0 right-0 h-1 rounded-t-2xl bg-gradient-to-r from-indigo-500 to-blue-500" />
               <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-600">
@@ -606,7 +607,7 @@ export default async function LandingPage() {
               </div>
             </div>
 
-            {/* Pillar 2 — Work */}
+            {/* Pillar 2  -  Work */}
             <div className="relative overflow-hidden rounded-2xl border border-violet-200 bg-gradient-to-b from-violet-50 to-white p-8 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg">
               <div className="absolute top-0 left-0 right-0 h-1 rounded-t-2xl bg-gradient-to-r from-violet-500 to-purple-500" />
               <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-violet-600">
@@ -634,7 +635,7 @@ export default async function LandingPage() {
               </div>
             </div>
 
-            {/* Pillar 3 — Deliver */}
+            {/* Pillar 3  -  Deliver */}
             <div className="relative overflow-hidden rounded-2xl border border-emerald-200 bg-gradient-to-b from-emerald-50 to-white p-8 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg">
               <div className="absolute top-0 left-0 right-0 h-1 rounded-t-2xl bg-gradient-to-r from-emerald-500 to-teal-500" />
               <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-600">
@@ -1633,13 +1634,13 @@ export default async function LandingPage() {
           {/* ── LinkedIn-style profile card ── */}
           <div className="mx-auto max-w-3xl rounded-2xl border border-gray-200 bg-white shadow-lg overflow-hidden">
 
-            {/* Banner — dark professional slate */}
+            {/* Banner  -  dark professional slate */}
             <div className="h-28" style={{background: 'linear-gradient(to right, #1e293b, #334155, #1e1b4b)'}} />
 
             {/* Avatar + name row */}
             <div className="px-6 pb-0">
               <div className="flex items-end gap-4 -mt-12 mb-4">
-                {/* Circular avatar — face and shoulders only */}
+                {/* Circular avatar  -  face and shoulders only */}
                 <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-full border-4 border-white shadow-lg bg-slate-100">
                   <Image
                     src="/founder-outdoor.jpg"
@@ -1657,7 +1658,7 @@ export default async function LandingPage() {
                 </div>
               </div>
 
-              {/* Credentials — sorted chronologically */}
+              {/* Credentials  -  sorted chronologically */}
               <div className="flex flex-wrap gap-2 pb-4 border-b border-gray-100">
                 {[
                   { label: 'Microsoft Certified Professional, 1998',    color: 'bg-sky-50 text-sky-700 border-sky-100' },
@@ -1670,7 +1671,7 @@ export default async function LandingPage() {
                 ))}
               </div>
 
-              {/* PAIN POINTS — first, so visitors see the problem immediately */}
+              {/* PAIN POINTS  -  first, so visitors see the problem immediately */}
               <div className="py-5 border-b border-gray-100">
                 <p className="text-xs font-semibold text-rose-600 uppercase tracking-wide mb-3">The daily reality he watched, up close</p>
                 <div className="rounded-xl border border-rose-100 bg-rose-50 p-4">
@@ -1698,7 +1699,7 @@ export default async function LandingPage() {
                 </div>
               </div>
 
-              {/* About — detailed founder message */}
+              {/* About  -  detailed founder message */}
               <div className="py-5 border-b border-gray-100">
                 <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">About</p>
 
@@ -1727,7 +1728,7 @@ export default async function LandingPage() {
                 </p>
               </div>
 
-              {/* Experience — 2-column grid */}
+              {/* Experience  -  2-column grid */}
               <div className="py-5 border-b border-gray-100">
                 <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-4">Experience</p>
                 <div className="grid gap-3" style={{gridTemplateColumns: 'repeat(2, minmax(0, 1fr))'}}>
@@ -1836,6 +1837,71 @@ export default async function LandingPage() {
         </div>
       </section>
 
+      {/* ─── The Norva Privacy Standard ─── */}
+      <section id="privacy-standard" className="relative py-24 sm:py-32 border-t border-gray-100 bg-gradient-to-b from-slate-50 to-white">
+        <div className="mx-auto max-w-7xl px-6 lg:px-8">
+          <div className="mx-auto max-w-2xl text-center">
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-indigo-100 bg-indigo-50 px-3 py-1 text-sm font-semibold text-indigo-700">
+              <Shield className="h-3.5 w-3.5" />
+              PIPEDA-Aligned Architecture
+            </div>
+            <h2 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">
+              The Norva Privacy Standard
+            </h2>
+            <p className="mt-4 text-lg leading-8 text-gray-600">
+              NorvaOS operates as a Data Custodian under PIPEDA guidelines. We do not sell, monetise, or train AI on your sensitive legal files. Your data is your property; our fortress is your protection.
+            </p>
+          </div>
+
+          <div className="mx-auto mt-16 grid max-w-5xl grid-cols-1 gap-8 sm:grid-cols-3">
+            {/* Column A  -  Canadian Data Residency */}
+            <div className="relative rounded-2xl border border-gray-200 bg-white p-8 shadow-sm transition-shadow hover:shadow-lg">
+              <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-600">
+                <Lock className="h-6 w-6 text-white" />
+              </div>
+              <h3 className="text-lg font-bold text-gray-900">Canadian Data Residency</h3>
+              <p className="mt-3 text-sm leading-6 text-gray-600">
+                Your data never leaves Canada. Strictly hosted in AWS ca-central-1 to meet Law Society and PIPEDA standards. No cross-border transfers, no exceptions.
+              </p>
+              <div className="mt-5 flex items-center gap-2 text-xs font-medium text-indigo-600">
+                <span className="inline-block h-1.5 w-1.5 rounded-full bg-indigo-600" />
+                ca-central-1 (Montréal)
+              </div>
+            </div>
+
+            {/* Column B  -  Immutable Integrity */}
+            <div className="relative rounded-2xl border border-gray-200 bg-white p-8 shadow-sm transition-shadow hover:shadow-lg">
+              <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-violet-600">
+                <Fingerprint className="h-6 w-6 text-white" />
+              </div>
+              <h3 className="text-lg font-bold text-gray-900">Immutable Integrity</h3>
+              <p className="mt-3 text-sm leading-6 text-gray-600">
+                Every document in the Norva Vault is hashed with SHA-256 encryption. Proof of truth is etched into every file. Tamper-evident by design.
+              </p>
+              <div className="mt-5 flex items-center gap-2 text-xs font-medium text-violet-600">
+                <span className="inline-block h-1.5 w-1.5 rounded-full bg-violet-600" />
+                SHA-256 Genesis Hash
+              </div>
+            </div>
+
+            {/* Column C  -  Sovereign Compliance */}
+            <div className="relative rounded-2xl border border-gray-200 bg-white p-8 shadow-sm transition-shadow hover:shadow-lg">
+              <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-600">
+                <ShieldCheck className="h-6 w-6 text-white" />
+              </div>
+              <h3 className="text-lg font-bold text-gray-900">Sovereign Compliance</h3>
+              <p className="mt-3 text-sm leading-6 text-gray-600">
+                Real-time compliance matrices at the Firm, Matter, and Client levels. Audit-ready by design, with automated checks against Law Society requirements.
+              </p>
+              <div className="mt-5 flex items-center gap-2 text-xs font-medium text-emerald-600">
+                <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-600" />
+                Firm · Matter · Client
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* CTA */}
       <section
         className="relative overflow-hidden py-24 sm:py-32"
@@ -1875,28 +1941,116 @@ export default async function LandingPage() {
               <span className="text-indigo-400">|</span>
               <span>PIPEDA-compliant</span>
               <span className="text-indigo-400">|</span>
-              <span>Setup in under 48 hours</span>
+              <span>Setup in minutes</span>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-gray-200 bg-white py-12">
-        <div className="mx-auto max-w-7xl px-6 lg:px-8">
-          <div className="flex flex-col items-center justify-between gap-6 md:flex-row">
-            <div className="flex items-center gap-2">
-              <NorvaLogo size={28} id="footer" />
-              <span className="text-base font-bold text-gray-900">NorvaOS</span>
-              <span className="ml-2 text-sm text-gray-600">A complete legal operating system</span>
+      {/* ─── Sovereign Footer ─── */}
+      <footer className="border-t border-gray-200 bg-slate-900 text-gray-300">
+        <div className="mx-auto max-w-7xl px-6 py-16 lg:px-8">
+          <div className="grid grid-cols-1 gap-10 md:grid-cols-4">
+            {/* Brand */}
+            <div className="md:col-span-1">
+              <div className="flex items-center gap-2.5">
+                <NorvaLogo size={28} id="footer" />
+                <span className="text-lg font-bold text-white">NorvaOS</span>
+              </div>
+              <p className="mt-3 text-sm leading-6 text-gray-400">
+                A complete legal operating system. Built in Canada, for Canadian law firms.
+              </p>
+              {/* PIPEDA Badge */}
+              <div className="mt-5 inline-flex items-center gap-2 rounded-full border border-slate-700 bg-slate-800 px-3.5 py-1.5 text-xs font-medium text-gray-300">
+                <Shield className="h-3.5 w-3.5 text-indigo-400" />
+                PIPEDA-Aligned Architecture
+              </div>
             </div>
-            <div className="flex flex-wrap items-center gap-6 text-sm text-gray-700">
-              <a href="#" className="hover:text-gray-900">Privacy Policy</a>
-              <a href="#" className="hover:text-gray-900">Terms of Service</a>
-              <a href="#" className="hover:text-gray-900">Security</a>
-              <Link href="/login" className="hover:text-gray-900">Sign in</Link>
+
+            {/* Legal */}
+            <div>
+              <h4 className="text-sm font-semibold uppercase tracking-wider text-white">Legal</h4>
+              <ul className="mt-4 space-y-3">
+                <li>
+                  <Link href="/privacy" className="text-sm text-gray-400 transition-colors hover:text-white">
+                    Privacy Policy
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/terms" className="text-sm text-gray-400 transition-colors hover:text-white">
+                    Terms of Service
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/security" className="text-sm text-gray-400 transition-colors hover:text-white">
+                    Security
+                  </Link>
+                </li>
+              </ul>
             </div>
-            <p className="text-sm text-gray-600">© 2026 NorvaOS. All rights reserved.</p>
+
+            {/* Platform */}
+            <div>
+              <h4 className="text-sm font-semibold uppercase tracking-wider text-white">Platform</h4>
+              <ul className="mt-4 space-y-3">
+                <li>
+                  <a href="#platform" className="text-sm text-gray-400 transition-colors hover:text-white">
+                    Features
+                  </a>
+                </li>
+                <li>
+                  <a href="#billing" className="text-sm text-gray-400 transition-colors hover:text-white">
+                    Pricing
+                  </a>
+                </li>
+                <li>
+                  <a href="#trust" className="text-sm text-gray-400 transition-colors hover:text-white">
+                    Trust Accounting
+                  </a>
+                </li>
+                <li>
+                  <a href="#appointments" className="text-sm text-gray-400 transition-colors hover:text-white">
+                    Appointments
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+            {/* Company */}
+            <div>
+              <h4 className="text-sm font-semibold uppercase tracking-wider text-white">Company</h4>
+              <ul className="mt-4 space-y-3">
+                <li>
+                  <Link href="/login" className="text-sm text-gray-400 transition-colors hover:text-white">
+                    Sign In
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/signup" className="text-sm text-gray-400 transition-colors hover:text-white">
+                    Request Access
+                  </Link>
+                </li>
+                <li>
+                  <a href="mailto:support@norvaos.com" className="text-sm text-gray-400 transition-colors hover:text-white">
+                    Contact
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Bottom bar */}
+          <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-slate-800 pt-8 md:flex-row">
+            <p className="text-xs text-gray-500">
+              © {new Date().getFullYear()} NorvaOS Inc. All rights reserved. Data hosted in Canada (ca-central-1).
+            </p>
+            <div className="flex items-center gap-4 text-xs text-gray-500">
+              <span>🇨🇦 Canadian-owned</span>
+              <span className="text-slate-700">|</span>
+              <span>PIPEDA-compliant</span>
+              <span className="text-slate-700">|</span>
+              <span>SOC 2 audit-ready</span>
+            </div>
           </div>
         </div>
       </footer>

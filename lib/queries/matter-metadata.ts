@@ -34,6 +34,6 @@ export function useMatterMetadata() {
       if (!res.ok) throw new Error('Failed to fetch matter metadata')
       return res.json()
     },
-    staleTime: 5 * 60_000, // 5 minutes — reference data
+    staleTime: 5 * 60_000, // 5 minutes  -  reference data
   })
 }

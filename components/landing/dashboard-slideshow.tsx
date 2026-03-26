@@ -27,7 +27,7 @@ const SLIDES = [
   { label: 'Billing', url: 'billing' },
 ]
 
-// Static class strings — required for Tailwind JIT detection
+// Static class strings  -  required for Tailwind JIT detection
 const STYLES = [
   { logo: 'bg-indigo-600', sidebar: 'bg-indigo-50 font-semibold text-indigo-700', dot: 'bg-indigo-400', progress: 'bg-indigo-600' },
   { logo: 'bg-violet-600', sidebar: 'bg-violet-50 font-semibold text-violet-700', dot: 'bg-violet-400', progress: 'bg-violet-600' },

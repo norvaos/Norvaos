@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * AnswerHistoryPanel — Audit trail timeline for form instance answer changes.
+ * AnswerHistoryPanel  -  Audit trail timeline for form instance answer changes.
  *
  * Features:
  * 1. Timeline view: each change as a card with timestamp, field, diff, source, user

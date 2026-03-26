@@ -18,7 +18,7 @@ const ALLOWED_TYPES = [
   'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
 ]
 
-// ── GET — list client-submitted documents ──────────────────────────────────
+// ── GET  -  list client-submitted documents ──────────────────────────────────
 
 export async function GET(
   request: Request,
@@ -63,7 +63,7 @@ export async function GET(
   }
 }
 
-// ── POST — upload a new document ───────────────────────────────────────────
+// ── POST  -  upload a new document ───────────────────────────────────────────
 
 export async function POST(
   request: Request,

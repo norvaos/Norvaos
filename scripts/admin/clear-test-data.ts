@@ -1,5 +1,5 @@
 /**
- * Norva Sovereign Pilot Data-Wipe Script — Directive 029
+ * Norva Sovereign Pilot Data-Wipe Script  -  Directive 029
  *
  * Usage: npx tsx scripts/admin/clear-test-data.ts
  *
@@ -26,7 +26,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY)
 
 async function clearTestData() {
   console.log('═══════════════════════════════════════════════════')
-  console.log('  NORVA SOVEREIGN — Pilot Data-Wipe Script')
+  console.log('  NORVA SOVEREIGN  -  Pilot Data-Wipe Script')
   console.log('  Directive 029: Clear test data, preserve integrity')
   console.log('═══════════════════════════════════════════════════')
   console.log()
@@ -44,7 +44,7 @@ async function clearTestData() {
     console.log(`  Created: ${genesisZero.created_at}`)
     console.log(`  This record will be PRESERVED.`)
   } else {
-    console.log('⚠ No Genesis Zero found — proceeding without preservation guard.')
+    console.log('⚠ No Genesis Zero found  -  proceeding without preservation guard.')
   }
   console.log()
 
@@ -93,7 +93,7 @@ async function clearTestData() {
         .select('*', { count: 'exact', head: true })
 
       if (error) {
-        // Some tables may not exist or may have RLS blocking — skip gracefully
+        // Some tables may not exist or may have RLS blocking  -  skip gracefully
         console.log(`  ⚠ ${table}: ${error.message}`)
       } else {
         const deleted = count ?? 0

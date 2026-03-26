@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * PortalClientUpload — Allows clients to submit ad-hoc documents
+ * PortalClientUpload  -  Allows clients to submit ad-hoc documents
  * with a required name and optional description.
  */
 
@@ -55,7 +55,7 @@ export function PortalClientUpload({
       const data = await res.json()
       setDocuments(data.documents ?? [])
     } catch {
-      // Silent — non-critical
+      // Silent  -  non-critical
     } finally {
       setLoading(false)
     }

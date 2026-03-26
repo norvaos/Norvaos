@@ -6,9 +6,9 @@
 -- and a clear audit trail of what was configured at go-live.
 --
 -- Design decisions:
---   • One row per tenant (UNIQUE tenant_id) — the wizard is a singleton.
---   • answers JSONB — typed by WizardAnswers in lib/types/onboarding.ts.
---   • activation_log JSONB — array of { action, applied_at, ok, error? }.
+--   • One row per tenant (UNIQUE tenant_id)  -  the wizard is a singleton.
+--   • answers JSONB  -  typed by WizardAnswers in lib/types/onboarding.ts.
+--   • activation_log JSONB  -  array of { action, applied_at, ok, error? }.
 --     Records every config action applied, enabling idempotency on re-run.
 --   • status enum: draft → activated (or default_applied for fast path).
 --
@@ -93,7 +93,7 @@ CREATE POLICY "onboarding_wizard_select"
   );
 
 -- Service-layer writes use the admin client (bypasses RLS).
--- No INSERT/UPDATE policies needed for user-context — all mutations go through
+-- No INSERT/UPDATE policies needed for user-context  -  all mutations go through
 -- the API layer which uses the service-role key.
 
 -- =============================================================================

@@ -4,14 +4,14 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { withTiming } from '@/lib/middleware/request-timing'
 
 /**
- * POST /api/documents/vault-drop — Directive 33.0 §B / 40.0 §2
+ * POST /api/documents/vault-drop  -  Directive 33.0 §B / 40.0 §2
  *
  * Public-facing vault drop. No authentication required.
  * Files are stored in a quarantine bucket indexed by content_hash + temp_session_id.
  *
  * When an intake is later converted to a Matter, the "claim" flow
  * matches orphaned vault hashes against the session and moves documents
- * into the matter's archive — zero re-upload.
+ * into the matter's archive  -  zero re-upload.
  */
 async function handlePost(request: NextRequest) {
   try {
@@ -35,7 +35,7 @@ async function handlePost(request: NextRequest) {
     // Verify client hash matches server hash (integrity check)
     if (clientHash && clientHash !== serverHash) {
       return NextResponse.json(
-        { error: 'Hash mismatch — file may have been corrupted in transit' },
+        { error: 'Hash mismatch  -  file may have been corrupted in transit' },
         { status: 422 }
       )
     }
@@ -102,7 +102,7 @@ async function handlePost(request: NextRequest) {
 
     if (insertErr) {
       console.error('[vault-drop] Failed to index vault drop:', insertErr)
-      // Non-fatal — file is already in storage, index can be rebuilt
+      // Non-fatal  -  file is already in storage, index can be rebuilt
     }
 
     // ── Auto-Scan: extract fields from scannable files (Directive 40.0) ──
@@ -146,7 +146,7 @@ export const POST = withTiming(handlePost, 'POST /api/documents/vault-drop')
 /**
  * Asynchronously scan a vault drop file via OCR.space and persist
  * the extracted fields to vault_drops.ai_extracted_data.
- * Runs fire-and-forget — failures are logged but never block the upload.
+ * Runs fire-and-forget  -  failures are logged but never block the upload.
  */
 async function autoScanVaultDrop(
   admin: ReturnType<typeof createAdminClient>,
@@ -157,7 +157,7 @@ async function autoScanVaultDrop(
 ) {
   const apiKey = process.env.OCR_SPACE_API_KEY
   if (!apiKey) {
-    console.warn('[vault-drop] OCR_SPACE_API_KEY not set — skipping auto-scan')
+    console.warn('[vault-drop] OCR_SPACE_API_KEY not set  -  skipping auto-scan')
     return
   }
 

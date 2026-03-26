@@ -1,5 +1,5 @@
 // ============================================================================
-// Field Auto-Classification — shared server-compatible module
+// Field Auto-Classification  -  shared server-compatible module
 // ============================================================================
 // Extracts classification logic from client-field-config-panel.tsx into a
 // reusable module for: upload pipeline, rescan, backfill, admin UI, and
@@ -16,7 +16,7 @@ export const JUNK_TOP_PREFIXES = ['Overflow', 'OverFlowPage', 'master', 'Barcode
 
 /**
  * Page-layout prefixes (Page1, Page2, etc.) that wrap real content sections.
- * These are "transparent" — we look through them at the second segment.
+ * These are "transparent"  -  we look through them at the second segment.
  */
 const PAGE_PREFIX_PATTERN = /^Page\d+$/
 
@@ -37,7 +37,7 @@ export const JUNK_PATH_PATTERNS = /(?:ValidatedFlag|FlagMirror|btnValidate|btnCl
  *
  * Some IRCC forms (IMM1344) use Part1.SponsorDetails.Field structure,
  * while others (IMM5710E) use Page1.PersonalDetails.Field structure.
- * Page* prefixes are transparent — we look at the second segment.
+ * Page* prefixes are transparent  -  we look at the second segment.
  */
 export function isSystemField(xfaPath: string, suggestedLabel: string | null): boolean {
   const parts = xfaPath.split('.')
@@ -46,7 +46,7 @@ export function isSystemField(xfaPath: string, suggestedLabel: string | null): b
   // Pure junk top-level containers (Overflow, master, Barcodes)
   if (JUNK_TOP_PREFIXES.includes(topLevel)) return true
 
-  // Page* prefix is transparent — check second segment
+  // Page* prefix is transparent  -  check second segment
   if (PAGE_PREFIX_PATTERN.test(topLevel)) {
     // Single-segment under page (e.g. Page1.CurrentPage) → meta
     if (parts.length <= 2) {
@@ -150,7 +150,7 @@ export const SECTION_DESCRIPTION_MAP: Record<string, string> = {
 }
 
 /**
- * Section aliases — maps fragmented XFA section names to canonical section keys.
+ * Section aliases  -  maps fragmented XFA section names to canonical section keys.
  * IRCC forms sometimes split a logical section across multiple XFA containers
  * (e.g. BackgroundInfo + BackgroundInfo2 + BackgroundInfo_SectionHeader all map to BackgroundInfo).
  */
@@ -195,7 +195,7 @@ export function deriveSectionKey(xfaPath: string): string | null {
   // Skip question-number segments (q1, q2 used as second level in some forms)
   if (/^q\d+$/i.test(candidate)) return null
 
-  // PageWrapper is a transparent layout container — look at the third segment
+  // PageWrapper is a transparent layout container  -  look at the third segment
   if (candidate === 'PageWrapper' && parts.length >= 3) {
     candidate = parts[2]
   }

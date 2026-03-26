@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * ActiveUsersIndicator — Shows avatars of users currently viewing a matter.
+ * ActiveUsersIndicator  -  Shows avatars of users currently viewing a matter.
  *
  * Renders an AvatarGroup with online pulse indicators. Each avatar has a
  * tooltip showing the user's name. Excludes the current user from the display
@@ -52,7 +52,7 @@ export function ActiveUsersIndicator({
   maxVisible = 4,
   className,
 }: ActiveUsersIndicatorProps) {
-  // Filter out the current user — they don't need to see themselves
+  // Filter out the current user  -  they don't need to see themselves
   const otherViewers = useMemo(
     () => viewers.filter((v) => v.userId !== currentUserId),
     [viewers, currentUserId],

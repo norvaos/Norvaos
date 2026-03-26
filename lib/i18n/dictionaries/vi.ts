@@ -1,5 +1,5 @@
 /**
- * Tiếng Việt (vi) — Vietnamese dictionary.
+ * Tiếng Việt (vi)  -  Vietnamese dictionary.
  * For Vietnamese-speaking clients (Vietnam, diaspora).
  */
 
@@ -69,7 +69,7 @@ export const vi: Partial<Record<DictionaryKey, string>> = {
   'dashboard.deadline_today': 'Today',
   'dashboard.deadline_1_day': '1 day',
   'dashboard.deadline_days': '{days} days',
-  'dashboard.deadlines_14_days': 'Deadlines — Next 14 Days',
+  'dashboard.deadlines_14_days': 'Deadlines  -  Next 14 Days',
   'dashboard.no_deadlines_14': 'No deadlines in the next 14 days',
   'dashboard.no_deadlines_14_desc': 'Typed deadlines on matters will appear here.',
   'dashboard.unknown_matter': 'Unknown matter',
@@ -98,12 +98,12 @@ export const vi: Partial<Record<DictionaryKey, string>> = {
   'common.save': 'Lưu',
   'common.view': 'Xem',
 
-  // ── Chỉ thị 41.0 — Liên hệ & Kho lưu trữ ──────────────────────────────
+  // ── Chỉ thị 41.0  -  Liên hệ & Kho lưu trữ ──────────────────────────────
   'contact.badge.retained_client': 'Khách hàng đã ký hợp đồng',
   'contact.badge.prospective_lead': 'Khách hàng tiềm năng',
   'contact.badge.contact': 'Liên hệ',
   'contact.command_centre': 'Trung tâm chỉ huy',
-  'contact.command_centre_red_alert': 'Điểm sẵn sàng ở mức cực thấp — cần chú ý ngay lập tức',
+  'contact.command_centre_red_alert': 'Điểm sẵn sàng ở mức cực thấp  -  cần chú ý ngay lập tức',
   'contact.intake_funnel': 'Phễu tiếp nhận',
   'contact.intake_progress': 'Tiến trình tiếp nhận',
   'contact.matter_readiness': 'Mức độ sẵn sàng của vụ việc',
@@ -116,13 +116,13 @@ export const vi: Partial<Record<DictionaryKey, string>> = {
   'vault.title': 'Norva Vault',
   'vault.empty': 'Norva Vault trống',
   'vault.empty_description': 'Chưa có tài liệu nào được tải lên cho liên hệ này.',
-  'vault.sentinel_eye': 'Sentinel Eye — Xem và xác minh',
+  'vault.sentinel_eye': 'Sentinel Eye  -  Xem và xác minh',
   'vault.file_tampered': 'Cảnh báo: Tệp đã bị thay đổi',
   'vault.sha256_verified': 'SHA-256 đã xác minh',
   'vault.hash_pending': 'Đang chờ băm',
   'vault.integrity_alert': 'Cảnh báo tính toàn vẹn',
   'vault.untracked': 'Chưa theo dõi',
-  'vault.no_preview': 'Không có bản xem trước — thiếu URL tệp',
+  'vault.no_preview': 'Không có bản xem trước  -  thiếu URL tệp',
 
   'legal.retainer_title': 'Hợp đồng dịch vụ pháp lý',
   'legal.retainer_intro': 'Hợp đồng này quy định các điều khoản dịch vụ pháp lý được cung cấp.',
@@ -203,12 +203,12 @@ export const vi: Partial<Record<DictionaryKey, string>> = {
   'status.days_remaining': 'Còn {days} ngày',
   'status.verified': 'Đã xác minh',
   'status.expiry_label': 'Hạn',
-  'status.sentinel_tamper_title': 'CẢNH BÁO SENTINEL — Phát hiện giả mạo',
+  'status.sentinel_tamper_title': 'CẢNH BÁO SENTINEL  -  Phát hiện giả mạo',
   'status.sentinel_tamper_body': 'Hash tài liệu không khớp. Tài liệu này đã bị sửa đổi ngoài NorvaOS.',
-  'status.vault_verified_title': 'Kho Norva — Đã xác minh tính toàn vẹn',
+  'status.vault_verified_title': 'Kho Norva  -  Đã xác minh tính toàn vẹn',
   'status.vault_verified_body': 'Tài liệu này được khóa hash trong Kho Norva. Mọi giả mạo sẽ được phát hiện.',
 
-  // ── Leads Command Centre (Directive 40.0 — Sovereign Layer) ─────────────
+  // ── Leads Command Centre (Directive 40.0  -  Sovereign Layer) ─────────────
   'leads.title': 'Khách hàng tiềm năng',
   'leads.add_lead': 'Thêm khách hàng tiềm năng',
   'leads.import': 'Nhập',
@@ -331,7 +331,7 @@ export const vi: Partial<Record<DictionaryKey, string>> = {
   'form.notes_placeholder': 'Add any additional notes about this contact...',
   'form.create_contact': 'Create Contact',
   'form.save_changes': 'Save Changes',
-  'form.review_required_ocr': 'Review Required — OCR could not extract',
+  'form.review_required_ocr': 'Review Required  -  OCR could not extract',
   'form.section_basic_info': 'Basic Information',
   'form.section_contact_details': 'Contact Details',
   'form.section_address': 'Address',

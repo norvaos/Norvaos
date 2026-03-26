@@ -2,13 +2,13 @@
  * Tests for lib/services/pii-dual-write.ts
  *
  * Covers:
- *   withContactPIIEncrypted — field extraction, encryption format, round-trip
- *   withLeadPIIEncrypted — field extraction, encryption format, round-trip
- *   withMatterImmigrationPIIEncrypted — field extraction, encryption format, round-trip
- *   withAppointmentPIIEncrypted — field extraction, encryption format, round-trip
- *   Missing fields — null encrypted values, no errors
+ *   withContactPIIEncrypted  -  field extraction, encryption format, round-trip
+ *   withLeadPIIEncrypted  -  field extraction, encryption format, round-trip
+ *   withMatterImmigrationPIIEncrypted  -  field extraction, encryption format, round-trip
+ *   withAppointmentPIIEncrypted  -  field extraction, encryption format, round-trip
+ *   Missing fields  -  null encrypted values, no errors
  *
- * Sprint 6 — 2026-03-25
+ * Sprint 6  -  2026-03-25
  */
 
 import {

@@ -2,7 +2,7 @@
  * Tests for the Immigration Readiness Matrix Engine.
  *
  * Covers: computeReadinessMatrix(), evaluateLawyerReviewTriggers()
- * — domain scoring, blocker identification, person-role scoping,
+ *  -  domain scoring, blocker identification, person-role scoping,
  *   drafting vs filing separation, and lawyer review trigger logic.
  */
 
@@ -203,7 +203,7 @@ describe('computeReadinessMatrix', () => {
     const result = computeReadinessMatrix(ctx)!
     expect(result).not.toBeNull()
 
-    // 4 PA rules should be evaluated (spouse rule skipped — no spouse person)
+    // 4 PA rules should be evaluated (spouse rule skipped  -  no spouse person)
     expect(result.allBlockers).toHaveLength(0)
     expect(result.overallPct).toBe(100)
     expect(result.meetsThreshold).toBe(true)
@@ -305,7 +305,7 @@ describe('computeReadinessMatrix', () => {
     const ctx = makeContext({
       playbook: makePlaybook({
         questionnaireFieldRules: FIELD_RULES.slice(0, 1), // minimal question
-        documentRules: [DOC_RULES[0]], // passport — PA scope
+        documentRules: [DOC_RULES[0]], // passport  -  PA scope
       }),
       profile: { personal: { family_name: 'Zia' } },
       people: [makePerson()],
@@ -344,7 +344,7 @@ describe('computeReadinessMatrix', () => {
     const ctx = makeContext({
       playbook: makePlaybook({
         questionnaireFieldRules: FIELD_RULES.slice(0, 1),
-        documentRules: [DOC_RULES[2]], // police_clearance — "all" scope
+        documentRules: [DOC_RULES[2]], // police_clearance  -  "all" scope
       }),
       profile: { personal: { family_name: 'Zia' } },
       people: [
@@ -492,14 +492,14 @@ describe('evaluateLawyerReviewTriggers', () => {
       condition_field: 'criminal_charges',
       condition_source: 'people',
       condition_operator: 'truthy',
-      message: 'Criminal charges detected — lawyer review required',
+      message: 'Criminal charges detected  -  lawyer review required',
     },
     {
       key: 'prior_refusals',
       condition_field: 'prior_refusals',
       condition_source: 'immigration',
       condition_operator: 'truthy',
-      message: 'Prior refusals on record — lawyer review required',
+      message: 'Prior refusals on record  -  lawyer review required',
     },
     {
       key: 'inadmissibility',
@@ -507,7 +507,7 @@ describe('evaluateLawyerReviewTriggers', () => {
       condition_source: 'people',
       condition_operator: 'equals',
       condition_value: true,
-      message: 'Inadmissibility flag — lawyer review required',
+      message: 'Inadmissibility flag  -  lawyer review required',
     },
   ]
 

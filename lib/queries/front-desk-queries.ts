@@ -1,10 +1,10 @@
 /**
- * Front Desk Query Layer — Server-Side Projection
+ * Front Desk Query Layer  -  Server-Side Projection
  *
  * Dedicated hooks for the front desk console. NEVER uses select('*').
  * Returns ONLY fields the front desk is allowed to see.
  *
- * Rule #10: Separate locked interface — own query layer.
+ * Rule #10: Separate locked interface  -  own query layer.
  * No billing fields, no document content, no detailed matter notes.
  */
 
@@ -220,7 +220,7 @@ export function useFrontDeskSearch(query: string) {
       const term = `%${query.trim()}%`
       const today = new Date().toISOString().split('T')[0]
 
-      // 1. Search contacts — explicit column projection
+      // 1. Search contacts  -  explicit column projection
       const { data: contacts, error } = await supabase
         .from('contacts')
         .select('id, first_name, last_name, preferred_name, phone_primary, email_primary, last_contacted_at, custom_fields')
@@ -395,7 +395,7 @@ export function useTodaySchedule(tenantId: string, date: string) {
     queryFn: async (): Promise<{ staffName: string; staffId: string | null; appointments: FrontDeskAppointment[] }[]> => {
       const supabase = createClient()
 
-      // Select base columns — 'room' may not exist pre-migration 048, so we
+      // Select base columns  -  'room' may not exist pre-migration 048, so we
       // use 'as any' on the select and cast the result.
       type ApptRow = { id: string; guest_name: string | null; guest_email: string | null; guest_phone: string | null; start_time: string | null; end_time: string | null; status: string; user_id: string; contact_id: string | null; appointment_date: string | null; booking_page_id: string | null; duration_minutes: number | null; room?: string | null }
 
@@ -584,7 +584,7 @@ export function useFrontDeskTasks(tenantId: string, currentUserId: string, staff
         }))
     },
     enabled: !!tenantId && !!currentUserId,
-    refetchInterval: 8_000,   // Poll every 8s — realtime handles instant updates
+    refetchInterval: 8_000,   // Poll every 8s  -  realtime handles instant updates
     staleTime: 5_000,
   })
 }
@@ -912,7 +912,7 @@ export function useFrontDeskActiveShift(userId: string) {
       return { ...shift, onBreak, breakStartedAt }
     },
     enabled: !!userId,
-    staleTime: 0,            // Always stale — refetch immediately on focus/invalidation
+    staleTime: 0,            // Always stale  -  refetch immediately on focus/invalidation
     refetchInterval: 10_000, // Poll every 10s as fallback
     refetchOnMount: 'always',// Always hit DB on mount, never serve stale cache
   })
@@ -1061,7 +1061,7 @@ export function useTenantKioskUrl(tenantId: string) {
           return `/kiosk/${data.kiosk_token}`
         }
       } catch {
-        // table may not exist yet — fall through
+        // table may not exist yet  -  fall through
       }
 
       // Fallback: read from tenant settings

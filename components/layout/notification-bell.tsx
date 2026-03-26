@@ -66,7 +66,7 @@ function playChime() {
     osc.start(ctx.currentTime)
     osc.stop(ctx.currentTime + 0.6)
   } catch {
-    // Audio context unavailable — skip silently
+    // Audio context unavailable  -  skip silently
   }
 }
 
@@ -110,7 +110,7 @@ export function NotificationBell() {
     const latest = notifications[0]
 
     if (!initialLoadDoneRef.current) {
-      // First load — record the current latest ID and suppress popup
+      // First load  -  record the current latest ID and suppress popup
       seenLatestIdRef.current = latest.id
       initialLoadDoneRef.current = true
       return
@@ -185,7 +185,7 @@ export function NotificationBell() {
     markAllAsRead.mutate(userId)
   }
 
-  // SSR placeholder — identical layout, no Radix Popover (avoids hydration ID mismatch)
+  // SSR placeholder  -  identical layout, no Radix Popover (avoids hydration ID mismatch)
   if (!mounted) {
     return (
       <Button variant="ghost" size="icon" className="relative h-9 w-9">

@@ -6,9 +6,9 @@
 --- document-slot-engine (document_slot_templates → document_slots).
 ---
 --- Three new tables:
----   1. ircc_form_assignment_templates  — reusable per-matter-type form config
----   2. matter_form_instances           — per-matter snapshot instances
----   3. form_assignment_template_history — append-only audit changelog
+---   1. ircc_form_assignment_templates   -  reusable per-matter-type form config
+---   2. matter_form_instances            -  per-matter snapshot instances
+---   3. form_assignment_template_history  -  append-only audit changelog
 ---
 --- Data migration: existing ircc_stream_forms rows → assignment templates
 --- ═══════════════════════════════════════════════════════════════════════════════

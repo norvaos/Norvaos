@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * Document Engine — Field Resolver (Pure Function Engine)
+ * Document Engine  -  Field Resolver (Pure Function Engine)
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * Resolves merge field placeholders from pre-fetched data.

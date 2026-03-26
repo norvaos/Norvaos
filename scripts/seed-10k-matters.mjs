@@ -15,11 +15,11 @@ const MATTER_TYPES = [
   { id: '0b676a6a-e934-4037-acad-5c0d12cae1ee', name: 'Work Permit' },
   { id: 'baeac916-3a00-470b-aca8-c6e088fcb5b2', name: 'Express Entry' },
   { id: 'dd99fa52-3ea7-43a3-ab97-d3b04bec9b7a', name: 'PR Application' },
-  { id: 'ea0e35d9-f407-42f8-a1bc-e8878902d063', name: 'Visitor Visa — Inside Canada' },
-  { id: 'bea9a5e7-2e90-4b52-a80e-21150bde953f', name: 'Visitor Visa — Outside Canada' },
+  { id: 'ea0e35d9-f407-42f8-a1bc-e8878902d063', name: 'Visitor Visa  -  Inside Canada' },
+  { id: 'bea9a5e7-2e90-4b52-a80e-21150bde953f', name: 'Visitor Visa  -  Outside Canada' },
   { id: '966db7c5-1d38-4f11-9c46-2f70ac018296', name: 'PGWP' },
-  { id: '2ad0bb84-fce3-419d-90d1-fb3cdaa61721', name: 'Spousal Sponsorship — Inside' },
-  { id: '02da5696-3e19-47aa-92c5-a66243e1e5ed', name: 'Spousal Sponsorship — Outside' },
+  { id: '2ad0bb84-fce3-419d-90d1-fb3cdaa61721', name: 'Spousal Sponsorship  -  Inside' },
+  { id: '02da5696-3e19-47aa-92c5-a66243e1e5ed', name: 'Spousal Sponsorship  -  Outside' },
   { id: 'a56520f5-6da7-402d-9fdc-2c1bb4d5e253', name: 'General Matter' },
 ]
 
@@ -55,7 +55,7 @@ function generateMatter(i) {
   const mt = pick(MATTER_TYPES)
   const firstName = pick(FIRST_NAMES)
   const lastName = pick(LAST_NAMES)
-  const title = `[GHOST] ${firstName} ${lastName} — ${mt.name}`
+  const title = `[GHOST] ${firstName} ${lastName}  -  ${mt.name}`
 
   return {
     tenant_id: TENANT_ID,

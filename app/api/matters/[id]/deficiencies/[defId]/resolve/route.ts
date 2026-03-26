@@ -5,7 +5,7 @@
  * Auth: Lawyer or Admin role only.
  * Body: { resolution_notes: string (min 20 chars), resolution_evidence_path?: string }
  *
- * Sprint 6, Week 1 — 2026-03-17
+ * Sprint 6, Week 1  -  2026-03-17
  */
 
 import { NextResponse } from 'next/server'
@@ -24,7 +24,7 @@ export async function PUT(
     const admin = createAdminClient()
 
     // Role check: Lawyer or Admin only.
-    // auth.role is pre-fetched by authenticateRequest() — zero extra DB calls.
+    // auth.role is pre-fetched by authenticateRequest()  -  zero extra DB calls.
     const roleName = auth.role?.name ?? null
 
     if (roleName !== 'Lawyer' && roleName !== 'Admin') {

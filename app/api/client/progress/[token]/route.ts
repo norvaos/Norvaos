@@ -1,7 +1,7 @@
 /**
  * GET /api/client/progress/[token]
  *
- * Client-facing progress API — returns stage pipeline + missing documents.
+ * Client-facing progress API  -  returns stage pipeline + missing documents.
  *
  * Security (Sentinel):
  * - Token lookup via portal_links (admin client, no RLS bypass exposed)
@@ -73,7 +73,7 @@ export async function GET(
     // This ensures data is scoped to the specific client.
     if (!link.contact_id) {
       return NextResponse.json(
-        { success: false, error: 'Access denied — no contact association' },
+        { success: false, error: 'Access denied  -  no contact association' },
         { status: 403 },
       )
     }
@@ -119,7 +119,7 @@ export async function GET(
 
       if (!peopleCount || peopleCount === 0) {
         return NextResponse.json(
-          { success: false, error: 'Access denied — contact not linked to this matter' },
+          { success: false, error: 'Access denied  -  contact not linked to this matter' },
           { status: 403 },
         )
       }
@@ -157,7 +157,7 @@ export async function GET(
 
       stagesPayload = {
         currentStageName: currentIdx >= 0 ? sorted[currentIdx]?.name ?? null : null,
-        timeInStage: stageEnteredAt ? formatDuration(stageEnteredAt) : '—',
+        timeInStage: stageEnteredAt ? formatDuration(stageEnteredAt) : ' - ',
         pipelineProgress: progress,
         stages: sorted.map((s, idx) => ({
           name: s.name,

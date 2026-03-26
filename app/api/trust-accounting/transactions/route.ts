@@ -1,6 +1,6 @@
 /**
- * GET  /api/trust-accounting/transactions — List trust transactions (filterable)
- * POST /api/trust-accounting/transactions — Record a deposit or opening balance
+ * GET  /api/trust-accounting/transactions  -  List trust transactions (filterable)
+ * POST /api/trust-accounting/transactions  -  Record a deposit or opening balance
  */
 
 import { NextRequest, NextResponse } from 'next/server'

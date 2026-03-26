@@ -23,7 +23,7 @@ const directHost = process.env.SUPABASE_DIRECT_HOST
 
 if (!user || !password) {
   console.error('Missing required env vars: SUPABASE_DB_USER, SUPABASE_DB_PASSWORD')
-  console.error('Set these in .env.local — see .env.example for the required keys')
+  console.error('Set these in .env.local  -  see .env.example for the required keys')
   process.exit(1)
 }
 

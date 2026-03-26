@@ -119,7 +119,7 @@ async function runChecks(): Promise<void> {
   if (DEMO_TENANT_ID!.includes('demo')) {
     pass('tenant_id_format', 'DEMO_TENANT_ID contains "demo" marker')
   } else {
-    warn('tenant_id_format', 'DEMO_TENANT_ID does not contain "demo" — verify this is not a production tenant')
+    warn('tenant_id_format', 'DEMO_TENANT_ID does not contain "demo"  -  verify this is not a production tenant')
   }
 
   // Check 5: No cross-tenant data leakage
@@ -145,10 +145,10 @@ async function runChecks(): Promise<void> {
 
   console.log()
   if (failCount > 0) {
-    console.error(`VERIFICATION FAILED — ${failCount} check(s) did not pass`)
+    console.error(`VERIFICATION FAILED  -  ${failCount} check(s) did not pass`)
     process.exit(1)
   } else {
-    console.log('VERIFICATION PASSED — demo data meets isolation requirements')
+    console.log('VERIFICATION PASSED  -  demo data meets isolation requirements')
     process.exit(0)
   }
 }

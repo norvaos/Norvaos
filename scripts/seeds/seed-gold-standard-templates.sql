@@ -1,11 +1,11 @@
 -- ============================================================================
--- Seed: Gold Standard Templates — Initial Seed for Launch
+-- Seed: Gold Standard Templates  -  Initial Seed for Launch
 -- ============================================================================
 -- Pre-populates Success-Reverb with 3 Gold Standard templates from
 -- top-performing mock cases:
---   1. Spousal Sponsorship — 14-day approval
---   2. Study Permit — 21-day approval
---   3. Humanitarian & Compassionate (H&C) — 42-day approval
+--   1. Spousal Sponsorship  -  14-day approval
+--   2. Study Permit  -  21-day approval
+--   3. Humanitarian & Compassionate (H&C)  -  42-day approval
 --
 -- These ensure the first Founding 100 firms see the Success-Reverb banner
 -- immediately: "Apply the 'High-Speed Approval' template from our recent
@@ -69,7 +69,7 @@ BEGIN
     v_matter_hc := COALESCE(v_matter_spousal, gen_random_uuid());
   END IF;
 
-  -- ── 1. Spousal Sponsorship — "High-Speed Approval" (14 days) ───────
+  -- ── 1. Spousal Sponsorship  -  "High-Speed Approval" (14 days) ───────
   INSERT INTO gold_standard_templates (
     tenant_id, source_matter_id, case_type, matter_type_name,
     readability_score, grade, keyword_density, document_structure,
@@ -105,7 +105,7 @@ BEGIN
   )
   ON CONFLICT DO NOTHING;
 
-  -- ── 2. Study Permit — "Academic Fast-Track" (21 days) ──────────────
+  -- ── 2. Study Permit  -  "Academic Fast-Track" (21 days) ──────────────
   INSERT INTO gold_standard_templates (
     tenant_id, source_matter_id, case_type, matter_type_name,
     readability_score, grade, keyword_density, document_structure,
@@ -141,7 +141,7 @@ BEGIN
   )
   ON CONFLICT DO NOTHING;
 
-  -- ── 3. Humanitarian & Compassionate — "Compassion Victory" (42 days) ─
+  -- ── 3. Humanitarian & Compassionate  -  "Compassion Victory" (42 days) ─
   INSERT INTO gold_standard_templates (
     tenant_id, source_matter_id, case_type, matter_type_name,
     readability_score, grade, keyword_density, document_structure,

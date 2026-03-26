@@ -200,10 +200,10 @@ function OverviewSection({
               <span className="text-muted-foreground">Version:</span> v{version.version_number as number}
             </div>
             <div>
-              <span className="text-muted-foreground">Label:</span> {(version.version_label as string) || '—'}
+              <span className="text-muted-foreground">Label:</span> {(version.version_label as string) || ' - '}
             </div>
             <div className="col-span-2">
-              <span className="text-muted-foreground">Summary:</span> {(version.change_summary as string) || '—'}
+              <span className="text-muted-foreground">Summary:</span> {(version.change_summary as string) || ' - '}
             </div>
           </div>
         </div>

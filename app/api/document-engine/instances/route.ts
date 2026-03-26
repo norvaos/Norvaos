@@ -1,6 +1,6 @@
 /**
- * GET  /api/document-engine/instances — List instances (filtered by matter/contact/status)
- * POST /api/document-engine/instances — Generate a new document instance
+ * GET  /api/document-engine/instances  -  List instances (filtered by matter/contact/status)
+ * POST /api/document-engine/instances  -  Generate a new document instance
  */
 
 import { NextRequest, NextResponse } from 'next/server'

@@ -7,7 +7,7 @@ import { test, expect } from '@playwright/test';
  * matter and verifying that NorvaOS AI classification is applied.
  */
 
-// Minimal valid PDF generated inline — no external fixture file required.
+// Minimal valid PDF generated inline  -  no external fixture file required.
 const testPdf = Buffer.from(
   '%PDF-1.4\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj\n' +
     '2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj\n' +
@@ -54,7 +54,7 @@ test.describe('Golden Path: Document Upload & Classification', () => {
     });
 
     // ── Step 4: Wait for the upload to complete ─────────────────────
-    // Look for a success indicator — toast, status badge, or row entry.
+    // Look for a success indicator  -  toast, status badge, or row entry.
     await expect(
       page.getByText(/upload(ed|complete|success)/i).first(),
     ).toBeVisible({ timeout: 15_000 });

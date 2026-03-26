@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * IntakeClient — Client-facing branded intake form.
+ * IntakeClient  -  Client-facing branded intake form.
  *
  * Renders the questionnaire in a premium, firm-branded layout.
  * Includes: save/retry with draft indicator, per-form progress,

@@ -6,7 +6,7 @@
 -- The Python sidecar processes form_pack_config from matter_type and
 -- writes the result back; this table is the audit trail.
 --
--- 2026-03-17 — Sprint 6, Week 2
+-- 2026-03-17  -  Sprint 6, Week 2
 -- ============================================================================
 
 CREATE TABLE IF NOT EXISTS form_generation_log (
@@ -82,7 +82,7 @@ COMMENT ON TABLE form_generation_log IS
   'Audit log for every PDF form generation job dispatched to the Python sidecar. '
   'status lifecycle: pending → processing → completed | failed. '
   'output_path stores the Supabase Storage path of the generated PDF. '
-  'Sprint 6, Week 2 — Migration 130.';
+  'Sprint 6, Week 2  -  Migration 130.';
 
 -- ============================================================================
 -- END Migration 130

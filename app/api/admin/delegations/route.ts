@@ -7,7 +7,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 
 /**
  * GET /api/admin/delegations
- * Admin-only — requirePermission throws 403 if unauthorised.
+ * Admin-only  -  requirePermission throws 403 if unauthorised.
  *
  * Returns active delegations for the authenticated user.
  * Any authenticated user can view their own delegations.

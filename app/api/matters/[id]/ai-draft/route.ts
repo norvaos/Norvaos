@@ -1,7 +1,7 @@
 /**
  * POST /api/matters/[id]/ai-draft
  *
- * Norva Intelligence — AI-Paralegal Drafting Engine.
+ * Norva Intelligence  -  AI-Paralegal Drafting Engine.
  *
  * Flow:
  * 1. Auth + tenant validation via authenticateRequest()
@@ -89,7 +89,7 @@ Remember: Use [MISSING DATA] for any missing fields. Never invent information.`
       try {
         sourceAttributions = JSON.parse(sourcesMatch[1])
       } catch {
-        // Attribution parsing failed — non-fatal
+        // Attribution parsing failed  -  non-fatal
       }
     }
 
