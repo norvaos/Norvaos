@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
     )
 
     // Store in DB
-    await admin.from('graph_webhook_subscriptions').insert({
+    await (admin as any).from('graph_webhook_subscriptions').insert({
       tenant_id: profile.tenant_id,
       connection_id: connection.id,
       graph_subscription_id: subscription.id,

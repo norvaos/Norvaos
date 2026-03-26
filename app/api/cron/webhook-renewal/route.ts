@@ -19,17 +19,19 @@ export async function POST(request: Request) {
   }
 
   const admin = createAdminClient()
+  // Cast to any — graph_webhook_subscriptions not yet in generated Database types
+  const db = admin as any
   const stats = { renewed: 0, failed: 0, deactivated: 0 }
 
   try {
     // Find subscriptions expiring within 24 hours
     const expirationThreshold = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
 
-    const { data: expiring } = await (admin as any)
+    const { data: expiring } = await db
       .from('graph_webhook_subscriptions')
       .select('id, graph_subscription_id, connection_id, error_count')
       .eq('is_active', true)
-      .lt('expiration_datetime', expirationThreshold) as { data: { id: string; graph_subscription_id: string; connection_id: string; error_count: number }[] | null }
+      .lt('expiration_datetime', expirationThreshold)
 
     if (!expiring || expiring.length === 0) {
       return NextResponse.json({ message: 'No subscriptions to renew', stats })
@@ -39,7 +41,7 @@ export async function POST(request: Request) {
       try {
         if (sub.error_count >= 5) {
           // Too many errors — deactivate instead of renewing
-          await admin
+          await db
             .from('graph_webhook_subscriptions')
             .update({ is_active: false, updated_at: new Date().toISOString() })
             .eq('id', sub.id)
@@ -54,7 +56,7 @@ export async function POST(request: Request) {
         const msg = err instanceof Error ? err.message : 'Unknown error'
         console.error(`[webhook-renewal] Failed to renew ${sub.graph_subscription_id}:`, msg)
 
-        await admin
+        await db
           .from('graph_webhook_subscriptions')
           .update({
             error_count: sub.error_count + 1,

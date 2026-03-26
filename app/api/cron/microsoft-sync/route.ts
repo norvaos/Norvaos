@@ -9,6 +9,7 @@ import {
 } from '@/lib/services/microsoft-sync'
 import { syncInboundEmails } from '@/lib/services/email-sync'
 import { associateEmailToMatter } from '@/lib/services/email-association'
+import { renewSubscription } from '@/lib/services/microsoft-webhooks'
 
 const MAX_ERROR_COUNT = 10
 
@@ -36,6 +37,7 @@ async function handlePost(request: Request) {
     tasksSynced: 0,
     emailsSynced: 0,
     emailsCreated: 0,
+    subscriptionsRenewed: 0,
     errors: 0,
   }
 
@@ -133,6 +135,30 @@ async function handlePost(request: Request) {
           } catch {
             // Non-blocking — association failures should not stop the cron
           }
+        }
+      }
+    }
+
+    // ── 4. Webhook subscription renewal ───────────────────────────────────
+    const twentyFourHoursFromNow = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+    const { data: expiringSubscriptions } = await (admin as any)
+      .from('graph_webhook_subscriptions')
+      .select('id, connection_id, graph_subscription_id')
+      .eq('is_active', true)
+      .lt('expiration_datetime', twentyFourHoursFromNow)
+
+    if (expiringSubscriptions && expiringSubscriptions.length > 0) {
+      for (const sub of expiringSubscriptions) {
+        try {
+          await renewSubscription(sub.graph_subscription_id, sub.connection_id, admin)
+          stats.subscriptionsRenewed++
+        } catch (err) {
+          stats.errors++
+          const errorMessage = err instanceof Error ? err.message : 'Unknown error'
+          console.error(
+            `[cron/microsoft-sync] Webhook renewal failed for subscription ${sub.graph_subscription_id}:`,
+            errorMessage
+          )
         }
       }
     }

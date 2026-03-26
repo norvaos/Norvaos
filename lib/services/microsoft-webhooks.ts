@@ -62,7 +62,8 @@ export async function createOneDriveSubscription(
   )
 
   // Persist subscription record in the database
-  const { error: dbError } = await adminClient
+  // Cast: graph_webhook_subscriptions not in generated Database types (Migration 198)
+  const { error: dbError } = await (adminClient as any)
     .from('graph_webhook_subscriptions')
     .insert({
       id: subscription.id,
@@ -105,7 +106,7 @@ export async function renewSubscription(
     body: { expirationDateTime },
   })
 
-  const { error: dbError } = await adminClient
+  const { error: dbError } = await (adminClient as any)
     .from('graph_webhook_subscriptions')
     .update({
       expiration_date_time: expirationDateTime,
@@ -133,7 +134,7 @@ export async function deleteSubscription(
     method: 'DELETE',
   })
 
-  const { error: dbError } = await adminClient
+  const { error: dbError } = await (adminClient as any)
     .from('graph_webhook_subscriptions')
     .delete()
     .eq('id', subscriptionId)
@@ -186,7 +187,7 @@ export async function processChangeNotification(
   adminClient: SupabaseClient<Database>
 ): Promise<void> {
   // Look up the subscription to find the owning connection and validate clientState
-  const { data: subscription, error: lookupError } = await adminClient
+  const { data: subscription, error: lookupError } = await (adminClient as any)
     .from('graph_webhook_subscriptions')
     .select('id, connection_id, client_state, resource')
     .eq('id', notification.subscriptionId)
