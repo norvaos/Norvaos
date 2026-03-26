@@ -453,8 +453,9 @@ export default function DashboardLayout({
   const pathname = usePathname()
   useEffect(() => {
     if (tenantLoading || !tenant) return
-    // Don't redirect if already on the setup page
+    // Don't redirect if already on the setup page or onboarding flow
     if (pathname.startsWith('/setup/compliance')) return
+    if (pathname.startsWith('/onboarding')) return
     if (!tenant.home_province) {
       router.replace('/setup/compliance')
     }
