@@ -66,6 +66,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
 import { DocumentScanButton } from '@/components/shared/document-scan-button'
+import { TamperStatusIndicator } from '@/components/matters/document-tamper-overlay'
 
 // ─── Types ──────────────────────────────────────────────────────────────────────
 
@@ -299,6 +300,12 @@ export function SlotCard({
           <span className="truncate max-w-[200px]">{currentDoc.file_name}</span>
           <span className="text-muted-foreground/50">·</span>
           <span>{formatFileSize(currentDoc.file_size)}</span>
+          {/* Directive 016.1: Integrity Overlay — tamper status indicator */}
+          <span className="text-muted-foreground/50">·</span>
+          <TamperStatusIndicator
+            documentId={currentDoc.id}
+            tamperStatus={(currentDoc as { tamper_status?: string }).tamper_status as 'verified' | 'tampered' | 'unchecked' | undefined}
+          />
         </div>
       )}
 

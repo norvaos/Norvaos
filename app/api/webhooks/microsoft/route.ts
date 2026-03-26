@@ -156,7 +156,7 @@ async function processNotification(
   })
 
   // 1. Look up the subscription in our database
-  const { data: subscription, error: subErr } = await admin
+  const { data: subscription, error: subErr } = await (admin as any)
     .from('microsoft_graph_subscriptions')
     .select('id, connection_id, client_state, tenant_id, resource')
     .eq('subscription_id', subscriptionId)
@@ -180,7 +180,7 @@ async function processNotification(
     })
 
     // Audit log the security event
-    await admin.from('webhook_audit_log').insert({
+    await (admin as any).from('webhook_audit_log').insert({
       provider: 'microsoft',
       event_type: 'client_state_mismatch',
       subscription_id: subscriptionId,
@@ -206,7 +206,7 @@ async function processNotification(
     })
 
     // Still log the event for audit
-    await admin.from('webhook_audit_log').insert({
+    await (admin as any).from('webhook_audit_log').insert({
       provider: 'microsoft',
       event_type: 'change_notification',
       subscription_id: subscriptionId,
@@ -224,7 +224,7 @@ async function processNotification(
   }
 
   // 4. Audit log the notification
-  await admin.from('webhook_audit_log').insert({
+  await (admin as any).from('webhook_audit_log').insert({
     provider: 'microsoft',
     event_type: 'change_notification',
     subscription_id: subscriptionId,

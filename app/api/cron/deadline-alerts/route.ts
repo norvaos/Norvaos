@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { processAutomationTrigger } from '@/lib/services/automation-engine'
 import { calculateDeadlineRiskScore } from '@/lib/utils/deadline-risk-engine'
+import { processMultiLayerAlerts } from '@/lib/services/deadline-shield'
 import { withTiming } from '@/lib/middleware/request-timing'
 import type { Database } from '@/lib/types/database'
 
@@ -29,7 +30,7 @@ async function handlePost(request: Request) {
   const supabase = createAdminClient()
   const today = new Date()
   const todayStr = today.toISOString().split('T')[0]
-  const stats = { tenantsProcessed: 0, overdueUpdated: 0, atRiskUpdated: 0, alertsCreated: 0, criticalEscalations: 0 }
+  const stats = { tenantsProcessed: 0, overdueUpdated: 0, atRiskUpdated: 0, alertsCreated: 0, criticalEscalations: 0, shield_alerts_24h: 0, shield_alerts_1w: 0, shield_alerts_1m: 0, shield_escalations: 0 }
 
   try {
     // 1. Fetch all active tenants
@@ -130,6 +131,22 @@ async function handlePost(request: Request) {
             // Don't block processing of other deadlines
           }
         }
+      }
+    }
+
+    // ── Deadline Shield: Multi-Layer Alert Enforcement ──────────────────
+    // Process shielded deadline alerts (24h, 1w, 1m, escalation) for each tenant.
+    for (const tenant of tenants) {
+      try {
+        const shieldResult = await processMultiLayerAlerts(tenant.id)
+        if (shieldResult.success && shieldResult.data) {
+          stats.shield_alerts_24h += shieldResult.data.alerts_24h
+          stats.shield_alerts_1w += shieldResult.data.alerts_1w
+          stats.shield_alerts_1m += shieldResult.data.alerts_1m
+          stats.shield_escalations += shieldResult.data.escalations
+        }
+      } catch {
+        // Don't block processing of other tenants
       }
     }
 

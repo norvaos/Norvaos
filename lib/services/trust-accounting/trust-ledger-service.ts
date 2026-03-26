@@ -171,6 +171,13 @@ const LOG_PREFIX = '[trust-ledger-service]'
 
 /**
  * Write an immutable audit log entry via admin client (bypasses RLS).
+ *
+ * NOTE (Directive 005): The critical balance-level audit is now handled by
+ * the trust_ledger_audit DB trigger (migration 200). Every trust_transactions
+ * INSERT automatically creates a trust_ledger_audit row in the same DB
+ * transaction — if the audit fails, the transaction rolls back. This
+ * writeAuditLog function remains as a secondary operational log for non-
+ * balance events (disbursement approvals, hold releases, etc.).
  */
 async function writeAuditLog(params: {
   tenantId: string

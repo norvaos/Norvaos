@@ -6,6 +6,7 @@
  */
 
 import { createClient } from '@/lib/supabase/client'
+import { withContactPIIEncrypted, withLeadPIIEncrypted } from '@/lib/services/pii-dual-write'
 
 interface CreateIntakeParams {
   tenantId: string
@@ -49,6 +50,12 @@ export async function createSovereignIntake(params: CreateIntakeParams): Promise
       pipeline_stage: 'new_lead',
       milestone: 'lead_created',
       created_by: params.userId,
+      ...withContactPIIEncrypted({
+        first_name: params.firstName,
+        last_name: params.lastName,
+        email_primary: params.emailPrimary || null,
+        phone_primary: params.phonePrimary || null,
+      }),
     })
     .select('id')
     .single()
@@ -101,6 +108,7 @@ export async function createSovereignIntake(params: CreateIntakeParams): Promise
       source: params.source || 'sovereign_intake',
       practice_area_id: params.practiceAreaId || null,
       created_by: params.userId,
+      ...withLeadPIIEncrypted({}),
     })
     .select('id')
     .single()

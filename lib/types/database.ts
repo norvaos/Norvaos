@@ -420,6 +420,9 @@ export type Database = {
           status: string
           tenant_id: string
           user_id: string
+          guest_name_encrypted: string | null
+          guest_email_encrypted: string | null
+          guest_phone_encrypted: string | null
         }
         Insert: {
           answers?: Json | null
@@ -444,6 +447,9 @@ export type Database = {
           status?: string
           tenant_id: string
           user_id: string
+          guest_name_encrypted?: string | null
+          guest_email_encrypted?: string | null
+          guest_phone_encrypted?: string | null
         }
         Update: {
           answers?: Json | null
@@ -468,6 +474,9 @@ export type Database = {
           status?: string
           tenant_id?: string
           user_id?: string
+          guest_name_encrypted?: string | null
+          guest_email_encrypted?: string | null
+          guest_phone_encrypted?: string | null
         }
         Relationships: [
           {
@@ -2964,6 +2973,139 @@ export type Database = {
           },
         ]
       }
+      matter_genesis_metadata: {
+        Row: {
+          id: string
+          tenant_id: string
+          matter_id: string
+          generated_by: string
+          generated_at: string
+          conflict_scan_id: string | null
+          conflict_search_id: string | null
+          conflict_decision: string | null
+          conflict_justification: string | null
+          conflict_score: number | null
+          conflict_decided_at: string | null
+          kyc_verification_id: string | null
+          kyc_status: string | null
+          kyc_document_type: string | null
+          kyc_document_hash: string | null
+          kyc_verified_at: string | null
+          retainer_agreement_id: string | null
+          retainer_status: string | null
+          retainer_signed_at: string | null
+          retainer_total_cents: number | null
+          retainer_hash: string | null
+          initial_trust_balance: number
+          last_trust_audit_hash: string | null
+          genesis_payload: Record<string, unknown>
+          genesis_hash: string
+          trust_audit_chain_seq: number | null
+          is_compliant: boolean
+          has_sequence_violation: boolean
+          compliance_notes: string | null
+          is_revoked: boolean
+          revoked_at: string | null
+          revoked_by: string | null
+          revocation_reason: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          tenant_id: string
+          matter_id: string
+          generated_by: string
+          generated_at?: string
+          conflict_scan_id?: string | null
+          conflict_search_id?: string | null
+          conflict_decision?: string | null
+          conflict_justification?: string | null
+          conflict_score?: number | null
+          conflict_decided_at?: string | null
+          kyc_verification_id?: string | null
+          kyc_status?: string | null
+          kyc_document_type?: string | null
+          kyc_document_hash?: string | null
+          kyc_verified_at?: string | null
+          retainer_agreement_id?: string | null
+          retainer_status?: string | null
+          retainer_signed_at?: string | null
+          retainer_total_cents?: number | null
+          retainer_hash?: string | null
+          initial_trust_balance?: number
+          last_trust_audit_hash?: string | null
+          genesis_payload: Record<string, unknown>
+          genesis_hash: string
+          trust_audit_chain_seq?: number | null
+          is_compliant?: boolean
+          has_sequence_violation?: boolean
+          compliance_notes?: string | null
+          is_revoked?: boolean
+          revoked_at?: string | null
+          revoked_by?: string | null
+          revocation_reason?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          tenant_id?: string
+          matter_id?: string
+          generated_by?: string
+          generated_at?: string
+          conflict_scan_id?: string | null
+          conflict_search_id?: string | null
+          conflict_decision?: string | null
+          conflict_justification?: string | null
+          conflict_score?: number | null
+          conflict_decided_at?: string | null
+          kyc_verification_id?: string | null
+          kyc_status?: string | null
+          kyc_document_type?: string | null
+          kyc_document_hash?: string | null
+          kyc_verified_at?: string | null
+          retainer_agreement_id?: string | null
+          retainer_status?: string | null
+          retainer_signed_at?: string | null
+          retainer_total_cents?: number | null
+          retainer_hash?: string | null
+          initial_trust_balance?: number
+          last_trust_audit_hash?: string | null
+          genesis_payload?: Record<string, unknown>
+          genesis_hash?: string
+          trust_audit_chain_seq?: number | null
+          is_compliant?: boolean
+          has_sequence_violation?: boolean
+          compliance_notes?: string | null
+          is_revoked?: boolean
+          revoked_at?: string | null
+          revoked_by?: string | null
+          revocation_reason?: string | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "matter_genesis_metadata_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matter_genesis_metadata_matter_id_fkey"
+            columns: ["matter_id"]
+            isOneToOne: true
+            referencedRelation: "matters"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matter_genesis_metadata_generated_by_fkey"
+            columns: ["generated_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       conflict_decisions: {
         Row: {
           contact_id: string
@@ -3419,6 +3561,13 @@ export type Database = {
           travel_history_flag: boolean | null
           updated_at: string | null
           website: string | null
+          first_name_encrypted: string | null
+          last_name_encrypted: string | null
+          date_of_birth_encrypted: string | null
+          address_encrypted: string | null
+          passport_number_encrypted: string | null
+          phone_encrypted: string | null
+          email_encrypted: string | null
         }
         Insert: {
           address_line1?: string | null
@@ -3488,6 +3637,13 @@ export type Database = {
           travel_history_flag?: boolean | null
           updated_at?: string | null
           website?: string | null
+          first_name_encrypted?: string | null
+          last_name_encrypted?: string | null
+          date_of_birth_encrypted?: string | null
+          address_encrypted?: string | null
+          passport_number_encrypted?: string | null
+          phone_encrypted?: string | null
+          email_encrypted?: string | null
         }
         Update: {
           address_line1?: string | null
@@ -3557,6 +3713,13 @@ export type Database = {
           travel_history_flag?: boolean | null
           updated_at?: string | null
           website?: string | null
+          first_name_encrypted?: string | null
+          last_name_encrypted?: string | null
+          date_of_birth_encrypted?: string | null
+          address_encrypted?: string | null
+          passport_number_encrypted?: string | null
+          phone_encrypted?: string | null
+          email_encrypted?: string | null
         }
         Relationships: [
           {
@@ -10983,6 +11146,10 @@ export type Database = {
           jurisdiction_id: string | null
           preferred_view: string
           preferred_language: string | null
+          first_name_encrypted: string | null
+          last_name_encrypted: string | null
+          email_encrypted: string | null
+          phone_encrypted: string | null
         }
         Insert: {
           assigned_intake_staff_id?: string | null
@@ -11045,6 +11212,10 @@ export type Database = {
           jurisdiction_id?: string | null
           preferred_view?: string
           preferred_language?: string | null
+          first_name_encrypted?: string | null
+          last_name_encrypted?: string | null
+          email_encrypted?: string | null
+          phone_encrypted?: string | null
         }
         Update: {
           assigned_intake_staff_id?: string | null
@@ -11107,6 +11278,10 @@ export type Database = {
           jurisdiction_id?: string | null
           preferred_view?: string
           preferred_language?: string | null
+          first_name_encrypted?: string | null
+          last_name_encrypted?: string | null
+          email_encrypted?: string | null
+          phone_encrypted?: string | null
         }
         Relationships: [
           {
@@ -12120,6 +12295,13 @@ export type Database = {
           intended_destination: string | null
           target_entry_date: string | null
           has_representative: boolean | null
+          passport_number_encrypted: string | null
+          date_of_birth_encrypted: string | null
+          uci_number_encrypted: string | null
+          prior_refusal_details_encrypted: string | null
+          criminal_record_details_encrypted: string | null
+          medical_issue_details_encrypted: string | null
+          sponsor_name_encrypted: string | null
         }
         Insert: {
           application_number?: string | null
@@ -12187,6 +12369,13 @@ export type Database = {
           intended_destination?: string | null
           target_entry_date?: string | null
           has_representative?: boolean | null
+          passport_number_encrypted?: string | null
+          date_of_birth_encrypted?: string | null
+          uci_number_encrypted?: string | null
+          prior_refusal_details_encrypted?: string | null
+          criminal_record_details_encrypted?: string | null
+          medical_issue_details_encrypted?: string | null
+          sponsor_name_encrypted?: string | null
         }
         Update: {
           application_number?: string | null
@@ -12254,6 +12443,13 @@ export type Database = {
           intended_destination?: string | null
           target_entry_date?: string | null
           has_representative?: boolean | null
+          passport_number_encrypted?: string | null
+          date_of_birth_encrypted?: string | null
+          uci_number_encrypted?: string | null
+          prior_refusal_details_encrypted?: string | null
+          criminal_record_details_encrypted?: string | null
+          medical_issue_details_encrypted?: string | null
+          sponsor_name_encrypted?: string | null
         }
         Relationships: [
           {
@@ -19490,6 +19686,394 @@ export type Database = {
           },
         ]
       }
+      // ─── Directive 018/021/023: Continuity Engine & Shadow Matter ────────
+      address_history: {
+        Row: {
+          id: string
+          tenant_id: string
+          contact_id: string
+          matter_id: string | null
+          label: string | null
+          address_line1: string
+          address_line2: string | null
+          city: string
+          province_state: string | null
+          postal_code: string | null
+          country: string
+          start_date: string
+          end_date: string | null
+          is_current: boolean
+          source: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          tenant_id: string
+          contact_id: string
+          matter_id?: string | null
+          label?: string | null
+          address_line1: string
+          address_line2?: string | null
+          city: string
+          province_state?: string | null
+          postal_code?: string | null
+          country?: string
+          start_date: string
+          end_date?: string | null
+          is_current?: boolean
+          source?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          tenant_id?: string
+          contact_id?: string
+          matter_id?: string | null
+          label?: string | null
+          address_line1?: string
+          address_line2?: string | null
+          city?: string
+          province_state?: string | null
+          postal_code?: string | null
+          country?: string
+          start_date?: string
+          end_date?: string | null
+          is_current?: boolean
+          source?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "address_history_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "address_history_matter_id_fkey"
+            columns: ["matter_id"]
+            isOneToOne: false
+            referencedRelation: "matters"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "address_history_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      personal_history: {
+        Row: {
+          id: string
+          tenant_id: string
+          contact_id: string
+          matter_id: string | null
+          history_type: string
+          label: string | null
+          organization: string | null
+          position_title: string | null
+          city: string | null
+          province_state: string | null
+          country: string | null
+          start_date: string
+          end_date: string | null
+          is_current: boolean
+          source: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          tenant_id: string
+          contact_id: string
+          matter_id?: string | null
+          history_type?: string
+          label?: string | null
+          organization?: string | null
+          position_title?: string | null
+          city?: string | null
+          province_state?: string | null
+          country?: string | null
+          start_date: string
+          end_date?: string | null
+          is_current?: boolean
+          source?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          tenant_id?: string
+          contact_id?: string
+          matter_id?: string | null
+          history_type?: string
+          label?: string | null
+          organization?: string | null
+          position_title?: string | null
+          city?: string | null
+          province_state?: string | null
+          country?: string | null
+          start_date?: string
+          end_date?: string | null
+          is_current?: boolean
+          source?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "personal_history_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "personal_history_matter_id_fkey"
+            columns: ["matter_id"]
+            isOneToOne: false
+            referencedRelation: "matters"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "personal_history_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      prospect_triggers: {
+        Row: {
+          id: string
+          tenant_id: string
+          contact_id: string
+          document_type: string
+          expiry_date: string
+          trigger_at_days: number[]
+          last_triggered_at: string | null
+          last_trigger_days: number | null
+          shadow_matter_id: string | null
+          status: string
+          source_matter_id: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          tenant_id: string
+          contact_id: string
+          document_type: string
+          expiry_date: string
+          trigger_at_days?: number[]
+          last_triggered_at?: string | null
+          last_trigger_days?: number | null
+          shadow_matter_id?: string | null
+          status?: string
+          source_matter_id?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          tenant_id?: string
+          contact_id?: string
+          document_type?: string
+          expiry_date?: string
+          trigger_at_days?: number[]
+          last_triggered_at?: string | null
+          last_trigger_days?: number | null
+          shadow_matter_id?: string | null
+          status?: string
+          source_matter_id?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prospect_triggers_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "prospect_triggers_shadow_matter_id_fkey"
+            columns: ["shadow_matter_id"]
+            isOneToOne: false
+            referencedRelation: "matters"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "prospect_triggers_source_matter_id_fkey"
+            columns: ["source_matter_id"]
+            isOneToOne: false
+            referencedRelation: "matters"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "prospect_triggers_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      compliance_overrides: {
+        Row: {
+          id: string
+          tenant_id: string
+          matter_id: string
+          override_type: string
+          blocked_node: string
+          original_status: string
+          justification: string
+          justification_hash: string
+          authorized_by: string
+          authorized_role: string
+          partner_pin_hash: string
+          genesis_amendment_hash: string | null
+          is_active: boolean
+          revoked_at: string | null
+          revoked_by: string | null
+          revocation_reason: string | null
+          expires_at: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          tenant_id: string
+          matter_id: string
+          override_type: string
+          blocked_node: string
+          original_status: string
+          justification: string
+          justification_hash: string
+          authorized_by: string
+          authorized_role: string
+          partner_pin_hash: string
+          genesis_amendment_hash?: string | null
+          is_active?: boolean
+          revoked_at?: string | null
+          revoked_by?: string | null
+          revocation_reason?: string | null
+          expires_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          tenant_id?: string
+          matter_id?: string
+          override_type?: string
+          blocked_node?: string
+          original_status?: string
+          justification?: string
+          justification_hash?: string
+          authorized_by?: string
+          authorized_role?: string
+          partner_pin_hash?: string
+          genesis_amendment_hash?: string | null
+          is_active?: boolean
+          revoked_at?: string | null
+          revoked_by?: string | null
+          revocation_reason?: string | null
+          expires_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "compliance_overrides_matter_id_fkey"
+            columns: ["matter_id"]
+            isOneToOne: false
+            referencedRelation: "matters"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "compliance_overrides_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "compliance_overrides_authorized_by_fkey"
+            columns: ["authorized_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "compliance_overrides_revoked_by_fkey"
+            columns: ["revoked_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      firm_global_audit_ledger: {
+        Row: {
+          id: string
+          tenant_id: string
+          event_type: string
+          event_payload: Json
+          event_hash: string
+          prev_hash: string
+          chain_seq: number
+          created_by: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          tenant_id: string
+          event_type: string
+          event_payload?: Json
+          event_hash: string
+          prev_hash: string
+          chain_seq: number
+          created_by?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          tenant_id?: string
+          event_type?: string
+          event_payload?: Json
+          event_hash?: string
+          prev_hash?: string
+          chain_seq?: number
+          created_by?: string | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "firm_global_audit_ledger_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "firm_global_audit_ledger_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       mv_lead_metrics: {
@@ -20048,6 +20632,54 @@ export type Database = {
       }
     }
     Functions: {
+      fn_generate_matter_genesis_block: {
+        Args: {
+          p_matter_id: string
+          p_tenant_id: string
+          p_user_id: string
+        }
+        Returns: Record<string, unknown>
+      }
+      fn_revoke_genesis_block: {
+        Args: {
+          p_matter_id: string
+          p_tenant_id: string
+          p_user_id: string
+          p_reason: string
+        }
+        Returns: Record<string, unknown>
+      }
+      fn_initialize_shadow_matter: {
+        Args: {
+          p_contact_id: string
+          p_tenant_id: string
+          p_user_id: string
+          p_matter_type_id: string
+          p_source_matter_id?: string
+          p_trigger_id?: string
+        }
+        Returns: Record<string, unknown>
+      }
+      fn_initialize_firm_sovereignty: {
+        Args: {
+          p_tenant_id: string
+          p_user_id: string
+        }
+        Returns: Json
+      }
+      fn_log_compliance_override: {
+        Args: {
+          p_tenant_id: string
+          p_matter_id: string
+          p_user_id: string
+          p_override_type: string
+          p_blocked_node: string
+          p_original_status: string
+          p_justification: string
+          p_partner_pin: string
+        }
+        Returns: Json
+      }
       fn_bulk_conflict_check: {
         Args: {
           p_emails: string[]
@@ -21476,6 +22108,48 @@ export type TrustReconciliationItemType   = string
 
 export type TrustAuditLogRow    = Database['public']['Tables']['trust_audit_log']['Row']
 export type TrustAuditLogInsert = Database['public']['Tables']['trust_audit_log']['Insert']
+
+// ── trust_ledger_audit (Directive 005 — immutable balance audit trail) ──────
+
+export interface TrustLedgerAuditRow {
+  id: string
+  tenant_id: string
+  transaction_id: string
+  transaction_type: string
+  trust_account_id: string
+  matter_id: string
+  balance_before_cents: number
+  amount_cents: number
+  balance_after_cents: number
+  authorized_by: string
+  recorded_by: string
+  description: string
+  payment_method: string | null
+  reference_number: string | null
+  reversal_of_id: string | null
+  metadata: Json
+  content_hash: string
+  created_at: string
+}
+
+export interface TrustLedgerAuditInsert {
+  tenant_id: string
+  transaction_id: string
+  transaction_type: string
+  trust_account_id: string
+  matter_id: string
+  balance_before_cents: number
+  amount_cents: number
+  balance_after_cents: number
+  authorized_by: string
+  recorded_by: string
+  description: string
+  payment_method?: string | null
+  reference_number?: string | null
+  reversal_of_id?: string | null
+  metadata?: Json
+  content_hash: string
+}
 
 // ── trust_transaction_log (append-only financial event log) ─────────────────
 

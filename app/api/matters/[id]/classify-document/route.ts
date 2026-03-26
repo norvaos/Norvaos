@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { authenticateRequest, AuthError } from '@/lib/services/auth'
 import { requirePermission } from '@/lib/services/require-role'
 import { classifyPostSubmissionDocument } from '@/lib/services/post-submission-engine'
+import { broadcastDocumentStatus } from '@/lib/services/document-realtime'
 import { withTiming } from '@/lib/middleware/request-timing'
 import { createAdminClient } from '@/lib/supabase/admin'
 
@@ -61,6 +62,27 @@ async function handlePost(
         { error: result.error },
         { status: 400 }
       )
+    }
+
+    // Broadcast classification event for real-time portal updates
+    if (document_id) {
+      const { data: docRow } = await admin
+        .from('documents')
+        .select('file_name, category')
+        .eq('id', document_id)
+        .eq('tenant_id', auth.tenantId)
+        .single()
+
+      if (docRow) {
+        broadcastDocumentStatus({
+          documentId: document_id,
+          matterId,
+          fileName: docRow.file_name ?? type_key,
+          status: 'classified',
+          category: docRow.category ?? type_key,
+          updatedAt: new Date().toISOString(),
+        }).catch(() => {})
+      }
     }
 
     return NextResponse.json({

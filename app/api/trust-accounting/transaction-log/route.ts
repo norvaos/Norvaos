@@ -8,6 +8,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { authenticateRequest, AuthError } from '@/lib/services/auth'
 import { requirePermission } from '@/lib/services/require-role'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { queryTransactionLog } from '@/lib/services/trust-accounting/trust-transaction-log-service'
 
 export async function GET(request: NextRequest) {
@@ -15,6 +16,7 @@ export async function GET(request: NextRequest) {
     const auth = await authenticateRequest()
     requirePermission(auth, 'trust_accounting', 'view')
 
+    const supabase = createAdminClient()
     const { searchParams } = new URL(request.url)
     const trustAccountId = searchParams.get('trustAccountId') ?? undefined
     const matterId = searchParams.get('matterId') ?? undefined
@@ -25,6 +27,7 @@ export async function GET(request: NextRequest) {
     const pageSize = parseInt(searchParams.get('pageSize') ?? '50', 10)
 
     const result = await queryTransactionLog({
+      supabase,
       tenantId: auth.tenantId,
       trustAccountId,
       matterId,
@@ -44,8 +47,8 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      entries: result.entries,
-      pagination: { page, pageSize, total: result.total ?? 0 },
+      entries: result.data?.data ?? [],
+      pagination: { page, pageSize, total: result.data?.total ?? 0 },
     })
   } catch (error) {
     if (error instanceof AuthError) {

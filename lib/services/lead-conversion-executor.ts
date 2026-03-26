@@ -35,6 +35,7 @@ import { resolveTemplate, isAutomationEnabled, buildBaseTemplateContext } from '
 import { activateWorkflowKit, activateImmigrationKit } from './kit-activation'
 import { sendDocumentRequest } from './document-request-service'
 import { LEAD_STAGES } from '@/lib/config/lead-workflow-definitions'
+import { withContactPIIEncrypted } from '@/lib/services/pii-dual-write'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -418,7 +419,7 @@ export async function convertLeadToMatter(
           if (!existingPA) {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const c = contact as any
-            await supabase.from('matter_people').insert({
+            const matterPersonPayload = {
               tenant_id: tenantId,
               matter_id: matter.id,
               contact_id: lead.contact_id,
@@ -445,7 +446,11 @@ export async function convertLeadToMatter(
               city: c.city ?? null,
               province_state: c.province_state ?? null,
               postal_code: c.postal_code ?? null,
-            })
+            }
+            await supabase.from('matter_people').insert({
+              ...matterPersonPayload,
+              ...withContactPIIEncrypted(matterPersonPayload),
+            } as never)
           }
         }
       }
@@ -803,6 +808,27 @@ export async function convertLeadToMatter(
 
       // 5p. Recalculate lead summary
       await recalculateLeadSummary(supabase, leadId, tenantId)
+
+      // 5q. PII Ghost Scrub — Directive 026
+      // After conversion, the lead record is "ghosted" — PII fields are replaced
+      // with anonymized placeholders. The real data lives on the contact and matter.
+      // This prevents stale PII from lingering in the leads table post-conversion.
+      try {
+        const ghostTimestamp = new Date().toISOString()
+        await supabase
+          .from('leads')
+          .update({
+            first_name_encrypted: null,
+            last_name_encrypted: null,
+            email_encrypted: null,
+            phone_encrypted: null,
+            custom_intake_data: { _ghosted: true, _ghosted_at: ghostTimestamp } as unknown as Json,
+          } as never)
+          .eq('id', leadId)
+          .eq('tenant_id', tenantId)
+      } catch (ghostErr) {
+        console.warn('[conversion] PII ghost scrub failed (non-fatal):', ghostErr)
+      }
 
       return { matterId: matter.id }
     },

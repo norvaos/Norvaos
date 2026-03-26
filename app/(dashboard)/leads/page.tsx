@@ -666,9 +666,9 @@ export default function LeadsPage() {
           status: 'lost',
         })
 
-        toast.success('Lead closed as lost')
+        toast.success(t('leads.lead_closed_lost', 'Lead closed as lost'))
       } catch {
-        toast.error('Failed to close lead as lost')
+        toast.error(t('leads.lead_closed_lost_error', 'Failed to close lead as lost'))
         queryClient.invalidateQueries({ queryKey: leadKeys.lists() })
       }
     },
@@ -737,7 +737,7 @@ export default function LeadsPage() {
           <EmptyState
             icon={Funnel}
             title={t('leads.no_pipelines', 'No lead pipelines configured')}
-            description="Create a lead pipeline in Settings to start tracking your leads through stages."
+            description={t('leads.no_pipelines_desc', 'Create a lead pipeline in Settings to start tracking your leads through stages.')}
           />
         </div>
       </div>
@@ -772,7 +772,7 @@ export default function LeadsPage() {
               >
                 <SelectTrigger className="w-[200px]">
                   <Funnel className="mr-2 h-4 w-4 text-slate-400" />
-                  <SelectValue placeholder="Select pipeline" />
+                  <SelectValue placeholder={t('leads.select_pipeline', 'Select pipeline')} />
                 </SelectTrigger>
                 <SelectContent>
                   {filteredPipelines.map((p) => (
@@ -797,7 +797,7 @@ export default function LeadsPage() {
             <div className="hidden items-center gap-4 text-sm text-slate-500 md:flex">
               <span>
                 <span className="font-medium text-slate-700">{totalLeads}</span>{' '}
-                {totalLeads === 1 ? 'lead' : 'leads'}
+                {totalLeads === 1 ? t('leads.lead_singular', 'lead') : t('leads.leads_plural', 'leads')}
               </span>
               {totalValue > 0 && (
                 <span>
@@ -815,7 +815,7 @@ export default function LeadsPage() {
                 variant={viewMode === 'kanban' ? 'secondary' : 'ghost'}
                 size="sm"
                 className="h-7 px-2.5"
-                title="Kanban"
+                title={t('leads.kanban', 'Kanban')}
                 onClick={() => setViewMode('kanban')}
               >
                 <LayoutGrid className="h-3.5 w-3.5" />
@@ -824,7 +824,7 @@ export default function LeadsPage() {
                 variant={viewMode === 'table' ? 'secondary' : 'ghost'}
                 size="sm"
                 className="h-7 px-2.5"
-                title="Table"
+                title={t('leads.table', 'Table')}
                 onClick={() => setViewMode('table')}
               >
                 <List className="h-3.5 w-3.5" />
@@ -938,7 +938,7 @@ export default function LeadsPage() {
                 {t('leads.display', 'Display')}
                 {hiddenStageIds.size > 0 && (
                   <Badge variant="secondary" className="ml-1 text-[10px] px-1.5">
-                    {hiddenStageIds.size} hidden
+                    {hiddenStageIds.size} {t('leads.hidden', 'hidden')}
                   </Badge>
                 )}
               </Button>
@@ -946,7 +946,7 @@ export default function LeadsPage() {
             <PopoverContent className="w-72" align="end">
               <div className="space-y-4">
                 <div>
-                  <h4 className="text-sm font-medium mb-2">{t('leads.display', 'Card Display')}</h4>
+                  <h4 className="text-sm font-medium mb-2">{t('leads.card_display', 'Card Display')}</h4>
                   <div className="space-y-2">
                     <label className="flex items-center justify-between">
                       <span className="text-sm text-slate-600">{t('leads.card_show_values', 'Show values')}</span>
@@ -1076,7 +1076,7 @@ export default function LeadsPage() {
             <EmptyState
               icon={Funnel}
               title={t('leads.no_stages', 'No stages configured')}
-              description="This pipeline has no stages yet. Add stages in pipeline settings to start organizing leads."
+              description={t('leads.no_stages_desc', 'This pipeline has no stages yet. Add stages in pipeline settings to start organising leads.')}
             />
           </div>
         ) : viewMode === 'kanban' ? (
@@ -1265,7 +1265,7 @@ function LeadsTable({
         <EmptyState
           icon={List}
           title={t('leads.no_results', 'No leads match your filters')}
-          description="Try adjusting your search or filter criteria."
+          description={t('leads.no_results_desc', 'Try adjusting your search or filter criteria.')}
         />
       </div>
     )

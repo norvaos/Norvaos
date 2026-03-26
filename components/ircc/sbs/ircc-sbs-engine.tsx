@@ -55,7 +55,7 @@ export function IRCCSideBySideEngine({ matterId, tenantId, contactId }: IRCCSide
         .single()
 
       if (error) throw error
-      return (data?.immigration_data as IRCCProfile) ?? null
+      return (data?.immigration_data as unknown as IRCCProfile) ?? null
     },
     enabled: !!contactId,
     staleTime: 30_000,

@@ -27,6 +27,7 @@ export type SentinelEventType =
   | 'DOCUMENT_TAMPER'
   | 'IDENTITY_VERIFICATION'
   | 'EMERGENCY_LOCKDOWN'
+  | 'AUDIT_SIMULATION_EXECUTED'
 
 export type SentinelSeverity = 'info' | 'warning' | 'critical' | 'breach'
 

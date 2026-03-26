@@ -36,6 +36,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { cn } from '@/lib/utils'
 import { useUploadDocument } from '@/lib/queries/documents'
+import { ChainLockActivateButton } from './chain-lock-activate-button'
 
 export interface CommandToolbarProps {
   matterId: string
@@ -64,6 +65,8 @@ export interface CommandToolbarProps {
   /** Trigger OneDrive sync */
   onSyncOneDrive?: () => void
   syncingOneDrive?: boolean
+  /** Readiness score (0-100) for GenesisGuard gating */
+  readinessScore?: number | null
   className?: string
 }
 
@@ -82,6 +85,7 @@ export function CommandToolbar({
   onDelete,
   onSyncOneDrive,
   syncingOneDrive,
+  readinessScore,
   className,
 }: CommandToolbarProps) {
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -204,6 +208,13 @@ export function CommandToolbar({
           </button>
         )}
       </div>
+
+      {/* ── Directive 016 + 016.1: Chain-Lock Activate Matter ── */}
+      <ChainLockActivateButton
+        matterId={matterId}
+        tenantId={tenantId}
+        readinessScore={readinessScore}
+      />
 
       {/* ── Right: Secondary Actions ── */}
       <div className="flex items-center gap-1.5 ml-auto">

@@ -9,22 +9,24 @@ import { en } from './en'
 export type { DictionaryKey }
 
 /** All dictionaries keyed by locale code — Global 15 (Directive 16.1). */
-const dictionaries: Record<LocaleCode, () => Promise<Record<DictionaryKey, string>>> = {
+type Dict = Record<DictionaryKey, string>
+
+const dictionaries: Record<LocaleCode, () => Promise<Dict>> = {
   en: () => Promise.resolve(en),
-  fr: () => import('./fr').then((m) => m.fr),
-  es: () => import('./es').then((m) => m.es),
-  pa: () => import('./pa').then((m) => m.pa),
-  zh: () => import('./zh').then((m) => m.zh),
-  ar: () => import('./ar').then((m) => m.ar),
-  ur: () => import('./ur').then((m) => m.ur),
-  hi: () => import('./hi').then((m) => m.hi),
-  pt: () => import('./pt').then((m) => m.pt),
-  tl: () => import('./tl').then((m) => m.tl),
-  fa: () => import('./fa').then((m) => m.fa),
-  vi: () => import('./vi').then((m) => m.vi),
-  ko: () => import('./ko').then((m) => m.ko),
-  uk: () => import('./uk').then((m) => m.uk),
-  bn: () => import('./bn').then((m) => m.bn),
+  fr: () => import('./fr').then((m) => ({ ...en, ...m.fr }) as Dict),
+  es: () => import('./es').then((m) => ({ ...en, ...m.es }) as Dict),
+  pa: () => import('./pa').then((m) => ({ ...en, ...m.pa }) as Dict),
+  zh: () => import('./zh').then((m) => ({ ...en, ...m.zh }) as Dict),
+  ar: () => import('./ar').then((m) => ({ ...en, ...m.ar }) as Dict),
+  ur: () => import('./ur').then((m) => ({ ...en, ...m.ur }) as Dict),
+  hi: () => import('./hi').then((m) => ({ ...en, ...m.hi }) as Dict),
+  pt: () => import('./pt').then((m) => ({ ...en, ...m.pt }) as Dict),
+  tl: () => import('./tl').then((m) => ({ ...en, ...m.tl }) as Dict),
+  fa: () => import('./fa').then((m) => ({ ...en, ...m.fa }) as Dict),
+  vi: () => import('./vi').then((m) => ({ ...en, ...m.vi }) as Dict),
+  ko: () => import('./ko').then((m) => ({ ...en, ...m.ko }) as Dict),
+  uk: () => import('./uk').then((m) => ({ ...en, ...m.uk }) as Dict),
+  bn: () => import('./bn').then((m) => ({ ...en, ...m.bn }) as Dict),
 }
 
 /**

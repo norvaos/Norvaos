@@ -3,6 +3,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { createRateLimiter } from '@/lib/middleware/rate-limit'
 import { withTiming } from '@/lib/middleware/request-timing'
 import { validatePortalToken, PortalAuthError } from '@/lib/services/portal-auth'
+import { broadcastDocumentStatus } from '@/lib/services/document-realtime'
 
 /**
  * POST /api/portal/[token]/upload-document
@@ -166,6 +167,16 @@ async function handlePost(
       { status: 201 }
     )
   }
+
+  // Directive 012: Broadcast to lawyer dashboard in real-time
+  broadcastDocumentStatus({
+    documentId: doc.id,
+    matterId: link.matter_id,
+    fileName: file.name,
+    status: 'uploaded',
+    category: 'portal_upload',
+    updatedAt: new Date().toISOString(),
+  }).catch(() => {})
 
   // ── Log activity (fire-and-forget) ──────────────────────────────────────────
   admin.from('activities').insert({

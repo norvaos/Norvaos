@@ -9,6 +9,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { authenticateRequest, AuthError } from '@/lib/services/auth'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { classifyDocument } from '@/lib/services/document-classifier'
+import { broadcastDocumentStatus } from '@/lib/services/document-realtime'
 
 export async function POST(request: NextRequest) {
   try {
@@ -33,6 +34,8 @@ export async function POST(request: NextRequest) {
 
     // If a documentId was provided, update the document record
     if (documentId) {
+      const classifiedAt = new Date().toISOString()
+
       await admin
         .from('documents')
         .update({
@@ -45,12 +48,31 @@ export async function POST(request: NextRequest) {
               confidence: result.confidence,
               method: result.method,
               suggestedName: result.suggestedName,
-              classified_at: new Date().toISOString(),
+              classified_at: classifiedAt,
             },
           },
         })
         .eq('id', documentId)
         .eq('tenant_id', auth.tenantId)
+
+      // Broadcast classification event for real-time portal updates
+      const { data: docRow } = await admin
+        .from('documents')
+        .select('matter_id')
+        .eq('id', documentId)
+        .eq('tenant_id', auth.tenantId)
+        .single()
+
+      if (docRow?.matter_id) {
+        broadcastDocumentStatus({
+          documentId,
+          matterId: docRow.matter_id,
+          fileName,
+          status: 'classified',
+          category: result.category,
+          updatedAt: classifiedAt,
+        }).catch(() => {})
+      }
     }
 
     return NextResponse.json({

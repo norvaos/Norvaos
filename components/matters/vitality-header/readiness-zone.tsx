@@ -28,11 +28,14 @@ import { useUIStore } from '@/lib/stores/ui-store'
 
 // ─── Colour Helpers ──────────────────────────────────────────────────────────
 
-function scoreColour(score: number) {
-  if (score >= 95) return { stroke: '#d4af37', text: 'text-yellow-600', bg: 'bg-yellow-500', gold: true }
-  if (score >= 85) return { stroke: '#22c55e', text: 'text-green-600', bg: 'bg-green-500', gold: false }
-  if (score >= 60) return { stroke: '#f59e0b', text: 'text-amber-600', bg: 'bg-amber-500', gold: false }
-  return { stroke: '#ef4444', text: 'text-red-600', bg: 'bg-red-500', gold: false }
+// Directive 016: Sovereign Purple = #7c3aed (violet-600), Emerald = #10b981
+function scoreColour(score: number, shieldComplete?: boolean) {
+  // Directive 016: Emerald Green glow ONLY when 100% of shield requirements met
+  if (shieldComplete && score >= 95) return { stroke: '#10b981', text: 'text-emerald-500', bg: 'bg-emerald-500', gold: false, emerald: true }
+  if (score >= 95) return { stroke: '#d4af37', text: 'text-yellow-600', bg: 'bg-yellow-500', gold: true, emerald: false }
+  if (score >= 85) return { stroke: '#22c55e', text: 'text-green-600', bg: 'bg-green-500', gold: false, emerald: false }
+  if (score >= 60) return { stroke: '#f59e0b', text: 'text-amber-600', bg: 'bg-amber-500', gold: false, emerald: false }
+  return { stroke: '#ef4444', text: 'text-red-600', bg: 'bg-red-500', gold: false, emerald: false }
 }
 
 function riskColour(level: ReadinessZoneData['riskLevel']) {
@@ -61,13 +64,24 @@ const RING_CENTER = RING_SIZE / 2
 const RING_RADIUS = 27
 const RING_CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS
 
-function ScoreRing({ score }: { score: number }) {
-  const colours = scoreColour(score)
+function ScoreRing({ score, shieldComplete = false }: { score: number; shieldComplete?: boolean }) {
+  const colours = scoreColour(score, shieldComplete)
   const offset = RING_CIRCUMFERENCE - (score / 100) * RING_CIRCUMFERENCE
+  const hasGlowFilter = colours.gold || colours.emerald
 
   return (
     <div className="relative shrink-0">
-      {/* Gold-Pulse glow — only when score >= 95 */}
+      {/* Directive 016: Emerald Glow — only when shield requirements 100% met */}
+      {colours.emerald && (
+        <div
+          className="absolute inset-0 rounded-full"
+          style={{
+            background: 'radial-gradient(circle, rgba(16,185,129,0.35) 0%, transparent 70%)',
+            animation: 'emerald-glow 2s ease-in-out infinite',
+          }}
+        />
+      )}
+      {/* Gold-Pulse glow — only when score >= 95 (non-shield) */}
       {colours.gold && (
         <div
           className="absolute inset-0 rounded-full"
@@ -84,11 +98,11 @@ function ScoreRing({ score }: { score: number }) {
         className="relative"
         aria-hidden="true"
       >
-        {/* Gold glow filter */}
-        {colours.gold && (
+        {/* Glow filter (gold or emerald) */}
+        {hasGlowFilter && (
           <defs>
-            <filter id="gold-glow">
-              <feGaussianBlur stdDeviation="2" result="blur" />
+            <filter id={colours.emerald ? 'emerald-ring-glow' : 'gold-glow'}>
+              <feGaussianBlur stdDeviation={colours.emerald ? 3 : 2} result="blur" />
               <feMerge>
                 <feMergeNode in="blur" />
                 <feMergeNode in="SourceGraphic" />
@@ -96,15 +110,15 @@ function ScoreRing({ score }: { score: number }) {
             </filter>
           </defs>
         )}
-        {/* Background track */}
+        {/* Directive 016: Sovereign Purple background track */}
         <circle
           cx={RING_CENTER}
           cy={RING_CENTER}
           r={RING_RADIUS}
           fill="none"
-          stroke="currentColor"
+          stroke="#7c3aed"
           strokeWidth={3}
-          className="text-muted/30"
+          opacity={0.2}
         />
         {/* Progress arc */}
         <circle
@@ -113,12 +127,12 @@ function ScoreRing({ score }: { score: number }) {
           r={RING_RADIUS}
           fill="none"
           stroke={colours.stroke}
-          strokeWidth={colours.gold ? 4 : 3}
+          strokeWidth={hasGlowFilter ? 4 : 3}
           strokeLinecap="round"
           strokeDasharray={RING_CIRCUMFERENCE}
           strokeDashoffset={offset}
           className="transition-all duration-500"
-          filter={colours.gold ? 'url(#gold-glow)' : undefined}
+          filter={hasGlowFilter ? `url(#${colours.emerald ? 'emerald-ring-glow' : 'gold-glow'})` : undefined}
           style={{
             transform: 'rotate(-90deg)',
             transformOrigin: '50% 50%',
@@ -283,6 +297,16 @@ export function ReadinessZone({ data, isLoading, onDrillDown }: ReadinessZonePro
     [data?.riskLevel]
   )
 
+  // Directive 016: Shield complete = all "shield" domains (Documents, Review, Compliance) at 100%
+  const shieldComplete = useMemo(() => {
+    if (!data) return false
+    const shieldDomains = ['Documents', 'Review', 'Compliance']
+    return shieldDomains.every((key) => {
+      const domain = data.domains.find((d) => d.key === key)
+      return domain ? domain.pct >= 100 : false
+    })
+  }, [data])
+
   if (isLoading || !data) {
     return <ReadinessZoneSkeleton />
   }
@@ -303,14 +327,19 @@ export function ReadinessZone({ data, isLoading, onDrillDown }: ReadinessZonePro
     topBlockers,
   } = data
 
+  // Directive 016: Critical pulse when readiness < 35
+  const isCriticalPulse = overallScore < 35
+
   return (
     <TooltipProvider>
       <div
         role="region"
         aria-label="Readiness overview"
         className={cn(
-          'flex flex-col gap-3 p-3 transition-colors',
-          onDrillDown && 'cursor-pointer hover:bg-muted/40 rounded-lg'
+          'flex flex-col gap-3 p-3 transition-colors rounded-lg border',
+          isCriticalPulse && 'animate-emerald-pulse-critical bg-violet-950/5 dark:bg-violet-950/20',
+          !isCriticalPulse && 'border-transparent',
+          onDrillDown && 'cursor-pointer hover:bg-muted/40'
         )}
         onClick={onDrillDown}
         onKeyDown={(e) => {
@@ -326,7 +355,7 @@ export function ReadinessZone({ data, isLoading, onDrillDown }: ReadinessZonePro
           <Tooltip>
             <TooltipTrigger asChild>
               <div className="shrink-0">
-                <ScoreRing score={overallScore} />
+                <ScoreRing score={overallScore} shieldComplete={shieldComplete} />
               </div>
             </TooltipTrigger>
             <TooltipContent>Overall readiness score: {overallScore}/100</TooltipContent>
@@ -342,7 +371,18 @@ export function ReadinessZone({ data, isLoading, onDrillDown }: ReadinessZonePro
               {riskLevel.charAt(0).toUpperCase() + riskLevel.slice(1)} Risk
             </Badge>
 
-            {overallScore >= 95 && (
+            {overallScore >= 95 && shieldComplete && (
+              <Badge
+                variant="outline"
+                size="sm"
+                className="gap-1 w-fit border-emerald-400 bg-gradient-to-r from-emerald-50 to-green-50 text-emerald-800 dark:from-emerald-900/30 dark:to-green-900/30 dark:text-emerald-300 dark:border-emerald-600"
+                style={{ animation: 'emerald-glow 2s ease-in-out infinite' }}
+              >
+                <Shield className="size-3 text-emerald-600" />
+                Shield Complete
+              </Badge>
+            )}
+            {overallScore >= 95 && !shieldComplete && (
               <Badge
                 variant="outline"
                 size="sm"

@@ -194,7 +194,7 @@ export function QuickOutcomes() {
           )}
           onClick={() => {
             if (!conflictGatePassed) {
-              toast.error('Sovereign Block: Conflict check must be cleared before booking a consultation.', {
+              toast.error('Norva Sovereign Block: Conflict check must be cleared before booking a consultation.', {
                 description: 'Run the conflict scan from the Compliance Pulse panel first.',
               })
               return
@@ -242,13 +242,13 @@ export function QuickOutcomes() {
           )}
           onClick={() => {
             if (!conflictGatePassed) {
-              toast.error('Sovereign Block: Conflict check must be cleared before sending the retainer.', {
+              toast.error('Norva Sovereign Block: Conflict check must be cleared before sending the retainer.', {
                 description: 'Open the Compliance Pulse panel to run the conflict scan.',
               })
               return
             }
             if (!govIdGatePassed) {
-              toast.error('Sovereign Block: Government ID must be uploaded to the Norva Vault before sending the retainer.', {
+              toast.error('Norva Sovereign Block: Government ID must be uploaded to the Norva Vault before sending the retainer.', {
                 description: 'Upload a passport or government ID to the Identity category.',
               })
               return

@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { createClient } from '@/lib/supabase/client'
 import type { Database } from '@/lib/types/database'
 import { logAudit } from '@/lib/queries/audit-logs'
+import { withLeadPIIEncrypted } from '@/lib/services/pii-dual-write'
 import { toast } from 'sonner'
 
 type Lead = Database['public']['Tables']['leads']['Row']
@@ -104,7 +105,10 @@ export function useCreateLead() {
       const supabase = createClient()
       const { data, error } = await supabase
         .from('leads')
-        .insert(lead)
+        .insert({
+          ...lead,
+          ...withLeadPIIEncrypted(lead),
+        })
         .select()
         .single()
 
@@ -148,7 +152,10 @@ export function useUpdateLead() {
       const supabase = createClient()
       const { data, error } = await supabase
         .from('leads')
-        .update(updates)
+        .update({
+          ...updates,
+          ...withLeadPIIEncrypted(updates),
+        })
         .eq('id', id)
         .select()
         .single()

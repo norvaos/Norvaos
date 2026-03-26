@@ -3,6 +3,7 @@ import { assertOk } from '../db-assert'
 import { frontDeskCreateIntakeSchema, type FrontDeskCreateIntakeInput } from '@/lib/schemas/workflow-actions'
 import { resolveDefaultPipelineAndStage } from '@/lib/services/pipeline-resolver'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { withContactPIIEncrypted, withLeadPIIEncrypted } from '@/lib/services/pii-dual-write'
 
 interface FrontDeskCreateIntakeResult {
   contactId: string
@@ -65,36 +66,44 @@ export const frontDeskCreateIntakeAction: ActionDefinition<FrontDeskCreateIntake
     if (existingContactId) {
       // Use existing contact — update fields if provided
       contactId = existingContactId
+      const contactUpdatePayload = {
+        first_name: input.firstName,
+        last_name: input.lastName,
+        ...(email ? { email_primary: email } : {}),
+        ...(dob ? { date_of_birth: dob } : {}),
+        custom_fields: {
+          language: input.language ?? null,
+          preferred_contact_method: input.preferredContactMethod ?? null,
+        },
+      }
       await supabase
         .from('contacts')
         .update({
-          first_name: input.firstName,
-          last_name: input.lastName,
-          ...(email ? { email_primary: email } : {}),
-          ...(dob ? { date_of_birth: dob } : {}),
-          custom_fields: {
-            language: input.language ?? null,
-            preferred_contact_method: input.preferredContactMethod ?? null,
-          },
+          ...contactUpdatePayload,
+          ...withContactPIIEncrypted(contactUpdatePayload),
         })
         .eq('id', existingContactId)
     } else {
+      const contactInsertPayload = {
+        tenant_id: tenantId,
+        first_name: input.firstName,
+        last_name: input.lastName,
+        date_of_birth: dob,
+        phone_primary: phone,
+        email_primary: email,
+        source: input.source ?? 'front_desk',
+        created_by: userId,
+        custom_fields: {
+          language: input.language ?? null,
+          preferred_contact_method: input.preferredContactMethod ?? null,
+        },
+      }
       const contact = assertOk(
         await supabase
           .from('contacts')
           .insert({
-            tenant_id: tenantId,
-            first_name: input.firstName,
-            last_name: input.lastName,
-            date_of_birth: dob,
-            phone_primary: phone,
-            email_primary: email,
-            source: input.source ?? 'front_desk',
-            created_by: userId,
-            custom_fields: {
-              language: input.language ?? null,
-              preferred_contact_method: input.preferredContactMethod ?? null,
-            },
+            ...contactInsertPayload,
+            ...withContactPIIEncrypted(contactInsertPayload),
           })
           .select('id')
           .single(),
@@ -130,20 +139,24 @@ export const frontDeskCreateIntakeAction: ActionDefinition<FrontDeskCreateIntake
           low: 'cold',
         }
 
+        const leadInsertPayload = {
+          tenant_id: tenantId,
+          contact_id: contactId,
+          pipeline_id: pipelineId,
+          stage_id: stageId,
+          practice_area_id: input.practiceAreaId ?? null,
+          temperature: temperatureMap[input.urgency] ?? 'warm',
+          status: 'open',
+          source: input.source ?? 'front_desk',
+          notes: input.reason || null,
+          created_by: userId,
+        }
         const lead = assertOk(
           await supabase
             .from('leads')
             .insert({
-              tenant_id: tenantId,
-              contact_id: contactId,
-              pipeline_id: pipelineId,
-              stage_id: stageId,
-              practice_area_id: input.practiceAreaId ?? null,
-              temperature: temperatureMap[input.urgency] ?? 'warm',
-              status: 'open',
-              source: input.source ?? 'front_desk',
-              notes: input.reason || null,
-              created_by: userId,
+              ...leadInsertPayload,
+              ...withLeadPIIEncrypted(leadInsertPayload),
             })
             .select('id')
             .single(),

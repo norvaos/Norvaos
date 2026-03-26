@@ -173,7 +173,7 @@ async function handlePost(
     // ── 8. Call upload_document_version RPC ─────────────────────────────
     // p_uploaded_by = null because portal uploads are anonymous (FK to users)
     // The contact_id is tracked in the documents table and activity log
-    const { data: versionNumber, error: rpcError } = await admin.rpc(
+    const { data: versionNumber, error: rpcError } = await (admin as any).rpc(
       'upload_document_version',
       {
         p_tenant_id: link.tenant_id,

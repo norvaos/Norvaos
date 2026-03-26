@@ -22,6 +22,8 @@ import { useUser } from '@/lib/hooks/use-user'
 import { useTenant } from '@/lib/hooks/use-tenant'
 import { useFeatureFlags } from '@/lib/hooks/use-feature-flag'
 import { usePrefetchOnHover } from '@/lib/hooks/use-prefetch-on-hover'
+import { useFirmHealth } from '@/lib/hooks/use-firm-health'
+import { useCertification } from '@/lib/hooks/use-certification'
 import { matterKeys, MATTER_LIST_COLUMNS } from '@/lib/queries/matters'
 import { contactKeys } from '@/lib/queries/contacts'
 import { leadKeys } from '@/lib/queries/leads'
@@ -418,6 +420,9 @@ export function Sidebar() {
   const { appUser, fullName } = useUser()
   const { tenant } = useTenant()
   const featureFlags = useFeatureFlags()
+  const { shouldPulseAmber, riskLevel } = useFirmHealth()
+  const { data: certification } = useCertification()
+  const isCertified = certification?.isCertified ?? false
 
   const handleLogout = useCallback(async () => {
     await fetch('/auth/signout', { method: 'POST' })
@@ -437,7 +442,9 @@ export function Sidebar() {
       <aside
         className={cn(
           'sticky top-0 z-30 flex h-screen flex-col border-r border-[#e2e8f0] bg-white transition-all duration-300',
-          sidebarCollapsed ? 'w-[72px]' : 'w-64'
+          sidebarCollapsed ? 'w-[72px]' : 'w-64',
+          shouldPulseAmber && riskLevel === 'medium' && 'sovereign-pulse-amber',
+          shouldPulseAmber && riskLevel === 'high' && 'sovereign-pulse-red',
         )}
       >
         {/* ---------------------------------------------------------------- */}
@@ -573,7 +580,13 @@ export function Sidebar() {
               sidebarCollapsed && 'flex-col gap-2 px-2 py-3'
             )}
           >
-            <Avatar size="default" className="shrink-0">
+            <Avatar
+              size="default"
+              className={cn(
+                'shrink-0',
+                isCertified && 'sovereign-certified-avatar',
+              )}
+            >
               {appUser?.avatar_url && (
                 <AvatarImage src={appUser.avatar_url} alt={fullName} />
               )}

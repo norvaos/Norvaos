@@ -25,6 +25,7 @@ export type SyncMessageType =
   | 'contact:updated'
   | 'trust:updated'
   | 'task:updated'
+  | 'document:uploaded'
 
 interface SyncMessage {
   type: SyncMessageType
@@ -135,6 +136,16 @@ export function useCrossTabSync() {
 
         case 'task:updated':
           queryClient.invalidateQueries({ queryKey: ['tasks'] })
+          break
+
+        case 'document:uploaded':
+          queryClient.invalidateQueries({ queryKey: ['documents'] })
+          if (msg.matterId) {
+            queryClient.invalidateQueries({ queryKey: ['documents', 'matter', msg.matterId] })
+            queryClient.invalidateQueries({ queryKey: ['document-slots', msg.matterId] })
+            queryClient.invalidateQueries({ queryKey: ['readiness', msg.matterId] })
+            queryClient.invalidateQueries({ queryKey: ['matter-dashboard', 'core', msg.matterId] })
+          }
           break
       }
     }

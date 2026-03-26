@@ -9,6 +9,7 @@
 
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/lib/types/database'
+import { withLeadPIIEncrypted, withContactPIIEncrypted } from '@/lib/services/pii-dual-write'
 
 const COMMIT_CHUNK = 25
 
@@ -92,9 +93,7 @@ export async function commitStagingToLeads(params: CommitParams): Promise<Commit
         const jurisdictionId = row.user_jurisdiction_override ?? row.matched_jurisdiction_id ?? null
 
         // 3. Create lead
-        const { data: lead, error: leadErr } = await supabase
-          .from('leads')
-          .insert({
+        const leadPayload = {
             tenant_id: tenantId,
             contact_id: contactId,
             pipeline_id: pipelineId,
@@ -112,6 +111,12 @@ export async function commitStagingToLeads(params: CommitParams): Promise<Commit
             jurisdiction_id: jurisdictionId,
             matter_type_id: defaultMatterTypeId ?? null,
             created_by: userId,
+          }
+        const { data: lead, error: leadErr } = await supabase
+          .from('leads')
+          .insert({
+            ...leadPayload,
+            ...withLeadPIIEncrypted(leadPayload),
           })
           .select('id')
           .single()
@@ -192,9 +197,7 @@ async function findOrCreateContact(
   }
 
   // Create new contact
-  const { data: contact, error } = await supabase
-    .from('contacts')
-    .insert({
+  const contactPayload = {
       tenant_id: tenantId,
       first_name: row.first_name ?? null,
       last_name: row.last_name ?? null,
@@ -209,6 +212,12 @@ async function findOrCreateContact(
       contact_type: 'individual',
       source: 'bulk_import',
       created_by: userId,
+    }
+  const { data: contact, error } = await supabase
+    .from('contacts')
+    .insert({
+      ...contactPayload,
+      ...withContactPIIEncrypted(contactPayload),
     })
     .select('id')
     .single()

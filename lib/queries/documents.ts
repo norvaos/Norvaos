@@ -112,12 +112,70 @@ export function useUploadDocument() {
       }
       return result.document as Document
     },
-    onSuccess: (_data, variables) => {
+    // Directive 012: Optimistic UI — show the document instantly before server confirms
+    onMutate: async (variables) => {
+      // Cancel in-flight refetches to prevent overwrite
+      await queryClient.cancelQueries({ queryKey: documentKeys.all })
+
+      // Snapshot previous state for rollback
+      const matterId = variables.metadata.matter_id
+      const previousDocs = matterId
+        ? queryClient.getQueryData(documentKeys.byMatter(matterId))
+        : undefined
+
+      // Build optimistic document entry
+      if (matterId) {
+        const optimisticDoc: Partial<Document> = {
+          id: `optimistic-${Date.now()}`,
+          file_name: variables.displayName || variables.file.name,
+          file_type: variables.file.type,
+          file_size: variables.file.size,
+          matter_id: matterId,
+          category: (variables.metadata.category ?? null) as any,
+          description: (variables.metadata.description ?? null) as any,
+          created_at: new Date().toISOString(),
+          is_archived: false,
+          storage_path: '',
+        }
+
+        // Prepend to matter document list
+        queryClient.setQueryData(
+          documentKeys.byMatter(matterId),
+          (old: Document[] | undefined) => old ? [optimisticDoc as Document, ...old] : [optimisticDoc as Document],
+        )
+      }
+
+      return { previousDocs, matterId }
+    },
+    onSuccess: (data, variables, context) => {
+      // Replace optimistic entry with real data
+      if (context?.matterId) {
+        queryClient.setQueryData(
+          documentKeys.byMatter(context.matterId),
+          (old: Document[] | undefined) =>
+            old
+              ? old.map((d) => d.id.startsWith('optimistic-') ? data : d)
+              : [data],
+        )
+      }
+      // Invalidate all document caches to ensure consistency
       queryClient.invalidateQueries({ queryKey: documentKeys.all })
+      // Also invalidate document slots (for readiness tracking)
+      if (context?.matterId) {
+        queryClient.invalidateQueries({ queryKey: ['document-slots', context.matterId] })
+        queryClient.invalidateQueries({ queryKey: ['readiness', context.matterId] })
+      }
       const location = variables.storageLocation === 'onedrive' ? 'OneDrive' : 'NorvaOS'
       toast.success(`Document uploaded to ${location}`)
     },
-    onError: (error: Error) => {
+    onError: (error: Error, _variables, context) => {
+      // Rollback on failure
+      if (context?.matterId && context.previousDocs) {
+        queryClient.setQueryData(
+          documentKeys.byMatter(context.matterId),
+          context.previousDocs,
+        )
+      }
       toast.error(error.message || 'Failed to upload document')
     },
   })

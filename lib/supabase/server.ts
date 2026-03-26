@@ -3,6 +3,11 @@ import { createClient } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
 import type { Database } from '@/lib/types/database'
 import { incrementDbCalls } from '@/lib/middleware/request-timing'
+import { enforceRegionCompliance } from './region-guard'
+
+// Directive 005.3: Enforce ca-central-1 at module load (server boot).
+// If region is wrong, this throws CriticalComplianceError and halts the app.
+enforceRegionCompliance()
 
 export async function createServerSupabaseClient() {
   const cookieStore = await cookies()

@@ -300,7 +300,7 @@ export function useResolveConflict() {
     onSuccess: (_, input) => {
       qc.invalidateQueries({ queryKey: canonicalProfileKeys.conflicts(input.profileId) })
       qc.invalidateQueries({ queryKey: canonicalProfileKeys.fields(input.profileId) })
-      toast.success('Conflict resolved')
+      toast.success('Norva Conflict resolved')
     },
     onError: () => {
       toast.error('Failed to resolve conflict')

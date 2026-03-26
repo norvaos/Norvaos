@@ -140,16 +140,16 @@ export function CommandPalette() {
 
         {/* No results for query */}
         {!isSearching && hasQuery && !hasResults && (
-          <CommandEmpty>No results found for &ldquo;{query}&rdquo;</CommandEmpty>
+          <CommandEmpty>{(t as any)('common.noResultsFor', { query })}</CommandEmpty>
         )}
 
         {/* Search Results */}
         {hasQuery && hasResults && (
           <>
             {contacts.length > 0 && (
-              <CommandGroup heading="Contacts">
+              <CommandGroup heading={t('nav.contacts' as any)}>
                 {contacts.map((c) => {
-                  const name = [c.first_name, c.last_name].filter(Boolean).join(' ') || c.organization_name || 'Unnamed'
+                  const name = [c.first_name, c.last_name].filter(Boolean).join(' ') || c.organization_name || t('common.unnamed' as any)
                   return (
                     <CommandItem
                       key={c.id}
@@ -159,7 +159,7 @@ export function CommandPalette() {
                       <Users className="mr-2 size-4 text-blue-500" />
                       <div className="flex flex-col">
                         <span className="text-sm">{name}</span>
-                        <span className="text-xs text-muted-foreground">{c.email_primary || c.contact_type || 'Contact'}</span>
+                        <span className="text-xs text-muted-foreground">{c.email_primary || c.contact_type || t('common.contact' as any)}</span>
                       </div>
                     </CommandItem>
                   )
@@ -168,7 +168,7 @@ export function CommandPalette() {
             )}
 
             {matters.length > 0 && (
-              <CommandGroup heading="Matters">
+              <CommandGroup heading={t('nav.matters' as any)}>
                 {matters.map((m) => (
                   <CommandItem
                     key={m.id}
@@ -188,9 +188,9 @@ export function CommandPalette() {
             )}
 
             {leads.length > 0 && (
-              <CommandGroup heading="Leads">
+              <CommandGroup heading={t('nav.leads' as any)}>
                 {leads.map((l) => {
-                  const name = [l.contact_first_name, l.contact_last_name].filter(Boolean).join(' ') || 'Unknown'
+                  const name = [l.contact_first_name, l.contact_last_name].filter(Boolean).join(' ') || t('common.unknown' as any)
                   return (
                     <CommandItem
                       key={l.id}
@@ -200,7 +200,7 @@ export function CommandPalette() {
                       <Target className="mr-2 size-4 text-orange-500" />
                       <div className="flex flex-col">
                         <span className="text-sm">{name}</span>
-                        <span className="text-xs text-muted-foreground">{l.source ? `Lead · ${l.source}` : 'Lead'}</span>
+                        <span className="text-xs text-muted-foreground">{l.source ? `${t('common.lead' as any)} · ${l.source}` : t('common.lead' as any)}</span>
                       </div>
                     </CommandItem>
                   )
@@ -209,18 +209,18 @@ export function CommandPalette() {
             )}
 
             {tasks.length > 0 && (
-              <CommandGroup heading="Tasks">
-                {tasks.map((t) => (
+              <CommandGroup heading={t('nav.tasks' as any)}>
+                {tasks.map((tk) => (
                   <CommandItem
-                    key={t.id}
-                    value={`task-${t.id}-${t.title}`}
+                    key={tk.id}
+                    value={`task-${tk.id}-${tk.title}`}
                     onSelect={() => runAction(() => router.push('/tasks'))}
                   >
                     <CheckSquare className="mr-2 size-4 text-purple-500" />
                     <div className="flex flex-col">
-                      <span className="text-sm">{t.title}</span>
+                      <span className="text-sm">{tk.title}</span>
                       <span className="text-xs text-muted-foreground">
-                        {(t.status ?? '').replace(/_/g, ' ')} · {t.priority ?? ''}
+                        {(tk.status ?? '').replace(/_/g, ' ')} · {tk.priority ?? ''}
                       </span>
                     </div>
                   </CommandItem>
@@ -230,7 +230,7 @@ export function CommandPalette() {
 
             {/* Knowledge Base — Universal Library (locale-agnostic, Directive 36.3) */}
             {wiki.length > 0 && (
-              <CommandGroup heading="Knowledge Base">
+              <CommandGroup heading={t('nav.knowledgeBase' as any)}>
                 {wiki.map((w) => (
                   <CommandItem
                     key={w.id}
@@ -252,7 +252,7 @@ export function CommandPalette() {
                       <span className="text-sm truncate">{w.title}</span>
                       <span className="text-xs text-muted-foreground truncate">
                         {w.category_name ? `${w.category_name} · ` : ''}
-                        {w.item_type === 'playbook' ? 'Playbook' : 'Snippet'}
+                        {w.item_type === 'playbook' ? t('common.playbook' as any) : t('common.snippet' as any)}
                         {w.description ? ` — ${w.description.slice(0, 80)}` : ''}
                       </span>
                     </div>
@@ -267,76 +267,76 @@ export function CommandPalette() {
         {!hasQuery && (
           <>
             {/* Quick Actions */}
-            <CommandGroup heading="Quick Actions">
+            <CommandGroup heading={t('common.quickActions' as any)}>
               <CommandItem onSelect={() => runAction(() => openModal('create-contact'))}>
                 <Plus className="mr-2 size-4" />
-                New Contact
+                {t('common.newContact' as any)}
               </CommandItem>
               <CommandItem onSelect={() => runAction(() => openModal('create-matter'))}>
                 <Plus className="mr-2 size-4" />
-                New Matter
+                {t('common.newMatter' as any)}
               </CommandItem>
               <CommandItem onSelect={() => runAction(() => openModal('create-task'))}>
                 <Plus className="mr-2 size-4" />
-                New Task
+                {t('common.newTask' as any)}
               </CommandItem>
               <CommandItem onSelect={() => runAction(() => openModal('create-lead'))}>
                 <Plus className="mr-2 size-4" />
-                New Lead
+                {t('common.newLead' as any)}
               </CommandItem>
             </CommandGroup>
 
             <CommandSeparator />
 
             {/* Navigation */}
-            <CommandGroup heading="Go to">
+            <CommandGroup heading={t('common.goTo' as any)}>
               <CommandItem onSelect={() => runAction(() => router.push('/'))}>
                 <LayoutDashboard className="mr-2 size-4" />
-                Dashboard
+                {t('nav.dashboard' as any)}
               </CommandItem>
               <CommandItem onSelect={() => runAction(() => router.push('/contacts'))}>
                 <Users className="mr-2 size-4" />
-                Contacts
+                {t('nav.contacts' as any)}
               </CommandItem>
               <CommandItem onSelect={() => runAction(() => router.push('/matters'))}>
                 <Briefcase className="mr-2 size-4" />
-                Matters
+                {t('nav.matters' as any)}
               </CommandItem>
               <CommandItem onSelect={() => runAction(() => router.push('/leads'))}>
                 <Target className="mr-2 size-4" />
-                Leads
+                {t('nav.leads' as any)}
               </CommandItem>
               <CommandItem onSelect={() => runAction(() => router.push('/tasks'))}>
                 <CheckSquare className="mr-2 size-4" />
-                Tasks
+                {t('nav.tasks' as any)}
               </CommandItem>
               <CommandItem onSelect={() => runAction(() => router.push('/calendar'))}>
                 <Calendar className="mr-2 size-4" />
-                Calendar
+                {t('nav.calendar' as any)}
               </CommandItem>
               <CommandItem onSelect={() => runAction(() => router.push('/documents'))}>
                 <FileText className="mr-2 size-4" />
-                Documents
+                {t('nav.documents' as any)}
               </CommandItem>
               <CommandItem onSelect={() => runAction(() => router.push('/communications'))}>
                 <Mail className="mr-2 size-4" />
-                Communications
+                {t('nav.communications' as any)}
               </CommandItem>
               <CommandItem onSelect={() => runAction(() => router.push('/chat'))}>
                 <MessageSquare className="mr-2 size-4" />
-                Chat
+                {t('nav.chat' as any)}
               </CommandItem>
               <CommandItem onSelect={() => runAction(() => router.push('/billing'))}>
                 <DollarSign className="mr-2 size-4" />
-                Billing
+                {t('nav.billing' as any)}
               </CommandItem>
               <CommandItem onSelect={() => runAction(() => router.push('/reports'))}>
                 <BarChart3 className="mr-2 size-4" />
-                Reports
+                {t('nav.reports' as any)}
               </CommandItem>
               <CommandItem onSelect={() => runAction(() => router.push('/settings'))}>
                 <Settings className="mr-2 size-4" />
-                Settings
+                {t('nav.settings' as any)}
               </CommandItem>
             </CommandGroup>
           </>

@@ -28,6 +28,7 @@ import { ActiveUsersIndicator } from '@/components/matters/active-users-indicato
 import { UniversalGlobeSelector } from '@/components/i18n/UniversalGlobeSelector'
 import { useLocale } from '@/lib/i18n/use-locale'
 import { AuraHeader } from '@/components/front-desk/AuraHeader'
+import { SovereignSeal } from '@/components/matters/sovereign-seal'
 import { AiDraftPanel } from '@/components/matters/ai-draft-panel'
 import { NorvaEarPanel } from '@/components/matters/norva-ear-panel'
 import { NorvaWelcomeBanner } from '@/components/shell/NorvaWelcomeBanner'
@@ -266,6 +267,7 @@ export default function MatterShellPage() {
       <div className="h-full overflow-hidden">
         {/* Active users bar + language — visible above the funnel */}
         <div className="flex items-center justify-end gap-2 border-b px-4 py-1 bg-muted/20">
+          <SovereignSeal matterId={matterId} />
           <UniversalGlobeSelector
             value={locale}
             onChange={(code) => setLocale(code as import('@/lib/i18n/config').LocaleCode)}
@@ -314,6 +316,7 @@ export default function MatterShellPage() {
           </Button>
         </div>
         <div className="flex items-center gap-2">
+          <SovereignSeal matterId={matterId} />
           <UniversalGlobeSelector
             value={locale}
             onChange={(code) => setLocale(code as import('@/lib/i18n/config').LocaleCode)}

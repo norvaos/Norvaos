@@ -1,59 +1,64 @@
 'use client'
 
-import { Fragment } from 'react'
+import { Fragment, useMemo } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { ChevronRight, Home } from 'lucide-react'
-
-// Human-readable labels for route segments
-const SEGMENT_LABELS: Record<string, string> = {
-  '': 'Home',
-  contacts: 'Contacts',
-  matters: 'Matters',
-  leads: 'Leads',
-  tasks: 'Tasks',
-  calendar: 'Calendar',
-  documents: 'Documents',
-  billing: 'Billing',
-  reports: 'Reports',
-  settings: 'Settings',
-  communications: 'Email',
-  chat: 'Chat',
-  bookings: 'Bookings',
-  dashboards: 'Dashboards',
-  immigration: 'Immigration',
-  tools: 'Tools',
-  'visitor-visa-invitation': 'Visa Invitation',
-  'time-tracking': 'Time Tracking',
-  'practice-areas': 'Practice Areas & Matter Types',
-  'matter-types': 'Practice Areas & Matter Types',
-  'deadline-types': 'Deadline Types',
-  pipelines: 'Pipelines',
-  'workflow-templates': 'Workflow Templates',
-  'document-slot-templates': 'Document Slots',
-  forms: 'Forms',
-  automations: 'Automations',
-  roles: 'Roles',
-  users: 'Users',
-  general: 'General',
-}
-
-/**
- * Convert a route segment to a human-readable label.
- * Falls back to title-casing if no explicit mapping exists.
- */
-function segmentLabel(segment: string): string {
-  if (SEGMENT_LABELS[segment]) return SEGMENT_LABELS[segment]
-  // UUIDs — don't render
-  if (/^[0-9a-f]{8}-/.test(segment)) return ''
-  // Fallback: title-case with dashes replaced
-  return segment
-    .replace(/-/g, ' ')
-    .replace(/\b\w/g, (c) => c.toUpperCase())
-}
+import { useI18n } from '@/lib/i18n/i18n-provider'
 
 export function Breadcrumbs() {
   const pathname = usePathname()
+  const { t } = useI18n()
+
+  // Human-readable labels for route segments — uses t() for i18n
+  const segmentLabels: Record<string, string> = useMemo(
+    () => ({
+      '': t('nav.home'),
+      contacts: t('nav.contacts'),
+      matters: t('nav.matters'),
+      leads: t('nav.leads'),
+      tasks: t('nav.tasks'),
+      calendar: t('nav.calendar'),
+      documents: t('nav.documents'),
+      billing: t('nav.billing'),
+      reports: t('nav.reports'),
+      settings: t('nav.settings'),
+      communications: t('nav.communications'),
+      chat: t('nav.chat'),
+      bookings: t('nav.bookings'),
+      dashboards: t('nav.dashboards'),
+      immigration: t('nav.immigration'),
+      tools: t('nav.tools'),
+      'visitor-visa-invitation': t('nav.visitor_visa_invitation'),
+      'time-tracking': t('nav.time_tracking'),
+      'practice-areas': t('nav.practice_areas'),
+      'matter-types': t('nav.practice_areas'),
+      'deadline-types': t('nav.deadline_types'),
+      pipelines: t('nav.pipelines'),
+      'workflow-templates': t('nav.workflow_templates'),
+      'document-slot-templates': t('nav.document_slot_templates'),
+      forms: t('nav.forms'),
+      automations: t('nav.automations'),
+      roles: t('nav.roles'),
+      users: t('nav.users'),
+      general: t('nav.general'),
+    }),
+    [t],
+  )
+
+  /**
+   * Convert a route segment to a human-readable label.
+   * Falls back to title-casing if no explicit mapping exists.
+   */
+  function segmentLabel(segment: string): string {
+    if (segmentLabels[segment]) return segmentLabels[segment]
+    // UUIDs — don't render
+    if (/^[0-9a-f]{8}-/.test(segment)) return ''
+    // Fallback: title-case with dashes replaced
+    return segment
+      .replace(/-/g, ' ')
+      .replace(/\b\w/g, (c) => c.toUpperCase())
+  }
 
   // Don't show breadcrumbs on the root dashboard
   if (pathname === '/' || pathname === '') return null

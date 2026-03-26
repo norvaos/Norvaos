@@ -186,3 +186,87 @@ export function decryptLeadPII(encrypted: LeadPIIEncrypted): LeadPII {
     phone: decryptPII(encrypted.phone_encrypted),
   }
 }
+
+// ---------------------------------------------------------------------------
+// Matter Immigration PII helpers
+// ---------------------------------------------------------------------------
+
+/** Plaintext matter immigration PII fields. */
+export interface MatterImmigrationPII {
+  passport_number?: string | null
+  date_of_birth?: string | null
+  uci_number?: string | null
+  prior_refusal_details?: string | null
+  criminal_record_details?: string | null
+  medical_issue_details?: string | null
+  sponsor_name?: string | null
+}
+
+/** Encrypted matter immigration PII fields (column-level). */
+export interface MatterImmigrationPIIEncrypted {
+  passport_number_encrypted?: string | null
+  date_of_birth_encrypted?: string | null
+  uci_number_encrypted?: string | null
+  prior_refusal_details_encrypted?: string | null
+  criminal_record_details_encrypted?: string | null
+  medical_issue_details_encrypted?: string | null
+  sponsor_name_encrypted?: string | null
+}
+
+export function encryptMatterImmigrationPII(data: MatterImmigrationPII): MatterImmigrationPIIEncrypted {
+  return {
+    passport_number_encrypted: encryptPII(data.passport_number),
+    date_of_birth_encrypted: encryptPII(data.date_of_birth),
+    uci_number_encrypted: encryptPII(data.uci_number),
+    prior_refusal_details_encrypted: encryptPII(data.prior_refusal_details),
+    criminal_record_details_encrypted: encryptPII(data.criminal_record_details),
+    medical_issue_details_encrypted: encryptPII(data.medical_issue_details),
+    sponsor_name_encrypted: encryptPII(data.sponsor_name),
+  }
+}
+
+export function decryptMatterImmigrationPII(encrypted: MatterImmigrationPIIEncrypted): MatterImmigrationPII {
+  return {
+    passport_number: decryptPII(encrypted.passport_number_encrypted),
+    date_of_birth: decryptPII(encrypted.date_of_birth_encrypted),
+    uci_number: decryptPII(encrypted.uci_number_encrypted),
+    prior_refusal_details: decryptPII(encrypted.prior_refusal_details_encrypted),
+    criminal_record_details: decryptPII(encrypted.criminal_record_details_encrypted),
+    medical_issue_details: decryptPII(encrypted.medical_issue_details_encrypted),
+    sponsor_name: decryptPII(encrypted.sponsor_name_encrypted),
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Appointment PII helpers
+// ---------------------------------------------------------------------------
+
+/** Plaintext appointment PII fields. */
+export interface AppointmentPII {
+  guest_name?: string | null
+  guest_email?: string | null
+  guest_phone?: string | null
+}
+
+/** Encrypted appointment PII fields (column-level). */
+export interface AppointmentPIIEncrypted {
+  guest_name_encrypted?: string | null
+  guest_email_encrypted?: string | null
+  guest_phone_encrypted?: string | null
+}
+
+export function encryptAppointmentPII(data: AppointmentPII): AppointmentPIIEncrypted {
+  return {
+    guest_name_encrypted: encryptPII(data.guest_name),
+    guest_email_encrypted: encryptPII(data.guest_email),
+    guest_phone_encrypted: encryptPII(data.guest_phone),
+  }
+}
+
+export function decryptAppointmentPII(encrypted: AppointmentPIIEncrypted): AppointmentPII {
+  return {
+    guest_name: decryptPII(encrypted.guest_name_encrypted),
+    guest_email: decryptPII(encrypted.guest_email_encrypted),
+    guest_phone: decryptPII(encrypted.guest_phone_encrypted),
+  }
+}

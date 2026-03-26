@@ -888,8 +888,8 @@ export default function ExecutiveSummary({
     }
     return {
       total_amount_cents: matter.total_amount_cents ?? 0,
-      tax_amount_cents: matter.tax_amount_cents ?? 0,
-      subtotal_cents: matter.subtotal_cents ?? 0,
+      tax_amount_cents: (matter as any).tax_amount_cents ?? 0,
+      subtotal_cents: (matter as any).subtotal_cents ?? 0,
     }
   }, [matter])
 

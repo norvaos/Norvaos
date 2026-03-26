@@ -5,6 +5,8 @@
  *   encryptPII / decryptPII — format, round-trip, random IV, env guard
  *   encryptContactPII / decryptContactPII — field-level encrypt/decrypt
  *   encryptLeadPII / decryptLeadPII — field-level encrypt/decrypt
+ *   encryptMatterImmigrationPII / decryptMatterImmigrationPII — field-level encrypt/decrypt
+ *   encryptAppointmentPII / decryptAppointmentPII — field-level encrypt/decrypt
  *   Null/undefined/empty-string edge cases
  *
  * Sprint 6 — 2026-03-25
@@ -17,6 +19,10 @@ import {
   decryptContactPII,
   encryptLeadPII,
   decryptLeadPII,
+  encryptMatterImmigrationPII,
+  decryptMatterImmigrationPII,
+  encryptAppointmentPII,
+  decryptAppointmentPII,
 } from '@/lib/services/pii-encryption'
 
 const TEST_KEY = 'test-pii-encryption-key-for-unit-tests-32bytes!'
@@ -177,5 +183,105 @@ describe('encryptLeadPII / decryptLeadPII', () => {
     expect(decrypted.last_name).toBe(lead.last_name)
     expect(decrypted.email).toBe(lead.email)
     expect(decrypted.phone).toBe(lead.phone)
+  })
+})
+
+// ─── encryptMatterImmigrationPII / decryptMatterImmigrationPII ──────────────
+
+describe('encryptMatterImmigrationPII', () => {
+  it('encrypts all fields and returns *_encrypted keys', () => {
+    const immigration = {
+      passport_number: 'AB1234567',
+      date_of_birth: '1990-05-15',
+      uci_number: '1234-5678',
+      prior_refusal_details: 'Refused in 2019',
+      criminal_record_details: 'None',
+      medical_issue_details: 'None',
+      sponsor_name: 'Jane Doe',
+    }
+
+    const encrypted = encryptMatterImmigrationPII(immigration)
+
+    // Should have _encrypted suffix keys
+    expect(encrypted).toHaveProperty('passport_number_encrypted')
+    expect(encrypted).toHaveProperty('date_of_birth_encrypted')
+    expect(encrypted).toHaveProperty('uci_number_encrypted')
+    expect(encrypted).toHaveProperty('prior_refusal_details_encrypted')
+    expect(encrypted).toHaveProperty('criminal_record_details_encrypted')
+    expect(encrypted).toHaveProperty('medical_issue_details_encrypted')
+    expect(encrypted).toHaveProperty('sponsor_name_encrypted')
+
+    // Encrypted values should be colon-separated hex strings
+    for (const key of Object.keys(encrypted)) {
+      if (key.endsWith('_encrypted')) {
+        const val = encrypted[key as keyof typeof encrypted] as string
+        expect(val.split(':')).toHaveLength(3)
+      }
+    }
+  })
+
+  it('round-trips correctly with decryptMatterImmigrationPII', () => {
+    const immigration = {
+      passport_number: 'CD9876543',
+      date_of_birth: '1985-12-01',
+      uci_number: '8765-4321',
+      prior_refusal_details: 'تفصیلات رد — ویزا درخواست 2020 میں مسترد',
+      criminal_record_details: 'کوئی ریکارڈ نہیں',
+      medical_issue_details: 'طبی مسائل: کوئی نہیں',
+      sponsor_name: 'وسیر',
+    }
+
+    const encrypted = encryptMatterImmigrationPII(immigration)
+    const decrypted = decryptMatterImmigrationPII(encrypted)
+
+    expect(decrypted.passport_number).toBe(immigration.passport_number)
+    expect(decrypted.date_of_birth).toBe(immigration.date_of_birth)
+    expect(decrypted.uci_number).toBe(immigration.uci_number)
+    expect(decrypted.prior_refusal_details).toBe(immigration.prior_refusal_details)
+    expect(decrypted.criminal_record_details).toBe(immigration.criminal_record_details)
+    expect(decrypted.medical_issue_details).toBe(immigration.medical_issue_details)
+    expect(decrypted.sponsor_name).toBe(immigration.sponsor_name)
+  })
+})
+
+// ─── encryptAppointmentPII / decryptAppointmentPII ──────────────────────────
+
+describe('encryptAppointmentPII', () => {
+  it('encrypts all fields and returns *_encrypted keys', () => {
+    const appointment = {
+      guest_name: 'John Smith',
+      guest_email: 'john@example.com',
+      guest_phone: '+1-613-555-0100',
+    }
+
+    const encrypted = encryptAppointmentPII(appointment)
+
+    // Should have _encrypted suffix keys
+    expect(encrypted).toHaveProperty('guest_name_encrypted')
+    expect(encrypted).toHaveProperty('guest_email_encrypted')
+    expect(encrypted).toHaveProperty('guest_phone_encrypted')
+
+    // Encrypted values should be colon-separated hex strings
+    for (const key of Object.keys(encrypted)) {
+      if (key.endsWith('_encrypted')) {
+        const val = encrypted[key as keyof typeof encrypted] as string
+        expect(val.split(':')).toHaveLength(3)
+      }
+    }
+  })
+
+  it('round-trips correctly with decryptAppointmentPII', () => {
+    const appointment = {
+      guest_name: 'وسیر',
+      guest_email: 'waseer@example.com',
+      guest_phone: '+92-300-1234567',
+    }
+
+    const encrypted = encryptAppointmentPII(appointment)
+    const decrypted = decryptAppointmentPII(encrypted)
+
+    expect(decrypted.guest_name).toBe(appointment.guest_name)
+    expect(decrypted.guest_email).toBe(appointment.guest_email)
+    expect(decrypted.guest_phone).toBe(appointment.guest_phone)
   })
 })

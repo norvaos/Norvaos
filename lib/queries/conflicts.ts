@@ -155,7 +155,7 @@ export function useRunConflictScan() {
       queryClient.invalidateQueries({ queryKey: conflictKeys.scans(variables.contactId) })
       queryClient.invalidateQueries({ queryKey: conflictKeys.latestScan(variables.contactId) })
       queryClient.invalidateQueries({ queryKey: ['contacts'] }) // Refresh contact data
-      toast.success('Conflict scan completed')
+      toast.success('Norva Conflict scan completed')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'Failed to run conflict scan')
@@ -201,7 +201,7 @@ export function useRecordConflictDecision() {
       queryClient.invalidateQueries({ queryKey: conflictKeys.decisions(variables.contactId) })
       queryClient.invalidateQueries({ queryKey: conflictKeys.latestScan(variables.contactId) })
       queryClient.invalidateQueries({ queryKey: ['contacts'] })
-      toast.success('Conflict decision recorded')
+      toast.success('Norva Conflict decision recorded')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'Failed to record decision')

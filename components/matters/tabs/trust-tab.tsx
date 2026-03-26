@@ -301,7 +301,7 @@ export function TrustTab({ matterId, tenantId, matter }: TrustTabProps) {
       </div>
 
       {/* Overdue Invoice Alert */}
-      <OverdueInvoiceBanner invoices={overdueInvoices} matterId={matterId} />
+      <OverdueInvoiceBanner invoices={overdueInvoices as any} matterId={matterId} />
 
       {/* Smart-Match Suggestions */}
       <SmartMatchCard matterId={matterId} />

@@ -79,7 +79,7 @@ export function useCreateTrustAccount() {
     }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: trustKeys.accounts() })
-      toast.success('Trust account created')
+      toast.success('Norva Trust Ledger — Account created')
     },
     onError: (error: Error) => {
       toast.error(error.message)

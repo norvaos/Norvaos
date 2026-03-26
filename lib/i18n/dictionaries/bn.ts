@@ -5,7 +5,7 @@
 
 import type { DictionaryKey } from './en'
 
-export const bn: Record<DictionaryKey, string> = {
+export const bn: Partial<Record<DictionaryKey, string>> = {
   'intake.welcome': 'আপনার নিরাপদ ভর্তি পোর্টালে স্বাগতম',
   'intake.instructions': 'অনুগ্রহ করে নিম্নলিখিত ফর্মগুলি পূরণ করুন। আপনার তথ্য এনক্রিপ্টেড এবং সুরক্ষিত।',
   'intake.language_select': 'আপনার পছন্দের ভাষা নির্বাচন করুন',
@@ -400,7 +400,6 @@ export const bn: Record<DictionaryKey, string> = {
   'form.matter_title_placeholder': 'e.g. Smith v. Jones',
   'form.matter_search_contact': 'Search or create a contact...',
   'form.matter_description_placeholder': 'Brief description of the matter...',
-  'form.select_practice_area': 'Select a practice area',
   'form.select_matter_type': 'Type to search...',
   'form.no_matter_types': 'No matter types found.',
   'form.select_province': 'Select province or territory',
@@ -498,4 +497,32 @@ export const bn: Record<DictionaryKey, string> = {
   'nav.section_work': 'Work',
   'nav.section_finance': 'Finance',
   'nav.section_admin': 'Admin',
+  'nav.home': 'Home',
+  'nav.immigration': 'Immigration',
+  'nav.tools': 'Tools',
+  'nav.dashboards': 'Dashboards',
+  'nav.chat': 'Chat',
+  'nav.practice_areas': 'Practice Areas & Matter Types',
+  'nav.deadline_types': 'Deadline Types',
+  'nav.pipelines': 'Pipelines',
+  'nav.workflow_templates': 'Workflow Templates',
+  'nav.document_slot_templates': 'Document Slots',
+  'nav.forms': 'Forms',
+  'nav.automations': 'Automations',
+  'nav.roles': 'Roles',
+  'nav.users': 'Users',
+  'nav.visitor_visa_invitation': 'Visa Invitation',
+
+  // ── Classification Labels ──────────────────────────────────────────────
+  'classification.lead': 'Lead',
+  'classification.client': 'Client',
+  'classification.former_client': 'Former Client',
+  'classification.lawyer': 'Lawyer',
+  'classification.ircc_officer': 'IRCC Officer',
+  'classification.consultant': 'Consultant',
+  'classification.judge': 'Judge',
+  'classification.referral_source': 'Referral Source',
+  'classification.government': 'Government',
+  'classification.vendor': 'Vendor',
+  'classification.other_professional': 'Other Professional',
 }

@@ -8,6 +8,8 @@ import { checkTenantLimit, rateLimitResponse } from '@/lib/middleware/tenant-lim
 import { invalidateGating } from '@/lib/services/cache-invalidation'
 import { syncImmigrationIntakeStatus } from '@/lib/services/immigration-status-engine'
 import { dispatchNotification } from '@/lib/services/notification-engine'
+import { checkAndNotifyReadiness } from '@/lib/services/matter-readiness-notifier'
+import { broadcastDocumentStatus } from '@/lib/services/document-realtime'
 import { withTiming } from '@/lib/middleware/request-timing'
 
 async function handlePost(request: NextRequest) {
@@ -312,11 +314,23 @@ async function handlePost(request: NextRequest) {
         )
       }
 
+      // Broadcast upload event for real-time portal updates
+      if (doc && effectiveMatterId) {
+        broadcastDocumentStatus({
+          documentId: doc.id,
+          matterId: effectiveMatterId,
+          fileName: effectiveFileName,
+          status: 'uploaded',
+          category: effectiveCategory,
+          updatedAt: doc.created_at ?? new Date().toISOString(),
+        }).catch(() => {})
+      }
+
       // Slot version tracking (reuse same logic)
       let versionNumber: number | null = null
       if (slotData && doc) {
         const fileExt = file.name.split('.').pop() ?? 'bin'
-        const { data: rpcResult, error: rpcError } = await admin.rpc(
+        const { data: rpcResult, error: rpcError } = await (admin as any).rpc(
           'upload_document_version',
           {
             p_tenant_id: auth.tenantId,
@@ -339,26 +353,15 @@ async function handlePost(request: NextRequest) {
         await invalidateGating(auth.tenantId, effectiveMatterId)
       }
 
-      // Notify responsible lawyer
+      // Directive 012: Smart notification batching — check readiness instead
+      // of alerting per-document. Only fires "Matter Ready for Review" when
+      // 100% of Identity + Financial slots are filled.
       if (effectiveMatterId) {
-        const { data: matterDetail } = await admin
-          .from('matters')
-          .select('responsible_lawyer_id')
-          .eq('id', effectiveMatterId)
-          .single()
-
-        const recipientId = matterDetail?.responsible_lawyer_id
-        if (recipientId && recipientId !== auth.userId) {
-          dispatchNotification(admin, {
-            tenantId: auth.tenantId,
-            eventType: 'document_uploaded',
-            recipientUserIds: [recipientId],
-            title: 'New document uploaded to OneDrive',
-            message: `${effectiveFileName} has been uploaded to OneDrive.`,
-            entityType: 'document',
-            entityId: doc.id,
-          }).catch(() => {})
-        }
+        checkAndNotifyReadiness(admin, {
+          tenantId: auth.tenantId,
+          matterId: effectiveMatterId,
+          uploadedByUserId: auth.userId,
+        }).catch(() => {}) // fire-and-forget
       }
 
       return NextResponse.json(
@@ -444,11 +447,24 @@ async function handlePost(request: NextRequest) {
       )
     }
 
+    // Broadcast upload event for real-time portal updates
+    const uploadMatterId = matterId || (slotData?.matter_id ?? null)
+    if (doc && uploadMatterId) {
+      broadcastDocumentStatus({
+        documentId: doc.id,
+        matterId: uploadMatterId,
+        fileName: autoFileName || displayName || file.name,
+        status: 'uploaded',
+        category: effectiveCategory,
+        updatedAt: doc.created_at ?? new Date().toISOString(),
+      }).catch(() => {})
+    }
+
     // Version tracking via RPC (for slot uploads)
     let versionNumber: number | null = null
 
     if (slotData && doc) {
-      const { data: rpcResult, error: rpcError } = await admin.rpc(
+      const { data: rpcResult, error: rpcError } = await (admin as any).rpc(
         'upload_document_version',
         {
           p_tenant_id: auth.tenantId,
@@ -501,27 +517,15 @@ async function handlePost(request: NextRequest) {
       }
     }
 
-    // Notify responsible lawyer about new document upload
-    const effectiveMatterIdForNotify = matterId || (slotData?.matter_id ?? null)
-    if (effectiveMatterIdForNotify) {
-      const { data: matterDetail } = await admin
-        .from('matters')
-        .select('responsible_lawyer_id')
-        .eq('id', effectiveMatterIdForNotify)
-        .single()
-
-      const recipientId = matterDetail?.responsible_lawyer_id
-      if (recipientId && recipientId !== auth.userId) {
-        dispatchNotification(admin, {
-          tenantId: auth.tenantId,
-          eventType: 'document_uploaded',
-          recipientUserIds: [recipientId],
-          title: 'New document uploaded',
-          message: `${autoFileName || displayName || file.name} has been uploaded.`,
-          entityType: 'document',
-          entityId: doc.id,
-        }).catch(() => {})
-      }
+    // Directive 012: Smart notification batching — check readiness instead
+    // of alerting per-document. Only fires "Matter Ready for Review" when
+    // 100% of Identity + Financial slots are filled.
+    if (effectiveMatterId) {
+      checkAndNotifyReadiness(admin, {
+        tenantId: auth.tenantId,
+        matterId: effectiveMatterId,
+        uploadedByUserId: auth.userId,
+      }).catch(() => {}) // fire-and-forget
     }
 
     return NextResponse.json(

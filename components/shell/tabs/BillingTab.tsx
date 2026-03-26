@@ -266,7 +266,7 @@ function RecordTrustTransactionDialog({
 
       if (error) {
         if (error.message?.includes('cannot go negative')) {
-          toast.error('Insufficient trust balance for this transaction')
+          toast.error('Norva Trust Ledger — Insufficient trust balance for this transaction')
         } else {
           toast.error(`Failed to record transaction: ${error.message}`)
         }
@@ -276,7 +276,7 @@ function RecordTrustTransactionDialog({
       queryClient.invalidateQueries({ queryKey: ['trust-transactions', matterId] })
       queryClient.invalidateQueries({ queryKey: ['trust-transactions-all', matterId] })
       queryClient.invalidateQueries({ queryKey: ['matters'] })
-      toast.success('Trust transaction recorded')
+      toast.success('Norva Trust Ledger — Transaction recorded')
       resetForm()
       onOpenChange(false)
     } catch {

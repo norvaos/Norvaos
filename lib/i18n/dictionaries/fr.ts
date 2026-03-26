@@ -5,7 +5,7 @@
 
 import type { DictionaryKey } from './en'
 
-export const fr: Record<DictionaryKey, string> = {
+export const fr: Partial<Record<DictionaryKey, string>> = {
   // ── Portail d'admission ──────────────────────────────────────────────────
   'intake.welcome': 'Bienvenue sur votre portail d\'admission sécurisé',
   'intake.instructions': 'Veuillez remplir les formulaires suivants. Vos informations sont chiffrées et protégées.',
@@ -407,7 +407,6 @@ export const fr: Record<DictionaryKey, string> = {
   'form.matter_title_placeholder': 'ex. Dupont c. Martin',
   'form.matter_search_contact': 'Rechercher ou créer un contact...',
   'form.matter_description_placeholder': 'Brève description du dossier...',
-  'form.select_practice_area': 'Sélectionner un domaine de pratique',
   'form.select_matter_type': 'Taper pour rechercher...',
   'form.no_matter_types': 'Aucun type de dossier trouvé.',
   'form.select_province': 'Sélectionner la province ou le territoire',
@@ -505,4 +504,32 @@ export const fr: Record<DictionaryKey, string> = {
   'nav.section_work': 'Travail',
   'nav.section_finance': 'Finances',
   'nav.section_admin': 'Administration',
+  'nav.home': 'Home',
+  'nav.immigration': 'Immigration',
+  'nav.tools': 'Tools',
+  'nav.dashboards': 'Dashboards',
+  'nav.chat': 'Chat',
+  'nav.practice_areas': 'Practice Areas & Matter Types',
+  'nav.deadline_types': 'Deadline Types',
+  'nav.pipelines': 'Pipelines',
+  'nav.workflow_templates': 'Workflow Templates',
+  'nav.document_slot_templates': 'Document Slots',
+  'nav.forms': 'Forms',
+  'nav.automations': 'Automations',
+  'nav.roles': 'Roles',
+  'nav.users': 'Users',
+  'nav.visitor_visa_invitation': 'Visa Invitation',
+
+  // ── Classification Labels ──────────────────────────────────────────────
+  'classification.lead': 'Prospect',
+  'classification.client': 'Client',
+  'classification.former_client': 'Ancien client',
+  'classification.lawyer': 'Avocat(e)',
+  'classification.ircc_officer': 'Agent IRCC',
+  'classification.consultant': 'Consultant(e)',
+  'classification.judge': 'Juge',
+  'classification.referral_source': 'Source de référence',
+  'classification.government': 'Gouvernement',
+  'classification.vendor': 'Fournisseur',
+  'classification.other_professional': 'Autre professionnel',
 }

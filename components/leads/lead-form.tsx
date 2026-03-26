@@ -490,7 +490,7 @@ export function LeadForm({
                   <FormLabel>{t('form.lead_notes' as any)}</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="Any relevant notes about this lead..."
+                      placeholder={t('form.lead_notes_placeholder' as any)}
                       rows={3}
                       {...field}
                       value={field.value ?? ''}

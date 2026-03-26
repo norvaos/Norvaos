@@ -12,6 +12,7 @@
 import { NextResponse } from 'next/server'
 import { AuthError } from '@/lib/services/auth'
 import { logSentinelEvent } from '@/lib/services/sentinel-audit'
+import { reportRLSViolation, reportError } from '@/lib/monitoring/error-reporter'
 
 // PostgreSQL error code for insufficient_privilege (used by our SENTINEL triggers)
 const PG_INSUFFICIENT_PRIVILEGE = '42501'
@@ -51,6 +52,13 @@ export function withSentinelGuard(
           },
         }).catch(() => {})
 
+        // Directive 008: Report to Sentry with full context
+        reportRLSViolation(error, {
+          route: routeLabel,
+          action: 'tenant_violation',
+          metadata: { request_method: request.method },
+        })
+
         return NextResponse.json(
           {
             code: 'SENTINEL_TENANT_VIOLATION',
@@ -71,6 +79,10 @@ export function withSentinelGuard(
 
       // Unknown error — don't leak details
       console.error(`[SENTINEL][${routeLabel}] Unhandled error:`, error)
+
+      // Directive 008: Every 500 error captured with full stack trace
+      reportError(error, { route: routeLabel, action: 'unhandled_500' })
+
       return NextResponse.json(
         { error: 'Internal server error' },
         { status: 500 },

@@ -674,7 +674,7 @@ function MyTasksWidget({
                   <Checkbox
                     checked={false}
                     onCheckedChange={() => handleComplete(task.id)}
-                    aria-label={`Complete task: ${task.title}`}
+                    aria-label={`${t('dashboard.complete_task_aria')}: ${task.title}`}
                   />
                   <div
                     className="h-2 w-2 rounded-full shrink-0"
@@ -749,7 +749,7 @@ function RecentActivityWidget({ tenantId }: { tenantId: string }) {
     auditLogs?.forEach((log) => {
       const changes = log.changes as Record<string, unknown>
       const desc = Object.keys(changes).length > 0
-        ? `Changed: ${Object.keys(changes).join(', ')}`
+        ? `${t('dashboard.audit_changed')}: ${Object.keys(changes).join(', ')}`
         : null
       items.push({
         id: `al-${log.id}`,
@@ -764,7 +764,7 @@ function RecentActivityWidget({ tenantId }: { tenantId: string }) {
 
     items.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
     return items.slice(0, 12)
-  }, [activities, auditLogs])
+  }, [activities, auditLogs, t])
 
   return (
     <Card>
@@ -966,7 +966,7 @@ function DeadlinesIn14DaysWidget({
                       isWarning && 'border-orange-400 text-orange-600 bg-orange-50'
                     )}
                   >
-                    {daysLeft === 0 ? t('dashboard.deadline_today') : daysLeft === 1 ? t('dashboard.deadline_1_day') : `${daysLeft}d`}
+                    {daysLeft === 0 ? t('dashboard.deadline_today') : daysLeft === 1 ? t('dashboard.deadline_1_day') : t('dashboard.deadline_days').replace('{days}', String(daysLeft))}
                   </Badge>
                 </Link>
               )
@@ -1070,7 +1070,7 @@ export default function DashboardPage() {
 
   const tenantId = tenant?.id ?? ''
   const userId = appUser?.id ?? ''
-  const firstName = appUser?.first_name ?? 'there'
+  const firstName = appUser?.first_name ?? t('dashboard.greeting_fallback')
 
   const {
     data: stats,

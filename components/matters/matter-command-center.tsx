@@ -259,7 +259,7 @@ export function MatterCommandCenter({
 
               <TabsContent value="trust" className="space-y-4">
                 <RequirePermission entity="trust_accounting" action="view" variant="inline">
-                  <TrustTab matterId={matterId} tenantId={tenantId} matter={matter} />
+                  <TrustTab matterId={matterId} tenantId={tenantId} matter={matter as any} />
                 </RequirePermission>
               </TabsContent>
 

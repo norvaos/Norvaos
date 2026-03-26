@@ -1,6 +1,7 @@
 import type { ActionDefinition } from '../types'
 import { assertOk } from '../db-assert'
 import { frontDeskBookAppointmentSchema, type FrontDeskBookAppointmentInput } from '@/lib/schemas/workflow-actions'
+import { withAppointmentPIIEncrypted } from '@/lib/services/pii-dual-write'
 
 interface FrontDeskBookAppointmentResult {
   appointmentId: string
@@ -84,6 +85,11 @@ export const frontDeskBookAppointmentAction: ActionDefinition<FrontDeskBookAppoi
       guest_name: guestName,
       guest_email: contact?.email_primary ?? '',
       guest_phone: contact?.phone_primary ?? '',
+      ...withAppointmentPIIEncrypted({
+        guest_name: guestName,
+        guest_email: contact?.email_primary ?? '',
+        guest_phone: contact?.phone_primary ?? '',
+      }),
       appointment_date: input.appointmentDate,
       start_time: input.startTime,
       end_time: endTime,

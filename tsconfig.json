@@ -30,5 +30,5 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts"
   ],
-  "exclude": ["node_modules", "vitest.config.ts", "**/__tests__", "scale-readiness", "scripts"]
+  "exclude": ["node_modules", "vitest.config.ts", "**/__tests__", "scale-readiness", "scripts", "e2e", "playwright.config.ts", "supabase"]
 }

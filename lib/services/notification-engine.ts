@@ -43,18 +43,19 @@ interface UserPrefs {
 
 // Default channel config when tenant hasn't configured triggers
 const DEFAULT_TRIGGERS: Record<string, ChannelConfig> = {
-  stage_change:         { in_app: true, email: true,  push: false },
-  task_assigned:        { in_app: true, email: true,  push: true  },
-  task_completed:       { in_app: true, email: false, push: false },
-  document_uploaded:    { in_app: true, email: true,  push: false },
-  new_message:          { in_app: true, email: true,  push: true  },
-  deadline_approaching: { in_app: true, email: true,  push: true  },
-  matter_updated:       { in_app: true, email: false, push: false },
-  invoice_sent:          { in_app: true, email: false, push: false },
-  invoice_overdue:       { in_app: true, email: true,  push: false },
-  payment_received:      { in_app: true, email: false, push: false },
-  payment_plan_created:  { in_app: true, email: false, push: false },
-  write_off_approved:    { in_app: true, email: true,  push: false },
+  stage_change:              { in_app: true, email: true,  push: false },
+  task_assigned:             { in_app: true, email: true,  push: true  },
+  task_completed:            { in_app: true, email: false, push: false },
+  document_uploaded:         { in_app: false, email: false, push: false }, // Directive 012: suppressed — replaced by matter_ready_for_review
+  new_message:               { in_app: true, email: true,  push: true  },
+  deadline_approaching:      { in_app: true, email: true,  push: true  },
+  matter_updated:            { in_app: true, email: false, push: false },
+  matter_ready_for_review:   { in_app: true, email: true,  push: true  }, // Directive 012: fires when 100% Identity + Financial docs submitted
+  invoice_sent:              { in_app: true, email: false, push: false },
+  invoice_overdue:           { in_app: true, email: true,  push: false },
+  payment_received:          { in_app: true, email: false, push: false },
+  payment_plan_created:      { in_app: true, email: false, push: false },
+  write_off_approved:        { in_app: true, email: true,  push: false },
 }
 
 // ─── Core Dispatch ──────────────────────────────────────────────────────────

@@ -1,6 +1,10 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/lib/types/database'
 import { incrementDbCalls } from '@/lib/middleware/request-timing'
+import { enforceRegionCompliance } from './region-guard'
+
+// Directive 005.3: Enforce ca-central-1 at module load.
+enforceRegionCompliance()
 
 /**
  * Create a Supabase admin client (service_role key, bypasses RLS).

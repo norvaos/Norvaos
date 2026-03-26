@@ -11,6 +11,7 @@
  */
 
 import type { SupabaseClient } from '@supabase/supabase-js'
+import { withContactPIIEncrypted } from '@/lib/services/pii-dual-write'
 
 // Fields that sync from contact → matter and vice versa
 const SYNC_FIELDS = [
@@ -205,9 +206,13 @@ export async function syncMatterToContact(
     }
   }
 
+  // Dual-write: encrypt any PII fields (e.g. passport_number) present in
+  // the top-level contact update so the *_encrypted columns stay in sync.
+  const piiEncrypted = withContactPIIEncrypted(contactUpdate)
+
   await supabase
     .from('contacts')
-    .update(contactUpdate)
+    .update({ ...contactUpdate, ...piiEncrypted })
     .eq('id', primaryLink.contact_id)
 
   return {

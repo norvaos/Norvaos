@@ -98,3 +98,31 @@ export {
   type LedgerGuardInput,
   type LedgerGuardResult,
 } from './ledger-guard'
+
+// Compliance Examination Snapshots — Directive 004, Pillar 1
+export {
+  generateComplianceSnapshot,
+  listComplianceSnapshots,
+  getComplianceSnapshot,
+  verifyAuditChains,
+  type GenerateSnapshotParams,
+  type ComplianceSnapshot,
+  type ChainVerificationResult,
+  type SnapshotType,
+} from './compliance-examination-service'
+
+// Auto-Reconciliation & Disbursement Lockdown — Directive 004, Pillar 2
+export {
+  runAutoReconciliation,
+  checkDisbursementLock,
+  getDiscrepancies,
+  resolveDiscrepancy,
+  getReconciliationSchedule,
+  upsertReconciliationSchedule,
+  type AutoReconcileParams,
+  type AutoReconcileResult,
+  type Discrepancy,
+  type DisbursementLockStatus,
+  type ReconciliationFrequency,
+  type ReconciliationScheduleRow,
+} from './auto-reconciliation-service'

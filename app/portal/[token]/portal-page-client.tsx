@@ -683,7 +683,7 @@ export function PortalPageClient({
                 {tr.booking_title ?? 'Book a Consultation'}
               </h3>
               <p className="text-xs text-slate-500">
-                {tr.booking_subtitle ?? 'Schedule a meeting with your legal team in 2 clicks'}
+                {(tr as any).booking_subtitle ?? 'Schedule a meeting with your legal team in 2 clicks'}
               </p>
             </div>
           </div>

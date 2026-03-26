@@ -520,7 +520,7 @@ export function MatterForm({ mode, defaultValues, onSubmit, isLoading }: MatterF
                           <Command>
                             <CommandInput placeholder={t('form.select_matter_type' as any)} />
                             <CommandList>
-                              <CommandEmpty>No matter types found.</CommandEmpty>
+                              <CommandEmpty>{t('form.no_matter_types' as any)}</CommandEmpty>
                               <CommandGroup>
                                 {matterTypes?.map((mt) => (
                                   <CommandItem
@@ -566,8 +566,8 @@ export function MatterForm({ mode, defaultValues, onSubmit, isLoading }: MatterF
         {watchedMatterTypeId && (
           <div className="space-y-4">
             <div>
-              <h3 className="text-sm font-semibold text-foreground">Location &amp; Tax</h3>
-              <p className="text-xs text-muted-foreground">Determines applicable tax rates for billing</p>
+              <h3 className="text-sm font-semibold text-foreground">{t('form.section_location_tax' as any)}</h3>
+              <p className="text-xs text-muted-foreground">{t('form.section_location_tax_desc' as any)}</p>
             </div>
             <Separator />
             <div className="space-y-4">
@@ -577,7 +577,7 @@ export function MatterForm({ mode, defaultValues, onSubmit, isLoading }: MatterF
                 render={({ field }) => (
                   <FormItem className="space-y-3">
                     <div className="flex items-center gap-2">
-                      <FormLabel>Applicant Location</FormLabel>
+                      <FormLabel>{t('form.matter_applicant_location' as any)}</FormLabel>
                       <HelperTip contentKey="matter.applicant_location" />
                     </div>
                     <FormControl>
@@ -618,7 +618,7 @@ export function MatterForm({ mode, defaultValues, onSubmit, isLoading }: MatterF
                   render={({ field }) => (
                     <FormItem>
                       <div className="flex items-center gap-2">
-                        <FormLabel>Client Province / Territory</FormLabel>
+                        <FormLabel>{t('form.matter_client_province' as any)}</FormLabel>
                         <HelperTip contentKey="matter.client_province" />
                       </div>
                       <Select
@@ -627,7 +627,7 @@ export function MatterForm({ mode, defaultValues, onSubmit, isLoading }: MatterF
                       >
                         <FormControl>
                           <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Select province or territory" />
+                            <SelectValue placeholder={t('form.select_province' as any)} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -659,7 +659,7 @@ export function MatterForm({ mode, defaultValues, onSubmit, isLoading }: MatterF
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-sm font-semibold text-foreground">Financials &amp; Billing</h3>
+              <h3 className="text-sm font-semibold text-foreground">{t('form.section_financials' as any)}</h3>
               <p className="text-xs text-muted-foreground">
                 {watchedMatterTypeId
                   ? 'Fee structure auto-populates from your case type template'
@@ -684,13 +684,13 @@ export function MatterForm({ mode, defaultValues, onSubmit, isLoading }: MatterF
                 render={({ field }) => (
                   <FormItem>
                     <div className="flex items-center gap-2">
-                      <FormLabel>Fee Template</FormLabel>
+                      <FormLabel>{t('form.matter_fee_template' as any)}</FormLabel>
                       <HelperTip contentKey="matter.fee_template" />
                     </div>
                     <Select onValueChange={(val) => { field.onChange(val); setUserPickedTemplate(true) }} value={field.value ?? ''}>
                       <FormControl>
                         <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select a fee template" />
+                          <SelectValue placeholder={t('form.select_fee_template' as any)} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -761,28 +761,28 @@ export function MatterForm({ mode, defaultValues, onSubmit, isLoading }: MatterF
                       )}
                     >
                       <Pencil className="h-2.5 w-2.5" />
-                      {isEditingLineItems ? 'Save Changes' : 'Edit Line Items'}
+                      {isEditingLineItems ? t('form.save_changes' as any) : t('form.fee_edit_individual' as any)}
                     </button>
                   </div>
                 </div>
                 <div className="grid grid-cols-3 gap-3 text-center">
                   <div className="rounded-md bg-white border border-emerald-100 px-3 py-2">
-                    <div className="text-[11px] text-muted-foreground uppercase tracking-wide">Legal</div>
-                    <div className="text-[10px] text-muted-foreground">Legal counsel and representation fees</div>
+                    <div className="text-[11px] text-muted-foreground uppercase tracking-wide">{t('form.fee_legal' as any)}</div>
+                    <div className="text-[10px] text-muted-foreground">{t('form.fee_legal_desc' as any)}</div>
                     <div className="text-sm font-semibold text-foreground mt-0.5">
                       {formatCents(feeBreakdown.professional)}
                     </div>
                   </div>
                   <div className="rounded-md bg-white border border-emerald-100 px-3 py-2">
-                    <div className="text-[11px] text-muted-foreground uppercase tracking-wide">Govt</div>
-                    <div className="text-[10px] text-muted-foreground">IRCC fees (tax-exempt)</div>
+                    <div className="text-[11px] text-muted-foreground uppercase tracking-wide">{t('form.fee_govt' as any)}</div>
+                    <div className="text-[10px] text-muted-foreground">{t('form.fee_govt_desc' as any)}</div>
                     <div className="text-sm font-semibold text-foreground mt-0.5">
                       {formatCents(feeBreakdown.government)}
                     </div>
                   </div>
                   <div className="rounded-md bg-white border border-emerald-100 px-3 py-2">
-                    <div className="text-[11px] text-muted-foreground uppercase tracking-wide">Admin</div>
-                    <div className="text-[10px] text-muted-foreground">Courier and third-party costs</div>
+                    <div className="text-[11px] text-muted-foreground uppercase tracking-wide">{t('form.fee_admin' as any)}</div>
+                    <div className="text-[10px] text-muted-foreground">{t('form.fee_admin_desc' as any)}</div>
                     <div className="text-sm font-semibold text-foreground mt-0.5">
                       {formatCents(feeBreakdown.disbursements)}
                     </div>
@@ -792,7 +792,7 @@ export function MatterForm({ mode, defaultValues, onSubmit, isLoading }: MatterF
                 {/* Inline editable line items */}
                 {isEditingLineItems && editedLineItems && (
                   <div className="space-y-2 pt-2 border-t border-emerald-200">
-                    <div className="text-[10px] font-semibold text-emerald-700 uppercase tracking-wide">Edit Individual Fees</div>
+                    <div className="text-[10px] font-semibold text-emerald-700 uppercase tracking-wide">{t('form.fee_edit_individual' as any)}</div>
                     {editedLineItems.profItems.map((item, i) => (
                       <div key={`edit-pf-${i}`} className="flex items-center justify-between gap-2 text-xs">
                         <span className="truncate text-muted-foreground">{item.name || item.description || 'Professional Fee'}</span>
@@ -926,7 +926,7 @@ export function MatterForm({ mode, defaultValues, onSubmit, isLoading }: MatterF
                       </div>
                       {(provinceConfig || isOutsideCanada) && (
                         <div className="flex items-center justify-between text-xs font-semibold">
-                          <span className="text-emerald-800">Total (incl. tax)</span>
+                          <span className="text-emerald-800">{t('form.fee_total_incl_tax' as any)}</span>
                           <span className="text-emerald-800">{formatCents(totalWithTax)}</span>
                         </div>
                       )}
@@ -942,8 +942,8 @@ export function MatterForm({ mode, defaultValues, onSubmit, isLoading }: MatterF
                   <div className="mt-2 space-y-1 pl-2 border-l-2 border-emerald-200">
                     {feeBreakdown.profItems.length > 0 && (
                       <div className="pt-1 pb-0.5">
-                        <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Professional Services</div>
-                        <div className="text-[11px] text-muted-foreground">Fees for legal work and representation</div>
+                        <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide">{t('form.fee_professional_services' as any)}</div>
+                        <div className="text-[11px] text-muted-foreground">{t('form.fee_professional_desc' as any)}</div>
                       </div>
                     )}
                     {feeBreakdown.profItems.map((f, i) => (
@@ -959,8 +959,8 @@ export function MatterForm({ mode, defaultValues, onSubmit, isLoading }: MatterF
                     ))}
                     {feeBreakdown.govItems.length > 0 && (
                       <div className="pt-2 pb-0.5">
-                        <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Government Fees</div>
-                        <div className="text-[11px] text-muted-foreground">Regulatory and filing fees (GST/HST exempt)</div>
+                        <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide">{t('form.fee_government' as any)}</div>
+                        <div className="text-[11px] text-muted-foreground">{t('form.fee_government_desc' as any)}</div>
                       </div>
                     )}
                     {feeBreakdown.govItems.map((f, i) => (
@@ -976,8 +976,8 @@ export function MatterForm({ mode, defaultValues, onSubmit, isLoading }: MatterF
                     ))}
                     {feeBreakdown.disbItems.length > 0 && (
                       <div className="pt-2 pb-0.5">
-                        <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Disbursements</div>
-                        <div className="text-[11px] text-muted-foreground">Administrative and third-party expenses</div>
+                        <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide">{t('form.fee_disbursements' as any)}</div>
+                        <div className="text-[11px] text-muted-foreground">{t('form.fee_disbursements_desc' as any)}</div>
                       </div>
                     )}
                     {feeBreakdown.disbItems.map((f, i) => (
@@ -1023,8 +1023,8 @@ export function MatterForm({ mode, defaultValues, onSubmit, isLoading }: MatterF
                           </div>
                           <div className="flex justify-between text-xs">
                             <span>
-                              Government Fees (Exempt)
-                              <span className="ml-1 text-[10px] text-muted-foreground/70">(GST/HST exempt)</span>
+                              {t('form.fee_government' as any)} (Exempt)
+                              <span className="ml-1 text-[10px] text-muted-foreground/70">{t('form.fee_gst_exempt' as any)}</span>
                             </span>
                             <span className="font-medium tabular-nums">{formatCents(feeBreakdown.government)}</span>
                           </div>
@@ -1049,7 +1049,7 @@ export function MatterForm({ mode, defaultValues, onSubmit, isLoading }: MatterF
                           )}
                           <div className="border-t border-emerald-300 my-1" />
                           <div className="flex justify-between text-sm font-bold">
-                            <span>TOTAL</span>
+                            <span>{t('form.fee_total' as any)}</span>
                             <span className="tabular-nums">{formatCents(totalCents)}</span>
                           </div>
                         </div>
@@ -1068,7 +1068,7 @@ export function MatterForm({ mode, defaultValues, onSubmit, isLoading }: MatterF
                 render={({ field }) => (
                   <FormItem>
                     <div className="flex items-center gap-2">
-                      <FormLabel>Estimated Value (CAD)</FormLabel>
+                      <FormLabel>{t('form.matter_estimated_value' as any)}</FormLabel>
                       <HelperTip contentKey="matter.estimated_value" />
                     </div>
                     {hasTemplateApplied && field.value && !isManualOverride ? (
@@ -1076,19 +1076,19 @@ export function MatterForm({ mode, defaultValues, onSubmit, isLoading }: MatterF
                         <div className="flex h-9 items-center rounded-md border bg-slate-50 px-3 text-sm font-semibold text-foreground">
                           {formatCents(field.value as number)}
                           <div className="ml-auto flex items-center gap-2">
-                            <span className="text-xs font-normal text-muted-foreground">Set by template</span>
+                            <span className="text-xs font-normal text-muted-foreground">{t('form.fee_set_by_template' as any)}</span>
                             <button
                               type="button"
                               onClick={() => setIsManualOverride(true)}
                               className="inline-flex items-center justify-center rounded-md p-1 text-muted-foreground hover:bg-slate-200 hover:text-foreground transition-colors"
-                              title="Edit estimated value"
+                              title={t('form.fee_edit_tooltip' as any)}
                             >
                               <Pencil className="h-3.5 w-3.5" />
                             </button>
                           </div>
                         </div>
                         <FormDescription>
-                          To customise fees, go to <strong>Settings → Fee Templates</strong> and edit the template, or click the edit icon to enter a custom value.
+                          {t('form.fee_customise_help' as any)}
                         </FormDescription>
                       </>
                     ) : hasTemplateApplied && isManualOverride ? (
@@ -1165,11 +1165,11 @@ export function MatterForm({ mode, defaultValues, onSubmit, isLoading }: MatterF
               name="billing_type"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Billing Type</FormLabel>
+                  <FormLabel>{t('form.matter_billing_type' as any)}</FormLabel>
                   {hasTemplateApplied ? (
                     <div className="flex h-9 items-center rounded-md border bg-slate-50 px-3 text-sm text-slate-700">
                       {BILLING_TYPES.find((bt) => bt.value === field.value)?.label ?? field.value}
-                      <span className="ml-auto text-xs text-muted-foreground">Set by template</span>
+                      <span className="ml-auto text-xs text-muted-foreground">{t('form.fee_set_by_template' as any)}</span>
                     </div>
                   ) : (
                     <Select onValueChange={field.onChange} value={field.value}>
@@ -1448,7 +1448,7 @@ export function MatterForm({ mode, defaultValues, onSubmit, isLoading }: MatterF
         <div className="flex justify-end gap-2 pt-4">
           <Button type="submit" disabled={isLoading}>
             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {mode === 'create' ? 'Create Matter' : 'Update Matter'}
+            {mode === 'create' ? t('form.create_contact' as any) : t('form.save_changes' as any)}
           </Button>
         </div>
       </form>

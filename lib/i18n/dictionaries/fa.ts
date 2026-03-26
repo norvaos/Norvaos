@@ -5,7 +5,7 @@
 
 import type { DictionaryKey } from './en'
 
-export const fa: Record<DictionaryKey, string> = {
+export const fa: Partial<Record<DictionaryKey, string>> = {
   'intake.welcome': 'به پرتال امن پذیرش خود خوش آمدید',
   'intake.instructions': 'لطفاً فرم‌های زیر را تکمیل کنید. اطلاعات شما رمزگذاری و محافظت شده است.',
   'intake.language_select': 'زبان مورد نظر خود را انتخاب کنید',
@@ -499,4 +499,32 @@ export const fa: Record<DictionaryKey, string> = {
   'nav.section_work': 'Work',
   'nav.section_finance': 'Finance',
   'nav.section_admin': 'Admin',
+  'nav.home': 'Home',
+  'nav.immigration': 'Immigration',
+  'nav.tools': 'Tools',
+  'nav.dashboards': 'Dashboards',
+  'nav.chat': 'Chat',
+  'nav.practice_areas': 'Practice Areas & Matter Types',
+  'nav.deadline_types': 'Deadline Types',
+  'nav.pipelines': 'Pipelines',
+  'nav.workflow_templates': 'Workflow Templates',
+  'nav.document_slot_templates': 'Document Slots',
+  'nav.forms': 'Forms',
+  'nav.automations': 'Automations',
+  'nav.roles': 'Roles',
+  'nav.users': 'Users',
+  'nav.visitor_visa_invitation': 'Visa Invitation',
+
+  // ── Classification Labels ──────────────────────────────────────────────
+  'classification.lead': 'Lead',
+  'classification.client': 'Client',
+  'classification.former_client': 'Former Client',
+  'classification.lawyer': 'Lawyer',
+  'classification.ircc_officer': 'IRCC Officer',
+  'classification.consultant': 'Consultant',
+  'classification.judge': 'Judge',
+  'classification.referral_source': 'Referral Source',
+  'classification.government': 'Government',
+  'classification.vendor': 'Vendor',
+  'classification.other_professional': 'Other Professional',
 }

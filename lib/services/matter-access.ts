@@ -43,7 +43,7 @@ export async function checkMatterAccess(
   matterId: string,
 ): Promise<boolean> {
   const admin = createAdminClient()
-  const { data, error } = await admin.rpc('check_matter_access', {
+  const { data, error } = await (admin as any).rpc('check_matter_access', {
     p_user_id: userId,
     p_matter_id: matterId,
   })

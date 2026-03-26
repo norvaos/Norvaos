@@ -66,9 +66,9 @@ export function useRecalculateReadiness() {
       queryClient.invalidateQueries({ queryKey: ['leads'] })
 
       if (result.score >= 70) {
-        toast.success(`Readiness: ${result.score}% — Lead is conversion-ready`)
+        toast.success(`Norva Readiness: ${result.score}% — Lead is conversion-ready`)
       } else {
-        toast.warning(`Readiness: ${result.score}% — ${result.missing?.length ?? 0} field(s) missing`)
+        toast.warning(`Norva Readiness: ${result.score}% — ${result.missing?.length ?? 0} field(s) missing`)
       }
     },
     onError: () => {
@@ -110,13 +110,13 @@ export function useRunConflictCheck() {
       queryClient.invalidateQueries({ queryKey: ['leads'] })
 
       if (result.has_conflicts) {
-        toast.warning(`${result.match_count} conflict(s) detected — review required`)
+        toast.warning(`Norva Conflict — ${result.match_count} conflict(s) detected — review required`)
       } else {
-        toast.success('No conflicts detected')
+        toast.success('Norva Conflict — No conflicts detected')
       }
     },
     onError: () => {
-      toast.error('Failed to run conflict check')
+      toast.error('Norva Conflict — Failed to run conflict check')
     },
   })
 }

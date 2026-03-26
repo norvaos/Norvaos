@@ -7,11 +7,12 @@
  *   Review         18%
  *   Forms          13%
  *   Billing        13%
- *   Compliance     11%  ← NEW: Document expiry + status validity (Directive 20.2)
+ *   Compliance     11%  ← Document expiry + status validity (Directive 20.2)
  *   Submission      5%
  *
- * The Compliance domain checks contact_status_records (passport, permit expiries)
- * and penalises scores when critical documents are expiring or expired.
+ * Post-computation blockers (Directives 018/024):
+ *   - Stale-Date Blocker: If any document is >150 days old → cap total at 34 (Critical: Stale)
+ *   - Continuity Blocker: If address or personal history has gaps >0 days → BLOCKER
  *
  * Called server-side from POST /api/matters/[id]/readiness.
  * Results are persisted to matters.readiness_score + readiness_breakdown + readiness_focus_area.
@@ -462,6 +463,112 @@ async function computeSubmission(
   return buildDomain('Submission', 100, weight, 'Filing ready: yes — financial clearance passed')
 }
 
+// ── Stale-Date Blocker (Directive 024) ────────────────────────────────────────
+// If any document in the matter is >150 days old, cap the total score at 34.
+// This forces the "Activate Matter" button to re-lock, preventing stale submissions.
+
+async function checkStaleDateBlocker(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  supabase: SupabaseClient<any>,
+  matterId: string,
+): Promise<{ isBlocked: boolean; staleDocuments: string[] }> {
+  const staleDocuments: string[] = []
+
+  const { data: slots } = await supabase
+    .from('document_slots')
+    .select('id, label, document_type, uploaded_at')
+    .eq('matter_id', matterId)
+    .eq('is_active', true)
+    .not('uploaded_at', 'is', null)
+
+  if (!slots || slots.length === 0) return { isBlocked: false, staleDocuments }
+
+  const now = Date.now()
+  const STALE_THRESHOLD_DAYS = 150
+
+  for (const slot of slots as Array<{ label: string; document_type: string; uploaded_at: string }>) {
+    if (!slot.uploaded_at) continue
+    const uploadedMs = new Date(slot.uploaded_at).getTime()
+    const daysSinceUpload = Math.floor((now - uploadedMs) / (1000 * 60 * 60 * 24))
+    if (daysSinceUpload > STALE_THRESHOLD_DAYS) {
+      staleDocuments.push(`${slot.label || slot.document_type} (${daysSinceUpload}d old)`)
+    }
+  }
+
+  return { isBlocked: staleDocuments.length > 0, staleDocuments }
+}
+
+// ── Continuity Gap Blocker (Directive 018) ────────────────────────────────────
+// Any gap in address or personal history >0 days = BLOCKER on the readiness score.
+
+async function checkContinuityBlocker(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  supabase: SupabaseClient<any>,
+  matterId: string,
+): Promise<{ isBlocked: boolean; gaps: string[] }> {
+  const gaps: string[] = []
+
+  // Fetch address history for this matter
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: addressRows } = await (supabase as SupabaseClient<any>)
+    .from('address_history')
+    .select('label, city, country, start_date, end_date')
+    .eq('matter_id', matterId)
+    .order('start_date', { ascending: true })
+
+  const addresses = (addressRows ?? []) as Array<{
+    label: string | null; city: string; country: string;
+    start_date: string; end_date: string | null
+  }>
+
+  if (addresses.length >= 2) {
+    for (let i = 0; i < addresses.length - 1; i++) {
+      const current = addresses[i]
+      const next = addresses[i + 1]
+      if (!current.end_date) continue
+
+      const endMs = new Date(current.end_date).getTime()
+      const startMs = new Date(next.start_date).getTime()
+      const gapDays = Math.floor((startMs - endMs) / (1000 * 60 * 60 * 24)) - 1
+
+      if (gapDays > 0) {
+        gaps.push(`Address gap: ${gapDays}d between "${current.label || current.city}" and "${next.label || next.city}"`)
+      }
+    }
+  }
+
+  // Fetch personal/employment history
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: personalRows } = await (supabase as SupabaseClient<any>)
+    .from('personal_history')
+    .select('label, history_type, organization, start_date, end_date')
+    .eq('matter_id', matterId)
+    .order('start_date', { ascending: true })
+
+  const personal = (personalRows ?? []) as Array<{
+    label: string | null; history_type: string; organization: string | null;
+    start_date: string; end_date: string | null
+  }>
+
+  if (personal.length >= 2) {
+    for (let i = 0; i < personal.length - 1; i++) {
+      const current = personal[i]
+      const next = personal[i + 1]
+      if (!current.end_date) continue
+
+      const endMs = new Date(current.end_date).getTime()
+      const startMs = new Date(next.start_date).getTime()
+      const gapDays = Math.floor((startMs - endMs) / (1000 * 60 * 60 * 24)) - 1
+
+      if (gapDays > 0) {
+        gaps.push(`${current.history_type} gap: ${gapDays}d between "${current.label || current.organization}" and "${next.label || next.organization}"`)
+      }
+    }
+  }
+
+  return { isBlocked: gaps.length > 0, gaps }
+}
+
 // ── Main export ───────────────────────────────────────────────────────────────
 
 export async function computeReadiness(
@@ -478,8 +585,8 @@ export async function computeReadiness(
 
   const matterTypeId = matter?.matter_type_id ?? null
 
-  // All domains computed in parallel
-  const [documents, questionnaire, review, forms, billing, compliance, submission] = await Promise.all([
+  // All domains + blockers computed in parallel
+  const [documents, questionnaire, review, forms, billing, compliance, submission, staleCheck, continuityCheck] = await Promise.all([
     computeDocuments(supabase, matterId, matterTypeId),
     computeQuestionnaire(supabase, matterId),
     computeReview(supabase, matterId),
@@ -487,13 +594,40 @@ export async function computeReadiness(
     computeBilling(supabase, matterId),
     computeCompliance(supabase, matterId),
     computeSubmission(supabase, matterId),
+    checkStaleDateBlocker(supabase, matterId),
+    checkContinuityBlocker(supabase, matterId),
   ])
 
   const domains = [documents, questionnaire, review, forms, billing, compliance, submission]
 
-  const total = Math.round(
+  let total = Math.round(
     domains.reduce((sum, d) => sum + d.score * d.weight, 0),
   )
+
+  // ── Directive 024: Stale-Date Blocker ────────────────────────────────
+  // If any document is >150 days old, cap score at 34 (forces "Critical: Stale")
+  if (staleCheck.isBlocked) {
+    total = Math.min(total, 34)
+    // Inject a synthetic domain note
+    domains.push(buildDomain(
+      'Freshness',
+      0,
+      0, // no weight — it's a hard cap
+      `BLOCKER: ${staleCheck.staleDocuments.length} stale document(s): ${staleCheck.staleDocuments.join('; ')}`,
+    ))
+  }
+
+  // ── Directive 018: Continuity Gap Blocker ─────────────────────────────
+  // Any gap in address or personal history = BLOCKER
+  if (continuityCheck.isBlocked) {
+    total = Math.min(total, 34)
+    domains.push(buildDomain(
+      'Continuity',
+      0,
+      0,
+      `BLOCKER: ${continuityCheck.gaps.length} chronological gap(s): ${continuityCheck.gaps.join('; ')}`,
+    ))
+  }
 
   // Focus area = domain with the lowest raw score
   const focus = domains.reduce((min, d) => (d.score < min.score ? d : min), domains[0])

@@ -178,20 +178,22 @@ interface MatterColumn {
   alwaysVisible?: boolean
 }
 
-const MATTER_COLUMNS: MatterColumn[] = [
-  { id: 'matter_number', label: 'Matter #', sortable: 'matter_number', alwaysVisible: true },
-  { id: 'title', label: 'Title', sortable: 'title', alwaysVisible: true },
-  { id: 'practice_area', label: 'Practice Area' },
-  { id: 'matter_type', label: 'Matter Type' },
-  { id: 'stage', label: 'Stage / Progress' },
-  { id: 'status', label: 'Status', sortable: 'status' },
-  { id: 'priority', label: 'Priority', sortable: 'priority' },
-  { id: 'risk', label: 'Risk' },
-  { id: 'intake', label: 'Intake' },
-  { id: 'lawyer', label: 'Responsible Lawyer' },
-  { id: 'next_deadline', label: 'Next Deadline', sortable: 'next_deadline' },
-  { id: 'created_at', label: 'Created', sortable: 'created_at' },
-]
+function buildMatterColumns(t: (key: any) => string): MatterColumn[] {
+  return [
+    { id: 'matter_number', label: t('matters.col_matter_number' as any), sortable: 'matter_number', alwaysVisible: true },
+    { id: 'title', label: t('matters.col_title' as any), sortable: 'title', alwaysVisible: true },
+    { id: 'practice_area', label: t('matters.col_practice_area' as any) },
+    { id: 'matter_type', label: t('matters.col_matter_type' as any) },
+    { id: 'stage', label: t('matters.col_stage' as any) },
+    { id: 'status', label: t('matters.col_status' as any), sortable: 'status' },
+    { id: 'priority', label: t('matters.col_priority' as any), sortable: 'priority' },
+    { id: 'risk', label: t('matters.col_risk' as any) },
+    { id: 'intake', label: t('matters.col_intake' as any) },
+    { id: 'lawyer', label: t('matters.col_lawyer' as any) },
+    { id: 'next_deadline', label: t('matters.col_next_deadline' as any), sortable: 'next_deadline' },
+    { id: 'created_at', label: t('matters.col_created' as any), sortable: 'created_at' },
+  ]
+}
 
 const DEFAULT_VISIBLE = ['matter_number', 'title', 'stage', 'status', 'priority', 'lawyer', 'next_deadline', 'created_at']
 
@@ -211,6 +213,8 @@ export default function MattersPage() {
   const tenantId = tenant?.id ?? ''
   const queryClient = useQueryClient()
   const { t } = useI18n()
+
+  const MATTER_COLUMNS = useMemo(() => buildMatterColumns(t), [t])
 
   const [visibleColumns, setVisibleColumns] = useState<string[]>(loadVisibleColumns)
 
@@ -429,7 +433,7 @@ export default function MattersPage() {
         <div>
           <h1 className="text-2xl font-semibold text-slate-900">{t('dashboard.matters')}</h1>
           <p className="mt-1 text-sm text-slate-500">
-            Manage your firm&apos;s matters and cases
+            {t('matters.subtitle' as any)}
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -438,11 +442,11 @@ export default function MattersPage() {
             <ColumnDropdownTrigger asChild>
               <Button variant="outline" size="sm">
                 <SlidersHorizontal className="mr-1.5 h-4 w-4" />
-                Columns
+                {t('matters.columns' as any)}
               </Button>
             </ColumnDropdownTrigger>
             <ColumnDropdownContent align="end" className="w-48">
-              <ColumnDropdownLabel>Toggle Columns</ColumnDropdownLabel>
+              <ColumnDropdownLabel>{t('matters.toggle_columns' as any)}</ColumnDropdownLabel>
               <ColumnDropdownSeparator />
               {MATTER_COLUMNS.map((col) => (
                 <DropdownMenuCheckboxItem
@@ -501,10 +505,10 @@ export default function MattersPage() {
           onValueChange={(v) => { setStatusFilter(v === ALL_FILTER_VALUE ? '' : v); setPage(1) }}
         >
           <SelectTrigger className="w-[150px]">
-            <SelectValue placeholder="Status" />
+            <SelectValue placeholder={t('matters.col_status' as any)} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value={ALL_FILTER_VALUE}>All Statuses</SelectItem>
+            <SelectItem value={ALL_FILTER_VALUE}>{t('matters.all_statuses' as any)}</SelectItem>
             {MATTER_STATUSES.map((s) => (
               <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>
             ))}
@@ -518,10 +522,10 @@ export default function MattersPage() {
             disabled={globalIsFiltered}
           >
             <SelectTrigger className="w-[170px]">
-              <SelectValue placeholder="Practice Area" />
+              <SelectValue placeholder={t('matters.col_practice_area' as any)} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value={ALL_FILTER_VALUE}>All Practice Areas</SelectItem>
+              <SelectItem value={ALL_FILTER_VALUE}>{t('matters.all_practice_areas' as any)}</SelectItem>
               {practiceAreas?.map((pa) => (
                 <SelectItem key={pa.id} value={pa.id}>{pa.name}</SelectItem>
               ))}
@@ -529,7 +533,7 @@ export default function MattersPage() {
           </Select>
           {globalIsFiltered && activePracticeArea && (
             <span className="text-xs text-muted-foreground whitespace-nowrap">
-              via global filter
+              {t('matters.via_global_filter' as any)}
             </span>
           )}
         </div>
@@ -539,10 +543,10 @@ export default function MattersPage() {
           onValueChange={(v) => { setPriorityFilter(v === ALL_FILTER_VALUE ? '' : v); setPage(1) }}
         >
           <SelectTrigger className="w-[140px]">
-            <SelectValue placeholder="Priority" />
+            <SelectValue placeholder={t('matters.col_priority' as any)} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value={ALL_FILTER_VALUE}>All Priorities</SelectItem>
+            <SelectItem value={ALL_FILTER_VALUE}>{t('matters.all_priorities' as any)}</SelectItem>
             {PRIORITIES.map((p) => (
               <SelectItem key={p.value} value={p.value}>{p.label}</SelectItem>
             ))}
@@ -554,10 +558,10 @@ export default function MattersPage() {
           onValueChange={(v) => { setLawyerFilter(v === ALL_FILTER_VALUE ? '' : v); setPage(1) }}
         >
           <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Responsible Lawyer" />
+            <SelectValue placeholder={t('matters.col_lawyer' as any)} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value={ALL_FILTER_VALUE}>All Lawyers</SelectItem>
+            <SelectItem value={ALL_FILTER_VALUE}>{t('matters.all_lawyers' as any)}</SelectItem>
             {lawyers?.map((u) => (
               <SelectItem key={u.id} value={u.id}>{formatUserName(u)}</SelectItem>
             ))}
@@ -569,10 +573,10 @@ export default function MattersPage() {
           onValueChange={(v) => { setRiskLevelFilter(v === ALL_FILTER_VALUE ? '' : v); setPage(1) }}
         >
           <SelectTrigger className="w-[140px]">
-            <SelectValue placeholder="Risk Level" />
+            <SelectValue placeholder={t('matters.risk_level' as any)} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value={ALL_FILTER_VALUE}>All Risk Levels</SelectItem>
+            <SelectItem value={ALL_FILTER_VALUE}>{t('matters.all_risk_levels' as any)}</SelectItem>
             {RISK_LEVELS.map((r) => (
               <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>
             ))}
@@ -581,7 +585,7 @@ export default function MattersPage() {
 
         {hasActiveFilters && (
           <Button variant="ghost" size="sm" onClick={handleClearFilters}>
-            Clear filters
+            {t('matters.clear_filters' as any)}
           </Button>
         )}
       </div>
@@ -602,19 +606,19 @@ export default function MattersPage() {
         </div>
       ) : isError ? (
         <div className="rounded-lg border border-red-200 bg-red-50 p-8 text-center">
-          <p className="text-sm text-red-600">Failed to load matters. Please try again.</p>
+          <p className="text-sm text-red-600">{t('matters.load_error' as any)}</p>
         </div>
       ) : matters.length === 0 ? (
         <EmptyState
           icon={Briefcase}
-          title="No matters found"
+          title={t('matters.no_matters_found' as any)}
           description={
             hasActiveFilters
-              ? 'No matters match your current filters. Try adjusting or clearing your filters.'
-              : 'Create your first matter to start managing your caseload.'
+              ? t('matters.no_matters_filtered' as any)
+              : t('matters.no_matters_empty' as any)
           }
-          quickHint={hasActiveFilters ? undefined : 'Tip: Choose a practice area and matter type to activate stage pipelines and deadline tracking automatically.'}
-          actionLabel={hasActiveFilters ? 'Clear filters' : t('dashboard.new_matter')}
+          quickHint={hasActiveFilters ? undefined : t('matters.quick_hint' as any)}
+          actionLabel={hasActiveFilters ? t('matters.clear_filters' as any) : t('dashboard.new_matter')}
           onAction={hasActiveFilters ? handleClearFilters : () => setSheetOpen(true)}
         />
       ) : (
@@ -623,7 +627,7 @@ export default function MattersPage() {
           {selectedIds.size > 0 && (
             <div className="flex items-center justify-between rounded-lg border border-blue-200 bg-blue-50 px-4 py-2.5">
               <span className="text-sm font-medium text-blue-800">
-                {selectedIds.size} matter{selectedIds.size !== 1 ? 's' : ''} selected
+                {selectedIds.size} {selectedIds.size !== 1 ? t('matters.matters_plural' as any) : t('matters.matter_singular' as any)} {t('matters.selected' as any)}
               </span>
               <div className="flex items-center gap-2">
                 <Button
@@ -632,7 +636,7 @@ export default function MattersPage() {
                   className="text-slate-600"
                   onClick={() => setSelectedIds(new Set())}
                 >
-                  Clear selection
+                  {t('matters.clear_selection' as any)}
                 </Button>
                 <Button
                   variant="destructive"
@@ -640,7 +644,7 @@ export default function MattersPage() {
                   onClick={() => setDeleteDialogOpen(true)}
                 >
                   <Trash2 className="mr-1.5 h-3.5 w-3.5" />
-                  Delete {selectedIds.size} matter{selectedIds.size !== 1 ? 's' : ''}
+                  {t('common.delete' as any)} {selectedIds.size} {selectedIds.size !== 1 ? t('matters.matters_plural' as any) : t('matters.matter_singular' as any)}
                 </Button>
               </div>
             </div>
@@ -671,7 +675,7 @@ export default function MattersPage() {
           {/* Pagination */}
           <div className="flex items-center justify-between">
             <p className="text-sm text-slate-500">
-              Showing {((page - 1) * 25) + 1}--{Math.min(page * 25, totalCount)} of {totalCount} matter{totalCount !== 1 ? 's' : ''}
+              {t('matters.showing' as any)} {((page - 1) * 25) + 1}--{Math.min(page * 25, totalCount)} {t('matters.of' as any)} {totalCount} {totalCount !== 1 ? t('matters.matters_plural' as any) : t('matters.matter_singular' as any)}
             </p>
             <div className="flex items-center gap-2">
               <Button
@@ -681,10 +685,10 @@ export default function MattersPage() {
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
               >
                 <ChevronLeft className="mr-1 h-4 w-4" />
-                Previous
+                {t('matters.previous' as any)}
               </Button>
               <span className="text-sm text-slate-600">
-                Page {page} of {totalPages}
+                {t('matters.page' as any)} {page} {t('matters.of' as any)} {totalPages}
               </span>
               <Button
                 variant="outline"
@@ -692,7 +696,7 @@ export default function MattersPage() {
                 disabled={page >= totalPages}
                 onClick={() => setPage((p) => p + 1)}
               >
-                Next
+                {t('matters.next' as any)}
                 <ChevronRight className="ml-1 h-4 w-4" />
               </Button>
             </div>
@@ -706,10 +710,10 @@ export default function MattersPage() {
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
               <AlertTriangle className="h-5 w-5 text-red-500" />
-              Delete {selectedIds.size} matter{selectedIds.size !== 1 ? 's' : ''}?
+              {t('common.delete' as any)} {selectedIds.size} {selectedIds.size !== 1 ? t('matters.matters_plural' as any) : t('matters.matter_singular' as any)}?
             </AlertDialogTitle>
             <AlertDialogDescription>
-              This will archive {selectedIds.size} matter{selectedIds.size !== 1 ? 's' : ''}. They will no longer appear in your active matters list. This action can be reversed by your administrator.
+              {t('matters.delete_description' as any)}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -719,7 +723,7 @@ export default function MattersPage() {
               disabled={deleting}
               className="bg-red-600 hover:bg-red-700 focus:ring-red-600"
             >
-              {deleting ? 'Deleting...' : `Delete ${selectedIds.size} matter${selectedIds.size !== 1 ? 's' : ''}`}
+              {deleting ? t('matters.deleting' as any) : `${t('common.delete' as any)} ${selectedIds.size} ${selectedIds.size !== 1 ? t('matters.matters_plural' as any) : t('matters.matter_singular' as any)}`}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -1040,6 +1044,7 @@ function MatterKanbanColumn({
   onMatterHover?: (id: string) => void
 }) {
   const { setNodeRef, isOver } = useDroppable({ id: stageId })
+  const { t } = useI18n()
 
   return (
     <div
@@ -1070,7 +1075,7 @@ function MatterKanbanColumn({
             />
           ))
         ) : (
-          <p className="text-xs text-center text-slate-400 py-6">No matters</p>
+          <p className="text-xs text-center text-slate-400 py-6">{t('matters.no_matters' as any)}</p>
         )}
       </div>
     </div>
@@ -1088,6 +1093,7 @@ function MattersKanban({
   onMatterClick: (id: string) => void
   onMatterHover?: (id: string) => void
 }) {
+  const { t } = useI18n()
   const queryClient = useQueryClient()
   const { data: pipelines } = usePipelines(tenantId, 'matter')
   const [selectedPipelineId, setSelectedPipelineId] = useState('')
@@ -1158,12 +1164,12 @@ function MattersKanban({
     return (
       <div className="rounded-lg border border-dashed border-slate-300 bg-slate-50 p-12 text-center">
         <Kanban className="mx-auto mb-3 h-10 w-10 text-slate-400" />
-        <h3 className="text-base font-medium text-slate-900">No Matter Pipelines</h3>
+        <h3 className="text-base font-medium text-slate-900">{t('matters.no_pipelines' as any)}</h3>
         <p className="mt-1 text-sm text-slate-500">
-          Create a matter pipeline to use the board view.
+          {t('matters.no_pipelines_description' as any)}
         </p>
         <Button variant="outline" className="mt-4" asChild>
-          <a href="/settings/pipelines">Manage Pipelines</a>
+          <a href="/settings/pipelines">{t('matters.manage_pipelines' as any)}</a>
         </Button>
       </div>
     )
@@ -1175,7 +1181,7 @@ function MattersKanban({
       {pipelines.length > 1 && (
         <Select value={pipelineId} onValueChange={setSelectedPipelineId}>
           <SelectTrigger className="w-[250px]">
-            <SelectValue placeholder="Select pipeline" />
+            <SelectValue placeholder={t('matters.select_pipeline' as any)} />
           </SelectTrigger>
           <SelectContent>
             {pipelines.map((p) => (
@@ -1216,7 +1222,7 @@ function MattersKanban({
               {(mattersByStage['__no_stage__']?.length ?? 0) > 0 && (
                 <MatterKanbanColumn
                   stageId="__no_stage__"
-                  stageName="No Stage"
+                  stageName={t('matters.no_stage' as any)}
                   stageColor="#9ca3af"
                   matters={mattersByStage['__no_stage__']}
                   getLawyerName={getLawyerName}

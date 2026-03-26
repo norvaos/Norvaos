@@ -925,7 +925,7 @@ export function useRequestTrustAllocation() {
     onSuccess: (_data, { invoiceId }) => {
       qc.invalidateQueries({ queryKey: billingKeys.trustAllocations(invoiceId) })
       qc.invalidateQueries({ queryKey: invoicingKeys.invoiceDetail(invoiceId) })
-      toast.success('Trust allocation requested')
+      toast.success('Norva Trust Ledger — Allocation requested')
     },
     onError: (err: Error) => toast.error(err.message),
   })

@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { createClient } from '@/lib/supabase/client'
 import type { Database } from '@/lib/types/database'
 import { logAudit } from '@/lib/queries/audit-logs'
+import { withContactPIIEncrypted } from '@/lib/services/pii-dual-write'
 import { toast } from 'sonner'
 
 type Contact = Database['public']['Tables']['contacts']['Row']
@@ -136,7 +137,7 @@ export function useCreateContact() {
 
       const { data, error } = await supabase
         .from('contacts')
-        .insert(contact)
+        .insert({ ...contact, ...withContactPIIEncrypted(contact) })
         .select()
         .single()
 
@@ -175,7 +176,7 @@ export function useUpdateContact() {
       const supabase = createClient()
       const { data, error } = await supabase
         .from('contacts')
-        .update(updates)
+        .update({ ...updates, ...withContactPIIEncrypted(updates) })
         .eq('id', id)
         .select()
         .single()

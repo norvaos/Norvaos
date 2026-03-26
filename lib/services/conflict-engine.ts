@@ -70,12 +70,12 @@ export interface ScanResult {
 // ─── Weight Configuration ────────────────────────────────────────────────────
 
 const WEIGHTS = {
-  exact_name: 30,
+  exact_name: 50,
   fuzzy_name: 20,
   email_match: 25,
   phone_match: 20,
   address_match: 15,
-  dob_match: 20,
+  dob_match: 40,
   org_match: 15,
   adverse_party: 40,
   former_client: 25,

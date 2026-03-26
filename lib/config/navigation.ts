@@ -24,6 +24,7 @@ import {
   Receipt,
   Activity,
   BookOpen,
+  GraduationCap,
   type LucideIcon,
 } from 'lucide-react'
 
@@ -67,6 +68,7 @@ export const navigation: NavSection[] = [
       { title: 'Leads', labelKey: 'nav.leads', href: '/leads', icon: Target },
       { title: 'Bookings', labelKey: 'nav.bookings', href: '/bookings', icon: CalendarCheck },
       { title: 'Norva Guardian', labelKey: 'nav.guardian', href: '/guardian', icon: Shield },
+      { title: 'Norva Academy', labelKey: 'nav.academy', href: '/academy', icon: GraduationCap },
     ],
   },
   {

@@ -5,7 +5,7 @@
 
 import type { DictionaryKey } from './en'
 
-export const vi: Record<DictionaryKey, string> = {
+export const vi: Partial<Record<DictionaryKey, string>> = {
   'intake.welcome': 'Chào mừng bạn đến cổng tiếp nhận an toàn',
   'intake.instructions': 'Vui lòng hoàn thành các biểu mẫu sau. Thông tin của bạn được mã hóa và bảo vệ.',
   'intake.language_select': 'Chọn ngôn ngữ ưa thích của bạn',
@@ -400,7 +400,6 @@ export const vi: Record<DictionaryKey, string> = {
   'form.matter_title_placeholder': 'e.g. Smith v. Jones',
   'form.matter_search_contact': 'Search or create a contact...',
   'form.matter_description_placeholder': 'Brief description of the matter...',
-  'form.select_practice_area': 'Select a practice area',
   'form.select_matter_type': 'Type to search...',
   'form.no_matter_types': 'No matter types found.',
   'form.select_province': 'Select province or territory',
@@ -498,4 +497,32 @@ export const vi: Record<DictionaryKey, string> = {
   'nav.section_work': 'Work',
   'nav.section_finance': 'Finance',
   'nav.section_admin': 'Admin',
+  'nav.home': 'Home',
+  'nav.immigration': 'Immigration',
+  'nav.tools': 'Tools',
+  'nav.dashboards': 'Dashboards',
+  'nav.chat': 'Chat',
+  'nav.practice_areas': 'Practice Areas & Matter Types',
+  'nav.deadline_types': 'Deadline Types',
+  'nav.pipelines': 'Pipelines',
+  'nav.workflow_templates': 'Workflow Templates',
+  'nav.document_slot_templates': 'Document Slots',
+  'nav.forms': 'Forms',
+  'nav.automations': 'Automations',
+  'nav.roles': 'Roles',
+  'nav.users': 'Users',
+  'nav.visitor_visa_invitation': 'Visa Invitation',
+
+  // ── Classification Labels ──────────────────────────────────────────────
+  'classification.lead': 'Lead',
+  'classification.client': 'Client',
+  'classification.former_client': 'Former Client',
+  'classification.lawyer': 'Lawyer',
+  'classification.ircc_officer': 'IRCC Officer',
+  'classification.consultant': 'Consultant',
+  'classification.judge': 'Judge',
+  'classification.referral_source': 'Referral Source',
+  'classification.government': 'Government',
+  'classification.vendor': 'Vendor',
+  'classification.other_professional': 'Other Professional',
 }
