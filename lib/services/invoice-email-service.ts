@@ -11,6 +11,8 @@ import { generateInvoicePdf, type InvoicePdfData } from '@/lib/utils/invoice-pdf
 import { generateReceiptPdf } from '@/lib/utils/receipt-pdf'
 import { log } from '@/lib/utils/logger'
 import { reportError } from '@/lib/monitoring/error-reporter'
+import { renderPaymentReceiptEmail } from '@/lib/email-templates/payment-receipt'
+import { resolveEmailLocale } from '@/lib/email-templates/email-locale'
 
 // Re-use email service patterns
 function getResend(): Resend | null {
@@ -264,21 +266,25 @@ export async function sendReceiptEmail(
       return { success: false, error: 'No payments recorded on this invoice' }
     }
 
-    // Resolve recipient email
+    // Resolve recipient email + preferred language
     let recipientEmail = emailOverride
     let billToName = 'Client'
+    let clientFirstName: string | null = null
+    let preferredLanguage: string | null = null
 
     if (!recipientEmail && invoice.contact_id) {
       const { data: contact } = await supabase
         .from('contacts')
-        .select('first_name, last_name, email_primary')
+        .select('first_name, last_name, email_primary, preferred_language')
         .eq('id', invoice.contact_id)
         .eq('tenant_id', tenantId)
         .single()
 
       if (contact) {
         recipientEmail = contact.email_primary ?? undefined
+        clientFirstName = contact.first_name
         billToName = [contact.first_name, contact.last_name].filter(Boolean).join(' ') || 'Client'
+        preferredLanguage = contact.preferred_language
       }
     }
 
@@ -287,6 +293,7 @@ export async function sendReceiptEmail(
     }
 
     const currency = tenant.currency || 'CAD'
+    const locale = resolveEmailLocale(preferredLanguage)
     const settings = tenant.settings as Record<string, unknown> | null
     const firmAddress = (settings?.firm_address as string) ?? null
 
@@ -308,23 +315,40 @@ export async function sendReceiptEmail(
       dateFormat: (tenant as { date_format?: string | null }).date_format ?? null,
     })
 
-    const totalFormatted = new Intl.NumberFormat('en-CA', { style: 'currency', currency }).format((invoice.amount_paid ?? 0) / 100)
+    const currencyLocale = locale === 'fr' ? 'fr-CA' : 'en-CA'
+    const totalFormatted = new Intl.NumberFormat(currencyLocale, { style: 'currency', currency }).format((invoice.amount_paid ?? 0) / 100)
+
+    // Latest payment info for the template
+    const latestPayment = payments[0]
+    const paymentDate = latestPayment?.created_at
+      ? new Date(latestPayment.created_at).toLocaleDateString(currencyLocale, { year: 'numeric', month: 'long', day: 'numeric' })
+      : new Date().toLocaleDateString(currencyLocale)
+
+    const balanceRemaining = (invoice.total_amount ?? 0) - (invoice.amount_paid ?? 0)
+    const balanceFormatted = balanceRemaining > 0
+      ? new Intl.NumberFormat(currencyLocale, { style: 'currency', currency }).format(balanceRemaining / 100)
+      : undefined
+
+    // Render localised receipt email
+    const { html, text, subject } = await renderPaymentReceiptEmail({
+      firmName: tenant.name,
+      firmLogoUrl: (tenant as { logo_url?: string | null }).logo_url ?? null,
+      primaryColor: (tenant as { primary_color?: string | null }).primary_color ?? '#3b82f6',
+      clientFirstName,
+      invoiceNumber: invoice.invoice_number ?? '',
+      amountPaid: totalFormatted,
+      paymentDate,
+      paymentMethod: latestPayment?.payment_method ?? undefined,
+      balanceRemaining: balanceFormatted,
+      language: locale,
+    })
 
     const { error: sendError } = await resend.emails.send({
       from: getFromAddress(tenant.name),
       to: [recipientEmail],
-      subject: `Payment Receipt — ${totalFormatted} for Invoice ${invoice.invoice_number}`,
-      html: `
-        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #1a1a1a;">Payment Receipt</h2>
-          <p>Dear ${billToName},</p>
-          <p>Thank you for your payment of <strong>${totalFormatted}</strong> towards Invoice ${invoice.invoice_number}.</p>
-          <p>Please find the receipt attached for your records.</p>
-          <hr style="border: none; border-top: 1px solid #eee; margin: 24px 0;">
-          <p style="color: #999; font-size: 12px;">${tenant.name}</p>
-        </div>
-      `,
-      text: `Payment Receipt from ${tenant.name}\n\nPayment of ${totalFormatted} received for Invoice ${invoice.invoice_number}.\n\nThank you.`,
+      subject,
+      html,
+      text,
       attachments: [
         {
           filename: `RECEIPT-${invoice.invoice_number}.pdf`,

@@ -130,6 +130,14 @@ export async function authenticateRequest(): Promise<AuthContext> {
     throw new AuthError('Account deactivated', 403)
   }
 
+  // 3b. Prime the session GUC so get_current_tenant_id() skips the users-table lookup
+  // on every RLS check and SENTINEL trigger for the remainder of this transaction.
+  try {
+    await supabase.rpc('set_tenant_context', { p_tenant_id: appUser.tenant_id })
+  } catch {
+    // Non-critical: get_current_tenant_id() falls back to users-table lookup
+  }
+
   // 4. Fetch role + permissions in parallel with nothing (single extra call, not sequential)
   let role: AuthRole | null = null
   if (appUser.role_id) {

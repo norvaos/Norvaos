@@ -10,6 +10,7 @@ export const leadSchema = z.object({
   estimated_value: z.number().min(0).optional().nullable(),
   assigned_to: z.string().uuid().optional().nullable(),
   temperature: z.enum(['cold', 'warm', 'hot']).default('warm'),
+  preferred_language: z.string().max(5).optional(),
   notes: z.string().optional(),
   next_follow_up: z.string().optional().nullable(),
 })

@@ -31,27 +31,11 @@ import type {
   ChequeAccountType,
   ChequeStatus,
 } from '@/lib/types/database'
+import type { ServiceResult, PaginationParams, PaginatedResult } from './trust-types'
 
-// ─── Shared Types ──────────────────────────────────────────────────────────
+// ─── Shared Types (re-exported from trust-types) ───────────────────────────
 
-export interface ServiceResult<T> {
-  success: boolean
-  data?: T
-  error?: string
-}
-
-export interface PaginationParams {
-  page: number
-  pageSize: number
-}
-
-export interface PaginatedResult<T> {
-  rows: T[]
-  total: number
-  page: number
-  pageSize: number
-  totalPages: number
-}
+export type { ServiceResult, PaginationParams, PaginatedResult } from './trust-types'
 
 // ─── Report-Specific Types ─────────────────────────────────────────────────
 
@@ -229,8 +213,8 @@ export interface LSOComplianceReport {
 // ─── Helpers ───────────────────────────────────────────────────────────────
 
 function paginationOffsetLimit(params: PaginationParams): { offset: number; limit: number } {
-  const page = Math.max(1, params.page)
-  const pageSize = Math.min(Math.max(1, params.pageSize), 500) // cap at 500
+  const page = Math.max(1, params.page ?? 1)
+  const pageSize = Math.min(Math.max(1, params.pageSize ?? 25), 500) // cap at 500
   return { offset: (page - 1) * pageSize, limit: pageSize }
 }
 
@@ -239,11 +223,11 @@ function buildPaginatedResult<T>(
   total: number,
   params: PaginationParams
 ): PaginatedResult<T> {
-  const pageSize = Math.min(Math.max(1, params.pageSize), 500)
+  const pageSize = Math.min(Math.max(1, params.pageSize ?? 25), 500)
   return {
     rows,
     total,
-    page: Math.max(1, params.page),
+    page: Math.max(1, params.page ?? 1),
     pageSize,
     totalPages: Math.ceil(total / pageSize) || 1,
   }

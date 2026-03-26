@@ -6,6 +6,7 @@ import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Building2, Loader2, Phone, MapPin, Globe, DollarSign, Save } from 'lucide-react'
 import { toast } from 'sonner'
+import { norvaToast } from '@/lib/utils/norva-branding'
 import { z } from 'zod'
 
 import { useTenant } from '@/lib/hooks/use-tenant'
@@ -144,9 +145,7 @@ export default function OfficeSettingsPage() {
       queryClient.invalidateQueries({ queryKey: ['tenant'] })
     },
     onError: (err) => {
-      toast.error('Failed to save office settings.', {
-        description: err instanceof Error ? err.message : 'Unknown error',
-      })
+      norvaToast('save_failed', err instanceof Error ? err.message : undefined)
     },
   })
 

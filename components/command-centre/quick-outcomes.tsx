@@ -30,6 +30,7 @@ import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 import { createClient } from '@/lib/supabase/client'
 import { useCommandPermissions } from '@/lib/hooks/use-command-permissions'
+import { useComplianceMatrix, useHasGovernmentId } from '@/lib/hooks/use-compliance-data'
 
 // ─── Stage discovery helpers ────────────────────────────────────────
 
@@ -56,6 +57,20 @@ export function QuickOutcomes() {
   const updateLeadStage = useUpdateLeadStage()
   const updateLead = useUpdateLead()
   const { canMarkRetained, canCloseLost } = useCommandPermissions()
+
+  // ── Directive 41.3: Step-Gate Compliance ──────────────────────────
+  const matrix = useComplianceMatrix(
+    contact?.id ?? null,
+    entityId,
+    null, // no matterId for leads
+    tenantId
+  )
+  const { data: hasGovId } = useHasGovernmentId(contact?.id ?? null, tenantId)
+
+  // Step 1 Gate: Conflict check must pass before advancing past inquiry
+  const conflictGatePassed = matrix.conflict === 'passed'
+  // Step 2 Gate: Government ID must exist before sending questionnaire/retainer
+  const govIdGatePassed = !!hasGovId
 
   // Dialogs
   const [conversionOpen, setConversionOpen] = useState(false)
@@ -168,15 +183,22 @@ export function QuickOutcomes() {
   return (
     <>
       <div className="px-4 py-2 flex items-center gap-2 overflow-x-auto">
-        {/* Book Consult */}
+        {/* Book Consult — Step 1 Gate: Conflict check must be initiated */}
         <Button
           variant={isAtConsult ? 'default' : 'outline'}
           size="sm"
           className={cn(
             'h-8 text-xs gap-1.5 shrink-0',
-            isAtConsult && 'bg-blue-600 hover:bg-blue-700 text-white'
+            isAtConsult && 'bg-blue-600 hover:bg-blue-700 text-white',
+            !conflictGatePassed && !isAtConsult && 'opacity-60'
           )}
           onClick={() => {
+            if (!conflictGatePassed) {
+              toast.error('Sovereign Block: Conflict check must be cleared before booking a consultation.', {
+                description: 'Run the conflict scan from the Compliance Pulse panel first.',
+              })
+              return
+            }
             if (consultStage) {
               handleStageMove(consultStage.id, consultStage.name)
             } else {
@@ -209,15 +231,28 @@ export function QuickOutcomes() {
           <span className="md:hidden">No-Show</span>
         </Button>
 
-        {/* Send Retainer */}
+        {/* Send Retainer — Step 2 Gate: Conflict check + Gov ID required */}
         <Button
           variant={isAtRetainerSent ? 'default' : 'outline'}
           size="sm"
           className={cn(
             'h-8 text-xs gap-1.5 shrink-0',
-            isAtRetainerSent && 'bg-blue-600 hover:bg-blue-700 text-white'
+            isAtRetainerSent && 'bg-blue-600 hover:bg-blue-700 text-white',
+            (!conflictGatePassed || !govIdGatePassed) && !isAtRetainerSent && 'opacity-60'
           )}
           onClick={() => {
+            if (!conflictGatePassed) {
+              toast.error('Sovereign Block: Conflict check must be cleared before sending the retainer.', {
+                description: 'Open the Compliance Pulse panel to run the conflict scan.',
+              })
+              return
+            }
+            if (!govIdGatePassed) {
+              toast.error('Sovereign Block: Government ID must be uploaded to the Norva Vault before sending the retainer.', {
+                description: 'Upload a passport or government ID to the Identity category.',
+              })
+              return
+            }
             if (retainerSentStage) {
               handleStageMove(retainerSentStage.id, retainerSentStage.name)
             } else {

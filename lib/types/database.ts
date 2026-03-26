@@ -14,6 +14,83 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_drafts: {
+        Row: {
+          id: string
+          tenant_id: string
+          matter_id: string
+          draft_type: string
+          title: string | null
+          content: string | null
+          status: string
+          hitl_checks: Json | null
+          verified_by: string | null
+          verified_at: string | null
+          created_by: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          tenant_id: string
+          matter_id: string
+          draft_type?: string
+          title?: string | null
+          content?: string | null
+          status?: string
+          hitl_checks?: Json | null
+          verified_by?: string | null
+          verified_at?: string | null
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          tenant_id?: string
+          matter_id?: string
+          draft_type?: string
+          title?: string | null
+          content?: string | null
+          status?: string
+          hitl_checks?: Json | null
+          verified_by?: string | null
+          verified_at?: string | null
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_drafts_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_drafts_matter_id_fkey"
+            columns: ["matter_id"]
+            isOneToOne: false
+            referencedRelation: "matters"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_drafts_verified_by_fkey"
+            columns: ["verified_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_drafts_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       activities: {
         Row: {
           activity_type: string
@@ -3278,6 +3355,7 @@ export type Database = {
           address_line1: string | null
           address_line2: string | null
           city: string | null
+          client_status: 'lead' | 'client' | 'former_client' | 'lawyer' | 'ircc_officer' | 'consultant' | 'judge' | 'referral_source' | 'government' | 'vendor' | 'other_professional'
           conflict_score: number | null
           conflict_status: string
           contact_type: string
@@ -3290,6 +3368,7 @@ export type Database = {
           currently_in_canada: boolean | null
           custom_fields: Json | null
           date_of_birth: string | null
+          active_matter_count: number
           email_notifications_enabled: boolean | null
           email_opt_in: boolean | null
           email_primary: string | null
@@ -3329,6 +3408,7 @@ export type Database = {
           portal_last_login: string | null
           portal_user_id: string | null
           postal_code: string | null
+          preferred_language: string | null
           preferred_name: string | null
           province_state: string | null
           referred_by: string | null
@@ -3344,6 +3424,7 @@ export type Database = {
           address_line1?: string | null
           address_line2?: string | null
           city?: string | null
+          client_status?: 'lead' | 'client' | 'former_client' | 'lawyer' | 'ircc_officer' | 'consultant' | 'judge' | 'referral_source' | 'government' | 'vendor' | 'other_professional'
           conflict_score?: number | null
           conflict_status?: string
           contact_type?: string
@@ -3356,6 +3437,7 @@ export type Database = {
           currently_in_canada?: boolean | null
           custom_fields?: Json | null
           date_of_birth?: string | null
+          active_matter_count?: number
           email_notifications_enabled?: boolean | null
           email_opt_in?: boolean | null
           email_primary?: string | null
@@ -3395,6 +3477,7 @@ export type Database = {
           portal_last_login?: string | null
           portal_user_id?: string | null
           postal_code?: string | null
+          preferred_language?: string | null
           preferred_name?: string | null
           province_state?: string | null
           referred_by?: string | null
@@ -3410,6 +3493,7 @@ export type Database = {
           address_line1?: string | null
           address_line2?: string | null
           city?: string | null
+          client_status?: 'lead' | 'client' | 'former_client' | 'lawyer' | 'ircc_officer' | 'consultant' | 'judge' | 'referral_source' | 'government' | 'vendor' | 'other_professional'
           conflict_score?: number | null
           conflict_status?: string
           contact_type?: string
@@ -3422,6 +3506,7 @@ export type Database = {
           currently_in_canada?: boolean | null
           custom_fields?: Json | null
           date_of_birth?: string | null
+          active_matter_count?: number
           email_notifications_enabled?: boolean | null
           email_opt_in?: boolean | null
           email_primary?: string | null
@@ -3461,6 +3546,7 @@ export type Database = {
           portal_last_login?: string | null
           portal_user_id?: string | null
           postal_code?: string | null
+          preferred_language?: string | null
           preferred_name?: string | null
           province_state?: string | null
           referred_by?: string | null
@@ -5745,6 +5831,9 @@ export type Database = {
           updated_at: string | null
           uploaded_by: string | null
           version: number | null
+          content_hash: string | null
+          hash_verified_at: string | null
+          tamper_status: string | null
         }
         Insert: {
           ai_extracted_data?: Json | null
@@ -5785,6 +5874,9 @@ export type Database = {
           updated_at?: string | null
           uploaded_by?: string | null
           version?: number | null
+          content_hash?: string | null
+          hash_verified_at?: string | null
+          tamper_status?: string | null
         }
         Update: {
           ai_extracted_data?: Json | null
@@ -5825,6 +5917,9 @@ export type Database = {
           updated_at?: string | null
           uploaded_by?: string | null
           version?: number | null
+          content_hash?: string | null
+          hash_verified_at?: string | null
+          tamper_status?: string | null
         }
         Relationships: [
           {
@@ -6277,6 +6372,66 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      email_ghost_drafts: {
+        Row: {
+          id: string
+          tenant_id: string
+          email_thread_id: string
+          email_message_id: string | null
+          matter_id: string
+          draft_subject: string | null
+          draft_body_text: string
+          draft_body_html: string | null
+          model: string
+          tokens_input: number | null
+          tokens_output: number | null
+          duration_ms: number | null
+          status: 'generating' | 'generated' | 'reviewed' | 'sent' | 'discarded'
+          reviewed_by: string | null
+          reviewed_at: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          tenant_id: string
+          email_thread_id: string
+          email_message_id?: string | null
+          matter_id: string
+          draft_subject?: string | null
+          draft_body_text: string
+          draft_body_html?: string | null
+          model?: string
+          tokens_input?: number | null
+          tokens_output?: number | null
+          duration_ms?: number | null
+          status?: 'generating' | 'generated' | 'reviewed' | 'sent' | 'discarded'
+          reviewed_by?: string | null
+          reviewed_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          tenant_id?: string
+          email_thread_id?: string
+          email_message_id?: string | null
+          matter_id?: string
+          draft_subject?: string | null
+          draft_body_text?: string
+          draft_body_html?: string | null
+          model?: string
+          tokens_input?: number | null
+          tokens_output?: number | null
+          duration_ms?: number | null
+          status?: 'generating' | 'generated' | 'reviewed' | 'sent' | 'discarded'
+          reviewed_by?: string | null
+          reviewed_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       email_logs: {
         Row: {
@@ -10823,6 +10978,11 @@ export type Database = {
           utm_medium: string | null
           utm_source: string | null
           weighted_value: number | null
+          readiness_score: number | null
+          readiness_breakdown: Json | null
+          jurisdiction_id: string | null
+          preferred_view: string
+          preferred_language: string | null
         }
         Insert: {
           assigned_intake_staff_id?: string | null
@@ -10880,6 +11040,11 @@ export type Database = {
           utm_medium?: string | null
           utm_source?: string | null
           weighted_value?: number | null
+          readiness_score?: number | null
+          readiness_breakdown?: Json | null
+          jurisdiction_id?: string | null
+          preferred_view?: string
+          preferred_language?: string | null
         }
         Update: {
           assigned_intake_staff_id?: string | null
@@ -10937,6 +11102,11 @@ export type Database = {
           utm_medium?: string | null
           utm_source?: string | null
           weighted_value?: number | null
+          readiness_score?: number | null
+          readiness_breakdown?: Json | null
+          jurisdiction_id?: string | null
+          preferred_view?: string
+          preferred_language?: string | null
         }
         Relationships: [
           {
@@ -12127,6 +12297,7 @@ export type Database = {
           intake_delegation: string
           intake_status: string
           jurisdiction: string
+          lead_intake_snapshot: Json | null
           lock_reason: string | null
           locked_at: string | null
           locked_by: string | null
@@ -12164,6 +12335,7 @@ export type Database = {
           intake_delegation?: string
           intake_status?: string
           jurisdiction?: string
+          lead_intake_snapshot?: Json | null
           lock_reason?: string | null
           locked_at?: string | null
           locked_by?: string | null
@@ -12201,6 +12373,7 @@ export type Database = {
           intake_delegation?: string
           intake_status?: string
           jurisdiction?: string
+          lead_intake_snapshot?: Json | null
           lock_reason?: string | null
           locked_at?: string | null
           locked_by?: string | null
@@ -13274,6 +13447,8 @@ export type Database = {
           responsible_lawyer_id: string | null
           restricted_admin_override: boolean | null
           risk_level: string | null
+          source: string | null
+          source_detail: string | null
           stage_entered_at: string | null
           stage_id: string | null
           status: string | null
@@ -13285,6 +13460,9 @@ export type Database = {
           total_paid: number | null
           trust_balance: number | null
           updated_at: string | null
+          utm_campaign: string | null
+          utm_medium: string | null
+          utm_source: string | null
           visibility: string
           weighted_value: number | null
         }
@@ -13329,6 +13507,8 @@ export type Database = {
           responsible_lawyer_id?: string | null
           restricted_admin_override?: boolean | null
           risk_level?: string | null
+          source?: string | null
+          source_detail?: string | null
           stage_entered_at?: string | null
           stage_id?: string | null
           status?: string | null
@@ -13340,6 +13520,9 @@ export type Database = {
           total_paid?: number | null
           trust_balance?: number | null
           updated_at?: string | null
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
           visibility?: string
           weighted_value?: number | null
         }
@@ -13384,6 +13567,8 @@ export type Database = {
           responsible_lawyer_id?: string | null
           restricted_admin_override?: boolean | null
           risk_level?: string | null
+          source?: string | null
+          source_detail?: string | null
           stage_entered_at?: string | null
           stage_id?: string | null
           status?: string | null
@@ -13395,6 +13580,9 @@ export type Database = {
           total_paid?: number | null
           trust_balance?: number | null
           updated_at?: string | null
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
           visibility?: string
           weighted_value?: number | null
         }
@@ -15361,6 +15549,45 @@ export type Database = {
           },
         ]
       }
+      sentinel_audit_log: {
+        Row: {
+          id: string
+          event_type: string
+          severity: string
+          tenant_id: string | null
+          user_id: string | null
+          auth_user_id: string | null
+          table_name: string | null
+          record_id: string | null
+          ip_address: string | null
+          user_agent: string | null
+          request_path: string | null
+          details: Json
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          event_type: string
+          severity?: string
+          tenant_id?: string | null
+          user_id?: string | null
+          auth_user_id?: string | null
+          table_name?: string | null
+          record_id?: string | null
+          ip_address?: string | null
+          user_agent?: string | null
+          request_path?: string | null
+          details?: Json
+          created_at?: string
+        }
+        Update: {
+          // Immutable — no updates allowed
+          id?: never
+          event_type?: never
+          severity?: never
+        }
+        Relationships: []
+      }
       signing_documents: {
         Row: {
           checksum_sha256: string
@@ -16772,6 +16999,42 @@ export type Database = {
           },
         ]
       }
+      tenant_violation_log: {
+        Row: {
+          id: string
+          tenant_id: string | null
+          attempted_tenant_id: string | null
+          user_id: string | null
+          table_name: string | null
+          operation: string | null
+          ip_address: string | null
+          occurred_at: string
+          metadata: Json
+        }
+        Insert: {
+          id?: string
+          tenant_id?: string | null
+          attempted_tenant_id?: string | null
+          user_id?: string | null
+          table_name?: string | null
+          operation?: string | null
+          ip_address?: string | null
+          occurred_at?: string
+          metadata?: Json
+        }
+        Update: {
+          id?: string
+          tenant_id?: string | null
+          attempted_tenant_id?: string | null
+          user_id?: string | null
+          table_name?: string | null
+          operation?: string | null
+          ip_address?: string | null
+          occurred_at?: string
+          metadata?: Json
+        }
+        Relationships: []
+      }
       tenants: {
         Row: {
           accent_color: string | null
@@ -16786,9 +17049,14 @@ export type Database = {
           date_format: string | null
           favicon_url: string | null
           feature_flags: Json | null
+          home_province: string | null
           id: string
           jurisdiction_code: string
           logo_url: string | null
+          matter_number_include_year: boolean | null
+          matter_number_padding: number | null
+          matter_number_prefix: string | null
+          matter_number_separator: string | null
           max_storage_gb: number | null
           max_users: number | null
           name: string
@@ -16824,9 +17092,14 @@ export type Database = {
           date_format?: string | null
           favicon_url?: string | null
           feature_flags?: Json | null
+          home_province?: string | null
           id?: string
           jurisdiction_code?: string
           logo_url?: string | null
+          matter_number_include_year?: boolean | null
+          matter_number_padding?: number | null
+          matter_number_prefix?: string | null
+          matter_number_separator?: string | null
           max_storage_gb?: number | null
           max_users?: number | null
           name: string
@@ -16862,9 +17135,14 @@ export type Database = {
           date_format?: string | null
           favicon_url?: string | null
           feature_flags?: Json | null
+          home_province?: string | null
           id?: string
           jurisdiction_code?: string
           logo_url?: string | null
+          matter_number_include_year?: boolean | null
+          matter_number_padding?: number | null
+          matter_number_prefix?: string | null
+          matter_number_separator?: string | null
           max_storage_gb?: number | null
           max_users?: number | null
           name?: string
@@ -17892,6 +18170,7 @@ export type Database = {
           tenant_id: string
           updated_at: string | null
           utilization_target_hours: number | null
+          locale_preference: string | null
         }
         Insert: {
           auth_user_id?: string | null
@@ -17921,6 +18200,7 @@ export type Database = {
           tenant_id: string
           updated_at?: string | null
           utilization_target_hours?: number | null
+          locale_preference?: string | null
         }
         Update: {
           auth_user_id?: string | null
@@ -17950,6 +18230,7 @@ export type Database = {
           tenant_id?: string
           updated_at?: string | null
           utilization_target_hours?: number | null
+          locale_preference?: string | null
         }
         Relationships: [
           {
@@ -18698,6 +18979,517 @@ export type Database = {
           },
         ]
       }
+      vault_drops: {
+        Row: {
+          id: string
+          temp_session_id: string
+          content_hash: string
+          file_name: string
+          file_size: number
+          mime_type: string
+          storage_path: string
+          source: string
+          claimed_matter_id: string | null
+          claimed_at: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          temp_session_id: string
+          content_hash: string
+          file_name: string
+          file_size?: number
+          mime_type?: string
+          storage_path: string
+          source?: string
+          claimed_matter_id?: string | null
+          claimed_at?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          temp_session_id?: string
+          content_hash?: string
+          file_name?: string
+          file_size?: number
+          mime_type?: string
+          storage_path?: string
+          source?: string
+          claimed_matter_id?: string | null
+          claimed_at?: string | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vault_drops_claimed_matter_id_fkey"
+            columns: ["claimed_matter_id"]
+            isOneToOne: false
+            referencedRelation: "matters"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      wiki_categories: {
+        Row: {
+          id: string
+          tenant_id: string
+          name: string
+          slug: string
+          description: string | null
+          color: string
+          icon: string
+          sort_order: number
+          is_active: boolean
+          created_at: string
+          created_by: string | null
+        }
+        Insert: {
+          id?: string
+          tenant_id: string
+          name: string
+          slug: string
+          description?: string | null
+          color?: string
+          icon?: string
+          sort_order?: number
+          is_active?: boolean
+          created_at?: string
+          created_by?: string | null
+        }
+        Update: {
+          name?: string
+          slug?: string
+          description?: string | null
+          color?: string
+          icon?: string
+          sort_order?: number
+          is_active?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wiki_categories_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      wiki_playbooks: {
+        Row: {
+          id: string
+          tenant_id: string
+          category_id: string | null
+          title: string
+          slug: string
+          description: string | null
+          content: Json
+          tags: string[]
+          status: string
+          is_pinned: boolean
+          version_number: number
+          practice_area_id: string | null
+          matter_type_id: string | null
+          is_active: boolean
+          created_at: string
+          updated_at: string
+          created_by: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          id?: string
+          tenant_id: string
+          category_id?: string | null
+          title: string
+          slug: string
+          description?: string | null
+          content?: Json
+          tags?: string[]
+          status?: string
+          is_pinned?: boolean
+          version_number?: number
+          practice_area_id?: string | null
+          matter_type_id?: string | null
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+          created_by?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          category_id?: string | null
+          title?: string
+          slug?: string
+          description?: string | null
+          content?: Json
+          tags?: string[]
+          status?: string
+          is_pinned?: boolean
+          version_number?: number
+          practice_area_id?: string | null
+          matter_type_id?: string | null
+          is_active?: boolean
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wiki_playbooks_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wiki_playbooks_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "wiki_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      wiki_playbook_versions: {
+        Row: {
+          id: string
+          tenant_id: string
+          playbook_id: string
+          version_number: number
+          title: string
+          content: Json
+          change_summary: string | null
+          created_at: string
+          created_by: string | null
+        }
+        Insert: {
+          id?: string
+          tenant_id: string
+          playbook_id: string
+          version_number: number
+          title: string
+          content?: Json
+          change_summary?: string | null
+          created_at?: string
+          created_by?: string | null
+        }
+        Update: {
+          version_number?: number
+          title?: string
+          content?: Json
+          change_summary?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wiki_playbook_versions_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wiki_playbook_versions_playbook_id_fkey"
+            columns: ["playbook_id"]
+            isOneToOne: false
+            referencedRelation: "wiki_playbooks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      wiki_snippets: {
+        Row: {
+          id: string
+          tenant_id: string
+          category_id: string | null
+          title: string
+          content: string
+          snippet_type: string
+          tags: string[]
+          use_count: number
+          is_favourite: boolean
+          practice_area_id: string | null
+          is_active: boolean
+          created_at: string
+          updated_at: string
+          created_by: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          id?: string
+          tenant_id: string
+          category_id?: string | null
+          title: string
+          content: string
+          snippet_type?: string
+          tags?: string[]
+          use_count?: number
+          is_favourite?: boolean
+          practice_area_id?: string | null
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+          created_by?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          category_id?: string | null
+          title?: string
+          content?: string
+          snippet_type?: string
+          tags?: string[]
+          use_count?: number
+          is_favourite?: boolean
+          practice_area_id?: string | null
+          is_active?: boolean
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wiki_snippets_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wiki_snippets_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "wiki_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      norva_ear_sessions: {
+        Row: {
+          id: string
+          tenant_id: string
+          matter_id: string | null
+          user_id: string
+          title: string | null
+          status: string
+          consent_granted: boolean
+          consent_granted_at: string | null
+          consent_method: string | null
+          participants: string[]
+          duration_seconds: number | null
+          transcript: string | null
+          transcript_english: string | null
+          source_language: string | null
+          extracted_facts: Json
+          anchored_fields: Json
+          raw_audio_path: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          tenant_id: string
+          matter_id?: string | null
+          user_id: string
+          title?: string | null
+          status?: string
+          consent_granted: boolean
+          consent_granted_at?: string | null
+          consent_method?: string | null
+          participants?: string[]
+          duration_seconds?: number | null
+          transcript?: string | null
+          transcript_english?: string | null
+          source_language?: string | null
+          extracted_facts?: Json
+          anchored_fields?: Json
+          raw_audio_path?: string | null
+        }
+        Update: {
+          title?: string | null
+          status?: string
+          duration_seconds?: number | null
+          transcript?: string | null
+          transcript_english?: string | null
+          source_language?: string | null
+          extracted_facts?: Json
+          anchored_fields?: Json
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "norva_ear_sessions_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      audit_optimizer_scans: {
+        Row: {
+          id: string
+          tenant_id: string
+          matter_id: string
+          document_id: string | null
+          scanned_by: string
+          readability_score: number | null
+          keyword_coverage: Json
+          structure_issues: Json
+          recommendations: Json
+          metadata_zones: Json
+          status: string
+          error_message: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          tenant_id: string
+          matter_id: string
+          document_id?: string | null
+          scanned_by: string
+          readability_score?: number | null
+          keyword_coverage?: Json
+          structure_issues?: Json
+          recommendations?: Json
+          metadata_zones?: Json
+          status?: string
+          error_message?: string | null
+        }
+        Update: {
+          readability_score?: number | null
+          keyword_coverage?: Json
+          structure_issues?: Json
+          recommendations?: Json
+          metadata_zones?: Json
+          status?: string
+          error_message?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "audit_optimizer_scans_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      case_law_alerts: {
+        Row: {
+          id: string
+          tenant_id: string
+          alert_type: string
+          title: string
+          summary: string | null
+          source_url: string | null
+          source_citation: string | null
+          court: string | null
+          jurisdiction: string | null
+          practice_area_id: string | null
+          keywords: string[]
+          relevance_score: number | null
+          status: string
+          reviewed_by: string | null
+          reviewed_at: string | null
+          affected_matter_ids: string[]
+          raw_data: Json
+          decision_date: string | null
+          acknowledged_at: string | null
+          acknowledged_by: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          tenant_id: string
+          alert_type?: string
+          title: string
+          summary?: string | null
+          source_url?: string | null
+          source_citation?: string | null
+          court?: string | null
+          jurisdiction?: string | null
+          practice_area_id?: string | null
+          keywords?: string[]
+          relevance_score?: number | null
+          status?: string
+          affected_matter_ids?: string[]
+          raw_data?: Json
+          decision_date?: string | null
+        }
+        Update: {
+          title?: string
+          summary?: string | null
+          status?: string
+          reviewed_by?: string | null
+          reviewed_at?: string | null
+          affected_matter_ids?: string[]
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "case_law_alerts_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gold_standard_templates: {
+        Row: {
+          id: string
+          tenant_id: string
+          source_matter_id: string
+          case_type: string
+          matter_type_name: string | null
+          readability_score: number | null
+          grade: string
+          keyword_density: Json
+          document_structure: Json
+          zone_coverage: Json
+          days_to_approval: number | null
+          playbook_id: string | null
+          playbook_title: string | null
+          applicant_redacted: string
+          approved_at: string | null
+          extracted_by: string | null
+          created_at: string
+          is_active: boolean
+        }
+        Insert: {
+          id?: string
+          tenant_id: string
+          source_matter_id: string
+          case_type?: string
+          matter_type_name?: string | null
+          readability_score?: number | null
+          grade?: string
+          keyword_density?: Json
+          document_structure?: Json
+          zone_coverage?: Json
+          days_to_approval?: number | null
+          playbook_id?: string | null
+          playbook_title?: string | null
+          applicant_redacted?: string
+          approved_at?: string | null
+          extracted_by?: string | null
+        }
+        Update: {
+          readability_score?: number | null
+          grade?: string
+          keyword_density?: Json
+          document_structure?: Json
+          zone_coverage?: Json
+          is_active?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gold_standard_templates_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       mv_lead_metrics: {
@@ -18888,8 +19680,381 @@ export type Database = {
           },
         ]
       }
+      jurisdictions: {
+        Row: {
+          id: string
+          code: string
+          name: string
+          type: string
+          parent_id: string | null
+          aliases: Json
+          is_active: boolean
+          sort_order: number
+        }
+        Insert: {
+          id?: string
+          code: string
+          name: string
+          type?: string
+          parent_id?: string | null
+          aliases?: Json
+          is_active?: boolean
+          sort_order?: number
+        }
+        Update: {
+          id?: string
+          code?: string
+          name?: string
+          type?: string
+          parent_id?: string | null
+          aliases?: Json
+          is_active?: boolean
+          sort_order?: number
+        }
+        Relationships: []
+      }
+      lead_readiness_fields: {
+        Row: {
+          id: string
+          tenant_id: string
+          matter_type_id: string
+          field_key: string
+          field_label: string
+          field_source: string
+          is_required: boolean
+          weight: number
+          sort_order: number
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          tenant_id: string
+          matter_type_id: string
+          field_key: string
+          field_label: string
+          field_source: string
+          is_required?: boolean
+          weight?: number
+          sort_order?: number
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          tenant_id?: string
+          matter_type_id?: string
+          field_key?: string
+          field_label?: string
+          field_source?: string
+          is_required?: boolean
+          weight?: number
+          sort_order?: number
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lead_readiness_fields_matter_type_id_fkey"
+            columns: ["matter_type_id"]
+            isOneToOne: false
+            referencedRelation: "matter_types"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lead_jurisdiction_matches: {
+        Row: {
+          id: string
+          tenant_id: string
+          lead_id: string
+          raw_input: string
+          matched_jurisdiction_id: string | null
+          match_type: string
+          confidence: number
+          reviewed_by: string | null
+          reviewed_at: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          tenant_id: string
+          lead_id: string
+          raw_input: string
+          matched_jurisdiction_id?: string | null
+          match_type: string
+          confidence?: number
+          reviewed_by?: string | null
+          reviewed_at?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          tenant_id?: string
+          lead_id?: string
+          raw_input?: string
+          matched_jurisdiction_id?: string | null
+          match_type?: string
+          confidence?: number
+          reviewed_by?: string | null
+          reviewed_at?: string | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lead_jurisdiction_matches_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lead_jurisdiction_matches_jurisdiction_id_fkey"
+            columns: ["matched_jurisdiction_id"]
+            isOneToOne: false
+            referencedRelation: "jurisdictions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lead_import_sources: {
+        Row: {
+          id: string
+          tenant_id: string
+          name: string
+          platform: string
+          default_source_tag: string | null
+          default_campaign_tag: string | null
+          utm_source: string | null
+          utm_medium: string | null
+          utm_campaign: string | null
+          is_active: boolean
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          tenant_id: string
+          name: string
+          platform?: string
+          default_source_tag?: string | null
+          default_campaign_tag?: string | null
+          utm_source?: string | null
+          utm_medium?: string | null
+          utm_campaign?: string | null
+          is_active?: boolean
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          tenant_id?: string
+          name?: string
+          platform?: string
+          default_source_tag?: string | null
+          default_campaign_tag?: string | null
+          utm_source?: string | null
+          utm_medium?: string | null
+          utm_campaign?: string | null
+          is_active?: boolean
+          created_at?: string
+        }
+        Relationships: []
+      }
+      lead_import_staging: {
+        Row: {
+          id: string
+          batch_id: string
+          tenant_id: string
+          row_number: number
+          first_name: string | null
+          last_name: string | null
+          email: string | null
+          phone: string | null
+          date_of_birth: string | null
+          nationality: string | null
+          country_of_birth: string | null
+          passport_number: string | null
+          raw_jurisdiction: string | null
+          matched_jurisdiction_id: string | null
+          jurisdiction_match_type: string | null
+          jurisdiction_match_confidence: number | null
+          jurisdiction_needs_review: boolean
+          user_jurisdiction_override: string | null
+          matter_type_name: string | null
+          temperature: string | null
+          estimated_value: number | null
+          notes: string | null
+          source_tag: string | null
+          campaign_tag: string | null
+          utm_source: string | null
+          utm_medium: string | null
+          utm_campaign: string | null
+          source_data: Record<string, unknown> | null
+          validation_status: string
+          validation_errors: string[] | null
+          conflict_status: string
+          conflict_details: Record<string, unknown>[] | null
+          user_conflict_override: string | null
+          committed: boolean
+          created_lead_id: string | null
+          created_contact_id: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          batch_id: string
+          tenant_id: string
+          row_number: number
+          first_name?: string | null
+          last_name?: string | null
+          email?: string | null
+          phone?: string | null
+          date_of_birth?: string | null
+          nationality?: string | null
+          country_of_birth?: string | null
+          passport_number?: string | null
+          raw_jurisdiction?: string | null
+          matched_jurisdiction_id?: string | null
+          jurisdiction_match_type?: string | null
+          jurisdiction_match_confidence?: number | null
+          jurisdiction_needs_review?: boolean
+          user_jurisdiction_override?: string | null
+          matter_type_name?: string | null
+          temperature?: string | null
+          estimated_value?: number | null
+          notes?: string | null
+          source_tag?: string | null
+          campaign_tag?: string | null
+          utm_source?: string | null
+          utm_medium?: string | null
+          utm_campaign?: string | null
+          source_data?: Record<string, unknown> | null
+          validation_status?: string
+          validation_errors?: string[] | null
+          conflict_status?: string
+          conflict_details?: Record<string, unknown>[] | null
+          user_conflict_override?: string | null
+          committed?: boolean
+          created_lead_id?: string | null
+          created_contact_id?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          batch_id?: string
+          tenant_id?: string
+          row_number?: number
+          first_name?: string | null
+          last_name?: string | null
+          email?: string | null
+          phone?: string | null
+          date_of_birth?: string | null
+          nationality?: string | null
+          country_of_birth?: string | null
+          passport_number?: string | null
+          raw_jurisdiction?: string | null
+          matched_jurisdiction_id?: string | null
+          jurisdiction_match_type?: string | null
+          jurisdiction_match_confidence?: number | null
+          jurisdiction_needs_review?: boolean
+          user_jurisdiction_override?: string | null
+          matter_type_name?: string | null
+          temperature?: string | null
+          estimated_value?: number | null
+          notes?: string | null
+          source_tag?: string | null
+          campaign_tag?: string | null
+          utm_source?: string | null
+          utm_medium?: string | null
+          utm_campaign?: string | null
+          source_data?: Record<string, unknown> | null
+          validation_status?: string
+          validation_errors?: string[] | null
+          conflict_status?: string
+          conflict_details?: Record<string, unknown>[] | null
+          user_conflict_override?: string | null
+          committed?: boolean
+          created_lead_id?: string | null
+          created_contact_id?: string | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lead_import_staging_batch_id_fkey"
+            columns: ["batch_id"]
+            isOneToOne: false
+            referencedRelation: "import_batches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ircc_submission_checklist: {
+        Row: {
+          id: string
+          tenant_id: string
+          matter_id: string
+          item_key: string
+          label: string
+          category: string
+          sort_order: number
+          is_required: boolean
+          status: string
+          completed_at: string | null
+          completed_by: string | null
+          notes: string | null
+          ircc_ref: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          tenant_id: string
+          matter_id: string
+          item_key: string
+          label: string
+          category?: string
+          sort_order?: number
+          is_required?: boolean
+          status?: string
+          completed_at?: string | null
+          completed_by?: string | null
+          notes?: string | null
+          ircc_ref?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          tenant_id?: string
+          matter_id?: string
+          item_key?: string
+          label?: string
+          category?: string
+          sort_order?: number
+          is_required?: boolean
+          status?: string
+          completed_at?: string | null
+          completed_by?: string | null
+          notes?: string | null
+          ircc_ref?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ircc_submission_checklist_matter_id_fkey"
+            columns: ["matter_id"]
+            isOneToOne: false
+            referencedRelation: "matters"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
+      fn_bulk_conflict_check: {
+        Args: {
+          p_emails: string[]
+          p_passports: string[]
+        }
+        Returns: Record<string, unknown>
+      }
       create_judicial_review_matter: {
         Args: {
           p_source_matter_id: string
@@ -19020,6 +20185,10 @@ export type Database = {
         Args: { p_tenant_id: string }
         Returns: undefined
       }
+      set_tenant_context: {
+        Args: { p_tenant_id: string }
+        Returns: undefined
+      }
       show_limit: { Args: never; Returns: number }
       show_trgm: { Args: { "": string }; Returns: string[] }
       snapshot_contact_profile_to_matter: {
@@ -19062,6 +20231,18 @@ export type Database = {
           p_jurisdiction: string
         }
         Returns: number
+      }
+      fn_calculate_lead_readiness: {
+        Args: { p_lead_id: string }
+        Returns: Json
+      }
+      fn_conflict_check_alpha: {
+        Args: { p_lead_id: string }
+        Returns: Json
+      }
+      fn_match_jurisdiction: {
+        Args: { p_raw_input: string }
+        Returns: Json
       }
     }
     Enums: {
@@ -20296,6 +21477,65 @@ export type TrustReconciliationItemType   = string
 export type TrustAuditLogRow    = Database['public']['Tables']['trust_audit_log']['Row']
 export type TrustAuditLogInsert = Database['public']['Tables']['trust_audit_log']['Insert']
 
+// ── trust_transaction_log (append-only financial event log) ─────────────────
+
+export type TrustTransactionLogEventType =
+  | 'deposit_recorded'
+  | 'disbursement_recorded'
+  | 'transfer_recorded'
+  | 'reversal_recorded'
+  | 'hold_created'
+  | 'hold_released'
+  | 'hold_cancelled'
+  | 'reconciliation_created'
+  | 'reconciliation_completed'
+  | 'reconciliation_reviewed'
+  | 'disbursement_request_prepared'
+  | 'disbursement_request_approved'
+  | 'disbursement_request_rejected'
+  | 'balance_warning'
+  | 'overdraft_prevented'
+
+export interface TrustTransactionLogRow {
+  id: string
+  tenant_id: string
+  event_type: TrustTransactionLogEventType
+  trust_account_id: string | null
+  matter_id: string | null
+  transaction_id: string | null
+  related_entity_type: string | null
+  related_entity_id: string | null
+  balance_before_cents: number | null
+  balance_after_cents: number | null
+  amount_cents: number | null
+  performed_by: string
+  performed_at: string
+  description: string
+  metadata: Json
+  sequence_number: number
+  previous_hash: string | null
+  entry_hash: string | null
+  created_at: string
+}
+
+export interface TrustTransactionLogInsert {
+  tenant_id: string
+  event_type: TrustTransactionLogEventType
+  trust_account_id?: string | null
+  matter_id?: string | null
+  transaction_id?: string | null
+  related_entity_type?: string | null
+  related_entity_id?: string | null
+  balance_before_cents?: number | null
+  balance_after_cents?: number | null
+  amount_cents?: number | null
+  performed_by: string
+  description: string
+  metadata?: Json
+  previous_hash?: string | null
+  entry_hash?: string | null
+}
+
 export type ChequeRow    = Database['public']['Tables']['cheques']['Row']
 export type ChequeInsert = Database['public']['Tables']['cheques']['Insert']
 export type ChequeUpdate = Database['public']['Tables']['cheques']['Update']
@@ -20377,6 +21617,7 @@ export interface RetainerAgreementRow {
   voided_reason: string | null
   matter_auto_created: boolean
   stage_advanced: boolean
+  include_ai_disclosure: boolean
   created_by: string | null
   updated_by: string | null
   created_at: string
@@ -20407,6 +21648,7 @@ export interface RetainerAgreementInsert {
   voided_reason?: string | null
   matter_auto_created?: boolean
   stage_advanced?: boolean
+  include_ai_disclosure?: boolean
   created_by?: string | null
   updated_by?: string | null
   created_at?: string
@@ -20434,6 +21676,7 @@ export interface RetainerAgreementUpdate {
   voided_reason?: string | null
   matter_auto_created?: boolean
   stage_advanced?: boolean
+  include_ai_disclosure?: boolean
   updated_by?: string | null
   updated_at?: string
 }
@@ -21104,4 +22347,334 @@ export interface CompositeValidationRuleUpdate {
   is_active?: boolean
   sort_order?: number
   updated_at?: string
+}
+
+// ── Wiki Knowledge Base ─────────────────────────────────────────────────────
+
+export type WikiPlaybookStatus = 'draft' | 'published' | 'archived'
+export type WikiSnippetType = 'email' | 'clause' | 'template' | 'note'
+
+export interface WikiBlockContent {
+  id: string
+  type: 'heading' | 'paragraph' | 'checklist' | 'callout' | 'divider' | 'code' | 'quote'
+  content: string
+  checked?: boolean
+  level?: number
+  variant?: string
+}
+
+export interface WikiCategoryRow {
+  id: string
+  tenant_id: string
+  name: string
+  slug: string
+  description: string | null
+  color: string
+  icon: string
+  sort_order: number
+  is_active: boolean
+  created_at: string
+  created_by: string | null
+}
+
+export interface WikiCategoryInsert {
+  id?: string
+  tenant_id: string
+  name: string
+  slug: string
+  description?: string | null
+  color?: string
+  icon?: string
+  sort_order?: number
+  is_active?: boolean
+}
+
+export interface WikiCategoryUpdate {
+  name?: string
+  slug?: string
+  description?: string | null
+  color?: string
+  icon?: string
+  sort_order?: number
+  is_active?: boolean
+}
+
+export interface WikiPlaybookRow {
+  id: string
+  tenant_id: string
+  category_id: string | null
+  title: string
+  slug: string
+  description: string | null
+  content: Json
+  tags: string[]
+  status: WikiPlaybookStatus
+  is_pinned: boolean
+  version_number: number
+  practice_area_id: string | null
+  matter_type_id: string | null
+  is_active: boolean
+  created_at: string
+  updated_at: string
+  created_by: string | null
+  updated_by: string | null
+}
+
+export interface WikiPlaybookInsert {
+  id?: string
+  tenant_id: string
+  category_id?: string | null
+  title: string
+  slug: string
+  description?: string | null
+  content?: Json
+  tags?: string[]
+  status?: WikiPlaybookStatus
+  is_pinned?: boolean
+  version_number?: number
+  practice_area_id?: string | null
+  matter_type_id?: string | null
+}
+
+export interface WikiPlaybookUpdate {
+  category_id?: string | null
+  title?: string
+  slug?: string
+  description?: string | null
+  content?: Json
+  tags?: string[]
+  status?: WikiPlaybookStatus
+  is_pinned?: boolean
+  version_number?: number
+  practice_area_id?: string | null
+  matter_type_id?: string | null
+  updated_by?: string | null
+}
+
+export interface WikiPlaybookVersionRow {
+  id: string
+  tenant_id: string
+  playbook_id: string
+  version_number: number
+  title: string
+  content: Json
+  change_summary: string | null
+  created_at: string
+  created_by: string | null
+}
+
+export interface WikiSnippetRow {
+  id: string
+  tenant_id: string
+  category_id: string | null
+  title: string
+  content: string
+  snippet_type: WikiSnippetType
+  tags: string[]
+  use_count: number
+  is_favourite: boolean
+  practice_area_id: string | null
+  is_active: boolean
+  created_at: string
+  updated_at: string
+  created_by: string | null
+  updated_by: string | null
+}
+
+export interface WikiSnippetInsert {
+  id?: string
+  tenant_id: string
+  category_id?: string | null
+  title: string
+  content: string
+  snippet_type?: WikiSnippetType
+  tags?: string[]
+  practice_area_id?: string | null
+}
+
+export interface WikiSnippetUpdate {
+  category_id?: string | null
+  title?: string
+  content?: string
+  snippet_type?: WikiSnippetType
+  tags?: string[]
+  is_favourite?: boolean
+  practice_area_id?: string | null
+  updated_by?: string | null
+}
+
+export interface WikiSearchResult {
+  id: string
+  item_type: 'playbook' | 'snippet'
+  title: string
+  description: string | null
+  category_name: string | null
+  tags: string[]
+  status: string
+  updated_at: string
+  rank: number
+}
+
+// ── Norva Ear Sessions ─────────────────────────────────────────────────────
+
+export type NorvaEarStatus = 'recording' | 'processing' | 'completed' | 'failed'
+export type NorvaEarConsentMethod = 'verbal' | 'written' | 'digital' | 'pre_authorized'
+
+export interface NorvaEarSessionRow {
+  id: string
+  tenant_id: string
+  matter_id: string | null
+  user_id: string
+  title: string | null
+  status: NorvaEarStatus
+  consent_granted: boolean
+  consent_granted_at: string | null
+  consent_method: NorvaEarConsentMethod | null
+  participants: string[]
+  duration_seconds: number | null
+  transcript: string | null
+  extracted_facts: Json
+  anchored_fields: Json
+  raw_audio_path: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface NorvaEarSessionInsert {
+  tenant_id: string
+  matter_id?: string | null
+  user_id: string
+  title?: string | null
+  status?: NorvaEarStatus
+  consent_granted: boolean
+  consent_granted_at?: string | null
+  consent_method?: NorvaEarConsentMethod | null
+  participants?: string[]
+  duration_seconds?: number | null
+  transcript?: string | null
+  extracted_facts?: Json
+  anchored_fields?: Json
+  raw_audio_path?: string | null
+}
+
+// ── IRCC Readability Scans (Audit-Optimizer / Regulator-Mirror) ────────────
+
+export type AuditScanStatus = 'pending' | 'scanning' | 'completed' | 'failed'
+
+export interface AuditScanRow {
+  id: string
+  tenant_id: string
+  matter_id: string
+  document_id: string | null
+  scanned_by: string
+  readability_score: number | null
+  keyword_coverage: Json
+  structure_issues: Json
+  recommendations: Json
+  metadata_zones: Json
+  status: AuditScanStatus
+  error_message: string | null
+  created_at: string
+}
+
+export interface AuditScanInsert {
+  tenant_id: string
+  matter_id: string
+  document_id?: string | null
+  scanned_by: string
+  readability_score?: number | null
+  keyword_coverage?: Json
+  structure_issues?: Json
+  recommendations?: Json
+  metadata_zones?: Json
+  status?: AuditScanStatus
+  error_message?: string | null
+}
+
+// ── Case Law Alerts (Drift Sentry) ─────────────────────────────────────────
+
+export type CaseLawAlertType = 'case_law_change' | 'policy_update' | 'regulation_change'
+export type CaseLawAlertStatus = 'new' | 'reviewed' | 'actioned' | 'dismissed'
+
+export interface CaseLawAlertRow {
+  id: string
+  tenant_id: string
+  alert_type: CaseLawAlertType
+  title: string
+  summary: string | null
+  source_url: string | null
+  source_citation: string | null
+  court: string | null
+  jurisdiction: string | null
+  practice_area_id: string | null
+  keywords: string[]
+  relevance_score: number | null
+  status: CaseLawAlertStatus
+  reviewed_by: string | null
+  reviewed_at: string | null
+  affected_matter_ids: string[]
+  raw_data: Json
+  decision_date: string | null
+  acknowledged_at: string | null
+  acknowledged_by: string | null
+  created_at: string
+}
+
+export interface CaseLawAlertInsert {
+  tenant_id: string
+  alert_type?: CaseLawAlertType
+  title: string
+  summary?: string | null
+  source_url?: string | null
+  source_citation?: string | null
+  court?: string | null
+  jurisdiction?: string | null
+  practice_area_id?: string | null
+  keywords?: string[]
+  relevance_score?: number | null
+  status?: CaseLawAlertStatus
+  affected_matter_ids?: string[]
+  raw_data?: Json
+  decision_date?: string | null
+}
+
+// ── Gold Standard Templates (Success-Reverb) ──────────────────────────────
+
+export interface GoldStandardTemplateRow {
+  id: string
+  tenant_id: string
+  source_matter_id: string
+  case_type: string
+  matter_type_name: string | null
+  readability_score: number | null
+  grade: string
+  keyword_density: Json
+  document_structure: Json
+  zone_coverage: Json
+  days_to_approval: number | null
+  playbook_id: string | null
+  playbook_title: string | null
+  applicant_redacted: string
+  approved_at: string | null
+  extracted_by: string | null
+  created_at: string
+  is_active: boolean
+}
+
+export interface GoldStandardTemplateInsert {
+  tenant_id: string
+  source_matter_id: string
+  case_type?: string
+  matter_type_name?: string | null
+  readability_score?: number | null
+  grade?: string
+  keyword_density?: Json
+  document_structure?: Json
+  zone_coverage?: Json
+  days_to_approval?: number | null
+  playbook_id?: string | null
+  playbook_title?: string | null
+  applicant_redacted?: string
+  approved_at?: string | null
+  extracted_by?: string | null
 }

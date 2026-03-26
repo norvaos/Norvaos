@@ -31,7 +31,7 @@ const EVENT_TYPES = [
   { key: 'stage_change', label: 'Stage Changes', description: 'When a matter advances to a new stage' },
   { key: 'task_assigned', label: 'Task Assignments', description: 'When a task is assigned to a team member' },
   { key: 'task_completed', label: 'Task Completed', description: 'When a task is marked complete' },
-  { key: 'document_uploaded', label: 'Document Uploads', description: 'When a document is uploaded to a matter' },
+  { key: 'document_uploaded', label: 'Norva Document Bridge', description: 'When a document arrives via the Document Bridge' },
   { key: 'new_message', label: 'New Messages', description: 'When a new chat message is sent' },
   { key: 'deadline_approaching', label: 'Deadline Alerts', description: 'When a deadline is approaching' },
   { key: 'matter_updated', label: 'Matter Updates', description: 'When matter details are changed' },

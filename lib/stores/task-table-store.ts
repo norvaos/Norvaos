@@ -102,7 +102,7 @@ export const useTaskTableStore = create<TaskTableState>()(
       setStatusFilter: (status) => set({ statusFilter: status }),
     }),
     {
-      name: 'lexcrm-task-table',
+      name: 'norvaos-task-table',
       partialize: (state) => ({
         columnVisibility: state.columnVisibility,
         columnOrder: state.columnOrder,

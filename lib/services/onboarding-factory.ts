@@ -318,28 +318,56 @@ async function executePortalCreation(
     return { status: 'failed', portalLinkId: null }
   }
 
-  // Send welcome email via API (non-blocking)
+  // Send portal invite email via email service (non-blocking, locale-aware)
   try {
     const { data: contact } = await supabase
       .from('contacts')
-      .select('email_primary, first_name')
+      .select('email_primary, first_name, preferred_language')
       .eq('id', contactId)
       .single()
 
     if (contact?.email_primary) {
+      // Fetch matter reference for the email
+      const { data: matterData } = await supabase
+        .from('matters')
+        .select('title, matter_number')
+        .eq('id', matterId)
+        .single()
+      const matterRef = matterData?.matter_number || matterData?.title || 'your case'
+
+      // Build portal URL
+      const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+      const portalUrl = `${baseUrl}/portal/${token}`
+
+      // Send localised portal invite email
+      const { sendClientEmail } = await import('./email-service')
+      await sendClientEmail({
+        supabase,
+        tenantId,
+        matterId,
+        contactId,
+        notificationType: 'portal_invite',
+        templateData: {
+          portal_url: portalUrl,
+          lawyer_name: lawyerName,
+          matter_reference: matterRef,
+        },
+      })
+
       await supabase.from('activities').insert({
         tenant_id: tenantId,
         matter_id: matterId,
         contact_id: contactId,
         activity_type: 'portal_welcome_sent',
-        title: 'Client portal welcome email queued',
-        description: `Welcome email queued for ${contact.email_primary}. Portal link created.`,
+        title: 'Client portal invite email sent',
+        description: `Portal invite email sent to ${contact.email_primary}. Portal link created.`,
         entity_type: 'matter',
         entity_id: matterId,
         user_id: userId,
         metadata: {
           portal_link_id: portalLink.id,
           contact_email: contact.email_primary,
+          language: contact.preferred_language || 'en',
         } as unknown as Json,
       })
     }

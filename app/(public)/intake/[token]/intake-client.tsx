@@ -27,8 +27,13 @@ import {
   AlertCircle,
   RefreshCw,
   Shield,
+  ScanSearch,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { LanguageSelector } from '@/components/i18n/LanguageSelector'
+import { useLocale } from '@/lib/i18n/use-locale'
+import { useScanPrefill } from '@/lib/hooks/use-scan-prefill'
+import { QuestionnaireRenderer } from '@/components/ircc/workspace/questionnaire-renderer'
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -81,7 +86,15 @@ export function IntakeClient({
   branding,
   formInstances: initialInstances,
 }: IntakeClientProps) {
+  const { dir, t } = useLocale({ audience: 'client' })
   const [instances, setInstances] = useState(initialInstances)
+
+  // ── Scan-to-Autofill: load prefill data from scanned documents ────────
+  const { prefill: scanPrefill, fieldCount: scanFieldCount } = useScanPrefill({
+    matterId,
+    tenantId,
+    enabled: !!matterId,
+  })
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle')
   const [lastSavedAt, setLastSavedAt] = useState<string | null>(null)
   const [retryPayload, setRetryPayload] = useState<{
@@ -213,7 +226,7 @@ export function IntakeClient({
   // ── Render ─────────────────────────────────────────────────────────────
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-50" data-intake-portal dir={dir}>
       {/* ── Header with firm branding ──────────────────────────────────── */}
       <header
         className="border-b bg-white shadow-sm"
@@ -240,16 +253,17 @@ export function IntakeClient({
               <h1 className="text-lg font-semibold text-slate-900">
                 {branding.firmName}
               </h1>
-              <p className="text-xs text-slate-500">Secure Client Intake</p>
+              <p className="text-xs text-slate-500">{t('intake.secure_intake')}</p>
             </div>
           </div>
 
-          {/* Save status indicator */}
+          {/* Language selector + Save status */}
           <div className="flex items-center gap-2">
+            <LanguageSelector compact />
             {saveStatus === 'saving' && (
               <Badge variant="secondary" className="gap-1.5 text-xs">
                 <Loader2 className="h-3 w-3 animate-spin" />
-                Saving...
+                {t('intake.saving')}
               </Badge>
             )}
             {saveStatus === 'saved' && (
@@ -258,7 +272,7 @@ export function IntakeClient({
                 className="gap-1.5 text-xs border-green-300 text-green-700 bg-green-50"
               >
                 <CheckCircle2 className="h-3 w-3" />
-                Draft Saved {lastSavedAt && `at ${lastSavedAt}`}
+                {lastSavedAt ? t('intake.draft_saved_at').replace('{{time}}', lastSavedAt) : t('intake.draft_saved')}
               </Badge>
             )}
             {saveStatus === 'error' && (
@@ -269,12 +283,12 @@ export function IntakeClient({
                 className="gap-1.5 text-xs"
               >
                 <RefreshCw className="h-3 w-3" />
-                Retry Save
+                {t('intake.retry_save')}
               </Button>
             )}
             <Badge variant="outline" className="gap-1 text-xs">
               <Shield className="h-3 w-3 text-green-600" />
-              Encrypted
+              {t('intake.encrypted')}
             </Badge>
           </div>
         </div>
@@ -294,14 +308,19 @@ export function IntakeClient({
           </div>
         )}
 
+        {/* ── Language Selector (Polyglot Bridge) ──────────────────────────── */}
+        <div className="mb-4 rounded-lg border border-slate-200 bg-white p-4">
+          <LanguageSelector />
+        </div>
+
         {/* ── Overall progress ───────────────────────────────────────────── */}
         <div className="mb-6 rounded-lg border bg-white p-4">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-medium text-slate-700">
-              Overall Progress
+              {t('intake.overall_progress')}
             </span>
             <span className="text-sm text-slate-500">
-              {filledFields} of {totalFields} fields completed ({overallPct}%)
+              {t('intake.fields_completed').replace('{{filled}}', String(filledFields)).replace('{{total}}', String(totalFields)).replace('{{pct}}', String(overallPct))}
             </span>
           </div>
           <Progress value={overallPct} className="h-2" />
@@ -335,13 +354,13 @@ export function IntakeClient({
                         {inst.form_name}
                       </p>
                       <p className="text-xs text-slate-500">
-                        {filled}/{total} fields · {Math.round(pct)}% complete
+                        {t('intake.fields_status').replace('{{filled}}', String(filled)).replace('{{total}}', String(total))} · {t('intake.pct_complete').replace('{{pct}}', String(Math.round(pct)))}
                       </p>
                     </div>
                     {inst.blocker_count > 0 && (
                       <Badge variant="destructive" className="text-xs gap-1">
                         <AlertCircle className="h-3 w-3" />
-                        {inst.blocker_count} required
+                        {inst.blocker_count} {t('intake.required').toLowerCase()}
                       </Badge>
                     )}
                     {isComplete && (
@@ -349,28 +368,46 @@ export function IntakeClient({
                         variant="outline"
                         className="text-xs border-green-300 text-green-700 bg-green-50"
                       >
-                        Ready
+                        {t('intake.ready')}
                       </Badge>
                     )}
                     {!isComplete && pct > 0 && (
                       <Badge variant="secondary" className="text-xs gap-1">
                         <Clock className="h-3 w-3" />
-                        In Progress
+                        {t('intake.in_progress')}
                       </Badge>
                     )}
                   </div>
                 </AccordionTrigger>
                 <AccordionContent className="px-4 pb-4">
-                  <div className="text-sm text-slate-500 py-4 text-center border-t">
-                    {/* The QuestionnaireRenderer would be mounted here per form instance.
-                        For now, show a placeholder directing the client to use the portal. */}
-                    <p>
-                      Form fields for <strong>{inst.form_code}</strong> will render here
-                      via the QuestionnaireRenderer in client mode.
-                    </p>
-                    <p className="mt-2 text-xs text-slate-400">
-                      Instance: {inst.id.slice(0, 8)}... · Status: {inst.status}
-                    </p>
+                  <div className="border-t pt-3">
+                    {/* Scan-to-Autofill banner */}
+                    {scanFieldCount > 0 && (
+                      <div className="mb-3 rounded-lg border border-emerald-200 bg-emerald-50 p-3 flex items-start gap-2">
+                        <ScanSearch className="h-4 w-4 text-emerald-600 mt-0.5 shrink-0" />
+                        <div>
+                          <p className="text-xs font-medium text-emerald-800">
+                            {t('intake.scan_autofill').replace('{{count}}', String(scanFieldCount))}
+                          </p>
+                          <p className="text-[10px] text-emerald-600 mt-0.5">
+                            {t('intake.scan_review')}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
+                    <QuestionnaireRenderer
+                      instanceId={inst.id}
+                      formId={inst.form_id}
+                      matterId={matterId}
+                      tenantId={tenantId}
+                      mode="client"
+                      onAnswerChange={(profilePath, value) => {
+                        broadcastFieldEdit(profilePath)
+                        // Debounced save via the intake portal endpoint
+                        saveAnswers(inst.id, { [profilePath]: value })
+                      }}
+                    />
                   </div>
                 </AccordionContent>
               </AccordionItem>
@@ -381,7 +418,7 @@ export function IntakeClient({
         {/* ── Lawyer contact ────────────────────────────────────────────── */}
         {branding.lawyerName && (
           <div className="mt-6 rounded-lg border bg-white p-4">
-            <p className="text-xs text-slate-500 mb-1">Your Lawyer</p>
+            <p className="text-xs text-slate-500 mb-1">{t('intake.your_lawyer')}</p>
             <p className="text-sm font-medium text-slate-900">
               {branding.lawyerName}
             </p>
@@ -401,7 +438,7 @@ export function IntakeClient({
       <footer className="border-t bg-white mt-12">
         <div className="mx-auto max-w-3xl px-4 py-4 text-center">
           <p className="text-xs text-slate-400">
-            Powered by NorvaOS · Your data is encrypted and secure
+            {t('intake.powered_by')}
           </p>
         </div>
       </footer>

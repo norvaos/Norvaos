@@ -37,7 +37,7 @@ async function computeSlots(
   const prevDate = shiftDate(date, -1)
   const nextDate = shiftDate(date, +1)
 
-  const [appointmentsRes, calendarEventsRes] = await Promise.all([
+  const [appointmentsRes, calendarEventsRes, tasksRes] = await Promise.all([
     admin
       .from('appointments')
       .select('start_time, end_time')
@@ -53,6 +53,15 @@ async function computeSlots(
       .neq('status', 'cancelled')
       .gte('start_at', prevDate + 'T00:00:00')
       .lte('start_at', nextDate + 'T23:59:59'),
+    // Dynamic Availability: block slots where lawyer has tasks due
+    admin
+      .from('tasks')
+      .select('due_date, due_time, estimated_minutes')
+      .eq('assigned_to', userId)
+      .eq('tenant_id', tenantId)
+      .eq('is_deleted', false)
+      .in('status', ['todo', 'in_progress'])
+      .eq('due_date', date),
   ])
 
   const appointmentBlocks: BusyBlock[] = (appointmentsRes.data ?? []).map((a: { start_time: string; end_time: string }) => ({
@@ -65,7 +74,21 @@ async function computeSlots(
     .map((e: { start_at: string; end_at: string; all_day: boolean }) => eventToBusyBlock(e, date, tz))
     .filter((b: BusyBlock | null): b is BusyBlock => b !== null)
 
-  const allBusy = [...appointmentBlocks, ...calendarBlocks]
+  // Task-based blocking: tasks with due_time block that slot; tasks without due_time
+  // block a default 30-min window at 9:00 AM (assumed morning prep)
+  const taskBlocks: BusyBlock[] = (tasksRes.data ?? []).map(
+    (t: { due_time: string | null; estimated_minutes: number | null }) => {
+      const duration = t.estimated_minutes ?? 30
+      if (t.due_time) {
+        const start = timeToMinutes(t.due_time)
+        return { start, end: start + duration }
+      }
+      // No due_time: block 09:00 for estimated duration (conservative)
+      return { start: 9 * 60, end: 9 * 60 + duration }
+    }
+  )
+
+  const allBusy = [...appointmentBlocks, ...calendarBlocks, ...taskBlocks]
 
   const nowInTz = nowInTimezone(tz)
   const todayStr = dateInTimezone(tz)
@@ -584,27 +607,71 @@ async function handlePost(
       return NextResponse.json({ error: 'Failed to create appointment' }, { status: 500 })
     }
 
-    // 5. Log activity (fire-and-forget)
-    if (link.contact_id) {
+    // 5. Meeting-to-Matter Auto-Link: create calendar_event on the matter timeline
+    const meetingLabel = meeting_type === 'video' ? 'Video Call' : meeting_type === 'phone' ? 'Phone Call' : 'In-Person Meeting'
+    const eventTitle = `${meetingLabel} — ${guestName || 'Client'}`
+
+    // Build UTC ISO timestamps from local date + time in booking page timezone
+    const startIso = new Date(`${date}T${time}:00`).toISOString()
+    const endIso = new Date(`${date}T${endTime}:00`).toISOString()
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const calendarEventPromise = (admin as any).from('calendar_events').insert({
+      tenant_id: link.tenant_id,
+      title: eventTitle,
+      description: notes ? `Client notes: ${notes}` : `Booked via client portal`,
+      start_at: startIso,
+      end_at: endIso,
+      all_day: false,
+      event_type: 'consultation',
+      matter_id: link.matter_id,
+      contact_id: link.contact_id,
+      created_by: page.user_id,
+      status: 'confirmed',
+      show_as: 'busy',
+      is_active: true,
+      is_client_visible: true,
+    }).select('id').single()
+
+    // 6. Send Global Ping — create notification for the legal team
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const notificationPromise = (admin as any).from('notifications').insert({
+      tenant_id: link.tenant_id,
+      user_id: page.user_id,
+      type: 'booking_created',
+      title: `New Booking: ${guestName || 'Client'}`,
+      message: `${meetingLabel} on ${date} at ${time} — booked via client portal`,
+      entity_type: 'appointment',
+      entity_id: appointment.id,
+      is_read: false,
+    }).then(() => {})
+
+    // 7. Log activity (fire-and-forget)
+    const activityPromise = link.contact_id
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      ;(admin as any).from('activities').insert({
-        tenant_id: link.tenant_id,
-        user_id: page.user_id,
-        activity_type: 'booking_created',
-        title: `Portal Booking: ${guestName} — ${page.title}`,
-        entity_type: 'contact',
-        entity_id: link.contact_id,
-        metadata: {
-          appointment_id: appointment.id,
-          booking_page: page.title,
-          date,
-          time,
-          meeting_type,
-          source: 'client_portal',
-          matter_id: link.matter_id,
-        },
-      }).then(() => {})
-    }
+      ? (admin as any).from('activities').insert({
+          tenant_id: link.tenant_id,
+          user_id: page.user_id,
+          activity_type: 'booking_created',
+          title: `Portal Booking: ${guestName} — ${page.title}`,
+          entity_type: 'contact',
+          entity_id: link.contact_id,
+          metadata: {
+            appointment_id: appointment.id,
+            booking_page: page.title,
+            date,
+            time,
+            meeting_type,
+            source: 'client_portal',
+            matter_id: link.matter_id,
+          },
+        }).then(() => {})
+      : Promise.resolve()
+
+    // Fire all side-effects in parallel (non-blocking)
+    Promise.all([calendarEventPromise, notificationPromise, activityPromise]).catch((err) => {
+      console.error('[Portal Booking] Side-effect error (non-blocking):', err)
+    })
 
     return NextResponse.json({
       success: true,

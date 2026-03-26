@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { PortalZoomWrapper } from './portal-zoom-client'
 
 export const metadata: Metadata = {
-  title: 'Document Upload Portal',
+  title: 'Norva Document Bridge',
   description: 'Upload your documents securely',
 }
 

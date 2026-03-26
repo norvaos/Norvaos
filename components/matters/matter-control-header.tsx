@@ -90,9 +90,11 @@ export function MatterControlHeader({
     <div className="rounded-lg border bg-card px-4 py-2.5 space-y-1.5">
       {/* Metrics strip */}
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
-        {/* Matter type */}
+        {/* Matter type — iron-canvas-guard for long translations */}
         {matterTypeName && (
-          <span className="font-medium text-slate-700">{matterTypeName}</span>
+          <span className="font-medium text-slate-700 iron-canvas-guard max-w-[200px]" title={matterTypeName}>
+            {matterTypeName}
+          </span>
         )}
 
         {/* Intake status */}
@@ -101,7 +103,8 @@ export function MatterControlHeader({
             <Divider />
             <Badge
               variant="outline"
-              className="text-[11px] border"
+              className="text-[11px] border iron-canvas-guard max-w-[180px]"
+              title={statusMeta.label}
               style={{
                 backgroundColor: `${statusMeta.color}15`,
                 color: statusMeta.color,
@@ -118,7 +121,7 @@ export function MatterControlHeader({
           <>
             <Divider />
             <div className="flex items-center gap-1.5">
-              <span className="text-slate-500">Readiness</span>
+              <span className="text-slate-500 iron-canvas-guard">Readiness</span>
               <div className="w-16 h-1.5 bg-slate-200 rounded-full overflow-hidden">
                 <div
                   className={cn(
@@ -139,7 +142,7 @@ export function MatterControlHeader({
         {matrix && (
           <>
             <Divider />
-            <span className="text-slate-500">Drafting</span>
+            <span className="text-slate-500 iron-canvas-guard">Drafting</span>
             {hasDraftingBlockers ? (
               <Badge variant="destructive" className="text-[10px] px-1.5 py-0">
                 BLOCKED
@@ -156,7 +159,7 @@ export function MatterControlHeader({
         {matrix && (
           <>
             <Divider />
-            <span className="text-slate-500">Filing</span>
+            <span className="text-slate-500 iron-canvas-guard">Filing</span>
             {hasFilingBlockers ? (
               <Badge variant="destructive" className="text-[10px] px-1.5 py-0">
                 BLOCKED
@@ -173,7 +176,7 @@ export function MatterControlHeader({
         {lawyerReviewNeeded && (
           <>
             <Divider />
-            <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-amber-300 text-amber-700 bg-amber-50">
+            <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-amber-300 text-amber-700 bg-amber-50 iron-canvas-guard max-w-[200px]" title="Lawyer Review Required">
               Lawyer Review Required
             </Badge>
           </>
@@ -183,7 +186,7 @@ export function MatterControlHeader({
         {stalePacks > 0 && (
           <>
             <Divider />
-            <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-amber-300 text-amber-700 bg-amber-50">
+            <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-amber-300 text-amber-700 bg-amber-50 iron-canvas-guard max-w-[200px]" title={`${stalePacks} outdated ${stalePacks === 1 ? 'form pack' : 'form packs'}`}>
               {stalePacks} outdated {stalePacks === 1 ? 'form pack' : 'form packs'}
             </Badge>
           </>

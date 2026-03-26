@@ -10,6 +10,8 @@ import { leadSchema, type LeadFormValues } from '@/lib/schemas/lead'
 import { createClient } from '@/lib/supabase/client'
 import { useTenant } from '@/lib/hooks/use-tenant'
 import { LEAD_TEMPERATURES, CONTACT_SOURCES } from '@/lib/utils/constants'
+import { CLIENT_LOCALES } from '@/lib/i18n/config'
+import { useI18n } from '@/lib/i18n/i18n-provider'
 import type { Database } from '@/lib/types/database'
 
 import { Button } from '@/components/ui/button'
@@ -139,6 +141,7 @@ export function LeadForm({
   fixedPipelineId,
   fixedStageId,
 }: LeadFormProps) {
+  const { t } = useI18n()
   const { tenant } = useTenant()
   const tenantId = tenant?.id ?? ''
 
@@ -155,6 +158,7 @@ export function LeadForm({
       estimated_value: undefined,
       assigned_to: undefined,
       temperature: 'warm',
+      preferred_language: undefined,
       notes: undefined,
       next_follow_up: undefined,
       ...defaultValues,
@@ -186,7 +190,7 @@ export function LeadForm({
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         {/* Contact Selection */}
         <div>
-          <h3 className="text-sm font-medium text-slate-900">Contact</h3>
+          <h3 className="text-sm font-medium text-slate-900">{t('form.section_contact' as any)}</h3>
           <Separator className="my-3" />
           <div className="space-y-4">
             <FormField
@@ -194,13 +198,13 @@ export function LeadForm({
               name="contact_id"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Contact *</FormLabel>
+                  <FormLabel>{t('form.lead_contact' as any)} *</FormLabel>
                   <FormControl>
                     <ContactSearch
                       value={field.value}
                       onChange={field.onChange}
                       tenantId={tenantId}
-                      placeholder="Search contacts by name or email..."
+                      placeholder={t('form.search_contacts' as any)}
                     />
                   </FormControl>
                   <FormMessage />
@@ -212,7 +216,7 @@ export function LeadForm({
 
         {/* Pipeline & Stage */}
         <div>
-          <h3 className="text-sm font-medium text-slate-900">Pipeline & Stage</h3>
+          <h3 className="text-sm font-medium text-slate-900">{t('form.section_pipeline_stage' as any)}</h3>
           <Separator className="my-3" />
           <div className="space-y-4">
             <FormField
@@ -220,7 +224,7 @@ export function LeadForm({
               name="pipeline_id"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Pipeline *</FormLabel>
+                  <FormLabel>{t('form.lead_pipeline' as any)} *</FormLabel>
                   <Select
                     onValueChange={field.onChange}
                     value={field.value}
@@ -228,7 +232,7 @@ export function LeadForm({
                     <FormControl>
                       <SelectTrigger className="w-full">
                         <SelectValue
-                          placeholder={pipelinesLoading ? 'Loading...' : 'Select a pipeline'}
+                          placeholder={pipelinesLoading ? t('common.loading') : t('form.select_pipeline' as any)}
                         />
                       </SelectTrigger>
                     </FormControl>
@@ -250,7 +254,7 @@ export function LeadForm({
               name="stage_id"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Stage *</FormLabel>
+                  <FormLabel>{t('form.lead_stage' as any)} *</FormLabel>
                   <Select
                     onValueChange={field.onChange}
                     value={field.value}
@@ -261,10 +265,10 @@ export function LeadForm({
                         <SelectValue
                           placeholder={
                             !watchedPipelineId
-                              ? 'Select a pipeline first'
+                              ? t('form.select_pipeline_first' as any)
                               : stagesLoading
-                                ? 'Loading...'
-                                : 'Select a stage'
+                                ? t('common.loading')
+                                : t('form.select_stage' as any)
                           }
                         />
                       </SelectTrigger>
@@ -286,7 +290,7 @@ export function LeadForm({
 
         {/* Lead Details */}
         <div>
-          <h3 className="text-sm font-medium text-slate-900">Lead Details</h3>
+          <h3 className="text-sm font-medium text-slate-900">{t('form.section_lead_details' as any)}</h3>
           <Separator className="my-3" />
           <div className="space-y-4">
             <FormField
@@ -294,22 +298,22 @@ export function LeadForm({
               name="temperature"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Temperature</FormLabel>
+                  <FormLabel>{t('form.lead_temperature' as any)}</FormLabel>
                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select temperature" />
+                        <SelectValue placeholder={t('form.select_temperature' as any)} />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {LEAD_TEMPERATURES.map((t) => (
-                        <SelectItem key={t.value} value={t.value}>
+                      {LEAD_TEMPERATURES.map((temp) => (
+                        <SelectItem key={temp.value} value={temp.value}>
                           <div className="flex items-center gap-2">
                             <span
                               className="inline-block h-2.5 w-2.5 rounded-full"
-                              style={{ backgroundColor: t.color }}
+                              style={{ backgroundColor: temp.color }}
                             />
-                            {t.label}
+                            {temp.label}
                           </div>
                         </SelectItem>
                       ))}
@@ -325,11 +329,11 @@ export function LeadForm({
               name="source"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Source</FormLabel>
+                  <FormLabel>{t('form.lead_source' as any)}</FormLabel>
                   <Select onValueChange={field.onChange} value={field.value ?? ''}>
                     <FormControl>
                       <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select source" />
+                        <SelectValue placeholder={t('form.select_source' as any)} />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -347,15 +351,40 @@ export function LeadForm({
 
             <FormField
               control={form.control}
+              name="preferred_language"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t('form.preferred_language' as any)}</FormLabel>
+                  <Select onValueChange={field.onChange} value={field.value ?? ''}>
+                    <FormControl>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder={t('form.select_preferred_language' as any)} />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {CLIENT_LOCALES.map((locale) => (
+                        <SelectItem key={locale.code} value={locale.code}>
+                          {locale.nativeLabel} ({locale.label})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
               name="practice_area_id"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Practice Area</FormLabel>
+                  <FormLabel>{t('form.lead_practice_area' as any)}</FormLabel>
                   <Select onValueChange={field.onChange} value={field.value ?? ''}>
                     <FormControl>
                       <SelectTrigger className="w-full">
                         <SelectValue
-                          placeholder={practiceAreasLoading ? 'Loading...' : 'Select a practice area (optional)'}
+                          placeholder={practiceAreasLoading ? t('common.loading') : t('form.select_practice_area' as any)}
                         />
                       </SelectTrigger>
                     </FormControl>
@@ -377,7 +406,7 @@ export function LeadForm({
               name="estimated_value"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Estimated Value ($)</FormLabel>
+                  <FormLabel>{t('form.lead_estimated_value' as any)}</FormLabel>
                   <FormControl>
                     <Input
                       type="number"
@@ -398,7 +427,7 @@ export function LeadForm({
 
         {/* Assignment */}
         <div>
-          <h3 className="text-sm font-medium text-slate-900">Assignment</h3>
+          <h3 className="text-sm font-medium text-slate-900">{t('form.section_assignment' as any)}</h3>
           <Separator className="my-3" />
           <div className="space-y-4">
             <FormField
@@ -406,12 +435,12 @@ export function LeadForm({
               name="assigned_to"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Assigned To</FormLabel>
+                  <FormLabel>{t('form.lead_assigned_to' as any)}</FormLabel>
                   <Select onValueChange={field.onChange} value={field.value ?? ''}>
                     <FormControl>
                       <SelectTrigger className="w-full">
                         <SelectValue
-                          placeholder={lawyersLoading ? 'Loading...' : 'Select a lawyer (optional)'}
+                          placeholder={lawyersLoading ? t('common.loading') : t('form.select_lawyer' as any)}
                         />
                       </SelectTrigger>
                     </FormControl>
@@ -432,7 +461,7 @@ export function LeadForm({
 
         {/* Follow-up & Notes */}
         <div>
-          <h3 className="text-sm font-medium text-slate-900">Follow-up & Notes</h3>
+          <h3 className="text-sm font-medium text-slate-900">{t('form.section_followup_notes' as any)}</h3>
           <Separator className="my-3" />
           <div className="space-y-4">
             <FormField
@@ -440,7 +469,7 @@ export function LeadForm({
               name="next_follow_up"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Next Follow-up</FormLabel>
+                  <FormLabel>{t('form.lead_follow_up' as any)}</FormLabel>
                   <FormControl>
                     <Input
                       type="date"
@@ -458,7 +487,7 @@ export function LeadForm({
               name="notes"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Notes</FormLabel>
+                  <FormLabel>{t('form.lead_notes' as any)}</FormLabel>
                   <FormControl>
                     <Textarea
                       placeholder="Any relevant notes about this lead..."

@@ -4,8 +4,9 @@ import { useCreateLead } from '@/lib/queries/leads'
 import { useTenant } from '@/lib/hooks/use-tenant'
 import { useUser } from '@/lib/hooks/use-user'
 import { useUIStore } from '@/lib/stores/ui-store'
+import { useI18n } from '@/lib/i18n/i18n-provider'
 import type { LeadFormValues } from '@/lib/schemas/lead'
-import type { Database } from '@/lib/types/database'
+import type { Database, Json } from '@/lib/types/database'
 
 import {
   Sheet,
@@ -33,6 +34,7 @@ export function LeadCreateSheet({
   pipelineId,
   stageId,
 }: LeadCreateSheetProps) {
+  const { t } = useI18n()
   const { tenant } = useTenant()
   const { appUser } = useUser()
   const activePracticeFilter = useUIStore((s) => s.activePracticeFilter)
@@ -40,6 +42,12 @@ export function LeadCreateSheet({
 
   function handleSubmit(values: LeadFormValues) {
     if (!tenant) return
+
+    // Build custom_fields with preferred_language if provided
+    const customFields: Record<string, unknown> = {}
+    if (values.preferred_language) {
+      customFields.preferred_language = values.preferred_language
+    }
 
     createLead.mutate(
       {
@@ -56,6 +64,7 @@ export function LeadCreateSheet({
         notes: values.notes || null,
         next_follow_up: values.next_follow_up || null,
         created_by: appUser?.id ?? null,
+        ...(Object.keys(customFields).length > 0 ? { custom_fields: customFields as unknown as Json } : {}),
       },
       {
         onSuccess: () => {
@@ -69,9 +78,9 @@ export function LeadCreateSheet({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="right" className="w-full sm:max-w-lg p-0">
         <SheetHeader className="border-b px-6 py-4">
-          <SheetTitle>Add New Lead</SheetTitle>
+          <SheetTitle>{t('form.add_new_lead' as any)}</SheetTitle>
           <SheetDescription>
-            Create a new lead and add it to your pipeline.
+            {t('form.add_new_lead_desc' as any)}
           </SheetDescription>
         </SheetHeader>
 

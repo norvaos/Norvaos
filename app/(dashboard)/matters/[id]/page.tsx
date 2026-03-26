@@ -186,6 +186,7 @@ function useMatterUsers(tenantId: string) {
       return data as UserRow[]
     },
     enabled: !!tenantId,
+    staleTime: 1000 * 60 * 5, // 5 min — reference data, rarely changes
   })
 }
 
@@ -204,6 +205,7 @@ function useMatterPracticeArea(practiceAreaId: string | null) {
       return data as PracticeArea
     },
     enabled: !!practiceAreaId,
+    staleTime: 1000 * 60 * 5, // 5 min — reference data, rarely changes
   })
 }
 
@@ -214,7 +216,7 @@ function useMatterTasks(matterId: string, tenantId: string) {
       const supabase = createClient()
       const { data, error } = await supabase
         .from('tasks')
-        .select('*')
+        .select('id, title, status, priority, due_date, assigned_to, matter_id, created_at')
         .eq('matter_id', matterId)
         .eq('tenant_id', tenantId)
         .order('created_at', { ascending: false })
@@ -223,6 +225,7 @@ function useMatterTasks(matterId: string, tenantId: string) {
       return data as Task[]
     },
     enabled: !!matterId && !!tenantId,
+    staleTime: 1000 * 60, // 1 min
   })
 }
 

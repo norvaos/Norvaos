@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { useTenant } from '@/lib/hooks/use-tenant'
 import { useUser } from '@/lib/hooks/use-user'
@@ -108,6 +108,7 @@ import {
   FileStack,
   UserCircle,
   CalendarDays,
+  Shield,
   ShieldCheck,
   Crown,
   Plane,
@@ -115,9 +116,17 @@ import {
   Save,
   ChevronDown,
   ChevronUp,
+  Eye,
+  ChevronRight,
 } from 'lucide-react'
+import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 import { MatterCreateSheet } from '@/components/matters/matter-create-sheet'
+import { ContactReadinessZone } from '@/components/contacts/contact-readiness-zone'
+import { VaultMonitor } from '@/components/contacts/vault-monitor'
+import { SovereignLayout } from '@/components/contacts/sovereign-layout'
+import { ClassificationActionMenu } from '@/components/contacts/classification-action-menu'
+import { useLeadReadiness } from '@/lib/queries/lead-readiness'
 import {
   Select,
   SelectContent,
@@ -246,6 +255,8 @@ export default function ContactDetailPage() {
   const { data: activeLead } = useContactActiveLead(contactId)
   const { data: teamAssignments } = useContactAssignments(contactId)
   const { role: userRole } = useUserRole()
+  const { data: leadReadiness } = useLeadReadiness(activeLead?.id)
+  const isRedScore = (leadReadiness?.score ?? 100) <= 35
 
   // Loading state
   if (isLoading) {
@@ -312,9 +323,10 @@ export default function ContactDetailPage() {
         source_detail: values.source_detail || null,
         notes: values.notes || null,
         phone_type_secondary: values.phone_type_secondary || null,
+        client_status: values.client_status || 'lead',
       },
       {
-        onSuccess: () => {
+        onSuccess: async () => {
           setEditOpen(false)
           createAuditLog.mutate({
             tenant_id: tenantId,
@@ -324,6 +336,55 @@ export default function ContactDetailPage() {
             action: 'update',
             changes: values as any,
           })
+
+          // ── Classification-based actions ────────────────────────
+          const newClassification = values.client_status
+          const oldClassification = (contact as any).client_status
+
+          if (newClassification !== oldClassification) {
+            // Lead activation: auto-create lead record if none exists
+            if (newClassification === 'lead') {
+              try {
+                const supabase = createClient()
+                const { data: existingLead } = await supabase
+                  .from('leads')
+                  .select('id')
+                  .eq('contact_id', contactId)
+                  .eq('tenant_id', tenantId)
+                  .not('status', 'in', '("converted","lost")')
+                  .limit(1)
+                  .maybeSingle()
+
+                if (!existingLead) {
+                  const displayName = [values.first_name, values.last_name].filter(Boolean).join(' ') || values.organization_name || 'Contact'
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  const { error: leadErr } = await (supabase as any)
+                    .from('leads')
+                    .insert({
+                      tenant_id: tenantId,
+                      contact_id: contactId,
+                      title: `${displayName} — New Enquiry`,
+                      status: 'new',
+                      source: 'classification_change',
+                      created_by: appUser?.id ?? null,
+                    })
+                  if (!leadErr) {
+                    toast.success('Lead pipeline activated — new lead created for this contact.')
+                  }
+                } else {
+                  toast.info('Active lead already exists for this contact.')
+                }
+              } catch {
+                // Non-fatal: classification saved, lead creation failed
+                toast.error('Classification saved but lead creation failed.')
+              }
+            }
+
+            // Professional classification notice
+            if (['lawyer', 'ircc_officer', 'consultant', 'judge', 'government'].includes(newClassification ?? '')) {
+              toast.info(`Classified as ${newClassification?.replace(/_/g, ' ')} — auto-sync from matters is now disabled.`)
+            }
+          }
         },
       }
     )
@@ -366,9 +427,29 @@ export default function ContactDetailPage() {
     email_opt_in: contact.email_opt_in ?? undefined,
     sms_opt_in: contact.sms_opt_in ?? undefined,
     notes: contact.notes ?? undefined,
+    client_status: (contact as any).client_status ?? 'lead',
   }
 
+  // Persist language selection from AuraHeader globe button to contact record
+  const handleLanguageChange = useCallback((localeCode: string) => {
+    const existingCustomFields = (contact.custom_fields && typeof contact.custom_fields === 'object')
+      ? contact.custom_fields as Record<string, unknown>
+      : {}
+    updateContact.mutate({
+      id: contactId,
+      custom_fields: { ...existingCustomFields, preferred_language: localeCode },
+    } as any)
+  }, [contactId, contact.custom_fields, updateContact])
+
   return (
+    <SovereignLayout
+      preferredLanguage={
+        contact.custom_fields && typeof contact.custom_fields === 'object'
+          ? (contact.custom_fields as Record<string, string>).preferred_language ?? null
+          : null
+      }
+      onLanguageChange={handleLanguageChange}
+    >
     <div className="space-y-6">
       {/* Back button */}
       <Button
@@ -393,26 +474,32 @@ export default function ContactDetailPage() {
               <h1 className="text-2xl font-semibold text-slate-900">
                 {displayName}
               </h1>
-              <Badge variant="secondary" className="gap-1 capitalize">
-                {isOrganization ? (
-                  <Building2 className="size-3" />
-                ) : (
-                  <User className="size-3" />
-                )}
-                {isOrganization ? 'Organisation' : 'Individual'}
-              </Badge>
-              {(stats?.matterCount ?? 0) > 0 && (
-                <Badge className="gap-1 bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-50">
-                  <Briefcase className="size-3" />
-                  Client
+              {/* Logic-Gate Badge — Directive 41.0 Status Authority */}
+              {(stats?.matterCount ?? 0) > 0 ? (
+                <Badge className="gap-1.5 bg-emerald-50 text-emerald-700 border-emerald-300 hover:bg-emerald-50 font-semibold tracking-wide text-[11px] uppercase">
+                  <ShieldCheck className="size-3.5" />
+                  Retained Client
+                </Badge>
+              ) : (stats?.leadCount ?? 0) > 0 ? (
+                <Badge className="gap-1.5 bg-amber-50 text-amber-700 border-amber-300 hover:bg-amber-50 font-semibold tracking-wide text-[11px] uppercase">
+                  <UserCircle className="size-3.5" />
+                  Prospective Lead
+                </Badge>
+              ) : (
+                <Badge variant="secondary" className="gap-1 capitalize">
+                  {isOrganization ? (
+                    <Building2 className="size-3" />
+                  ) : (
+                    <User className="size-3" />
+                  )}
+                  {isOrganization ? 'Organisation' : 'Contact'}
                 </Badge>
               )}
-              {(stats?.leadCount ?? 0) > 0 && (stats?.matterCount ?? 0) === 0 && (
-                <Badge className="gap-1 bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-50">
-                  <UserCircle className="size-3" />
-                  Lead
-                </Badge>
-              )}
+              {/* Classification action menu */}
+              <ClassificationActionMenu
+                contactId={contactId}
+                currentStatus={(contact as any).client_status ?? 'lead'}
+              />
               {/* Assigned team avatars (tooltip on hover for name + role) */}
               {teamAssignments && teamAssignments.length > 0 && (
                 <TooltipProvider delayDuration={150}>
@@ -477,13 +564,30 @@ export default function ContactDetailPage() {
 
         <div className="flex items-center gap-2">
           {activeLead && (
-            <Button
-              size="sm"
-              onClick={() => router.push(`/command/lead/${activeLead.id}`)}
-            >
-              <LayoutDashboard className="mr-1.5 size-4" />
-              Command Centre
-            </Button>
+            <TooltipProvider delayDuration={150}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    size="sm"
+                    className={isRedScore ? 'animate-pulse bg-red-600 hover:bg-red-700 shadow-red-300 shadow-md' : ''}
+                    onClick={() => router.push(`/command/lead/${activeLead.id}`)}
+                  >
+                    <LayoutDashboard className="mr-1.5 size-4" />
+                    Command Centre
+                    {isRedScore && (
+                      <span className="ml-1.5 inline-flex items-center rounded-full bg-white/20 px-1.5 py-0.5 text-[10px] font-bold">
+                        {leadReadiness?.score}%
+                      </span>
+                    )}
+                  </Button>
+                </TooltipTrigger>
+                {isRedScore && (
+                  <TooltipContent side="bottom" className="bg-red-50 text-red-800 border-red-200">
+                    Readiness score is critically low — immediate attention required
+                  </TooltipContent>
+                )}
+              </Tooltip>
+            </TooltipProvider>
           )}
           <Button variant="outline" onClick={() => setEditOpen(true)}>
             <Pencil className="mr-2 size-4" />
@@ -673,6 +777,7 @@ export default function ContactDetailPage() {
         </DialogContent>
       </Dialog>
     </div>
+    </SovereignLayout>
   )
 }
 
@@ -1008,41 +1113,78 @@ function OverviewTab({
 
       {/* Right column: Stats sidebar */}
       <div className="space-y-4">
-        {/* Pipeline Progress — reads from the active lead's current_stage */}
+        {/* Intake Funnel — Directive 41.0 Command Centre Sync */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center justify-between text-sm">
-              Pipeline
-              {activeLead?.current_stage ? (
+              Intake Funnel
+              {activeLead?.current_stage && (
                 <span className="inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium bg-blue-50 text-blue-700 border-blue-200">
                   {STAGE_LABELS[activeLead.current_stage as keyof typeof STAGE_LABELS] ?? activeLead.current_stage}
                 </span>
-              ) : (
-                <PipelineStageBadge stage={contact.pipeline_stage ?? 'new_lead'} />
               )}
             </CardTitle>
           </CardHeader>
           <CardContent>
             {leadLoading ? (
               <div className="h-16 animate-pulse rounded bg-slate-100" />
-            ) : activeLead?.current_stage ? (
-              // ── Lead-driven pipeline widget ─────────────────────────────
-              // Shows the lead's actual stage from LEAD_STAGES, not the
-              // stale contacts.pipeline_stage field.
-              (() => {
-                const stageIndex = ACTIVE_STAGES.indexOf(activeLead.current_stage as typeof ACTIVE_STAGES[number])
-                const progress = stageIndex >= 0
-                  ? Math.round(((stageIndex + 1) / ACTIVE_STAGES.length) * 100)
-                  : 0
-                const nextStage = stageIndex >= 0 && stageIndex < ACTIVE_STAGES.length - 1
-                  ? ACTIVE_STAGES[stageIndex + 1]
-                  : null
+            ) : (() => {
+              // Resolve the current stage — fallback to pipeline_stage for contacts without an active lead
+              const currentStage = activeLead?.current_stage ?? contact.pipeline_stage ?? 'new_lead'
+              const stageIndex = ACTIVE_STAGES.indexOf(currentStage as typeof ACTIVE_STAGES[number])
+              const effectiveIndex = stageIndex >= 0 ? stageIndex : 0
+              const progress = Math.round(((effectiveIndex + 1) / ACTIVE_STAGES.length) * 100)
+              const nextStage = effectiveIndex < ACTIVE_STAGES.length - 1
+                ? ACTIVE_STAGES[effectiveIndex + 1]
+                : null
 
-                return (
-                  <div className="space-y-2">
+              return (
+                <div className="space-y-3">
+                  {/* Funnel Chevron — visual stage indicators */}
+                  <div className="flex items-center gap-0.5 overflow-x-auto pb-1">
+                    {ACTIVE_STAGES.map((stage, idx) => {
+                      const isCompleted = idx < effectiveIndex
+                      const isCurrent = idx === effectiveIndex
+                      const label = STAGE_LABELS[stage as keyof typeof STAGE_LABELS] ?? stage
+                      // Abbreviate for chevron display
+                      const shortLabel = label.split(/[–\s]/).slice(0, 2).join(' ').slice(0, 12)
+
+                      return (
+                        <TooltipProvider key={stage} delayDuration={100}>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <div className="flex items-center">
+                                <div
+                                  className={cn(
+                                    'flex items-center gap-1 rounded-sm px-1.5 py-1 text-[9px] font-medium transition-all whitespace-nowrap',
+                                    isCompleted && 'bg-emerald-100 text-emerald-700',
+                                    isCurrent && 'bg-blue-100 text-blue-700 ring-1 ring-blue-300',
+                                    !isCompleted && !isCurrent && 'bg-slate-50 text-slate-400',
+                                  )}
+                                >
+                                  {isCompleted && <CheckCircle2 className="size-2.5 shrink-0" />}
+                                  {isCurrent && <div className="size-2 shrink-0 rounded-full bg-blue-500" />}
+                                  {shortLabel}
+                                </div>
+                                {idx < ACTIVE_STAGES.length - 1 && (
+                                  <ChevronRight className="size-3 shrink-0 text-slate-300" />
+                                )}
+                              </div>
+                            </TooltipTrigger>
+                            <TooltipContent side="bottom" className="text-xs">
+                              {label}
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      )
+                    })}
+                  </div>
+
+                  {/* Progress bar */}
+                  <div className="space-y-1">
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-medium text-slate-700">
-                        {STAGE_LABELS[activeLead.current_stage as keyof typeof STAGE_LABELS] ?? activeLead.current_stage}
+                        {STAGE_LABELS[currentStage as keyof typeof STAGE_LABELS] ?? currentStage}
                       </span>
                       <span className="text-xs text-muted-foreground">{progress}%</span>
                     </div>
@@ -1053,183 +1195,61 @@ function OverviewTab({
                       />
                     </div>
                     <p className="text-[10px] text-muted-foreground">
-                      {stageIndex >= 0 ? `Step ${stageIndex + 1} of ${ACTIVE_STAGES.length}` : 'Stage unknown'}
+                      Step {effectiveIndex + 1} of {ACTIVE_STAGES.length}
                     </p>
-                    {nextStage && (
-                      <div className="border-t border-slate-100 pt-2">
-                        <button
-                          type="button"
-                          disabled={isAdvancingStage}
-                          onClick={() => handleLeadStageAdvance(nextStage)}
-                          className="flex w-full items-center justify-center gap-1.5 rounded-md border border-blue-200 bg-blue-50 px-2.5 py-1.5 text-xs font-medium text-blue-700 transition-colors hover:bg-blue-100 hover:border-blue-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                          {isAdvancingStage ? (
-                            <span className="size-3 animate-spin rounded-full border border-blue-500 border-t-transparent" />
-                          ) : (
-                            <span>›</span>
-                          )}
-                          Advance to {STAGE_LABELS[nextStage as keyof typeof STAGE_LABELS] ?? nextStage}
-                        </button>
-                      </div>
-                    )}
                   </div>
-                )
-              })()
-            ) : (
-              // No active lead — show placeholder
-              <p className="text-xs text-muted-foreground">No active lead for this contact.</p>
-            )}
+
+                  {/* Advance button — only for contacts with an active lead */}
+                  {activeLead && nextStage && (
+                    <div className="border-t border-slate-100 pt-2">
+                      <button
+                        type="button"
+                        disabled={isAdvancingStage}
+                        onClick={() => handleLeadStageAdvance(nextStage)}
+                        className="flex w-full items-center justify-center gap-1.5 rounded-md border border-blue-200 bg-blue-50 px-2.5 py-1.5 text-xs font-medium text-blue-700 transition-colors hover:bg-blue-100 hover:border-blue-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {isAdvancingStage ? (
+                          <span className="size-3 animate-spin rounded-full border border-blue-500 border-t-transparent" />
+                        ) : (
+                          <ChevronRight className="size-3" />
+                        )}
+                        Advance to {STAGE_LABELS[nextStage as keyof typeof STAGE_LABELS] ?? nextStage}
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )
+            })()}
           </CardContent>
         </Card>
 
-        {/* Conflict Status */}
+        {/* Readiness — Directive 41.0: Intake Completion (Leads) / Legal Success (Clients) */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center justify-between text-sm">
-              Conflict Check
+              {(stats?.matterCount ?? 0) > 0 ? 'Matter Readiness' : 'Intake Progress'}
               <ConflictStatusBadge status={contact.conflict_status ?? 'not_run'} />
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <button
-              onClick={() => onTabChange('conflict-review')}
-              className="w-full text-left"
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <ShieldCheck className="size-4" />
-                  Risk Score
-                </div>
-                <span className="text-sm font-semibold text-slate-900">{contact.conflict_score ?? 0}/100</span>
-              </div>
-            </button>
+            <ContactReadinessZone contactId={contactId} tenantId={tenantId} />
           </CardContent>
         </Card>
 
-        {/* Quick Stats (clickable) */}
+        {/* Norva Vault Monitor — SHA-256 document integrity (replaces legacy Quick Stats) */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-sm">Quick Stats</CardTitle>
+            <CardTitle className="flex items-center gap-2 text-sm">
+              <Shield className="size-4 text-muted-foreground" />
+              Norva Vault
+            </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3">
-            <button
-              onClick={() => onTabChange('matters')}
-              className="flex w-full items-center justify-between hover:bg-slate-50 rounded -mx-1 px-1 py-0.5 transition-colors"
-            >
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Briefcase className="size-4" />
-                Matters
-              </div>
-              <span className="text-sm font-semibold text-slate-900">{stats?.matterCount ?? 0}</span>
-            </button>
-            <button
-              onClick={() => router.push('/leads')}
-              className="flex w-full items-center justify-between hover:bg-slate-50 rounded -mx-1 px-1 py-0.5 transition-colors"
-            >
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <UserCircle className="size-4" />
-                Leads
-              </div>
-              <span className="text-sm font-semibold text-slate-900">{stats?.leadCount ?? 0}</span>
-            </button>
-            <button
-              onClick={() => onTabChange('tasks')}
-              className="flex w-full items-center justify-between hover:bg-slate-50 rounded -mx-1 px-1 py-0.5 transition-colors"
-            >
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <CheckCircle2 className="size-4" />
-                Tasks
-              </div>
-              <span className="text-sm font-semibold text-slate-900">{stats?.taskCount ?? 0}</span>
-            </button>
-            <button
-              onClick={() => onTabChange('documents')}
-              className="flex w-full items-center justify-between hover:bg-slate-50 rounded -mx-1 px-1 py-0.5 transition-colors"
-            >
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <FileStack className="size-4" />
-                Documents
-              </div>
-              <span className="text-sm font-semibold text-slate-900">{stats?.documentCount ?? 0}</span>
-            </button>
-            <Separator />
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <CalendarDays className="size-4" />
-                Last Contacted
-              </div>
-              <span className="text-sm font-semibold text-slate-900">
-                {daysSinceLastContact !== null
-                  ? daysSinceLastContact === 0
-                    ? 'Today'
-                    : `${daysSinceLastContact}d ago`
-                  : 'Never'}
-              </span>
-            </div>
-            <button
-              onClick={() => onTabChange('interactions')}
-              className="flex w-full items-center justify-between hover:bg-slate-50 rounded -mx-1 px-1 py-0.5 transition-colors"
-            >
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <MessageSquare className="size-4" />
-                Interactions
-              </div>
-              <span className="text-sm font-semibold text-slate-900">{contact.interaction_count}</span>
-            </button>
-            {/* Upcoming Appointments (inside Quick Stats — clickable to Appointments tab) */}
-            {appointments && appointments.length > 0 && (
-              <>
-                <Separator />
-                <button
-                  onClick={() => onTabChange('appointments')}
-                  className="w-full text-left hover:bg-slate-50 rounded -mx-1 px-1 py-0.5 transition-colors"
-                >
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
-                    <CalendarDays className="size-4" />
-                    Upcoming Appointments
-                  </div>
-                  <div className="space-y-2">
-                    {appointments.slice(0, 3).map((appt) => {
-                      const d = appt.appointment_date
-                        ? new Date(appt.appointment_date + 'T00:00:00')
-                        : null
-                      const startTime = appt.start_time ?? ''
-                      const [h = 0, m = 0] = startTime ? startTime.split(':').map(Number) : [0, 0]
-                      const ampm = h >= 12 ? 'PM' : 'AM'
-                      const hour12 = h === 0 ? 12 : h > 12 ? h - 12 : h
-                      const timeStr = startTime
-                        ? `${hour12}:${m.toString().padStart(2, '0')} ${ampm}`
-                        : 'Time TBD'
-                      const lawyerName = [appt.user_first_name, appt.user_last_name].filter(Boolean).join(' ')
-                      return (
-                        <div key={appt.id} className="flex items-center gap-2">
-                          <div className="flex h-8 w-8 shrink-0 flex-col items-center justify-center rounded bg-primary/10 text-primary">
-                            <span className="text-[9px] font-medium leading-none">
-                              {d ? d.toLocaleDateString('en-US', { month: 'short' }) : '---'}
-                            </span>
-                            <span className="text-xs font-bold leading-none">{d ? d.getDate() : '-'}</span>
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <p className="text-xs font-medium text-slate-900">{timeStr}</p>
-                            <p className="text-[10px] text-muted-foreground truncate">
-                              {lawyerName && `${lawyerName} · `}{appt.duration_minutes} min
-                            </p>
-                          </div>
-                          <Badge variant="secondary" className="text-[9px] bg-emerald-100 text-emerald-700 px-1 py-0">
-                            {appt.status === 'confirmed' ? 'Confirmed' : appt.status}
-                          </Badge>
-                        </div>
-                      )
-                    })}
-                    {appointments.length > 3 && (
-                      <p className="text-[10px] text-muted-foreground text-center">
-                        +{appointments.length - 3} more
-                      </p>
-                    )}
-                  </div>
-                </button>
-              </>
-            )}
+          <CardContent>
+            <VaultMonitor contactId={contactId} tenantId={tenantId} contactName={
+              isOrganization
+                ? contact.organization_name ?? undefined
+                : formatFullName(contact.first_name, contact.last_name) || undefined
+            } />
           </CardContent>
         </Card>
 

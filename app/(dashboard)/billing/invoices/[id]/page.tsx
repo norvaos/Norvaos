@@ -521,7 +521,7 @@ function InvoiceDetailContent() {
             <Wallet className="h-4 w-4 mr-1" /> Trust Allocations
           </TabsTrigger>
           <TabsTrigger value="audit">
-            <History className="h-4 w-4 mr-1" /> Audit Log
+            <History className="h-4 w-4 mr-1" /> Norva Vault
           </TabsTrigger>
         </TabsList>
 

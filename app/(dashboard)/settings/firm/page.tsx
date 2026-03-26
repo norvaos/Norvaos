@@ -1,28 +1,42 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Building2, Loader2, Lock, MapPin, Phone, Save } from 'lucide-react'
+import { AlertTriangle, Building2, DollarSign, FileCheck2, Loader2, Lock, MapPin, Phone, Save, Scale, ShieldCheck } from 'lucide-react'
 import { toast } from 'sonner'
+import { norvaToast } from '@/lib/utils/norva-branding'
 import { TenantNotificationTriggers } from '@/components/settings/tenant-notification-triggers'
 
 import { useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useTenant } from '@/lib/hooks/use-tenant'
 import { firmSchema, type FirmFormValues, firmAddressSchema, type FirmAddressFormValues } from '@/lib/schemas/settings'
-import { JURISDICTIONS } from '@/lib/config/jurisdictions'
+import { JURISDICTIONS, REGULATORY_BODIES, CANADIAN_PROVINCES, resolveRegulatoryBody } from '@/lib/config/jurisdictions'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
@@ -145,6 +159,33 @@ export default function SettingsFirmPage() {
   const { tenant, isLoading: tenantLoading, refreshTenant } = useTenant()
   const router = useRouter()
 
+  // ── Deep-link scroll: if URL has a #hash, scroll and glow that field ──
+  useEffect(() => {
+    const hash = window.location.hash?.replace('#', '')
+    if (!hash) return
+    // Wait for the form to mount and populate
+    const timer = setTimeout(() => {
+      const el = document.getElementById(hash)
+      if (!el) return
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      if ('focus' in el && typeof el.focus === 'function') el.focus()
+      el.classList.add('ring-4', 'ring-amber-400', 'ring-offset-2', 'transition-all', 'duration-500')
+      setTimeout(() => {
+        el.classList.remove('ring-4', 'ring-amber-400', 'ring-offset-2')
+      }, 2500)
+    }, 600)
+    return () => clearTimeout(timer)
+  }, [])
+
+  // ── Consequence Guard: warn before changing an already-set regulatory body ──
+  // Only fires when the user explicitly selects a DIFFERENT regulatory body
+  // from the dropdown — never on page load, form reset, or non-jurisdiction saves.
+  const [showConsequenceWarning, setShowConsequenceWarning] = useState(false)
+  const [pendingRegulatoryChange, setPendingRegulatoryChange] = useState<string | null>(null)
+  const [confirmCountdown, setConfirmCountdown] = useState(3)
+  const countdownRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const pageReadyRef = useRef(false)
+
   const { data: firmData, isLoading } = useQuery({
     queryKey: ['settings', 'firm', tenant?.id],
     queryFn: async () => {
@@ -165,6 +206,7 @@ export default function SettingsFirmPage() {
     resolver: standardSchemaResolver(firmSchema),
     defaultValues: {
       name: '',
+      home_province: '',
       primary_color: '#6366f1',
       secondary_color: '#8b5cf6',
       accent_color: '#ec4899',
@@ -178,6 +220,7 @@ export default function SettingsFirmPage() {
     if (tenant) {
       form.reset({
         name: tenant.name ?? '',
+        home_province: tenant.home_province ?? '',
         primary_color: tenant.primary_color ?? '#6366f1',
         secondary_color: tenant.secondary_color ?? '#8b5cf6',
         accent_color: tenant.accent_color ?? '#ec4899',
@@ -185,8 +228,13 @@ export default function SettingsFirmPage() {
         currency: tenant.currency ?? 'CAD',
         date_format: tenant.date_format ?? 'YYYY-MM-DD',
       })
+      // Mark page as ready after initial form hydration — prevents
+      // the Consequence Guard from firing during the reset cycle.
+      setTimeout(() => { pageReadyRef.current = true }, 500)
     }
-  }, [tenant, form])
+  }, [tenant, firmData, form])
+
+  const queryClient = useQueryClient()
 
   const updateFirm = useMutation({
     mutationFn: async (values: FirmFormValues) => {
@@ -203,12 +251,12 @@ export default function SettingsFirmPage() {
     onSuccess: async () => {
       toast.success('Firm settings updated successfully.')
       await refreshTenant()   // await so singleton is updated before the UI re-renders
+      // Invalidate all queries that depend on tenant settings (regulatory sidebar, etc.)
+      queryClient.invalidateQueries({ queryKey: ['settings', 'firm'] })
       router.refresh()
     },
     onError: (error) => {
-      toast.error('Failed to update firm settings.', {
-        description: error.message,
-      })
+      norvaToast('save_failed', error.message)
     },
   })
 
@@ -270,30 +318,117 @@ export default function SettingsFirmPage() {
             </CardContent>
           </Card>
 
-          {/* Jurisdiction (read-only) */}
-          {firmData?.jurisdiction_code && (() => {
-            const j = JURISDICTIONS.find((jd) => jd.code === firmData.jurisdiction_code)
-            return (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    Jurisdiction
-                    <Lock className="h-4 w-4 text-muted-foreground" />
-                  </CardTitle>
-                  <CardDescription>
-                    Set at creation — cannot be changed.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-center gap-2 rounded-md border bg-muted/50 px-4 py-3">
+          {/* Regulatory Body & Jurisdiction */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Scale className="h-5 w-5" />
+                Regulatory Body
+              </CardTitle>
+              <CardDescription>
+                Select the Law Society or College that regulates your firm. This determines compliance rules, AML requirements, and reporting standards across NorvaOS.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <FormField
+                control={form.control}
+                name="home_province"
+                render={({ field }) => {
+                  const resolved = resolveRegulatoryBody(field.value)
+                  const federalBodies = REGULATORY_BODIES.filter((b) => b.scope === 'federal')
+                  const provincialBodies = REGULATORY_BODIES.filter((b) => b.scope === 'provincial')
+                  return (
+                    <FormItem>
+                      <FormLabel>Primary Regulatory Body</FormLabel>
+                      <Select
+                        value={field.value || undefined}
+                        onValueChange={(newValue) => {
+                          // Only show the Consequence Guard if:
+                          // 1. Page has fully loaded (not during form reset)
+                          // 2. A regulatory body was already set
+                          // 3. The user is selecting a DIFFERENT body
+                          if (pageReadyRef.current && tenant?.home_province && newValue !== tenant.home_province) {
+                            setPendingRegulatoryChange(newValue)
+                            setConfirmCountdown(3)
+                            setShowConsequenceWarning(true)
+                            // Start countdown timer
+                            if (countdownRef.current) clearInterval(countdownRef.current)
+                            countdownRef.current = setInterval(() => {
+                              setConfirmCountdown((prev) => {
+                                if (prev <= 1) {
+                                  if (countdownRef.current) clearInterval(countdownRef.current)
+                                  return 0
+                                }
+                                return prev - 1
+                              })
+                            }, 1000)
+                          } else {
+                            field.onChange(newValue)
+                          }
+                        }}
+                      >
+                        <FormControl>
+                          <SelectTrigger id="firm-jurisdiction-field" className="w-full">
+                            <SelectValue placeholder="Select your Law Society or College…" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectGroup>
+                            <SelectLabel>Federal</SelectLabel>
+                            {federalBodies.map((b) => (
+                              <SelectItem key={b.code} value={b.code}>
+                                {b.name} ({b.abbr})
+                              </SelectItem>
+                            ))}
+                          </SelectGroup>
+                          <SelectGroup>
+                            <SelectLabel>Provincial</SelectLabel>
+                            {provincialBodies.map((b) => (
+                              <SelectItem key={b.code} value={b.code}>
+                                {b.name} ({b.abbr})
+                              </SelectItem>
+                            ))}
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                      <FormDescription>
+                        Immigration consultants select CICC. Lawyers select their provincial Law Society.
+                      </FormDescription>
+                      <FormMessage />
+
+                      {/* Resolved Regulatory Badge */}
+                      {resolved && (
+                        <div className="mt-3 flex items-center gap-2 rounded-md border border-emerald-200 bg-emerald-50 px-4 py-3">
+                          <ShieldCheck className="h-5 w-5 text-emerald-600 shrink-0" />
+                          <div>
+                            <p className="text-sm font-semibold text-emerald-800">
+                              {resolved.name} ({resolved.abbr})
+                            </p>
+                            <p className="text-xs text-emerald-600">
+                              {resolved.scope === 'federal' ? 'Federal regulatory body' : `Provincial — ${resolved.description}`}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                    </FormItem>
+                  )
+                }}
+              />
+
+              {/* Country (read-only) */}
+              {firmData?.jurisdiction_code && (() => {
+                const j = JURISDICTIONS.find((jd) => jd.code === (firmData.jurisdiction_code as string))
+                return (
+                  <div className="flex items-center gap-2 rounded-md border bg-muted/50 px-4 py-2.5">
+                    <Lock className="h-3.5 w-3.5 text-muted-foreground" />
                     <span className="text-lg">{j?.flag ?? ''}</span>
-                    <span className="font-medium">{j?.name ?? firmData.jurisdiction_code}</span>
-                    <span className="text-sm text-muted-foreground">({firmData.jurisdiction_code})</span>
+                    <span className="text-sm font-medium">{j?.name ?? firmData.jurisdiction_code}</span>
+                    <span className="text-xs text-muted-foreground">(Country — set at creation)</span>
                   </div>
-                </CardContent>
-              </Card>
-            )
-          })()}
+                )
+              })()}
+            </CardContent>
+          </Card>
 
           <Card>
             <CardHeader>
@@ -486,7 +621,114 @@ export default function SettingsFirmPage() {
       <TenantNotificationTriggers />
 
       {/* Office Address Card */}
-      <FirmAddressCard tenantId={tenant!.id} firmData={firmData} />
+      <FirmAddressCard tenantId={tenant!.id} firmData={firmData} refreshTenant={refreshTenant} homeProvince={tenant?.home_province} />
+
+      {/* ── Consequence Guard: Regulatory Change Warning Modal ────────── */}
+      {/* ── Consequence Guard: "The Pause" Modal ────────────────────────── */}
+      <AlertDialog
+        open={showConsequenceWarning}
+        onOpenChange={(open) => {
+          if (!open) {
+            setPendingRegulatoryChange(null)
+            if (countdownRef.current) clearInterval(countdownRef.current)
+          }
+          setShowConsequenceWarning(open)
+        }}
+      >
+        <AlertDialogContent className="max-w-lg">
+          <AlertDialogHeader className="space-y-3 text-center items-center">
+            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-red-100">
+              <AlertTriangle className="h-7 w-7 text-red-600" />
+            </div>
+            <AlertDialogTitle className="text-2xl text-red-700 text-center w-full leading-snug">
+              Wait - This is a Regulatory Change
+              <span className="block text-sm font-normal text-muted-foreground mt-2">
+                Changing your firm&apos;s home jurisdiction isn&apos;t just a setting - it changes how you practise law in this system.
+              </span>
+            </AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div className="space-y-4 text-sm">
+
+                <div className="space-y-3 rounded-lg border bg-muted/30 p-4">
+                  <div className="flex items-start gap-3">
+                    <Scale className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-semibold text-foreground">Law Society Rules</p>
+                      <p className="text-xs text-muted-foreground">
+                        We will instantly switch from{' '}
+                        <strong className="text-foreground">{resolveRegulatoryBody(tenant?.home_province)?.abbr ?? 'current'}</strong>{' '}
+                        to{' '}
+                        <strong className="text-foreground">{resolveRegulatoryBody(pendingRegulatoryChange)?.abbr ?? 'new'}</strong>{' '}
+                        protocols.
+                      </p>
+                    </div>
+                  </div>
+                  <Separator />
+                  <div className="flex items-start gap-3">
+                    <DollarSign className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-semibold text-foreground">Tax Recalculation</p>
+                      <p className="text-xs text-muted-foreground">
+                        All new invoices will shift (e.g. from 13% HST to 5% GST).
+                        This cannot be bulk-undone.
+                      </p>
+                    </div>
+                  </div>
+                  <Separator />
+                  <div className="flex items-start gap-3">
+                    <FileCheck2 className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-semibold text-foreground">Audit Integrity</p>
+                      <p className="text-xs text-muted-foreground">
+                        A permanent entry will be made in your Sentinel Eye Audit Log
+                        marking this transition for your next Law Society review.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Responsibility notice */}
+                <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2.5 text-xs text-red-700 leading-relaxed text-center">
+                  We strongly recommend reviewing the compliance requirements of both
+                  your current and new regulatory body before proceeding. The administering
+                  user assumes full responsibility for ensuring continued compliance
+                  following this change.
+                </div>
+
+                {/* Countdown friction */}
+                {confirmCountdown > 0 && (
+                  <p className="text-center text-xs text-muted-foreground italic animate-pulse">
+                    Reviewing consequences… ({confirmCountdown}s)
+                  </p>
+                )}
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex-col gap-2 sm:flex-row sm:gap-3 pt-2">
+            <AlertDialogCancel className="w-full sm:w-auto font-semibold order-1 sm:order-none">
+              Keep Current (Recommended)
+            </AlertDialogCancel>
+            <AlertDialogAction
+              disabled={confirmCountdown > 0}
+              className={
+                confirmCountdown > 0
+                  ? 'w-full sm:w-auto bg-muted text-muted-foreground border border-border cursor-not-allowed font-medium'
+                  : 'w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white border-0 font-semibold'
+              }
+              onClick={() => {
+                if (pendingRegulatoryChange) {
+                  form.setValue('home_province', pendingRegulatoryChange, { shouldDirty: true })
+                }
+                setPendingRegulatoryChange(null)
+              }}
+            >
+              {confirmCountdown > 0
+                ? `Reviewing… (${confirmCountdown}s)`
+                : 'Confirm & Log Change'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }
@@ -496,11 +738,16 @@ export default function SettingsFirmPage() {
 function FirmAddressCard({
   tenantId,
   firmData,
+  refreshTenant,
+  homeProvince,
 }: {
   tenantId: string
   firmData: Record<string, unknown> | null | undefined
+  refreshTenant: () => Promise<void>
+  homeProvince: string | null | undefined
 }) {
   const queryClient = useQueryClient()
+  const regBody = resolveRegulatoryBody(homeProvince ?? null)
 
   const form = useForm<FirmAddressFormValues>({
     resolver: standardSchemaResolver(firmAddressSchema),
@@ -522,7 +769,7 @@ function FirmAddressCard({
         address_line1: (firmData.address_line1 as string) ?? '',
         address_line2: (firmData.address_line2 as string) ?? '',
         city: (firmData.city as string) ?? '',
-        province: (firmData.province as string) ?? '',
+        province: (firmData.province as FirmAddressFormValues['province']) ?? '',
         postal_code: (firmData.postal_code as string) ?? '',
         country: (firmData.country as string) ?? 'Canada',
         office_phone: (firmData.office_phone as string) ?? '',
@@ -533,6 +780,18 @@ function FirmAddressCard({
 
   const updateAddress = useMutation({
     mutationFn: async (values: FirmAddressFormValues) => {
+      // ── Province-to-Jurisdiction Validation ──────────────────────────
+      // If a provincial regulatory body is set, the office address province
+      // must match that body's province. E.g., LSO requires ON.
+      if (regBody && regBody.scope === 'provincial' && regBody.provinceCode && values.province) {
+        if (values.province !== regBody.provinceCode) {
+          const provinceName = CANADIAN_PROVINCES.find(p => p.code === regBody.provinceCode)?.name ?? regBody.provinceCode
+          throw new Error(
+            `${regBody.abbr}-regulated firms must have a physical presence in ${provinceName}. Please update your jurisdiction or your address.`
+          )
+        }
+      }
+
       const supabase = createClient()
       const { error } = await supabase
         .from('tenants')
@@ -549,8 +808,9 @@ function FirmAddressCard({
         .eq('id', tenantId)
       if (error) throw error
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       toast.success('Office address saved.')
+      await refreshTenant() // ← Sync tenant context so Header Badge updates immediately
       queryClient.invalidateQueries({ queryKey: ['settings', 'firm'] })
     },
     onError: (error) => {
@@ -580,7 +840,7 @@ function FirmAddressCard({
                 <FormItem>
                   <FormLabel>Street Address</FormLabel>
                   <FormControl>
-                    <Input placeholder="123 Legal Street, Suite 400" {...field} value={field.value ?? ''} />
+                    <Input id="firm-address-field" placeholder="123 Legal Street, Suite 400" {...field} value={field.value ?? ''} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -618,10 +878,24 @@ function FirmAddressCard({
                 name="province"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Province / State</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Ontario" {...field} value={field.value ?? ''} />
-                    </FormControl>
+                    <FormLabel>Province / Territory</FormLabel>
+                    <Select
+                      value={field.value || undefined}
+                      onValueChange={field.onChange}
+                    >
+                      <FormControl>
+                        <SelectTrigger id="firm-province-field">
+                          <SelectValue placeholder="Select province…" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {CANADIAN_PROVINCES.map((p) => (
+                          <SelectItem key={p.code} value={p.code}>
+                            {p.name} ({p.code})
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -633,7 +907,7 @@ function FirmAddressCard({
                   <FormItem>
                     <FormLabel>Postal Code</FormLabel>
                     <FormControl>
-                      <Input placeholder="M5H 2N2" {...field} value={field.value ?? ''} />
+                      <Input id="firm-postal-field" placeholder="M5H 2N2" {...field} value={field.value ?? ''} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -665,7 +939,7 @@ function FirmAddressCard({
                   <FormItem>
                     <FormLabel>Office Phone</FormLabel>
                     <FormControl>
-                      <Input placeholder="+1 (416) 555-0100" {...field} value={field.value ?? ''} />
+                      <Input id="firm-phone-field" placeholder="+1 (416) 555-0100" {...field} value={field.value ?? ''} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -678,7 +952,7 @@ function FirmAddressCard({
                   <FormItem>
                     <FormLabel>Fax (optional)</FormLabel>
                     <FormControl>
-                      <Input placeholder="+1 (416) 555-0199" {...field} value={field.value ?? ''} />
+                      <Input id="firm-fax-field" placeholder="+1 (416) 555-0199" {...field} value={field.value ?? ''} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

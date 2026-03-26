@@ -12,6 +12,8 @@ export const lifecycleKeys = {
   contactStatus: (contactId: string) => [...lifecycleKeys.all, 'contact-status', contactId] as const,
   draftingQuestions: (matterTypeId?: string) => [...lifecycleKeys.all, 'drafting-questions', matterTypeId] as const,
   draftingResponses: (matterId: string) => [...lifecycleKeys.all, 'drafting-responses', matterId] as const,
+  guardianTimeline: (tenantId: string) => [...lifecycleKeys.all, 'guardian-timeline', tenantId] as const,
+  guardianBirthdays: (tenantId: string) => [...lifecycleKeys.all, 'guardian-birthdays', tenantId] as const,
 }
 
 // ─── usePostSubmissionDocTypes ───────────────────────────────────────────────
@@ -259,5 +261,131 @@ export function useSaveDraftingPrepResponse() {
     onError: () => {
       toast.error('Failed to save response')
     },
+  })
+}
+
+// ─── useGuardianTimeline ────────────────────────────────────────────────────
+// 10-year post-matter timeline: all expiry dates (passports, permits, visas)
+
+export interface GuardianTimelineEntry {
+  id: string
+  contact_id: string
+  contact_name: string
+  contact_email: string | null
+  status_type: string
+  expiry_date: string
+  document_reference: string | null
+  matter_id: string | null
+  days_until_expiry: number
+  year: number
+}
+
+export function useGuardianTimeline(tenantId: string) {
+  return useQuery({
+    queryKey: lifecycleKeys.guardianTimeline(tenantId),
+    queryFn: async () => {
+      const supabase = createClient()
+      const today = new Date()
+      const tenYearsOut = new Date()
+      tenYearsOut.setFullYear(tenYearsOut.getFullYear() + 10)
+
+      const { data, error } = await supabase
+        .from('contact_status_records')
+        .select('id, contact_id, status_type, expiry_date, document_reference, matter_id, contacts!inner(first_name, last_name, email_primary)')
+        .eq('tenant_id', tenantId)
+        .gte('expiry_date', today.toISOString().split('T')[0])
+        .lte('expiry_date', tenYearsOut.toISOString().split('T')[0])
+        .order('expiry_date', { ascending: true })
+        .limit(2000)
+
+      if (error) throw error
+
+      const todayMs = today.getTime()
+      return (data ?? []).map((record: any): GuardianTimelineEntry => {
+        const expiry = new Date(record.expiry_date)
+        const diffDays = Math.ceil((expiry.getTime() - todayMs) / (1000 * 60 * 60 * 24))
+        const contact = record.contacts as any
+        return {
+          id: record.id,
+          contact_id: record.contact_id,
+          contact_name: `${contact?.first_name ?? ''} ${contact?.last_name ?? ''}`.trim(),
+          contact_email: contact?.email_primary ?? null,
+          status_type: record.status_type,
+          expiry_date: record.expiry_date,
+          document_reference: record.document_reference,
+          matter_id: record.matter_id,
+          days_until_expiry: diffDays,
+          year: expiry.getFullYear(),
+        }
+      })
+    },
+    enabled: !!tenantId,
+    staleTime: 1000 * 60 * 5,
+  })
+}
+
+// ─── useGuardianBirthdays ──────────────────────────────────────────────────
+// Upcoming birthdays/anniversaries for engagement
+
+export interface GuardianBirthdayEntry {
+  contact_id: string
+  contact_name: string
+  date_of_birth: string
+  next_birthday: string
+  days_until: number
+  age_turning: number
+}
+
+export function useGuardianBirthdays(tenantId: string) {
+  return useQuery({
+    queryKey: lifecycleKeys.guardianBirthdays(tenantId),
+    queryFn: async () => {
+      const supabase = createClient()
+
+      const { data, error } = await supabase
+        .from('contacts')
+        .select('id, first_name, last_name, date_of_birth')
+        .eq('tenant_id', tenantId)
+        .eq('is_active', true)
+        .not('date_of_birth', 'is', null)
+        .limit(5000)
+
+      if (error) throw error
+
+      const today = new Date()
+      const thisYear = today.getFullYear()
+
+      const entries: GuardianBirthdayEntry[] = []
+
+      for (const c of data ?? []) {
+        if (!c.date_of_birth) continue
+        const dob = new Date(c.date_of_birth)
+        if (isNaN(dob.getTime())) continue
+
+        // Calculate next birthday
+        let nextBirthday = new Date(thisYear, dob.getMonth(), dob.getDate())
+        if (nextBirthday < today) {
+          nextBirthday = new Date(thisYear + 1, dob.getMonth(), dob.getDate())
+        }
+
+        const diffDays = Math.ceil((nextBirthday.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
+
+        // Only include upcoming 90 days
+        if (diffDays > 90) continue
+
+        entries.push({
+          contact_id: c.id,
+          contact_name: `${c.first_name ?? ''} ${c.last_name ?? ''}`.trim(),
+          date_of_birth: c.date_of_birth,
+          next_birthday: nextBirthday.toISOString().split('T')[0],
+          days_until: diffDays,
+          age_turning: nextBirthday.getFullYear() - dob.getFullYear(),
+        })
+      }
+
+      return entries.sort((a, b) => a.days_until - b.days_until)
+    },
+    enabled: !!tenantId,
+    staleTime: 1000 * 60 * 10,
   })
 }

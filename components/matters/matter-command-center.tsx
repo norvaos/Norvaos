@@ -30,6 +30,7 @@ import { ActivityTimeline } from '@/components/shared/activity-timeline'
 import { NotesEditor } from '@/components/shared/notes-editor'
 import { MatterComments } from '@/components/matters/matter-comments'
 import { BillingTab } from '@/components/matters/tabs/billing-tab'
+import { TrustTab } from '@/components/matters/tabs/trust-tab'
 import { TasksTab } from '@/components/matters/tabs/tasks-tab'
 import { DeadlinesTab } from '@/components/matters/tabs/deadlines-tab'
 import { OverviewTab } from '@/components/matters/tabs/overview-tab'
@@ -194,6 +195,7 @@ export function MatterCommandCenter({
                 <TabsTrigger value="documents" className="text-xs">Documents</TabsTrigger>
                 <TabsTrigger value="tasks" className="text-xs">Tasks & Deadlines</TabsTrigger>
                 <TabsTrigger value="billing" className="text-xs">Billing</TabsTrigger>
+                <TabsTrigger value="trust" className="text-xs">Trust</TabsTrigger>
                 <TabsTrigger value="forms" className="text-xs">Forms</TabsTrigger>
                 <TabsTrigger value="activity" className="text-xs">Activity</TabsTrigger>
               </TabsList>
@@ -252,6 +254,12 @@ export function MatterCommandCenter({
               <TabsContent value="billing" className="space-y-4">
                 <RequirePermission entity="billing" action="view" variant="inline">
                   <BillingTab matterId={matterId} tenantId={tenantId} matter={matter} />
+                </RequirePermission>
+              </TabsContent>
+
+              <TabsContent value="trust" className="space-y-4">
+                <RequirePermission entity="trust_accounting" action="view" variant="inline">
+                  <TrustTab matterId={matterId} tenantId={tenantId} matter={matter} />
                 </RequirePermission>
               </TabsContent>
 

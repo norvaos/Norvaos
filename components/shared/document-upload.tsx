@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useCallback } from 'react'
-import { useDocuments, useUploadDocument, useDeleteDocument, useDownloadDocument } from '@/lib/queries/documents'
+import { useDocuments, useUploadDocument, useDeleteDocument, useDownloadDocument, usePersistScanData, type DocumentScanResult } from '@/lib/queries/documents'
 import { useMicrosoftConnection } from '@/lib/queries/microsoft-integration'
 import { useUser } from '@/lib/hooks/use-user'
 import { formatDate } from '@/lib/utils/formatters'
@@ -128,6 +128,7 @@ export function DocumentUpload({ entityType, entityId, tenantId, entityName, hid
   const [isDragging, setIsDragging] = useState(false)
   const [viewerDoc, setViewerDoc] = useState<{ storagePath: string; fileName: string; fileType: string | null } | null>(null)
   const [scanExtracted, setScanExtracted] = useState<Record<string, string | number | null> | null>(null)
+  const [pendingScanData, setPendingScanData] = useState<DocumentScanResult | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Check if OneDrive is connected and enabled
@@ -146,6 +147,7 @@ export function DocumentUpload({ entityType, entityId, tenantId, entityName, hid
   const uploadMutation = useUploadDocument()
   const deleteMutation = useDeleteDocument()
   const downloadMutation = useDownloadDocument()
+  const persistScanMutation = usePersistScanData()
 
   /** Build an auto-generated display name: {EntityName}_{Category}_{Date}_v{N} */
   const buildAutoName = useCallback(
@@ -240,13 +242,21 @@ export function DocumentUpload({ entityType, entityId, tenantId, entityName, hid
       const ext = getFileExtension(file.name)
       const displayName = editedName ? `${editedName}${ext}` : file.name
       try {
-        await uploadMutation.mutateAsync({
+        const uploadedDoc = await uploadMutation.mutateAsync({
           file,
           metadata: metadataBase,
           displayName,
           storageLocation: hasOneDrive ? storageLocation : undefined,
         })
         successCount++
+
+        // Persist scan data to the uploaded document's ai_extracted_data
+        if (pendingScanData && uploadedDoc?.id) {
+          persistScanMutation.mutate({
+            documentId: uploadedDoc.id,
+            scanData: pendingScanData,
+          })
+        }
       } catch (err) {
         const msg = err instanceof Error ? err.message : 'Upload failed'
         errors.push(`"${displayName}": ${msg}`)
@@ -268,6 +278,7 @@ export function DocumentUpload({ entityType, entityId, tenantId, entityName, hid
     setDescription('')
     setStorageLocation('local')
     setScanExtracted(null)
+    setPendingScanData(null)
   }
 
   const handleDownload = async (storagePath: string, fileName: string) => {
@@ -481,6 +492,10 @@ export function DocumentUpload({ entityType, entityId, tenantId, entityName, hid
                   <DocumentScanButton
                     file={selectedFiles[0]}
                     documentTypeHint={category}
+                    onScanComplete={(scanResult) => {
+                      // Store the full scan result for persistence after upload
+                      setPendingScanData(scanResult)
+                    }}
                     onFieldsExtracted={(fields, detectedType) => {
                       setScanExtracted(fields)
                       // Auto-set category based on detected type

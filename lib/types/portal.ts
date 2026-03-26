@@ -30,6 +30,9 @@ export type PortalEventType =
   | 'client_document_uploaded'
   | 'portal_form_opened'
   | 'portal_form_completed'
+  | 'message_team_clicked'
+  | 'team_card_email_clicked'
+  | 'team_card_phone_clicked'
 
 // ── Payment configuration ───────────────────────────────────────────────────────
 

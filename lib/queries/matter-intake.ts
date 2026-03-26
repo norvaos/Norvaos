@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/client'
 import type { Database } from '@/lib/types/database'
 import { toast } from 'sonner'
 import { gatingKeys } from '@/lib/queries/matter-types'
+import type { IntakePrefillResult } from '@/lib/services/intake-prefill'
 
 type MatterIntake = Database['public']['Tables']['matter_intake']['Row']
 type MatterIntakeInsert = Database['public']['Tables']['matter_intake']['Insert']
@@ -12,11 +13,33 @@ type MatterIntakeInsert = Database['public']['Tables']['matter_intake']['Insert'
 export const intakeKeys = {
   all: ['matter_intake'] as const,
   detail: (matterId: string) => [...intakeKeys.all, matterId] as const,
+  prefill: (matterId: string) => [...intakeKeys.all, 'prefill', matterId] as const,
   riskOverview: (tenantId: string, practiceAreaId?: string) =>
     [...intakeKeys.all, 'risk_overview', tenantId, practiceAreaId ?? 'all'] as const,
 }
 
 // ─── Fetch Intake ───────────────────────────────────────────────────────────
+
+// Lean column fragment — only the 16 columns actually consumed by UI components.
+// Avoids fetching 37 columns via SELECT * (100/20 compliance).
+const MATTER_INTAKE_COLUMNS = [
+  'id',
+  'matter_id',
+  'tenant_id',
+  'intake_status',
+  'program_category',
+  'processing_stream',
+  'jurisdiction',
+  'intake_delegation',
+  'risk_level',
+  'risk_score',
+  'risk_override_level',
+  'risk_override_reason',
+  'red_flags',
+  'completion_pct',
+  'created_at',
+  'updated_at',
+].join(', ')
 
 /**
  * Fetch the matter_intake record for a given matter.
@@ -29,7 +52,7 @@ export function useMatterIntake(matterId: string) {
       const supabase = createClient()
       const { data, error } = await supabase
         .from('matter_intake')
-        .select('*')
+        .select(MATTER_INTAKE_COLUMNS)
         .eq('matter_id', matterId)
         .maybeSingle()
 
@@ -37,6 +60,26 @@ export function useMatterIntake(matterId: string) {
       return data as MatterIntake | null
     },
     enabled: !!matterId,
+  })
+}
+
+// ─── Intake Prefill from Lead Snapshot ──────────────────────────────────────
+
+/**
+ * Reads ONLY the lead_intake_snapshot (1 column) from matter_intake and
+ * returns a flat answer map via the intake-prefill service.
+ * Does NOT re-fetch from leads, lead_intake_profiles, or intake_submissions.
+ */
+export function useIntakePrefill(matterId: string) {
+  return useQuery({
+    queryKey: intakeKeys.prefill(matterId),
+    queryFn: async (): Promise<IntakePrefillResult> => {
+      const supabase = createClient()
+      const { getIntakePrefill } = await import('@/lib/services/intake-prefill')
+      return getIntakePrefill(supabase, matterId)
+    },
+    enabled: !!matterId,
+    staleTime: 5 * 60 * 1000, // Snapshot is immutable — 5 min cache
   })
 }
 

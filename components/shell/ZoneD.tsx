@@ -3,18 +3,20 @@
 /**
  * ZoneD — Main Workspace
  *
- * 10-tab strip giving access to every facet of the matter.
+ * 12-tab strip giving access to every facet of the matter.
  * Tabs (in order):
- *   1. Details       — UnifiedCaseDetailsTab (core + immigration fields)
+ *   1. Overview      — UnifiedCaseDetailsTab (core + immigration fields)
  *   2. Documents     — DocumentSlotPanel (file requirements + upload)
- *   3. Forms         — FormsTab (IRCC form instances)
- *   4. Questionnaire — ImmigrationReadiness → QuestionsWorkflowSection
- *   5. Review        — ReviewTab (gate blockers + contradiction flags + lawyer sign-off)
- *   6. Billing       — BillingTab (time, invoices, retainer)
- *   7. Communications— stub (Sprint 7)
- *   8. Correspondence— stub (Sprint 4)
- *   9. Tasks         — TasksTab
- *  10. Notes         — NotesEditor + ActivityTimeline
+ *   3. Intelligence  — Norva Intelligence deep-work panel (Audit-Mirror + Ghost-Writer + Fact-Anchors)
+ *   4. Forms         — FormsTab (IRCC form instances)
+ *   5. Questionnaire — ImmigrationReadiness → QuestionsWorkflowSection
+ *   6. Review        — ReviewTab (gate blockers + contradiction flags + lawyer sign-off)
+ *   7. Billing       — BillingTab (time, invoices, retainer)
+ *   8. Communications— stub (Sprint 7)
+ *   9. Correspondence— stub (Sprint 4)
+ *  10. Tasks         — TasksTab
+ *  11. Notes         — NotesEditor + ActivityTimeline
+ *  12. IRCC Portal   — Side-by-Side Engine (Field-to-Clip + Submission Checklist + Final Package)
  *
  * Spec ref: Section 3 — Zone D: Main Workspace
  */
@@ -36,8 +38,21 @@ import { IRCCIntakeTab }               from '@/app/(dashboard)/matters/[id]/ircc
 import { ReviewTab }              from '@/components/shell/tabs/ReviewTab'
 import { CommunicationsTab }      from '@/components/shell/tabs/CommunicationsTab'
 import { CorrespondenceTab }      from '@/components/shell/tabs/CorrespondenceTab'
+import { LeadSnapshotTab }        from '@/components/shell/tabs/LeadSnapshotTab'
 import { RulesAtOpeningPanel }    from '@/components/matters/rules-at-opening-panel'
+import { IRCCSideBySideEngine }  from '@/components/ircc/sbs/ircc-sbs-engine'
+import dynamic from 'next/dynamic'
 import type { Database } from '@/lib/types/database'
+
+const IntelligenceTabPanel = dynamic(
+  () => import('@/components/matters/intelligence-tab').then(m => ({ default: m.IntelligenceTabPanel })),
+  { ssr: false },
+)
+
+const DocumentArchivePanel = dynamic(
+  () => import('@/components/matters/document-archive-panel').then(m => ({ default: m.DocumentArchivePanel })),
+  { ssr: false },
+)
 
 type Matter = Database['public']['Tables']['matters']['Row']
 
@@ -46,6 +61,7 @@ type Matter = Database['public']['Tables']['matters']['Row']
 type TabId =
   | 'details'
   | 'documents'
+  | 'intelligence'
   | 'forms'
   | 'questionnaire'
   | 'review'
@@ -54,10 +70,13 @@ type TabId =
   | 'correspondence'
   | 'tasks'
   | 'notes'
+  | 'lead-snapshot'
+  | 'ircc-portal'
 
 const TABS: { id: TabId; label: string }[] = [
-  { id: 'details',        label: 'Details'        },
+  { id: 'details',        label: 'Overview'       },
   { id: 'documents',      label: 'Documents'      },
+  { id: 'intelligence',   label: 'Intelligence \u2726' },
   { id: 'forms',          label: 'Forms'          },
   { id: 'questionnaire',  label: 'Questionnaire'  },
   { id: 'review',         label: 'Review'         },
@@ -66,6 +85,8 @@ const TABS: { id: TabId; label: string }[] = [
   { id: 'correspondence', label: 'Correspondence' },
   { id: 'tasks',          label: 'Tasks'          },
   { id: 'notes',          label: 'Notes'          },
+  { id: 'lead-snapshot',   label: 'Intake History'   },
+  { id: 'ircc-portal',    label: 'Submission Engine' },
 ]
 
 // ── Props ─────────────────────────────────────────────────────────────────────
@@ -196,7 +217,7 @@ export function ZoneD({ matter, tenantId, initialTab = 'details' }: ZoneDProps) 
           </div>
         </TabsContent>
 
-        {/* 2 — Documents */}
+        {/* 2 — Documents (Slots + Archive) */}
         <TabsContent value="documents" className="flex-1 overflow-y-auto m-0 p-0">
           <DocumentsTab
             matterId={matter.id}
@@ -205,9 +226,24 @@ export function ZoneD({ matter, tenantId, initialTab = 'details' }: ZoneDProps) 
             matterTypeId={matter.matter_type_id ?? null}
             enforcementEnabled={true}
           />
+          {/* Directive 22.2 — Classifier-categorised file archive */}
+          <div className="border-t">
+            <DocumentArchivePanel
+              matterId={matter.id}
+              tenantId={tenantId}
+            />
+          </div>
         </TabsContent>
 
-        {/* 3 — Forms */}
+        {/* 3 — Intelligence */}
+        <TabsContent value="intelligence" className="flex-1 overflow-hidden m-0 p-0">
+          <IntelligenceTabPanel
+            matterId={matter.id}
+            tenantId={tenantId}
+          />
+        </TabsContent>
+
+        {/* 4 — Forms */}
         <TabsContent value="forms" className="flex-1 overflow-y-auto m-0 p-0">
           <FormsTab
             matterId={matter.id}
@@ -274,6 +310,23 @@ export function ZoneD({ matter, tenantId, initialTab = 'details' }: ZoneDProps) 
               <ActivityTimeline tenantId={tenantId} matterId={matter.id} />
             </div>
           </div>
+        </TabsContent>
+
+        {/* 12 — Lead Snapshot (Intake History) */}
+        <TabsContent value="lead-snapshot" className="flex-1 overflow-y-auto m-0 p-0">
+          <LeadSnapshotTab
+            matterId={matter.id}
+            tenantId={tenantId}
+          />
+        </TabsContent>
+
+        {/* 11 — IRCC Portal (Side-by-Side Engine) */}
+        <TabsContent value="ircc-portal" className="flex-1 overflow-hidden m-0 p-0">
+          <IRCCSideBySideEngine
+            matterId={matter.id}
+            tenantId={tenantId}
+            contactId={primaryContactId ?? null}
+          />
         </TabsContent>
 
       </Tabs>

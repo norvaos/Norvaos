@@ -7,8 +7,10 @@ import {
   CalendarClock,
   CircleDollarSign,
   Clock,
+  ExternalLink,
   GripVertical,
   RotateCcw,
+  Trophy,
   User,
 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
@@ -59,6 +61,8 @@ interface KanbanCardProps extends KanbanCardDisplayOptions {
   practiceAreaName?: string | null
   practiceAreaColor?: string | null
   onClick?: (leadId: string) => void
+  onViewMatter?: (matterId: string) => void
+  activeMatterCount?: number
 }
 
 function getTemperatureColour(temperature: string | null): string {
@@ -115,6 +119,8 @@ export const KanbanCard = memo(function KanbanCard({
   practiceAreaName,
   practiceAreaColor,
   onClick,
+  onViewMatter,
+  activeMatterCount,
   showValues = true,
   showFollowUp = true,
   showSource = true,
@@ -122,8 +128,11 @@ export const KanbanCard = memo(function KanbanCard({
   showDaysInStage = true,
   showPracticeArea = false,
 }: KanbanCardProps) {
+  const isConverted = lead.status === 'converted' && !!lead.converted_matter_id
+
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: lead.id,
+    disabled: isConverted,
     data: {
       type: 'lead',
       lead,
@@ -148,6 +157,47 @@ export const KanbanCard = memo(function KanbanCard({
   const rottingThreshold = stageRottingDays ?? (isTrack1 ? 2 : null)
   const isStale = rottingThreshold != null && daysInStage > rottingThreshold
 
+  // ── Converted variant ─────────────────────────────────────────────────────
+  if (isConverted) {
+    return (
+      <div
+        ref={setNodeRef}
+        className="group cursor-pointer rounded-lg border border-emerald-300 bg-emerald-50/60 p-3 shadow-sm transition-shadow hover:shadow-md hover:border-emerald-400"
+        onClick={() => onViewMatter?.(lead.converted_matter_id!) ?? onClick?.(lead.id)}
+      >
+        <div className="flex items-start gap-2">
+          <Trophy className="mt-0.5 h-4 w-4 flex-shrink-0 text-emerald-600" />
+          <div className="min-w-0 flex-1">
+            <span className="truncate text-sm font-medium text-emerald-900">
+              {contactName}
+            </span>
+            <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+              <Badge className="bg-emerald-600 text-[10px] font-normal text-white hover:bg-emerald-700">
+                Retained
+              </Badge>
+              {activeMatterCount != null && activeMatterCount > 0 && (
+                <Badge variant="outline" className="border-emerald-300 text-[10px] font-normal text-emerald-700">
+                  {activeMatterCount} Active Matter{activeMatterCount !== 1 ? 's' : ''}
+                </Badge>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-2.5 flex items-center justify-between text-xs">
+          <span className="text-emerald-600/70">
+            {lead.converted_at ? formatDate(lead.converted_at) : 'Converted'}
+          </span>
+          <div className="flex items-center gap-1 font-medium text-emerald-700 opacity-0 transition-opacity group-hover:opacity-100">
+            <span>View Matter</span>
+            <ExternalLink className="h-3 w-3" />
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // ── Standard lead card ────────────────────────────────────────────────────
   return (
     <div
       ref={setNodeRef}

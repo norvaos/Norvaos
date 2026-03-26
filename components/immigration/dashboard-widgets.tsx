@@ -38,6 +38,8 @@ import {
   useOverdueRiskItems,
   useAllUpcomingDeadlines,
   useStaffWorkload,
+  useStaffWellness,
+  type StaffWellnessEntry,
 } from '@/lib/queries/immigration'
 
 // ---------------------------------------------------------------------------
@@ -702,6 +704,122 @@ export function StaffWorkloadWidget({ tenantId }: WidgetProps) {
                 ))}
               </tbody>
             </table>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// Staff Wellness Meter — Norva Wellness
+// ---------------------------------------------------------------------------
+
+const WELLNESS_CONFIG = {
+  healthy:    { label: 'Healthy',    color: 'text-green-700',  bg: 'bg-green-50',  border: 'border-green-200', icon: CheckCircle2 },
+  elevated:   { label: 'Elevated',   color: 'text-amber-700',  bg: 'bg-amber-50',  border: 'border-amber-200', icon: AlertTriangle },
+  overloaded: { label: 'Overloaded', color: 'text-red-700',    bg: 'bg-red-50',    border: 'border-red-200',   icon: AlertTriangle },
+} as const
+
+export function StaffWellnessMeter({ tenantId }: WidgetProps) {
+  const { data, isLoading } = useStaffWellness(tenantId)
+
+  if (isLoading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-sm">
+            <Shield className="h-4 w-4 text-muted-foreground" />
+            Staff Wellness
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="flex items-center justify-between gap-4">
+                <Skeleton className="h-4 w-28" />
+                <Skeleton className="h-4 w-20" />
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  const staff = [...(data ?? [])].sort((a, b) => {
+    // Overloaded first, then elevated, then healthy
+    const statusOrder = { overloaded: 0, elevated: 1, healthy: 2 }
+    if (statusOrder[a.wellness_status] !== statusOrder[b.wellness_status]) {
+      return statusOrder[a.wellness_status] - statusOrder[b.wellness_status]
+    }
+    return b.red_matters - a.red_matters
+  })
+
+  const alertCount = staff.filter((s) => s.load_balance_alert).length
+
+  return (
+    <Card className={alertCount > 0 ? 'border-red-200' : undefined}>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2 text-sm">
+          <Shield className="h-4 w-4 text-muted-foreground" />
+          Norva Wellness Meter
+          {alertCount > 0 && (
+            <Badge variant="destructive" className="text-[10px] px-1.5 ml-auto">
+              {alertCount} Load-Balance {alertCount === 1 ? 'Alert' : 'Alerts'}
+            </Badge>
+          )}
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        {staff.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-6 text-center text-muted-foreground">
+            <Shield className="h-8 w-8 mb-2 opacity-50" />
+            <p className="text-sm">No staff data available</p>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {staff.map((member) => {
+              const config = WELLNESS_CONFIG[member.wellness_status]
+              const StatusIcon = config.icon
+              return (
+                <div
+                  key={member.user_id}
+                  className={cn(
+                    'flex items-center justify-between rounded-md border px-3 py-2',
+                    member.load_balance_alert ? `${config.bg} ${config.border}` : 'border-slate-100',
+                  )}
+                >
+                  <div className="flex items-center gap-2 min-w-0">
+                    <span className="text-sm font-medium truncate">
+                      {member.first_name} {member.last_name}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3 shrink-0">
+                    <span className="text-xs text-muted-foreground tabular-nums">
+                      {member.active_matters} files
+                    </span>
+                    <span className={cn('text-xs font-semibold tabular-nums', config.color)}>
+                      {member.red_matters} red
+                    </span>
+                    {member.overdue_tasks > 0 && (
+                      <Badge variant="destructive" className="text-[10px] px-1.5">
+                        {member.overdue_tasks} overdue
+                      </Badge>
+                    )}
+                    <span
+                      className={cn(
+                        'inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-medium',
+                        config.color, config.bg, config.border,
+                      )}
+                    >
+                      <StatusIcon className="h-3 w-3" />
+                      {config.label}
+                    </span>
+                  </div>
+                </div>
+              )
+            })}
           </div>
         )}
       </CardContent>

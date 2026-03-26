@@ -75,7 +75,7 @@ const PLAN_FEATURES_DISPLAY: Record<string, string[]> = {
     'Advanced Reporting',
     'API Access',
     'SSO',
-    'Audit Logs',
+    'Norva Vault',
     'White Label',
   ],
 }
@@ -383,7 +383,7 @@ export default function BillingPlanPage() {
                           variant="outline"
                           className="w-full"
                           onClick={() => {
-                            window.location.href = 'mailto:sales@lexcrm.com?subject=Enterprise Plan Inquiry'
+                            window.location.href = 'mailto:sales@norvaos.com?subject=Enterprise Plan Inquiry'
                           }}
                         >
                           Contact Sales

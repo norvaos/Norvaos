@@ -15,6 +15,7 @@ import {
 } from 'lucide-react'
 import { toast } from 'sonner'
 import Link from 'next/link'
+import { norvaToast } from '@/lib/utils/norva-branding'
 
 import { useUser } from '@/lib/hooks/use-user'
 import {
@@ -115,7 +116,7 @@ export function IRCCIntakeTab({ matterId, contactId, tenantId, matterTypeId, ini
   // Start a new questionnaire session
   const handleStartSession = useCallback(async () => {
     if (!contactId) {
-      toast.error('This matter needs a primary contact before starting the IRCC questionnaire.')
+      norvaToast('missing_contact')
       return
     }
 
@@ -178,7 +179,7 @@ export function IRCCIntakeTab({ matterId, contactId, tenantId, matterTypeId, ini
   const handleGeneratePdf = useCallback(
     async (formCode: string) => {
       if (!contactId) {
-        toast.error('No contact associated with this matter.')
+        norvaToast('missing_contact')
         return
       }
 
@@ -213,8 +214,7 @@ export function IRCCIntakeTab({ matterId, contactId, tenantId, matterTypeId, ini
 
         toast.success(`${formCode} PDF downloaded successfully.`)
       } catch (err) {
-        const message = err instanceof Error ? err.message : 'Failed to generate PDF'
-        toast.error(message)
+        norvaToast(null, err instanceof Error ? err.message : 'PDF generation failed', 'Check the client profile for missing fields and try again.')
       } finally {
         setGeneratingPdf(null)
       }

@@ -99,7 +99,7 @@ export async function convertLeadToMatter(
 
   const { data: lead, error: leadError } = await supabase
     .from('leads')
-    .select('id, tenant_id, status, current_stage, is_closed, converted_matter_id, contact_id, practice_area_id, responsible_lawyer_id, assigned_to, pipeline_id, custom_fields')
+    .select('id, tenant_id, status, current_stage, is_closed, converted_matter_id, contact_id, practice_area_id, responsible_lawyer_id, assigned_to, pipeline_id, custom_fields, utm_source, utm_medium, utm_campaign, source, source_detail, custom_intake_data')
     .eq('id', leadId)
     .eq('tenant_id', tenantId)
     .single()
@@ -274,6 +274,14 @@ export async function convertLeadToMatter(
           pipeline_id: matterData.pipelineId || null,
           stage_id: matterData.stageId || null,
           originating_lead_id: leadId,
+          // ── Source Attribution Carry-Forward ──
+          // Preserve marketing/UTM data from the lead so it's available for
+          // matter-level analytics without requiring a join back to leads.
+          utm_source: (lead as any).utm_source ?? null,
+          utm_medium: (lead as any).utm_medium ?? null,
+          utm_campaign: (lead as any).utm_campaign ?? null,
+          source: (lead as any).source ?? null,
+          source_detail: (lead as any).source_detail ?? null,
         })
         .select('id')
         .single()
@@ -487,6 +495,70 @@ export async function convertLeadToMatter(
         const leadCF = (lead.custom_fields ?? {}) as Record<string, unknown>
         const processingStream = (leadCF.processing_stream as string) || null
 
+        // ── Build lead intake snapshot ──
+        // Aggregate ALL intake data from the lead phase into a single JSONB
+        // snapshot so matter intake forms can pre-fill and never re-ask questions.
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const leadAnyIntake = lead as any
+        const intakeSnapshot: Record<string, unknown> = {}
+
+        // 1. Front desk screening answers (leads.custom_intake_data)
+        if (leadAnyIntake.custom_intake_data) {
+          intakeSnapshot.screening_answers = leadAnyIntake.custom_intake_data
+        }
+
+        // 2. Lead intake profile (practice-area-specific intake data)
+        try {
+          const { data: intakeProfile } = await supabase
+            .from('lead_intake_profiles')
+            .select('custom_intake_data, intake_summary, jurisdiction, urgency_level, preferred_contact_method, opposing_party_names, related_party_names, abuse_safety_flag, capacity_concern_flag, limitation_risk_flag')
+            .eq('lead_id', leadId)
+            .maybeSingle()
+
+          if (intakeProfile) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const ip = intakeProfile as any
+            intakeSnapshot.intake_profile = {
+              custom_intake_data: ip.custom_intake_data ?? null,
+              intake_summary: ip.intake_summary ?? null,
+              jurisdiction: ip.jurisdiction ?? null,
+              urgency_level: ip.urgency_level ?? null,
+              preferred_contact_method: ip.preferred_contact_method ?? null,
+              opposing_party_names: ip.opposing_party_names ?? null,
+              related_party_names: ip.related_party_names ?? null,
+              abuse_safety_flag: ip.abuse_safety_flag ?? false,
+              capacity_concern_flag: ip.capacity_concern_flag ?? false,
+              limitation_risk_flag: ip.limitation_risk_flag ?? false,
+            }
+          }
+        } catch {
+          // Non-fatal: intake profile fetch failure doesn't block conversion
+        }
+
+        // 3. Intake form submissions linked to this lead's contact
+        try {
+          if (lead.contact_id) {
+            const { data: submissions } = await supabase
+              .from('intake_submissions')
+              .select('id, form_id, answers, utm_source, utm_medium, utm_campaign, created_at')
+              .eq('contact_id', lead.contact_id)
+              .eq('status', 'processed')
+              .order('created_at', { ascending: false })
+              .limit(10)
+
+            if (submissions && submissions.length > 0) {
+              intakeSnapshot.form_submissions = submissions
+            }
+          }
+        } catch {
+          // Non-fatal: submission fetch failure doesn't block conversion
+        }
+
+        intakeSnapshot.snapshot_created_at = new Date().toISOString()
+        intakeSnapshot.originating_lead_id = leadId
+
+        const hasSnapshotData = Object.keys(intakeSnapshot).length > 2 // more than just metadata
+
         await supabase.from('matter_intake').insert({
           tenant_id: tenantId,
           matter_id: matter.id,
@@ -494,6 +566,7 @@ export async function convertLeadToMatter(
           jurisdiction: tenantRow?.jurisdiction_code ?? 'CA',
           program_category: programCategoryKey,
           processing_stream: processingStream,
+          lead_intake_snapshot: hasSnapshotData ? (intakeSnapshot as unknown as Json) : null,
         })
       } catch {
         // Non-fatal: ignore if matter_intake insert conflicts

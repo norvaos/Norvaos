@@ -1,5 +1,5 @@
 # =============================================================================
-# LexCRM CI/CD Pipeline
+# NorvaOS CI/CD Pipeline
 # =============================================================================
 # Triggers:
 #   - Pull requests to main/develop → runs lint + type-check + build

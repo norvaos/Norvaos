@@ -1,7 +1,11 @@
 'use client'
 
-import { useState } from 'react'
-import { Shield, Loader2, CheckCircle2, XCircle, MinusCircle } from 'lucide-react'
+import { useState, useCallback } from 'react'
+import {
+  Shield, Loader2, CheckCircle2, XCircle, MinusCircle,
+  User, Mail, Phone, Globe, Calendar, Eye, EyeOff,
+  Fingerprint, AlertTriangle, ShieldAlert,
+} from 'lucide-react'
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
 } from '@/components/ui/dialog'
@@ -18,7 +22,159 @@ import {
 } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
 import { getGateStatusConfig } from './lead-workflow-helpers'
-import type { GateResult, PracticeArea, UserRow } from './lead-workflow-types'
+import type { GateResult, PracticeArea, UserRow, Contact } from './lead-workflow-types'
+
+// ─── PII Masking ──────────────────────────────────────────────────────────────
+
+function maskValue(value: string): string {
+  if (value.length <= 4) return value
+  return '\u2022'.repeat(value.length - 4) + value.slice(-4)
+}
+
+function maskEmail(email: string): string {
+  const atIdx = email.indexOf('@')
+  if (atIdx <= 0) return '\u2022\u2022\u2022'
+  return '\u2022'.repeat(Math.max(1, atIdx - 2)) + email.slice(atIdx - 2)
+}
+
+// ─── Contact Preview Panel ──────────────────────────────────────────────────
+
+interface ContactPreviewProps {
+  contact: Contact
+}
+
+function ContactPreviewPanel({ contact }: ContactPreviewProps) {
+  const [revealed, setRevealed] = useState<Set<string>>(new Set())
+
+  const toggleReveal = useCallback((field: string) => {
+    setRevealed(prev => {
+      const next = new Set(prev)
+      if (next.has(field)) {
+        next.delete(field)
+      } else {
+        next.add(field)
+      }
+      return next
+    })
+  }, [])
+
+  const fullName = [contact.first_name, contact.last_name].filter(Boolean).join(' ') || 'Unnamed'
+
+  // Extract immigration data for sensitive fields
+  const immData = (() => {
+    if (contact.immigration_data && typeof contact.immigration_data === 'object') {
+      return contact.immigration_data as Record<string, string | undefined>
+    }
+    if (contact.custom_fields && typeof contact.custom_fields === 'object') {
+      const cf = contact.custom_fields as Record<string, unknown>
+      return {
+        uci: cf.uci as string | undefined,
+        passport_number: cf.passport_number as string | undefined,
+      }
+    }
+    return {}
+  })()
+
+  const rows: { key: string; icon: React.ElementType; label: string; value: string; sensitive?: boolean }[] = []
+
+  // Name — always visible
+  rows.push({ key: 'name', icon: User, label: 'Name', value: fullName })
+
+  // Email — masked by default
+  if (contact.email_primary) {
+    rows.push({ key: 'email', icon: Mail, label: 'Email', value: contact.email_primary, sensitive: true })
+  }
+
+  // Phone — masked by default
+  if (contact.phone_primary) {
+    rows.push({ key: 'phone', icon: Phone, label: 'Phone', value: contact.phone_primary, sensitive: true })
+  }
+
+  // Nationality
+  if (contact.nationality) {
+    rows.push({ key: 'nationality', icon: Globe, label: 'Nationality', value: contact.nationality })
+  }
+
+  // Date of birth — masked
+  if (contact.date_of_birth) {
+    rows.push({ key: 'dob', icon: Calendar, label: 'Date of Birth', value: contact.date_of_birth, sensitive: true })
+  }
+
+  // UCI — always masked
+  if (immData.uci) {
+    rows.push({ key: 'uci', icon: Fingerprint, label: 'UCI', value: immData.uci, sensitive: true })
+  }
+
+  // Passport — always masked
+  if (immData.passport_number) {
+    rows.push({ key: 'passport', icon: Shield, label: 'Passport', value: immData.passport_number, sensitive: true })
+  }
+
+  return (
+    <div className="space-y-2">
+      <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+        Contact Record Preview
+      </Label>
+      <p className="text-xs text-muted-foreground">
+        This contact will be linked to the new matter as the principal applicant.
+      </p>
+      <div className="rounded-md border bg-muted/30 divide-y">
+        {rows.map(row => {
+          const isRevealed = revealed.has(row.key)
+          const Icon = row.icon
+          const displayValue = row.sensitive && !isRevealed
+            ? (row.key === 'email' ? maskEmail(row.value) : maskValue(row.value))
+            : row.value
+
+          return (
+            <div key={row.key} className="flex items-center gap-2 px-3 py-1.5">
+              <Icon className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+              <span className="text-xs font-medium text-muted-foreground w-20 shrink-0">
+                {row.label}
+              </span>
+              <span className={`text-xs flex-1 truncate ${row.sensitive && !isRevealed ? 'font-mono tracking-wider' : ''}`}>
+                {displayValue}
+              </span>
+              {row.sensitive && (
+                <button
+                  type="button"
+                  onClick={() => toggleReveal(row.key)}
+                  className="shrink-0 p-0.5 rounded text-muted-foreground hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                  aria-label={isRevealed ? `Hide ${row.label}` : `Reveal ${row.label}`}
+                >
+                  {isRevealed ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
+                </button>
+              )}
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
+// ─── 403 Sentinel Error Banner ──────────────────────────────────────────────
+
+function SentinelErrorBanner({ message }: { message: string }) {
+  return (
+    <div className="rounded-md bg-red-50 border border-red-300 px-3 py-3 dark:bg-red-950/30 dark:border-red-800">
+      <div className="flex items-start gap-2">
+        <ShieldAlert className="h-4 w-4 shrink-0 mt-0.5 text-red-600 dark:text-red-400" />
+        <div className="min-w-0">
+          <p className="text-xs font-semibold text-red-700 dark:text-red-400">
+            Access Denied
+          </p>
+          <p className="text-xs text-red-600 dark:text-red-400 mt-0.5">
+            {message}
+          </p>
+          <p className="text-xs text-red-500 dark:text-red-500 mt-1">
+            Contact your administrator if you believe this is an error.
+          </p>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 // ─── Gate Icon Map ──────────────────────────────────────────────────────────
 
@@ -42,6 +198,8 @@ interface ConvertLeadDialogProps {
   defaultTitle?: string
   defaultPracticeAreaId?: string
   defaultResponsibleLawyerId?: string
+  /** Contact record for PII-masked preview */
+  contact?: Contact | null
   onConfirm: (data: {
     title: string
     description?: string
@@ -51,6 +209,8 @@ interface ConvertLeadDialogProps {
     priority?: string
   }) => void
   isSubmitting?: boolean
+  /** Sentinel/permission error from a failed conversion attempt */
+  conversionError?: string | null
 }
 
 export function ConvertLeadDialog({
@@ -65,8 +225,10 @@ export function ConvertLeadDialog({
   defaultTitle = '',
   defaultPracticeAreaId,
   defaultResponsibleLawyerId,
+  contact,
   onConfirm,
   isSubmitting = false,
+  conversionError,
 }: ConvertLeadDialogProps) {
   const [title, setTitle] = useState(defaultTitle)
   const [description, setDescription] = useState('')
@@ -95,14 +257,24 @@ export function ConvertLeadDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Shield className="h-5 w-5" />
-            Convert to Matter
+            Approve &amp; Convert to Matter
           </DialogTitle>
           <DialogDescription>
-            Create an active matter from this lead. All conversion gates must pass before proceeding.
+            Review the contact details below, then create an active matter. All conversion gates must pass.
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-5 py-2 max-h-[60vh] overflow-y-auto">
+          {/* 403 Sentinel Error Banner */}
+          {conversionError && (
+            <SentinelErrorBanner message={conversionError} />
+          )}
+
+          {/* Contact Preview Panel — PII-masked */}
+          {contact && (
+            <ContactPreviewPanel contact={contact} />
+          )}
+
           {/* Gate Checklist */}
           <div className="space-y-2">
             <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
@@ -138,11 +310,11 @@ export function ConvertLeadDialog({
 
             {/* Blocked summary */}
             {!canConvert && blockedReasons.length > 0 && (
-              <div className="rounded-md bg-red-50 border border-red-200 px-3 py-2 mt-2">
-                <p className="text-xs font-medium text-red-700 mb-1">Cannot convert</p>
+              <div className="rounded-md bg-red-50 border border-red-200 px-3 py-2 mt-2 dark:bg-red-950/20 dark:border-red-800">
+                <p className="text-xs font-medium text-red-700 dark:text-red-400 mb-1">Cannot convert</p>
                 <ul className="space-y-0.5">
                   {blockedReasons.map((r, i) => (
-                    <li key={i} className="text-xs text-red-600">• {r}</li>
+                    <li key={i} className="text-xs text-red-600 dark:text-red-400">• {r}</li>
                   ))}
                 </ul>
               </div>
@@ -266,7 +438,7 @@ export function ConvertLeadDialog({
                 Converting...
               </>
             ) : (
-              'Create Matter'
+              'Approve & Create Matter'
             )}
           </Button>
         </DialogFooter>

@@ -29,8 +29,10 @@ interface KanbanColumnProps extends KanbanCardDisplayOptions {
   contactsMap: Record<string, ContactInfo>
   usersMap: Record<string, UserInfo>
   practiceAreasMap?: Record<string, PracticeAreaInfo>
+  activeMatterCountMap?: Record<string, number>
   onAddLead?: (stageId: string) => void
   onCardClick?: (leadId: string) => void
+  onViewMatter?: (matterId: string) => void
 }
 
 export const KanbanColumn = memo(function KanbanColumn({
@@ -39,8 +41,10 @@ export const KanbanColumn = memo(function KanbanColumn({
   contactsMap,
   usersMap,
   practiceAreasMap,
+  activeMatterCountMap,
   onAddLead,
   onCardClick,
+  onViewMatter,
   showValues = true,
   showFollowUp = true,
   showSource = true,
@@ -113,7 +117,9 @@ export const KanbanColumn = memo(function KanbanColumn({
                 assignedUser={lead.assigned_to ? usersMap[lead.assigned_to] : undefined}
                 practiceAreaName={lead.practice_area_id && practiceAreasMap ? practiceAreasMap[lead.practice_area_id]?.name : null}
                 practiceAreaColor={lead.practice_area_id && practiceAreasMap ? practiceAreasMap[lead.practice_area_id]?.color : null}
+                activeMatterCount={lead.contact_id && activeMatterCountMap ? activeMatterCountMap[lead.contact_id] : undefined}
                 onClick={onCardClick}
+                onViewMatter={onViewMatter}
                 showValues={showValues}
                 showFollowUp={showFollowUp}
                 showSource={showSource}

@@ -7,6 +7,7 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { toast } from 'sonner'
+import { norvaToast } from '@/lib/utils/norva-branding'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -58,7 +59,7 @@ export default function SignupPage() {
       })
       const result = await res.json()
       if (!res.ok) {
-        toast.error(result.error ?? 'Something went wrong. Please try again.')
+        norvaToast('auth_failed', result.error)
         return
       }
       // Pin the new tenant as active so login lands on the right firm
@@ -68,7 +69,7 @@ export default function SignupPage() {
       setSignupEmail(data.email)
       setSignupComplete(true)
     } catch {
-      toast.error('Something went wrong. Please try again.')
+      norvaToast('auth_failed')
     } finally {
       setIsLoading(false)
     }

@@ -699,7 +699,7 @@ export function CommandSidebar({
             </button>
           </div>
         ) : (
-          <p className="text-[11px] text-muted-foreground italic">No activity yet.</p>
+          <p className="text-[11px] text-muted-foreground italic">No timeline entries yet.</p>
         )}
       </SidebarSection>
     </div>

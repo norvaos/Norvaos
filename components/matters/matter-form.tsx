@@ -7,6 +7,7 @@ import { Loader2, Plus, X, CheckCircle2, ChevronsUpDown, Check, Pencil, AlertTri
 
 import { matterSchema, type MatterFormValues } from '@/lib/schemas/matter'
 import { useTenant } from '@/lib/hooks/use-tenant'
+import { useI18n } from '@/lib/i18n/i18n-provider'
 import { BILLING_TYPES, PRIORITIES, MATTER_STATUSES, MATTER_CONTACT_ROLES } from '@/lib/utils/constants'
 import { ContactSearch } from '@/components/shared/contact-search'
 import {
@@ -138,6 +139,7 @@ function computeTemplateTotal(template: Database['public']['Tables']['retainer_f
 
 export function MatterForm({ mode, defaultValues, onSubmit, isLoading }: MatterFormProps) {
   const { tenant } = useTenant()
+  const { t } = useI18n()
   const tenantId = tenant?.id ?? ''
 
   const form = useForm<MatterFormValues>({
@@ -372,8 +374,8 @@ export function MatterForm({ mode, defaultValues, onSubmit, isLoading }: MatterF
         {/* ── Section 1: Client & Matter ──────────────────────────────────────── */}
         <div className="space-y-4">
           <div>
-            <h3 className="text-sm font-semibold text-foreground">Client &amp; Matter</h3>
-            <p className="text-xs text-muted-foreground">Basic information about the case</p>
+            <h3 className="text-sm font-semibold text-foreground">{t('form.section_client_matter' as any)}</h3>
+            <p className="text-xs text-muted-foreground">{t('form.section_client_matter_desc' as any)}</p>
           </div>
           <Separator />
           <div className="space-y-4">
@@ -382,9 +384,9 @@ export function MatterForm({ mode, defaultValues, onSubmit, isLoading }: MatterF
               name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Title *</FormLabel>
+                  <FormLabel>{t('form.matter_title' as any)} *</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g. Smith v. Jones" {...field} />
+                    <Input placeholder={t('form.matter_title_placeholder' as any)} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -397,13 +399,13 @@ export function MatterForm({ mode, defaultValues, onSubmit, isLoading }: MatterF
               name="contact_id"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Primary Contact</FormLabel>
+                  <FormLabel>{t('form.matter_primary_contact' as any)}</FormLabel>
                   <FormControl>
                     <ContactSearch
                       value={field.value ?? ''}
                       onChange={(val) => field.onChange(val || null)}
                       tenantId={tenantId}
-                      placeholder="Search or create a contact..."
+                      placeholder={t('form.matter_search_contact' as any)}
                     />
                   </FormControl>
                   <FormDescription>
@@ -428,10 +430,10 @@ export function MatterForm({ mode, defaultValues, onSubmit, isLoading }: MatterF
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Description</FormLabel>
+                  <FormLabel>{t('form.matter_description' as any)}</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="Brief description of the matter..."
+                      placeholder={t('form.matter_description_placeholder' as any)}
                       rows={3}
                       {...field}
                       value={field.value ?? ''}
@@ -447,8 +449,8 @@ export function MatterForm({ mode, defaultValues, onSubmit, isLoading }: MatterF
         {/* ── Section 2: Classification ─────────────────────────────────────── */}
         <div className="space-y-4">
           <div>
-            <h3 className="text-sm font-semibold text-foreground">Classification</h3>
-            <p className="text-xs text-muted-foreground">Practice area and case type determine fee templates and automations</p>
+            <h3 className="text-sm font-semibold text-foreground">{t('form.section_classification' as any)}</h3>
+            <p className="text-xs text-muted-foreground">{t('form.section_classification_desc' as any)}</p>
           </div>
           <Separator />
           <div className="space-y-4">
@@ -457,11 +459,11 @@ export function MatterForm({ mode, defaultValues, onSubmit, isLoading }: MatterF
               name="practice_area_id"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Practice Area *</FormLabel>
+                  <FormLabel>{t('form.matter_practice_area' as any)} *</FormLabel>
                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger className="w-full">
-                        <SelectValue placeholder={practiceAreasLoading ? 'Loading...' : 'Select a practice area'} />
+                        <SelectValue placeholder={practiceAreasLoading ? t('common.loading') : t('form.select_practice_area' as any)} />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -486,7 +488,7 @@ export function MatterForm({ mode, defaultValues, onSubmit, isLoading }: MatterF
                   const selectedType = matterTypes?.find((mt) => mt.id === field.value)
                   return (
                     <FormItem className="flex flex-col">
-                      <FormLabel>Matter Type</FormLabel>
+                      <FormLabel>{t('form.matter_type' as any)}</FormLabel>
                       <Popover open={matterTypeOpen} onOpenChange={setMatterTypeOpen}>
                         <PopoverTrigger asChild>
                           <FormControl>
@@ -508,7 +510,7 @@ export function MatterForm({ mode, defaultValues, onSubmit, isLoading }: MatterF
                                   {selectedType.name}
                                 </span>
                               ) : (
-                                matterTypesLoading ? 'Loading...' : 'Search or select a matter type...'
+                                matterTypesLoading ? t('common.loading') : t('form.select_matter_type' as any)
                               )}
                               <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                             </Button>
@@ -516,7 +518,7 @@ export function MatterForm({ mode, defaultValues, onSubmit, isLoading }: MatterF
                         </PopoverTrigger>
                         <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
                           <Command>
-                            <CommandInput placeholder="Type to search..." />
+                            <CommandInput placeholder={t('form.select_matter_type' as any)} />
                             <CommandList>
                               <CommandEmpty>No matter types found.</CommandEmpty>
                               <CommandGroup>

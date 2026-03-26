@@ -17,7 +17,7 @@ and add the following repository secrets:
 |---|---|
 | `VERCEL_TOKEN` | Vercel API token (from vercel.com/account/tokens) |
 | `VERCEL_ORG_ID` | Vercel org/team ID (from .vercel/project.json or dashboard) |
-| `VERCEL_PROJECT_ID` | Vercel project ID for LexCRM |
+| `VERCEL_PROJECT_ID` | Vercel project ID for NorvaOS |
 
 ### Database Secrets
 | Secret | Description |
@@ -133,7 +133,7 @@ If you prefer to validate against a local or staging environment manually:
 
 ```bash
 # Set environment variables
-export STAGING_URL=https://staging.lexcrm.com  # or http://localhost:3000
+export STAGING_URL=https://staging.norvaos.com  # or http://localhost:3000
 export SUPABASE_URL=https://xxx.supabase.co
 export SUPABASE_ANON_KEY=xxx
 export ADMIN_EMAIL=admin@vanguardlaw.test

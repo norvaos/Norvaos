@@ -29,6 +29,7 @@ import {
 } from '@/components/ui/table'
 import { EmptyState } from '@/components/shared/empty-state'
 import { Label } from '@/components/ui/label'
+import { NorvaWhisper } from '@/components/ui/norva-whisper'
 
 interface AuditEntry {
   id: string
@@ -149,11 +150,14 @@ function AdminAuditLogInner() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold tracking-tight">Audit Log</h2>
+        <h2 className="text-2xl font-bold tracking-tight">
+          Norva Vault
+          <NorvaWhisper contentKey="vault.audit" />
+        </h2>
         <p className="text-muted-foreground">
           {tenantNameParam
-            ? `Audit trail for ${tenantNameParam}`
-            : 'Audit trail for a tenant. Enter a tenant ID to load logs.'}
+            ? `Norva Vault audit trail for ${tenantNameParam}`
+            : 'Norva Vault audit trail. Enter a tenant ID to load logs.'}
         </p>
       </div>
 

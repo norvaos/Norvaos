@@ -1,11 +1,18 @@
 'use client'
 
-import { useEffect, useCallback, useMemo } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 import { useCommandCentre } from './command-centre-context'
 import { useUpdateLead } from '@/lib/queries/leads'
 import { LEAD_TEMPERATURES, CONTACT_SOURCES, PERSON_SCOPES } from '@/lib/utils/constants'
 import { useMatterTypes } from '@/lib/queries/matter-types'
+import {
+  usePreviousSponsors,
+  useLinkContactToLead,
+  useLinkSponsorToLead,
+} from '@/lib/queries/entity-recognition'
+import { ContactSearch, useContactById } from '@/components/shared/contact-search'
+import { formatFullName } from '@/lib/utils/formatters'
 import { ScreeningAnswers } from './panels/screening-answers'
 import { MeetingNotes } from './panels/meeting-notes'
 import { TaskPanel } from './panels/task-panel'
@@ -20,6 +27,10 @@ import { DocumentStatusPanel } from './panels/document-status-panel'
 import { RiskPanel } from './panels/risk-panel'
 import { IntakeWizardPanel } from './panels/intake-wizard-panel'
 import { ClientProfilePanel } from './panels/client-profile-panel'
+import { RegulatorySidebar } from './panels/regulatory-sidebar'
+import { CompliancePulse } from './panels/compliance-pulse'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -44,6 +55,11 @@ import {
   History,
   BadgeInfo,
   Globe,
+  Search,
+  Link2,
+  Pencil,
+  Lock,
+  UserPlus,
 } from 'lucide-react'
 
 // ─── Types ──────────────────────────────────────────────────────────
@@ -119,6 +135,9 @@ export function Workspace() {
   if (entityType === 'matter') {
     return (
       <div className="max-w-5xl mx-auto px-4 py-6 space-y-6">
+        {/* Compliance Pulse — Directive 41.3 (persistent compliance matrix) */}
+        <CompliancePulse />
+
         {/* Client Profile — demographics collected at intake */}
         <ClientProfilePanel />
 
@@ -127,6 +146,9 @@ export function Workspace() {
           <MatterStatusPanel />
           <RiskPanel />
         </div>
+
+        {/* Regulatory Status — LSO/CICC Compliance (Directive 41.2) */}
+        <RegulatorySidebar />
 
         {/* Communications + Documents (side by side) */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -151,6 +173,17 @@ export function Workspace() {
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-6 space-y-6">
+      {/* Compliance Pulse — Directive 41.3 (persistent compliance matrix) */}
+      <CompliancePulse />
+
+      {/* Entity Recognition — Contact-thinking: link Principal + Sponsor */}
+      <EntityRecognitionCard
+        lead={lead}
+        entityId={entityId}
+        tenantId={tenantId}
+        isConverted={isConverted}
+      />
+
       {/* Core Data Card */}
       <CoreDataCard
         lead={lead}
@@ -175,6 +208,9 @@ export function Workspace() {
         <ScreeningAnswers />
         <DocumentPanelSwitcher />
       </div>
+
+      {/* Regulatory Status — LSO/CICC Compliance (Directive 41.2) */}
+      <RegulatorySidebar />
 
       {/* Notes + Call Log (side by side) */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -854,5 +890,259 @@ function CoreDataCard({ lead, entityId, tenantId, users, practiceAreas, isConver
         })()}
       </CardContent>
     </Card>
+  )
+}
+
+// ─── Entity Recognition Card ─────────────────────────────────────────
+
+interface EntityRecognitionCardProps {
+  lead: ReturnType<typeof useCommandCentre>['lead']
+  entityId: string
+  tenantId: string
+  isConverted: boolean
+}
+
+/**
+ * Contact-thinking panel: replaces "Lead-thinking" with entity-based data.
+ * - Shows ContactSearch for the Principal Applicant
+ * - When person_scope === 'joint', shows a second ContactSearch for the Sponsor
+ * - Linked contacts display key profile fields in read-only mode
+ * - "Edit" toggle enables field editing (future: Sync to Profile logic)
+ */
+function EntityRecognitionCard({ lead, entityId, tenantId, isConverted }: EntityRecognitionCardProps) {
+  const linkContact = useLinkContactToLead()
+  const linkSponsor = useLinkSponsorToLead()
+
+  const contactId = lead?.contact_id ?? undefined
+  const customFields = (lead?.custom_fields ?? {}) as Record<string, unknown>
+  const sponsorContactId = (customFields.sponsor_contact_id as string) ?? undefined
+  const personScope = lead?.person_scope ?? 'single'
+  const isJoint = personScope === 'joint'
+
+  // Fetch linked contact details
+  const { data: principalContact } = useContactById(contactId)
+  const { data: sponsorContact } = useContactById(isJoint ? sponsorContactId : undefined)
+
+  // Previous sponsors — auto-suggest when Joint is selected
+  const { data: previousSponsors, isLoading: sponsorsLoading } = usePreviousSponsors(
+    isJoint ? contactId : undefined
+  )
+
+  // Read-only toggle for profile fields
+  const [principalEditing, setPrincipalEditing] = useState(false)
+  const [sponsorEditing, setSponsorEditing] = useState(false)
+
+  // Reset editing state when contact changes
+  useEffect(() => { setPrincipalEditing(false) }, [contactId])
+  useEffect(() => { setSponsorEditing(false) }, [sponsorContactId])
+
+  const handlePrincipalChange = useCallback((newContactId: string) => {
+    if (!lead || isConverted) return
+    linkContact.mutate({ leadId: entityId, contactId: newContactId })
+  }, [lead, isConverted, entityId, linkContact])
+
+  const handleSponsorChange = useCallback((newSponsorId: string) => {
+    if (!lead || isConverted) return
+    linkSponsor.mutate({
+      leadId: entityId,
+      sponsorContactId: newSponsorId || null,
+      existingCustomFields: customFields,
+    })
+  }, [lead, isConverted, entityId, linkSponsor, customFields])
+
+  return (
+    <Card>
+      <CardHeader className="pb-3">
+        <CardTitle className="text-sm font-medium flex items-center gap-2 text-slate-700">
+          <Search className="h-4 w-4" />
+          Entity Recognition
+          {principalContact && (
+            <Badge variant="outline" className="ml-auto text-[10px] font-normal text-emerald-600 border-emerald-200 bg-emerald-50">
+              <Link2 className="h-3 w-3 mr-1" />
+              Linked
+            </Badge>
+          )}
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {/* ── Principal Applicant ──────────────────────────────────── */}
+        <div className="space-y-2">
+          <Label className="text-xs text-slate-500 flex items-center gap-1">
+            <UserCheck className="h-3 w-3" />
+            Principal Applicant
+          </Label>
+          <ContactSearch
+            value={contactId ?? ''}
+            onChange={handlePrincipalChange}
+            tenantId={tenantId}
+            placeholder="Search or create contact..."
+          />
+
+          {/* Read-only profile summary when linked */}
+          {principalContact && (
+            <ContactProfileSummary
+              contact={principalContact}
+              editing={principalEditing}
+              onToggleEdit={() => setPrincipalEditing(!principalEditing)}
+              isConverted={isConverted}
+              role="principal"
+            />
+          )}
+        </div>
+
+        {/* ── Sponsor / Co-Applicant (Joint only) ─────────────────── */}
+        {isJoint && (
+          <div className="space-y-2 pt-3 border-t border-slate-100">
+            <Label className="text-xs text-slate-500 flex items-center gap-1">
+              <UserPlus className="h-3 w-3" />
+              Sponsor / Co-Applicant
+            </Label>
+            <ContactSearch
+              value={sponsorContactId ?? ''}
+              onChange={handleSponsorChange}
+              tenantId={tenantId}
+              placeholder="Search for sponsor..."
+            />
+
+            {/* Previous sponsor suggestions */}
+            {!sponsorContactId && previousSponsors && previousSponsors.length > 0 && (
+              <div className="rounded-md border border-blue-100 bg-blue-50/50 p-2 space-y-1.5">
+                <p className="text-[10px] font-semibold text-blue-600 uppercase tracking-wide">
+                  Previously Linked Sponsors
+                </p>
+                {previousSponsors.slice(0, 3).map((sp) => {
+                  const name = formatFullName(sp.contact.first_name, sp.contact.last_name) || 'Unknown'
+                  return (
+                    <button
+                      key={sp.contact_id}
+                      onClick={() => handleSponsorChange(sp.contact_id)}
+                      className="flex items-center justify-between w-full px-2 py-1.5 text-left rounded hover:bg-blue-100/60 transition-colors"
+                    >
+                      <div className="min-w-0">
+                        <p className="text-xs font-medium text-slate-800 truncate">{name}</p>
+                        <p className="text-[10px] text-slate-500 truncate">
+                          {sp.contact.email_primary || sp.contact.phone_primary || ''}
+                          {sp.last_matter_name && ` · ${sp.last_matter_name}`}
+                        </p>
+                      </div>
+                      <Badge variant="secondary" className="text-[9px] ml-2 shrink-0">
+                        {sp.matter_count} matter{sp.matter_count > 1 ? 's' : ''}
+                      </Badge>
+                    </button>
+                  )
+                })}
+              </div>
+            )}
+
+            {!sponsorContactId && isJoint && !sponsorsLoading && (!previousSponsors || previousSponsors.length === 0) && (
+              <p className="text-[10px] text-slate-400">
+                No previous sponsors found. Search above or create a new contact.
+              </p>
+            )}
+
+            {/* Sponsor profile summary */}
+            {sponsorContact && (
+              <ContactProfileSummary
+                contact={sponsorContact}
+                editing={sponsorEditing}
+                onToggleEdit={() => setSponsorEditing(!sponsorEditing)}
+                isConverted={isConverted}
+                role="sponsor"
+              />
+            )}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  )
+}
+
+// ─── Contact Profile Summary (Read-Only by default) ──────────────────
+
+interface ContactProfileSummaryProps {
+  contact: {
+    id: string
+    first_name: string | null
+    last_name: string | null
+    email_primary: string | null
+    phone_primary: string | null
+    date_of_birth: string | null
+    nationality: string | null
+    immigration_status: string | null
+    gender: string | null
+    marital_status: string | null
+    custom_fields?: import('@/lib/types/database').Json | null
+  }
+  editing: boolean
+  onToggleEdit: () => void
+  isConverted: boolean
+  role: 'principal' | 'sponsor'
+}
+
+function ContactProfileSummary({ contact, editing, onToggleEdit, isConverted, role }: ContactProfileSummaryProps) {
+  const name = formatFullName(contact.first_name, contact.last_name) || 'Unnamed'
+  const cf = (contact.custom_fields ?? {}) as Record<string, unknown>
+  const uci = (cf.uci as string) || null
+
+  const fields = [
+    { label: 'Email', value: contact.email_primary },
+    { label: 'Phone', value: contact.phone_primary },
+    { label: 'DOB', value: contact.date_of_birth },
+    { label: 'Nationality', value: contact.nationality },
+    { label: 'Status', value: contact.immigration_status },
+    { label: 'Gender', value: contact.gender },
+    { label: 'Marital', value: contact.marital_status },
+    ...(uci ? [{ label: 'UCI', value: uci }] : []),
+  ].filter((f) => f.value)
+
+  return (
+    <div className="rounded-md border border-slate-200 bg-slate-50/60 p-2.5">
+      <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center gap-1.5">
+          <span className="text-xs font-semibold text-slate-700">{name}</span>
+          {role === 'sponsor' && (
+            <Badge variant="outline" className="text-[9px]">Sponsor</Badge>
+          )}
+        </div>
+        {!isConverted && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onToggleEdit}
+            className="h-6 px-2 text-[10px] gap-1"
+          >
+            {editing ? (
+              <>
+                <Lock className="h-3 w-3" />
+                Lock
+              </>
+            ) : (
+              <>
+                <Pencil className="h-3 w-3" />
+                Edit
+              </>
+            )}
+          </Button>
+        )}
+      </div>
+
+      {editing ? (
+        <p className="text-[10px] text-amber-600 mb-2">
+          Editing enabled — changes here will be synced to the global profile via &quot;Sync to Profile&quot; (Phase 2).
+        </p>
+      ) : (
+        <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+          {fields.map((f) => (
+            <div key={f.label} className="flex items-baseline gap-1.5">
+              <span className="text-[10px] text-slate-400 w-14 shrink-0">{f.label}</span>
+              <span className="text-[11px] text-slate-700 truncate">{f.value}</span>
+            </div>
+          ))}
+          {fields.length === 0 && (
+            <p className="text-[10px] text-slate-400 col-span-2">No profile data yet — details will populate from the Client Profile panel.</p>
+          )}
+        </div>
+      )}
+    </div>
   )
 }

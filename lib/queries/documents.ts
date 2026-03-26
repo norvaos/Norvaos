@@ -294,6 +294,40 @@ export function useAllDocuments(params: AllDocumentsParams) {
   })
 }
 
+// ── Vault Integrity Polling (Sentinel Shield — 2s interval) ─────────────────
+
+export interface VaultIntegrityRecord {
+  id: string
+  tamper_status: string | null
+  content_hash: string | null
+  hash_verified_at: string | null
+}
+
+/**
+ * Polls tamper_status for all documents in a matter every `intervalMs`.
+ * Used by the Sentinel Shield to detect hash corruption in near-real-time.
+ */
+export function useVaultIntegrityPolling(matterId: string, tenantId: string, intervalMs = 2000) {
+  return useQuery({
+    queryKey: [...documentKeys.all, 'vault-integrity', matterId],
+    queryFn: async () => {
+      const supabase = createClient()
+      const { data, error } = await supabase
+        .from('documents')
+        .select('id, tamper_status, content_hash, hash_verified_at')
+        .eq('tenant_id', tenantId)
+        .eq('matter_id', matterId)
+        .eq('is_archived', false)
+
+      if (error) throw error
+      return (data ?? []) as VaultIntegrityRecord[]
+    },
+    enabled: !!tenantId && !!matterId,
+    refetchInterval: intervalMs,
+    staleTime: 0,
+  })
+}
+
 // ── Document Scanning (AI Extraction) ────────────────────────────────────────
 
 export interface DocumentScanResult {
@@ -367,5 +401,111 @@ export function useDocumentStats(tenantId: string) {
     },
     enabled: !!tenantId,
     staleTime: 2 * 60 * 1000,
+  })
+}
+
+// ── Retainer PDF Generation ─────────────────────────────────────────────────
+
+export interface RetainerPdfResult {
+  ok: boolean
+  elapsed_ms: number
+  budget_met: boolean
+  document: {
+    document_id: string
+    slot_id: string
+    file_name: string
+    storage_path: string
+  }
+  context_summary: {
+    matter_number: string
+    client: string
+    risk_level: string
+    clauses_injected: number
+    has_risk_disclosure: boolean
+    total_amount: string
+  }
+}
+
+// ── Persist Scan Data (Scan-to-Autofill Pipeline) ─────────────────────────
+
+/**
+ * Persists OCR scan results to a document's ai_extracted_data JSONB column.
+ * Called after a successful scan + user confirmation so the data is available
+ * for intake form pre-filling via useScanPrefill.
+ */
+export function usePersistScanData() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async ({
+      documentId,
+      scanData,
+    }: {
+      documentId: string
+      scanData: DocumentScanResult
+    }) => {
+      const response = await fetch('/api/documents/persist-scan', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          document_id: documentId,
+          scan_data: scanData,
+        }),
+      })
+
+      const result = await response.json()
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || 'Failed to persist scan data')
+      }
+      return result
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: documentKeys.all })
+      queryClient.invalidateQueries({ queryKey: ['scan-prefill'] })
+    },
+    onError: (error: Error) => {
+      console.error('[persist-scan] Failed:', error.message)
+      // Silent failure — scan data persistence is non-critical
+    },
+  })
+}
+
+// ── Retainer PDF Generation ─────────────────────────────────────────────────
+
+export function useGenerateRetainerPdf() {
+  const qc = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (matterId: string): Promise<RetainerPdfResult> => {
+      const supabase = createClient()
+      const { data: { session } } = await supabase.auth.getSession()
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/generate-retainer-pdf`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${session?.access_token}`,
+          },
+          body: JSON.stringify({ matter_id: matterId }),
+        }
+      )
+
+      const result = await response.json()
+      if (!response.ok || !result.ok) {
+        throw new Error(result.message || 'Failed to generate retainer PDF')
+      }
+      return result as RetainerPdfResult
+    },
+    onSuccess: (data, matterId) => {
+      qc.invalidateQueries({ queryKey: documentKeys.all })
+      toast.success(
+        `Retainer generated in ${data.elapsed_ms}ms — ${data.context_summary.matter_number}`
+      )
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Failed to generate retainer')
+    },
   })
 }

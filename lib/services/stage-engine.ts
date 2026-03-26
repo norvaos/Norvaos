@@ -57,6 +57,11 @@ interface GatingRuleRequireSubmissionConfirmation {
   type: 'require_submission_confirmation'
 }
 
+interface GatingRuleRequireRetainerAgreement {
+  type: 'require_retainer_agreement'
+  minimum_status?: 'draft' | 'sent_for_signing' | 'signed'
+}
+
 export type GatingRule =
   | GatingRuleChecklistComplete
   | GatingRuleRequireDeadlines
@@ -68,6 +73,7 @@ export type GatingRule =
   | GatingRuleRequireImmIntakeStatus
   | GatingRuleRequireNoOpenDeficiencies
   | GatingRuleRequireSubmissionConfirmation
+  | GatingRuleRequireRetainerAgreement
 
 // ─── Result Types ─────────────────────────────────────────────────────────────
 
@@ -117,7 +123,7 @@ export async function advanceGenericStage(params: StageEngineParams): Promise<Ad
   // 1. Fetch target stage definition
   const { data: targetStage, error: stageErr } = await supabase
     .from('matter_stages')
-    .select('*')
+    .select('id, pipeline_id, name, gating_rules, sort_order, is_terminal, auto_close_matter, sla_days, client_label, notify_client_on_stage_change')
     .eq('id', targetStageId)
     .single()
 
@@ -128,7 +134,7 @@ export async function advanceGenericStage(params: StageEngineParams): Promise<Ad
   // 2. Fetch current stage state
   const { data: currentState } = await supabase
     .from('matter_stage_state')
-    .select('*')
+    .select('id, matter_id, pipeline_id, current_stage_id, previous_stage_id, entered_at, stage_history')
     .eq('matter_id', matterId)
     .eq('pipeline_id', targetStage.pipeline_id)
     .maybeSingle()
@@ -307,7 +313,7 @@ export async function advanceImmigrationStage(params: StageEngineParams): Promis
   // 1. Fetch the target stage definition
   const { data: newStage, error: stageError } = await supabase
     .from('case_stage_definitions')
-    .select('*')
+    .select('id, name, requires_checklist_complete, is_terminal, sort_order, client_label, notify_client_on_stage_change, case_type_id, auto_tasks')
     .eq('id', targetStageId)
     .single()
 
@@ -325,7 +331,7 @@ export async function advanceImmigrationStage(params: StageEngineParams): Promis
   if (newStage.requires_checklist_complete) {
     const { data: checklistItems, error: checklistError } = await supabase
       .from('matter_checklist_items')
-      .select('*')
+      .select('id, document_name, status, is_required')
       .eq('matter_id', matterId)
       .eq('is_required', true)
 
@@ -333,7 +339,7 @@ export async function advanceImmigrationStage(params: StageEngineParams): Promis
       return { success: false, error: 'Failed to verify checklist status' }
     }
 
-    const score = calculateCompletionScore(checklistItems ?? [])
+    const score = calculateCompletionScore(checklistItems as unknown as Database['public']['Tables']['matter_checklist_items']['Row'][] ?? [])
     const checklistPassed = score.isComplete
     const checklistDetails = checklistPassed
       ? undefined
@@ -522,7 +528,7 @@ export async function evaluateGatingRules(
       case 'require_checklist_complete': {
         const { data: items } = await supabase
           .from('matter_checklist_items')
-          .select('*')
+          .select('id, document_name, status, is_required')
           .eq('matter_id', matterId)
           .eq('is_required', true)
 
@@ -530,7 +536,7 @@ export async function evaluateGatingRules(
         let details: string | undefined
 
         if (items && items.length > 0) {
-          const score = calculateCompletionScore(items)
+          const score = calculateCompletionScore(items as unknown as Database['public']['Tables']['matter_checklist_items']['Row'][])
           if (!score.isComplete) {
             conditionPassed = false
             details = `Required checklist items incomplete (${score.requiredApproved}/${score.required}): ${score.missingRequired.slice(0, 3).join(', ')}${score.missingRequired.length > 3 ? '...' : ''}`
@@ -789,6 +795,45 @@ export async function evaluateGatingRules(
         })
         break
       }
+
+      case 'require_retainer_agreement': {
+        const { data: retainerRaw } = await supabase
+          .from('retainer_agreements' as never)
+          .select('status')
+          .eq('matter_id', matterId)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .maybeSingle()
+
+        const retainer = retainerRaw as { status: string } | null
+        const minimumStatus = rule.minimum_status ?? 'signed'
+        const statusOrder = ['draft', 'sent_for_signing', 'signed']
+        let retainerPassed = false
+        let retainerDetails: string | undefined
+
+        if (!retainer) {
+          retainerPassed = false
+          retainerDetails =
+            'Retainer Agreement is missing. A signed retainer is required before advancing this matter.'
+        } else {
+          const currentIdx = statusOrder.indexOf(retainer.status)
+          const requiredIdx = statusOrder.indexOf(minimumStatus)
+          retainerPassed = currentIdx >= requiredIdx
+
+          if (!retainerPassed) {
+            retainerDetails = `Retainer Agreement status is "${retainer.status}". Minimum required: ${minimumStatus}`
+          }
+        }
+
+        if (!retainerPassed) failedRules.push(retainerDetails!)
+        conditions.push({
+          conditionId: 'require_retainer_agreement',
+          conditionName: 'Retainer Agreement',
+          passed: retainerPassed,
+          details: retainerDetails,
+        })
+        break
+      }
     }
   }
 
@@ -1008,7 +1053,7 @@ async function autoInitializeChecklist(
     // Fetch templates for this case type
     const { data: templates } = await supabase
       .from('checklist_templates')
-      .select('*')
+      .select('id, document_name, description, category, is_required, sort_order')
       .eq('case_type_id', caseTypeId)
       .order('sort_order', { ascending: true })
 
@@ -1073,7 +1118,7 @@ async function applyStageWorkflowTemplates(
         if (workflow.task_template_id) {
           const { data: templateItems } = await supabase
             .from('task_template_items')
-            .select('*')
+            .select('id, title, days_offset, sort_order, description, priority')
             .eq('template_id', workflow.task_template_id)
             .order('sort_order')
 

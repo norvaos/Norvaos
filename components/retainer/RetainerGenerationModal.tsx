@@ -286,6 +286,10 @@ export function RetainerGenerationModal({
   const [signingMethod, setSigningMethod] = useState<string>('manual')
   const [clientInfo, setClientInfo] = useState<ClientInfo | null>(null)
 
+  // ── Audit-Mirror Disclosure (Directive 9.2) ────────────────────────────
+  const [includeAiDisclosure, setIncludeAiDisclosure] = useState(true)
+  const [includeUrduDisclosure, setIncludeUrduDisclosure] = useState(false)
+
   // ── Step 6: Agreement ID ────────────────────────────────────────────────
   const [agreementId, setAgreementId] = useState<string | null>(null)
 
@@ -449,6 +453,7 @@ export function RetainerGenerationModal({
         tax_amount_cents: taxCents,
         total_amount_cents: totalCents,
         signing_method: signingMethod,
+        include_ai_disclosure: includeAiDisclosure,
         status: 'draft',
       })
       setAgreementId(agreement.id)
@@ -460,7 +465,7 @@ export function RetainerGenerationModal({
   }, [
     tenantId, matter.id, billingType, flatFeeAmount, hourlyRate,
     estimatedHours, contingencyPct, scopeText, feeItems, hstApplicable,
-    subtotalCents, taxCents, totalCents, signingMethod, createAgreement,
+    subtotalCents, taxCents, totalCents, signingMethod, includeAiDisclosure, createAgreement,
   ])
 
   // ── Step 5 → 6 ─────────────────────────────────────────────────────────
@@ -580,6 +585,10 @@ export function RetainerGenerationModal({
                 matterId={matter.id}
                 signingMethod={signingMethod}
                 setSigningMethod={setSigningMethod}
+                includeAiDisclosure={includeAiDisclosure}
+                setIncludeAiDisclosure={setIncludeAiDisclosure}
+                includeUrduDisclosure={includeUrduDisclosure}
+                setIncludeUrduDisclosure={setIncludeUrduDisclosure}
                 onBack={() => setCurrentStep(3)}
                 onContinue={() => setCurrentStep(5)}
               />
@@ -599,6 +608,8 @@ export function RetainerGenerationModal({
                 totalCents={totalCents}
                 clientInfo={clientInfo}
                 signingMethod={signingMethod}
+                includeAiDisclosure={includeAiDisclosure}
+                includeUrduDisclosure={includeUrduDisclosure}
                 formatCAD={formatCAD}
                 onBack={() => setCurrentStep(4)}
                 onContinue={handleGoToSend}
@@ -972,6 +983,10 @@ function Step4ClientDetails({
   matterId,
   signingMethod,
   setSigningMethod,
+  includeAiDisclosure,
+  setIncludeAiDisclosure,
+  includeUrduDisclosure,
+  setIncludeUrduDisclosure,
   onBack,
   onContinue,
 }: {
@@ -979,6 +994,10 @@ function Step4ClientDetails({
   matterId: string
   signingMethod: string
   setSigningMethod: (v: string) => void
+  includeAiDisclosure: boolean
+  setIncludeAiDisclosure: (v: boolean) => void
+  includeUrduDisclosure: boolean
+  setIncludeUrduDisclosure: (v: boolean) => void
   onBack: () => void
   onContinue: () => void
 }) {
@@ -1036,6 +1055,64 @@ function Step4ClientDetails({
         </Select>
       </div>
 
+      {/* Audit-Mirror AI Disclosure (Directive 9.2) */}
+      <Separator />
+      <div className="space-y-2">
+        <div className="flex items-start gap-3">
+          <Checkbox
+            id="ai-disclosure"
+            checked={includeAiDisclosure}
+            onCheckedChange={(checked) => setIncludeAiDisclosure(checked === true)}
+            className="mt-0.5"
+          />
+          <div className="space-y-1">
+            <Label htmlFor="ai-disclosure" className="text-sm font-medium cursor-pointer">
+              Include AI-Usage Disclosure Statement
+            </Label>
+            <p className="text-[11px] text-muted-foreground leading-relaxed">
+              Per the 2026 Federal Court guidelines, disclose AI usage in research or drafting.
+              This inserts a professional clause into the retainer document.
+            </p>
+          </div>
+        </div>
+        {includeAiDisclosure && (
+          <div className="ml-7 space-y-3">
+            <div className="rounded-md border bg-muted/30 p-3">
+              <p className="text-xs text-muted-foreground italic leading-relaxed">
+                &ldquo;Portions of this document were optimised for technical accuracy using the Norva Audit-Mirror;
+                final legal verification was performed by [Lawyer Name].&rdquo;
+              </p>
+            </div>
+
+            {/* Polyglot Disclosure — Urdu (Directive 15.1) */}
+            <div className="flex items-start gap-3">
+              <Checkbox
+                id="urdu-disclosure"
+                checked={includeUrduDisclosure}
+                onCheckedChange={(checked) => setIncludeUrduDisclosure(checked === true)}
+                className="mt-0.5"
+              />
+              <div className="space-y-1">
+                <Label htmlFor="urdu-disclosure" className="text-sm font-medium cursor-pointer">
+                  Include Urdu translation / اردو ترجمہ شامل کریں
+                </Label>
+                <p className="text-[11px] text-muted-foreground leading-relaxed">
+                  Renders the disclosure in Urdu for bilingual clients.
+                </p>
+              </div>
+            </div>
+
+            {includeUrduDisclosure && (
+              <div className="rounded-md border bg-muted/30 p-3" dir="rtl">
+                <p className="text-xs text-muted-foreground italic leading-relaxed font-urdu">
+                  &ldquo;اس دستاویز کے کچھ حصوں کو تکنیکی درستگی کے لیے Norva Audit-Mirror کے ذریعے بہتر بنایا گیا ہے؛ حتمی قانونی تصدیق [وکیل کا نام] نے انجام دی ہے۔&rdquo;
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
       <div className="flex justify-between pt-2">
         <Button variant="outline" onClick={onBack} className="gap-1.5">
           <ChevronLeft className="h-3.5 w-3.5" /> Back
@@ -1066,6 +1143,8 @@ function Step5Preview({
   onBack,
   onContinue,
   isSaving,
+  includeAiDisclosure,
+  includeUrduDisclosure,
 }: {
   matter: Matter
   matterTypeName: string | null
@@ -1082,6 +1161,8 @@ function Step5Preview({
   onBack: () => void
   onContinue: () => void
   isSaving: boolean
+  includeAiDisclosure: boolean
+  includeUrduDisclosure: boolean
 }) {
   const billingLabel = BILLING_TYPE_OPTIONS.find(o => o.value === billingType)?.label ?? billingType
   const signingLabel = SIGNING_METHOD_OPTIONS.find(o => o.value === signingMethod)?.label ?? signingMethod
@@ -1173,6 +1254,25 @@ function Step5Preview({
           <PenLine className="h-3.5 w-3.5 shrink-0" />
           <span>Signing method: <strong className="text-foreground">{signingLabel}</strong></span>
         </div>
+
+        {/* AI-Usage Disclosure (Directive 9.2 + 15.1 Polyglot) */}
+        {includeAiDisclosure && (
+          <>
+            <Separator />
+            <div className="space-y-2">
+              <p className="font-semibold text-muted-foreground uppercase tracking-wide text-[10px]">AI-Usage Disclosure</p>
+              <p className="leading-relaxed text-muted-foreground italic">
+                Portions of this document were optimised for technical accuracy using the Norva
+                Audit-Mirror; final legal verification was performed by [Lawyer Name].
+              </p>
+              {includeUrduDisclosure && (
+                <p className="leading-relaxed text-muted-foreground italic pt-1" dir="rtl">
+                  اس دستاویز کے کچھ حصوں کو تکنیکی درستگی کے لیے Norva Audit-Mirror کے ذریعے بہتر بنایا گیا ہے؛ حتمی قانونی تصدیق [وکیل کا نام] نے انجام دی ہے۔
+                </p>
+              )}
+            </div>
+          </>
+        )}
 
         {/* Signature blocks */}
         <div className="grid grid-cols-2 gap-8 pt-4">

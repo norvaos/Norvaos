@@ -1,10 +1,12 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useI18n } from '@/lib/i18n/i18n-provider'
 import { useUIStore } from '@/lib/stores/ui-store'
-import { useTenant } from '@/lib/hooks/use-tenant'
-import { createClient } from '@/lib/supabase/client'
+import { useGlobalSearch } from '@/lib/queries/global-search'
+import { useWikiSearch } from '@/lib/queries/wiki'
+import { useCrossLocaleSearch } from '@/components/search/SearchContext'
 import {
   CommandDialog,
   CommandEmpty,
@@ -28,23 +30,13 @@ import {
   BarChart3,
   Settings,
   Plus,
-  Search,
   Loader2,
+  BookOpen,
+  ScrollText,
 } from 'lucide-react'
 
 // ---------------------------------------------------------------------------
-// Types for search results
-// ---------------------------------------------------------------------------
-interface SearchResult {
-  id: string
-  type: 'contact' | 'matter' | 'lead' | 'task'
-  title: string
-  subtitle: string
-  url: string
-}
-
-// ---------------------------------------------------------------------------
-// Debounce hook
+// Debounce hook — 150ms for near-instant feel
 // ---------------------------------------------------------------------------
 function useDebounce(value: string, delay: number) {
   const [debouncedValue, setDebouncedValue] = useState(value)
@@ -60,17 +52,37 @@ function useDebounce(value: string, delay: number) {
 // ---------------------------------------------------------------------------
 export function CommandPalette() {
   const router = useRouter()
+  const { t } = useI18n()
   const open = useUIStore((s) => s.commandPaletteOpen)
   const setOpen = useUIStore((s) => s.setCommandPaletteOpen)
+  const initialQuery = useUIStore((s) => s.commandPaletteInitialQuery)
   const openModal = useUIStore((s) => s.openModal)
-  const { tenant } = useTenant()
-  const tenantId = tenant?.id ?? ''
 
   const [query, setQuery] = useState('')
-  const [results, setResults] = useState<SearchResult[]>([])
-  const [isSearching, setIsSearching] = useState(false)
+  const debouncedQuery = useDebounce(query, 150)
 
-  const debouncedQuery = useDebounce(query, 300)
+  // Deep-link: pre-fill query when opened via openCommandPaletteWith()
+  useEffect(() => {
+    if (open && initialQuery) {
+      setQuery(initialQuery)
+    }
+  }, [open, initialQuery])
+
+  // Directive 36.2: Cross-locale resolution — if user types "پاسپورٹ" (Urdu),
+  // resolve to English equivalents ("Passport Number", "Passport Expiry Date")
+  // and search with the first English match instead of the raw non-English term.
+  const { englishTerms } = useCrossLocaleSearch(debouncedQuery, 80)
+  const effectiveQuery = englishTerms.length > 0 && debouncedQuery.trim().length > 0
+    ? englishTerms[0] // Use the first English canonical match
+    : debouncedQuery
+
+  // Single RPC call via TanStack Query — replaces 4 parallel client queries
+  const { data: results, isFetching } = useGlobalSearch(effectiveQuery)
+
+  // Directive 36.3: Wiki search — Universal Library (locale-agnostic).
+  // Always searches English content regardless of Globe locale setting.
+  // Uses the raw debouncedQuery AND effectiveQuery to cast the widest net.
+  const { data: wikiResults, isFetching: wikiFetching } = useWikiSearch(effectiveQuery)
 
   // Listen for Cmd+K / Ctrl+K keyboard shortcut
   useEffect(() => {
@@ -87,178 +99,42 @@ export function CommandPalette() {
 
   // Clear state when dialog closes
   useEffect(() => {
-    if (!open) {
-      setQuery('')
-      setResults([])
-    }
+    if (!open) setQuery('')
   }, [open])
-
-  // Global search across contacts, matters, leads, tasks
-  const performSearch = useCallback(
-    async (searchTerm: string) => {
-      if (!searchTerm.trim() || !tenantId) {
-        setResults([])
-        return
-      }
-
-      setIsSearching(true)
-
-      try {
-        const supabase = createClient()
-        const q = `%${searchTerm}%`
-
-        // Run all four queries in parallel
-        const [contactsRes, mattersRes, leadsRes, tasksRes] = await Promise.all([
-          // Search contacts by name or email
-          supabase
-            .from('contacts')
-            .select('id, first_name, last_name, email_primary, organization_name, contact_type')
-            .eq('tenant_id', tenantId)
-            .or(`first_name.ilike.${q},last_name.ilike.${q},email_primary.ilike.${q},organization_name.ilike.${q}`)
-            .limit(5),
-
-          // Search matters by title or matter_number
-          supabase
-            .from('matters')
-            .select('id, title, matter_number, status')
-            .eq('tenant_id', tenantId)
-            .or(`title.ilike.${q},matter_number.ilike.${q}`)
-            .limit(5),
-
-          // Search leads by contact info (via join)
-          supabase
-            .from('leads')
-            .select('id, contact_id, source, contacts!inner(first_name, last_name, email_primary)')
-            .eq('tenant_id', tenantId)
-            .or(`contacts.first_name.ilike.${q},contacts.last_name.ilike.${q},contacts.email_primary.ilike.${q}`)
-            .limit(5),
-
-          // Search tasks by title or description
-          supabase
-            .from('tasks')
-            .select('id, title, status, priority')
-            .eq('tenant_id', tenantId)
-            .eq('is_deleted', false)
-            .or(`title.ilike.${q},description.ilike.${q}`)
-            .limit(5),
-        ])
-
-        const searchResults: SearchResult[] = []
-
-        // Process contacts
-        if (contactsRes.data) {
-          for (const c of contactsRes.data) {
-            const name = [c.first_name, c.last_name].filter(Boolean).join(' ') || c.organization_name || 'Unnamed'
-            searchResults.push({
-              id: c.id,
-              type: 'contact',
-              title: name,
-              subtitle: c.email_primary || c.contact_type || 'Contact',
-              url: `/contacts/${c.id}`,
-            })
-          }
-        }
-
-        // Process matters
-        if (mattersRes.data) {
-          for (const m of mattersRes.data) {
-            searchResults.push({
-              id: m.id,
-              type: 'matter',
-              title: m.title,
-              subtitle: m.matter_number ? `#${m.matter_number} · ${m.status ?? ''}` : (m.status ?? ''),
-              url: `/matters/${m.id}`,
-            })
-          }
-        }
-
-        // Process leads
-        if (leadsRes.data) {
-          for (const l of leadsRes.data) {
-            const contact = l.contacts as any
-            const name = contact ? [contact.first_name, contact.last_name].filter(Boolean).join(' ') : 'Unknown'
-            searchResults.push({
-              id: l.id,
-              type: 'lead',
-              title: name,
-              subtitle: l.source ? `Lead · ${l.source}` : 'Lead',
-              url: `/command/lead/${l.id}`,
-            })
-          }
-        }
-
-        // Process tasks
-        if (tasksRes.data) {
-          for (const t of tasksRes.data) {
-            searchResults.push({
-              id: t.id,
-              type: 'task',
-              title: t.title,
-              subtitle: `${(t.status ?? '').replace(/_/g, ' ')} · ${t.priority ?? ''}`,
-              url: '/tasks',
-            })
-          }
-        }
-
-        setResults(searchResults)
-      } catch (error) {
-        console.error('Global search error:', error)
-        setResults([])
-      } finally {
-        setIsSearching(false)
-      }
-    },
-    [tenantId]
-  )
-
-  // Trigger search when debounced query changes
-  useEffect(() => {
-    performSearch(debouncedQuery)
-  }, [debouncedQuery, performSearch])
 
   function runAction(callback: () => void) {
     setOpen(false)
     callback()
   }
 
-  // Group results by type
-  const contactResults = results.filter((r) => r.type === 'contact')
-  const matterResults = results.filter((r) => r.type === 'matter')
-  const leadResults = results.filter((r) => r.type === 'lead')
-  const taskResults = results.filter((r) => r.type === 'task')
-
-  const hasResults = results.length > 0
   const hasQuery = query.trim().length > 0
-
-  // Icon for result type
-  function getTypeIcon(type: SearchResult['type']) {
-    switch (type) {
-      case 'contact': return <Users className="mr-2 size-4 text-blue-500" />
-      case 'matter': return <Briefcase className="mr-2 size-4 text-green-500" />
-      case 'lead': return <Target className="mr-2 size-4 text-orange-500" />
-      case 'task': return <CheckSquare className="mr-2 size-4 text-purple-500" />
-    }
-  }
+  const contacts = results?.contacts ?? []
+  const matters = results?.matters ?? []
+  const leads = results?.leads ?? []
+  const tasks = results?.tasks ?? []
+  const wiki = wikiResults ?? []
+  const hasResults = contacts.length > 0 || matters.length > 0 || leads.length > 0 || tasks.length > 0 || wiki.length > 0
+  const isSearching = isFetching || wikiFetching
 
   return (
     <CommandDialog
       open={open}
       onOpenChange={setOpen}
-      title="Global Search"
-      description="Search across contacts, matters, leads, and tasks. Or use quick actions."
+      title={t('common.globalSearch' as any)}
+      description={t('common.globalSearchDescription' as any)}
       shouldFilter={false}
     >
       <CommandInput
-        placeholder="Search contacts, matters, leads, tasks..."
+        placeholder={t('common.searchPlaceholder' as any)}
         value={query}
         onValueChange={setQuery}
       />
       <CommandList>
         {/* Loading state */}
-        {isSearching && (
+        {isSearching && !results && !wikiResults && (
           <div className="flex items-center justify-center py-6 text-sm text-muted-foreground">
             <Loader2 className="mr-2 size-4 animate-spin" />
-            Searching...
+            {t('common.searching' as any)}
           </div>
         )}
 
@@ -268,74 +144,117 @@ export function CommandPalette() {
         )}
 
         {/* Search Results */}
-        {!isSearching && hasQuery && hasResults && (
+        {hasQuery && hasResults && (
           <>
-            {contactResults.length > 0 && (
+            {contacts.length > 0 && (
               <CommandGroup heading="Contacts">
-                {contactResults.map((r) => (
-                  <CommandItem
-                    key={r.id}
-                    value={`contact-${r.id}-${r.title}`}
-                    onSelect={() => runAction(() => router.push(r.url))}
-                  >
-                    {getTypeIcon(r.type)}
-                    <div className="flex flex-col">
-                      <span className="text-sm">{r.title}</span>
-                      <span className="text-xs text-muted-foreground">{r.subtitle}</span>
-                    </div>
-                  </CommandItem>
-                ))}
+                {contacts.map((c) => {
+                  const name = [c.first_name, c.last_name].filter(Boolean).join(' ') || c.organization_name || 'Unnamed'
+                  return (
+                    <CommandItem
+                      key={c.id}
+                      value={`contact-${c.id}-${name}`}
+                      onSelect={() => runAction(() => router.push(`/contacts/${c.id}`))}
+                    >
+                      <Users className="mr-2 size-4 text-blue-500" />
+                      <div className="flex flex-col">
+                        <span className="text-sm">{name}</span>
+                        <span className="text-xs text-muted-foreground">{c.email_primary || c.contact_type || 'Contact'}</span>
+                      </div>
+                    </CommandItem>
+                  )
+                })}
               </CommandGroup>
             )}
 
-            {matterResults.length > 0 && (
+            {matters.length > 0 && (
               <CommandGroup heading="Matters">
-                {matterResults.map((r) => (
+                {matters.map((m) => (
                   <CommandItem
-                    key={r.id}
-                    value={`matter-${r.id}-${r.title}`}
-                    onSelect={() => runAction(() => router.push(r.url))}
+                    key={m.id}
+                    value={`matter-${m.id}-${m.title}`}
+                    onSelect={() => runAction(() => router.push(`/matters/${m.id}`))}
                   >
-                    {getTypeIcon(r.type)}
+                    <Briefcase className="mr-2 size-4 text-green-500" />
                     <div className="flex flex-col">
-                      <span className="text-sm">{r.title}</span>
-                      <span className="text-xs text-muted-foreground">{r.subtitle}</span>
+                      <span className="text-sm">{m.title}</span>
+                      <span className="text-xs text-muted-foreground">
+                        {m.matter_number ? `#${m.matter_number} · ${m.status ?? ''}` : (m.status ?? '')}
+                      </span>
                     </div>
                   </CommandItem>
                 ))}
               </CommandGroup>
             )}
 
-            {leadResults.length > 0 && (
+            {leads.length > 0 && (
               <CommandGroup heading="Leads">
-                {leadResults.map((r) => (
+                {leads.map((l) => {
+                  const name = [l.contact_first_name, l.contact_last_name].filter(Boolean).join(' ') || 'Unknown'
+                  return (
+                    <CommandItem
+                      key={l.id}
+                      value={`lead-${l.id}-${name}`}
+                      onSelect={() => runAction(() => router.push(`/command/lead/${l.id}`))}
+                    >
+                      <Target className="mr-2 size-4 text-orange-500" />
+                      <div className="flex flex-col">
+                        <span className="text-sm">{name}</span>
+                        <span className="text-xs text-muted-foreground">{l.source ? `Lead · ${l.source}` : 'Lead'}</span>
+                      </div>
+                    </CommandItem>
+                  )
+                })}
+              </CommandGroup>
+            )}
+
+            {tasks.length > 0 && (
+              <CommandGroup heading="Tasks">
+                {tasks.map((t) => (
                   <CommandItem
-                    key={r.id}
-                    value={`lead-${r.id}-${r.title}`}
-                    onSelect={() => runAction(() => router.push(r.url))}
+                    key={t.id}
+                    value={`task-${t.id}-${t.title}`}
+                    onSelect={() => runAction(() => router.push('/tasks'))}
                   >
-                    {getTypeIcon(r.type)}
+                    <CheckSquare className="mr-2 size-4 text-purple-500" />
                     <div className="flex flex-col">
-                      <span className="text-sm">{r.title}</span>
-                      <span className="text-xs text-muted-foreground">{r.subtitle}</span>
+                      <span className="text-sm">{t.title}</span>
+                      <span className="text-xs text-muted-foreground">
+                        {(t.status ?? '').replace(/_/g, ' ')} · {t.priority ?? ''}
+                      </span>
                     </div>
                   </CommandItem>
                 ))}
               </CommandGroup>
             )}
 
-            {taskResults.length > 0 && (
-              <CommandGroup heading="Tasks">
-                {taskResults.map((r) => (
+            {/* Knowledge Base — Universal Library (locale-agnostic, Directive 36.3) */}
+            {wiki.length > 0 && (
+              <CommandGroup heading="Knowledge Base">
+                {wiki.map((w) => (
                   <CommandItem
-                    key={r.id}
-                    value={`task-${r.id}-${r.title}`}
-                    onSelect={() => runAction(() => router.push(r.url))}
+                    key={w.id}
+                    value={`wiki-${w.id}-${w.title}`}
+                    onSelect={() => runAction(() =>
+                      router.push(
+                        w.item_type === 'playbook'
+                          ? `/wiki/playbooks/${w.id}`
+                          : `/wiki/snippets/${w.id}`
+                      )
+                    )}
                   >
-                    {getTypeIcon(r.type)}
-                    <div className="flex flex-col">
-                      <span className="text-sm">{r.title}</span>
-                      <span className="text-xs text-muted-foreground">{r.subtitle}</span>
+                    {w.item_type === 'playbook' ? (
+                      <BookOpen className="mr-2 size-4 text-amber-500" />
+                    ) : (
+                      <ScrollText className="mr-2 size-4 text-teal-500" />
+                    )}
+                    <div className="flex flex-col min-w-0">
+                      <span className="text-sm truncate">{w.title}</span>
+                      <span className="text-xs text-muted-foreground truncate">
+                        {w.category_name ? `${w.category_name} · ` : ''}
+                        {w.item_type === 'playbook' ? 'Playbook' : 'Snippet'}
+                        {w.description ? ` — ${w.description.slice(0, 80)}` : ''}
+                      </span>
                     </div>
                   </CommandItem>
                 ))}
@@ -349,35 +268,19 @@ export function CommandPalette() {
           <>
             {/* Quick Actions */}
             <CommandGroup heading="Quick Actions">
-              <CommandItem
-                onSelect={() =>
-                  runAction(() => openModal('create-contact'))
-                }
-              >
+              <CommandItem onSelect={() => runAction(() => openModal('create-contact'))}>
                 <Plus className="mr-2 size-4" />
                 New Contact
               </CommandItem>
-              <CommandItem
-                onSelect={() =>
-                  runAction(() => openModal('create-matter'))
-                }
-              >
+              <CommandItem onSelect={() => runAction(() => openModal('create-matter'))}>
                 <Plus className="mr-2 size-4" />
                 New Matter
               </CommandItem>
-              <CommandItem
-                onSelect={() =>
-                  runAction(() => openModal('create-task'))
-                }
-              >
+              <CommandItem onSelect={() => runAction(() => openModal('create-task'))}>
                 <Plus className="mr-2 size-4" />
                 New Task
               </CommandItem>
-              <CommandItem
-                onSelect={() =>
-                  runAction(() => openModal('create-lead'))
-                }
-              >
+              <CommandItem onSelect={() => runAction(() => openModal('create-lead'))}>
                 <Plus className="mr-2 size-4" />
                 New Lead
               </CommandItem>
@@ -387,77 +290,51 @@ export function CommandPalette() {
 
             {/* Navigation */}
             <CommandGroup heading="Go to">
-              <CommandItem
-                onSelect={() => runAction(() => router.push('/'))}
-              >
+              <CommandItem onSelect={() => runAction(() => router.push('/'))}>
                 <LayoutDashboard className="mr-2 size-4" />
                 Dashboard
               </CommandItem>
-              <CommandItem
-                onSelect={() => runAction(() => router.push('/contacts'))}
-              >
+              <CommandItem onSelect={() => runAction(() => router.push('/contacts'))}>
                 <Users className="mr-2 size-4" />
                 Contacts
               </CommandItem>
-              <CommandItem
-                onSelect={() => runAction(() => router.push('/matters'))}
-              >
+              <CommandItem onSelect={() => runAction(() => router.push('/matters'))}>
                 <Briefcase className="mr-2 size-4" />
                 Matters
               </CommandItem>
-              <CommandItem
-                onSelect={() => runAction(() => router.push('/leads'))}
-              >
+              <CommandItem onSelect={() => runAction(() => router.push('/leads'))}>
                 <Target className="mr-2 size-4" />
                 Leads
               </CommandItem>
-              <CommandItem
-                onSelect={() => runAction(() => router.push('/tasks'))}
-              >
+              <CommandItem onSelect={() => runAction(() => router.push('/tasks'))}>
                 <CheckSquare className="mr-2 size-4" />
                 Tasks
               </CommandItem>
-              <CommandItem
-                onSelect={() => runAction(() => router.push('/calendar'))}
-              >
+              <CommandItem onSelect={() => runAction(() => router.push('/calendar'))}>
                 <Calendar className="mr-2 size-4" />
                 Calendar
               </CommandItem>
-              <CommandItem
-                onSelect={() => runAction(() => router.push('/documents'))}
-              >
+              <CommandItem onSelect={() => runAction(() => router.push('/documents'))}>
                 <FileText className="mr-2 size-4" />
                 Documents
               </CommandItem>
-              <CommandItem
-                onSelect={() =>
-                  runAction(() => router.push('/communications'))
-                }
-              >
+              <CommandItem onSelect={() => runAction(() => router.push('/communications'))}>
                 <Mail className="mr-2 size-4" />
                 Communications
               </CommandItem>
-              <CommandItem
-                onSelect={() => runAction(() => router.push('/chat'))}
-              >
+              <CommandItem onSelect={() => runAction(() => router.push('/chat'))}>
                 <MessageSquare className="mr-2 size-4" />
                 Chat
               </CommandItem>
-              <CommandItem
-                onSelect={() => runAction(() => router.push('/billing'))}
-              >
+              <CommandItem onSelect={() => runAction(() => router.push('/billing'))}>
                 <DollarSign className="mr-2 size-4" />
                 Billing
               </CommandItem>
-              <CommandItem
-                onSelect={() => runAction(() => router.push('/reports'))}
-              >
+              <CommandItem onSelect={() => runAction(() => router.push('/reports'))}>
                 <BarChart3 className="mr-2 size-4" />
                 Reports
               </CommandItem>
-              <CommandItem
-                onSelect={() => runAction(() => router.push('/settings'))}
-              >
+              <CommandItem onSelect={() => runAction(() => router.push('/settings'))}>
                 <Settings className="mr-2 size-4" />
                 Settings
               </CommandItem>

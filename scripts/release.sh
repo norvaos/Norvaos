@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# LexCRM Release Script
+# NorvaOS Release Script
 # Usage: ./scripts/release.sh [patch|minor|major]
 #
 # This script:
@@ -31,7 +31,7 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m'
 
-echo -e "${BLUE}🚀 LexCRM Release Script${NC}"
+echo -e "${BLUE}🚀 NorvaOS Release Script${NC}"
 echo "─────────────────────────────────"
 
 # ─── Validations ─────────────────────────────────────────────────

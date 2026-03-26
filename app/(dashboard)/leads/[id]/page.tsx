@@ -67,6 +67,7 @@ import { useRunOnboarding } from '@/lib/queries/command-centre'
 import type { CommunicationFormData } from '@/components/leads/workflow/communication-log-form'
 import type { TransitionWithStatus, Lead, Contact, PracticeArea, UserRow } from '@/components/leads/workflow/lead-workflow-types'
 import { isStageAtOrPast } from '@/components/leads/workflow/lead-workflow-helpers'
+import { RouteGuard } from '@/app/providers/RouteGuard'
 
 // ─── Inline Data Hooks ──────────────────────────────────────────────────────
 
@@ -77,7 +78,7 @@ function useLeadContact(contactId: string, tenantId: string) {
       const supabase = createClient()
       const { data, error } = await supabase
         .from('contacts')
-        .select('*')
+        .select('id, first_name, last_name, email_primary, phone_primary, date_of_birth, nationality, immigration_data')
         .eq('id', contactId)
         .single()
       if (error) throw error
@@ -158,6 +159,7 @@ export default function LeadDetailPage() {
   const [showCloseDialog, setShowCloseDialog] = useState(false)
   const [showReopenDialog, setShowReopenDialog] = useState(false)
   const [showConvertDialog, setShowConvertDialog] = useState(false)
+  const [conversionError, setConversionError] = useState<string | null>(null)
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const [showCommSheet, setShowCommSheet] = useState(false)
   const [showIntakeSheet, setShowIntakeSheet] = useState(false)
@@ -280,6 +282,9 @@ export default function LeadDetailPage() {
     billingType?: string
     priority?: string
   }) {
+    // Clear any previous conversion error
+    setConversionError(null)
+
     convertLeadMutation.mutate(
       { leadId, tenantId, userId, ...data },
       {
@@ -288,11 +293,28 @@ export default function LeadDetailPage() {
 
           // Trigger One-Click Onboarding after successful conversion
           // This runs the 3-step sequence: Fee Snapshot → Portal Birth → Blueprint Injection
-          if (result?.converted_matter_id) {
+          const newMatterId = result?.matterId ?? result?.converted_matter_id
+          if (newMatterId) {
             runOnboarding.mutate({
-              matterId: result.converted_matter_id,
+              matterId: newMatterId,
               leadId,
             })
+
+            // Redirect to the new Matter Detail page
+            router.push(`/matters/${newMatterId}/shell`)
+          }
+        },
+        onError: (error: Error) => {
+          // Gracefully handle 403 Sentinel violations — show inline banner, don't crash
+          const msg = error.message || 'An unexpected error occurred'
+          if (
+            msg.includes('Permission denied') ||
+            msg.includes('Access denied') ||
+            msg.includes('Account deactivated') ||
+            msg.includes('No role assigned') ||
+            msg.includes('403')
+          ) {
+            setConversionError(msg)
           }
         },
       }
@@ -362,6 +384,7 @@ export default function LeadDetailPage() {
   // ─── Render ─────────────────────────────────────────────────────────────────
 
   return (
+    <RouteGuard leadId={leadId}>
     <div className="flex flex-col h-[calc(100vh-var(--header-height,64px))]">
       {/* Header */}
       <LeadDetailHeader
@@ -559,8 +582,10 @@ export default function LeadDetailPage() {
         defaultTitle={contact ? `${contact.first_name ?? ''} ${contact.last_name ?? ''} – Matter`.trim() : ''}
         defaultPracticeAreaId={lead.practice_area_id ?? undefined}
         defaultResponsibleLawyerId={lead.responsible_lawyer_id ?? undefined}
+        contact={contact}
         onConfirm={handleConvertLead}
         isSubmitting={convertLeadMutation.isPending}
+        conversionError={conversionError}
       />
 
       {/* Delete Confirmation */}
@@ -594,6 +619,7 @@ export default function LeadDetailPage() {
         </DialogContent>
       </Dialog>
     </div>
+    </RouteGuard>
   )
 }
 

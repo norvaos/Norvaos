@@ -228,7 +228,7 @@ export function ActivityTimeline({ tenantId, matterId, contactId, entityType, en
     <div className="space-y-4">
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList>
-          <TabsTrigger value="all">All Activity</TabsTrigger>
+          <TabsTrigger value="all">Norva Timeline</TabsTrigger>
           <TabsTrigger value="notes">Notes</TabsTrigger>
           <TabsTrigger value="activities">Events</TabsTrigger>
           <TabsTrigger value="changes">Changes</TabsTrigger>
@@ -272,7 +272,8 @@ export function ActivityTimeline({ tenantId, matterId, contactId, entityType, en
       ) : (
         <div className="text-center py-8 text-slate-500">
           <History className="mx-auto h-8 w-8 text-slate-300 mb-2" />
-          <p className="text-sm">No activity yet</p>
+          <p className="text-sm">No timeline entries yet</p>
+          <p className="text-xs text-slate-400 mt-1">Activity will appear here as the matter progresses.</p>
         </div>
       )}
     </div>

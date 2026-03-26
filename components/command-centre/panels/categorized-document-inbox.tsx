@@ -173,7 +173,7 @@ export function CategorizedDocumentInbox() {
         <div className="flex items-center justify-between">
           <CardTitle className="text-sm font-medium flex items-center gap-2 text-slate-700">
             <FileText className="h-4 w-4" />
-            Pre-Retainer Inbox
+            Norva Document Bridge
             {totalDocs > 0 && (
               <Badge variant="secondary" className="text-xs ml-1">
                 {totalDocs}

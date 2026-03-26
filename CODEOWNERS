@@ -17,20 +17,20 @@
 # Spec, registry, and waivers — these define what the system enforces.
 # Changes here can silently weaken security if not reviewed.
 
-docs/enforcement/                       @lexcrm/enforcement-reviewers
-docs/core-enforcement-spec-v1.md        @lexcrm/enforcement-reviewers
-scripts/check-spec-updated.ts           @lexcrm/enforcement-reviewers
-lib/config/version.ts                   @lexcrm/enforcement-reviewers
+docs/enforcement/                       @norvaos/enforcement-reviewers
+docs/core-enforcement-spec-v1.md        @norvaos/enforcement-reviewers
+scripts/check-spec-updated.ts           @norvaos/enforcement-reviewers
+lib/config/version.ts                   @norvaos/enforcement-reviewers
 
 # ── Frozen enforcement components (enforcement-v1.0.0) ─────────────────────
 # These files implement enforcement invariants. Any modification requires
 # the full version-bump protocol described above.
 
-components/require-permission.tsx                   @lexcrm/enforcement-reviewers
-lib/services/billing-permission.ts                  @lexcrm/enforcement-reviewers
-lib/services/stage-engine.ts                        @lexcrm/enforcement-reviewers
-lib/services/document-slot-engine.ts                @lexcrm/enforcement-reviewers
-scripts/migrations/024-uee-phase-a-hardening.sql    @lexcrm/enforcement-reviewers
-scripts/migrations/027-enforcement-enabled-lockdown.sql @lexcrm/enforcement-reviewers
-scripts/migrations/028-document-engine.sql          @lexcrm/enforcement-reviewers
-scripts/migrations/033-billing-rls-role-check.sql   @lexcrm/enforcement-reviewers
+components/require-permission.tsx                   @norvaos/enforcement-reviewers
+lib/services/billing-permission.ts                  @norvaos/enforcement-reviewers
+lib/services/stage-engine.ts                        @norvaos/enforcement-reviewers
+lib/services/document-slot-engine.ts                @norvaos/enforcement-reviewers
+scripts/migrations/024-uee-phase-a-hardening.sql    @norvaos/enforcement-reviewers
+scripts/migrations/027-enforcement-enabled-lockdown.sql @norvaos/enforcement-reviewers
+scripts/migrations/028-document-engine.sql          @norvaos/enforcement-reviewers
+scripts/migrations/033-billing-rls-role-check.sql   @norvaos/enforcement-reviewers

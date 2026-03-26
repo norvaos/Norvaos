@@ -252,7 +252,7 @@ export default function FrontDeskSettingsPage() {
           {([
             { key: 'show_action_appointments' as const, label: 'Appointment Actions', desc: 'Book, reschedule, cancel/no-show, and check-in buttons' },
             { key: 'show_action_tasks' as const, label: 'Task Actions', desc: 'Create and complete task buttons' },
-            { key: 'show_action_documents' as const, label: 'Document Upload', desc: 'Upload document button' },
+            { key: 'show_action_documents' as const, label: 'Norva Document Bridge', desc: 'Upload document button' },
             { key: 'show_action_walk_in' as const, label: 'New Walk-In', desc: 'Quick create walk-in intake button' },
           ]).map(({ key, label, desc }) => (
             <div key={key} className="flex items-center justify-between py-2">

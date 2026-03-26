@@ -17,7 +17,7 @@ export function DocumentInbox() {
         <div className="flex items-center justify-between">
           <CardTitle className="text-sm font-medium flex items-center gap-2 text-slate-700">
             <FileText className="h-4 w-4" />
-            Pre-Retainer Inbox
+            Norva Document Bridge
           </CardTitle>
           <Badge variant="outline" className="text-[10px] text-slate-400 font-normal">
             Staff Reference Only

@@ -43,8 +43,8 @@ const sections = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { id: 'contacts', label: 'Contacts & Leads', icon: Users },
   { id: 'matters', label: 'Matters', icon: Briefcase },
-  { id: 'documents', label: 'Documents & Vault', icon: FolderOpen },
-  { id: 'calendar', label: 'Calendar & Bookings', icon: Calendar },
+  { id: 'documents', label: 'Norva Document Bridge', icon: FolderOpen },
+  { id: 'calendar', label: 'Norva Scheduler', icon: Calendar },
   { id: 'tasks', label: 'Tasks', icon: CheckCircle },
   { id: 'communications', label: 'Communications', icon: MessageSquare },
   { id: 'billing', label: 'Billing & Finance', icon: CreditCard },
@@ -424,8 +424,8 @@ export default function HelpPage() {
                 <Calendar className="h-5 w-5 text-white" />
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-gray-900">Calendar & Bookings</h2>
-                <p className="text-sm text-gray-500">Scheduling and appointments</p>
+                <h2 className="text-2xl font-bold text-gray-900">Norva Scheduler</h2>
+                <p className="text-sm text-gray-500">Dynamic availability, native booking, auto-linked meetings</p>
               </div>
             </div>
 

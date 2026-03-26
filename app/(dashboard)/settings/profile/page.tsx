@@ -6,6 +6,7 @@ import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Loader2, Save, User, PenLine, Trash2, RefreshCw, Briefcase } from 'lucide-react'
 import { toast } from 'sonner'
+import { norvaToast } from '@/lib/utils/norva-branding'
 
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/lib/hooks/use-user'
@@ -94,9 +95,7 @@ export default function SettingsProfilePage() {
       queryClient.invalidateQueries({ queryKey: ['settings', 'profile'] })
     },
     onError: (error) => {
-      toast.error('Failed to update profile.', {
-        description: error.message,
-      })
+      norvaToast('save_failed', error.message)
     },
   })
 

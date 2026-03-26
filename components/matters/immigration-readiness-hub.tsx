@@ -160,7 +160,7 @@ export function ImmigrationReadinessHub({ matterId, userId, userRole }: Props) {
               color={documents.accepted === documents.mandatorySlots ? '#22c55e' : '#f59e0b'}
             />
             <MetricCard
-              label="Form Packs"
+              label="Submission Engine"
               value={formPacks.allReady ? 'Ready' : `${formPacks.generated.length}/${formPacks.required.length}`}
               color={formPacks.allReady ? '#22c55e' : '#94a3b8'}
             />

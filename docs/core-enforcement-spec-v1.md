@@ -7,7 +7,7 @@
 > **Baseline commit**: `1249dd1338f3ff59f8e15eb7082c9669bc6447c5`
 > **Git tag**: `enforcement-v1.0.0`
 >
-> This document is the single source of truth for LexCRM enforcement
+> This document is the single source of truth for NorvaOS enforcement
 > invariants. Any PR that touches a sensitive surface listed below MUST
 > either confirm "no impact to enforcement invariants" or include an
 > explicit spec update + regression tests. See **CI Gate** section.
@@ -413,7 +413,7 @@ To modify any frozen component:
 3. **Version bump**: Increment `CORE_ENFORCEMENT_SPEC_VERSION` in `lib/config/version.ts`
 4. **Co-update**: Update this spec document AND `sensitive-surfaces.json` in the same PR
 5. **Test**: Add or update enforcement regression tests covering the change
-6. **Review**: Obtain CODEOWNERS approval from `@lexcrm/enforcement-reviewers`
+6. **Review**: Obtain CODEOWNERS approval from `@norvaos/enforcement-reviewers`
 7. **CI**: All enforcement gates must pass
 
 ### Registry Size Guard

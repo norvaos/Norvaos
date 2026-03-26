@@ -43,6 +43,30 @@ export const CONTACT_TYPES = [
   { value: 'organization', label: 'Organisation' },
 ] as const
 
+/** All contact classification values with display metadata. */
+export const CONTACT_CLASSIFICATIONS = [
+  // Client lifecycle (auto-managed by DB triggers)
+  { value: 'lead', label: 'Lead', colour: 'bg-amber-100 text-amber-800', group: 'lifecycle' },
+  { value: 'client', label: 'Client', colour: 'bg-green-100 text-green-800', group: 'lifecycle' },
+  { value: 'former_client', label: 'Former Client', colour: 'bg-slate-100 text-slate-700', group: 'lifecycle' },
+  // Legal professionals
+  { value: 'lawyer', label: 'Lawyer', colour: 'bg-blue-100 text-blue-800', group: 'professional' },
+  { value: 'consultant', label: 'Consultant', colour: 'bg-indigo-100 text-indigo-800', group: 'professional' },
+  { value: 'judge', label: 'Judge', colour: 'bg-purple-100 text-purple-800', group: 'professional' },
+  // Government / IRCC
+  { value: 'ircc_officer', label: 'IRCC Officer', colour: 'bg-red-100 text-red-800', group: 'government' },
+  { value: 'government', label: 'Government', colour: 'bg-red-50 text-red-700', group: 'government' },
+  // Other
+  { value: 'referral_source', label: 'Referral Source', colour: 'bg-teal-100 text-teal-800', group: 'other' },
+  { value: 'vendor', label: 'Vendor', colour: 'bg-orange-100 text-orange-800', group: 'other' },
+  { value: 'other_professional', label: 'Other Professional', colour: 'bg-gray-100 text-gray-700', group: 'other' },
+] as const
+
+/** Quick lookup: classification value → display metadata */
+export const CLASSIFICATION_MAP = Object.fromEntries(
+  CONTACT_CLASSIFICATIONS.map(c => [c.value, c])
+) as Record<string, (typeof CONTACT_CLASSIFICATIONS)[number]>
+
 export const LEAD_TEMPERATURES = [
   { value: 'cold', label: 'Standard', color: '#6b7280' },
   { value: 'warm', label: 'Elevated', color: '#f59e0b' },

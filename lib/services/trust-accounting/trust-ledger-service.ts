@@ -28,6 +28,8 @@ import type {
   TrustBankAccountRow,
 } from '@/lib/types/database'
 import { createAdminClient } from '@/lib/supabase/admin'
+import type { ServiceResult } from './trust-types'
+import { normalizePagination, DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE } from './trust-types'
 
 // ─── Typed Table Accessors ──────────────────────────────────────────────────
 // Trust tables are defined as standalone types in database.ts but not yet
@@ -51,11 +53,7 @@ const from = {
 
 // ─── Service Result Pattern ─────────────────────────────────────────────────
 
-export interface ServiceResult<T = void> {
-  success: boolean
-  data?: T
-  error?: string
-}
+export type { ServiceResult } from './trust-types'
 
 // ─── Parameter Types ────────────────────────────────────────────────────────
 
@@ -170,8 +168,6 @@ export interface ReleaseHoldParams {
 // ─── Internal Helpers ───────────────────────────────────────────────────────
 
 const LOG_PREFIX = '[trust-ledger-service]'
-const DEFAULT_PAGE_SIZE = 50
-const MAX_PAGE_SIZE = 200
 
 /**
  * Write an immutable audit log entry via admin client (bypasses RLS).
@@ -253,17 +249,6 @@ async function getAvailableBalanceCents(
     heldAmount,
     available: ledgerBalance - heldAmount,
   }
-}
-
-/**
- * Clamp page/pageSize to safe bounds.
- */
-function normalizePagination(page?: number, pageSize?: number) {
-  const p = Math.max(1, page ?? 1)
-  const ps = Math.min(MAX_PAGE_SIZE, Math.max(1, pageSize ?? DEFAULT_PAGE_SIZE))
-  const fromIdx = (p - 1) * ps
-  const to = fromIdx + ps - 1
-  return { page: p, pageSize: ps, from: fromIdx, to }
 }
 
 // ─── 1. Record Deposit ──────────────────────────────────────────────────────

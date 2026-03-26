@@ -135,6 +135,8 @@ export function useRecordDeposit() {
       invoiceId?: string
       effectiveDate?: string
       notes?: string
+      /** Optional lead ID — triggers auto-conversion via Norva Ledger */
+      leadId?: string
     }) => fetchApi('/api/trust-accounting/transactions', {
       method: 'POST',
       body: JSON.stringify({ transactionType: 'deposit', ...input }),
@@ -143,6 +145,7 @@ export function useRecordDeposit() {
       qc.invalidateQueries({ queryKey: trustKeys.transactions() })
       qc.invalidateQueries({ queryKey: trustKeys.reports() })
       qc.invalidateQueries({ queryKey: ['matters'] })
+      qc.invalidateQueries({ queryKey: ['leads'] })
       toast.success('Deposit recorded')
     },
     onError: (error: Error) => {

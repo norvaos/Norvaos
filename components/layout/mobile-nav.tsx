@@ -9,6 +9,8 @@ import { Lock, LogOut, Menu } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { createClient } from '@/lib/supabase/client'
 import { navigation, type NavItem } from '@/lib/config/navigation'
+import { useI18n } from '@/lib/i18n/i18n-provider'
+import type { DictionaryKey } from '@/lib/i18n/dictionaries/en'
 import { useUIStore } from '@/lib/stores/ui-store'
 import { useUser } from '@/lib/hooks/use-user'
 import { useTenant } from '@/lib/hooks/use-tenant'
@@ -71,7 +73,9 @@ function MobileNavItem({
   featureFlags,
   onNavigate,
 }: MobileNavItemProps) {
+  const { t } = useI18n()
   const Icon = item.icon
+  const label = item.labelKey ? t(item.labelKey as DictionaryKey, item.title) : item.title
 
   // Hide items that require a feature flag that is not enabled.
   if (item.featureFlag && !featureFlags[item.featureFlag]) {
@@ -95,7 +99,7 @@ function MobileNavItem({
         <Icon className="size-5" />
       </span>
 
-      <span className="truncate">{item.title}</span>
+      <span className="truncate">{label}</span>
 
       {item.comingSoon && (
         <Lock className="ml-auto size-3.5 shrink-0 text-muted-foreground/60" />
@@ -109,6 +113,7 @@ function MobileNavItem({
 // ---------------------------------------------------------------------------
 
 export function MobileNavTrigger() {
+  const { t } = useI18n()
   const setSidebarMobileOpen = useUIStore((s) => s.setSidebarMobileOpen)
 
   return (
@@ -117,7 +122,7 @@ export function MobileNavTrigger() {
       size="icon"
       className="md:hidden"
       onClick={() => setSidebarMobileOpen(true)}
-      aria-label="Open navigation"
+      aria-label={t('nav.open_navigation', 'Open navigation')}
     >
       <Menu className="size-5" />
     </Button>
@@ -131,6 +136,7 @@ export function MobileNavTrigger() {
 export function MobileNav() {
   const pathname = usePathname()
   const router = useRouter()
+  const { t } = useI18n()
 
   const sidebarMobileOpen = useUIStore((s) => s.sidebarMobileOpen)
   const setSidebarMobileOpen = useUIStore((s) => s.setSidebarMobileOpen)
@@ -189,7 +195,7 @@ export function MobileNav() {
               return (
                 <div key={section.title} className="flex flex-col gap-1">
                   <span className="mb-1 px-3 text-xs font-medium uppercase tracking-wider text-muted-foreground/70">
-                    {section.title}
+                    {section.labelKey ? t(section.labelKey as DictionaryKey, section.title) : section.title}
                   </span>
 
                   {visibleItems.map((item) => (
@@ -244,7 +250,7 @@ export function MobileNav() {
               size="icon"
               onClick={handleLogout}
               className="size-8 shrink-0 text-muted-foreground hover:text-destructive"
-              aria-label="Log out"
+              aria-label={t('nav.log_out', 'Log out')}
             >
               <LogOut className="size-4" />
             </Button>

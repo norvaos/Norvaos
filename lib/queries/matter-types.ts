@@ -1,8 +1,9 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient, QueryClient } from '@tanstack/react-query'
 import { useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 import type { Database } from '@/lib/types/database'
+import { broadcastMutation } from '@/lib/hooks/use-cross-tab-sync'
 
 type MatterType = Database['public']['Tables']['matter_types']['Row']
 type MatterStagePipeline = Database['public']['Tables']['matter_stage_pipelines']['Row']
@@ -83,6 +84,35 @@ export function useMatterTypes(tenantId: string, practiceAreaId?: string | null)
       return data as MatterType[]
     },
     enabled: !!tenantId,
+    staleTime: 3 * 60 * 1000,
+  })
+}
+
+/**
+ * Prefetch matter types into the query cache so subsequent renders are instant.
+ * Call this from server components, route loaders, or layout effects to warm the cache.
+ */
+export function prefetchMatterTypes(queryClient: QueryClient, tenantId: string, practiceAreaId?: string) {
+  return queryClient.prefetchQuery({
+    queryKey: ['matter_types', tenantId, practiceAreaId ?? 'all'],
+    queryFn: async () => {
+      const supabase = createClient()
+      let q = supabase
+        .from('matter_types')
+        .select('*')
+        .eq('tenant_id', tenantId)
+        .eq('is_active', true)
+        .order('sort_order')
+        .order('name')
+
+      if (practiceAreaId) {
+        q = q.or(`practice_area_id.eq.${practiceAreaId},practice_area_id.is.null`)
+      }
+
+      const { data, error } = await q
+      if (error) throw error
+      return data as MatterType[]
+    },
     staleTime: 3 * 60 * 1000,
   })
 }
@@ -563,6 +593,28 @@ export function useMatterDeadlines(tenantId: string, matterId: string | null | u
 }
 
 /**
+ * Prefetch deadlines for a specific matter into the query cache.
+ * Use this to warm the cache before navigating to a matter detail page.
+ */
+export function prefetchMatterDeadlines(queryClient: QueryClient, tenantId: string, matterId: string) {
+  return queryClient.prefetchQuery({
+    queryKey: ['matter_deadlines', tenantId, matterId],
+    queryFn: async () => {
+      const supabase = createClient()
+      const { data, error } = await supabase
+        .from('matter_deadlines')
+        .select('*')
+        .eq('tenant_id', tenantId)
+        .eq('matter_id', matterId)
+        .order('due_date', { ascending: true })
+      if (error) throw error
+      return data as MatterDeadline[]
+    },
+    staleTime: 1000 * 60 * 2,
+  })
+}
+
+/**
  * Create a deadline on a matter.
  */
 export function useCreateMatterDeadline() {
@@ -989,6 +1041,28 @@ export function useMatterStageState(matterId: string | null | undefined) {
       return data as MatterStageState | null
     },
     enabled: !!matterId,
+    staleTime: 1000 * 60 * 2, // 2 min — avoid refetch on every mount when navigating matter pages
+  })
+}
+
+/**
+ * Prefetch the current stage state for a matter into the given QueryClient cache.
+ * Call this ahead of navigation to avoid a loading spinner on the matter detail page.
+ */
+export function prefetchMatterStageState(queryClient: QueryClient, matterId: string) {
+  return queryClient.prefetchQuery({
+    queryKey: matterStageKeys.state(matterId),
+    queryFn: async () => {
+      const supabase = createClient()
+      const { data, error } = await supabase
+        .from('matter_stage_state')
+        .select('*')
+        .eq('matter_id', matterId)
+        .maybeSingle()
+      if (error) throw error
+      return data as MatterStageState | null
+    },
+    staleTime: 1000 * 60 * 2, // 2 min
   })
 }
 
@@ -1024,8 +1098,38 @@ export function useAdvanceMatterStage() {
 
       return data as { success: true; stageName: string; failedRules?: string[] }
     },
+    // ── Optimistic UI: advance stage instantly in cache ──
+    onMutate: async ({ matterId, targetStageId }) => {
+      await queryClient.cancelQueries({ queryKey: matterStageKeys.state(matterId) })
+      await queryClient.cancelQueries({ queryKey: ['matters', 'detail', matterId] })
+
+      // Snapshot stage state for rollback
+      const previousState = queryClient.getQueryData(matterStageKeys.state(matterId))
+
+      // Optimistically update stage state
+      if (previousState && typeof previousState === 'object') {
+        queryClient.setQueryData(matterStageKeys.state(matterId), {
+          ...(previousState as Record<string, unknown>),
+          current_stage_id: targetStageId,
+          updated_at: new Date().toISOString(),
+        })
+      }
+
+      // Optimistically update the matter detail cache's stage_id
+      const detailKey = ['matters', 'detail', matterId]
+      const previousDetail = queryClient.getQueryData(detailKey)
+      if (previousDetail && typeof previousDetail === 'object') {
+        queryClient.setQueryData(detailKey, {
+          ...(previousDetail as Record<string, unknown>),
+          stage_id: targetStageId,
+          stage_entered_at: new Date().toISOString(),
+        })
+      }
+
+      return { previousState, previousDetail }
+    },
     onSuccess: (result, variables) => {
-      // Invalidate all related queries
+      // Invalidate all related queries to get real server data
       queryClient.invalidateQueries({ queryKey: matterStageKeys.state(variables.matterId) })
       queryClient.invalidateQueries({ queryKey: ['immigration', 'matter', variables.matterId] })
       queryClient.invalidateQueries({ queryKey: ['immigration', 'checklist', variables.matterId] })
@@ -1035,8 +1139,18 @@ export function useAdvanceMatterStage() {
       queryClient.invalidateQueries({ queryKey: gatingKeys.check(variables.matterId) })
       queryClient.invalidateQueries({ queryKey: ['matters', 'detail'] })
       toast.success(`Stage advanced to ${result.stageName}`)
+
+      // Broadcast to other tabs
+      broadcastMutation('matter:stage-advanced', { matterId: variables.matterId })
     },
-    onError: (error: Error) => {
+    onError: (error: Error, variables, context) => {
+      // Rollback on failure
+      if (context?.previousState) {
+        queryClient.setQueryData(matterStageKeys.state(variables.matterId), context.previousState)
+      }
+      if (context?.previousDetail) {
+        queryClient.setQueryData(['matters', 'detail', variables.matterId], context.previousDetail)
+      }
       toast.error(error.message || 'Failed to advance stage')
     },
   })

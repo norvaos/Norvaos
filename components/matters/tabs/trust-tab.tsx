@@ -26,6 +26,10 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Plus, ArrowDownRight, Loader2, ShieldCheck, XCircle, Landmark } from 'lucide-react'
+import { TrustStatusIndicator } from '@/components/trust/trust-status-indicator'
+import { OverdueInvoiceBanner } from '@/components/trust/overdue-invoice-banner'
+import { SmartMatchCard } from '@/components/trust/smart-match-card'
+import { useOverdueInvoices } from '@/lib/queries/overdue-invoices'
 import {
   useTrustAccounts,
   useTrustTransactions,
@@ -162,6 +166,9 @@ export function TrustTab({ matterId, tenantId, matter }: TrustTabProps) {
     requested_by_name?: string
   }> })?.requests ?? []
 
+  const { data: overdueData } = useOverdueInvoices(matterId)
+  const overdueInvoices = overdueData?.invoices ?? []
+
   // Mutations
   const recordDeposit = useRecordDeposit()
   const prepareDisbursement = usePrepareDisbursement()
@@ -252,18 +259,26 @@ export function TrustTab({ matterId, tenantId, matter }: TrustTabProps) {
   // ── Balance colour ───────────────────────────────────────────────────────
 
   const balanceCents = matter.trust_balance ?? 0
-  const balanceColour = balanceCents > 0 ? 'text-green-700' : balanceCents < 0 ? 'text-red-700' : 'text-slate-700'
+  const hasOverdue = overdueInvoices.length > 0
+  const isZeroOrNegative = balanceCents <= 0
+  const balanceColour = isZeroOrNegative ? 'text-red-700' : 'text-green-700'
 
   return (
     <div className="space-y-6">
       {/* Header — Trust Balance Summary */}
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
-        <Card>
+        <Card className={isZeroOrNegative ? 'border-red-300 bg-red-50' : ''}>
           <CardContent className="p-4">
-            <p className="text-xs text-muted-foreground">Trust Balance</p>
+            <div className="flex items-center justify-between">
+              <p className="text-xs text-muted-foreground">Trust Balance</p>
+              <TrustStatusIndicator balanceCents={balanceCents} overdueCount={overdueInvoices.length} />
+            </div>
             <p className={`text-lg font-semibold ${balanceColour}`}>
               {fmtCents(balanceCents)}
             </p>
+            {isZeroOrNegative && (
+              <p className="text-[10px] text-red-600 font-medium mt-0.5">No funds available</p>
+            )}
           </CardContent>
         </Card>
         <Card>
@@ -284,6 +299,12 @@ export function TrustTab({ matterId, tenantId, matter }: TrustTabProps) {
           </CardContent>
         </Card>
       </div>
+
+      {/* Overdue Invoice Alert */}
+      <OverdueInvoiceBanner invoices={overdueInvoices} matterId={matterId} />
+
+      {/* Smart-Match Suggestions */}
+      <SmartMatchCard matterId={matterId} />
 
       {/* Trust Account Selector */}
       {accountsLoading ? (
@@ -378,7 +399,7 @@ export function TrustTab({ matterId, tenantId, matter }: TrustTabProps) {
                       {isPositive ? '+' : ''}
                       {fmtCents(tx.amount_cents)}
                     </span>
-                    <span className="text-xs font-medium text-right">
+                    <span className={`text-xs font-medium text-right ${tx.running_balance_cents <= 0 ? 'text-red-700 font-bold' : ''}`}>
                       {fmtCents(tx.running_balance_cents)}
                     </span>
                     <span className="text-xs text-muted-foreground truncate">

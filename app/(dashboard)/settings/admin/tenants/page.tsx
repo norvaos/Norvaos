@@ -396,7 +396,7 @@ export default function AdminTenantsPage() {
                           onClick={() => router.push(`/settings/admin/audit-log?tenantId=${tenant.id}&tenantName=${encodeURIComponent(tenant.name)}`)}
                         >
                           <ChevronRight className="mr-2 h-4 w-4" />
-                          View Audit Log
+                          View Norva Vault
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => openMaxUsersDialog(tenant)}>
                           <RefreshCw className="mr-2 h-4 w-4" />

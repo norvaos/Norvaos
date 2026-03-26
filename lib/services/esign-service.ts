@@ -591,7 +591,7 @@ export async function createAndSendSigningRequest(
     // Verify document exists
     const { data: doc } = await supabase
       .from('signing_documents' as never)
-      .select('id, tenant_id, title, checksum_sha256')
+      .select('id, tenant_id, title, checksum_sha256, document_type')
       .eq('id', params.signingDocumentId)
       .eq('tenant_id', params.tenantId)
       .single()
@@ -700,22 +700,62 @@ export async function createAndSendSigningRequest(
 
     if (resend) {
       try {
-        const { renderSigningRequestEmail } = await import('@/lib/email-templates/signing-request')
-        const docRecord = doc as { title: string }
+        const docRecord = doc as { title: string; document_type?: string }
 
         // Extract first name from signer name
         const signerFirstName = params.signerName.split(' ')[0] || params.signerName
 
-        const { html, text, subject } = await renderSigningRequestEmail({
-          firmName: tenant.name,
-          firmLogoUrl: tenant.logo_url,
-          primaryColor: tenant.primary_color ?? "",
-          signerFirstName,
-          documentTitle: docRecord.title,
-          matterReference: matterRef,
-          signingUrl,
-          expiresAt: expiresAt.toISOString(),
-        })
+        // Resolve signer's preferred language for locale-aware templates
+        let signerLanguage: string | null = null
+        if (params.signerContactId) {
+          const { data: signerContact } = await supabase
+            .from('contacts')
+            .select('preferred_language')
+            .eq('id', params.signerContactId)
+            .single()
+          signerLanguage = signerContact?.preferred_language ?? null
+        }
+
+        let html: string
+        let text: string
+        let subject: string
+
+        if (docRecord.document_type === 'retainer_agreement') {
+          // Use locale-aware retainer agreement template
+          const { renderRetainerAgreementEmail } = await import('@/lib/email-templates/retainer-agreement')
+          const { resolveEmailLocale } = await import('@/lib/email-templates/email-locale')
+          const locale = resolveEmailLocale(signerLanguage)
+          const rendered = await renderRetainerAgreementEmail({
+            firmName: tenant.name,
+            firmLogoUrl: tenant.logo_url,
+            primaryColor: tenant.primary_color ?? "",
+            clientFirstName: signerFirstName,
+            matterReference: matterRef,
+            documentTitle: docRecord.title,
+            signingUrl,
+            expiresAt: expiresAt.toISOString(),
+            language: locale,
+          })
+          html = rendered.html
+          text = rendered.text
+          subject = rendered.subject
+        } else {
+          // Default signing request template for non-retainer documents
+          const { renderSigningRequestEmail } = await import('@/lib/email-templates/signing-request')
+          const rendered = await renderSigningRequestEmail({
+            firmName: tenant.name,
+            firmLogoUrl: tenant.logo_url,
+            primaryColor: tenant.primary_color ?? "",
+            signerFirstName,
+            documentTitle: docRecord.title,
+            matterReference: matterRef,
+            signingUrl,
+            expiresAt: expiresAt.toISOString(),
+          })
+          html = rendered.html
+          text = rendered.text
+          subject = rendered.subject
+        }
 
         const { data: resendData, error: resendError } = await resend.emails.send({
           from: getFromAddress(tenant.name),

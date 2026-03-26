@@ -59,3 +59,39 @@ export interface NorvaOSGateFailure {
   /** Full list of conditions with individual pass/fail results */
   failedConditions: GateConditionResult[]
 }
+
+// ── SENTINEL Security Error Types ─────────────────────────────────────────────
+
+/**
+ * Structured response returned by any route when a cross-tenant access
+ * violation is detected. HTTP 403.
+ *
+ * Team SENTINEL requirement: hard 403, never an empty list.
+ */
+export interface SentinelTenantViolation {
+  /** Always 'SENTINEL_TENANT_VIOLATION' */
+  code: 'SENTINEL_TENANT_VIOLATION'
+  /** Human-readable error message */
+  message: string
+  /** The authenticated user's tenant ID */
+  userTenantId: string
+  /** The tenant ID of the resource they tried to access */
+  attemptedTenantId: string
+  /** Which table the violation occurred on */
+  tableName: string
+  /** The record ID if applicable */
+  recordId: string | null
+}
+
+/**
+ * Structured response when a gating rule blocks stage advancement
+ * because a retainer agreement is missing or insufficient.
+ */
+export interface RetainerGateFailure extends NorvaOSGateFailure {
+  /** Always 'GATE_RETAINER_MISSING' or 'GATE_RETAINER_INSUFFICIENT' */
+  code: 'GATE_RETAINER_MISSING' | 'GATE_RETAINER_INSUFFICIENT'
+  /** Current retainer status (null if none exists) */
+  retainerStatus: string | null
+  /** Required minimum status */
+  requiredStatus: string
+}

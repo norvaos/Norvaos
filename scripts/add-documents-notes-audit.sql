@@ -1,4 +1,4 @@
--- Add documents, notes, and audit_logs tables for LexCRM
+-- Add documents, notes, and audit_logs tables for NorvaOS
 -- Run this in Supabase SQL Editor
 
 -- =========================================================================

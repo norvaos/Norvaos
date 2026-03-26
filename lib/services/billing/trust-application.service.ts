@@ -26,11 +26,8 @@ import type {
 } from '@/lib/types/database'
 import { appendAuditEvent } from './invoice-audit.service'
 
-export interface ServiceResult<T = void> {
-  success: boolean
-  data?: T
-  error?: string
-}
+import type { ServiceResult } from '../trust-accounting/trust-types'
+export type { ServiceResult } from '../trust-accounting/trust-types'
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const fromAllocations = (c: SupabaseClient<Database>) =>

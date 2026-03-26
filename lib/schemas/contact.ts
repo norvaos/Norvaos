@@ -28,6 +28,8 @@ export const contactSchema = z.object({
   email_opt_in: z.boolean().default(true),
   sms_opt_in: z.boolean().default(false),
   notes: z.string().optional(),
+  client_status: z.enum(['lead', 'client', 'former_client', 'lawyer', 'ircc_officer', 'consultant', 'judge', 'referral_source', 'government', 'vendor', 'other_professional']).optional(),
+  preferred_language: z.string().max(5).optional(),
 }).superRefine((data, ctx) => {
   if (data.contact_type === 'individual') {
     if (!data.first_name || data.first_name.trim().length === 0) {

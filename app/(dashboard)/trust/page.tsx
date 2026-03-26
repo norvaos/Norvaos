@@ -48,6 +48,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { NorvaWhisper } from '@/components/ui/norva-whisper'
 import {
   Table,
   TableBody,
@@ -242,7 +243,10 @@ function TrustDashboard() {
       {/* ── Page Header ─────────────────────────────────────────────── */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-900">Trust Accounting</h1>
+          <h1 className="text-2xl font-semibold text-slate-900">
+            Norva Ledger
+            <NorvaWhisper contentKey="ledger.trust" />
+          </h1>
           <p className="mt-1 text-sm text-slate-500">
             Manage trust accounts, client balances, and regulatory compliance.
           </p>
@@ -352,7 +356,8 @@ function TrustDashboard() {
           </TabsTrigger>
           <TabsTrigger value="audit" className="gap-1.5">
             <BookOpen className="h-3.5 w-3.5" />
-            Audit Trail
+            Norva Vault
+            <NorvaWhisper contentKey="vault.audit" className="ml-0.5" />
           </TabsTrigger>
         </TabsList>
 
@@ -709,7 +714,7 @@ function TrustDashboard() {
         <TabsContent value="audit">
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Trust Audit Trail</CardTitle>
+              <CardTitle className="text-base">Norva Vault — Trust Audit Trail</CardTitle>
             </CardHeader>
             <CardContent>
               {auditLoading ? (

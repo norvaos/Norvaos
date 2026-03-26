@@ -1,9 +1,11 @@
 'use client'
 
 import { useMatterImmigration } from '@/lib/queries/immigration'
+import { useMatter } from '@/lib/queries/matters'
 import { HelperTip } from '@/components/ui/helper-tip'
 import { Progress } from '@/components/ui/progress'
 import { cn } from '@/lib/utils'
+import type { ReadinessDomain } from '@/lib/services/readiness-engine'
 
 function countFilled(record: Record<string, unknown> | null, keys: string[]): number {
   if (!record) return 0
@@ -15,6 +17,7 @@ function countFilled(record: Record<string, unknown> | null, keys: string[]): nu
 
 export function MatterReadinessBadge({ matterId }: { matterId: string }) {
   const { data: immigration } = useMatterImmigration(matterId)
+  const { data: matter } = useMatter(matterId)
 
   if (!immigration) return null
 
@@ -35,14 +38,28 @@ export function MatterReadinessBadge({ matterId }: { matterId: string }) {
   const color = pct >= 80 ? 'text-emerald-600' : pct >= 40 ? 'text-amber-600' : 'text-red-500'
   const progressColor = pct >= 80 ? 'bg-emerald-500' : pct >= 40 ? 'bg-amber-500' : 'bg-red-400'
 
+  // Check if the Billing domain in the readiness breakdown has a score of 0 (no retainer)
+  const breakdown = matter?.readiness_breakdown as ReadinessDomain[] | null | undefined
+  const billingDomain = Array.isArray(breakdown)
+    ? breakdown.find((d) => d.name === 'Billing')
+    : null
+  const retainerMissing = billingDomain !== null && billingDomain !== undefined && billingDomain.score === 0
+
   return (
-    <div className="flex items-center gap-3 rounded-lg border bg-card px-4 py-2.5">
-      <div className="flex items-center gap-1.5">
-        <span className="text-xs font-medium text-muted-foreground">Matter Readiness</span>
-        <HelperTip contentKey="matter.readiness_score" />
+    <div className="flex flex-col gap-1">
+      <div className="flex items-center gap-3 rounded-lg border bg-card px-4 py-2.5">
+        <div className="flex items-center gap-1.5">
+          <span className="text-xs font-medium text-muted-foreground">Matter Readiness</span>
+          <HelperTip contentKey="matter.readiness_score" />
+        </div>
+        <Progress value={pct} className="h-2 w-24 [&>div]:transition-all" indicatorClassName={progressColor} />
+        <span className={cn('text-sm font-semibold tabular-nums', color)}>{pct}%</span>
       </div>
-      <Progress value={pct} className="h-2 w-24 [&>div]:transition-all" indicatorClassName={progressColor} />
-      <span className={cn('text-sm font-semibold tabular-nums', color)}>{pct}%</span>
+      {retainerMissing && (
+        <span className="text-[11px] font-medium text-amber-600 dark:text-amber-400 pl-1">
+          Retainer Missing
+        </span>
+      )}
     </div>
   )
 }

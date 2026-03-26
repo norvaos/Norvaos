@@ -2,6 +2,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/lib/types/database'
 import { graphFetch } from '@/lib/services/microsoft-graph'
 import { log } from '@/lib/utils/logger'
+import { buildTokenFooter, buildTokenFooterHtml } from '@/lib/services/email-thread-token'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -70,12 +71,23 @@ export async function sendEmailViaProvider(
   }
 
   try {
+    // Smart-Threader: Inject crypto token into email body for auto-association
+    // When a reply comes back, the token is extracted and matched to this matter.
+    let enrichedBody = body
+    if (options.matterId && account.tenant_id) {
+      if (options.bodyType === 'html') {
+        enrichedBody = body + buildTokenFooterHtml(options.matterId, account.tenant_id)
+      } else {
+        enrichedBody = body + buildTokenFooter(options.matterId, account.tenant_id)
+      }
+    }
+
     // Build the Graph API message object
     const message: Record<string, unknown> = {
       subject,
       body: {
         contentType: options.bodyType === 'html' ? 'HTML' : 'Text',
-        content: body,
+        content: enrichedBody,
       },
       toRecipients: to.map((addr) => ({
         emailAddress: { address: addr },
@@ -106,7 +118,7 @@ export async function sendEmailViaProvider(
             ccRecipients: message.ccRecipients,
             bccRecipients: message.bccRecipients,
           },
-          comment: body,
+          comment: enrichedBody,
         },
       })
     } else {

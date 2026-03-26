@@ -123,7 +123,7 @@ export function useImmigrationReadiness(matterId: string | null | undefined) {
       const [intakeRes, slotsRes, templateRes, formPacksRes, matterRes, peopleRes, immigrationRes] = await Promise.all([
         supabase
           .from('matter_intake')
-          .select('*')
+          .select('program_category, immigration_intake_status, imm_status_changed_at, completion_pct, contradiction_flags, contradiction_override_at, contradiction_override_by, lawyer_review_status, lawyer_review_by, lawyer_review_at, lawyer_review_notes, eligibility_verified_at, eligibility_verified_by, eligibility_outcome')
           .eq('matter_id', matterId)
           .maybeSingle(),
         supabase

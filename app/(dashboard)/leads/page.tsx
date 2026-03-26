@@ -33,12 +33,14 @@ import {
   Mail,
   User,
   ClipboardList,
+  FileUp,
 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
 import { useTenant } from '@/lib/hooks/use-tenant'
 import { usePracticeAreaContext } from '@/lib/hooks/use-practice-area-context'
+import { useI18n } from '@/lib/i18n/i18n-provider'
 import { createClient } from '@/lib/supabase/client'
 import { usePipelines, usePipelineStages } from '@/lib/queries/pipelines'
 import { useLeads, useUpdateLeadStage, useUpdateLead, leadKeys } from '@/lib/queries/leads'
@@ -50,6 +52,7 @@ import { KanbanColumn, KanbanColumnSkeleton } from '@/components/pipeline/kanban
 import { KanbanCard } from '@/components/pipeline/kanban-card'
 import type { ContactInfo, UserInfo } from '@/components/pipeline/kanban-card'
 import { LeadCreateSheet } from '@/components/leads/lead-create-sheet'
+import { BulkImportWizard } from '@/components/leads/import/bulk-import-wizard'
 import { DeferredDateDialog } from '@/components/leads/deferred-date-dialog'
 import { LostReasonDialog } from '@/components/leads/lost-reason-dialog'
 import type { LostReason } from '@/components/leads/lost-reason-dialog'
@@ -89,10 +92,93 @@ type Lead = Database['public']['Tables']['leads']['Row']
 // Main page component
 // ---------------------------------------------------------------------------
 
+// ─── Mini ScoreRing (Directive 36.1 — Sovereign Layer) ───────────────────────
+const MINI_RING_SIZE = 36
+const MINI_RING_CENTER = MINI_RING_SIZE / 2
+const MINI_RING_RADIUS = 14
+const MINI_RING_CIRCUMFERENCE = 2 * Math.PI * MINI_RING_RADIUS
+
+function MiniScoreRing({ score }: { score: number }) {
+  const colours = (() => {
+    if (score >= 95) return { stroke: '#d4af37', text: 'text-yellow-600', gold: true }
+    if (score >= 85) return { stroke: '#22c55e', text: 'text-green-600', gold: false }
+    if (score >= 60) return { stroke: '#f59e0b', text: 'text-amber-600', gold: false }
+    return { stroke: '#ef4444', text: 'text-red-600', gold: false }
+  })()
+  const offset = MINI_RING_CIRCUMFERENCE - (score / 100) * MINI_RING_CIRCUMFERENCE
+
+  return (
+    <div className="relative shrink-0">
+      {colours.gold && (
+        <div
+          className="absolute inset-0 rounded-full"
+          style={{
+            background: 'radial-gradient(circle, rgba(212,175,55,0.25) 0%, transparent 70%)',
+            animation: 'gold-pulse 2s ease-in-out infinite',
+          }}
+        />
+      )}
+      <svg
+        width={MINI_RING_SIZE}
+        height={MINI_RING_SIZE}
+        viewBox={`0 0 ${MINI_RING_SIZE} ${MINI_RING_SIZE}`}
+        className="relative"
+        aria-hidden="true"
+      >
+        {colours.gold && (
+          <defs>
+            <filter id="mini-gold-glow">
+              <feGaussianBlur stdDeviation="1.5" result="blur" />
+              <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+          </defs>
+        )}
+        <circle
+          cx={MINI_RING_CENTER}
+          cy={MINI_RING_CENTER}
+          r={MINI_RING_RADIUS}
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={2.5}
+          className="text-slate-200"
+        />
+        <circle
+          cx={MINI_RING_CENTER}
+          cy={MINI_RING_CENTER}
+          r={MINI_RING_RADIUS}
+          fill="none"
+          stroke={colours.stroke}
+          strokeWidth={colours.gold ? 3 : 2.5}
+          strokeLinecap="round"
+          strokeDasharray={MINI_RING_CIRCUMFERENCE}
+          strokeDashoffset={offset}
+          className="transition-all duration-500"
+          filter={colours.gold ? 'url(#mini-gold-glow)' : undefined}
+          style={{ transform: 'rotate(-90deg)', transformOrigin: '50% 50%' }}
+        />
+        <text
+          x={MINI_RING_CENTER}
+          y={MINI_RING_CENTER}
+          textAnchor="middle"
+          dominantBaseline="central"
+          className={cn('fill-current font-bold tabular-nums', colours.text)}
+          style={{ fontSize: '10px' }}
+        >
+          {score}
+        </text>
+      </svg>
+    </div>
+  )
+}
+
 export default function LeadsPage() {
   const { tenant, isLoading: tenantLoading } = useTenant()
   const queryClient = useQueryClient()
   const router = useRouter()
+  const { t } = useI18n()
   const tenantId = tenant?.id ?? ''
 
   // ---- Global practice area context ----------------------------------------
@@ -234,12 +320,12 @@ export default function LeadsPage() {
       const supabase = createClient()
       const { data, error } = await supabase
         .from('contacts')
-        .select('id, first_name, last_name, email_primary, organization_name')
+        .select('id, first_name, last_name, email_primary, organization_name, active_matter_count')
         .in('id', contactIds)
 
       if (error) throw error
       const map: Record<string, ContactInfo> = {}
-      for (const c of (data ?? []) as ContactInfo[]) {
+      for (const c of (data ?? []) as (ContactInfo & { active_matter_count?: number })[]) {
         map[c.id] = c
       }
       return map
@@ -395,6 +481,26 @@ export default function LeadsPage() {
   const totalValue = useMemo(
     () => leads.reduce((sum, l) => sum + (l.estimated_value ?? 0), 0),
     [leads]
+
+  // ---- Pipeline readiness score (weighted health metric) ------------------
+  )
+  const pipelineReadiness = useMemo(() => {
+    if (leads.length === 0) return 0
+    let score = 0
+    let weight = 0
+    for (const lead of leads) {
+      // +25 base for existing in pipeline
+      score += 25; weight += 25
+      // +25 if contact assigned
+      if (lead.contact_id) score += 25; weight += 25
+      // +25 if has value estimate
+      if (lead.estimated_value && lead.estimated_value > 0) score += 25; weight += 25
+      // +25 if follow-up is set and not overdue
+      if (lead.next_follow_up && !isOverdue(lead.next_follow_up)) score += 25
+      weight += 25
+    }
+    return weight > 0 ? Math.round((score / weight) * 100) : 0
+  }, [leads]
   )
 
   // ---- Drag-and-drop -------------------------------------------------------
@@ -580,6 +686,7 @@ export default function LeadsPage() {
 
   // ---- Lead creation sheet -------------------------------------------------
   const [createSheetOpen, setCreateSheetOpen] = useState(false)
+  const [importWizardOpen, setImportWizardOpen] = useState(false)
   const [createSheetStageId, setCreateSheetStageId] = useState<string>('')
 
   const handleAddLead = useCallback(
@@ -593,6 +700,20 @@ export default function LeadsPage() {
   const handleCardClick = useCallback((leadId: string) => {
     router.push(`/command/lead/${leadId}`)
   }, [router])
+
+  const handleViewMatter = useCallback((matterId: string) => {
+    router.push(`/matters/${matterId}`)
+  }, [router])
+
+  // Build active_matter_count lookup keyed by contact_id (from enriched contacts query)
+  const activeMatterCountMap = useMemo(() => {
+    const map: Record<string, number> = {}
+    for (const [contactId, contact] of Object.entries(contactsMap)) {
+      const count = (contact as ContactInfo & { active_matter_count?: number }).active_matter_count
+      if (count != null && count > 0) map[contactId] = count
+    }
+    return map
+  }, [contactsMap])
 
   // ---- Active filter count -------------------------------------------------
   const activeFilterCount =
@@ -615,7 +736,7 @@ export default function LeadsPage() {
         <div className="flex flex-1 items-center justify-center">
           <EmptyState
             icon={Funnel}
-            title="No lead pipelines configured"
+            title={t('leads.no_pipelines', 'No lead pipelines configured')}
             description="Create a lead pipeline in Settings to start tracking your leads through stages."
           />
         </div>
@@ -624,12 +745,22 @@ export default function LeadsPage() {
   }
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="flex h-full flex-col" data-leads-command>
       {/* Page header with pipeline selector */}
       <div className="flex-shrink-0 border-b bg-white px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <h1 className="text-2xl font-semibold text-slate-900">Leads</h1>
+            <h1 className="text-2xl font-semibold text-slate-900">{t('leads.title', 'Leads')}</h1>
+
+            {/* ScoreRing — Pipeline Readiness (Directive 36.1) */}
+            {totalLeads > 0 && (
+              <div className="flex items-center gap-2">
+                <MiniScoreRing score={pipelineReadiness} />
+                <Badge variant="outline" className="text-[10px] font-medium text-blue-700 border-blue-200 bg-blue-50 iron-shadow">
+                  {t('leads.new_inquiry', 'New Inquiry')}
+                </Badge>
+              </div>
+            )}
 
             {/* Pipeline selector */}
             {filteredPipelines.length > 1 && (
@@ -673,7 +804,7 @@ export default function LeadsPage() {
                   <span className="font-medium text-slate-700">
                     {formatCurrency(totalValue)}
                   </span>{' '}
-                  total value
+                  {t('leads.total_value', 'total value')}
                 </span>
               )}
             </div>
@@ -700,9 +831,21 @@ export default function LeadsPage() {
               </Button>
             </div>
 
+            {/* Import leads */}
+            <Button
+              size="sm"
+              variant="outline"
+              className="iron-shadow"
+              onClick={() => setImportWizardOpen(true)}
+            >
+              <FileUp className="mr-1 h-4 w-4" />
+              {t('leads.import', 'Import')}
+            </Button>
+
             {/* Add lead button */}
             <Button
               size="sm"
+              className="iron-shadow"
               onClick={() => {
                 const firstStage = stages?.[0]
                 if (firstStage) {
@@ -712,7 +855,7 @@ export default function LeadsPage() {
               disabled={!stages || stages.length === 0}
             >
               <Plus className="mr-1 h-4 w-4" />
-              Add Lead
+              {t('leads.add_lead', 'Add Lead')}
             </Button>
             <Button variant="ghost" size="icon" className="h-9 w-9" asChild>
               <Link href="/settings/pipelines">
@@ -728,10 +871,10 @@ export default function LeadsPage() {
           <div className="relative w-full max-w-xs">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
             <Input
-              placeholder="Search leads..."
+              placeholder={t('leads.search', 'Search leads...')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9"
+              className="pl-9 iron-shadow"
             />
             {searchQuery && (
               <button
@@ -748,12 +891,12 @@ export default function LeadsPage() {
             value={temperatureFilter}
             onValueChange={setTemperatureFilter}
           >
-            <SelectTrigger className="w-[160px]">
+            <SelectTrigger className="w-[160px] iron-shadow">
               <Thermometer className="mr-2 h-4 w-4 text-slate-400" />
-              <SelectValue placeholder="Temperature" />
+              <SelectValue placeholder={t('leads.temperature', 'Temperature')} />
             </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All temperatures</SelectItem>
+            <SelectContent className="iron-shadow-elevated">
+              <SelectItem value="all">{t('leads.all_temperatures', 'All temperatures')}</SelectItem>
               {LEAD_TEMPERATURES.map((t) => (
                 <SelectItem key={t.value} value={t.value}>
                   <div className="flex items-center gap-2">
@@ -773,12 +916,12 @@ export default function LeadsPage() {
             value={sourceFilter}
             onValueChange={setSourceFilter}
           >
-            <SelectTrigger className="w-[160px]">
+            <SelectTrigger className="w-[160px] iron-shadow">
               <ListFilter className="mr-2 h-4 w-4 text-slate-400" />
-              <SelectValue placeholder="Source" />
+              <SelectValue placeholder={t('leads.source', 'Source')} />
             </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All sources</SelectItem>
+            <SelectContent className="iron-shadow-elevated">
+              <SelectItem value="all">{t('leads.all_sources', 'All sources')}</SelectItem>
               {CONTACT_SOURCES.map((s) => (
                 <SelectItem key={s} value={s}>
                   {s}
@@ -790,9 +933,9 @@ export default function LeadsPage() {
           {/* Display settings popover */}
           <Popover>
             <PopoverTrigger asChild>
-              <Button variant="outline" size="sm" className="gap-1.5">
+              <Button variant="outline" size="sm" className="gap-1.5 iron-shadow">
                 <SlidersHorizontal className="h-3.5 w-3.5" />
-                Display
+                {t('leads.display', 'Display')}
                 {hiddenStageIds.size > 0 && (
                   <Badge variant="secondary" className="ml-1 text-[10px] px-1.5">
                     {hiddenStageIds.size} hidden
@@ -803,10 +946,10 @@ export default function LeadsPage() {
             <PopoverContent className="w-72" align="end">
               <div className="space-y-4">
                 <div>
-                  <h4 className="text-sm font-medium mb-2">Card Display</h4>
+                  <h4 className="text-sm font-medium mb-2">{t('leads.display', 'Card Display')}</h4>
                   <div className="space-y-2">
                     <label className="flex items-center justify-between">
-                      <span className="text-sm text-slate-600">Show values</span>
+                      <span className="text-sm text-slate-600">{t('leads.card_show_values', 'Show values')}</span>
                       <button
                         onClick={() => setShowValues(!showValues)}
                         className={`h-5 w-9 rounded-full transition-colors ${showValues ? 'bg-blue-600' : 'bg-slate-200'}`}
@@ -815,7 +958,7 @@ export default function LeadsPage() {
                       </button>
                     </label>
                     <label className="flex items-center justify-between">
-                      <span className="text-sm text-slate-600">Show follow-up dates</span>
+                      <span className="text-sm text-slate-600">{t('leads.card_show_follow_up', 'Show follow-up dates')}</span>
                       <button
                         onClick={() => setShowFollowUp(!showFollowUp)}
                         className={`h-5 w-9 rounded-full transition-colors ${showFollowUp ? 'bg-blue-600' : 'bg-slate-200'}`}
@@ -824,7 +967,7 @@ export default function LeadsPage() {
                       </button>
                     </label>
                     <label className="flex items-center justify-between">
-                      <span className="text-sm text-slate-600">Show source</span>
+                      <span className="text-sm text-slate-600">{t('leads.card_show_source', 'Show source')}</span>
                       <button
                         onClick={() => setShowSource(!showSource)}
                         className={`h-5 w-9 rounded-full transition-colors ${showSource ? 'bg-blue-600' : 'bg-slate-200'}`}
@@ -833,7 +976,7 @@ export default function LeadsPage() {
                       </button>
                     </label>
                     <label className="flex items-center justify-between">
-                      <span className="text-sm text-slate-600">Show assignee</span>
+                      <span className="text-sm text-slate-600">{t('leads.card_show_assignee', 'Show assignee')}</span>
                       <button
                         onClick={() => setShowAssignee(!showAssignee)}
                         className={`h-5 w-9 rounded-full transition-colors ${showAssignee ? 'bg-blue-600' : 'bg-slate-200'}`}
@@ -842,7 +985,7 @@ export default function LeadsPage() {
                       </button>
                     </label>
                     <label className="flex items-center justify-between">
-                      <span className="text-sm text-slate-600">Show days in stage</span>
+                      <span className="text-sm text-slate-600">{t('leads.card_show_days', 'Show days in stage')}</span>
                       <button
                         onClick={() => setShowDaysInStage(!showDaysInStage)}
                         className={`h-5 w-9 rounded-full transition-colors ${showDaysInStage ? 'bg-blue-600' : 'bg-slate-200'}`}
@@ -851,7 +994,7 @@ export default function LeadsPage() {
                       </button>
                     </label>
                     <label className="flex items-center justify-between">
-                      <span className="text-sm text-slate-600">Show practice area</span>
+                      <span className="text-sm text-slate-600">{t('leads.card_show_practice', 'Show practice area')}</span>
                       <button
                         onClick={() => setShowPracticeArea(!showPracticeArea)}
                         className={`h-5 w-9 rounded-full transition-colors ${showPracticeArea ? 'bg-blue-600' : 'bg-slate-200'}`}
@@ -865,7 +1008,7 @@ export default function LeadsPage() {
                 <Separator />
 
                 <div>
-                  <h4 className="text-sm font-medium mb-2">Stage Visibility</h4>
+                  <h4 className="text-sm font-medium mb-2">{t('leads.stage_visibility', 'Stage Visibility')}</h4>
                   <div className="space-y-1.5">
                     {stages?.map((stage) => (
                       <button
@@ -906,7 +1049,7 @@ export default function LeadsPage() {
               }}
             >
               <X className="mr-1 h-3.5 w-3.5" />
-              Clear filters ({activeFilterCount})
+              {t('leads.clear_filters', 'Clear filters')} ({activeFilterCount})
             </Button>
           )}
         </div>
@@ -932,7 +1075,7 @@ export default function LeadsPage() {
           <div className="flex h-full items-center justify-center">
             <EmptyState
               icon={Funnel}
-              title="No stages configured"
+              title={t('leads.no_stages', 'No stages configured')}
               description="This pipeline has no stages yet. Add stages in pipeline settings to start organizing leads."
             />
           </div>
@@ -953,8 +1096,10 @@ export default function LeadsPage() {
                   contactsMap={contactsMap}
                   usersMap={usersMap}
                   practiceAreasMap={practiceAreasMap}
+                  activeMatterCountMap={activeMatterCountMap}
                   onAddLead={handleAddLead}
                   onCardClick={handleCardClick}
+                  onViewMatter={handleViewMatter}
                   showValues={showValues}
                   showFollowUp={showFollowUp}
                   showSource={showSource}
@@ -1037,6 +1182,13 @@ export default function LeadsPage() {
         onConfirm={handleLostConfirm}
         onCancel={handleLostCancel}
       />
+
+      {/* Bulk import wizard */}
+      <BulkImportWizard
+        open={importWizardOpen}
+        onOpenChange={setImportWizardOpen}
+        tenantId={tenantId}
+      />
     </div>
   )
 }
@@ -1101,6 +1253,7 @@ function LeadsTable({
   onSort: (field: string) => void
   onRowClick: (leadId: string) => void
 }) {
+  const { t } = useI18n()
   const stageMap = useMemo(
     () => new Map(stages.map((s) => [s.id, s])),
     [stages]
@@ -1111,7 +1264,7 @@ function LeadsTable({
       <div className="flex h-64 items-center justify-center">
         <EmptyState
           icon={List}
-          title="No leads match your filters"
+          title={t('leads.no_results', 'No leads match your filters')}
           description="Try adjusting your search or filter criteria."
         />
       </div>
@@ -1124,30 +1277,30 @@ function LeadsTable({
         <TableHeader>
           <TableRow className="bg-slate-50/80 hover:bg-slate-50/80">
             <TableHead className="w-[200px]">
-              <SortHeader label="Contact" field="contact_name" currentField={sortField} currentDir={sortDir} onSort={onSort} />
+              <SortHeader label={t('leads.contact', 'Contact')} field="contact_name" currentField={sortField} currentDir={sortDir} onSort={onSort} />
             </TableHead>
             <TableHead className="w-[100px]">
-              <SortHeader label="Temperature" field="temperature" currentField={sortField} currentDir={sortDir} onSort={onSort} />
+              <SortHeader label={t('leads.temperature', 'Temperature')} field="temperature" currentField={sortField} currentDir={sortDir} onSort={onSort} />
             </TableHead>
             <TableHead className="w-[140px]">
-              <SortHeader label="Stage" field="stage" currentField={sortField} currentDir={sortDir} onSort={onSort} />
+              <SortHeader label={t('leads.stage', 'Stage')} field="stage" currentField={sortField} currentDir={sortDir} onSort={onSort} />
             </TableHead>
             <TableHead className="w-[120px]">
-              <SortHeader label="Source" field="source" currentField={sortField} currentDir={sortDir} onSort={onSort} />
+              <SortHeader label={t('leads.source', 'Source')} field="source" currentField={sortField} currentDir={sortDir} onSort={onSort} />
             </TableHead>
             <TableHead className="w-[110px] text-right">
-              <SortHeader label="Value" field="estimated_value" currentField={sortField} currentDir={sortDir} onSort={onSort} />
+              <SortHeader label={t('leads.value', 'Value')} field="estimated_value" currentField={sortField} currentDir={sortDir} onSort={onSort} />
             </TableHead>
             <TableHead className="w-[140px]">
-              <SortHeader label="Assigned To" field="assigned_to" currentField={sortField} currentDir={sortDir} onSort={onSort} />
+              <SortHeader label={t('leads.assigned_to', 'Assigned To')} field="assigned_to" currentField={sortField} currentDir={sortDir} onSort={onSort} />
             </TableHead>
             <TableHead className="w-[120px]">
-              <SortHeader label="Follow-up" field="next_follow_up" currentField={sortField} currentDir={sortDir} onSort={onSort} />
+              <SortHeader label={t('leads.follow_up', 'Follow-up')} field="next_follow_up" currentField={sortField} currentDir={sortDir} onSort={onSort} />
             </TableHead>
             <TableHead className="w-[110px]">
-              <SortHeader label="Created" field="created_at" currentField={sortField} currentDir={sortDir} onSort={onSort} />
+              <SortHeader label={t('leads.created', 'Created')} field="created_at" currentField={sortField} currentDir={sortDir} onSort={onSort} />
             </TableHead>
-            <TableHead className="w-[90px] text-center">Consult</TableHead>
+            <TableHead className="w-[90px] text-center">{t('leads.consult', 'Consult')}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -1242,7 +1395,7 @@ function LeadsTable({
                   {assigneeName ? (
                     <span className="text-xs text-slate-600">{assigneeName}</span>
                   ) : (
-                    <span className="text-xs text-slate-400">Unassigned</span>
+                    <span className="text-xs text-slate-400">{t('leads.unassigned', 'Unassigned')}</span>
                   )}
                 </TableCell>
 
@@ -1279,7 +1432,7 @@ function LeadsTable({
                     className="inline-flex items-center gap-1 rounded-md border border-blue-200 bg-blue-50 px-2 py-1 text-[11px] font-medium text-blue-700 hover:bg-blue-100 hover:border-blue-300 transition-colors"
                   >
                     <ClipboardList className="h-3 w-3" />
-                    Consult
+                    {t('leads.consult', 'Consult')}
                   </Link>
                 </TableCell>
               </TableRow>
@@ -1296,9 +1449,10 @@ function LeadsTable({
 // ---------------------------------------------------------------------------
 
 function PageHeader() {
+  const { t } = useI18n()
   return (
     <div className="flex-shrink-0 border-b bg-white px-6 py-4">
-      <h1 className="text-2xl font-semibold text-slate-900">Leads</h1>
+      <h1 className="text-2xl font-semibold text-slate-900">{t('leads.title', 'Leads')}</h1>
     </div>
   )
 }

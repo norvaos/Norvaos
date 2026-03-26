@@ -29,7 +29,10 @@ export const contactKeys = {
 }
 
 /** Columns fetched for contact list views (avoids SELECT *). */
-const CONTACT_LIST_COLUMNS = 'id, tenant_id, first_name, last_name, email_primary, phone_primary, contact_type, source, organization_name, is_archived, created_at, created_by, preferred_name, job_title, city, province_state, country, last_contacted_at' as const
+const CONTACT_LIST_COLUMNS = 'id, tenant_id, first_name, last_name, email_primary, phone_primary, contact_type, source, organization_name, is_archived, created_at, created_by, preferred_name, job_title, city, province_state, country, last_contacted_at, client_status' as const
+
+/** Columns fetched for contact detail views — 20 cols max (100/20 budget). */
+export const CONTACT_DETAIL_COLUMNS ='id, tenant_id, contact_type, first_name, last_name, middle_name, preferred_name, date_of_birth, email_primary, phone_primary, phone_type_primary, organization_name, job_title, address_line1, city, province_state, postal_code, country, nationality, gender, client_status' as const
 
 export function useContacts(params: ContactListParams) {
   const { tenantId, page = 1, pageSize = 25, search, sortBy = 'created_at', sortDirection = 'desc', contactType, source } = params
@@ -86,7 +89,7 @@ export function useContact(id: string) {
       const supabase = createClient()
       const { data, error } = await supabase
         .from('contacts')
-        .select('*')
+        .select(CONTACT_DETAIL_COLUMNS)
         .eq('id', id)
         .single()
 
@@ -236,6 +239,29 @@ export function useContactDependencies(contactId: string) {
       }
     },
     enabled: !!contactId,
+  })
+}
+
+export function useUpdateContactClassification() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ contactId, clientStatus }: { contactId: string; clientStatus: string }) => {
+      const supabase = createClient()
+      const { error } = await supabase
+        .from('contacts')
+        .update({ client_status: clientStatus as ContactUpdate['client_status'] })
+        .eq('id', contactId)
+      if (error) throw error
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['contacts'] })
+      qc.invalidateQueries({ queryKey: ['contact'] })
+      qc.invalidateQueries({ queryKey: ['matters'] })
+      toast.success('Classification updated')
+    },
+    onError: () => {
+      toast.error('Failed to update classification')
+    },
   })
 }
 

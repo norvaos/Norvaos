@@ -160,7 +160,7 @@ export const PLATFORM_INFO: Record<SourcePlatform, { displayName: string; descri
   },
   clio: {
     displayName: 'Clio',
-    description: 'Import contacts, matters, tasks, notes, time entries, and documents from Clio.',
+    description: 'Import contacts, matters, tasks, notes, time entries, documents, trust balances, custom field values, and more from Clio.',
   },
   officio: {
     displayName: 'Officio',

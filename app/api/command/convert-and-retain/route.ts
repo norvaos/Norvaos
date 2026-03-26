@@ -31,6 +31,7 @@ async function handlePost(request: Request) {
       billingType,
       personScope,
       leadUpdatedAt,
+      retainerDeposit,
     } = body
 
     if (!leadId || !title?.trim()) {
@@ -298,6 +299,77 @@ async function handlePost(request: Request) {
       )
     }
 
+    // ── 4b. Financial Snapshot — "Point of No Return" Lock (Directive 41.4) ──
+    // Capture the tax rate, fee structure, and retainer deposit at the moment
+    // of retention. This snapshot is immutable for audit purposes.
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: tenantFull } = await (adminClient as any)
+        .from('tenants')
+        .select('home_province, province, jurisdiction_code')
+        .eq('id', tenantId)
+        .single()
+
+      // Get client's province from contact
+      let clientProvince: string | null = null
+      if (lead.contact_id) {
+        const { data: contactForTax } = await adminClient
+          .from('contacts')
+          .select('province_state')
+          .eq('id', lead.contact_id)
+          .single()
+        clientProvince = contactForTax?.province_state ?? null
+      }
+
+      // Canadian tax rates by province (Place of Supply rules)
+      const TAX_RATES: Record<string, { rate: number; type: string }> = {
+        'ON': { rate: 13, type: 'HST' },
+        'NB': { rate: 15, type: 'HST' },
+        'NL': { rate: 15, type: 'HST' },
+        'NS': { rate: 15, type: 'HST' },
+        'PE': { rate: 15, type: 'HST' },
+        'AB': { rate: 5, type: 'GST' },
+        'BC': { rate: 12, type: 'GST+PST' },
+        'SK': { rate: 11, type: 'GST+PST' },
+        'MB': { rate: 12, type: 'GST+PST' },
+        'QC': { rate: 14.975, type: 'GST+QST' },
+        'NT': { rate: 5, type: 'GST' },
+        'NU': { rate: 5, type: 'GST' },
+        'YT': { rate: 5, type: 'GST' },
+      }
+
+      const firmProvince = tenantFull?.home_province ?? tenantFull?.province ?? null
+      const taxProvince = clientProvince ?? firmProvince ?? 'ON'
+      const taxInfo = TAX_RATES[taxProvince?.toUpperCase()] ?? TAX_RATES['ON']
+
+      const financialSnapshot = {
+        firm_province: firmProvince,
+        client_province: clientProvince,
+        tax_province_applied: taxProvince,
+        tax_rate_applied: taxInfo.rate,
+        tax_type_applied: taxInfo.type,
+        retainer_deposit_cents: retainerDeposit ? Number(retainerDeposit) : null,
+        billing_type_at_retention: billingType || 'flat_fee',
+        snapshot_timestamp: new Date().toISOString(),
+        regulatory_body: tenantFull?.home_province ?? null,
+      }
+
+      // Store as matter_custom_data with section_key 'financial_snapshot'
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await (adminClient as any)
+        .from('matter_custom_data')
+        .upsert({
+          tenant_id: tenantId,
+          matter_id: matter.id,
+          section_key: 'financial_snapshot',
+          data: financialSnapshot,
+        }, { onConflict: 'matter_id,section_key' })
+
+    } catch (err) {
+      // Non-fatal: log but don't block conversion
+      console.error('[convert-and-retain] Financial snapshot failed (non-fatal):', err)
+    }
+
     // ── 5. Link contact as 'client' in matter_contacts ────────────
     if (lead.contact_id) {
       await adminClient.from('matter_contacts').insert({
@@ -307,6 +379,44 @@ async function handlePost(request: Request) {
         role: 'client',
         is_primary: true,
       })
+    }
+
+    // ── 5b. Carry preferred_language from lead → contact ──────────
+    // The lead may store preferred_language as a top-level column (if the
+    // schema migration has landed) or inside custom_fields.  Either way,
+    // propagate it to the contact's preferred_language column AND its
+    // custom_fields so downstream systems (portal, Sentinel, IRCC forms)
+    // all pick it up.
+    if (lead.contact_id) {
+      const leadCf = (lead.custom_fields ?? {}) as Record<string, unknown>
+      const langFromLead =
+        (lead as Record<string, unknown>).preferred_language as string | undefined
+        || leadCf.preferred_language as string | undefined
+
+      if (langFromLead) {
+        try {
+          // Read existing contact custom_fields to merge (not overwrite)
+          const { data: existingContact } = await adminClient
+            .from('contacts')
+            .select('custom_fields')
+            .eq('id', lead.contact_id)
+            .single()
+
+          const existingCf = (existingContact?.custom_fields ?? {}) as Record<string, unknown>
+          const mergedCf = { ...existingCf, preferred_language: langFromLead }
+
+          await adminClient
+            .from('contacts')
+            .update({
+              preferred_language: langFromLead,
+              custom_fields: mergedCf as unknown as Json,
+            })
+            .eq('id', lead.contact_id)
+        } catch (err) {
+          // Non-fatal: log but don't block conversion
+          console.error('[convert-and-retain] preferred_language carry-over failed (non-fatal):', err)
+        }
+      }
     }
 
     // ── 6. Create matter_intake record ────────────────────────────
@@ -340,6 +450,55 @@ async function handlePost(request: Request) {
       program_category: programCategoryKey,
       processing_stream: processingStream,
     }).then(() => {}) // ignore conflict
+
+    // ── 6b. Migrate lead intake data → matter_custom_data ───────
+    // Zero-data-loss: carry ALL custom_intake_data and custom_fields
+    // into the matter so the lawyer retains every AI-captured data point.
+    try {
+      const intakeData = lead.custom_intake_data as Json | null
+      const customFields = lead.custom_fields as Json | null
+
+      const dataRows: { tenant_id: string; matter_id: string; section_key: string; data: Json }[] = []
+
+      if (intakeData && typeof intakeData === 'object' && !Array.isArray(intakeData) && Object.keys(intakeData).length > 0) {
+        dataRows.push({
+          tenant_id: tenantId,
+          matter_id: matter.id,
+          section_key: 'lead_intake_data',
+          data: intakeData,
+        })
+      }
+
+      if (customFields && typeof customFields === 'object' && !Array.isArray(customFields) && Object.keys(customFields).length > 0) {
+        dataRows.push({
+          tenant_id: tenantId,
+          matter_id: matter.id,
+          section_key: 'lead_custom_fields',
+          data: customFields,
+        })
+      }
+
+      // Also migrate lead_metadata if present
+      const leadMetadata = (lead as Record<string, unknown>).lead_metadata as Json | null
+      if (leadMetadata && typeof leadMetadata === 'object' && !Array.isArray(leadMetadata) && Object.keys(leadMetadata).length > 0) {
+        dataRows.push({
+          tenant_id: tenantId,
+          matter_id: matter.id,
+          section_key: 'lead_metadata',
+          data: leadMetadata,
+        })
+      }
+
+      if (dataRows.length > 0) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        await (adminClient as any)
+          .from('matter_custom_data')
+          .upsert(dataRows, { onConflict: 'matter_id,section_key' })
+      }
+    } catch (err) {
+      // Non-fatal: log but don't block conversion
+      console.error('[convert-and-retain] Lead data migration to matter_custom_data failed (non-fatal):', err)
+    }
 
     // ── 7. Seed principal applicant from contact ──────────────────
     if (lead.contact_id) {
@@ -383,6 +542,64 @@ async function handlePost(request: Request) {
       }
     }
 
+    // ── 7b. Seed sponsor from sponsor_contact_id (Joint applications) ──
+    const leadCustomFieldsFull = (lead.custom_fields ?? {}) as Record<string, unknown>
+    const sponsorContactId = leadCustomFieldsFull.sponsor_contact_id as string | undefined
+    if (sponsorContactId && personScope === 'joint') {
+      try {
+        // Link sponsor as matter_contact
+        await adminClient.from('matter_contacts').insert({
+          tenant_id: tenantId,
+          matter_id: matter.id,
+          contact_id: sponsorContactId,
+          role: 'sponsor',
+          is_primary: false,
+        })
+
+        // Seed sponsor into matter_people from contacts table
+        const { data: sponsorData } = await adminClient
+          .from('contacts')
+          .select('first_name, last_name, middle_name, email_primary, phone_primary, date_of_birth, nationality, gender, marital_status, immigration_status, immigration_status_expiry, country_of_residence, country_of_birth, currently_in_canada, criminal_charges, inadmissibility_flag, travel_history_flag, address_line1, address_line2, city, province_state, postal_code, country')
+          .eq('id', sponsorContactId)
+          .single()
+
+        if (sponsorData) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const s = sponsorData as any
+          await adminClient.from('matter_people').insert({
+            tenant_id: tenantId,
+            matter_id: matter.id,
+            contact_id: sponsorContactId,
+            person_role: 'sponsor',
+            first_name: s.first_name || '',
+            last_name: s.last_name || '',
+            middle_name: s.middle_name ?? null,
+            email: s.email_primary || null,
+            phone: s.phone_primary || null,
+            date_of_birth: s.date_of_birth ?? null,
+            nationality: s.nationality ?? null,
+            gender: s.gender ?? null,
+            marital_status: s.marital_status ?? null,
+            immigration_status: s.immigration_status ?? null,
+            status_expiry_date: s.immigration_status_expiry ?? null,
+            country_of_residence: s.country_of_residence ?? s.country ?? null,
+            country_of_birth: s.country_of_birth ?? null,
+            currently_in_canada: s.currently_in_canada ?? false,
+            criminal_charges: s.criminal_charges ?? false,
+            inadmissibility_flag: s.inadmissibility_flag ?? false,
+            travel_history_flag: s.travel_history_flag ?? false,
+            address_line1: s.address_line1 ?? null,
+            address_line2: s.address_line2 ?? null,
+            city: s.city ?? null,
+            province_state: s.province_state ?? null,
+            postal_code: s.postal_code ?? null,
+          })
+        }
+      } catch (err) {
+        console.error('[convert-and-retain] Sponsor seeding failed (non-fatal):', err)
+      }
+    }
+
     // ── 8. Create portal link (30-day token) ──────────────────────
     let portalLinkId: string | null = null
     if (lead.contact_id) {
@@ -400,7 +617,12 @@ async function handlePost(request: Request) {
           expires_at: expiresAt.toISOString(),
           is_active: true,
           created_by: userId,
-          metadata: {} as Json,
+          metadata: (() => {
+            const leadCf = (lead.custom_fields ?? {}) as Record<string, unknown>
+            const lang = (lead as Record<string, unknown>).preferred_language as string | undefined
+              || leadCf.preferred_language as string | undefined
+            return (lang ? { preferred_language: lang } : {}) as Json
+          })(),
         })
         .select('id')
         .single()
@@ -589,10 +811,12 @@ async function handlePost(request: Request) {
         gate_results: gateResult.gateResults,
         retainer_package_id: retainerPkg?.id ?? null,
         payment_status: retainerPkg?.payment_status ?? null,
+        retainer_deposit_cents: retainerDeposit ? Number(retainerDeposit) : null,
         conversion_steps_completed: [
           'matter_created',
           lead.contact_id ? 'contact_linked' : null,
           portalLinkId ? 'portal_link_created' : null,
+          'financial_snapshot_locked',
         ].filter(Boolean),
       } as unknown as Json,
     })

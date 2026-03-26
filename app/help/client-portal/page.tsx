@@ -73,7 +73,7 @@ function PortalHeaderMockup() {
       <div className="bg-white border-b border-gray-100 px-6 py-3 flex items-center justify-between">
         <div>
           <p className="font-bold text-gray-900 text-sm">My Law Office</p>
-          <p className="text-xs text-gray-400">Document Upload Portal</p>
+          <p className="text-xs text-gray-400">Norva Document Bridge</p>
         </div>
         <div className="flex items-center gap-1.5 rounded-lg border border-gray-200 px-3 py-1.5 text-xs text-gray-500">
           <Globe className="h-3.5 w-3.5" /> English ↓
@@ -534,7 +534,7 @@ export default function ClientPortalHelpPage() {
                   <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
                     <span className="rounded-full bg-gray-900 text-white text-xs px-2 py-0.5">①</span> Header
                   </h3>
-                  <p className="text-sm text-gray-600">Shows your firm name ("My Law Office"), the subtitle "Document Upload Portal", and a language switcher in the top right. The firm name comes from your <strong>Settings → Firm Profile</strong>.</p>
+                  <p className="text-sm text-gray-600">Shows your firm name ("My Law Office"), the subtitle "Norva Document Bridge", and a language switcher in the top right. The firm name comes from your <strong>Settings → Firm Profile</strong>.</p>
                 </div>
 
                 <div>

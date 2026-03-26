@@ -683,7 +683,7 @@ export default function TenantDetailPage() {
         <TabsContent value="audit" className="mt-4">
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Audit Log</CardTitle>
+              <CardTitle className="text-lg">Norva Vault</CardTitle>
               <CardDescription>Combined tenant and platform-admin actions</CardDescription>
             </CardHeader>
             <CardContent>

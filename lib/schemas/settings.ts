@@ -22,6 +22,7 @@ export type CredentialsFormValues = z.infer<typeof credentialsSchema>
 
 export const firmSchema = z.object({
   name: z.string().min(1, 'Firm name is required').max(255),
+  home_province: z.string().max(10).optional(),
   primary_color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Invalid colour'),
   secondary_color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Invalid colour'),
   accent_color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Invalid colour'),
@@ -32,11 +33,16 @@ export const firmSchema = z.object({
 
 export type FirmFormValues = z.infer<typeof firmSchema>
 
+/** ISO 3166-2:CA province/territory codes */
+const PROVINCE_CODES = [
+  'AB', 'BC', 'MB', 'NB', 'NL', 'NS', 'NT', 'NU', 'ON', 'PE', 'QC', 'SK', 'YT',
+] as const
+
 export const firmAddressSchema = z.object({
   address_line1: z.string().max(255).optional(),
   address_line2: z.string().max(255).optional(),
   city: z.string().max(100).optional(),
-  province: z.string().max(100).optional(),
+  province: z.enum(PROVINCE_CODES).optional().or(z.literal('')),
   postal_code: z.string().max(20).optional(),
   country: z.string().max(100).optional(),
   office_phone: z.string().max(30).optional(),

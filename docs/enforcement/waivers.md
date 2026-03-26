@@ -45,7 +45,7 @@ Copy this into the JSON array above to add a new waiver:
   "id": "WAIVER-2026-03-01-001",
   "files": ["path/to/file.ts", "path/to/file2.tsx"],
   "reason": "Specific justification for why no enforcement impact",
-  "reviewer": "@github-handle (must be in CODEOWNERS @lexcrm/enforcement-reviewers)",
+  "reviewer": "@github-handle (must be in CODEOWNERS @norvaos/enforcement-reviewers)",
   "created_at": "2026-03-01",
   "expires_at": "2026-03-14"
 }

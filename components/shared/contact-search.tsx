@@ -65,7 +65,7 @@ function useContactSearch(tenantId: string, search: string) {
   })
 }
 
-function useContactById(contactId: string | undefined) {
+export function useContactById(contactId: string | undefined) {
   return useQuery({
     queryKey: ['contact-by-id', contactId],
     queryFn: async () => {

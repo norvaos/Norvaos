@@ -26,6 +26,7 @@ import {
   EyeOff,
 } from 'lucide-react'
 import { toast } from 'sonner'
+import { norvaToast } from '@/lib/utils/norva-branding'
 import { formatDistanceToNow } from 'date-fns'
 
 import { createClient } from '@/lib/supabase/client'
@@ -313,17 +314,11 @@ export default function SettingsUsersPage() {
     },
     onError: (error: any) => {
       if (error.code === 'SEAT_LIMIT_REACHED') {
-        if (error.reason === 'PENDING_INVITE_CAP') {
-          toast.error('Too many pending invitations', {
-            description: `You have ${error.pending_invites} active invitations. Revoke unused ones first.`,
-          })
-        } else {
-          toast.error('Seat limit reached', {
-            description: `Your firm has ${error.active_user_count} of ${error.max_users} seats in use.`,
-          })
-        }
+        norvaToast('seat_limit', error.reason === 'PENDING_INVITE_CAP'
+          ? `You have ${error.pending_invites} active invitations. Revoke unused ones first.`
+          : `Your firm has ${error.active_user_count} of ${error.max_users} seats in use.`)
       } else {
-        toast.error('Failed to invite user.', { description: error.message })
+        norvaToast('save_failed', error.message)
       }
     },
   })
@@ -366,11 +361,9 @@ export default function SettingsUsersPage() {
     },
     onError: (error: any) => {
       if (error.code === 'SEAT_LIMIT_REACHED') {
-        toast.error('Seat limit reached', {
-          description: `Your firm has ${error.active_user_count} of ${error.max_users} seats in use.`,
-        })
+        norvaToast('seat_limit', `Your firm has ${error.active_user_count} of ${error.max_users} seats in use.`)
       } else {
-        toast.error('Failed to create user.', { description: error.message })
+        norvaToast('save_failed', error.message)
       }
     },
   })

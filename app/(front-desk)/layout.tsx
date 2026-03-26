@@ -2,17 +2,21 @@ import { redirect } from 'next/navigation'
 import { cookies } from 'next/headers'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { FrontDeskHeader } from '@/components/front-desk/front-desk-header'
+import { ConciergeShell } from '@/components/front-desk/ConciergeShell'
 
 /**
- * Front Desk Layout — restricted interface with NO sidebar.
+ * Front Desk Layout — Directive 32.0 ConciergeShell
  *
  * Rule #10: Front Desk Mode is a separate locked interface.
  *           Own route group, no sidebar, enforced by middleware AND server.
  *           URL typing must not bypass restrictions.
  *
- * Requires: front_desk:view permission.
+ * The ConciergeShell replaces the legacy FrontDeskHeader with:
+ *   - Operations Bar (shift, kiosk, notifications)
+ *   - AuraHeader (Polyglot Pulse + UniversalGlobeSelector)
+ *   - ActionTrident (3-card intake funnel)
  *
+ * Requires: front_desk:view permission.
  * Feature flag: tenant.feature_flags.front_desk_mode must be enabled.
  */
 export default async function FrontDeskLayout({
@@ -94,16 +98,13 @@ export default async function FrontDeskLayout({
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
-      <FrontDeskHeader
-        userId={userData.id}
-        userName={[userData.first_name, userData.last_name].filter(Boolean).join(' ') || 'User'}
-        avatarUrl={userData.avatar_url}
-        firmName={tenant?.name ?? 'Law Office'}
-      />
-      <main className="flex-1">
-        {children}
-      </main>
-    </div>
+    <ConciergeShell
+      userId={userData.id}
+      userName={[userData.first_name, userData.last_name].filter(Boolean).join(' ') || 'User'}
+      avatarUrl={userData.avatar_url}
+      firmName={tenant?.name ?? 'Law Office'}
+    >
+      {children}
+    </ConciergeShell>
   )
 }

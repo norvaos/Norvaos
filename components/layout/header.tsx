@@ -31,40 +31,49 @@ import {
   ChevronDown,
   X,
 } from 'lucide-react'
+import { useState } from 'react'
 import { NotificationBell } from '@/components/layout/notification-bell'
+import { UniversalGlobeSelector } from '@/components/i18n/UniversalGlobeSelector'
+import { useI18n } from '@/lib/i18n/i18n-provider'
+import { resolveRegulatoryBody } from '@/lib/config/jurisdictions'
+import {
+  ComplianceDiagnosticModal,
+  calculateComplianceScore,
+  resolveTier,
+} from '@/components/layout/compliance-diagnostic-modal'
 
 /**
  * Maps a pathname to a human-readable page title.
  * Falls back to a capitalised version of the last path segment.
  */
-function getPageTitle(pathname: string): string {
+function getPageTitle(pathname: string, t: (key: any) => string): string {
   const titles: Record<string, string> = {
-    '/': 'Dashboard',
-    '/contacts': 'Contacts',
-    '/matters': 'Matters',
-    '/leads': 'Leads',
-    '/tasks': 'Tasks',
-    '/calendar': 'Calendar',
-    '/documents': 'Documents',
-    '/communications': 'Communications',
+    '/': t('nav.dashboard'),
+    '/contacts': t('nav.contacts'),
+    '/matters': t('nav.matters'),
+    '/leads': t('nav.leads'),
+    '/tasks': t('nav.tasks'),
+    '/calendar': t('nav.calendar'),
+    '/documents': t('nav.documents'),
+    '/communications': t('nav.communications'),
     '/chat': 'Chat',
-    '/billing': 'Billing',
-    '/reports': 'Reports',
+    '/billing': t('nav.billing'),
+    '/reports': t('nav.reports'),
     '/marketing': 'Marketing',
-    '/settings': 'Settings',
-    '/settings/profile': 'Profile',
-    '/settings/firm': 'Firm Settings',
-    '/settings/users': 'Users',
+    '/settings': t('nav.settings'),
+    '/settings/profile': t('header.profile' as any),
+    '/settings/firm': t('header.firm_settings' as any),
+    '/settings/users': t('nav.users_roles' as any),
     '/settings/roles': 'Roles',
-    '/settings/practice-areas': 'Practice Areas & Matter Types',
-    '/settings/pipelines': 'Pipelines',
-    '/settings/custom-fields': 'Custom Fields',
-    '/settings/integrations': 'Integrations',
-    '/settings/automations': 'Automations',
-    '/settings/forms': 'Intake Forms',
-    '/settings/billing-plan': 'Billing & Plan',
-    '/settings/task-templates': 'Task Templates',
-    '/settings/matter-types': 'Practice Areas & Matter Types',
+    '/settings/practice-areas': t('header.practice_areas_matter_types' as any),
+    '/settings/pipelines': t('header.pipelines' as any),
+    '/settings/custom-fields': t('header.custom_fields' as any),
+    '/settings/integrations': t('nav.integrations'),
+    '/settings/automations': t('header.automations' as any),
+    '/settings/forms': t('header.intake_forms' as any),
+    '/settings/billing-plan': t('header.billing_plan' as any),
+    '/settings/task-templates': t('header.task_templates' as any),
+    '/settings/matter-types': t('header.practice_areas_matter_types' as any),
   }
 
   if (titles[pathname]) return titles[pathname]
@@ -74,9 +83,9 @@ function getPageTitle(pathname: string): string {
 
   // Command Centre routes: /command/lead/[id] or /command/matter/[id]
   if (segments[0] === 'command') {
-    if (segments[1] === 'lead') return 'Command Centre'
-    if (segments[1] === 'matter') return 'Command Centre'
-    return 'Command Centre'
+    if (segments[1] === 'lead') return t('header.command_centre' as any)
+    if (segments[1] === 'matter') return t('header.command_centre' as any)
+    return t('header.command_centre' as any)
   }
 
   if (segments.length >= 2) {
@@ -85,12 +94,12 @@ function getPageTitle(pathname: string): string {
   }
 
   // Fallback: capitalise the last segment (skip UUIDs)
-  const last = segments[segments.length - 1] ?? 'Dashboard'
+  const last = segments[segments.length - 1] ?? t('nav.dashboard')
   // If the last segment looks like a UUID, use the parent segment instead
   if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(last)) {
     const parent = segments[segments.length - 2]
     if (parent) return parent.charAt(0).toUpperCase() + parent.slice(1).replace(/-/g, ' ')
-    return 'Dashboard'
+    return t('nav.dashboard')
   }
   return last.charAt(0).toUpperCase() + last.slice(1).replace(/-/g, ' ')
 }
@@ -114,8 +123,26 @@ export function Header() {
   const storedColor = useUIStore((s) => s.activePracticeColor)
   const storedName = useUIStore((s) => s.activePracticeName)
   const setActivePracticeFilter = useUIStore((s) => s.setActivePracticeFilter)
+  const { locale, setLocale, t } = useI18n()
 
-  const pageTitle = getPageTitle(pathname)
+  const [diagnosticOpen, setDiagnosticOpen] = useState(false)
+
+  // ── Firm Compliance Score — 5-tier Risk Spectrum (Directive 41.2) ────
+  const regBody = resolveRegulatoryBody(tenant?.home_province ?? null)
+  const { score: firmScore } = calculateComplianceScore({
+    home_province: tenant?.home_province ?? null,
+    address_line1: tenant?.address_line1 ?? null,
+    city: tenant?.city ?? null,
+    province: tenant?.province ?? null,
+    postal_code: tenant?.postal_code ?? null,
+    office_phone: tenant?.office_phone ?? null,
+    office_fax: tenant?.office_fax ?? null,
+    regBody,
+  })
+  const firmTier = resolveTier(firmScore)
+  const FirmTierIcon = firmTier.icon
+
+  const pageTitle = getPageTitle(pathname, t)
 
   // ─── Matter context: show title + status when viewing a matter ──
   const matterIdMatch = pathname.match(/^\/matters\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/)
@@ -171,7 +198,7 @@ export function Header() {
         size="icon"
         className="lg:hidden"
         onClick={() => setSidebarMobileOpen(true)}
-        aria-label="Open navigation menu"
+        aria-label={t('header.open_nav' as any)}
       >
         <Menu className="size-5" />
       </Button>
@@ -209,13 +236,13 @@ export function Header() {
                           'size-2.5 shrink-0 rounded-full',
                           isZero ? 'bg-red-500 animate-pulse' : 'bg-amber-400'
                         )}
-                        aria-label={isZero ? 'Trust balance is zero' : 'Low trust balance'}
+                        aria-label={isZero ? t('header.trust_zero' as any) : t('header.trust_low' as any)}
                       />
                     </TooltipTrigger>
                     <TooltipContent>
                       {isZero
-                        ? `Trust balance: $0.00 — no funds available`
-                        : `Low trust balance: $${bal.toFixed(2)}`}
+                        ? t('header.trust_zero' as any)
+                        : t('header.trust_low' as any)}
                     </TooltipContent>
                   </Tooltip>
                 )
@@ -264,7 +291,7 @@ export function Header() {
                   ) : (
                     <>
                       <Layers className="size-3.5 text-muted-foreground shrink-0" />
-                      <span className="text-muted-foreground">All Practices</span>
+                      <span className="text-muted-foreground">{t('header.all_practices' as any)}</span>
                     </>
                   )}
                 </span>
@@ -274,7 +301,7 @@ export function Header() {
 
             <DropdownMenuContent align="end" className="w-[220px]">
               <DropdownMenuLabel className="text-xs text-muted-foreground font-normal">
-                Practice Area
+                {t('header.practice_area' as any)}
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
 
@@ -283,9 +310,9 @@ export function Header() {
                 className="gap-2"
               >
                 <Layers className="size-3.5 text-muted-foreground" />
-                <span>All Practices</span>
+                <span>{t('header.all_practices' as any)}</span>
                 {!isFiltered && (
-                  <span className="ml-auto text-xs text-muted-foreground">Active</span>
+                  <span className="ml-auto text-xs text-muted-foreground">{t('header.active' as any)}</span>
                 )}
               </DropdownMenuItem>
 
@@ -303,7 +330,7 @@ export function Header() {
                   />
                   <span>{pa.name}</span>
                   {activePracticeFilter === pa.id && (
-                    <span className="ml-auto text-xs text-muted-foreground">Active</span>
+                    <span className="ml-auto text-xs text-muted-foreground">{t('header.active' as any)}</span>
                   )}
                 </DropdownMenuItem>
               ))}
@@ -333,7 +360,7 @@ export function Header() {
         onClick={() => setCommandPaletteOpen(true)}
       >
         <Search className="size-4" />
-        <span className="text-sm">Search everything...</span>
+        <span className="text-sm">{t('header.search_placeholder' as any)}</span>
         <kbd className="ml-auto pointer-events-none hidden rounded border bg-muted px-1.5 py-0.5 font-mono text-[10px] font-medium text-muted-foreground sm:inline-flex">
           <span className="text-xs">&#8984;</span>K
         </kbd>
@@ -345,13 +372,45 @@ export function Header() {
         size="icon"
         className="sm:hidden"
         onClick={() => setCommandPaletteOpen(true)}
-        aria-label="Open search"
+        aria-label={t('header.open_search' as any)}
       >
         <Search className="size-5" />
       </Button>
 
+      {/* Universal Globe — admin en/fr, client Global 15 (Directive 0.0) */}
+      <UniversalGlobeSelector
+        value={locale}
+        onChange={(code) => setLocale(code as import('@/lib/i18n/config').LocaleCode)}
+        audience="admin"
+        compact
+        className="inline-flex"
+      />
+
       {/* Notification bell */}
       <NotificationBell />
+
+      {/* Firm Compliance Badge — 5-tier Risk Spectrum (Directive 41.2) */}
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <button
+            onClick={() => setDiagnosticOpen(true)}
+            className={cn(
+              'hidden sm:inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold transition-colors cursor-pointer border tabular-nums',
+              firmTier.badgeClass,
+            )}
+          >
+            <FirmTierIcon className="size-3" />
+            {regBody ? regBody.abbr : 'Setup'} {firmScore}%
+          </button>
+        </TooltipTrigger>
+        <TooltipContent side="bottom" className="text-xs max-w-xs">
+          <p className="font-semibold">{firmTier.label} — {firmTier.description}</p>
+          <p className="text-[9px] text-muted-foreground mt-0.5">{t('header.compliance_diagnostic' as any)}</p>
+        </TooltipContent>
+      </Tooltip>
+
+      {/* Compliance Diagnostic Modal */}
+      <ComplianceDiagnosticModal open={diagnosticOpen} onOpenChange={setDiagnosticOpen} />
 
       {/* User dropdown */}
       <DropdownMenu>
@@ -389,11 +448,11 @@ export function Header() {
           <DropdownMenuGroup>
             <DropdownMenuItem onClick={() => router.push('/settings/profile')}>
               <User className="mr-2 size-4" />
-              Profile
+              {t('header.profile' as any)}
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => router.push('/settings/firm')}>
               <Settings className="mr-2 size-4" />
-              Firm Settings
+              {t('header.firm_settings' as any)}
             </DropdownMenuItem>
           </DropdownMenuGroup>
 
@@ -401,7 +460,7 @@ export function Header() {
 
           <DropdownMenuItem onClick={handleSignOut}>
             <LogOut className="mr-2 size-4" />
-            Sign Out
+            {t('header.sign_out' as any)}
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

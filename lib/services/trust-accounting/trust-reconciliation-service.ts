@@ -29,14 +29,11 @@ import type {
   TrustAuditLogInsert,
 } from '@/lib/types/database'
 import { createAdminClient } from '@/lib/supabase/admin'
+import type { ServiceResult, PaginationParams } from './trust-types'
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
-export interface ServiceResult<T = void> {
-  success: boolean
-  data?: T
-  error?: string
-}
+export type { ServiceResult, PaginationParams } from './trust-types'
 
 export interface CreateReconciliationParams {
   supabase: SupabaseClient<Database>
@@ -60,11 +57,6 @@ export interface AddReconciliationItemParams {
 
 export interface ReconciliationWithItems extends TrustReconciliationRow {
   items: TrustReconciliationItemRow[]
-}
-
-export interface PaginationParams {
-  page?: number
-  pageSize?: number
 }
 
 export interface PaginatedResult<T> {

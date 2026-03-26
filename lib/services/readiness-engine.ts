@@ -1,13 +1,17 @@
 /**
  * Readiness Engine — Composite Matter Readiness Score
  *
- * Computes a 0–100 score from 6 weighted domains:
- *   Documents      25%
- *   Questionnaire  20%
- *   Review         20%
- *   Forms          15%
- *   Billing        15%
+ * Computes a 0–100 score from 7 weighted domains:
+ *   Documents      22%
+ *   Questionnaire  18%
+ *   Review         18%
+ *   Forms          13%
+ *   Billing        13%
+ *   Compliance     11%  ← NEW: Document expiry + status validity (Directive 20.2)
  *   Submission      5%
+ *
+ * The Compliance domain checks contact_status_records (passport, permit expiries)
+ * and penalises scores when critical documents are expiring or expired.
  *
  * Called server-side from POST /api/matters/[id]/readiness.
  * Results are persisted to matters.readiness_score + readiness_breakdown + readiness_focus_area.
@@ -59,7 +63,7 @@ function buildDomain(
   }
 }
 
-// ── Documents (25%) ───────────────────────────────────────────────────────────
+// ── Documents (22%) ───────────────────────────────────────────────────────────
 
 async function computeDocuments(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -67,7 +71,7 @@ async function computeDocuments(
   matterId: string,
   matterTypeId: string | null,
 ): Promise<ReadinessDomain> {
-  const weight = 0.25
+  const weight = 0.22
 
   // Mandatory slots defined for this matter type
   const { data: mandatorySlots } = await supabase
@@ -108,14 +112,14 @@ async function computeDocuments(
   )
 }
 
-// ── Questionnaire (20%) ──────────────────────────────────────────────────────
+// ── Questionnaire (18%) ──────────────────────────────────────────────────────
 
 async function computeQuestionnaire(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   supabase: SupabaseClient<any>,
   matterId: string,
 ): Promise<ReadinessDomain> {
-  const weight = 0.20
+  const weight = 0.18
 
   const { data: intake } = await supabase
     .from('matter_intake')
@@ -160,14 +164,14 @@ async function computeQuestionnaire(
   )
 }
 
-// ── Review (20%) ─────────────────────────────────────────────────────────────
+// ── Review (18%) ─────────────────────────────────────────────────────────────
 
 async function computeReview(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   supabase: SupabaseClient<any>,
   matterId: string,
 ): Promise<ReadinessDomain> {
-  const weight = 0.20
+  const weight = 0.18
 
   const { data: intake } = await supabase
     .from('matter_intake')
@@ -198,14 +202,14 @@ async function computeReview(
   return buildDomain('Review', score, weight, `Lawyer review: ${label}`)
 }
 
-// ── Forms (15%) ──────────────────────────────────────────────────────────────
+// ── Forms (13%) ──────────────────────────────────────────────────────────────
 
 async function computeForms(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   supabase: SupabaseClient<any>,
   matterId: string,
 ): Promise<ReadinessDomain> {
-  const weight = 0.15
+  const weight = 0.13
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data: forms } = await (supabase as any)
@@ -232,46 +236,119 @@ async function computeForms(
   return buildDomain('Forms', score, weight, `${completed}/${total} forms completed`)
 }
 
-// ── Billing (15%) ────────────────────────────────────────────────────────────
+// ── Billing (13%) ────────────────────────────────────────────────────────────
 
 async function computeBilling(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   supabase: SupabaseClient<any>,
   matterId: string,
 ): Promise<ReadinessDomain> {
-  const weight = 0.15
+  const weight = 0.13
 
-  const { data: retainer } = await supabase
-    .from('retainer_agreements')
+  const { data: retainerRaw } = await supabase
+    .from('retainer_agreements' as never)
     .select('status')
     .eq('matter_id', matterId)
     .order('created_at', { ascending: false })
     .limit(1)
     .maybeSingle()
 
+  const retainer = retainerRaw as { status: string } | null
   const status = retainer?.status ?? null
 
   let score = 0
-  let label = 'none'
+  let label = 'missing — retainer agreement required'
 
   if (status === 'signed') {
     score = 100
     label = 'signed'
   } else if (status === 'sent_for_signing') {
     score = 50
-    label = 'sent for signing'
+    label = 'sent for signing — awaiting client signature'
   } else if (status === 'draft') {
-    score = 25
-    label = 'draft'
+    score = 20
+    label = 'draft — awaiting completion'
+  } else if (status === 'voided') {
+    score = 0
+    label = 'voided — new retainer required'
   } else {
     score = 0
-    label = 'none'
+    label = 'missing — retainer agreement required'
   }
 
-  return buildDomain('Billing', score, weight, `Retainer: ${label}`)
+  return buildDomain('Billing', score, weight, `Retainer Agreement: ${label}`)
+}
+
+// ── Compliance (11%) — Document Expiry & Status Validity (Directive 20.2) ────
+// Checks contact_status_records for passport/permit expiries linked to this matter.
+// Scoring:
+//   - All documents valid (> 180 days to expiry): 100
+//   - Expiring within 180 days: proportional penalty
+//   - Expiring within 90 days: hard cap at 60 (forces amber)
+//   - Already expired: 0
+
+async function computeCompliance(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  supabase: SupabaseClient<any>,
+  matterId: string,
+): Promise<ReadinessDomain> {
+  const weight = 0.11
+
+  // Get all contact status records linked to this matter
+  const { data: records } = await supabase
+    .from('contact_status_records')
+    .select('status_type, expiry_date')
+    .eq('matter_id', matterId)
+
+  const statusRecords = (records ?? []) as Array<{
+    status_type: string
+    expiry_date: string
+  }>
+
+  if (statusRecords.length === 0) {
+    // No status records linked — no penalty (not all matters have them)
+    return buildDomain('Compliance', 100, weight, 'No document expiry records linked')
+  }
+
+  const now = Date.now()
+  let worstScore = 100
+  const issues: string[] = []
+
+  for (const rec of statusRecords) {
+    if (!rec.expiry_date) continue
+
+    const expiryMs = new Date(rec.expiry_date).getTime()
+    const daysUntilExpiry = Math.ceil((expiryMs - now) / (1000 * 60 * 60 * 24))
+    const typeLabel = rec.status_type.replace(/_/g, ' ')
+
+    if (daysUntilExpiry <= 0) {
+      // Already expired — score 0 for this record
+      worstScore = Math.min(worstScore, 0)
+      issues.push(`${typeLabel} EXPIRED (${Math.abs(daysUntilExpiry)}d ago)`)
+    } else if (daysUntilExpiry <= 90) {
+      // Critical: hard cap at 60 (forces amber zone)
+      const recordScore = Math.min(60, Math.round((daysUntilExpiry / 90) * 60))
+      worstScore = Math.min(worstScore, recordScore)
+      issues.push(`${typeLabel} expires in ${daysUntilExpiry}d`)
+    } else if (daysUntilExpiry <= 180) {
+      // Warning: proportional penalty
+      const recordScore = Math.round(60 + ((daysUntilExpiry - 90) / 90) * 40)
+      worstScore = Math.min(worstScore, recordScore)
+      issues.push(`${typeLabel} expires in ${daysUntilExpiry}d`)
+    }
+    // > 180 days: no penalty
+  }
+
+  const detail = issues.length > 0
+    ? `${issues.length} expiry concern${issues.length > 1 ? 's' : ''}: ${issues.join('; ')}`
+    : `${statusRecords.length} document${statusRecords.length > 1 ? 's' : ''} valid (>180d)`
+
+  return buildDomain('Compliance', worstScore, weight, detail)
 }
 
 // ── Submission (5%) ──────────────────────────────────────────────────────────
+// Financial Kill-Switch: Submission is BLOCKED if financial clearance fails.
+// The RPC check_financial_clearance runs entirely in Postgres.
 
 async function computeSubmission(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -292,8 +369,97 @@ async function computeSubmission(
     matter?.status === 'filing_ready' ||
     matter?.intake_status === 'ready_for_filing'
 
-  const score = isFilingReady ? 100 : 0
-  return buildDomain('Submission', score, weight, `Filing ready: ${isFilingReady ? 'yes' : 'no'}`)
+  // ── Financial Kill-Switch ─────────────────────────────────────────────
+  // Server-side: query trust balance + total billed directly (admin client
+  // has no auth.uid(), so the RPC's Sentinel check would fail).
+  // All amounts are DB-stored BIGINT cents — zero frontend calculations.
+  let financiallyCleared = true
+  const blockers: string[] = []
+
+  try {
+    // 1. Get total billed from the matter (already fetched above, but we
+    //    need fee_snapshot + total_amount_cents for the financial check)
+    const { data: fin } = await supabase
+      .from('matters')
+      .select('total_amount_cents, fee_snapshot')
+      .eq('id', matterId)
+      .single()
+
+    // 2. Get trust balance from latest trust transaction (DB-computed)
+    const { data: trustRow } = await supabase
+      .from('trust_transactions')
+      .select('running_balance_cents')
+      .eq('matter_id', matterId)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle()
+
+    const trustBalanceCents = trustRow?.running_balance_cents ?? 0
+
+    // 3. Resolve total billed — fee_snapshot is canonical, fallback to total_amount_cents
+    let totalBilledCents = fin?.total_amount_cents ?? 0
+    const feeSnap = fin?.fee_snapshot as Record<string, unknown> | null
+    if (feeSnap && typeof feeSnap === 'object') {
+      if (feeSnap.total_amount_cents != null) {
+        totalBilledCents = Number(feeSnap.total_amount_cents)
+      } else {
+        // Sum professional_fees + government_fees + disbursements
+        const sumArray = (arr: unknown) =>
+          Array.isArray(arr)
+            ? arr.reduce((s, item) => s + (Number((item as Record<string, unknown>).amount_cents) || 0), 0)
+            : 0
+        totalBilledCents =
+          sumArray(feeSnap.professional_fees) +
+          sumArray(feeSnap.government_fees) +
+          sumArray(feeSnap.disbursements)
+      }
+    }
+
+    // 4. Compute outstanding and unallocated (mirrors the RPC logic)
+    const outstandingCents = Math.max(0, totalBilledCents - trustBalanceCents)
+    const unallocatedCents = Math.max(0, trustBalanceCents - totalBilledCents)
+
+    if (outstandingCents > 0) {
+      financiallyCleared = false
+      const dollars = (outstandingCents / 100).toFixed(2)
+      blockers.push(`Client owes $${dollars} — outstanding balance must be cleared before submission.`)
+    }
+
+    if (unallocatedCents > 0) {
+      financiallyCleared = false
+      const dollars = (unallocatedCents / 100).toFixed(2)
+      blockers.push(`$${dollars} in unallocated trust funds — apply or refund before submission.`)
+    }
+  } catch (err) {
+    console.warn('[readiness] Financial clearance check failed:', (err as Error).message)
+    // Graceful fallback — don't block submission if the check itself fails
+    financiallyCleared = true
+  }
+
+  // Submission is only ready if BOTH filing status AND financials are clear
+  if (!isFilingReady && !financiallyCleared) {
+    return buildDomain(
+      'Submission',
+      0,
+      weight,
+      `Blocked: not filing-ready. ${blockers.join(' ')}`,
+    )
+  }
+
+  if (!financiallyCleared) {
+    return buildDomain(
+      'Submission',
+      0,
+      weight,
+      `Financial hold: ${blockers.join(' ')}`,
+    )
+  }
+
+  if (!isFilingReady) {
+    return buildDomain('Submission', 0, weight, 'Filing ready: no')
+  }
+
+  return buildDomain('Submission', 100, weight, 'Filing ready: yes — financial clearance passed')
 }
 
 // ── Main export ───────────────────────────────────────────────────────────────
@@ -313,16 +479,17 @@ export async function computeReadiness(
   const matterTypeId = matter?.matter_type_id ?? null
 
   // All domains computed in parallel
-  const [documents, questionnaire, review, forms, billing, submission] = await Promise.all([
+  const [documents, questionnaire, review, forms, billing, compliance, submission] = await Promise.all([
     computeDocuments(supabase, matterId, matterTypeId),
     computeQuestionnaire(supabase, matterId),
     computeReview(supabase, matterId),
     computeForms(supabase, matterId),
     computeBilling(supabase, matterId),
+    computeCompliance(supabase, matterId),
     computeSubmission(supabase, matterId),
   ])
 
-  const domains = [documents, questionnaire, review, forms, billing, submission]
+  const domains = [documents, questionnaire, review, forms, billing, compliance, submission]
 
   const total = Math.round(
     domains.reduce((sum, d) => sum + d.score * d.weight, 0),

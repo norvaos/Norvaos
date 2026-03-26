@@ -73,7 +73,7 @@ const NAV_SECTIONS: NavSection[] = [
   { key: 'biometrics',     label: 'Biometrics / Medical', icon: Stethoscope },
   { key: 'submission',     label: 'Submission History', icon: History },
   { key: 'notes',          label: 'Notes',             icon: StickyNote },
-  { key: 'audit_log',      label: 'Audit Log',         icon: ClipboardList },
+  { key: 'audit_log',      label: 'Norva Vault',        icon: ClipboardList },
 ]
 
 // ── Compute section badge status ──────────────────────────────────────────────

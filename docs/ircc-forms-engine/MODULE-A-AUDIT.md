@@ -1,7 +1,7 @@
 # MODULE A — Existing IRCC Forms System Audit
 
 **Date:** 2026-03-19
-**Scope:** Full subsystem audit of IRCC forms infrastructure inside NorvaOS/LexCRM
+**Scope:** Full subsystem audit of IRCC forms infrastructure inside NorvaOS
 **Purpose:** Identify what exists, what is strong, what is weak, what must be preserved, replaced, or deleted before building the IRCC Forms Engine.
 
 ---

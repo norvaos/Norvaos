@@ -50,6 +50,20 @@ export interface RetainerPdfData {
   verificationCode?: string | null
   /** Tenant's preferred date format token, e.g. "DD/MM/YYYY". Passed from API route. */
   dateFormat?: string | null
+  /** Matter number (e.g. NRV-2026-10001) — printed on PDF header */
+  matterNumber?: string | null
+  /** Matter title — printed below matter number */
+  matterTitle?: string | null
+  /** Lawyer name — printed in signature block */
+  lawyerName?: string | null
+  /** Risk level — triggers dynamic risk disclosure clause */
+  riskLevel?: string | null // 'low' | 'medium' | 'high' | 'critical'
+  /** Readiness score — included in risk disclosure context */
+  readinessScore?: number | null
+  /** Fee snapshot date — "frozen on" notice */
+  snapshotDate?: string | null
+  /** Practice area name */
+  practiceArea?: string | null
 }
 
 // ── Constants (exported for template renderer) ──────────────────────────────
@@ -441,6 +455,21 @@ export async function generateRetainerPdf(data: RetainerPdfData): Promise<Uint8A
   })
   pm.moveDown(30)
 
+  // ── 2b. Matter Reference ──────────────────────────────────
+  if (data.matterNumber || data.matterTitle) {
+    const refItems: [string, string][] = []
+    if (data.matterNumber) refItems.push(['Matter No.', data.matterNumber])
+    if (data.matterTitle) refItems.push(['Matter', sanitize(data.matterTitle)])
+    if (data.practiceArea) refItems.push(['Practice Area', sanitize(data.practiceArea)])
+
+    for (const [label, value] of refItems) {
+      pm.drawText(`${label}:`, { font: fontBold, size: FONT_SMALL, color: COLOR_MID, x: MARGIN_LEFT })
+      pm.drawText(value, { size: FONT_BODY, color: COLOR_DARK, x: MARGIN_LEFT + 80 })
+      pm.moveDown(LINE_HEIGHT)
+    }
+    pm.moveDown(6)
+  }
+
   // ── 3. Client Info Section ─────────────────────────────────
 
   pm.drawText('PREPARED FOR', {
@@ -741,6 +770,56 @@ export async function generateRetainerPdf(data: RetainerPdfData): Promise<Uint8A
     pm.moveDown(10)
   }
 
+  // ── 10b. Risk Disclosure (dynamic clause) ─────────────────
+  if (data.riskLevel === 'high' || data.riskLevel === 'critical') {
+    pm.ensureSpace(80)
+    pm.drawText('RISK DISCLOSURE', { font: fontBold, size: FONT_SMALL, color: COLOR_MID })
+    pm.moveDown(LINE_HEIGHT + 2)
+
+    // Red warning box
+    const riskBoxY = pm.y
+    pm.drawRect(MARGIN_LEFT, riskBoxY - 50, CONTENT_WIDTH, 62, rgb(1, 0.95, 0.95))
+    pm.page.drawRectangle({
+      x: MARGIN_LEFT,
+      y: riskBoxY - 50,
+      width: CONTENT_WIDTH,
+      height: 62,
+      borderColor: rgb(0.85, 0.2, 0.2),
+      borderWidth: 1,
+      color: rgb(1, 0.95, 0.95),
+    })
+
+    pm.drawText('IMPORTANT RISK NOTICE', {
+      font: fontBold,
+      size: FONT_SMALL,
+      color: rgb(0.85, 0.2, 0.2),
+      x: MARGIN_LEFT + 10,
+    })
+    pm.moveDown(LINE_HEIGHT)
+
+    const riskText = data.riskLevel === 'critical'
+      ? 'This matter has been assessed as CRITICAL RISK. The outcome is uncertain and may involve significant challenges. The Client acknowledges that results cannot be guaranteed and that additional fees may apply if complications arise during the course of representation.'
+      : 'This matter has been assessed as HIGH RISK. The Client acknowledges that the Legal Representative has disclosed the elevated risk profile of this case. The outcome may be uncertain, and the Client accepts this assessment as part of the engagement terms.'
+
+    pm.drawWrappedText(riskText, {
+      size: FONT_SMALL,
+      color: COLOR_DARK,
+      x: MARGIN_LEFT + 10,
+      maxWidth: CONTENT_WIDTH - 20,
+    })
+
+    pm.moveDown(12)
+  }
+
+  // ── 10c. Snapshot Notice ─────────────────────────────────
+  if (data.snapshotDate) {
+    pm.ensureSpace(24)
+    pm.drawRect(MARGIN_LEFT, pm.y - 4, CONTENT_WIDTH, 18, COLOR_BG)
+    const snapshotText = `Fee schedule frozen on ${formatDate(data.snapshotDate, data.dateFormat)}. Changes to fee templates after this date do not affect this agreement.`
+    pm.drawText(snapshotText, { size: FONT_SMALL, color: COLOR_MID, x: MARGIN_LEFT + 8 })
+    pm.moveDown(24)
+  }
+
   // ── 11. Consent Text ───────────────────────────────────────
 
   pm.ensureSpace(60)
@@ -821,8 +900,8 @@ export async function generateRetainerPdf(data: RetainerPdfData): Promise<Uint8A
     thickness: 0.5,
   })
 
-  // Firm name below line
-  pm.page.drawText(sanitize(data.firmName), {
+  // Lawyer/Firm name below line
+  pm.page.drawText(sanitize(data.lawyerName || data.firmName), {
     x: lawyerSigX,
     y: clientSigLineY - 14,
     size: FONT_BODY,

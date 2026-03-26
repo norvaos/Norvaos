@@ -42,7 +42,7 @@ export function StageActivityFeed({ stageHistory, activities, users }: StageActi
     return (
       <div className="flex flex-col items-center justify-center py-8 text-center">
         <History className="h-8 w-8 text-muted-foreground/30 mb-2" />
-        <p className="text-sm text-muted-foreground">No activity yet</p>
+        <p className="text-sm text-muted-foreground">No timeline entries yet</p>
       </div>
     )
   }

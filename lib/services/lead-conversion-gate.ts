@@ -82,7 +82,19 @@ export async function evaluateConversionGates(
     results.push(result)
   }
 
-  // 7. Lead not already converted (always enforced)
+  // 7. Readiness Score (if enabled — blocks conversion if score < 70%)
+  if (gates.readiness_complete) {
+    const result = await checkReadinessComplete(supabase, leadId)
+    results.push(result)
+  }
+
+  // 8. Trust Deposit Received (if enabled — Norva Ledger confirmation)
+  if (gates.trust_deposit_received) {
+    const result = await checkTrustDepositReceived(supabase, leadId)
+    results.push(result)
+  }
+
+  // 9. Lead not already converted (always enforced)
   const conversionCheck = await checkNotAlreadyConverted(supabase, leadId)
   results.push(conversionCheck)
 
@@ -102,7 +114,7 @@ export async function evaluateConversionGates(
 async function checkConflictCleared(
   supabase: SupabaseClient<Database>,
   leadId: string,
-  tenantId: string
+  _tenantId: string
 ): Promise<GateResult> {
   // Check existing conflict engine results for the lead's contact
   const { data: lead } = await supabase
@@ -115,17 +127,39 @@ async function checkConflictCleared(
     return { gate: 'conflict_cleared', label: 'Conflict Check', passed: false, reason: 'Lead not found', enabled: true }
   }
 
+  let status = lead.conflict_status ?? 'not_run'
+
+  // Auto-run the alpha conflict check if not yet scanned
+  if (status === 'not_run' || status === null) {
+    try {
+      const { data: alphaResult } = await supabase.rpc('fn_conflict_check_alpha', {
+        p_lead_id: leadId,
+      })
+      const result = alphaResult as { has_conflicts: boolean } | null
+      if (result) {
+        status = result.has_conflicts ? 'conflict_detected' : 'auto_scan_complete'
+        // Persist the result
+        await supabase
+          .from('leads')
+          .update({ conflict_status: status, updated_at: new Date().toISOString() })
+          .eq('id', leadId)
+      }
+    } catch {
+      // If alpha check fails, fall through to existing status logic
+    }
+  }
+
   // auto_scan_complete = scan ran, score < 25, no significant matches
   // review_suggested   = score 25–49, minor matches, not blocking
   // cleared_by_lawyer  = lawyer reviewed and cleared
   // waiver_obtained    = waiver signed
   // review_required / conflict_confirmed / blocked = cannot convert
   const clearedStatuses = ['auto_scan_complete', 'review_suggested', 'cleared', 'cleared_by_lawyer', 'waiver_obtained']
-  const status = lead.conflict_status ?? 'not_run'
   const passed = clearedStatuses.includes(status)
 
   const reasonMessages: Record<string, string> = {
-    not_run: 'Conflict check has not been run yet. A scan will be run automatically when opening the matter.',
+    not_run: 'Conflict check has not been run yet.',
+    conflict_detected: 'Email or passport conflict detected with an existing contact. Review required before converting.',
     review_required: 'Conflict check flagged potential conflicts. A lawyer must review before opening this matter.',
     conflict_confirmed: 'A conflict of interest has been confirmed. This matter cannot be opened.',
     blocked: 'This matter is blocked due to a confirmed conflict of interest.',
@@ -257,6 +291,102 @@ async function checkRequiredDocuments(
     label: 'Required Documents',
     passed,
     reason: passed ? undefined : `Required documents status: "${retainer?.required_documents_status ?? 'unknown'}"`,
+    enabled: true,
+  }
+}
+
+async function checkReadinessComplete(
+  supabase: SupabaseClient<Database>,
+  leadId: string
+): Promise<GateResult> {
+  const READINESS_THRESHOLD = 70
+
+  try {
+    const { data } = await supabase.rpc('fn_calculate_lead_readiness', {
+      p_lead_id: leadId,
+    })
+
+    const result = data as { score: number; missing: Array<{ label: string }> } | null
+    const score = result?.score ?? 0
+    const passed = score >= READINESS_THRESHOLD
+    const missingCount = result?.missing?.length ?? 0
+
+    return {
+      gate: 'readiness_complete',
+      label: 'Lead Readiness',
+      passed,
+      reason: passed
+        ? undefined
+        : `Lead readiness is ${score}% (requires ${READINESS_THRESHOLD}%). ${missingCount} required field(s) missing.`,
+      enabled: true,
+    }
+  } catch {
+    return {
+      gate: 'readiness_complete',
+      label: 'Lead Readiness',
+      passed: false,
+      reason: 'Failed to calculate lead readiness score.',
+      enabled: true,
+    }
+  }
+}
+
+async function checkTrustDepositReceived(
+  supabase: SupabaseClient<Database>,
+  leadId: string
+): Promise<GateResult> {
+  // Check if there's a trust deposit linked to the lead's retainer package
+  // or to any matter that originated from this lead.
+  //
+  // Path 1: Check retainer package payment_status (deposit recorded via retainer flow)
+  const { data: retainer } = await supabase
+    .from('lead_retainer_packages')
+    .select('payment_status, payment_amount')
+    .eq('lead_id', leadId)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+
+  if (retainer && retainer.payment_amount && Number(retainer.payment_amount) > 0) {
+    return {
+      gate: 'trust_deposit_received',
+      label: 'Trust Deposit Received',
+      passed: true,
+      enabled: true,
+    }
+  }
+
+  // Path 2: Check if any trust_transactions exist for a matter that originated from this lead
+  // (covers the case where deposit was recorded via Norva Ledger directly)
+  const { data: matters } = await supabase
+    .from('matters')
+    .select('id')
+    .eq('originating_lead_id', leadId)
+    .limit(1)
+
+  if (matters && matters.length > 0) {
+    const matterId = matters[0].id
+    const { count } = await supabase
+      .from('trust_transactions')
+      .select('id', { count: 'exact', head: true })
+      .eq('matter_id', matterId)
+      .eq('transaction_type', 'deposit')
+
+    if (count && count > 0) {
+      return {
+        gate: 'trust_deposit_received',
+        label: 'Trust Deposit Received',
+        passed: true,
+        enabled: true,
+      }
+    }
+  }
+
+  return {
+    gate: 'trust_deposit_received',
+    label: 'Trust Deposit Received',
+    passed: false,
+    reason: 'No trust deposit has been recorded for this lead. Record a deposit in the Norva Ledger or process a retainer payment to satisfy this gate.',
     enabled: true,
   }
 }

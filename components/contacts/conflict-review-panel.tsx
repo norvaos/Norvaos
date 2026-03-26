@@ -285,15 +285,22 @@ export function ConflictStatusBadge({ status, className }: { status: string; cla
       variant: 'bg-red-50 text-red-700 border-red-200',
       icon: <XCircle className="size-3" />,
     },
+    CONFLICT_DETECTED: {
+      label: 'Conflict Detected',
+      variant: 'bg-red-50 text-red-700 border-red-200',
+      icon: <XCircle className="size-3" />,
+    },
   }
 
   const c = config[status] ?? config.not_run
+  const isRedAlert = status === 'conflict_confirmed' || status === 'blocked' || status === 'CONFLICT_DETECTED'
 
   return (
     <Badge
       className={cn(
         'gap-1 border',
         c.variant,
+        isRedAlert && 'animate-pulse-red-35',
         className
       )}
     >

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Database Migration Runner for LexCRM
+ * Database Migration Runner for NorvaOS
  *
  * Usage:
  *   node scripts/migrate.mjs                    # Run pending migrations

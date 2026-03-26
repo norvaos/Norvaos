@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server'
 import { authenticateRequest, AuthError } from '@/lib/services/auth'
 import { sendInternalEmail } from '@/lib/services/email-service'
+import { renderSentinelWelcomeEmail } from '@/lib/email-templates/sentinel-welcome'
+import { CLIENT_LOCALES } from '@/lib/i18n/config'
 import { log } from '@/lib/utils/logger'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { checkSeatLimit, seatLimitResponse, logSeatLimitDenial } from '@/lib/services/seat-limit'
@@ -8,11 +10,100 @@ import { requirePermission } from '@/lib/services/require-role'
 import { withTiming } from '@/lib/middleware/request-timing'
 import { z } from 'zod'
 
+// ── Global 15 Invite Content (Directive 40.0 §3) ──────────────────────────
+// Localised invite messages — same pattern as WELCOME_CONTENT in sentinel-handshake
+// but tailored for staff/team invitations rather than client portal handshakes.
+
+interface InviteContent {
+  greeting: (name: string) => string
+  body: (firmName: string, roleName: string) => string
+  cta: string
+}
+
+const INVITE_CONTENT: Record<string, InviteContent> = {
+  en: {
+    greeting: (n) => `Dear ${n}`,
+    body: (f, r) => `You have been invited to join ${f} as ${r}. Click the button below to set up your account. This invitation expires in 7 days.`,
+    cta: 'Accept Invitation',
+  },
+  fr: {
+    greeting: (n) => `Cher(e) ${n}`,
+    body: (f, r) => `Vous avez été invité(e) à rejoindre ${f} en tant que ${r}. Cliquez sur le bouton ci-dessous pour configurer votre compte. Cette invitation expire dans 7 jours.`,
+    cta: 'Accepter l\'invitation',
+  },
+  es: {
+    greeting: (n) => `Estimado/a ${n}`,
+    body: (f, r) => `Ha sido invitado/a a unirse a ${f} como ${r}. Haga clic en el botón a continuación para configurar su cuenta. Esta invitación caduca en 7 días.`,
+    cta: 'Aceptar invitación',
+  },
+  pa: {
+    greeting: (n) => `ਪਿਆਰੇ ${n}`,
+    body: (f, r) => `ਤੁਹਾਨੂੰ ${f} ਵਿੱਚ ${r} ਵਜੋਂ ਸ਼ਾਮਲ ਹੋਣ ਲਈ ਸੱਦਾ ਦਿੱਤਾ ਗਿਆ ਹੈ। ਆਪਣਾ ਖਾਤਾ ਸੈੱਟ ਅੱਪ ਕਰਨ ਲਈ ਹੇਠਾਂ ਦਿੱਤੇ ਬਟਨ 'ਤੇ ਕਲਿੱਕ ਕਰੋ। ਇਹ ਸੱਦਾ 7 ਦਿਨਾਂ ਵਿੱਚ ਖਤਮ ਹੋ ਜਾਵੇਗਾ।`,
+    cta: 'ਸੱਦਾ ਸਵੀਕਾਰ ਕਰੋ',
+  },
+  zh: {
+    greeting: (n) => `尊敬的 ${n}`,
+    body: (f, r) => `您已被邀请加入 ${f}，担任 ${r}。请点击下方按钮设置您的账户。此邀请将在7天后过期。`,
+    cta: '接受邀请',
+  },
+  ar: {
+    greeting: (n) => `عزيزي/عزيزتي ${n}`,
+    body: (f, r) => `لقد تمت دعوتكم للانضمام إلى ${f} بصفة ${r}. يرجى النقر على الزر أدناه لإعداد حسابكم. تنتهي صلاحية هذه الدعوة خلال 7 أيام.`,
+    cta: 'قبول الدعوة',
+  },
+  ur: {
+    greeting: (n) => `محترم ${n}`,
+    body: (f, r) => `آپ کو ${f} میں ${r} کے طور پر شامل ہونے کی دعوت دی گئی ہے۔ اپنا اکاؤنٹ سیٹ اپ کرنے کے لیے نیچے دیے گئے بٹن پر کلک کریں۔ یہ دعوت 7 دنوں میں ختم ہو جائے گی۔`,
+    cta: 'دعوت قبول کریں',
+  },
+  hi: {
+    greeting: (n) => `प्रिय ${n}`,
+    body: (f, r) => `आपको ${f} में ${r} के रूप में शामिल होने के लिए आमंत्रित किया गया है। अपना खाता सेट अप करने के लिए नीचे दिए गए बटन पर क्लिक करें। यह आमंत्रण 7 दिनों में समाप्त हो जाएगा।`,
+    cta: 'आमंत्रण स्वीकार करें',
+  },
+  pt: {
+    greeting: (n) => `Caro/a ${n}`,
+    body: (f, r) => `Foi convidado/a para se juntar a ${f} como ${r}. Clique no botão abaixo para configurar a sua conta. Este convite expira em 7 dias.`,
+    cta: 'Aceitar convite',
+  },
+  tl: {
+    greeting: (n) => `Mahal na ${n}`,
+    body: (f, r) => `Ikaw ay inimbitahan na sumali sa ${f} bilang ${r}. I-click ang button sa ibaba upang i-setup ang iyong account. Ang imbitasyong ito ay mag-eexpire sa loob ng 7 araw.`,
+    cta: 'Tanggapin ang imbitasyon',
+  },
+  fa: {
+    greeting: (n) => `${n} عزیز`,
+    body: (f, r) => `شما به عنوان ${r} به ${f} دعوت شده‌اید. لطفاً روی دکمه زیر کلیک کنید تا حساب خود را تنظیم کنید. این دعوت در عرض 7 روز منقضی می‌شود.`,
+    cta: 'پذیرش دعوت',
+  },
+  vi: {
+    greeting: (n) => `Kính gửi ${n}`,
+    body: (f, r) => `Bạn đã được mời tham gia ${f} với vai trò ${r}. Vui lòng nhấp vào nút bên dưới để thiết lập tài khoản. Lời mời này hết hạn sau 7 ngày.`,
+    cta: 'Chấp nhận lời mời',
+  },
+  ko: {
+    greeting: (n) => `${n} 님께`,
+    body: (f, r) => `${f}에 ${r}(으)로 참여하도록 초대받으셨습니다. 아래 버튼을 클릭하여 계정을 설정해 주세요. 이 초대는 7일 후에 만료됩니다.`,
+    cta: '초대 수락',
+  },
+  uk: {
+    greeting: (n) => `Шановний/Шановна ${n}`,
+    body: (f, r) => `Вас запрошено приєднатися до ${f} як ${r}. Натисніть кнопку нижче, щоб налаштувати свій обліковий запис. Це запрошення дійсне протягом 7 днів.`,
+    cta: 'Прийняти запрошення',
+  },
+  bn: {
+    greeting: (n) => `প্রিয় ${n}`,
+    body: (f, r) => `আপনাকে ${f}-এ ${r} হিসেবে যোগদানের জন্য আমন্ত্রণ জানানো হয়েছে। আপনার অ্যাকাউন্ট সেট আপ করতে নীচের বোতামে ক্লিক করুন। এই আমন্ত্রণ 7 দিনের মধ্যে মেয়াদ উত্তীর্ণ হবে।`,
+    cta: 'আমন্ত্রণ গ্রহণ করুন',
+  },
+}
+
 const inviteUserSchema = z.object({
   email: z.string().email('Invalid email address'),
   first_name: z.string().min(1, 'First name is required').max(100),
   last_name: z.string().min(1, 'Last name is required').max(100),
   role_id: z.string().uuid().optional().nullable(),
+  preferred_language: z.string().min(2).max(5).optional().nullable(),
 })
 
 /**
@@ -40,7 +131,7 @@ async function handlePost(request: Request) {
       )
     }
 
-    const { email, first_name, last_name, role_id } = parsed.data
+    const { email, first_name, last_name, role_id, preferred_language } = parsed.data
 
     const admin = createAdminClient()
 
@@ -180,29 +271,80 @@ async function handlePost(request: Request) {
       )
     }
 
-    // Fetch tenant name for email (lightweight query)
+    // Fetch tenant info for email (name + branding for localised template)
     const { data: tenantData } = await admin
       .from('tenants')
-      .select('name')
+      .select('name, logo_url, primary_color')
       .eq('id', auth.tenantId)
       .single()
 
-    // Send invite email (non-blocking)
+    // ── Global-15 Dispatcher (Directive 40.0 §3) ────────────────────────────
+    // If preferred_language is a Global 15 locale, render a localised invite
+    // email using the Sentinel Welcome template. Otherwise, fall back to the
+    // plain English internal email.
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
     const acceptUrl = `${baseUrl}/invite/${token}`
+    const firmName = tenantData?.name ?? 'Your Law Firm'
 
-    sendInternalEmail({
-      supabase: admin,
-      tenantId: auth.tenantId,
-      recipientEmail: email,
-      recipientName: `${first_name} ${last_name}`,
-      title: `You've been invited to ${tenantData?.name ?? 'a firm'}`,
-      message: `You have been invited to join ${tenantData?.name ?? 'the firm'} as ${role.name}. Click the link below to set up your account. This invitation expires in 7 days.`,
-      entityType: 'invite' as any,
-      entityId: acceptUrl,
-    }).catch((err) => {
-      log.error('[invite] Failed to send invite email', { tenant_id: auth.tenantId, error_code: String(err) })
-    })
+    const isGlobal15 = preferred_language && INVITE_CONTENT[preferred_language]
+    const effectiveLocale = isGlobal15 ? preferred_language : 'en'
+
+    if (isGlobal15) {
+      // Localised invite via Sentinel Welcome template
+      const content = INVITE_CONTENT[effectiveLocale]!
+      const enContent = INVITE_CONTENT.en
+      const localeInfo = CLIENT_LOCALES.find((l) => l.code === effectiveLocale) ?? CLIENT_LOCALES[0]
+
+      renderSentinelWelcomeEmail({
+        firmName,
+        firmLogoUrl: (tenantData as any)?.logo_url ?? null,
+        primaryColor: (tenantData as any)?.primary_color ?? '#3b82f6',
+        clientFirstName: first_name,
+        localGreeting: content.greeting(`${first_name} ${last_name}`),
+        localBody: content.body(firmName, role.name),
+        localCta: content.cta,
+        englishBody: enContent.body(firmName, role.name),
+        safeLink: acceptUrl,
+        languageLabel: `${localeInfo.nativeLabel} — ${localeInfo.label}`,
+        dir: localeInfo.dir as 'ltr' | 'rtl',
+      })
+        .then((emailData) => {
+          // Dispatch via internal email service with pre-rendered localised HTML
+          return sendInternalEmail({
+            supabase: admin,
+            tenantId: auth.tenantId,
+            recipientEmail: email,
+            recipientName: `${first_name} ${last_name}`,
+            title: emailData.subject,
+            message: emailData.text,
+            entityType: 'invite' as any,
+            entityId: acceptUrl,
+            htmlOverride: emailData.html,
+            textOverride: emailData.text,
+          })
+        })
+        .catch((err) => {
+          log.error('[invite] Failed to send localised invite email', {
+            tenant_id: auth.tenantId,
+            locale: effectiveLocale,
+            error_code: String(err),
+          })
+        })
+    } else {
+      // English-only fallback — original sendInternalEmail path
+      sendInternalEmail({
+        supabase: admin,
+        tenantId: auth.tenantId,
+        recipientEmail: email,
+        recipientName: `${first_name} ${last_name}`,
+        title: `You've been invited to ${firmName}`,
+        message: `You have been invited to join ${firmName} as ${role.name}. Click the link below to set up your account. This invitation expires in 7 days.`,
+        entityType: 'invite' as any,
+        entityId: acceptUrl,
+      }).catch((err) => {
+        log.error('[invite] Failed to send invite email', { tenant_id: auth.tenantId, error_code: String(err) })
+      })
+    }
 
     log.info('[invite] User invited', {
       tenant_id: auth.tenantId,

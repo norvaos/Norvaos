@@ -208,16 +208,30 @@ async function handlePost(
           failedConditions: failedConditions.filter((c) => !c.passed),
         }
 
-        return NextResponse.json(
-          {
-            success: false,
-            error: gateFailure.title,
-            code: gateFailure.code,
-            gateFailure,
-            failedRules: result.failedRules ?? [],
-          },
-          { status: 422 }
+        // Gate failures from the stage engine (including require_retainer_agreement)
+        // surface automatically via failedConditions above. The block below adds
+        // retainer-specific context so the UI can render a targeted CTA.
+        const responseBody: Record<string, unknown> = {
+          success: false,
+          error: gateFailure.title,
+          code: gateFailure.code,
+          gateFailure,
+          failedRules: result.failedRules ?? [],
+        }
+
+        const retainerCondition = failedConditions.find(
+          (c) => c.conditionId === 'require_retainer_agreement'
         )
+        if (retainerCondition && !retainerCondition.passed) {
+          responseBody.retainerGate = {
+            blocked: true,
+            details: retainerCondition.details,
+            action: 'Generate and sign a Retainer Agreement before advancing.',
+            owner: 'billing',
+          }
+        }
+
+        return NextResponse.json(responseBody, { status: 422 })
       }
 
       // Non-gate failure (e.g. missing pipeline, DB error) — keep 400

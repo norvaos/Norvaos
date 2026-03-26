@@ -10,6 +10,25 @@ export default defineConfig({
       ['**/__tests__/**/*.test.tsx', 'jsdom'],
       ['**/__tests__/**/*.test.ts', 'node'],
     ],
+    coverage: {
+      provider: 'v8',
+      enabled: false, // Enable via CLI: vitest run --coverage
+      include: ['lib/services/**/*.ts', 'lib/utils/**/*.ts'],
+      exclude: [
+        '**/__tests__/**',
+        '**/node_modules/**',
+        '**/*.d.ts',
+      ],
+      thresholds: {
+        // Global minimum
+        lines: 80,
+        functions: 80,
+        branches: 75,
+        statements: 80,
+      },
+      reporter: ['text', 'text-summary', 'html', 'json-summary'],
+      reportsDirectory: './coverage',
+    },
   },
   resolve: {
     alias: {

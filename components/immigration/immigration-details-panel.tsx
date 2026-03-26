@@ -61,6 +61,7 @@ import {
 } from 'lucide-react'
 
 import { CrsCalculatorSheet } from './crs-calculator-sheet'
+import { PiiField } from '@/components/shared/pii-field'
 import type { Database } from '@/lib/types/database'
 
 type MatterImmigration = Database['public']['Tables']['matter_immigration']['Row']
@@ -716,11 +717,12 @@ export function ImmigrationDetailsPanel({ matterId, tenantId, fieldConfig }: Imm
           />
         )}
         {isFieldVisible('uci_number') && (
-          <InlineTextField
+          <PiiField
             label="UCI Number"
             value={immigration.uci_number}
+            fieldType="uci"
             fieldKey="uci_number"
-            onSave={handleTextSave}
+            matterId={matterId}
             placeholder="e.g., 1234-5678"
           />
         )}
@@ -796,20 +798,22 @@ export function ImmigrationDetailsPanel({ matterId, tenantId, fieldConfig }: Imm
           />
         )}
         {isFieldVisible('passport_number') && (
-          <InlineTextField
+          <PiiField
             label="Passport Number"
             value={immigration.passport_number}
+            fieldType="passport"
             fieldKey="passport_number"
-            onSave={handleTextSave}
+            matterId={matterId}
           />
         )}
         {isFieldVisible('passport_expiry') && (
-          <InlineTextField
+          <PiiField
             label="Passport Expiry"
             value={immigration.passport_expiry}
+            fieldType="date"
             fieldKey="passport_expiry"
-            onSave={handleTextSave}
-            type="date"
+            matterId={matterId}
+            formatDisplay={formatDate}
           />
         )}
       </CollapsibleSection>

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { authenticateRequest, AuthError } from '@/lib/services/auth'
 import { withTiming } from '@/lib/middleware/request-timing'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { createServerSupabaseClient } from '@/lib/supabase/server'
 
 /**
  * POST /api/matters/[id]/confirm-submission
@@ -134,8 +135,60 @@ async function handlePost(
       } as any,
     })
 
+    // ── 8. Norva Ledger: Auto-disburse government fees on submission ────
+    // "Trust-to-General transfers the millisecond the Submit button is clicked"
+    let disbursementResult: Record<string, unknown> | null = null
+    try {
+      const supabase = await createServerSupabaseClient()
+
+      // Step 1: Authorize (reserve funds) — skips if already reserved or readiness < 95
+      const { data: authData, error: authErr } = await supabase.rpc(
+        'fn_authorize_government_disbursement' as any,
+        { p_matter_id: matterId } as any,
+      )
+
+      if (!authErr && authData) {
+        // Step 2: Confirm disbursement (actual transfer) with IRCC confirmation as receipt
+        const receiptRef = hasConfirmationNumber
+          ? confirmation_number!.trim()
+          : 'IRCC-SUBMISSION-CONFIRMED'
+
+        const { data: confirmData, error: confirmErr } = await supabase.rpc(
+          'fn_confirm_government_disbursement' as any,
+          { p_matter_id: matterId, p_receipt_ref: receiptRef } as any,
+        )
+
+        if (!confirmErr && confirmData) {
+          disbursementResult = confirmData as Record<string, unknown>
+
+          // Log the auto-disbursement activity
+          await admin.from('activities').insert({
+            tenant_id: auth.tenantId,
+            matter_id: matterId,
+            activity_type: 'trust_disbursement',
+            title: 'Government fees auto-disbursed',
+            description: `Norva Ledger automatically transferred government fees to IRCC on submission confirmation. ${
+              (confirmData as any)?.amount_dollars ?? ''
+            }`,
+            entity_type: 'matter',
+            entity_id: matterId,
+            user_id: auth.userId,
+            metadata: confirmData as any,
+          })
+        } else if (confirmErr) {
+          console.warn('[confirm-submission] Auto-disburse confirm skipped:', confirmErr.message)
+        }
+      } else if (authErr) {
+        // Non-fatal: disbursement may not be applicable (no govt fees, insufficient balance, etc.)
+        console.info('[confirm-submission] Auto-disburse skipped:', authErr.message)
+      }
+    } catch (disbErr) {
+      // Non-fatal: submission confirmation succeeded, disbursement is best-effort
+      console.warn('[confirm-submission] Auto-disburse error (non-fatal):', disbErr)
+    }
+
     return NextResponse.json(
-      { success: true, intake: updatedIntake },
+      { success: true, intake: updatedIntake, disbursement: disbursementResult },
       { status: 200 }
     )
   } catch (error) {

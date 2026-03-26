@@ -1,5 +1,5 @@
 -- ============================================================================
--- LEXCRM DATABASE SCHEMA v2.0
+-- NORVAOS DATABASE SCHEMA v2.0
 -- Legal Practice CRM & Management Platform
 -- PostgreSQL / Supabase Compatible
 -- ============================================================================

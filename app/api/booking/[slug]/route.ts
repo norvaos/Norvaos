@@ -198,8 +198,8 @@ async function computeSlots(
   const prevDate = shiftDate(date, -1)
   const nextDate = shiftDate(date, +1)
 
-  // Fetch existing appointments AND calendar events in parallel
-  const [appointmentsRes, calendarEventsRes] = await Promise.all([
+  // Fetch existing appointments, calendar events, AND tasks in parallel
+  const [appointmentsRes, calendarEventsRes, tasksRes] = await Promise.all([
     // Existing appointments for this booking page on this date
     admin
       .from('appointments')
@@ -218,6 +218,16 @@ async function computeSlots(
       .neq('status', 'cancelled')
       .gte('start_at', prevDate + 'T00:00:00')
       .lte('start_at', nextDate + 'T23:59:59'),
+
+    // Dynamic Availability: block slots where lawyer has tasks due
+    admin
+      .from('tasks')
+      .select('due_date, due_time, estimated_minutes')
+      .eq('assigned_to', userId)
+      .eq('tenant_id', tenantId)
+      .eq('is_deleted', false)
+      .in('status', ['todo', 'in_progress'])
+      .eq('due_date', date),
   ])
 
   // Convert appointments to busy blocks
@@ -233,8 +243,21 @@ async function computeSlots(
     .map((e) => eventToBusyBlock(e, date, tz))
     .filter((b): b is BusyBlock => b !== null)
 
+  // Task-based blocking: tasks with due_time block that slot; tasks without
+  // due_time block a default 30-min window at 9:00 AM (assumed morning prep)
+  const taskBlocks: BusyBlock[] = (tasksRes.data ?? []).map(
+    (t: { due_time: string | null; estimated_minutes: number | null }) => {
+      const duration = t.estimated_minutes ?? 30
+      if (t.due_time) {
+        const start = timeToMinutes(t.due_time)
+        return { start, end: start + duration }
+      }
+      return { start: 9 * 60, end: 9 * 60 + duration }
+    }
+  )
+
   // Merge all busy blocks
-  const allBusy = [...appointmentBlocks, ...calendarBlocks]
+  const allBusy = [...appointmentBlocks, ...calendarBlocks, ...taskBlocks]
 
   // Compute minimum allowed start time based on notice hours
   // Use the booking page's timezone for "now" comparison

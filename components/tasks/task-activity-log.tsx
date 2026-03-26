@@ -162,7 +162,7 @@ export function TaskActivityLog({ taskId, tenantId }: TaskActivityLogProps) {
     return (
       <div className="py-8 text-center">
         <Clock className="mx-auto h-8 w-8 text-muted-foreground/40" />
-        <p className="mt-2 text-sm text-muted-foreground">No activity yet</p>
+        <p className="mt-2 text-sm text-muted-foreground">No timeline entries yet</p>
       </div>
     )
   }

@@ -1,4 +1,4 @@
-# LexCRM Defect Register
+# NorvaOS Defect Register
 
 **Register opened:** 2026-03-18  
 **Status:** ACTIVE — Defect Stabilization Pass  

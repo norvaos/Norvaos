@@ -412,7 +412,7 @@ interface PortalTranslations {
 // ═══════════════════════════════════════════════════════════════════════════════
 
 const en: PortalTranslations = {
-  portal_title: 'Document Upload Portal',
+  portal_title: 'Norva Document Bridge',
   portal_no_documents: 'No documents have been requested yet. Please check back later.',
   reference_label: 'Reference',
   instructions_label: 'Instructions',

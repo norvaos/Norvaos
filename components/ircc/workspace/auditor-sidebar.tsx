@@ -38,6 +38,7 @@ import type { Database } from '@/lib/types/database'
 import type { MatterPersonProfile } from '@/lib/queries/matter-profiles'
 import type { ImmigrationReadinessData } from '@/lib/queries/immigration-readiness'
 import type { DocumentSlot } from '@/lib/queries/document-slots'
+import { GoldPulseScore } from '@/components/ircc/gold-pulse-score'
 
 type Matter = Database['public']['Tables']['matters']['Row']
 type MatterImmigration = Database['public']['Tables']['matter_immigration']['Row']
@@ -378,22 +379,12 @@ export function AuditorSidebar({
         )}
       </div>
 
-      {/* Completeness progress bar */}
-      <div className="px-3 py-1.5 border-b shrink-0">
-        <div className="flex items-center justify-between mb-1">
-          <span className="text-[10px] text-muted-foreground">Filing readiness</span>
-          <span className="text-[10px] font-medium">{passItems}/{totalItems} checks</span>
-        </div>
-        <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
-          <div
-            className={cn(
-              'h-full rounded-full transition-all',
-              completionPct === 100 ? 'bg-green-500' : completionPct >= 60 ? 'bg-amber-500' : 'bg-red-500'
-            )}
-            style={{ width: `${completionPct}%` }}
-          />
-        </div>
-      </div>
+      {/* Completeness progress bar with Gold Pulse (Directive 8.2) */}
+      <GoldPulseScore
+        score={completionPct}
+        passed={passItems}
+        total={totalItems}
+      />
 
       {/* MIDDLE — Checklist */}
       <ScrollArea className="flex-1">

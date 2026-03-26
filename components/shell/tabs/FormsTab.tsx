@@ -103,10 +103,10 @@ export function FormsTab({ matterId, matterStatus: _matterStatus }: FormsTabProp
         </div>
         <div>
           <p className="text-sm font-medium text-muted-foreground">
-            No form pack generated yet.
+            Norva Submission Engine is ready.
           </p>
           <p className="text-xs text-muted-foreground mt-1">
-            Click Generate Pack to create form instances for this matter.
+            Click Generate Pack to create form instances for this matter and begin your submission.
           </p>
         </div>
         <GeneratePackButton matterId={matterId} />

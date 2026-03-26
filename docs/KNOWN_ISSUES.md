@@ -1,6 +1,6 @@
 # Known Issues Register
 
-This document tracks known issues in LexCRM (NorvaOS). Issues are logged here
+This document tracks known issues in NorvaOS. Issues are logged here
 when they are identified, partially mitigated, or intentionally deferred.
 P0 blockers must be resolved before any production release.
 

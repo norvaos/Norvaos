@@ -71,6 +71,7 @@ import {
   useSaveMatterDynamicIntake,
   useMatterIntakeRiskFlags,
   useResolveIntakeRiskFlag,
+  useIntakePrefill,
 } from '@/lib/queries/matter-intake'
 
 type Matter = Database['public']['Tables']['matters']['Row']
@@ -387,6 +388,7 @@ function DynamicIntakeSection({
 }) {
   const { data: schema = [], isLoading: schemaLoading } = useMatterTypeIntakeSchema(matterTypeId)
   const { data: existing, isLoading: answersLoading } = useMatterDynamicIntakeAnswers(matterId)
+  const { data: prefill } = useIntakePrefill(matterId)
   const { data: riskFlags = [] } = useMatterIntakeRiskFlags(matterId)
   const saveAnswers = useSaveMatterDynamicIntake()
   const resolveFlag = useResolveIntakeRiskFlag()
@@ -394,12 +396,27 @@ function DynamicIntakeSection({
   const [answers, setAnswers] = useState<Record<string, string | boolean | null>>({})
   const [dirty, setDirty] = useState(false)
 
+  // Merge: existing matter answers take priority, then pre-fill from lead snapshot
   useEffect(() => {
-    if (existing?.answers) {
-      setAnswers(existing.answers)
-      setDirty(false)
+    const merged: Record<string, string | boolean | null> = {}
+
+    // Layer 1: Pre-fill from lead snapshot (lowest priority)
+    if (prefill?.answers) {
+      for (const [key, value] of Object.entries(prefill.answers)) {
+        if (value !== null && value !== undefined && value !== '') {
+          merged[key] = value as string | boolean
+        }
+      }
     }
-  }, [existing])
+
+    // Layer 2: Existing matter-specific answers overwrite snapshot (highest priority)
+    if (existing?.answers) {
+      Object.assign(merged, existing.answers)
+    }
+
+    setAnswers(merged)
+    setDirty(false)
+  }, [existing, prefill])
 
   const isVisible = useCallback((q: IntakeQuestion): boolean => {
     if (!q.show_if) return true
@@ -501,11 +518,22 @@ function DynamicIntakeSection({
           if (!isVisible(q)) return null
           const val = answers[q.key]
 
+          const isFromSnapshot = !!(
+            prefill?.answers?.[q.key] !== undefined &&
+            prefill.answers[q.key] !== null &&
+            !existing?.answers?.[q.key]
+          )
+
           return (
             <div key={q.key} className="space-y-1">
               <Label className="text-xs font-medium">
                 {q.label}
                 {q.required && <span className="text-red-500 ml-1">*</span>}
+                {isFromSnapshot && (
+                  <span className="ml-2 inline-flex items-center rounded-full bg-blue-50 px-1.5 py-0.5 text-[10px] font-medium text-blue-700 border border-blue-200">
+                    Previously collected
+                  </span>
+                )}
               </Label>
 
               {q.type === 'boolean' && (

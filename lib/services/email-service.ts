@@ -5,6 +5,10 @@ import { renderStageChangeEmail } from '@/lib/email-templates/stage-change'
 import { renderDocumentRequestEmail } from '@/lib/email-templates/document-request'
 import { renderGeneralNotificationEmail } from '@/lib/email-templates/general-notification'
 import { renderDeadlineAlertEmail } from '@/lib/email-templates/deadline-alert'
+import { renderRetainerAgreementEmail } from '@/lib/email-templates/retainer-agreement'
+import { renderPortalInviteEmail } from '@/lib/email-templates/portal-invite'
+import { renderPaymentReceiptEmail } from '@/lib/email-templates/payment-receipt'
+import { resolveEmailLocale } from '@/lib/email-templates/email-locale'
 
 // ─── Types ──────────────────────────────────────────────────────────────────────
 
@@ -22,7 +26,7 @@ interface SendClientEmailParams {
   tenantId: string
   matterId: string
   contactId: string
-  notificationType: 'stage_change' | 'document_request' | 'deadline_alert' | 'general'
+  notificationType: 'stage_change' | 'document_request' | 'deadline_alert' | 'general' | 'retainer_agreement' | 'portal_invite' | 'payment_receipt'
   templateData: Record<string, unknown>
 }
 
@@ -82,7 +86,7 @@ async function fetchTenantBranding(supabase: SupabaseClient<Database>, tenantId:
 async function fetchContact(supabase: SupabaseClient<Database>, contactId: string) {
   const { data } = await supabase
     .from('contacts')
-    .select('first_name, email_primary, email_notifications_enabled')
+    .select('first_name, email_primary, email_notifications_enabled, preferred_language')
     .eq('id', contactId)
     .single()
   return data
@@ -365,6 +369,65 @@ export async function sendClientEmail(params: SendClientEmailParams): Promise<vo
         break
       }
 
+      case 'retainer_agreement': {
+        const locale = resolveEmailLocale(contact.preferred_language)
+        const rendered = await renderRetainerAgreementEmail({
+          firmName: tenant.name,
+          firmLogoUrl: tenant.logo_url,
+          primaryColor: tenant.primary_color ?? "",
+          clientFirstName: contact.first_name,
+          matterReference: matterRef,
+          documentTitle: (templateData.document_title as string) || 'Retainer Agreement',
+          signingUrl: (templateData.signing_url as string) || '',
+          expiresAt: (templateData.expires_at as string) || new Date(Date.now() + 7 * 86400000).toISOString(),
+          totalAmount: templateData.total_amount as string | undefined,
+          language: locale,
+        })
+        html = rendered.html
+        text = rendered.text
+        subject = rendered.subject
+        break
+      }
+
+      case 'portal_invite': {
+        const locale = resolveEmailLocale(contact.preferred_language)
+        const rendered = await renderPortalInviteEmail({
+          firmName: tenant.name,
+          firmLogoUrl: tenant.logo_url,
+          primaryColor: tenant.primary_color ?? "",
+          clientFirstName: contact.first_name,
+          matterReference: matterRef,
+          portalUrl: portalUrl || (templateData.portal_url as string) || '',
+          lawyerName: templateData.lawyer_name as string | undefined,
+          language: locale,
+        })
+        html = rendered.html
+        text = rendered.text
+        subject = rendered.subject
+        break
+      }
+
+      case 'payment_receipt': {
+        const locale = resolveEmailLocale(contact.preferred_language)
+        const rendered = await renderPaymentReceiptEmail({
+          firmName: tenant.name,
+          firmLogoUrl: tenant.logo_url,
+          primaryColor: tenant.primary_color ?? "",
+          clientFirstName: contact.first_name,
+          invoiceNumber: (templateData.invoice_number as string) || '',
+          amountPaid: (templateData.amount_paid as string) || '',
+          paymentDate: (templateData.payment_date as string) || new Date().toLocaleDateString(locale === 'fr' ? 'fr-CA' : 'en-CA'),
+          paymentMethod: templateData.payment_method as string | undefined,
+          trustAccountName: templateData.trust_account_name as string | undefined,
+          balanceRemaining: templateData.balance_remaining as string | undefined,
+          language: locale,
+        })
+        html = rendered.html
+        text = rendered.text
+        subject = rendered.subject
+        break
+      }
+
       case 'general':
       default: {
         const rendered = await renderGeneralNotificationEmail({
@@ -453,6 +516,10 @@ interface SendInternalEmailParams {
   message: string
   entityType?: string
   entityId?: string
+  /** Pre-rendered HTML — bypasses internal notification template (Directive 40.0 §3) */
+  htmlOverride?: string
+  /** Pre-rendered plain text — used with htmlOverride */
+  textOverride?: string
 }
 
 /**
@@ -461,7 +528,7 @@ interface SendInternalEmailParams {
  * Non-blocking: all errors caught internally — never throws.
  */
 export async function sendInternalEmail(params: SendInternalEmailParams): Promise<void> {
-  const { supabase, tenantId, recipientEmail, recipientName, title, message, entityType, entityId } = params
+  const { supabase, tenantId, recipientEmail, recipientName, title, message, entityType, entityId, htmlOverride, textOverride } = params
 
   try {
     const resend = getResend()
@@ -469,37 +536,51 @@ export async function sendInternalEmail(params: SendInternalEmailParams): Promis
 
     const tenant = await fetchTenantBranding(supabase, tenantId)
 
-    // Build action URL if entity context is available
-    let actionUrl: string | undefined
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
-    if (entityType && entityId) {
-      switch (entityType) {
-        case 'matter':
-          actionUrl = `${baseUrl}/matters/${entityId}`
-          break
-        case 'task':
-          actionUrl = `${baseUrl}/tasks`
-          break
-        case 'chat':
-          actionUrl = `${baseUrl}/chat`
-          break
-        case 'document':
-          actionUrl = `${baseUrl}/matters`
-          break
-      }
-    }
+    let html: string
+    let text: string
+    let subject: string
 
-    const { renderInternalNotificationEmail } = await import('@/lib/email-templates/internal-notification')
-    const { html, text, subject } = await renderInternalNotificationEmail({
-      firmName: tenant.name,
-      firmLogoUrl: tenant.logo_url,
-      primaryColor: tenant.primary_color ?? "",
-      recipientName,
-      title,
-      message,
-      actionUrl,
-      actionLabel: actionUrl ? 'View Details' : undefined,
-    })
+    if (htmlOverride) {
+      // Directive 40.0 §3: Pre-rendered localised template — skip internal notification rendering
+      html = htmlOverride
+      text = textOverride ?? message
+      subject = title
+    } else {
+      // Build action URL if entity context is available
+      let actionUrl: string | undefined
+      const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+      if (entityType && entityId) {
+        switch (entityType) {
+          case 'matter':
+            actionUrl = `${baseUrl}/matters/${entityId}`
+            break
+          case 'task':
+            actionUrl = `${baseUrl}/tasks`
+            break
+          case 'chat':
+            actionUrl = `${baseUrl}/chat`
+            break
+          case 'document':
+            actionUrl = `${baseUrl}/matters`
+            break
+        }
+      }
+
+      const { renderInternalNotificationEmail } = await import('@/lib/email-templates/internal-notification')
+      const rendered = await renderInternalNotificationEmail({
+        firmName: tenant.name,
+        firmLogoUrl: tenant.logo_url,
+        primaryColor: tenant.primary_color ?? "",
+        recipientName,
+        title,
+        message,
+        actionUrl,
+        actionLabel: actionUrl ? 'View Details' : undefined,
+      })
+      html = rendered.html
+      text = rendered.text
+      subject = rendered.subject
+    }
 
     await resend.emails.send({
       from: getFromAddress(tenant.name),

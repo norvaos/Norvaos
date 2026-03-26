@@ -912,5 +912,7 @@ export const DEFAULT_WORKSPACE_CONFIG = {
     intake_complete: false,
     id_verification: false,
     required_documents: false,
+    readiness_complete: true,
+    trust_deposit_received: false,
   },
 } as const

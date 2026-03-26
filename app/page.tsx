@@ -177,7 +177,7 @@ export default async function LandingPage() {
               { label: 'E-Signing', icon: '✍️' },
               { label: 'Client Scheduling', icon: '📅' },
               { label: 'Legal Accounting', icon: '💼' },
-              { label: 'Trust Accounting', icon: '🏦' },
+              { label: 'Norva Ledger', icon: '🏦' },
               { label: 'Client CRM', icon: '👥' },
               { label: 'Form Generation', icon: '📋' },
               { label: 'Client Portal', icon: '🔐' },
@@ -453,7 +453,7 @@ export default async function LandingPage() {
               },
               {
                 icon: Landmark,
-                label: 'Trust Accounting',
+                label: 'Norva Ledger',
                 sub: 'Law Society–compliant trust ledger, three-way reconciliation',
                 color: 'text-emerald-700',
                 bg: 'bg-emerald-100',
@@ -1113,7 +1113,7 @@ export default async function LandingPage() {
             <div>
               <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-emerald-100 bg-emerald-50 px-3 py-1 text-sm font-semibold text-emerald-700">
                 <Landmark className="h-3.5 w-3.5" />
-                Trust Accounting
+                Norva Ledger
               </div>
               <h2 className="text-4xl font-bold tracking-tight text-black sm:text-5xl">
                 Trust compliance.

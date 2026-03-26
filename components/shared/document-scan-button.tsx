@@ -22,6 +22,8 @@ interface DocumentScanButtonProps {
   documentTypeHint?: string
   /** Called with extracted fields when user confirms the scan results */
   onFieldsExtracted?: (fields: Record<string, string | number | null>, documentType: string) => void
+  /** Called with the full scan result for persistence to ai_extracted_data */
+  onScanComplete?: (scanResult: DocumentScanResult) => void
   /** Button variant */
   variant?: 'default' | 'outline' | 'ghost' | 'secondary'
   /** Button size */
@@ -51,6 +53,7 @@ export function DocumentScanButton({
   file,
   documentTypeHint,
   onFieldsExtracted,
+  onScanComplete,
   variant = 'outline',
   size = 'sm',
   className,
@@ -86,8 +89,9 @@ export function DocumentScanButton({
   }
 
   const handleConfirm = () => {
-    if (scanResult && onFieldsExtracted) {
-      onFieldsExtracted(scanResult.extracted_fields, scanResult.detected_document_type)
+    if (scanResult) {
+      onFieldsExtracted?.(scanResult.extracted_fields, scanResult.detected_document_type)
+      onScanComplete?.(scanResult)
     }
     setShowResults(false)
     toast.success('Scanned data applied')

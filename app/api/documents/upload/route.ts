@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { createHash } from 'crypto'
 import { authenticateRequest, AuthError } from '@/lib/services/auth'
 import { requirePermission } from '@/lib/services/require-role'
 import { createAdminClient } from '@/lib/supabase/admin'
@@ -398,9 +399,13 @@ async function handlePost(request: NextRequest) {
       filePath = `${auth.tenantId}/${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`
     }
 
+    // ── SENTINEL Vault Hashing: compute SHA-256 of file content ──────────
+    const fileBuffer = await file.arrayBuffer()
+    const contentHash = createHash('sha256').update(Buffer.from(fileBuffer)).digest('hex')
+
     const { error: uploadError } = await adminSupabase.storage
       .from('documents')
-      .upload(filePath, file, { contentType: file.type })
+      .upload(filePath, Buffer.from(fileBuffer), { contentType: file.type })
 
     if (uploadError) {
       return NextResponse.json(
@@ -426,6 +431,8 @@ async function handlePost(request: NextRequest) {
         storage_path: filePath,
         category: effectiveCategory,
         description: description,
+        content_hash: contentHash,
+        tamper_status: 'verified',
       })
       .select()
       .single()

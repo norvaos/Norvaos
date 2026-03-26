@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
- * LexCRM Permission Matrix
+ * NorvaOS Permission Matrix
  * ═══════════════════════════════════════════════════════════════════════════════
  *
  * SINGLE SOURCE OF TRUTH for role-based access control.

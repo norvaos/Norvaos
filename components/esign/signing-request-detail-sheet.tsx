@@ -358,7 +358,7 @@ export function SigningRequestDetailSheet({
             {/* ── Event Timeline ──────────────────────────────────────── */}
             <div className="px-4 py-3">
               <h4 className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-3">
-                Audit Trail
+                Norva Vault
               </h4>
 
               {events.length === 0 ? (

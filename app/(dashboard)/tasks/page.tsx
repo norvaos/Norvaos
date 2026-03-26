@@ -429,7 +429,7 @@ export default function TasksPage() {
                   <p className="mt-1 text-sm text-slate-500">
                     {searchQuery || statusFilter
                       ? 'Try adjusting your search or filter criteria.'
-                      : 'Get started by creating your first task.'}
+                      : 'Create a task manually, or let Norva auto-generate them when matters advance through pipeline stages.'}
                   </p>
                   {!searchQuery && !statusFilter && (
                     <Button

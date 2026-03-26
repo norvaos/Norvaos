@@ -5,12 +5,8 @@ import type { Database } from '@/lib/types/database'
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
-/** Standard service return envelope. */
-export interface ServiceResult<T> {
-  success: boolean
-  data?: T
-  error?: string
-}
+import type { ServiceResult } from './trust-types'
+export type { ServiceResult } from './trust-types'
 
 export interface AvailableBalance {
   ledger_balance_cents: number

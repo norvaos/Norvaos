@@ -60,6 +60,7 @@ import {
   CollapsibleTrigger,
 } from '@/components/ui/collapsible'
 import { RequirePermission } from '@/components/require-permission'
+import { FormDiffWarning } from '@/components/ircc/form-diff-warning'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
   useFormPackVersions,
@@ -230,6 +231,9 @@ export function IRCCFormsTab({ matterId, contactId, tenantId, caseTypeId }: IRCC
           </div>
         )}
       </div>
+
+      {/* ── SENTINEL: Data Mismatch Warning ──────────────────────────────── */}
+      <FormDiffWarning matterId={matterId} formCode={selectedPackType} />
 
       {/* ── Missing Fields (Collapsible) ─────────────────────────────────── */}
       {readiness && readiness.fields.missing.length > 0 && (

@@ -30,6 +30,7 @@ import {
   CheckCircle2,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import { useI18n } from '@/lib/i18n/i18n-provider'
 import { useTenant } from '@/lib/hooks/use-tenant'
 import { useUser } from '@/lib/hooks/use-user'
 import { useUIStore } from '@/lib/stores/ui-store'
@@ -51,6 +52,12 @@ import type { Database } from '@/lib/types/database'
 const TodaysAppointmentsWidget = dynamic(
   () => import('@/components/dashboard/todays-appointments-widget').then((m) => ({ default: m.TodaysAppointmentsWidget })),
   { loading: () => <ImmigrationWidgetSkeleton /> }
+)
+
+// Lazy-load Compliance Health Bar — Directive 41.3
+const ComplianceHealthBar = dynamic(
+  () => import('@/components/dashboard/compliance-health-bar').then((m) => ({ default: m.ComplianceHealthBar })),
+  { loading: () => <></> }
 )
 
 // Lazy-load UEE widget
@@ -84,10 +91,32 @@ const StaffWorkloadWidget = dynamic(
   () => import('@/components/immigration/dashboard-widgets').then((m) => ({ default: m.StaffWorkloadWidget })),
   { loading: () => <ImmigrationWidgetSkeleton /> }
 )
+const StaffWellnessMeter = dynamic(
+  () => import('@/components/immigration/dashboard-widgets').then((m) => ({ default: m.StaffWellnessMeter })),
+  { loading: () => <ImmigrationWidgetSkeleton /> }
+)
 
 // Lazy-load quick-start checklist — only shown for empty tenants
 const QuickStartChecklist = dynamic(
   () => import('@/components/dashboard/quick-start-checklist').then((m) => ({ default: m.QuickStartChecklist })),
+  { ssr: false }
+)
+
+// Lazy-load Welcome Home migration summary — only shown for migrated firms
+const WelcomeHomeWidget = dynamic(
+  () => import('@/components/dashboard/welcome-home-widget').then((m) => ({ default: m.WelcomeHomeWidget })),
+  { ssr: false }
+)
+
+// Lazy-load Launch Demo Hook — Directive 29.2: Arjun Mehta first-login CTA
+const LaunchDemoHook = dynamic(
+  () => import('@/components/dashboard/launch-demo-hook').then((m) => ({ default: m.LaunchDemoHook })),
+  { ssr: false }
+)
+
+// Lazy-load Action Trident — Directive 0.0: client entry funnel on dashboard
+const ActionTrident = dynamic(
+  () => import('@/components/front-desk/ActionTrident').then((m) => ({ default: m.ActionTrident })),
   { ssr: false }
 )
 
@@ -119,13 +148,6 @@ type PipelineStage = Database['public']['Tables']['pipeline_stages']['Row']
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
-
-function getGreeting(): string {
-  const hour = new Date().getHours()
-  if (hour < 12) return 'Good morning'
-  if (hour < 17) return 'Good afternoon'
-  return 'Good evening'
-}
 
 function getActivityIcon(activityType: string) {
   switch (activityType) {
@@ -601,6 +623,7 @@ function MyTasksWidget({
   tenantId: string
   userId: string
 }) {
+  const { t } = useI18n()
   const { data: tasks, isLoading } = useMyUpcomingTasks(tenantId, userId)
   const completeTask = useCompleteTask()
 
@@ -616,12 +639,12 @@ function MyTasksWidget({
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-base">
           <CheckSquare className="h-4 w-4 text-muted-foreground" />
-          My Tasks
+          {t('dashboard.tasks')}
         </CardTitle>
         <CardAction>
           <Button variant="ghost" size="sm" asChild>
             <Link href="/tasks">
-              View All
+              {t('dashboard.view_all')}
               <ArrowRight className="ml-1 h-3 w-3" />
             </Link>
           </Button>
@@ -633,8 +656,8 @@ function MyTasksWidget({
         ) : !tasks || tasks.length === 0 ? (
           <EmptyState
             icon={CheckSquare}
-            title="No pending tasks"
-            description="You're all caught up. Create a new task to get started."
+            title={t('dashboard.no_pending_tasks')}
+            description={t('dashboard.no_pending_tasks_desc')}
           />
         ) : (
           <div className="space-y-1">
@@ -693,6 +716,7 @@ function MyTasksWidget({
 // ---------------------------------------------------------------------------
 
 function RecentActivityWidget({ tenantId }: { tenantId: string }) {
+  const { t } = useI18n()
   const { data: activities, isLoading: activitiesLoading } = useRecentActivities(tenantId)
   const { data: auditLogs, isLoading: auditLoading } = useRecentAuditLogs(tenantId)
 
@@ -747,7 +771,7 @@ function RecentActivityWidget({ tenantId }: { tenantId: string }) {
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-base">
           <Clock className="h-4 w-4 text-muted-foreground" />
-          Recent Activity
+          {t('dashboard.recent_activity')}
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -756,8 +780,8 @@ function RecentActivityWidget({ tenantId }: { tenantId: string }) {
         ) : mergedItems.length === 0 ? (
           <EmptyState
             icon={Clock}
-            title="No recent activity"
-            description="Activity will appear here as you work on matters and tasks."
+            title={t('dashboard.no_recent_activity')}
+            description={t('dashboard.no_recent_activity_desc')}
           />
         ) : (
           <div className="space-y-1">
@@ -805,6 +829,7 @@ function RecentActivityWidget({ tenantId }: { tenantId: string }) {
 // ---------------------------------------------------------------------------
 
 function UpcomingDeadlinesWidget({ tenantId }: { tenantId: string }) {
+  const { t } = useI18n()
   const { data: deadlines, isLoading } = useUpcomingDeadlines(tenantId)
 
   return (
@@ -812,7 +837,7 @@ function UpcomingDeadlinesWidget({ tenantId }: { tenantId: string }) {
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-base">
           <AlertTriangle className="h-4 w-4 text-muted-foreground" />
-          Upcoming Deadlines <HelperTip contentKey="dashboard.upcoming_deadlines" />
+          {t('dashboard.upcoming_deadlines')} <HelperTip contentKey="dashboard.upcoming_deadlines" />
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -821,8 +846,8 @@ function UpcomingDeadlinesWidget({ tenantId }: { tenantId: string }) {
         ) : !deadlines || deadlines.length === 0 ? (
           <EmptyState
             icon={Calendar}
-            title="No upcoming deadlines"
-            description="Deadlines on your active matters will appear here."
+            title={t('dashboard.no_upcoming_deadlines')}
+            description={t('dashboard.no_upcoming_deadlines_desc')}
           />
         ) : (
           <div className="space-y-1">
@@ -850,10 +875,10 @@ function UpcomingDeadlinesWidget({ tenantId }: { tenantId: string }) {
                     className="ml-2 shrink-0"
                   >
                     {daysLeft === 0
-                      ? 'Today'
+                      ? t('dashboard.deadline_today')
                       : daysLeft === 1
-                        ? '1 day'
-                        : `${daysLeft} days`}
+                        ? t('dashboard.deadline_1_day')
+                        : t('dashboard.deadline_days').replace('{days}', String(daysLeft))}
                   </Badge>
                 </Link>
               )
@@ -877,6 +902,7 @@ function DeadlinesIn14DaysWidget({
   tenantId: string
   practiceAreaId: string
 }) {
+  const { t } = useI18n()
   const { data: deadlines, isLoading } = useUpcomingMatterDeadlines(tenantId, {
     practiceAreaId: practiceAreaId !== 'all' ? practiceAreaId : null,
     days: 14,
@@ -888,12 +914,12 @@ function DeadlinesIn14DaysWidget({
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-base">
           <AlertTriangle className="h-4 w-4 text-orange-500" />
-          Deadlines — Next 14 Days <HelperTip contentKey="dashboard.upcoming_deadlines" />
+          {t('dashboard.deadlines_14_days')} <HelperTip contentKey="dashboard.upcoming_deadlines" />
         </CardTitle>
         <CardAction>
           <Button variant="ghost" size="sm" asChild>
             <Link href="/matters">
-              View All
+              {t('dashboard.view_all')}
               <ArrowRight className="ml-1 h-3 w-3" />
             </Link>
           </Button>
@@ -905,8 +931,8 @@ function DeadlinesIn14DaysWidget({
         ) : !deadlines || deadlines.length === 0 ? (
           <EmptyState
             icon={Calendar}
-            title="No deadlines in the next 14 days"
-            description="Typed deadlines on matters will appear here."
+            title={t('dashboard.no_deadlines_14')}
+            description={t('dashboard.no_deadlines_14_desc')}
           />
         ) : (
           <div className="space-y-1">
@@ -923,7 +949,7 @@ function DeadlinesIn14DaysWidget({
                 >
                   <div className="min-w-0 flex-1">
                     <p className="text-sm font-medium truncate">
-                      {dl.matters?.title ?? 'Unknown matter'}
+                      {dl.matters?.title ?? t('dashboard.unknown_matter')}
                     </p>
                     <p className="text-xs text-muted-foreground">
                       {dl.deadline_type}
@@ -940,7 +966,7 @@ function DeadlinesIn14DaysWidget({
                       isWarning && 'border-orange-400 text-orange-600 bg-orange-50'
                     )}
                   >
-                    {daysLeft === 0 ? 'Today' : daysLeft === 1 ? '1 day' : `${daysLeft}d`}
+                    {daysLeft === 0 ? t('dashboard.deadline_today') : daysLeft === 1 ? t('dashboard.deadline_1_day') : `${daysLeft}d`}
                   </Badge>
                 </Link>
               )
@@ -957,6 +983,7 @@ function DeadlinesIn14DaysWidget({
 // ---------------------------------------------------------------------------
 
 function PipelineSummaryWidget({ tenantId }: { tenantId: string }) {
+  const { t } = useI18n()
   const { data: pipelineData, isLoading } = useLeadPipeline(tenantId)
 
   const maxCount = useMemo(() => {
@@ -969,7 +996,7 @@ function PipelineSummaryWidget({ tenantId }: { tenantId: string }) {
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-base">
           <Target className="h-4 w-4 text-muted-foreground" />
-          Lead Pipeline
+          {t('dashboard.lead_pipeline')}
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -985,8 +1012,8 @@ function PipelineSummaryWidget({ tenantId }: { tenantId: string }) {
         ) : !pipelineData ? (
           <EmptyState
             icon={Target}
-            title="No lead pipeline"
-            description="Set up a lead pipeline to track your intake process."
+            title={t('dashboard.no_lead_pipeline')}
+            description={t('dashboard.no_lead_pipeline_desc')}
           />
         ) : (
           <div className="space-y-3">
@@ -1011,10 +1038,10 @@ function PipelineSummaryWidget({ tenantId }: { tenantId: string }) {
             <div className="mt-4 flex items-center justify-between border-t pt-3">
               <div className="text-xs text-muted-foreground">
                 <span className="font-medium text-foreground">{pipelineData.totalLeads}</span>{' '}
-                open leads
+                {t('dashboard.open_leads')}
               </div>
               <div className="text-xs text-muted-foreground">
-                Pipeline value:{' '}
+                {t('dashboard.pipeline_value')}{' '}
                 <span className="font-medium text-foreground">
                   {formatCurrency(pipelineData.totalValue)}
                 </span>
@@ -1035,6 +1062,7 @@ function PipelineSummaryWidget({ tenantId }: { tenantId: string }) {
 // ---------------------------------------------------------------------------
 
 export default function DashboardPage() {
+  const { t } = useI18n()
   const { tenant, isLoading: tenantLoading } = useTenant()
   const { appUser, isLoading: userLoading } = useUser()
   const openModal = useUIStore((s) => s.openModal)
@@ -1051,8 +1079,7 @@ export default function DashboardPage() {
 
   const { data: quickStart } = useQuickStartStatus(tenantId)
 
-  // Compute greeting and date once per mount (not per render)
-  const greeting = useMemo(() => getGreeting(), [])
+  // Compute date string once per mount (not per render)
   const todayStr = useMemo(() => formatDate(new Date()), [])
 
   if (tenantLoading || userLoading) {
@@ -1065,7 +1092,7 @@ export default function DashboardPage() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-semibold text-foreground">
-            {greeting}, {firstName}
+            {t('dashboard.welcome')}, {firstName}
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
             {todayStr}
@@ -1079,7 +1106,7 @@ export default function DashboardPage() {
             onClick={() => openModal('create-contact')}
           >
             <Plus className="mr-1 h-3.5 w-3.5" />
-            New Contact
+            {t('dashboard.new_contact')}
           </Button>
           <Button
             size="sm"
@@ -1087,7 +1114,7 @@ export default function DashboardPage() {
             onClick={() => openModal('create-matter')}
           >
             <Plus className="mr-1 h-3.5 w-3.5" />
-            New Matter
+            {t('dashboard.new_matter')}
           </Button>
           <Button
             size="sm"
@@ -1095,7 +1122,7 @@ export default function DashboardPage() {
             onClick={() => openModal('create-task')}
           >
             <Plus className="mr-1 h-3.5 w-3.5" />
-            New Task
+            {t('dashboard.new_task')}
           </Button>
           <Button
             size="sm"
@@ -1103,7 +1130,7 @@ export default function DashboardPage() {
             onClick={() => openModal('create-lead')}
           >
             <Plus className="mr-1 h-3.5 w-3.5" />
-            New Lead
+            {t('dashboard.new_lead')}
           </Button>
         </div>
       </div>
@@ -1115,6 +1142,22 @@ export default function DashboardPage() {
           hasTrustAccount={quickStart.hasTrustAccount}
         />
       )}
+
+      {/* ---- Launch Demo Hook — Directive 29.2: Arjun Mehta first-login ---- */}
+      <LaunchDemoHook tenantId={tenantId} userId={userId} />
+
+      {/* ---- Welcome Home — Migration Summary (Directive 11.1) ---- */}
+      <WelcomeHomeWidget tenantId={tenantId} />
+
+      {/* ---- Action Trident — Directive 0.0: Client Entry Funnel ---- */}
+      <ActionTrident
+        intakeHref="/leads?action=new"
+        vaultHref="/documents?action=upload"
+        portalHref="/settings/portal"
+      />
+
+      {/* ---- Firm Compliance Health — Directive 41.3 ---- */}
+      <ComplianceHealthBar />
 
       {/* ---- Stats Row ---- */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -1129,39 +1172,39 @@ export default function DashboardPage() {
           <>
             <StatCard
               icon={Briefcase}
-              label="Active Matters"
+              label={t('dashboard.active_matters')}
               value={stats?.activeMatterCount ?? 0}
-              subtitle="Currently open"
+              subtitle={t('dashboard.currently_open')}
               iconBg="bg-blue-50"
               iconColor="text-blue-600"
               href="/matters"
             />
             <StatCard
               icon={CheckSquare}
-              label="Open Tasks"
+              label={t('dashboard.open_tasks')}
               value={stats?.openTaskCount ?? 0}
-              subtitle="Assigned to you"
+              subtitle={t('dashboard.assigned_to_you')}
               iconBg="bg-violet-50"
               iconColor="text-violet-600"
               href="/tasks"
             />
             <StatCard
               icon={Users}
-              label="New Leads"
+              label={t('dashboard.new_leads')}
               value={stats?.newLeadCount ?? 0}
-              subtitle="This month"
+              subtitle={t('dashboard.this_month')}
               iconBg="bg-emerald-50"
               iconColor="text-emerald-600"
               href="/leads"
             />
             <StatCard
               icon={AlertTriangle}
-              label="Overdue Tasks"
+              label={t('dashboard.overdue_tasks')}
               value={stats?.overdueTaskCount ?? 0}
               subtitle={
                 (stats?.overdueTaskCount ?? 0) > 0
-                  ? 'Require attention'
-                  : 'All on track'
+                  ? t('dashboard.require_attention')
+                  : t('dashboard.all_on_track')
               }
               iconBg={(stats?.overdueTaskCount ?? 0) > 0 ? 'bg-red-50' : 'bg-slate-50'}
               iconColor={
@@ -1197,7 +1240,7 @@ export default function DashboardPage() {
       {/* ---- Immigration Section (hidden when filtered to non-immigration) ---- */}
       {(!isFiltered || isImmigration) && (
         <div className="space-y-4">
-          <h2 className="text-lg font-semibold text-foreground">Immigration Practice</h2>
+          <h2 className="text-lg font-semibold text-foreground">{t('dashboard.immigration_practice')}</h2>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <ActiveFilesByStageWidget tenantId={tenantId} />
             <FilesAwaitingDocsWidget tenantId={tenantId} />
@@ -1208,6 +1251,7 @@ export default function DashboardPage() {
             <ImmigrationDeadlinesWidget tenantId={tenantId} />
             <StaffWorkloadWidget tenantId={tenantId} />
           </div>
+          <StaffWellnessMeter tenantId={tenantId} />
         </div>
       )}
     </div>

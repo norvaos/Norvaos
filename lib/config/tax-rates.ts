@@ -44,3 +44,39 @@ export const PROVINCE_OPTIONS = Object.entries(CANADIAN_TAX_RATES)
     label: config.label,
   }))
   .sort((a, b) => a.name.localeCompare(b.name))
+
+/**
+ * Place of Supply Tax Resolution — Excise Tax Act, Part IX
+ *
+ * For legal services, tax is based on the client's province of residence
+ * (place of supply), NOT the firm's location. This function resolves the
+ * applicable tax config for a given client province code.
+ *
+ * Falls back to the firm's home jurisdiction if the client province is
+ * unknown or outside Canada.
+ */
+export function getPlaceOfSupplyTax(
+  clientProvinceCode: string | null | undefined,
+  firmJurisdictionCode?: string,
+): ProvinceTaxConfig & { provinceCode: string; isOutOfProvince: boolean } {
+  const normalised = clientProvinceCode?.toUpperCase().trim() ?? ''
+  const clientTax = CANADIAN_TAX_RATES[normalised]
+
+  if (clientTax) {
+    const firmCode = firmJurisdictionCode?.toUpperCase().replace(/^CA-/, '') ?? 'ON'
+    return {
+      ...clientTax,
+      provinceCode: normalised,
+      isOutOfProvince: normalised !== firmCode,
+    }
+  }
+
+  // Fallback: firm's home jurisdiction (default ON for LSO)
+  const firmCode = firmJurisdictionCode?.toUpperCase().replace(/^CA-/, '') ?? 'ON'
+  const firmTax = CANADIAN_TAX_RATES[firmCode] ?? CANADIAN_TAX_RATES.ON
+  return {
+    ...firmTax,
+    provinceCode: firmCode,
+    isOutOfProvince: false,
+  }
+}

@@ -9,6 +9,7 @@ import { KioskDataSafetyNotice } from '@/components/kiosk/kiosk-data-safety-noti
 import { KioskIdScanner } from '@/components/kiosk/kiosk-id-scanner'
 import { KioskConfirmation } from '@/components/kiosk/kiosk-confirmation'
 import { KioskLanguageSelector } from '@/components/kiosk/kiosk-language-selector'
+import { KioskConciergeWelcome } from '@/components/kiosk/kiosk-concierge-welcome'
 import { KioskQuestions } from '@/components/kiosk/kiosk-questions'
 import { KioskWalkInInfo } from '@/components/kiosk/kiosk-walk-in-info'
 import { KioskReturningClientSearch } from '@/components/kiosk/kiosk-returning-client-search'
@@ -346,46 +347,26 @@ export function KioskFlow({ token, tenantId, branding }: KioskFlowProps) {
 
   // ── Render ──────────────────────────────────────────────────────────────
 
-  // Welcome screen
+  // Welcome screen — Directive 31.0 "Concierge"
   if (step === 'welcome') {
     return (
-      <div className="min-h-screen flex flex-col" dir={isRtl(locale) ? 'rtl' : 'ltr'}>
-        <KioskHeader
-          firmName={branding.firmName}
-          logoUrl={branding.logoUrl}
-          primaryColor={branding.primaryColor}
-        />
-        <div className="flex-1 flex flex-col items-center justify-center gap-8 px-6">
-          <div className="text-center space-y-4">
-            <h1 className="text-4xl font-bold text-slate-900">
-              Welcome
-            </h1>
-            <p className="text-xl text-slate-600 max-w-md">
-              {branding.welcomeMessage}
-            </p>
-          </div>
-
-          {showLanguageSelector && (
-            <div>
-              <KioskLanguageSelector
-                enabledLanguages={branding.enabledLanguages}
-                currentLocale={locale}
-                onSelect={setLocale}
-                primaryColor={branding.primaryColor}
-              />
-            </div>
-          )}
-
-          <button
-            type="button"
-            onClick={() => setStep('search')}
-            className="px-12 py-6 rounded-2xl text-xl font-semibold text-white transition-transform hover:scale-105 active:scale-95"
-            style={{ backgroundColor: branding.primaryColor }}
-          >
-            Touch to Begin
-          </button>
-        </div>
-      </div>
+      <KioskConciergeWelcome
+        firmName={branding.firmName}
+        welcomeMessage={branding.welcomeMessage}
+        primaryColor={branding.primaryColor}
+        locale={locale}
+        enabledLanguages={branding.enabledLanguages}
+        showLanguageSelector={showLanguageSelector}
+        onLocaleChange={setLocale}
+        onNewIntake={() => setStep('walk_in_info')}
+        onSecureUpload={() => setStep('search')}
+        onReturningClient={() => setStep('returning_client_search')}
+        onVoiceCommand={(transcript, detectedLang) => {
+          console.log('[Concierge] Voice:', transcript, detectedLang)
+          // Future: route based on intent detection
+          setStep('search')
+        }}
+      />
     )
   }
 

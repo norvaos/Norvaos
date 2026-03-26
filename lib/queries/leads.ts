@@ -22,6 +22,9 @@ interface LeadListParams {
   sortDirection?: 'asc' | 'desc'
 }
 
+/** Columns fetched for lead detail views — 20 cols max (100/20 budget). */
+const LEAD_DETAIL_COLUMNS = 'id, tenant_id, contact_id, status, current_stage, pipeline_id, stage_id, practice_area_id, matter_type_id, responsible_lawyer_id, assigned_to, estimated_value, temperature, source, utm_source, utm_medium, utm_campaign, retainer_status, payment_status, created_at' as const
+
 export const leadKeys = {
   all: ['leads'] as const,
   lists: () => [...leadKeys.all, 'list'] as const,
@@ -82,7 +85,7 @@ export function useLead(id: string) {
       const supabase = createClient()
       const { data, error } = await supabase
         .from('leads')
-        .select('*')
+        .select(LEAD_DETAIL_COLUMNS)
         .eq('id', id)
         .single()
 

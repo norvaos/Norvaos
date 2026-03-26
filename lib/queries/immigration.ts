@@ -28,6 +28,7 @@ export const immigrationKeys = {
   stageStats: (tenantId: string) => [...immigrationKeys.all, 'stage-stats', tenantId] as const,
   riskItems: (tenantId: string) => [...immigrationKeys.all, 'risk-items', tenantId] as const,
   staffWorkload: (tenantId: string) => [...immigrationKeys.all, 'staff-workload', tenantId] as const,
+  staffWellness: (tenantId: string) => [...immigrationKeys.all, 'staff-wellness', tenantId] as const,
 }
 
 // ─── 1. useCaseTypes ────────────────────────────────────────────────────────────
@@ -100,7 +101,7 @@ export function useMatterImmigration(matterId: string) {
       const supabase = createClient()
       const { data, error } = await supabase
         .from('matter_immigration')
-        .select('*')
+        .select('id, matter_id, case_type_id, current_stage_id, intake_status, uci_number, application_number, submitted_at, approved_at, refused_at, created_at')
         .eq('matter_id', matterId)
         .maybeSingle()
 
@@ -108,6 +109,7 @@ export function useMatterImmigration(matterId: string) {
       return data as MatterImmigration | null
     },
     enabled: !!matterId,
+    staleTime: 1000 * 60 * 2, // 2 min
   })
 }
 
@@ -1190,5 +1192,109 @@ export function useReorderChecklistTemplates() {
     onError: () => {
       toast.error('Failed to reorder templates')
     },
+  })
+}
+
+// ─── 22. useStaffWellness — Staff Wellness Meter ────────────────────────────────
+
+const RED_MATTER_THRESHOLD = 20
+
+export interface StaffWellnessEntry {
+  user_id: string
+  first_name: string
+  last_name: string
+  active_matters: number
+  red_matters: number          // priority=urgent OR risk_level in (high, critical)
+  overdue_tasks: number
+  wellness_status: 'healthy' | 'elevated' | 'overloaded'
+  load_balance_alert: boolean  // true when red_matters > threshold
+}
+
+export function useStaffWellness(tenantId: string) {
+  return useQuery({
+    queryKey: immigrationKeys.staffWellness(tenantId),
+    queryFn: async () => {
+      const supabase = createClient()
+
+      // Fetch all active users
+      const { data: users, error: usersError } = await supabase
+        .from('users')
+        .select('id, first_name, last_name')
+        .eq('tenant_id', tenantId)
+        .eq('is_active', true)
+        .limit(500)
+
+      if (usersError) throw usersError
+      if (!users || users.length === 0) return []
+
+      // Fetch active matters with priority and risk_level
+      const { data: matters, error: mattersError } = await supabase
+        .from('matters')
+        .select('responsible_lawyer_id, priority, risk_level')
+        .eq('tenant_id', tenantId)
+        .eq('status', 'active')
+        .not('responsible_lawyer_id', 'is', null)
+        .limit(5000)
+
+      if (mattersError) throw mattersError
+
+      const activeCounts: Record<string, number> = {}
+      const redCounts: Record<string, number> = {}
+      for (const m of matters ?? []) {
+        const uid = m.responsible_lawyer_id as string
+        if (!uid) continue
+        activeCounts[uid] = (activeCounts[uid] || 0) + 1
+        // "Red" = urgent priority OR high/critical risk
+        const isRed =
+          m.priority === 'urgent' ||
+          m.risk_level === 'high' ||
+          m.risk_level === 'critical'
+        if (isRed) {
+          redCounts[uid] = (redCounts[uid] || 0) + 1
+        }
+      }
+
+      // Fetch overdue tasks
+      const today = new Date().toISOString().split('T')[0]
+      const { data: overdueTasks, error: overdueErr } = await supabase
+        .from('tasks')
+        .select('assigned_to')
+        .eq('tenant_id', tenantId)
+        .not('assigned_to', 'is', null)
+        .not('status', 'in', '("done","cancelled")')
+        .lt('due_date', today)
+
+      if (overdueErr) throw overdueErr
+
+      const overdueCounts: Record<string, number> = {}
+      for (const t of overdueTasks ?? []) {
+        if (t.assigned_to) {
+          overdueCounts[t.assigned_to] = (overdueCounts[t.assigned_to] || 0) + 1
+        }
+      }
+
+      return users.map((u): StaffWellnessEntry => {
+        const red = redCounts[u.id] || 0
+        const overdue = overdueCounts[u.id] || 0
+        const loadBalanceAlert = red > RED_MATTER_THRESHOLD
+
+        let wellness_status: StaffWellnessEntry['wellness_status'] = 'healthy'
+        if (red > RED_MATTER_THRESHOLD) wellness_status = 'overloaded'
+        else if (red > 10 || overdue > 5) wellness_status = 'elevated'
+
+        return {
+          user_id: u.id,
+          first_name: u.first_name ?? '',
+          last_name: u.last_name ?? '',
+          active_matters: activeCounts[u.id] || 0,
+          red_matters: red,
+          overdue_tasks: overdue,
+          wellness_status,
+          load_balance_alert: loadBalanceAlert,
+        }
+      })
+    },
+    enabled: !!tenantId,
+    staleTime: 60_000,
   })
 }

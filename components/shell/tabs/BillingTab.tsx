@@ -58,6 +58,8 @@ import {
   Undo2,
 } from 'lucide-react'
 import { formatDate } from '@/lib/utils/formatters'
+import { SmartMatchCard } from '@/components/trust/smart-match-card'
+import { GovernmentDisbursementCard } from '@/components/trust/government-disbursement-card'
 import { HelperTip } from '@/components/ui/helper-tip'
 import { PAYMENT_METHODS } from '@/lib/utils/constants'
 import { useUser } from '@/lib/hooks/use-user'
@@ -440,7 +442,7 @@ function TrustWidget({ matterId, tenantId, trustBalance }: { matterId: string; t
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <ShieldCheck className="h-4 w-4 text-emerald-600" />
-            <CardTitle className="text-sm font-semibold">Trust Account</CardTitle>
+            <CardTitle className="text-sm font-semibold">Norva Ledger</CardTitle>
             <HelperTip contentKey="billing.trust_account" />
           </div>
           <Button
@@ -1162,6 +1164,12 @@ export function BillingTab({ matterId, tenantId, matter }: BillingTabProps) {
         unbilledCount={unbilled.length}
         onGenerateInvoice={() => setShowGenerateSheet(true)}
       />
+
+      {/* ── Smart-Match Suggestions ──────────────────────────────────────── */}
+      <SmartMatchCard matterId={matterId} />
+
+      {/* ── Government Fee Disbursement ───────────────────────────────────── */}
+      <GovernmentDisbursementCard matterId={matterId} />
 
       {/* ── B. Invoice List ─────────────────────────────────────────────────── */}
       <Card>

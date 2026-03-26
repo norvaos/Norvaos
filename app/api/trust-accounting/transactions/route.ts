@@ -7,6 +7,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { authenticateRequest, AuthError } from '@/lib/services/auth'
 import { requirePermission } from '@/lib/services/require-role'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { convertLeadOnTrustDeposit } from '@/lib/services/trust-deposit-conversion'
 
 export async function GET(request: NextRequest) {
   try {
@@ -67,7 +68,7 @@ export async function POST(request: NextRequest) {
     const {
       trustAccountId, matterId, contactId, transactionType, amountCents,
       description, clientDescription, referenceNumber, paymentMethod,
-      invoiceId, effectiveDate, notes,
+      invoiceId, effectiveDate, notes, leadId,
     } = body
 
     // Only allow deposit and opening_balance via direct creation
@@ -180,7 +181,36 @@ export async function POST(request: NextRequest) {
       },
     })
 
-    return NextResponse.json({ success: true, transaction: txn }, { status: 201 })
+    // ── 5.2: Auto-convert lead on trust deposit (non-blocking) ──────────
+    // If a leadId was provided or the matter originated from a lead,
+    // attempt auto-conversion. Failures are logged but never block the deposit.
+    let conversionResult: { converted: boolean; matterId?: string; matterNumber?: string; error?: string } | undefined
+    if (transactionType === 'deposit') {
+      try {
+        conversionResult = await convertLeadOnTrustDeposit({
+          supabase: adminClient,
+          tenantId: auth.tenantId,
+          userId: auth.userId,
+          matterId,
+          leadId: leadId ?? undefined,
+          amountCents,
+        })
+      } catch (convErr) {
+        console.warn('[trust-transactions] Lead auto-conversion failed (non-blocking):', convErr)
+      }
+    }
+
+    return NextResponse.json({
+      success: true,
+      transaction: txn,
+      ...(conversionResult?.converted ? {
+        conversion: {
+          converted: true,
+          matterId: conversionResult.matterId,
+          matterNumber: conversionResult.matterNumber,
+        },
+      } : {}),
+    }, { status: 201 })
   } catch (error) {
     if (error instanceof AuthError) {
       return NextResponse.json({ success: false, error: error.message }, { status: error.status })
@@ -188,5 +218,3 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 })
   }
 }
-
-const admin = createAdminClient()

@@ -217,7 +217,7 @@ export function MiniTimeline({
     return (
       <div className={cn('py-4 text-center', className)}>
         <History className="mx-auto h-5 w-5 text-slate-300 mb-1" />
-        <p className="text-xs text-slate-400">No activity yet</p>
+        <p className="text-xs text-slate-400">No timeline entries yet</p>
       </div>
     )
   }

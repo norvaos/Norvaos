@@ -81,7 +81,7 @@ export const useTimerStore = create<TimerState>()(
       setDescription: (description) => set({ description }),
     }),
     {
-      name: 'lexcrm-timer',
+      name: 'norvaos-timer',
       partialize: (state) => ({
         isRunning: state.isRunning,
         matterId: state.matterId,

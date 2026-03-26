@@ -1,8 +1,9 @@
 'use client'
 
-import { useState, useCallback, useRef, useMemo } from 'react'
+import { useState, useCallback, useRef, useMemo, useEffect, type ReactNode } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { prefetchMatterFull } from '@/lib/queries/matter-dashboard'
 import {
   Plus,
   Search,
@@ -31,6 +32,7 @@ import {
 } from '@dnd-kit/core'
 import { useDraggable, useDroppable } from '@dnd-kit/core'
 
+import { useI18n } from '@/lib/i18n/i18n-provider'
 import { useTenant } from '@/lib/hooks/use-tenant'
 import { useMatters, useUpdateMatterStage } from '@/lib/queries/matters'
 import { usePipelines, usePipelineStages } from '@/lib/queries/pipelines'
@@ -83,6 +85,7 @@ import {
 } from '@/components/ui/table'
 import { Card } from '@/components/ui/card'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
+import { useVirtualizer } from '@tanstack/react-virtual'
 import { EmptyState } from '@/components/shared/empty-state'
 import { MatterCreateSheet } from '@/components/matters/matter-create-sheet'
 import { RiskBadge } from '@/components/matters/risk-badge'
@@ -166,7 +169,7 @@ function formatUserName(user: User | undefined): string {
   return name || user.email
 }
 
-const MATTER_COLUMN_STORAGE_KEY = 'lexcrm:matters:visible-columns'
+const MATTER_COLUMN_STORAGE_KEY = 'norvaos:matters:visible-columns'
 
 interface MatterColumn {
   id: string
@@ -207,6 +210,7 @@ export default function MattersPage() {
   const { tenant } = useTenant()
   const tenantId = tenant?.id ?? ''
   const queryClient = useQueryClient()
+  const { t } = useI18n()
 
   const [visibleColumns, setVisibleColumns] = useState<string[]>(loadVisibleColumns)
 
@@ -423,7 +427,7 @@ export default function MattersPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-900">Matters</h1>
+          <h1 className="text-2xl font-semibold text-slate-900">{t('dashboard.matters')}</h1>
           <p className="mt-1 text-sm text-slate-500">
             Manage your firm&apos;s matters and cases
           </p>
@@ -475,7 +479,7 @@ export default function MattersPage() {
 
           <Button onClick={() => setSheetOpen(true)}>
             <Plus className="mr-2 h-4 w-4" />
-            New Matter
+            {t('dashboard.new_matter')}
           </Button>
         </div>
       </div>
@@ -485,7 +489,7 @@ export default function MattersPage() {
         <div className="relative flex-1 min-w-[240px] max-w-sm">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
           <Input
-            placeholder="Search by title or matter number..."
+            placeholder={`${t('common.search')}...`}
             className="pl-10"
             value={search}
             onChange={(e) => handleSearch(e.target.value)}
@@ -588,6 +592,7 @@ export default function MattersPage() {
           tenantId={tenantId}
           getLawyerName={getLawyerName}
           onMatterClick={(id) => router.push(`/matters/${id}`)}
+          onMatterHover={(id) => router.prefetch(`/matters/${id}`)}
         />
       ) : isLoading ? (
         <div className="space-y-3">
@@ -606,9 +611,10 @@ export default function MattersPage() {
           description={
             hasActiveFilters
               ? 'No matters match your current filters. Try adjusting or clearing your filters.'
-              : 'Get started by creating your first matter.'
+              : 'Create your first matter to start managing your caseload.'
           }
-          actionLabel={hasActiveFilters ? 'Clear filters' : 'New Matter'}
+          quickHint={hasActiveFilters ? undefined : 'Tip: Choose a practice area and matter type to activate stage pipelines and deadline tracking automatically.'}
+          actionLabel={hasActiveFilters ? 'Clear filters' : t('dashboard.new_matter')}
           onAction={hasActiveFilters ? handleClearFilters : () => setSheetOpen(true)}
         />
       ) : (
@@ -640,127 +646,27 @@ export default function MattersPage() {
             </div>
           )}
 
-          <div className="rounded-lg border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-10 pl-3">
-                    <Checkbox
-                      checked={allSelected ? true : someSelected ? 'indeterminate' : false}
-                      onCheckedChange={toggleSelectAll}
-                      aria-label="Select all matters"
-                    />
-                  </TableHead>
-                  {activeColumns.map((col) => (
-                    <TableHead key={col.id}>
-                      {col.sortable ? (
-                        <button
-                          className="inline-flex items-center text-xs font-medium"
-                          onClick={() => handleSort(col.sortable!)}
-                        >
-                          {col.label} {renderSortIcon(col.sortable!)}
-                        </button>
-                      ) : (
-                        col.label
-                      )}
-                    </TableHead>
-                  ))}
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {matters.map((matter) => (
-                  <TableRow
-                    key={matter.id}
-                    className={`cursor-pointer ${selectedIds.has(matter.id) ? 'bg-blue-50/60' : ''}`}
-                    onClick={() => router.push(`/matters/${matter.id}`)}
-                  >
-                    <TableCell className="pl-3" onClick={(e) => e.stopPropagation()}>
-                      <Checkbox
-                        checked={selectedIds.has(matter.id)}
-                        onCheckedChange={() => toggleSelectOne(matter.id)}
-                        aria-label={`Select ${matter.title}`}
-                      />
-                    </TableCell>
-                    {activeColumns.map((col) => {
-                      switch (col.id) {
-                        case 'matter_number':
-                          return <TableCell key={col.id} className="font-mono text-xs text-slate-500">{matter.matter_number ?? '--'}</TableCell>
-                        case 'title':
-                          return <TableCell key={col.id} className="font-medium text-slate-900 max-w-[250px] truncate">{matter.title}</TableCell>
-                        case 'practice_area':
-                          return <TableCell key={col.id} className="text-sm text-slate-600">{getPracticeAreaName(matter.practice_area_id)}</TableCell>
-                        case 'matter_type':
-                          return (
-                            <TableCell key={col.id}>
-                              {matter.matter_type_id ? (() => {
-                                const typeName = getMatterTypeName(matter.matter_type_id)
-                                const typeColor = getMatterTypeColor(matter.matter_type_id)
-                                return typeName ? (
-                                  <span className="inline-flex items-center gap-1 text-xs font-medium">
-                                    <span className="h-1.5 w-1.5 rounded-full shrink-0" style={{ backgroundColor: typeColor ?? '#6366f1' }} />
-                                    {typeName}
-                                  </span>
-                                ) : <span className="text-slate-400 text-xs">--</span>
-                              })() : <span className="text-slate-400 text-xs">--</span>}
-                            </TableCell>
-                          )
-                        case 'stage': {
-                          const stageInfo = getMatterStageInfo(matter.id)
-                          const pct = stageInfo?.stage?.completion_pct ?? null
-                          const stageName = stageInfo?.stage?.name ?? null
-                          const stageColor = stageInfo?.stage?.color ?? '#94a3b8'
-                          if (!stageName) return <TableCell key={col.id} className="text-slate-400 text-xs">--</TableCell>
-                          return (
-                            <TableCell key={col.id} className="min-w-[160px]">
-                              <div className="space-y-1">
-                                <div className="flex items-center gap-1.5">
-                                  <span className="h-2 w-2 rounded-full shrink-0" style={{ backgroundColor: stageColor }} />
-                                  <span className="text-xs font-medium text-slate-700 truncate max-w-[120px]">{stageName}</span>
-                                  {pct !== null && (
-                                    <span className={cn(
-                                      'text-[10px] font-semibold tabular-nums shrink-0',
-                                      pct >= 100 ? 'text-emerald-600' : pct >= 70 ? 'text-violet-600' : pct >= 40 ? 'text-blue-600' : 'text-amber-600'
-                                    )}>{pct}%</span>
-                                  )}
-                                </div>
-                                {pct !== null && (
-                                  <div className="h-1 bg-slate-100 rounded-full overflow-hidden">
-                                    <div
-                                      className={cn(
-                                        'h-full rounded-full transition-all duration-500',
-                                        pct >= 100 ? 'bg-emerald-500' : pct >= 70 ? 'bg-violet-500' : pct >= 40 ? 'bg-blue-500' : 'bg-amber-500'
-                                      )}
-                                      style={{ width: `${Math.min(pct, 100)}%` }}
-                                    />
-                                  </div>
-                                )}
-                              </div>
-                            </TableCell>
-                          )
-                        }
-                        case 'status':
-                          return <TableCell key={col.id}>{getStatusBadge(matter.status ?? '')}</TableCell>
-                        case 'priority':
-                          return <TableCell key={col.id}>{getPriorityBadge(matter.priority ?? '')}</TableCell>
-                        case 'risk':
-                          return <TableCell key={col.id}><RiskBadge level={(matter as any).risk_level} size="sm" /></TableCell>
-                        case 'intake':
-                          return <TableCell key={col.id}><IntakeStatusBadge status={(matter as any).intake_status} /></TableCell>
-                        case 'lawyer':
-                          return <TableCell key={col.id} className="text-sm text-slate-600">{getLawyerName(matter.responsible_lawyer_id)}</TableCell>
-                        case 'next_deadline':
-                          return <TableCell key={col.id} className="text-sm text-slate-600">{matter.next_deadline ? formatDate(matter.next_deadline) : '--'}</TableCell>
-                        case 'created_at':
-                          return <TableCell key={col.id} className="text-sm text-slate-500">{formatDate(matter.created_at)}</TableCell>
-                        default:
-                          return <TableCell key={col.id}>--</TableCell>
-                      }
-                    })}
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
+          <VirtualizedMatterTable
+            matters={matters}
+            activeColumns={activeColumns}
+            selectedIds={selectedIds}
+            allSelected={allSelected}
+            someSelected={someSelected}
+            toggleSelectAll={toggleSelectAll}
+            toggleSelectOne={toggleSelectOne}
+            handleSort={handleSort}
+            renderSortIcon={renderSortIcon}
+            getPracticeAreaName={getPracticeAreaName}
+            getMatterTypeName={getMatterTypeName}
+            getMatterTypeColor={getMatterTypeColor}
+            getMatterStageInfo={getMatterStageInfo}
+            getLawyerName={getLawyerName}
+            onRowClick={(id) => router.push(`/matters/${id}`)}
+            onRowHover={(id) => {
+              prefetchMatterFull(queryClient, id)
+              router.prefetch(`/matters/${id}`)
+            }}
+          />
 
           {/* Pagination */}
           <div className="flex items-center justify-between">
@@ -807,7 +713,7 @@ export default function MattersPage() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={deleting}>{t('common.cancel')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleBulkDelete}
               disabled={deleting}
@@ -826,19 +732,222 @@ export default function MattersPage() {
 }
 
 // -------------------------------------------------------------------
-// Matters Kanban Board
+// Virtualized Matter Table — only renders visible rows in the DOM
 // -------------------------------------------------------------------
 
 type Matter = Database['public']['Tables']['matters']['Row']
+
+const ROW_HEIGHT = 48 // px — matches TableRow height with py-2 + content
+const TABLE_MAX_HEIGHT = 'calc(100vh - 340px)' // leaves room for header, filters, pagination
+
+function VirtualizedMatterTable({
+  matters,
+  activeColumns,
+  selectedIds,
+  allSelected,
+  someSelected,
+  toggleSelectAll,
+  toggleSelectOne,
+  handleSort,
+  renderSortIcon,
+  getPracticeAreaName,
+  getMatterTypeName,
+  getMatterTypeColor,
+  getMatterStageInfo,
+  getLawyerName,
+  onRowClick,
+  onRowHover,
+}: {
+  matters: Matter[]
+  activeColumns: MatterColumn[]
+  selectedIds: Set<string>
+  allSelected: boolean
+  someSelected: boolean
+  toggleSelectAll: () => void
+  toggleSelectOne: (id: string) => void
+  handleSort: (column: SortColumn) => void
+  renderSortIcon: (column: SortColumn) => ReactNode
+  getPracticeAreaName: (id: string | null) => string
+  getMatterTypeName: (id: string | null) => string | null
+  getMatterTypeColor: (id: string | null) => string | null
+  getMatterStageInfo: (matterId: string) => { matter_id: string; stage: { name: string; color: string; completion_pct: number } | null } | null
+  getLawyerName: (id: string | null) => string
+  onRowClick: (id: string) => void
+  onRowHover: (id: string) => void
+}) {
+  const scrollRef = useRef<HTMLDivElement>(null)
+
+  const virtualizer = useVirtualizer({
+    count: matters.length,
+    getScrollElement: () => scrollRef.current,
+    estimateSize: () => ROW_HEIGHT,
+    overscan: 5, // render 5 extra rows above/below viewport for smooth scrolling
+  })
+
+  return (
+    <div className="rounded-lg border">
+      {/* Sticky header — always visible */}
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead className="w-10 pl-3">
+              <Checkbox
+                checked={allSelected ? true : someSelected ? 'indeterminate' : false}
+                onCheckedChange={toggleSelectAll}
+                aria-label="Select all matters"
+              />
+            </TableHead>
+            {activeColumns.map((col) => (
+              <TableHead key={col.id}>
+                {col.sortable ? (
+                  <button
+                    className="inline-flex items-center text-xs font-medium"
+                    onClick={() => handleSort(col.sortable!)}
+                  >
+                    {col.label} {renderSortIcon(col.sortable!)}
+                  </button>
+                ) : (
+                  col.label
+                )}
+              </TableHead>
+            ))}
+          </TableRow>
+        </TableHeader>
+      </Table>
+
+      {/* Virtualized scrollable body */}
+      <div
+        ref={scrollRef}
+        style={{ height: TABLE_MAX_HEIGHT, overflow: 'auto' }}
+      >
+        <Table>
+          <TableBody>
+            {/* Spacer for items above the viewport */}
+            {virtualizer.getVirtualItems().length > 0 && (
+              <tr style={{ height: virtualizer.getVirtualItems()[0]?.start ?? 0 }} />
+            )}
+            {virtualizer.getVirtualItems().map((virtualRow) => {
+              const matter = matters[virtualRow.index]
+              if (!matter) return null
+              return (
+                <TableRow
+                  key={matter.id}
+                  data-index={virtualRow.index}
+                  ref={virtualizer.measureElement}
+                  className={`cursor-pointer ${selectedIds.has(matter.id) ? 'bg-blue-50/60' : ''}`}
+                  onClick={() => onRowClick(matter.id)}
+                  onMouseEnter={() => onRowHover(matter.id)}
+                >
+                  <TableCell className="pl-3" onClick={(e) => e.stopPropagation()}>
+                    <Checkbox
+                      checked={selectedIds.has(matter.id)}
+                      onCheckedChange={() => toggleSelectOne(matter.id)}
+                      aria-label={`Select ${matter.title}`}
+                    />
+                  </TableCell>
+                  {activeColumns.map((col) => {
+                    switch (col.id) {
+                      case 'matter_number':
+                        return <TableCell key={col.id} className="font-mono text-xs text-slate-500">{matter.matter_number ?? '--'}</TableCell>
+                      case 'title':
+                        return <TableCell key={col.id} className="font-medium text-slate-900 max-w-[250px] truncate">{matter.title}</TableCell>
+                      case 'practice_area':
+                        return <TableCell key={col.id} className="text-sm text-slate-600">{getPracticeAreaName(matter.practice_area_id)}</TableCell>
+                      case 'matter_type':
+                        return (
+                          <TableCell key={col.id}>
+                            {matter.matter_type_id ? (() => {
+                              const typeName = getMatterTypeName(matter.matter_type_id)
+                              const typeColor = getMatterTypeColor(matter.matter_type_id)
+                              return typeName ? (
+                                <span className="inline-flex items-center gap-1 text-xs font-medium">
+                                  <span className="h-1.5 w-1.5 rounded-full shrink-0" style={{ backgroundColor: typeColor ?? '#6366f1' }} />
+                                  {typeName}
+                                </span>
+                              ) : <span className="text-slate-400 text-xs">--</span>
+                            })() : <span className="text-slate-400 text-xs">--</span>}
+                          </TableCell>
+                        )
+                      case 'stage': {
+                        const stageInfo = getMatterStageInfo(matter.id)
+                        const pct = stageInfo?.stage?.completion_pct ?? null
+                        const stageName = stageInfo?.stage?.name ?? null
+                        const stageColor = stageInfo?.stage?.color ?? '#94a3b8'
+                        if (!stageName) return <TableCell key={col.id} className="text-slate-400 text-xs">--</TableCell>
+                        return (
+                          <TableCell key={col.id} className="min-w-[160px]">
+                            <div className="space-y-1">
+                              <div className="flex items-center gap-1.5">
+                                <span className="h-2 w-2 rounded-full shrink-0" style={{ backgroundColor: stageColor }} />
+                                <span className="text-xs font-medium text-slate-700 truncate max-w-[120px]">{stageName}</span>
+                                {pct !== null && (
+                                  <span className={cn(
+                                    'text-[10px] font-semibold tabular-nums shrink-0',
+                                    pct >= 100 ? 'text-emerald-600' : pct >= 70 ? 'text-violet-600' : pct >= 40 ? 'text-blue-600' : 'text-amber-600'
+                                  )}>{pct}%</span>
+                                )}
+                              </div>
+                              {pct !== null && (
+                                <div className="h-1 bg-slate-100 rounded-full overflow-hidden">
+                                  <div
+                                    className={cn(
+                                      'h-full rounded-full transition-all duration-500',
+                                      pct >= 100 ? 'bg-emerald-500' : pct >= 70 ? 'bg-violet-500' : pct >= 40 ? 'bg-blue-500' : 'bg-amber-500'
+                                    )}
+                                    style={{ width: `${Math.min(pct, 100)}%` }}
+                                  />
+                                </div>
+                              )}
+                            </div>
+                          </TableCell>
+                        )
+                      }
+                      case 'status':
+                        return <TableCell key={col.id}>{getStatusBadge(matter.status ?? '')}</TableCell>
+                      case 'priority':
+                        return <TableCell key={col.id}>{getPriorityBadge(matter.priority ?? '')}</TableCell>
+                      case 'risk':
+                        return <TableCell key={col.id}><RiskBadge level={(matter as any).risk_level} size="sm" /></TableCell>
+                      case 'intake':
+                        return <TableCell key={col.id}><IntakeStatusBadge status={(matter as any).intake_status} /></TableCell>
+                      case 'lawyer':
+                        return <TableCell key={col.id} className="text-sm text-slate-600">{getLawyerName(matter.responsible_lawyer_id)}</TableCell>
+                      case 'next_deadline':
+                        return <TableCell key={col.id} className="text-sm text-slate-600">{matter.next_deadline ? formatDate(matter.next_deadline) : '--'}</TableCell>
+                      case 'created_at':
+                        return <TableCell key={col.id} className="text-sm text-slate-500">{formatDate(matter.created_at)}</TableCell>
+                      default:
+                        return <TableCell key={col.id}>--</TableCell>
+                    }
+                  })}
+                </TableRow>
+              )
+            })}
+            {/* Spacer for items below the viewport */}
+            {virtualizer.getVirtualItems().length > 0 && (
+              <tr style={{ height: virtualizer.getTotalSize() - (virtualizer.getVirtualItems()[virtualizer.getVirtualItems().length - 1]?.end ?? 0) }} />
+            )}
+          </TableBody>
+        </Table>
+      </div>
+    </div>
+  )
+}
+
+// -------------------------------------------------------------------
+// Matters Kanban Board
+// -------------------------------------------------------------------
 
 function MatterKanbanCard({
   matter,
   getLawyerName,
   onClick,
+  onMouseEnter,
 }: {
   matter: Matter
   getLawyerName: (id: string | null) => string
   onClick: () => void
+  onMouseEnter?: () => void
 }) {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: matter.id,
@@ -863,6 +972,7 @@ function MatterKanbanCard({
         isDragging ? 'opacity-50' : ''
       }`}
       onClick={onClick}
+      onMouseEnter={onMouseEnter}
     >
       <div className="flex items-start gap-2">
         <div
@@ -919,6 +1029,7 @@ function MatterKanbanColumn({
   matters,
   getLawyerName,
   onMatterClick,
+  onMatterHover,
 }: {
   stageId: string
   stageName: string
@@ -926,6 +1037,7 @@ function MatterKanbanColumn({
   matters: Matter[]
   getLawyerName: (id: string | null) => string
   onMatterClick: (id: string) => void
+  onMatterHover?: (id: string) => void
 }) {
   const { setNodeRef, isOver } = useDroppable({ id: stageId })
 
@@ -954,6 +1066,7 @@ function MatterKanbanColumn({
               matter={matter}
               getLawyerName={getLawyerName}
               onClick={() => onMatterClick(matter.id)}
+              onMouseEnter={() => onMatterHover?.(matter.id)}
             />
           ))
         ) : (
@@ -968,10 +1081,12 @@ function MattersKanban({
   tenantId,
   getLawyerName,
   onMatterClick,
+  onMatterHover,
 }: {
   tenantId: string
   getLawyerName: (id: string | null) => string
   onMatterClick: (id: string) => void
+  onMatterHover?: (id: string) => void
 }) {
   const queryClient = useQueryClient()
   const { data: pipelines } = usePipelines(tenantId, 'matter')
@@ -1095,6 +1210,7 @@ function MattersKanban({
                   matters={mattersByStage[stage.id] ?? []}
                   getLawyerName={getLawyerName}
                   onMatterClick={onMatterClick}
+                  onMatterHover={(id) => { prefetchMatterFull(queryClient, id); onMatterHover?.(id) }}
                 />
               ))}
               {(mattersByStage['__no_stage__']?.length ?? 0) > 0 && (
@@ -1105,6 +1221,7 @@ function MattersKanban({
                   matters={mattersByStage['__no_stage__']}
                   getLawyerName={getLawyerName}
                   onMatterClick={onMatterClick}
+                  onMatterHover={(id) => { prefetchMatterFull(queryClient, id); onMatterHover?.(id) }}
                 />
               )}
             </div>

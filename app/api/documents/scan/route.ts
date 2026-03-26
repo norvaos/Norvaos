@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import Anthropic from '@anthropic-ai/sdk'
 import { authenticateRequest, AuthError } from '@/lib/services/auth'
 import { requirePermission } from '@/lib/services/require-role'
 import { withTiming } from '@/lib/middleware/request-timing'
@@ -541,6 +542,83 @@ function generateSummary(text: string, docType: DocumentType): string {
   return `${label}. ${firstLines.trim()}...`.slice(0, 250)
 }
 
+// ─── AI-Powered Extraction (Claude Haiku fallback) ──────────────────────────
+// When regex extraction yields low confidence (many null fields), Claude reads
+// the raw OCR text and fills in what regex missed. This is the "Norva Eye" layer.
+
+const FIELD_SCHEMAS: Partial<Record<DocumentType, string>> = {
+  passport: 'full_name, given_name, family_name, date_of_birth (YYYY-MM-DD), passport_number, nationality, sex (M/F), date_of_issue (YYYY-MM-DD), date_of_expiry (YYYY-MM-DD), place_of_birth, issuing_authority',
+  drivers_licence: 'full_name, date_of_birth (YYYY-MM-DD), licence_number, address, date_of_issue (YYYY-MM-DD), date_of_expiry (YYYY-MM-DD), licence_class, province_state',
+  birth_certificate: 'full_name, date_of_birth (YYYY-MM-DD), place_of_birth, mother_name, father_name, registration_number, date_of_registration (YYYY-MM-DD)',
+  marriage_certificate: 'spouse_1_name, spouse_2_name, date_of_marriage (YYYY-MM-DD), place_of_marriage, registration_number, officiant_name',
+  ircc_acknowledgement: 'applicant_name, application_number, uci_number, date_received (YYYY-MM-DD), date_issued (YYYY-MM-DD), application_type, office',
+  ircc_biometrics: 'applicant_name, application_number, uci_number, date_issued (YYYY-MM-DD), biometrics_deadline (YYYY-MM-DD), biometrics_location',
+  ircc_medical: 'applicant_name, application_number, uci_number, date_issued (YYYY-MM-DD), medical_deadline (YYYY-MM-DD), designated_medical_practitioner',
+  ircc_decision: 'applicant_name, application_number, uci_number, date_issued (YYYY-MM-DD), decision (approved/refused/withdrawn), decision_details, office',
+  ircc_portal_letter: 'applicant_name, application_number, uci_number, date_issued (YYYY-MM-DD), portal_deadline (YYYY-MM-DD), documents_requested',
+  ircc_procedural_fairness: 'applicant_name, application_number, uci_number, date_issued (YYYY-MM-DD), response_deadline (YYYY-MM-DD), concerns',
+  employment_letter: 'employee_name, employer_name, job_title, employment_start_date (YYYY-MM-DD), salary, employment_type, date_issued (YYYY-MM-DD), noc_code',
+  tax_document: 'taxpayer_name, tax_year, document_type (T4/NOA/T1 General/T4A/T5), total_income, tax_paid, social_insurance_number (MASK: show only last 3 digits as ***-***-XXX)',
+  bank_statement: 'account_holder_name, bank_name, account_number (MASK: show only last 4 digits as ****XXXX), statement_period_start (YYYY-MM-DD), statement_period_end (YYYY-MM-DD), opening_balance, closing_balance, currency',
+  court_order: 'case_number, court_name, judge_name, parties, date_issued (YYYY-MM-DD), order_type (custody/support/restraining), key_terms',
+  police_clearance: 'applicant_name, date_of_birth (YYYY-MM-DD), date_issued (YYYY-MM-DD), issuing_authority, result (clear/record found), certificate_number',
+  general: 'document_type, names, dates, reference_numbers, key_information',
+}
+
+async function aiExtractFields(
+  rawText: string,
+  docType: DocumentType,
+  regexFields: Record<string, string | number | null>,
+): Promise<Record<string, string | number | null>> {
+  const apiKey = process.env.ANTHROPIC_API_KEY
+  if (!apiKey) return regexFields // No API key — regex only
+
+  const fieldSchema = FIELD_SCHEMAS[docType] || FIELD_SCHEMAS.general!
+  const nullFields = Object.entries(regexFields)
+    .filter(([, v]) => v === null)
+    .map(([k]) => k)
+
+  if (nullFields.length === 0) return regexFields // All fields already extracted
+
+  try {
+    const client = new Anthropic({ apiKey })
+    const response = await client.messages.create({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 512,
+      system: `You are a document field extractor for a Canadian immigration law firm. Extract structured data from OCR text. Return ONLY valid JSON with the requested fields. For dates use YYYY-MM-DD. For fields you cannot find, use null. NEVER fabricate data — if uncertain, use null. Mask sensitive data: SIN → ***-***-XXX (last 3), bank account → ****XXXX (last 4).`,
+      messages: [
+        {
+          role: 'user',
+          content: `Document type: ${docType}\nRequired fields: ${fieldSchema}\n\nFields already extracted (do NOT change these):\n${JSON.stringify(Object.fromEntries(Object.entries(regexFields).filter(([, v]) => v !== null)), null, 2)}\n\nFields still missing (extract these from the text): ${nullFields.join(', ')}\n\n--- OCR TEXT ---\n${rawText.slice(0, 3000)}\n--- END ---\n\nReturn JSON with ALL fields (keep existing values, fill in missing ones):`,
+        },
+      ],
+    })
+
+    const textContent = response.content.find((c) => c.type === 'text')
+    if (!textContent || textContent.type !== 'text') return regexFields
+
+    // Parse JSON from response (handle markdown code blocks)
+    let jsonStr = textContent.text.trim()
+    const codeBlock = jsonStr.match(/```(?:json)?\s*([\s\S]*?)```/)
+    if (codeBlock) jsonStr = codeBlock[1].trim()
+
+    const aiFields = JSON.parse(jsonStr) as Record<string, string | number | null>
+
+    // Merge: regex fields take priority, AI fills nulls
+    const merged = { ...regexFields }
+    for (const key of nullFields) {
+      if (aiFields[key] !== undefined && aiFields[key] !== null) {
+        merged[key] = aiFields[key]
+      }
+    }
+
+    return merged
+  } catch (err) {
+    console.error('[document-scan] AI extraction failed (non-fatal, using regex only):', err)
+    return regexFields
+  }
+}
+
 // ─── Route Handler ──────────────────────────────────────────────────────────
 
 async function handlePost(request: NextRequest) {
@@ -598,11 +676,22 @@ async function handlePost(request: NextRequest) {
     // Step 2: Detect document type
     const docType = detectDocumentType(rawText, documentTypeHint)
 
-    // Step 3: Extract fields using regex patterns
+    // Step 3: Extract fields using regex patterns (fast, first pass)
     const extractor = EXTRACTORS[docType]
-    const extractedFields = extractor(rawText)
+    const regexFields = extractor(rawText)
 
-    // Step 4: Compute confidence
+    // Step 3b: AI Enhancement — if regex missed fields, Claude fills gaps
+    const regexConfidence = computeConfidence(regexFields, docType)
+    let extractedFields = regexFields
+    let extractionMethod: 'regex' | 'regex+ai' = 'regex'
+
+    if (regexConfidence < 70 && process.env.ANTHROPIC_API_KEY) {
+      extractedFields = await aiExtractFields(rawText, docType, regexFields)
+      const aiFilledCount = Object.entries(extractedFields).filter(([k, v]) => v !== null && regexFields[k] === null).length
+      if (aiFilledCount > 0) extractionMethod = 'regex+ai'
+    }
+
+    // Step 4: Compute confidence (on final merged fields)
     const confidence = computeConfidence(extractedFields, docType)
 
     // Step 5: Generate summary
@@ -615,6 +704,7 @@ async function handlePost(request: NextRequest) {
         confidence,
         extracted_fields: extractedFields,
         raw_text_summary: summary,
+        extraction_method: extractionMethod,
       },
     })
   } catch (error) {

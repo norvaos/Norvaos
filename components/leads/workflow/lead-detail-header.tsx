@@ -18,7 +18,19 @@ import {
 import { formatFullName, formatInitials } from '@/lib/utils/formatters'
 import { getStageLabel } from './lead-workflow-helpers'
 import { isTerminalStage, isClosedStage, LEAD_STAGES } from '@/lib/config/lead-workflow-definitions'
+import { RiskBadge } from '@/components/matters/risk-badge'
 import type { Lead, Contact } from './lead-workflow-types'
+
+// ─── Temperature → Risk Level mapping (Team TRUST — ComplianceDomain) ──────
+
+function temperatureToRiskLevel(temperature: string | null | undefined): string {
+  switch (temperature) {
+    case 'hot':  return 'high'
+    case 'warm': return 'medium'  // Elevated → Amber pulsing
+    case 'cold': return 'low'
+    default:     return 'medium'
+  }
+}
 
 // ─── Temperature config ─────────────────────────────────────────────────────
 
@@ -93,6 +105,14 @@ export function LeadDetailHeader({
           <Badge variant="outline" size="xs" className={tempBadge.className}>
             {tempBadge.label}
           </Badge>
+          {/* Pulsing Amber Risk Badge — Compliance Domain (Team TRUST) */}
+          <RiskBadge
+            level={temperatureToRiskLevel(lead.temperature)}
+            score={lead.readiness_score ?? 60}
+            showScore
+            pulse
+            size="sm"
+          />
           {lead.current_stage && (
             <Badge variant="outline" size="xs">
               {getStageLabel(lead.current_stage)}

@@ -50,6 +50,7 @@ import {
 } from '@/lib/queries/matter-profiles'
 import { PROFILE_PATH_CATALOG, type ProfilePathEntry } from '@/lib/ircc/profile-path-catalog'
 import type { WorkspaceSection } from './workspace-shell'
+import { NorvaWhisper } from '@/components/ui/norva-whisper'
 
 // ── Verification entry type ───────────────────────────────────────────────────
 
@@ -547,8 +548,9 @@ export function WorkbenchPanel({
     <div className="flex flex-col h-full overflow-hidden">
       {/* Workbench header */}
       <div className="flex items-center justify-between px-3 py-2 border-b bg-muted/30 shrink-0">
-        <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+        <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground flex items-center">
           Workbench
+          <NorvaWhisper contentKey="bridge.verification" />
         </span>
         <div className="flex items-center gap-2">
           {isLocked && (
@@ -608,7 +610,7 @@ export function WorkbenchPanel({
           ) : activeSection === 'notes' ? (
             <StubSection label="Internal Notes & Strategy" />
           ) : activeSection === 'audit_log' ? (
-            <StubSection label="Audit Log" />
+            <StubSection label="Norva Vault" />
           ) : null}
         </div>
       </ScrollArea>

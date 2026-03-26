@@ -18,7 +18,7 @@ async function handlePatch(request: Request) {
     const admin = createAdminClient()
 
     const body = await request.json()
-    const { name, primary_color, secondary_color, accent_color, timezone, currency, date_format } =
+    const { name, primary_color, secondary_color, accent_color, timezone, currency, date_format, home_province } =
       body as {
         name?: string
         primary_color?: string
@@ -27,6 +27,7 @@ async function handlePatch(request: Request) {
         timezone?: string
         currency?: string
         date_format?: string
+        home_province?: string
       }
 
     const update: Record<string, unknown> = {}
@@ -37,9 +38,22 @@ async function handlePatch(request: Request) {
     if (timezone !== undefined) update.timezone = timezone
     if (currency !== undefined) update.currency = currency
     if (date_format !== undefined) update.date_format = date_format
+    if (home_province !== undefined) update.home_province = home_province
 
     if (Object.keys(update).length === 0) {
       return NextResponse.json({ error: 'No fields to update' }, { status: 400 })
+    }
+
+    // If home_province is changing, capture the old value for audit
+    let oldHomeProvince: string | null = null
+    if (update.home_province !== undefined) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: current } = await (admin as any)
+        .from('tenants')
+        .select('home_province')
+        .eq('id', auth.tenantId)
+        .single()
+      oldHomeProvince = current?.home_province as string | null
     }
 
     const { error } = await admin
@@ -50,15 +64,25 @@ async function handlePatch(request: Request) {
     if (error) throw error
 
     // Audit log (fire-and-forget)
+    const auditMetadata: Record<string, unknown> = { updated_fields: Object.keys(update) }
+    // Enhanced audit for regulatory body changes
+    if (update.home_province !== undefined) {
+      auditMetadata.regulatory_change = {
+        old_value: oldHomeProvince,
+        new_value: update.home_province,
+        changed_at: new Date().toISOString(),
+      }
+    }
+
     admin
       .from('audit_logs')
       .insert({
         tenant_id: auth.tenantId,
         user_id: auth.userId,
-        action: 'firm_settings_updated',
+        action: update.home_province !== undefined ? 'regulatory_body_changed' : 'firm_settings_updated',
         entity_type: 'tenant',
         entity_id: auth.tenantId,
-        metadata: { updated_fields: Object.keys(update) } as never,
+        metadata: auditMetadata as never,
       })
       .then(() => {})
 

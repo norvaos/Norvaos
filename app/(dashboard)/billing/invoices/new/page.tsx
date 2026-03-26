@@ -1,14 +1,17 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useForm, useFieldArray } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
+import { useQuery } from '@tanstack/react-query'
+import { createClient } from '@/lib/supabase/client'
 import { useMatters } from '@/lib/queries/matters'
 import { useCreateInvoice } from '@/lib/queries/invoicing'
 import { useTaxProfiles } from '@/lib/queries/tax-profiles'
 import { useTenant } from '@/lib/hooks/use-tenant'
+import { getPlaceOfSupplyTax, type ProvinceTaxConfig } from '@/lib/config/tax-rates'
 import { RequirePermission } from '@/components/require-permission'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -22,6 +25,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Checkbox } from '@/components/ui/checkbox'
 import { Separator } from '@/components/ui/separator'
 import { ArrowLeft, Plus, Trash2, Loader2 } from 'lucide-react'
 
@@ -53,6 +57,43 @@ function fmtCents(cents: number): string {
     currency: 'CAD',
     minimumFractionDigits: 2,
   }).format(cents / 100)
+}
+
+/**
+ * Resolve the primary contact's province for a given matter.
+ * Used for Place of Supply tax determination.
+ */
+function useClientProvince(matterId: string | null, tenantId: string) {
+  return useQuery({
+    queryKey: ['client-province', matterId],
+    queryFn: async (): Promise<string | null> => {
+      if (!matterId) return null
+      const supabase = createClient()
+
+      // Get primary contact for this matter
+      const { data: mc } = await supabase
+        .from('matter_contacts')
+        .select('contact_id')
+        .eq('matter_id', matterId)
+        .eq('tenant_id', tenantId)
+        .eq('is_primary', true)
+        .limit(1)
+        .maybeSingle()
+
+      if (!mc?.contact_id) return null
+
+      // Get the contact's province
+      const { data: contact } = await supabase
+        .from('contacts')
+        .select('province_state')
+        .eq('id', mc.contact_id)
+        .single()
+
+      return contact?.province_state ?? null
+    },
+    enabled: !!matterId && !!tenantId,
+    staleTime: 1000 * 60 * 5,
+  })
 }
 
 // ── Page ──────────────────────────────────────────────────────────────────────
@@ -89,12 +130,31 @@ function NewInvoiceContent() {
   const matters = mattersData?.matters ?? []
   const createInvoice = useCreateInvoice()
 
+  // ── Place of Supply Tax Engine ──────────────────────────────────────────
+  const selectedMatterId = watch('matterId') || null
+  const { data: clientProvince } = useClientProvince(selectedMatterId, tenant?.id ?? '')
+
+  const taxConfig = useMemo(
+    () => getPlaceOfSupplyTax(clientProvince, tenant?.jurisdiction_code),
+    [clientProvince, tenant?.jurisdiction_code],
+  )
+
   // Calculate totals live
   const subtotalCents = lineItems.reduce((sum, li) => {
     const qty = Number(li.quantity) || 0
     const price = Math.round((Number(li.unitPrice) || 0) * 100)
     return sum + Math.round(qty * price)
   }, 0)
+
+  // Live tax estimate based on client's province (Place of Supply)
+  const taxableCents = lineItems.reduce((sum, li, idx) => {
+    if (!li.isTaxable) return sum
+    const qty = Number(li.quantity) || 0
+    const price = Math.round((Number(li.unitPrice) || 0) * 100)
+    return sum + Math.round(qty * price)
+  }, 0)
+  const estimatedTaxCents = Math.round(taxableCents * taxConfig.rate)
+  const estimatedTotalCents = subtotalCents + estimatedTaxCents
 
   const onSubmit = async (values: InvoiceFormValues) => {
     await createInvoice.mutateAsync({
@@ -230,8 +290,17 @@ function NewInvoiceContent() {
                     placeholder="0.00"
                   />
                 </div>
-                <div className={`col-span-12 sm:col-span-1 flex ${idx === 0 ? 'items-end pb-0' : 'items-start'} pt-1`}>
+                <div className={`col-span-12 sm:col-span-1 flex gap-2 ${idx === 0 ? 'items-end pb-0' : 'items-center'} pt-1`}>
                   {idx === 0 && <div className="h-5" />}
+                  <label className="flex items-center gap-1 cursor-pointer" title="Taxable">
+                    <Checkbox
+                      checked={watch(`lineItems.${idx}.isTaxable`)}
+                      onCheckedChange={(checked) =>
+                        setValue(`lineItems.${idx}.isTaxable`, checked === true)
+                      }
+                    />
+                    <span className="text-[10px] text-muted-foreground">Tax</span>
+                  </label>
                   <Button
                     type="button"
                     variant="ghost"
@@ -263,13 +332,35 @@ function NewInvoiceContent() {
 
             <Separator />
             <div className="flex justify-end">
-              <div className="text-sm space-y-1 min-w-[200px]">
+              <div className="text-sm space-y-1.5 min-w-[240px]">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Subtotal</span>
                   <span className="font-medium">{fmtCents(subtotalCents)}</span>
                 </div>
-                <p className="text-xs text-muted-foreground">
-                  Tax will be calculated on finalisation.
+                {/* ── Place of Supply Tax Preview ─────────────────── */}
+                <div className="flex justify-between items-center">
+                  <span className="text-muted-foreground">
+                    {taxConfig.label} ({(taxConfig.rate * 100).toFixed(taxConfig.rate % 1 === 0 ? 0 : 3)}%)
+                  </span>
+                  <span className="font-medium">{fmtCents(estimatedTaxCents)}</span>
+                </div>
+                {taxConfig.isOutOfProvince && (
+                  <p className="text-[10px] text-amber-600 font-medium">
+                    Dynamic Tax Adjustment: {(taxConfig.rate * 100).toFixed(0)}% {taxConfig.label} Applied (Out-of-Province Client — {taxConfig.provinceCode})
+                  </p>
+                )}
+                {!selectedMatterId && (
+                  <p className="text-[10px] text-muted-foreground">
+                    Select a matter to resolve client tax jurisdiction.
+                  </p>
+                )}
+                <Separator />
+                <div className="flex justify-between font-semibold">
+                  <span>Estimated Total</span>
+                  <span>{fmtCents(estimatedTotalCents)}</span>
+                </div>
+                <p className="text-[10px] text-muted-foreground">
+                  Final tax calculated on finalisation via tax profiles.
                 </p>
               </div>
             </div>

@@ -5,6 +5,8 @@ import { useForm } from 'react-hook-form'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { contactSchema, type ContactFormValues } from '@/lib/schemas/contact'
 import { CONTACT_SOURCES } from '@/lib/utils/constants'
+import { CLIENT_LOCALES } from '@/lib/i18n/config'
+import { useI18n } from '@/lib/i18n/i18n-provider'
 
 import {
   Form,
@@ -32,8 +34,10 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/collapsible'
-import { Loader2, User, Building2, ChevronDown } from 'lucide-react'
+import { Loader2, User, Building2, ChevronDown, Globe } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { IdScanner } from '@/components/contacts/id-scanner'
+import type { IdScanFields } from '@/lib/services/ocr/id-field-parser'
 
 const PHONE_TYPES = [
   { value: 'mobile', label: 'Mobile' },
@@ -47,18 +51,18 @@ const PHONE_TYPES = [
 /* ------------------------------------------------------------------ */
 
 const MONTHS = [
-  { value: '01', label: 'January' },
-  { value: '02', label: 'February' },
-  { value: '03', label: 'March' },
-  { value: '04', label: 'April' },
-  { value: '05', label: 'May' },
-  { value: '06', label: 'June' },
-  { value: '07', label: 'July' },
-  { value: '08', label: 'August' },
-  { value: '09', label: 'September' },
-  { value: '10', label: 'October' },
-  { value: '11', label: 'November' },
-  { value: '12', label: 'December' },
+  { value: '01', key: 'form.month_january' },
+  { value: '02', key: 'form.month_february' },
+  { value: '03', key: 'form.month_march' },
+  { value: '04', key: 'form.month_april' },
+  { value: '05', key: 'form.month_may' },
+  { value: '06', key: 'form.month_june' },
+  { value: '07', key: 'form.month_july' },
+  { value: '08', key: 'form.month_august' },
+  { value: '09', key: 'form.month_september' },
+  { value: '10', key: 'form.month_october' },
+  { value: '11', key: 'form.month_november' },
+  { value: '12', key: 'form.month_december' },
 ] as const
 
 function daysInMonth(year: number, month: number): number {
@@ -71,6 +75,8 @@ interface DateOfBirthPickerProps {
 }
 
 function DateOfBirthPicker({ value, onChange }: DateOfBirthPickerProps) {
+  const { t } = useI18n()
+
   // Parse the existing value (YYYY-MM-DD) into parts
   const parsed = useMemo(() => {
     if (!value) return { year: '', month: '', day: '' }
@@ -140,7 +146,7 @@ function DateOfBirthPicker({ value, onChange }: DateOfBirthPickerProps) {
         }}
       >
         <SelectTrigger className="w-full">
-          <SelectValue placeholder="Year" />
+          <SelectValue placeholder={t('form.year' as any)} />
         </SelectTrigger>
         <SelectContent className="max-h-60">
           {yearOptions.map((y) => (
@@ -160,12 +166,12 @@ function DateOfBirthPicker({ value, onChange }: DateOfBirthPickerProps) {
         }}
       >
         <SelectTrigger className="w-full">
-          <SelectValue placeholder="Month" />
+          <SelectValue placeholder={t('form.month' as any)} />
         </SelectTrigger>
         <SelectContent className="max-h-60">
           {MONTHS.map((m) => (
             <SelectItem key={m.value} value={m.value}>
-              {m.label}
+              {t(m.key as any)}
             </SelectItem>
           ))}
         </SelectContent>
@@ -181,7 +187,7 @@ function DateOfBirthPicker({ value, onChange }: DateOfBirthPickerProps) {
         disabled={!year || !month}
       >
         <SelectTrigger className="w-full">
-          <SelectValue placeholder="Day" />
+          <SelectValue placeholder={t('form.day' as any)} />
         </SelectTrigger>
         <SelectContent className="max-h-60">
           {dayOptions.map((d) => (
@@ -212,13 +218,17 @@ export function ContactForm({
   onSubmit,
   isLoading = false,
 }: ContactFormProps) {
+  const { t } = useI18n()
   const [additionalDetailsOpen, setAdditionalDetailsOpen] = useState(false)
+  /** Fields the OCR parser flagged as needing manual review — shows amber border */
+  const [reviewRequiredFields, setReviewRequiredFields] = useState<Set<string>>(new Set())
 
   const form = useForm<ContactFormValues>({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     resolver: standardSchemaResolver(contactSchema) as any,
     defaultValues: {
       contact_type: 'individual',
+      client_status: 'lead',
       phone_type_primary: 'mobile',
       country: 'Canada',
       email_opt_in: true,
@@ -228,6 +238,27 @@ export function ContactForm({
   })
 
   const contactType = form.watch('contact_type')
+
+  // ── ID Scanner auto-fill callback ───────────────────────────────────────
+  const handleScanComplete = useCallback((fields: IdScanFields) => {
+    if (fields.first_name) form.setValue('first_name', fields.first_name, { shouldDirty: true })
+    if (fields.last_name) form.setValue('last_name', fields.last_name, { shouldDirty: true })
+    if (fields.middle_name) form.setValue('middle_name', fields.middle_name, { shouldDirty: true })
+    if (fields.date_of_birth) form.setValue('date_of_birth', fields.date_of_birth, { shouldDirty: true })
+    if (fields.address_line1) form.setValue('address_line1', fields.address_line1, { shouldDirty: true })
+    if (fields.city) form.setValue('city', fields.city, { shouldDirty: true })
+    if (fields.province_state) form.setValue('province_state', fields.province_state, { shouldDirty: true })
+    if (fields.postal_code) form.setValue('postal_code', fields.postal_code, { shouldDirty: true })
+    // Ensure contact type is individual
+    form.setValue('contact_type', 'individual')
+
+    // Flag fields the parser couldn't confidently extract — amber "Review Required" border
+    if (fields.review_required && fields.review_required.length > 0) {
+      setReviewRequiredFields(new Set(fields.review_required))
+    } else {
+      setReviewRequiredFields(new Set())
+    }
+  }, [form])
 
   // Reset name fields when switching contact type
   useEffect(() => {
@@ -269,7 +300,7 @@ export function ContactForm({
           name="contact_type"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Contact Type</FormLabel>
+              <FormLabel>{t('form.contact_type' as any)}</FormLabel>
               <FormControl>
                 <div className="flex rounded-lg border p-1">
                   <button
@@ -305,6 +336,134 @@ export function ContactForm({
           )}
         />
 
+        {/* Classification — visible in both create and edit */}
+        <FormField
+          control={form.control}
+          name="client_status"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{t('form.classification' as any)}</FormLabel>
+              <Select
+                value={field.value || 'lead'}
+                onValueChange={field.onChange}
+              >
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder={t('form.select_classification' as any)} />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {/* Client Lifecycle — auto-managed by system for these */}
+                  <SelectItem value="lead">
+                    <span className="flex items-center gap-2">
+                      <span className="size-2 rounded-full bg-amber-400" />
+                      Lead
+                    </span>
+                  </SelectItem>
+                  <SelectItem value="client">
+                    <span className="flex items-center gap-2">
+                      <span className="size-2 rounded-full bg-green-500" />
+                      Client
+                    </span>
+                  </SelectItem>
+                  <SelectItem value="former_client">
+                    <span className="flex items-center gap-2">
+                      <span className="size-2 rounded-full bg-slate-400" />
+                      Former Client
+                    </span>
+                  </SelectItem>
+                  {/* Legal Professionals */}
+                  <SelectItem value="lawyer">
+                    <span className="flex items-center gap-2">
+                      <span className="size-2 rounded-full bg-blue-500" />
+                      Lawyer
+                    </span>
+                  </SelectItem>
+                  <SelectItem value="consultant">
+                    <span className="flex items-center gap-2">
+                      <span className="size-2 rounded-full bg-indigo-500" />
+                      Consultant
+                    </span>
+                  </SelectItem>
+                  <SelectItem value="judge">
+                    <span className="flex items-center gap-2">
+                      <span className="size-2 rounded-full bg-purple-500" />
+                      Judge
+                    </span>
+                  </SelectItem>
+                  {/* Government / IRCC */}
+                  <SelectItem value="ircc_officer">
+                    <span className="flex items-center gap-2">
+                      <span className="size-2 rounded-full bg-red-500" />
+                      IRCC Officer
+                    </span>
+                  </SelectItem>
+                  <SelectItem value="government">
+                    <span className="flex items-center gap-2">
+                      <span className="size-2 rounded-full bg-red-400" />
+                      Government
+                    </span>
+                  </SelectItem>
+                  {/* Other */}
+                  <SelectItem value="referral_source">
+                    <span className="flex items-center gap-2">
+                      <span className="size-2 rounded-full bg-teal-500" />
+                      Referral Source
+                    </span>
+                  </SelectItem>
+                  <SelectItem value="vendor">
+                    <span className="flex items-center gap-2">
+                      <span className="size-2 rounded-full bg-orange-500" />
+                      Vendor
+                    </span>
+                  </SelectItem>
+                  <SelectItem value="other_professional">
+                    <span className="flex items-center gap-2">
+                      <span className="size-2 rounded-full bg-gray-500" />
+                      Other Professional
+                    </span>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+              <FormDescription className="text-xs">
+                Lead/Client/Former auto-updates when matters change. Professional types are locked from auto-sync.
+              </FormDescription>
+            </FormItem>
+          )}
+        />
+
+        {/* Preferred Language */}
+        <FormField
+          control={form.control}
+          name="preferred_language"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="flex items-center gap-1.5">
+                <Globe className="size-4" />
+                {t('form.preferred_language' as any)}
+              </FormLabel>
+              <Select
+                onValueChange={field.onChange}
+                value={field.value ?? ''}
+              >
+                <FormControl>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder={t('form.select_preferred_language' as any)} />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {CLIENT_LOCALES.map((locale) => (
+                    <SelectItem key={locale.code} value={locale.code}>
+                      {locale.nativeLabel} — {locale.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
         <Separator />
 
         {/* ============================================================ */}
@@ -312,8 +471,13 @@ export function ContactForm({
         {/* ============================================================ */}
         <div className="space-y-4">
           <h3 className="text-sm font-semibold text-slate-900">
-            Basic Information
+            {t('form.section_basic_info' as any)}
           </h3>
+
+          {/* ID Scanner — scan a government ID to auto-fill fields */}
+          {mode === 'create' && contactType === 'individual' && (
+            <IdScanner onScanComplete={handleScanComplete} />
+          )}
 
           {contactType === 'individual' ? (
             <>
@@ -324,7 +488,7 @@ export function ContactForm({
                   name="first_name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>First Name *</FormLabel>
+                      <FormLabel>{t('form.first_name' as any)} *</FormLabel>
                       <FormControl>
                         <Input
                           placeholder="First name"
@@ -341,7 +505,7 @@ export function ContactForm({
                   name="last_name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Last Name *</FormLabel>
+                      <FormLabel>{t('form.last_name' as any)} *</FormLabel>
                       <FormControl>
                         <Input
                           placeholder="Last name"
@@ -361,7 +525,7 @@ export function ContactForm({
                 name="date_of_birth"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Date of Birth</FormLabel>
+                    <FormLabel>{t('form.date_of_birth' as any)}</FormLabel>
                     <FormControl>
                       <DateOfBirthPicker
                         value={field.value ?? undefined}
@@ -380,7 +544,7 @@ export function ContactForm({
                 name="organization_name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Organisation Name *</FormLabel>
+                    <FormLabel>{t('form.organisation_name' as any)} *</FormLabel>
                     <FormControl>
                       <Input
                         placeholder="Organisation name"
@@ -397,7 +561,7 @@ export function ContactForm({
                 name="website"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Website</FormLabel>
+                    <FormLabel>{t('form.website' as any)}</FormLabel>
                     <FormControl>
                       <Input
                         placeholder="https://example.com"
@@ -420,7 +584,7 @@ export function ContactForm({
         {/* ============================================================ */}
         <div className="space-y-4">
           <h3 className="text-sm font-semibold text-slate-900">
-            Contact Details
+            {t('form.section_contact_details' as any)}
           </h3>
 
           <FormField
@@ -428,7 +592,7 @@ export function ContactForm({
             name="email_primary"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Primary Email</FormLabel>
+                <FormLabel>{t('form.primary_email' as any)}</FormLabel>
                 <FormControl>
                   <Input
                     type="email"
@@ -449,7 +613,7 @@ export function ContactForm({
                 name="phone_primary"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Primary Phone</FormLabel>
+                    <FormLabel>{t('form.primary_phone' as any)}</FormLabel>
                     <FormControl>
                       <Input
                         placeholder="(555) 123-4567"
@@ -467,20 +631,20 @@ export function ContactForm({
               name="phone_type_primary"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Type</FormLabel>
+                  <FormLabel>{t('form.phone_type' as any)}</FormLabel>
                   <Select
                     onValueChange={field.onChange}
                     value={field.value ?? 'mobile'}
                   >
                     <FormControl>
                       <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Type" />
+                        <SelectValue placeholder={t('form.phone_type' as any)} />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
                       {PHONE_TYPES.map((type) => (
                         <SelectItem key={type.value} value={type.value}>
-                          {type.label}
+                          {t(('form.phone_' + type.value) as any)}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -498,14 +662,14 @@ export function ContactForm({
         {/*  Section: Address                                             */}
         {/* ============================================================ */}
         <div className="space-y-4">
-          <h3 className="text-sm font-semibold text-slate-900">Address</h3>
+          <h3 className="text-sm font-semibold text-slate-900">{t('form.section_address' as any)}</h3>
 
           <FormField
             control={form.control}
             name="address_line1"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Address Line 1</FormLabel>
+                <FormLabel>{t('form.address_line_1' as any)}</FormLabel>
                 <FormControl>
                   <Input
                     placeholder="123 Main St"
@@ -523,7 +687,7 @@ export function ContactForm({
             name="address_line2"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Address Line 2</FormLabel>
+                <FormLabel>{t('form.address_line_2' as any)}</FormLabel>
                 <FormControl>
                   <Input
                     placeholder="Suite 100"
@@ -544,14 +708,22 @@ export function ContactForm({
                 name="city"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>City</FormLabel>
+                    <FormLabel>{t('form.city' as any)}</FormLabel>
                     <FormControl>
                       <Input
                         placeholder="Toronto"
+                        className={cn(reviewRequiredFields.has('city') && !field.value && 'border-amber-400 ring-1 ring-amber-200 bg-amber-50/50')}
                         {...field}
                         value={field.value ?? ''}
+                        onChange={(e) => {
+                          field.onChange(e)
+                          if (e.target.value) setReviewRequiredFields(prev => { const next = new Set(prev); next.delete('city'); return next })
+                        }}
                       />
                     </FormControl>
+                    {reviewRequiredFields.has('city') && !field.value && (
+                      <p className="text-[10px] font-medium text-amber-600">{t('form.review_required_ocr' as any)}</p>
+                    )}
                     <FormMessage />
                   </FormItem>
                 )}
@@ -561,14 +733,22 @@ export function ContactForm({
                 name="province_state"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Province / State</FormLabel>
+                    <FormLabel>{t('form.province_state' as any)}</FormLabel>
                     <FormControl>
                       <Input
                         placeholder="Ontario"
+                        className={cn(reviewRequiredFields.has('province_state') && !field.value && 'border-amber-400 ring-1 ring-amber-200 bg-amber-50/50')}
                         {...field}
                         value={field.value ?? ''}
+                        onChange={(e) => {
+                          field.onChange(e)
+                          if (e.target.value) setReviewRequiredFields(prev => { const next = new Set(prev); next.delete('province_state'); return next })
+                        }}
                       />
                     </FormControl>
+                    {reviewRequiredFields.has('province_state') && !field.value && (
+                      <p className="text-[10px] font-medium text-amber-600">{t('form.review_required_ocr' as any)}</p>
+                    )}
                     <FormMessage />
                   </FormItem>
                 )}
@@ -580,12 +760,17 @@ export function ContactForm({
                 name="postal_code"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Postal Code</FormLabel>
+                    <FormLabel>{t('form.postal_code' as any)}</FormLabel>
                     <FormControl>
                       <Input
                         placeholder="M5V 2T6"
+                        className={cn(reviewRequiredFields.has('postal_code') && !field.value && 'border-amber-400 ring-1 ring-amber-200 bg-amber-50/50')}
                         {...field}
                         value={field.value ?? ''}
+                        onChange={(e) => {
+                          field.onChange(e)
+                          if (e.target.value) setReviewRequiredFields(prev => { const next = new Set(prev); next.delete('postal_code'); return next })
+                        }}
                         onKeyDown={(e) => {
                           if (e.key === 'Enter') {
                             e.preventDefault()
@@ -594,6 +779,9 @@ export function ContactForm({
                         }}
                       />
                     </FormControl>
+                    {reviewRequiredFields.has('postal_code') && !field.value && (
+                      <p className="text-[10px] font-medium text-amber-600">{t('form.review_required_ocr' as any)}</p>
+                    )}
                     <FormMessage />
                   </FormItem>
                 )}
@@ -603,7 +791,7 @@ export function ContactForm({
                 name="country"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Country</FormLabel>
+                    <FormLabel>{t('form.country' as any)}</FormLabel>
                     <FormControl>
                       <Input
                         placeholder="Canada"
@@ -652,7 +840,7 @@ export function ContactForm({
                     name="middle_name"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Middle Name</FormLabel>
+                        <FormLabel>{t('form.middle_name' as any)}</FormLabel>
                         <FormControl>
                           <Input
                             placeholder="Middle name"
@@ -669,7 +857,7 @@ export function ContactForm({
                     name="preferred_name"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Preferred Name</FormLabel>
+                        <FormLabel>{t('form.preferred_name' as any)}</FormLabel>
                         <FormControl>
                           <Input
                             placeholder="Preferred name"
@@ -688,7 +876,7 @@ export function ContactForm({
                   name="job_title"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Job Title</FormLabel>
+                      <FormLabel>{t('form.job_title' as any)}</FormLabel>
                       <FormControl>
                         <Input
                           placeholder="Job title"
@@ -706,7 +894,7 @@ export function ContactForm({
                   name="website"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Website</FormLabel>
+                      <FormLabel>{t('form.website' as any)}</FormLabel>
                       <FormControl>
                         <Input
                           placeholder="https://example.com"
@@ -726,7 +914,7 @@ export function ContactForm({
               name="email_secondary"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Secondary Email</FormLabel>
+                  <FormLabel>{t('form.secondary_email' as any)}</FormLabel>
                   <FormControl>
                     <Input
                       type="email"
@@ -747,7 +935,7 @@ export function ContactForm({
                   name="phone_secondary"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Secondary Phone</FormLabel>
+                      <FormLabel>{t('form.secondary_phone' as any)}</FormLabel>
                       <FormControl>
                         <Input
                           placeholder="(555) 987-6543"
@@ -765,20 +953,20 @@ export function ContactForm({
                 name="phone_type_secondary"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Type</FormLabel>
+                    <FormLabel>{t('form.phone_type' as any)}</FormLabel>
                     <Select
                       onValueChange={field.onChange}
                       value={field.value ?? ''}
                     >
                       <FormControl>
                         <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Type" />
+                          <SelectValue placeholder={t('form.phone_type' as any)} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
                         {PHONE_TYPES.map((type) => (
                           <SelectItem key={type.value} value={type.value}>
-                            {type.label}
+                            {t(('form.phone_' + type.value) as any)}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -798,7 +986,7 @@ export function ContactForm({
         {/* ============================================================ */}
         <div className="space-y-4">
           <h3 className="text-sm font-semibold text-slate-900">
-            Source &amp; Preferences
+            {t('form.section_source_prefs' as any)}
           </h3>
 
           <FormField
@@ -806,14 +994,14 @@ export function ContactForm({
             name="source"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Source</FormLabel>
+                <FormLabel>{t('form.source' as any)}</FormLabel>
                 <Select
                   onValueChange={field.onChange}
                   value={field.value ?? ''}
                 >
                   <FormControl>
                     <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select a source" />
+                      <SelectValue placeholder={t('form.select_source' as any)} />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
@@ -834,7 +1022,7 @@ export function ContactForm({
             name="source_detail"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Source Detail</FormLabel>
+                <FormLabel>{t('form.source_detail' as any)}</FormLabel>
                 <FormControl>
                   <Input
                     placeholder="e.g. Referred by John Smith"
@@ -854,7 +1042,7 @@ export function ContactForm({
               render={({ field }) => (
                 <FormItem className="flex items-center justify-between rounded-lg border p-3">
                   <div className="space-y-0.5">
-                    <FormLabel>Email Communications</FormLabel>
+                    <FormLabel>{t('form.email_communications' as any)}</FormLabel>
                     <FormDescription>
                       Receive email updates and newsletters
                     </FormDescription>
@@ -875,7 +1063,7 @@ export function ContactForm({
               render={({ field }) => (
                 <FormItem className="flex items-center justify-between rounded-lg border p-3">
                   <div className="space-y-0.5">
-                    <FormLabel>SMS Communications</FormLabel>
+                    <FormLabel>{t('form.sms_communications' as any)}</FormLabel>
                     <FormDescription>
                       Receive text message updates
                     </FormDescription>
@@ -896,17 +1084,17 @@ export function ContactForm({
 
         {/* Section: Notes */}
         <div className="space-y-4">
-          <h3 className="text-sm font-semibold text-slate-900">Notes</h3>
+          <h3 className="text-sm font-semibold text-slate-900">{t('form.notes' as any)}</h3>
 
           <FormField
             control={form.control}
             name="notes"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Notes</FormLabel>
+                <FormLabel>{t('form.notes' as any)}</FormLabel>
                 <FormControl>
                   <Textarea
-                    placeholder="Add any additional notes about this contact..."
+                    placeholder={t('form.notes_placeholder' as any)}
                     className="min-h-[100px] resize-y"
                     {...field}
                     value={field.value ?? ''}
@@ -929,7 +1117,7 @@ export function ContactForm({
         <div className="flex justify-end gap-3 pt-2">
           <Button type="submit" disabled={isLoading}>
             {isLoading && <Loader2 className="mr-2 size-4 animate-spin" />}
-            {mode === 'create' ? 'Create Contact' : 'Save Changes'}
+            {mode === 'create' ? t('form.create_contact' as any) : t('form.save_changes' as any)}
           </Button>
         </div>
       </form>

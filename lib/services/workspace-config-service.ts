@@ -29,6 +29,8 @@ export interface ResolvedWorkflowConfig {
     intake_complete: boolean
     id_verification: boolean
     required_documents: boolean
+    readiness_complete: boolean
+    trust_deposit_received: boolean
   }
   mandatoryTasksByStage: Record<string, string[]>
   stageReopenPermissions: Record<string, string[]>

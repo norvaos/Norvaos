@@ -11,6 +11,9 @@ import { useTenant } from '@/lib/hooks/use-tenant'
 import { navigation } from '@/lib/config/navigation'
 import { Header } from '@/components/layout/header'
 import { Breadcrumbs } from '@/components/layout/breadcrumbs'
+import { SearchProvider } from '@/components/search/SearchContext'
+import { useGlobalPing } from '@/lib/hooks/use-global-ping'
+import { LocaleDebugFooter } from '@/components/debug/locale-debug-footer'
 
 // Lazy-load heavy overlays — CommandPalette is only visible on Cmd+K and
 // imports 13 icons + 4 Supabase queries. Compiling it eagerly on every
@@ -39,6 +42,7 @@ import { APP_VERSION, BUILD_SHA } from '@/lib/config/version'
 import { Scale, ChevronsLeft, ChevronsRight, ChevronDown, Moon, Sun } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import type { NavItem } from '@/lib/config/navigation'
+import { useI18n } from '@/lib/i18n/i18n-provider'
 
 // ---------------------------------------------------------------------------
 // Sidebar helpers
@@ -65,6 +69,7 @@ function SidebarLink({
 }) {
   const isActive = isItemActive(item.href, pathname)
   const Icon = item.icon
+  const { t } = useI18n()
 
   const link = (
     <Link
@@ -82,7 +87,7 @@ function SidebarLink({
       )}
     >
       <Icon className="size-4 shrink-0" />
-      {!collapsed && <span className="truncate">{item.title}</span>}
+      {!collapsed && <span className="truncate">{t(item.labelKey as any, item.title)}</span>}
       {!collapsed && item.comingSoon && (
         <span className="ml-auto rounded bg-sidebar-accent px-1.5 py-0.5 text-[10px] font-medium text-sidebar-foreground/60">
           Soon
@@ -101,7 +106,7 @@ function SidebarLink({
       <Tooltip key={item.href}>
         <TooltipTrigger asChild>{link}</TooltipTrigger>
         <TooltipContent side="right">
-          {item.title}
+          {t(item.labelKey as any, item.title)}
           {item.comingSoon && ' (Coming Soon)'}
         </TooltipContent>
       </Tooltip>
@@ -123,6 +128,7 @@ function SidebarDropdown({
 }) {
   const children = item.children ?? []
   const Icon = item.icon
+  const { t } = useI18n()
   const anyChildActive = children.some((child) => isItemActive(child.href, pathname))
   const [open, setOpen] = useState(anyChildActive)
 
@@ -145,7 +151,7 @@ function SidebarDropdown({
           </button>
         </TooltipTrigger>
         <TooltipContent side="right" sideOffset={8} className="flex flex-col gap-1 p-2">
-          <span className="mb-0.5 text-xs font-semibold text-muted-foreground">{item.title}</span>
+          <span className="mb-0.5 text-xs font-semibold text-muted-foreground">{t(item.labelKey as any, item.title)}</span>
           {children.map((child) => {
             const ChildIcon = child.icon
             const active = isItemActive(child.href, pathname)
@@ -182,7 +188,7 @@ function SidebarDropdown({
         )}
       >
         <Icon className="size-4 shrink-0" />
-        <span className="truncate">{item.title}</span>
+        <span className="truncate">{t(item.labelKey as any, item.title)}</span>
         <ChevronDown
           className={cn(
             'ml-auto size-3.5 shrink-0 transition-transform duration-200',
@@ -214,6 +220,7 @@ function SidebarDropdown({
 
 function SidebarContent({ collapsed }: { collapsed: boolean }) {
   const pathname = usePathname()
+  const { t } = useI18n()
 
   return (
     <div className="flex h-full flex-col">
@@ -232,7 +239,7 @@ function SidebarContent({ collapsed }: { collapsed: boolean }) {
             <div key={section.title} className="mb-2">
               {!collapsed && (
                 <span className="mb-1 block px-2 text-[11px] font-semibold uppercase tracking-wider text-sidebar-foreground/50">
-                  {section.title}
+                  {t(section.labelKey as any, section.title)}
                 </span>
               )}
               {collapsed && <Separator className="my-1 bg-sidebar-border" />}
@@ -373,6 +380,7 @@ function MobileNav() {
   const open = useUIStore((s) => s.sidebarMobileOpen)
   const setOpen = useUIStore((s) => s.setSidebarMobileOpen)
   const pathname = usePathname()
+  const { t } = useI18n()
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -390,7 +398,7 @@ function MobileNav() {
             {navigation.map((section) => (
               <div key={section.title} className="mb-2">
                 <span className="mb-1 block px-2 text-[11px] font-semibold uppercase tracking-wider text-sidebar-foreground/50">
-                  {section.title}
+                  {t(section.labelKey as any, section.title)}
                 </span>
                 {section.items.map((item) =>
                   item.children && item.children.length > 0 ? (
@@ -430,8 +438,26 @@ export default function DashboardLayout({
 }) {
   const router = useRouter()
   const { role } = useUserRole()
-  const { isLoading: userLoading } = useUser()
-  const { isLoading: tenantLoading } = useTenant()
+  const { appUser, isLoading: userLoading } = useUser()
+  const { tenant, isLoading: tenantLoading } = useTenant()
+
+  // ─── Global Ping: toast notifications for team-wide events ──────────
+  useGlobalPing({
+    tenantId: tenant?.id ?? null,
+    userId: appUser?.id ?? null,
+    enabled: !!tenant?.id && !!appUser?.id,
+  })
+
+  // ─── Compliance Hard-Gate: redirect to setup if no regulatory body set ──
+  const pathname = usePathname()
+  useEffect(() => {
+    if (tenantLoading || !tenant) return
+    // Don't redirect if already on the setup page
+    if (pathname.startsWith('/setup/compliance')) return
+    if (!tenant.home_province) {
+      router.replace('/setup/compliance')
+    }
+  }, [tenant, tenantLoading, pathname, router])
 
   // ─── Route locking: front-desk-only users cannot access dashboard ──
   // If a user has front_desk:view but does NOT have matters:view,
@@ -463,27 +489,32 @@ export default function DashboardLayout({
   }
 
   return (
-    <div className="flex h-screen overflow-hidden">
-      {/* Sidebar (desktop only) */}
-      <Sidebar />
+    <SearchProvider>
+      <div className="flex h-screen overflow-hidden">
+        {/* Sidebar (desktop only) */}
+        <Sidebar />
 
-      {/* Main content area */}
-      <div className="flex flex-1 flex-col overflow-hidden">
-        {/* Header */}
-        <Header />
+        {/* Main content area */}
+        <div className="flex flex-1 flex-col overflow-hidden">
+          {/* Header */}
+          <Header />
 
-        {/* Page content */}
-        <main className="flex-1 overflow-y-auto bg-background p-4 lg:p-6">
-          <Breadcrumbs />
-          {children}
-        </main>
+          {/* Page content */}
+          <main className="flex-1 overflow-y-auto bg-background p-4 lg:p-6">
+            <Breadcrumbs />
+            {children}
+          </main>
+        </div>
+
+        {/* Mobile navigation sheet */}
+        <MobileNav />
+
+        {/* Command palette overlay */}
+        <CommandPalette />
+
+        {/* NUCLEAR FIX #3: Visual Debug — shows locale state vs DB vs localStorage */}
+        <LocaleDebugFooter />
       </div>
-
-      {/* Mobile navigation sheet */}
-      <MobileNav />
-
-      {/* Command palette overlay */}
-      <CommandPalette />
-    </div>
+    </SearchProvider>
   )
 }

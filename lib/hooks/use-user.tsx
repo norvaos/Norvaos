@@ -31,6 +31,7 @@ interface AppUser {
   notification_prefs: Record<string, boolean>
   settings: Record<string, unknown>
   practice_filter_preference?: string | null
+  locale_preference?: string | null
 }
 
 interface UserContextType {

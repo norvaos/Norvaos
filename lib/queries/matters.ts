@@ -4,10 +4,25 @@ import type { Database } from '@/lib/types/database'
 import { logAudit } from '@/lib/queries/audit-logs'
 import { toast } from 'sonner'
 import { IMPORT_REVERTED_STATUS } from '@/lib/utils/matter-status'
+import { broadcastMutation } from '@/lib/hooks/use-cross-tab-sync'
 
 type Matter = Database['public']['Tables']['matters']['Row']
 type MatterInsert = Database['public']['Tables']['matters']['Insert']
 type MatterUpdate = Database['public']['Tables']['matters']['Update']
+
+// ─── Lean Column Fragment (19 cols — max 20) ────────────────────────────────
+// Only the columns needed by the matter list table + kanban card.
+// Dropped: tenant_id, originating_lawyer_id, date_closed, estimated_value,
+//          total_billed, total_paid, updated_at
+export const MATTER_LIST_COLUMNS =
+  'id, title, matter_number, status, priority, practice_area_id, matter_type_id, matter_type, pipeline_id, stage_id, stage_entered_at, responsible_lawyer_id, date_opened, risk_level, intake_status, created_at, case_type_id, billing_type, trust_balance' as const
+
+// ─── Detail Column Fragment (20 cols — max 20) ─────────────────────────────
+// Only the columns needed by the matter detail view.
+// Adds total_billed, total_paid, readiness_score/breakdown over list columns.
+// Dropped: created_at, intake_status (both available from list-query cache).
+export const MATTER_DETAIL_COLUMNS =
+  'id, title, matter_number, status, priority, risk_level, practice_area_id, matter_type_id, matter_type, pipeline_id, stage_id, stage_entered_at, responsible_lawyer_id, billing_type, date_opened, case_type_id, total_billed, total_paid, readiness_score, readiness_breakdown' as const
 
 interface MatterListParams {
   tenantId: string
@@ -48,7 +63,7 @@ export function useMatters(params: MatterListParams) {
 
       let query = supabase
         .from('matters')
-        .select('id, tenant_id, title, matter_number, status, priority, practice_area_id, matter_type_id, matter_type, pipeline_id, stage_id, stage_entered_at, responsible_lawyer_id, originating_lawyer_id, date_opened, date_closed, billing_type, estimated_value, total_billed, total_paid, case_type_id, intake_status, risk_level, created_at, updated_at', { count: 'exact' })
+        .select(MATTER_LIST_COLUMNS, { count: 'exact' })
         .eq('tenant_id', tenantId)
         .neq('status', 'archived')
         .neq('status', IMPORT_REVERTED_STATUS)
@@ -83,20 +98,36 @@ export function useMatters(params: MatterListParams) {
   })
 }
 
+/** Standalone fetch for a single matter — can be used in queryFn or prefetch. */
+export async function fetchMatterDetail(id: string): Promise<Matter> {
+  const supabase = createClient()
+  const { data, error } = await supabase
+    .from('matters')
+    .select(MATTER_DETAIL_COLUMNS)
+    .eq('id', id)
+    .single()
+  if (error) throw error
+  return data as Matter
+}
+
+/** Fetch enforcement_enabled flag for a matter type. */
+export async function fetchMatterTypeEnforcement(
+  matterTypeId: string
+): Promise<{ id: string; enforcement_enabled: boolean }> {
+  const supabase = createClient()
+  const { data, error } = await supabase
+    .from('matter_types')
+    .select('id, enforcement_enabled')
+    .eq('id', matterTypeId)
+    .single()
+  if (error) throw error
+  return data as { id: string; enforcement_enabled: boolean }
+}
+
 export function useMatter(id: string) {
   return useQuery({
     queryKey: matterKeys.detail(id),
-    queryFn: async () => {
-      const supabase = createClient()
-      const { data, error } = await supabase
-        .from('matters')
-        .select('*')
-        .eq('id', id)
-        .single()
-
-      if (error) throw error
-      return data as Matter
-    },
+    queryFn: () => fetchMatterDetail(id),
     enabled: !!id,
     staleTime: 1000 * 60 * 2, // 2 min — cached data shows instantly (e.g. header context) while revalidating
   })
@@ -142,6 +173,9 @@ export function useCreateMatter() {
       queryClient.invalidateQueries({ queryKey: ['immigration'] })
       toast.success('Matter created successfully')
 
+      // Broadcast to other tabs
+      broadcastMutation('matter:created', { matterId: matter.id })
+
       logAudit({
         tenantId: matter.tenant_id,
         userId: matter.created_by ?? 'system',
@@ -181,10 +215,41 @@ export function useUpdateMatter() {
       if (error) throw error
       return { matter: data as Matter, before }
     },
+    // ── Optimistic UI: update cache instantly before server responds ──
+    onMutate: async ({ id, ...updates }) => {
+      // Cancel outgoing refetches so they don't overwrite our optimistic update
+      await queryClient.cancelQueries({ queryKey: matterKeys.detail(id) })
+      await queryClient.cancelQueries({ queryKey: matterKeys.lists() })
+
+      // Snapshot previous detail value for rollback
+      const previousDetail = queryClient.getQueryData<Matter>(matterKeys.detail(id))
+
+      // Optimistically update the detail cache
+      if (previousDetail) {
+        queryClient.setQueryData<Matter>(matterKeys.detail(id), {
+          ...previousDetail,
+          ...updates,
+          updated_at: new Date().toISOString(),
+        } as Matter)
+      }
+
+      // Optimistically update the dashboard core cache
+      const dashboardKey = ['matter-dashboard', 'core', id]
+      const previousDashboard = queryClient.getQueryData(dashboardKey)
+      if (previousDashboard) {
+        queryClient.setQueryData(dashboardKey, { ...previousDashboard as Record<string, unknown>, ...updates })
+      }
+
+      return { previousDetail, previousDashboard }
+    },
     onSuccess: ({ matter: data, before }) => {
-      queryClient.invalidateQueries({ queryKey: matterKeys.lists() })
+      // Replace optimistic data with real server data
       queryClient.setQueryData(matterKeys.detail(data.id), data)
+      queryClient.invalidateQueries({ queryKey: matterKeys.lists() })
       toast.success('Matter updated successfully')
+
+      // Broadcast to other tabs
+      broadcastMutation('matter:updated', { matterId: data.id })
 
       // Only log fields that actually changed
       if (before) {
@@ -209,7 +274,14 @@ export function useUpdateMatter() {
         }
       }
     },
-    onError: () => {
+    onError: (_error, variables, context) => {
+      // Rollback to previous data on error
+      if (context?.previousDetail) {
+        queryClient.setQueryData(matterKeys.detail(variables.id), context.previousDetail)
+      }
+      if (context?.previousDashboard) {
+        queryClient.setQueryData(['matter-dashboard', 'core', variables.id], context.previousDashboard)
+      }
       toast.error('Failed to update matter')
     },
   })
@@ -231,10 +303,27 @@ export function useUpdateMatterStage() {
       if (error) throw error
       return data as Matter
     },
+    // ── Optimistic UI: update stage instantly ──
+    onMutate: async ({ id, stageId }) => {
+      await queryClient.cancelQueries({ queryKey: matterKeys.detail(id) })
+
+      const previousDetail = queryClient.getQueryData<Matter>(matterKeys.detail(id))
+      if (previousDetail) {
+        queryClient.setQueryData<Matter>(matterKeys.detail(id), {
+          ...previousDetail,
+          stage_id: stageId,
+          stage_entered_at: new Date().toISOString(),
+        } as Matter)
+      }
+      return { previousDetail }
+    },
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: matterKeys.lists() })
       queryClient.setQueryData(matterKeys.detail(data.id), data)
+      queryClient.invalidateQueries({ queryKey: matterKeys.lists() })
       toast.success('Stage updated')
+
+      // Broadcast to other tabs
+      broadcastMutation('matter:stage-advanced', { matterId: data.id })
 
       logAudit({
         tenantId: data.tenant_id,
@@ -246,7 +335,10 @@ export function useUpdateMatterStage() {
         metadata: { title: data.title },
       })
     },
-    onError: () => {
+    onError: (_error, variables, context) => {
+      if (context?.previousDetail) {
+        queryClient.setQueryData(matterKeys.detail(variables.id), context.previousDetail)
+      }
       toast.error('Failed to update stage')
     },
   })

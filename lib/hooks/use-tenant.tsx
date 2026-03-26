@@ -21,7 +21,17 @@ interface Tenant {
   feature_flags: Record<string, boolean>
   settings: Record<string, unknown>
   jurisdiction_code: string
+  home_province: string | null
   max_users: number
+  // Firm address fields (used for compliance score)
+  address_line1: string | null
+  address_line2: string | null
+  city: string | null
+  province: string | null
+  postal_code: string | null
+  country: string | null
+  office_phone: string | null
+  office_fax: string | null
 }
 
 interface TenantContextType {

@@ -58,6 +58,14 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        {/* Nastaliq CDN Failover — Directive 0.0 Nastaliq Script Audit */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        {/* eslint-disable-next-line @next/next/no-page-custom-font */}
+        <link
+          href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;700&family=Noto+Sans+Arabic:wght@400;700&display=swap"
+          rel="stylesheet"
+        />
         {/*
           Blocking script: reads Zustand persisted UI state from localStorage
           BEFORE the first paint. Sets data-attributes on <html> so CSS can

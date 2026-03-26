@@ -81,3 +81,20 @@ export {
   type AuditTrailRow,
   type LSOComplianceReport,
 } from './trust-reporting-service'
+
+// Trust Reconciler — Clio-to-Norva migration balance comparison (Directive 20.1)
+export {
+  reconcileClioMigration,
+  type TrustMismatch,
+  type ReconciliationReport,
+} from './trust-reconciler'
+
+// LedgerGuard Middleware — Fiduciary Gate (Directive 20.0)
+export {
+  validateTrustModification,
+  enforceLedgerGuard,
+  TRUST_REASON_CODES,
+  type TrustReasonCode,
+  type LedgerGuardInput,
+  type LedgerGuardResult,
+} from './ledger-guard'

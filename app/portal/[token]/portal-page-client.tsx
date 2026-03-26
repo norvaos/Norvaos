@@ -36,6 +36,9 @@ import { PortalCollapsibleSection, type SectionMetric } from './portal-collapsib
 import { PortalDashboardCards } from './portal-dashboard-cards'
 import { PortalTimeline } from './portal-timeline'
 import { PortalSharedDocuments } from './portal-shared-documents'
+import { ClientProgressTracker } from './client-progress-tracker'
+import { PortalTeamMicroCards } from './portal-team-micro-cards'
+import { PortalMessageTeam } from './portal-message-team'
 
 // Content components
 import { PortalDocuments, type PortalSlot } from './portal-documents'
@@ -49,10 +52,10 @@ import { PortalClientUpload } from './portal-client-upload'
 
 import {
   getTranslations,
-  PORTAL_LOCALES,
   isRtl,
   type PortalLocale,
 } from '@/lib/utils/portal-translations'
+import { UniversalGlobeSelector } from '@/components/i18n/UniversalGlobeSelector'
 import type { PortalSummaryResponse, PortalSectionCounts } from '@/lib/types/portal'
 
 // ── Types ────────────────────────────────────────────────────────────────────
@@ -547,40 +550,12 @@ export function PortalPageClient({
             </h1>
             <p className="text-xs text-slate-500">{tr.portal_title}</p>
           </div>
-          {/* Language dropdown */}
-          <div className="relative inline-flex items-center">
-            <svg
-              className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400 pointer-events-none z-10"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <circle cx="12" cy="12" r="10" />
-              <line x1="2" y1="12" x2="22" y2="12" />
-              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-            </svg>
-            <select
-              value={currentLang}
-              onChange={(e) => setCurrentLang(e.target.value as PortalLocale)}
-              className="appearance-none bg-white border border-slate-200 rounded-md pl-8 pr-7 py-1.5 text-xs font-medium text-slate-700 cursor-pointer hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              {PORTAL_LOCALES.map((loc) => (
-                <option key={loc.value} value={loc.value}>
-                  {loc.nativeLabel}
-                </option>
-              ))}
-            </select>
-            <svg
-              className="absolute right-2 top-1/2 -translate-y-1/2 h-3 w-3 text-slate-400 pointer-events-none"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <polyline points="6 9 12 15 18 9" />
-            </svg>
-          </div>
+          {/* Universal Globe Language Selector (Directive 16.2) */}
+          <UniversalGlobeSelector
+            value={currentLang}
+            onChange={(code) => setCurrentLang(code as PortalLocale)}
+            audience="client"
+          />
         </div>
       </header>
 
@@ -604,6 +579,51 @@ export function PortalPageClient({
             token={token}
             primaryColor={tenant.primaryColor}
             language={currentLang}
+          />
+        )}
+
+        {/* 2b. Client Progress Tracker — stage pipeline + missing docs */}
+        <ClientProgressTracker
+          token={token}
+          accentColor={tenant.primaryColor}
+        />
+
+        {/* 2c. Team Micro-Cards — high-density mobile-first lawyer + assistant */}
+        {(portalInfo.lawyerName || portalInfo.supportStaffName) && (
+          <PortalTeamMicroCards
+            lawyer={
+              portalInfo.lawyerName
+                ? {
+                    name: portalInfo.lawyerName,
+                    role: 'Responsible Lawyer',
+                    email: portalInfo.lawyerEmail || undefined,
+                    phone: portalInfo.lawyerPhone || undefined,
+                    roleDescription: portalInfo.lawyerRoleDescription || undefined,
+                  }
+                : undefined
+            }
+            assistant={
+              portalInfo.supportStaffName
+                ? {
+                    name: portalInfo.supportStaffName,
+                    role: 'Case Assistant',
+                    email: portalInfo.supportStaffEmail || undefined,
+                    phone: portalInfo.supportStaffPhone || undefined,
+                    roleDescription: portalInfo.supportStaffRoleDescription || undefined,
+                  }
+                : undefined
+            }
+            accentColor={tenant.primaryColor}
+          />
+        )}
+
+        {/* 2d. Message My Team — secure mailto with matter reference */}
+        {portalInfo.lawyerEmail && (
+          <PortalMessageTeam
+            lawyerEmail={portalInfo.lawyerEmail}
+            matterRef={matterRef}
+            matterTitle={matterTitle}
+            accentColor={tenant.primaryColor}
           />
         )}
 
@@ -648,6 +668,31 @@ export function PortalPageClient({
           lawyerName={portalInfo.lawyerName || undefined}
           onSummaryLoaded={handleSummaryLoaded}
         />
+
+        {/* 5b. Book a Consultation — prominent standalone section */}
+        <section className="rounded-2xl border border-blue-200 bg-gradient-to-br from-blue-50 to-white p-4 shadow-sm">
+          <div className="flex items-center gap-2 mb-3">
+            <div
+              className="flex h-8 w-8 items-center justify-center rounded-lg text-white shrink-0"
+              style={{ backgroundColor: tenant.primaryColor || '#2563eb' }}
+            >
+              <CalendarIcon />
+            </div>
+            <div>
+              <h3 className="text-sm font-bold text-slate-900">
+                {tr.booking_title ?? 'Book a Consultation'}
+              </h3>
+              <p className="text-xs text-slate-500">
+                {tr.booking_subtitle ?? 'Schedule a meeting with your legal team in 2 clicks'}
+              </p>
+            </div>
+          </div>
+          <PortalBooking
+            token={token}
+            primaryColor={tenant.primaryColor}
+            language={currentLang}
+          />
+        </section>
 
         {/* 6. Dashboard Summary Cards — clickable grid */}
         <PortalDashboardCards

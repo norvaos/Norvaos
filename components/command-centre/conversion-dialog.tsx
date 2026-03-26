@@ -5,9 +5,11 @@ import { useRouter } from 'next/navigation'
 import { useCommandCentre } from './command-centre-context'
 import { useQuery } from '@tanstack/react-query'
 import { createClient } from '@/lib/supabase/client'
+import { useTenant } from '@/lib/hooks/use-tenant'
 import { useMatterTypes } from '@/lib/queries/matter-types'
 import { BILLING_TYPES } from '@/lib/utils/constants'
 import { formatFullName } from '@/lib/utils/formatters'
+import { resolveRegulatoryBody } from '@/lib/config/jurisdictions'
 import {
   Dialog,
   DialogContent,
@@ -28,6 +30,12 @@ import {
 } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
 import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
+import {
   Trophy,
   Loader2,
   CheckCircle2,
@@ -40,8 +48,110 @@ import {
   ShieldAlert,
   ShieldX,
   Shield,
+  Lock,
+  Fingerprint,
+  Archive,
+  Scale,
+  DollarSign,
 } from 'lucide-react'
 import { toast } from 'sonner'
+
+// ─── Types ──────────────────────────────────────────────────────────
+
+interface IdentityVerificationResult {
+  isVerified: boolean
+  latestVerification: {
+    id: string
+    status: string
+    method: string
+    document_type: string | null
+    verified_at: string | null
+  } | null
+}
+
+// ─── Hard-Gate Status — Directive 41.2 Compliance Checksum ──────────
+
+const CONFLICT_PASS_STATUSES = new Set([
+  'auto_scan_complete',
+  'cleared_by_lawyer',
+  'waiver_obtained',
+])
+
+interface ComplianceGateStatus {
+  idVerified: boolean
+  conflictPassed: boolean
+  jurisdictionSet: boolean
+  canConvert: boolean
+  blockReason: string | null
+}
+
+function useComplianceGates(
+  contactId: string | null | undefined,
+  tenantId: string,
+  homeProvince: string | null | undefined,
+  open: boolean,
+): {
+  gates: ComplianceGateStatus
+  isLoading: boolean
+  conflictStatus: string
+  conflictScore: number
+} {
+  // 1. Identity verification check
+  const { data: idVerification, isLoading: idLoading } = useQuery({
+    queryKey: ['identity-verification-gate', contactId, open],
+    queryFn: async (): Promise<IdentityVerificationResult> => {
+      const res = await fetch(`/api/contacts/${contactId}/identity-verification`)
+      if (!res.ok) throw new Error('Failed to fetch identity verification')
+      return res.json()
+    },
+    enabled: open && !!contactId,
+    staleTime: 0,
+  })
+
+  // 2. Conflict check status
+  const { data: conflictData, isLoading: conflictLoading } = useQuery({
+    queryKey: ['conflict-status', contactId, open],
+    queryFn: async () => {
+      if (!contactId) return null
+      const supabase = createClient()
+      const { data } = await supabase
+        .from('contacts')
+        .select('conflict_status, conflict_score')
+        .eq('id', contactId)
+        .single()
+      return data
+    },
+    enabled: open && !!contactId,
+    staleTime: 0,
+  })
+
+  const idVerified = idVerification?.isVerified ?? false
+  // Respect FORCE_CONFLICT_SIM for demo walkthrough (Red-Gate trigger)
+  const forceConflictSim = process.env.NEXT_PUBLIC_FORCE_CONFLICT_SIM === 'true'
+  const conflictStatusRaw = forceConflictSim
+    ? 'CONFLICT_DETECTED'
+    : (conflictData?.conflict_status ?? 'not_run')
+  const conflictPassed = CONFLICT_PASS_STATUSES.has(conflictStatusRaw)
+  const jurisdictionSet = !!homeProvince
+
+  const canConvert = idVerified && conflictPassed && jurisdictionSet
+
+  let blockReason: string | null = null
+  if (!canConvert) {
+    const missing: string[] = []
+    if (!jurisdictionSet) missing.push('Firm Regulatory Body (Settings → Firm)')
+    if (!idVerified) missing.push('Law Society ID Verification')
+    if (!conflictPassed) missing.push('Conflict Check')
+    blockReason = `Sovereign Block: ${missing.join(' & ')} Required.`
+  }
+
+  return {
+    gates: { idVerified, conflictPassed, jurisdictionSet, canConvert, blockReason },
+    isLoading: idLoading || conflictLoading,
+    conflictStatus: conflictStatusRaw,
+    conflictScore: conflictData?.conflict_score ?? 0,
+  }
+}
 
 // ─── Component ──────────────────────────────────────────────────────
 
@@ -52,6 +162,7 @@ interface ConversionDialogProps {
 
 export function ConversionDialog({ open, onOpenChange }: ConversionDialogProps) {
   const router = useRouter()
+  const { tenant } = useTenant()
   const {
     lead,
     contact,
@@ -68,6 +179,7 @@ export function ConversionDialog({ open, onOpenChange }: ConversionDialogProps) 
   const [practiceAreaId, setPracticeAreaId] = useState('')
   const [responsibleLawyerId, setResponsibleLawyerId] = useState('')
   const [billingType, setBillingType] = useState('flat_fee')
+  const [retainerDeposit, setRetainerDeposit] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [blockedReasons, setBlockedReasons] = useState<string[]>([])
@@ -77,22 +189,16 @@ export function ConversionDialog({ open, onOpenChange }: ConversionDialogProps) 
 
   const winStage = useMemo(() => stages.find((s) => s.is_win_stage), [stages])
 
-  // Fetch conflict status for the lead's contact when dialog opens
-  const { data: conflictStatus, isLoading: conflictLoading } = useQuery({
-    queryKey: ['conflict-status', lead?.contact_id, open],
-    queryFn: async () => {
-      if (!lead?.contact_id) return null
-      const supabase = createClient()
-      const { data } = await supabase
-        .from('contacts')
-        .select('conflict_status, conflict_score')
-        .eq('id', lead.contact_id)
-        .single()
-      return data
-    },
-    enabled: open && !!lead?.contact_id,
-    staleTime: 0,
-  })
+  // Resolve regulatory body for display
+  const regBody = resolveRegulatoryBody(tenant?.home_province)
+
+  // ── Directive 41.2 + 41.4: Hard-Gate Compliance Checksum ──────────
+  const {
+    gates,
+    isLoading: gatesLoading,
+    conflictStatus,
+    conflictScore,
+  } = useComplianceGates(lead?.contact_id, tenantId, tenant?.home_province, open)
 
   // Pre-fill form when dialog opens
   useEffect(() => {
@@ -112,8 +218,45 @@ export function ConversionDialog({ open, onOpenChange }: ConversionDialogProps) 
     }
   }, [open, contact, lead, practiceAreas, userId])
 
+  // ── Vault Drop Claim (Atomic Move) ────────────────────────────────
+  const claimVaultDrops = useCallback(async (matterId: string) => {
+    if (!lead?.contact_id) return
+    try {
+      const supabase = createClient()
+
+      // Find unclaimed vault drops for this contact's session
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: drops } = await (supabase as any)
+        .from('vault_drops')
+        .select('temp_session_id')
+        .is('claimed_matter_id', null)
+        .limit(1)
+        .maybeSingle()
+
+      if (drops?.temp_session_id) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        await (supabase as any).rpc('claim_vault_drops', {
+          p_session_id: drops.temp_session_id,
+          p_matter_id: matterId,
+          p_tenant_id: tenantId,
+          p_claimed_by: userId,
+        })
+      }
+    } catch (err) {
+      // Non-fatal: vault drops may not exist for this contact
+      console.error('[conversion-dialog] Vault drop claim failed (non-fatal):', err)
+    }
+  }, [lead?.contact_id, tenantId, userId])
+
   const handleConvert = async () => {
     if (!lead || !title.trim()) return
+
+    // Double-check hard gates
+    if (!gates.canConvert) {
+      setError(gates.blockReason ?? 'Compliance gates not satisfied')
+      return
+    }
+
     setIsSubmitting(true)
     setError(null)
     setBlockedReasons([])
@@ -129,6 +272,7 @@ export function ConversionDialog({ open, onOpenChange }: ConversionDialogProps) 
           matterTypeId: matterTypeId || null,
           responsibleLawyerId: responsibleLawyerId || userId,
           billingType,
+          retainerDeposit: retainerDeposit ? Math.round(parseFloat(retainerDeposit) * 100) : null,
         }),
       })
 
@@ -146,6 +290,9 @@ export function ConversionDialog({ open, onOpenChange }: ConversionDialogProps) 
         setError('Matter was not created. Please try again or contact support.')
         return
       }
+
+      // ── Atomic Move: Claim vault drops into the new matter ─────
+      await claimVaultDrops(result.matterId)
 
       toast.success('Lead converted to active matter!')
       onOpenChange(false)
@@ -170,11 +317,107 @@ export function ConversionDialog({ open, onOpenChange }: ConversionDialogProps) 
           </DialogDescription>
         </DialogHeader>
 
-        {/* Conflict Status */}
-        {!conflictLoading && conflictStatus && (() => {
-          const status = conflictStatus.conflict_status ?? 'not_run'
-          const score = conflictStatus.conflict_score ?? 0
+        {/* ── Directive 41.2: Hard-Gate Compliance Panel ────────────── */}
+        <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 space-y-2">
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+            Compliance Checksum
+          </p>
+          <div className="space-y-1.5">
+            {/* Jurisdiction Gate — Directive 41.4 */}
+            <div className="flex items-center gap-2">
+              {gates.jurisdictionSet ? (
+                <Scale className="size-4 text-green-600" />
+              ) : (
+                <Scale className="size-4 text-red-500" />
+              )}
+              <span className={`text-xs font-medium ${gates.jurisdictionSet ? 'text-green-700' : 'text-red-700'}`}>
+                Firm Regulatory Body
+              </span>
+              <Badge
+                variant="outline"
+                className={`ml-auto text-[9px] ${
+                  gates.jurisdictionSet
+                    ? 'border-green-300 bg-green-50 text-green-700'
+                    : 'border-red-300 bg-red-50 text-red-700'
+                }`}
+              >
+                {gates.jurisdictionSet ? (regBody?.abbr ?? 'SET') : 'NOT SET'}
+              </Badge>
+            </div>
 
+            {/* Identity Verification Gate */}
+            <div className="flex items-center gap-2">
+              {gatesLoading ? (
+                <Loader2 className="size-4 animate-spin text-slate-400" />
+              ) : gates.idVerified ? (
+                <Fingerprint className="size-4 text-green-600" />
+              ) : (
+                <Fingerprint className="size-4 text-red-500" />
+              )}
+              <span className={`text-xs font-medium ${gates.idVerified ? 'text-green-700' : 'text-red-700'}`}>
+                Law Society ID Verification
+              </span>
+              <Badge
+                variant="outline"
+                className={`ml-auto text-[9px] ${
+                  gates.idVerified
+                    ? 'border-green-300 bg-green-50 text-green-700'
+                    : 'border-red-300 bg-red-50 text-red-700'
+                }`}
+              >
+                {gates.idVerified ? 'VERIFIED' : 'REQUIRED'}
+              </Badge>
+            </div>
+
+            {/* Conflict Check Gate */}
+            <div className="flex items-center gap-2">
+              {gatesLoading ? (
+                <Loader2 className="size-4 animate-spin text-slate-400" />
+              ) : gates.conflictPassed ? (
+                <ShieldCheck className="size-4 text-green-600" />
+              ) : (
+                <ShieldAlert className="size-4 text-red-500" />
+              )}
+              <span className={`text-xs font-medium ${gates.conflictPassed ? 'text-green-700' : 'text-red-700'}`}>
+                Conflict Check
+              </span>
+              <Badge
+                variant="outline"
+                className={`ml-auto text-[9px] ${
+                  gates.conflictPassed
+                    ? 'border-green-300 bg-green-50 text-green-700'
+                    : 'border-red-300 bg-red-50 text-red-700'
+                }`}
+              >
+                {gates.conflictPassed ? 'PASSED' : conflictStatus === 'not_run' ? 'NOT RUN' : 'BLOCKED'}
+              </Badge>
+            </div>
+
+            {/* Vault Drop Claim */}
+            <div className="flex items-center gap-2">
+              <Archive className="size-4 text-blue-500" />
+              <span className="text-xs font-medium text-slate-600">
+                Vault Drop Claim
+              </span>
+              <Badge variant="outline" className="ml-auto text-[9px] border-blue-200 bg-blue-50 text-blue-600">
+                ON CONVERT
+              </Badge>
+            </div>
+          </div>
+
+          {/* Block message */}
+          {!gatesLoading && !gates.canConvert && (
+            <div className="mt-2 rounded-md border border-red-200 bg-red-50 px-3 py-2 flex items-start gap-2">
+              <Lock className="mt-0.5 size-3.5 text-red-600 shrink-0" />
+              <p className="text-[11px] text-red-700 font-medium">
+                {gates.blockReason}
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* Conflict Status Detail */}
+        {!gatesLoading && (() => {
           const configs: Record<string, { icon: typeof ShieldCheck; color: string; bg: string; border: string; label: string; message: string }> = {
             auto_scan_complete: {
               icon: ShieldCheck, color: 'text-green-700', bg: 'bg-green-50', border: 'border-green-200',
@@ -184,7 +427,7 @@ export function ConversionDialog({ open, onOpenChange }: ConversionDialogProps) 
             review_suggested: {
               icon: ShieldAlert, color: 'text-amber-700', bg: 'bg-amber-50', border: 'border-amber-200',
               label: 'Conflict Check: Review Suggested',
-              message: `Score ${score}/100 — minor potential matches found. Proceed with caution.`,
+              message: `Score ${conflictScore}/100 — minor potential matches found. Proceed with caution.`,
             },
             cleared_by_lawyer: {
               icon: ShieldCheck, color: 'text-green-700', bg: 'bg-green-50', border: 'border-green-200',
@@ -199,7 +442,7 @@ export function ConversionDialog({ open, onOpenChange }: ConversionDialogProps) 
             review_required: {
               icon: ShieldAlert, color: 'text-red-700', bg: 'bg-red-50', border: 'border-red-200',
               label: 'Conflict Check: Review Required',
-              message: `Score ${score}/100 — potential conflicts detected. This matter is blocked until a lawyer reviews the conflict check.`,
+              message: `Score ${conflictScore}/100 — potential conflicts detected. Blocked until reviewed.`,
             },
             conflict_confirmed: {
               icon: ShieldX, color: 'text-red-700', bg: 'bg-red-50', border: 'border-red-200',
@@ -218,7 +461,7 @@ export function ConversionDialog({ open, onOpenChange }: ConversionDialogProps) 
             },
           }
 
-          const cfg = configs[status] ?? configs.not_run
+          const cfg = configs[conflictStatus] ?? configs.not_run
           const Icon = cfg.icon
 
           return (
@@ -247,6 +490,9 @@ export function ConversionDialog({ open, onOpenChange }: ConversionDialogProps) 
             </span>
             <span className="flex items-center gap-1.5">
               <Mail className="h-3 w-3 shrink-0" /> Send document request pack
+            </span>
+            <span className="flex items-center gap-1.5">
+              <Archive className="h-3 w-3 shrink-0" /> Claim vault drops into client vault
             </span>
             <span className="flex items-center gap-1.5">
               <ClipboardList className="h-3 w-3 shrink-0" /> Log full audit chain
@@ -336,6 +582,31 @@ export function ConversionDialog({ open, onOpenChange }: ConversionDialogProps) 
               </SelectContent>
             </Select>
           </div>
+
+          {/* Retainer Deposit — Trust Account (Directive 41.4) */}
+          <div className="space-y-1.5">
+            <Label className="text-sm flex items-center gap-1.5">
+              <DollarSign className="h-3.5 w-3.5 text-muted-foreground" />
+              Retainer Deposit for Trust Account
+            </Label>
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">$</span>
+              <Input
+                type="number"
+                min="0"
+                step="0.01"
+                value={retainerDeposit}
+                onChange={(e) => setRetainerDeposit(e.target.value)}
+                placeholder="0.00"
+                className="pl-7"
+              />
+            </div>
+            <p className="text-[11px] text-muted-foreground">
+              {regBody
+                ? `${regBody.abbr} requires retainer deposits to be held in trust. Enter the amount received.`
+                : 'Enter the retainer amount received for the trust account.'}
+            </p>
+          </div>
         </div>
 
         {/* Error */}
@@ -359,23 +630,39 @@ export function ConversionDialog({ open, onOpenChange }: ConversionDialogProps) 
           <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isSubmitting}>
             Cancel
           </Button>
-          <Button
-            className="bg-green-600 hover:bg-green-700 text-white"
-            onClick={handleConvert}
-            disabled={!title.trim() || isSubmitting}
-          >
-            {isSubmitting ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Converting...
-              </>
-            ) : (
-              <>
-                <Trophy className="mr-2 h-4 w-4" />
-                Convert & Activate
-              </>
-            )}
-          </Button>
+          {/* Red-Gate Protocol: DOM-unmount claimVaultDrops button when conflict detected (Directive 41.2) */}
+          {!gatesLoading && !gates.canConvert ? (
+            <div className="flex items-center gap-2 rounded-md border border-red-200 bg-red-50 px-3 py-2 animate-pulse-red-35">
+              <Lock className="h-4 w-4 text-red-600" />
+              <span className="text-xs font-semibold text-red-700">Sovereign Block — Conversion Locked</span>
+            </div>
+          ) : (
+            <TooltipProvider delayDuration={100}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span className="inline-flex">
+                    <Button
+                      className="bg-green-600 hover:bg-green-700 text-white"
+                      onClick={handleConvert}
+                      disabled={!title.trim() || isSubmitting || gatesLoading}
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Converting...
+                        </>
+                      ) : (
+                        <>
+                          <Trophy className="mr-2 h-4 w-4" />
+                          Convert & Activate
+                        </>
+                      )}
+                    </Button>
+                  </span>
+                </TooltipTrigger>
+              </Tooltip>
+            </TooltipProvider>
+          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>

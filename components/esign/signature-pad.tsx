@@ -177,6 +177,7 @@ function DrawMode({
       <div className="relative border border-slate-300 rounded-lg overflow-hidden bg-white">
         <canvas
           ref={canvasRef}
+          data-signature-pad
           style={{ width: '100%', height: `${CANVAS_HEIGHT}px` }}
           className={`touch-none ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-crosshair'}`}
           onMouseDown={startDrawing}

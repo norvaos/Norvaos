@@ -135,7 +135,7 @@ export function FormPacksGateSection({
               <Lock className="h-5 w-5 text-slate-400 shrink-0" />
               <div>
                 <p className="text-sm font-medium text-slate-700">
-                  Form Packs & Drafting
+                  Norva Submission Engine
                 </p>
                 <p className="text-xs text-slate-500 mt-0.5">
                   Reach {threshold}% readiness to unlock form generation.
@@ -196,7 +196,7 @@ export function FormPacksGateSection({
       <div className="rounded-lg border bg-card">
         <div className="flex items-center gap-2 px-4 py-2.5 border-b">
           <Unlock className="h-4 w-4 text-green-600" />
-          <span className="text-sm font-medium">Form Packs & Drafting</span>
+          <span className="text-sm font-medium">Norva Submission Engine</span>
           <Badge variant="outline" className="text-[10px] border-green-300 text-green-700 bg-green-50 ml-1">
             UNLOCKED
           </Badge>

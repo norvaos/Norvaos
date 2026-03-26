@@ -38,6 +38,7 @@ import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import { createClient } from '@/lib/supabase/client'
+import { NorvaWhisper } from '@/components/ui/norva-whisper'
 import { useStageTransitionLog } from '@/lib/queries/stage-transitions'
 import { useUIStore } from '@/lib/stores/ui-store'
 import type { StageTransitionWithUser } from '@/lib/queries/stage-transitions'
@@ -356,8 +357,9 @@ export function ZoneE({ matterId, tenantId: _tenantId }: ZoneEProps) {
         <div className="flex items-center gap-1.5">
           <History className="h-3 w-3 text-muted-foreground" />
           <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-            Audit Rail
+            Norva Vault
           </span>
+          <NorvaWhisper contentKey="vault.audit" side="bottom" />
         </div>
         <button
           type="button"
@@ -377,7 +379,7 @@ export function ZoneE({ matterId, tenantId: _tenantId }: ZoneEProps) {
           <div className="px-3 py-1.5 bg-muted/40 flex items-center gap-1.5">
             <History className="h-2.5 w-2.5 text-muted-foreground" />
             <span className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">
-              Stage History
+              Norva Vault — Stage History
             </span>
           </div>
 
@@ -425,7 +427,7 @@ export function ZoneE({ matterId, tenantId: _tenantId }: ZoneEProps) {
           <div className="px-3 py-1.5 bg-muted/40 flex items-center gap-1.5">
             <Activity className="h-2.5 w-2.5 text-muted-foreground" />
             <span className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">
-              Activity Feed
+              Norva Timeline
             </span>
           </div>
 

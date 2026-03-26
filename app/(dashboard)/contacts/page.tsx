@@ -3,8 +3,12 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useTenant } from '@/lib/hooks/use-tenant'
-import { useContacts } from '@/lib/queries/contacts'
+import { useI18n } from '@/lib/i18n/i18n-provider'
+import { useQueryClient } from '@tanstack/react-query'
+import { useContacts, contactKeys, CONTACT_DETAIL_COLUMNS } from '@/lib/queries/contacts'
+import { createClient } from '@/lib/supabase/client'
 import { CONTACT_SOURCES, CONTACT_TYPES } from '@/lib/utils/constants'
+import { ClassificationBadge } from '@/components/contacts/classification-badge'
 import { formatDate, formatPhoneNumber, formatFullName, formatInitials } from '@/lib/utils/formatters'
 import { ContactCreateDialog } from '@/components/contacts/contact-create-dialog'
 import { EmptyState } from '@/components/shared/empty-state'
@@ -58,24 +62,26 @@ import {
 interface ColumnDef {
   id: string
   label: string
+  labelKey: string
   sortField?: string
   defaultVisible: boolean
   minWidth?: string
 }
 
 const COLUMNS: ColumnDef[] = [
-  { id: 'name', label: 'Name', sortField: 'name', defaultVisible: true },
-  { id: 'email', label: 'Email', sortField: 'email_primary', defaultVisible: true },
-  { id: 'phone', label: 'Phone', sortField: 'phone_primary', defaultVisible: true },
-  { id: 'type', label: 'Type', defaultVisible: true },
-  { id: 'source', label: 'Source', sortField: 'source', defaultVisible: true },
-  { id: 'created', label: 'Created', sortField: 'created_at', defaultVisible: true },
-  { id: 'last_contacted', label: 'Last Contacted', sortField: 'last_contacted_at', defaultVisible: false },
-  { id: 'location', label: 'Location', defaultVisible: false },
-  { id: 'job_title', label: 'Job Title', defaultVisible: false },
+  { id: 'name', label: 'Name', labelKey: 'contacts.col_name', sortField: 'name', defaultVisible: true },
+  { id: 'email', label: 'Email', labelKey: 'contacts.col_email', sortField: 'email_primary', defaultVisible: true },
+  { id: 'phone', label: 'Phone', labelKey: 'contacts.col_phone', sortField: 'phone_primary', defaultVisible: true },
+  { id: 'type', label: 'Type', labelKey: 'contacts.col_type', defaultVisible: true },
+  { id: 'classification', label: 'Classification', labelKey: 'contacts.col_classification', sortField: 'client_status', defaultVisible: true },
+  { id: 'source', label: 'Source', labelKey: 'contacts.col_source', sortField: 'source', defaultVisible: true },
+  { id: 'created', label: 'Created', labelKey: 'contacts.col_created', sortField: 'created_at', defaultVisible: true },
+  { id: 'last_contacted', label: 'Last Contacted', labelKey: 'contacts.col_last_contacted', sortField: 'last_contacted_at', defaultVisible: false },
+  { id: 'location', label: 'Location', labelKey: 'contacts.col_location', defaultVisible: false },
+  { id: 'job_title', label: 'Job Title', labelKey: 'contacts.col_job_title', defaultVisible: false },
 ]
 
-const STORAGE_KEY = 'lexcrm:contacts:visible-columns'
+const STORAGE_KEY = 'norvaos:contacts:visible-columns'
 
 function loadVisibleColumns(): Set<string> {
   if (typeof window === 'undefined') return new Set(COLUMNS.filter((c) => c.defaultVisible).map((c) => c.id))
@@ -99,8 +105,11 @@ function mapSortField(field: SortField): string {
 
 export default function ContactsPage() {
   const router = useRouter()
+  const queryClient = useQueryClient()
   const { tenant } = useTenant()
+  const { t } = useI18n()
 
+  const prefetchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [search, setSearch] = useState('')
   const [debouncedSearch, setDebouncedSearch] = useState('')
   const [contactType, setContactType] = useState<string>('')
@@ -238,14 +247,14 @@ export default function ContactsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-900">Contacts</h1>
+          <h1 className="text-2xl font-semibold text-slate-900">{t('nav.contacts')}</h1>
           <p className="mt-1 text-sm text-slate-500">
-            Manage your clients, organisations, and other contacts.
+            {t('contacts.subtitle' as any)}
           </p>
         </div>
         <Button onClick={() => setCreateOpen(true)}>
           <Plus className="mr-2 size-4" />
-          Add Contact
+          {t('dashboard.new_contact')}
         </Button>
       </div>
 
@@ -254,7 +263,7 @@ export default function ContactsPage() {
         <div className="relative flex-1 min-w-[240px] max-w-md">
           <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
-            placeholder="Search contacts..."
+            placeholder={t('common.search')}
             value={search}
             onChange={(e) => handleSearchChange(e.target.value)}
             className="pl-9"
@@ -269,13 +278,13 @@ export default function ContactsPage() {
           }}
         >
           <SelectTrigger className="w-[160px]">
-            <SelectValue placeholder="All types" />
+            <SelectValue placeholder={t('contacts.all_types' as any)} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All types</SelectItem>
-            {CONTACT_TYPES.map((t) => (
-              <SelectItem key={t.value} value={t.value}>
-                {t.label}
+            <SelectItem value="all">{t('contacts.all_types' as any)}</SelectItem>
+            {CONTACT_TYPES.map((ct) => (
+              <SelectItem key={ct.value} value={ct.value}>
+                {ct.label}
               </SelectItem>
             ))}
           </SelectContent>
@@ -289,10 +298,10 @@ export default function ContactsPage() {
           }}
         >
           <SelectTrigger className="w-[160px]">
-            <SelectValue placeholder="All sources" />
+            <SelectValue placeholder={t('contacts.all_sources' as any)} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All sources</SelectItem>
+            <SelectItem value="all">{t('contacts.all_sources' as any)}</SelectItem>
             {CONTACT_SOURCES.map((s) => (
               <SelectItem key={s} value={s}>
                 {s}
@@ -304,7 +313,7 @@ export default function ContactsPage() {
         {hasFilters && (
           <Button variant="ghost" size="sm" onClick={clearFilters}>
             <X className="mr-1 size-3.5" />
-            Clear filters
+            {t('contacts.clear_filters' as any)}
           </Button>
         )}
 
@@ -313,11 +322,11 @@ export default function ContactsPage() {
           <DropdownMenuTrigger asChild>
             <Button variant="outline" size="sm" className="ml-auto">
               <SlidersHorizontal className="mr-1.5 size-3.5" />
-              Columns
+              {t('contacts.columns' as any)}
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-48">
-            <DropdownMenuLabel>Toggle columns</DropdownMenuLabel>
+            <DropdownMenuLabel>{t('contacts.toggle_columns' as any)}</DropdownMenuLabel>
             <DropdownMenuSeparator />
             {COLUMNS.map((col) => (
               <DropdownMenuCheckboxItem
@@ -326,7 +335,7 @@ export default function ContactsPage() {
                 onCheckedChange={() => toggleColumn(col.id)}
                 disabled={col.id === 'name'}
               >
-                {col.label}
+                {t(col.labelKey as any, col.label)}
               </DropdownMenuCheckboxItem>
             ))}
           </DropdownMenuContent>
@@ -336,10 +345,10 @@ export default function ContactsPage() {
       {/* Results count */}
       {!isLoading && (
         <div className="text-sm text-muted-foreground">
-          {totalCount} {totalCount === 1 ? 'contact' : 'contacts'} found
+          {totalCount} {totalCount === 1 ? t('contacts.contact_found' as any) : t('contacts.contacts_found' as any)}
           {selectedIds.size > 0 && (
             <span className="ml-2 font-medium text-slate-700">
-              ({selectedIds.size} selected)
+              ({selectedIds.size} {t('contacts.selected' as any)})
             </span>
           )}
         </div>
@@ -351,26 +360,27 @@ export default function ContactsPage() {
           <ContactsTableSkeleton />
         ) : isError ? (
           <div className="flex flex-col items-center justify-center py-16 text-center">
-            <p className="text-sm text-destructive">Failed to load contacts. Please try again.</p>
+            <p className="text-sm text-destructive">{t('contacts.failed_load' as any)}</p>
             <Button variant="outline" size="sm" className="mt-4" onClick={() => window.location.reload()}>
-              Retry
+              {t('common.retry')}
             </Button>
           </div>
         ) : contacts.length === 0 ? (
           hasFilters ? (
             <EmptyState
               icon={Search}
-              title="No contacts found"
-              description="No contacts match your current filters. Try adjusting your search or filter criteria."
-              actionLabel="Clear filters"
+              title={t('contacts.no_found_title' as any)}
+              description={t('contacts.no_found_desc' as any)}
+              actionLabel={t('contacts.clear_filters' as any)}
               onAction={clearFilters}
             />
           ) : (
             <EmptyState
               icon={Users}
-              title="No contacts yet"
-              description="Get started by adding your first contact to the system."
-              actionLabel="Add Contact"
+              title={t('contacts.no_yet_title' as any)}
+              description={t('contacts.no_yet_desc' as any)}
+              quickHint={t('contacts.no_yet_hint' as any)}
+              actionLabel={t('contacts.add_contact' as any)}
               onAction={() => setCreateOpen(true)}
             />
           )
@@ -395,11 +405,11 @@ export default function ContactsPage() {
                           className="flex items-center text-xs font-medium hover:text-foreground"
                           onClick={() => handleSort(col.sortField as SortField)}
                         >
-                          {col.label}
+                          {t(col.labelKey as any, col.label)}
                           <SortIcon field={col.sortField as SortField} />
                         </button>
                       ) : (
-                        <span className="text-xs font-medium">{col.label}</span>
+                        <span className="text-xs font-medium">{t(col.labelKey as any, col.label)}</span>
                       )}
                     </TableHead>
                   ))}
@@ -411,6 +421,31 @@ export default function ContactsPage() {
                     key={contact.id}
                     className="cursor-pointer hover:bg-slate-50"
                     onClick={() => router.push(`/contacts/${contact.id}`)}
+                    onMouseEnter={() => {
+                      if (prefetchTimerRef.current) clearTimeout(prefetchTimerRef.current)
+                      prefetchTimerRef.current = setTimeout(() => {
+                        router.prefetch(`/contacts/${contact.id}`)
+                        queryClient.prefetchQuery({
+                          queryKey: contactKeys.detail(contact.id),
+                          queryFn: async () => {
+                            const supabase = createClient()
+                            const { data } = await supabase
+                              .from('contacts')
+                              .select(CONTACT_DETAIL_COLUMNS)
+                              .eq('id', contact.id)
+                              .single()
+                            return data
+                          },
+                          staleTime: 1000 * 60 * 2,
+                        })
+                      }, 80)
+                    }}
+                    onMouseLeave={() => {
+                      if (prefetchTimerRef.current) {
+                        clearTimeout(prefetchTimerRef.current)
+                        prefetchTimerRef.current = null
+                      }
+                    }}
                   >
                     <TableCell onClick={(e) => e.stopPropagation()}>
                       <Checkbox
@@ -467,9 +502,12 @@ export default function ContactsPage() {
                               <User className="size-3" />
                             )}
                             {contact.contact_type === 'organization'
-                              ? 'Organisation'
-                              : 'Individual'}
+                              ? t('contacts.organisation' as any)
+                              : t('contacts.individual' as any)}
                           </Badge>
+                        )}
+                        {col.id === 'classification' && (
+                          <ClassificationBadge status={(contact as any).client_status ?? 'lead'} className="text-xs" />
                         )}
                         {col.id === 'source' && (
                           <span>{contact.source ?? '-'}</span>
@@ -501,7 +539,7 @@ export default function ContactsPage() {
             {totalPages > 1 && (
               <div className="flex items-center justify-between border-t px-4 py-3">
                 <p className="text-sm text-muted-foreground">
-                  Page {page} of {totalPages}
+                  {t('contacts.page_of' as any).replace('{{page}}', String(page)).replace('{{total}}', String(totalPages))}
                 </p>
                 <div className="flex items-center gap-2">
                   <Button
@@ -511,7 +549,7 @@ export default function ContactsPage() {
                     onClick={() => setPage((p) => Math.max(1, p - 1))}
                   >
                     <ChevronLeft className="mr-1 size-4" />
-                    Previous
+                    {t('common.previous' as any)}
                   </Button>
                   <Button
                     variant="outline"
@@ -519,7 +557,7 @@ export default function ContactsPage() {
                     disabled={page >= totalPages}
                     onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                   >
-                    Next
+                    {t('common.next')}
                     <ChevronRight className="ml-1 size-4" />
                   </Button>
                 </div>

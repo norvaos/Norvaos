@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient, QueryClient } from '@tanstack/react-query'
 import { createClient } from '@/lib/supabase/client'
 import type { Database } from '@/lib/types/database'
 import { createTaskNotification } from '@/lib/queries/notifications'
@@ -400,5 +400,48 @@ export function useDeleteTask() {
     onError: () => {
       toast.error('Failed to delete task')
     },
+  })
+}
+
+/**
+ * Prefetch tasks for a specific matter into the query cache.
+ * Call this on hover / route prefetch to warm the cache before navigation.
+ */
+export function prefetchMatterTasks(queryClient: QueryClient, matterId: string, tenantId: string) {
+  const params: TaskListParams = {
+    tenantId,
+    matterId,
+    page: 1,
+    pageSize: 50,
+    sortBy: 'due_date',
+    sortDirection: 'asc',
+    showCompleted: true,
+  }
+
+  return queryClient.prefetchQuery({
+    queryKey: taskKeys.list(params),
+    queryFn: async () => {
+      const supabase = createClient()
+
+      const { data, error, count } = await supabase
+        .from('tasks')
+        .select(TASK_LIST_COLUMNS, { count: 'exact' })
+        .eq('tenant_id', tenantId)
+        .eq('is_deleted', false)
+        .eq('matter_id', matterId)
+        .order('due_date', { ascending: true, nullsFirst: false })
+        .range(0, 49)
+
+      if (error) throw error
+
+      return {
+        tasks: data as Task[],
+        totalCount: count ?? 0,
+        page: 1,
+        pageSize: 50,
+        totalPages: Math.ceil((count ?? 0) / 50),
+      }
+    },
+    staleTime: 1000 * 60,
   })
 }

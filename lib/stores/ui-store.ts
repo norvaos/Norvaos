@@ -24,7 +24,9 @@ interface UIState {
 
   // Command palette
   commandPaletteOpen: boolean
+  commandPaletteInitialQuery: string | null
   setCommandPaletteOpen: (open: boolean) => void
+  openCommandPaletteWith: (query: string) => void
 
   // View preferences
   viewPreferences: Record<string, 'table' | 'kanban' | 'calendar' | 'timeline' | 'week' | '3day' | 'day'>
@@ -65,7 +67,9 @@ export const useUIStore = create<UIState>()(
 
       // Command palette
       commandPaletteOpen: false,
-      setCommandPaletteOpen: (open) => set({ commandPaletteOpen: open }),
+      commandPaletteInitialQuery: null,
+      setCommandPaletteOpen: (open) => set({ commandPaletteOpen: open, commandPaletteInitialQuery: open ? null : null }),
+      openCommandPaletteWith: (query) => set({ commandPaletteOpen: true, commandPaletteInitialQuery: query }),
 
       // View preferences
       viewPreferences: {

@@ -62,6 +62,11 @@ import {
 } from './pdf-utils'
 import { getPlaybook, compareImmIntakeStatus } from '@/lib/config/immigration-playbooks'
 import { IMMIGRATION_INTAKE_STATUSES } from '@/lib/utils/constants'
+import {
+  logFormGeneration,
+  logFormGenerationBlocked,
+} from '@/lib/services/sentinel-audit'
+import { encryptPdf } from './pdf-encryption'
 import { writeFile, readFile, mkdtemp, rm } from 'fs/promises'
 import { join } from 'path'
 import { tmpdir } from 'os'
@@ -84,6 +89,34 @@ export async function generateFormPack(
   supabase: SupabaseClient<Database>,
 ): Promise<GenerationResult> {
   const { tenantId, matterId, userId, packType, idempotencyKey } = params
+
+  // ── 0. SENTINEL Readiness Gate — block if score < 90% ─────────────────
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: gateResult } = await (supabase as any).rpc('sentinel_check_readiness_gate', {
+    p_matter_id: matterId,
+    p_tenant_id: tenantId,
+    p_min_score: 90,
+  })
+
+  const gate = gateResult as { allowed: boolean; score: number; focus_area: string } | null
+
+  if (gate && !gate.allowed) {
+    // Fire-and-forget sentinel log
+    logFormGenerationBlocked({
+      tenantId,
+      userId,
+      matterId,
+      formCode: packType,
+      readinessScore: gate.score,
+      reason: `Readiness score ${gate.score}% below 90% minimum. Focus area: ${gate.focus_area}`,
+    }).catch(() => {})
+
+    throw new ReadinessError(
+      [gate.focus_area],
+      [`SENTINEL: Form generation blocked. Readiness score is ${gate.score}% (minimum 90% required). Focus area: ${gate.focus_area}`],
+    )
+  }
 
   // ── 1. Resolve DB form ──────────────────────────────────────────────────
 
@@ -320,9 +353,32 @@ export async function generateFormPack(
     const fileName = `${clientPart}${matterPart}${formCode}_${today}_v${result.version_number}_DRAFT.pdf`
     const outputStoragePath = `${tenantId}/ircc-packs/${matterId}/${result.version_id}/${fileName}`
 
+    // ── 12b. SENTINEL Encrypted PDF Vault — encrypt before upload ──────────
+
+    let uploadBytes: Uint8Array = outputBytes
+    let encryptionIv: string | null = null
+
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: vaultKey } = await (supabase as any).rpc('get_or_create_vault_key', {
+        p_matter_id: matterId,
+        p_tenant_id: tenantId,
+        p_user_id: userId,
+      })
+
+      if (vaultKey) {
+        const encrypted = encryptPdf(outputBytes, vaultKey as string)
+        uploadBytes = encrypted.encryptedBytes
+        encryptionIv = encrypted.iv
+      }
+    } catch (encryptErr) {
+      // Non-blocking: if encryption fails, upload unencrypted
+      console.warn('[generate_form_pack] Vault encryption skipped:', encryptErr)
+    }
+
     const { error: uploadError } = await supabase.storage
       .from('documents')
-      .upload(outputStoragePath, outputBytes, {
+      .upload(outputStoragePath, uploadBytes, {
         contentType: 'application/pdf',
         upsert: false,
       })
@@ -331,19 +387,32 @@ export async function generateFormPack(
       throw new Error(`[generate_form_pack] Storage upload failed: ${uploadError.message}`)
     }
 
-    // ── 13. Update artifact with storage path ───────────────────────────────
+    // ── 13. Update artifact with storage path + encryption metadata ──────────
 
     const { error: updateError } = await supabase
       .from('form_pack_artifacts')
       .update({
         storage_path: outputStoragePath,
         file_name: fileName,
+        is_encrypted: !!encryptionIv,
+        encryption_iv: encryptionIv,
       })
       .eq('id', result.artifact_id)
 
     if (updateError) {
       console.error('[generate_form_pack] Failed to update artifact path:', updateError.message)
     }
+
+    // ── SENTINEL: Log successful draft generation ───────────────────────────
+    logFormGeneration({
+      tenantId,
+      userId,
+      matterId,
+      formCode,
+      versionNumber: result.version_number,
+      packType: 'draft',
+      readinessScore: gate?.score,
+    }).catch(() => {})
 
     return {
       versionId: result.version_id,
@@ -520,9 +589,31 @@ export async function generateFinalPack(
     const fileName = `${finalClientPart}${finalMatterPart}${formCode}_${finalToday}_v${version.version_number}_FINAL.pdf`
     const storagePath = `${tenantId}/ircc-packs/${version.matter_id}/${packVersionId}/${fileName}`
 
+    // ── 6b. SENTINEL Encrypted PDF Vault — encrypt final PDF ────────────────
+
+    let finalUploadBytes: Uint8Array = filledBytes
+    let finalEncryptionIv: string | null = null
+
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: vaultKey } = await (supabase as any).rpc('get_or_create_vault_key', {
+        p_matter_id: version.matter_id,
+        p_tenant_id: tenantId,
+        p_user_id: userId,
+      })
+
+      if (vaultKey) {
+        const encrypted = encryptPdf(filledBytes, vaultKey as string)
+        finalUploadBytes = encrypted.encryptedBytes
+        finalEncryptionIv = encrypted.iv
+      }
+    } catch (encryptErr) {
+      console.warn('[approve_form_pack] Vault encryption skipped:', encryptErr)
+    }
+
     const { error: uploadError } = await supabase.storage
       .from('documents')
-      .upload(storagePath, filledBytes, {
+      .upload(storagePath, finalUploadBytes, {
         contentType: 'application/pdf',
         upsert: false,
       })
@@ -544,6 +635,8 @@ export async function generateFinalPack(
         p_file_size: filledBytes.length,
         p_checksum_sha256: checksum,
         p_is_final: true,
+        p_is_encrypted: !!finalEncryptionIv,
+        p_encryption_iv: finalEncryptionIv,
       },
     )
 
@@ -580,6 +673,16 @@ export async function generateFinalPack(
       hard_errors: finalAllErrors.length > 0 ? finalAllErrors : undefined,
       barcode_status: fillResult.barcodeEmbedded ? 'embedded' : 'requires_adobe_reader',
     }
+
+    // ── SENTINEL: Log successful final generation ──────────────────────────
+    logFormGeneration({
+      tenantId,
+      userId,
+      matterId: version.matter_id,
+      formCode: packType,
+      versionNumber: version.version_number,
+      packType: 'final',
+    }).catch(() => {})
 
     return {
       versionId: packVersionId,

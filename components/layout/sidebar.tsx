@@ -15,10 +15,18 @@ import {
 import { cn } from '@/lib/utils'
 import { createClient } from '@/lib/supabase/client'
 import { navigation, type NavItem } from '@/lib/config/navigation'
+import { useI18n } from '@/lib/i18n/i18n-provider'
+import type { DictionaryKey } from '@/lib/i18n/dictionaries/en'
 import { useUIStore } from '@/lib/stores/ui-store'
 import { useUser } from '@/lib/hooks/use-user'
 import { useTenant } from '@/lib/hooks/use-tenant'
 import { useFeatureFlags } from '@/lib/hooks/use-feature-flag'
+import { usePrefetchOnHover } from '@/lib/hooks/use-prefetch-on-hover'
+import { matterKeys, MATTER_LIST_COLUMNS } from '@/lib/queries/matters'
+import { contactKeys } from '@/lib/queries/contacts'
+import { leadKeys } from '@/lib/queries/leads'
+import { taskKeys } from '@/lib/queries/tasks'
+import { IMPORT_REVERTED_STATUS } from '@/lib/utils/matter-status'
 
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -70,6 +78,8 @@ interface NavItemButtonProps {
   isCollapsed: boolean
   featureFlags: Record<string, boolean>
   onClick?: () => void
+  onMouseEnter?: () => void
+  onMouseLeave?: () => void
 }
 
 function NavItemButton({
@@ -78,8 +88,12 @@ function NavItemButton({
   isCollapsed,
   featureFlags,
   onClick,
+  onMouseEnter,
+  onMouseLeave,
 }: NavItemButtonProps) {
+  const { t } = useI18n()
   const Icon = item.icon
+  const label = item.labelKey ? t(item.labelKey as DictionaryKey, item.title) : item.title
 
   // If the item has a feature flag requirement, check whether the flag is
   // enabled for the current tenant. Hidden items are not rendered at all.
@@ -93,6 +107,8 @@ function NavItemButton({
     <Link
       href={href}
       onClick={onClick}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
       className={cn(
         'group relative flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-sm font-medium transition-colours',
         isActive
@@ -108,7 +124,7 @@ function NavItemButton({
 
       {!isCollapsed && (
         <span className="truncate transition-opacity duration-200">
-          {item.title}
+          {label}
         </span>
       )}
 
@@ -132,7 +148,7 @@ function NavItemButton({
         <TooltipTrigger asChild>{content}</TooltipTrigger>
         <TooltipContent side="right" sideOffset={8}>
           <span className="flex items-center gap-1.5">
-            {item.title}
+            {label}
             {item.comingSoon && <Lock className="size-3" />}
           </span>
         </TooltipContent>
@@ -155,8 +171,10 @@ interface NavDropdownProps {
 }
 
 function NavDropdown({ item, pathname, isCollapsed, featureFlags }: NavDropdownProps) {
+  const { t } = useI18n()
   const Icon = item.icon
   const children = item.children ?? []
+  const label = item.labelKey ? t(item.labelKey as DictionaryKey, item.title) : item.title
 
   // Auto-open when any child is active
   const anyChildActive = children.some((child) => isNavItemActive(child.href, pathname))
@@ -183,10 +201,11 @@ function NavDropdown({ item, pathname, isCollapsed, featureFlags }: NavDropdownP
           </button>
         </TooltipTrigger>
         <TooltipContent side="right" sideOffset={8} className="flex flex-col gap-1 p-2">
-          <span className="mb-1 text-xs font-medium text-muted-foreground">{item.title}</span>
+          <span className="mb-1 text-xs font-medium text-muted-foreground">{label}</span>
           {children.map((child) => {
             const ChildIcon = child.icon
             const active = isNavItemActive(child.href, pathname)
+            const childLabel = child.labelKey ? t(child.labelKey as DictionaryKey, child.title) : child.title
             return (
               <Link
                 key={child.href}
@@ -197,7 +216,7 @@ function NavDropdown({ item, pathname, isCollapsed, featureFlags }: NavDropdownP
                 )}
               >
                 <ChildIcon className="size-3.5" />
-                {child.title}
+                {childLabel}
               </Link>
             )
           })}
@@ -222,7 +241,7 @@ function NavDropdown({ item, pathname, isCollapsed, featureFlags }: NavDropdownP
         <span className="flex size-5 shrink-0 items-center justify-center">
           <Icon className="size-5" />
         </span>
-        <span className="truncate">{item.title}</span>
+        <span className="truncate">{label}</span>
         <ChevronDown
           className={cn(
             'ml-auto size-4 shrink-0 transition-transform duration-200',
@@ -249,12 +268,149 @@ function NavDropdown({ item, pathname, isCollapsed, featureFlags }: NavDropdownP
 }
 
 // ---------------------------------------------------------------------------
+// Data prefetch helpers — warm the TanStack Query cache on hover
+// ---------------------------------------------------------------------------
+
+type PrefetchFn = (queryClient: ReturnType<typeof import('@tanstack/react-query').useQueryClient>) => void
+
+/** Routes that benefit from TanStack Query cache warming on hover. */
+const DATA_PREFETCH_ROUTES = new Set(['/matters', '/contacts', '/leads', '/tasks'])
+
+/**
+ * Builds a prefetchFn for a given nav href + tenantId.
+ * Returns undefined for routes that don't benefit from data prefetching.
+ */
+function buildPrefetchFn(href: string, tenantId: string): PrefetchFn | undefined {
+  const defaultParams = { tenantId }
+  const staleTime = 1000 * 60 * 2 // 2 min — avoid re-fetching if data is fresh
+
+  switch (href) {
+    case '/matters':
+      return (qc) => {
+        const params = { ...defaultParams, page: 1, pageSize: 25, sortBy: 'created_at', sortDirection: 'desc' as const }
+        qc.prefetchQuery({
+          queryKey: matterKeys.list(params),
+          queryFn: async () => {
+            const supabase = createClient()
+            const { data, count, error } = await supabase
+              .from('matters')
+              .select(MATTER_LIST_COLUMNS, { count: 'exact' })
+              .eq('tenant_id', tenantId)
+              .neq('status', 'archived')
+              .neq('status', IMPORT_REVERTED_STATUS)
+              .order('created_at', { ascending: false })
+              .range(0, 24)
+            if (error) throw error
+            return { matters: data, totalCount: count ?? 0, page: 1, pageSize: 25, totalPages: Math.ceil((count ?? 0) / 25) }
+          },
+          staleTime,
+        })
+      }
+    case '/contacts':
+      return (qc) => {
+        const params = { ...defaultParams, page: 1, pageSize: 25, sortBy: 'created_at', sortDirection: 'desc' as const }
+        qc.prefetchQuery({
+          queryKey: contactKeys.list(params),
+          queryFn: async () => {
+            const supabase = createClient()
+            const { data, count, error } = await supabase
+              .from('contacts')
+              .select('id, tenant_id, first_name, last_name, email_primary, phone_primary, contact_type, source, organization_name, is_archived, created_at, created_by, preferred_name, job_title, city, province_state, country, last_contacted_at', { count: 'exact' })
+              .eq('tenant_id', tenantId)
+              .eq('is_archived', false)
+              .order('created_at', { ascending: false })
+              .range(0, 24)
+            if (error) throw error
+            return { contacts: data, totalCount: count ?? 0, page: 1, pageSize: 25, totalPages: Math.ceil((count ?? 0) / 25) }
+          },
+          staleTime,
+        })
+      }
+    case '/leads':
+      return (qc) => {
+        const params = { ...defaultParams, page: 1, pageSize: 50, status: 'open', sortBy: 'created_at', sortDirection: 'desc' as const }
+        qc.prefetchQuery({
+          queryKey: leadKeys.list(params),
+          queryFn: async () => {
+            const supabase = createClient()
+            const { data, count, error } = await supabase
+              .from('leads')
+              .select('id, tenant_id, contact_id, pipeline_id, stage_id, assigned_to, practice_area_id, status, temperature, source, estimated_value, next_follow_up, notes, stage_entered_at, created_at, updated_at', { count: 'exact' })
+              .eq('tenant_id', tenantId)
+              .eq('status', 'open')
+              .order('created_at', { ascending: false })
+              .range(0, 49)
+            if (error) throw error
+            return { leads: data, totalCount: count ?? 0, page: 1, pageSize: 50, totalPages: Math.ceil((count ?? 0) / 50) }
+          },
+          staleTime,
+        })
+      }
+    case '/tasks':
+      return (qc) => {
+        const params = { ...defaultParams, page: 1, pageSize: 50, showCompleted: true, sortBy: 'due_date', sortDirection: 'asc' as const }
+        qc.prefetchQuery({
+          queryKey: taskKeys.list(params),
+          queryFn: async () => {
+            const supabase = createClient()
+            const { data, count, error } = await supabase
+              .from('tasks')
+              .select('id, tenant_id, title, status, priority, due_date, due_time, assigned_to, matter_id, contact_id, created_at, task_type, category, is_billable, completed_at, is_deleted, parent_task_id, estimated_minutes', { count: 'exact' })
+              .eq('tenant_id', tenantId)
+              .eq('is_deleted', false)
+              .order('due_date', { ascending: true, nullsFirst: false })
+              .range(0, 49)
+            if (error) throw error
+            return { tasks: data, totalCount: count ?? 0, page: 1, pageSize: 50, totalPages: Math.ceil((count ?? 0) / 50) }
+          },
+          staleTime,
+        })
+      }
+    default:
+      return undefined
+  }
+}
+
+/**
+ * Wrapper around NavItemButton that adds TanStack Query data prefetching
+ * via usePrefetchOnHover. Used for data-heavy nav items (matters, contacts,
+ * leads, tasks) so the query cache is warm before the user navigates.
+ */
+function NavItemWithDataPrefetch({
+  tenantId,
+  routerPrefetch,
+  ...props
+}: NavItemButtonProps & { tenantId: string; routerPrefetch: () => void }) {
+  const href = props.item.href
+  const prefetchFn = useCallback<PrefetchFn>(
+    (qc) => {
+      const fn = buildPrefetchFn(href, tenantId)
+      fn?.(qc)
+    },
+    [href, tenantId]
+  )
+  const { onMouseEnter, onMouseLeave } = usePrefetchOnHover(prefetchFn)
+
+  return (
+    <NavItemButton
+      {...props}
+      onMouseEnter={() => {
+        routerPrefetch()
+        onMouseEnter()
+      }}
+      onMouseLeave={onMouseLeave}
+    />
+  )
+}
+
+// ---------------------------------------------------------------------------
 // Sidebar
 // ---------------------------------------------------------------------------
 
 export function Sidebar() {
   const pathname = usePathname()
   const router = useRouter()
+  const { t } = useI18n()
 
   const sidebarCollapsed = useUIStore((s) => s.sidebarCollapsed)
   const toggleSidebar = useUIStore((s) => s.toggleSidebar)
@@ -267,6 +423,14 @@ export function Sidebar() {
     await fetch('/auth/signout', { method: 'POST' })
     window.location.href = '/'
   }, [])
+
+  /** Prefetch the Next.js page bundle + server data on hover */
+  const handleNavPrefetch = useCallback(
+    (href: string) => {
+      router.prefetch(href)
+    },
+    [router]
+  )
 
   return (
     <TooltipProvider delayDuration={100}>
@@ -311,7 +475,7 @@ export function Sidebar() {
                   'size-8 shrink-0',
                   sidebarCollapsed && 'mx-auto'
                 )}
-                aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+                aria-label={sidebarCollapsed ? t('nav.expand_sidebar', 'Expand sidebar') : t('nav.collapse_sidebar', 'Collapse sidebar')}
               >
                 {sidebarCollapsed ? (
                   <ChevronRight className="size-4" />
@@ -321,7 +485,7 @@ export function Sidebar() {
               </Button>
             </TooltipTrigger>
             <TooltipContent side="right" sideOffset={8}>
-              {sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+              {sidebarCollapsed ? t('nav.expand_sidebar', 'Expand sidebar') : t('nav.collapse_sidebar', 'Collapse sidebar')}
             </TooltipContent>
           </Tooltip>
         </div>
@@ -350,29 +514,48 @@ export function Sidebar() {
                   {/* Section title -- hidden when collapsed */}
                   {!sidebarCollapsed && (
                     <span className="mb-0.5 px-2.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/50">
-                      {section.title}
+                      {section.labelKey ? t(section.labelKey as DictionaryKey, section.title) : section.title}
                     </span>
                   )}
 
-                  {visibleItems.map((item) =>
-                    item.children && item.children.length > 0 ? (
-                      <NavDropdown
-                        key={item.title}
-                        item={item}
-                        pathname={pathname}
-                        isCollapsed={sidebarCollapsed}
-                        featureFlags={featureFlags}
-                      />
-                    ) : (
+                  {visibleItems.map((item) => {
+                    if (item.children && item.children.length > 0) {
+                      return (
+                        <NavDropdown
+                          key={item.title}
+                          item={item}
+                          pathname={pathname}
+                          isCollapsed={sidebarCollapsed}
+                          featureFlags={featureFlags}
+                        />
+                      )
+                    }
+
+                    if (tenant?.id && DATA_PREFETCH_ROUTES.has(item.href)) {
+                      return (
+                        <NavItemWithDataPrefetch
+                          key={item.href}
+                          item={item}
+                          isActive={isNavItemActive(item.href, pathname)}
+                          isCollapsed={sidebarCollapsed}
+                          featureFlags={featureFlags}
+                          tenantId={tenant.id}
+                          routerPrefetch={() => handleNavPrefetch(item.href)}
+                        />
+                      )
+                    }
+
+                    return (
                       <NavItemButton
                         key={item.href}
                         item={item}
                         isActive={isNavItemActive(item.href, pathname)}
                         isCollapsed={sidebarCollapsed}
                         featureFlags={featureFlags}
+                        onMouseEnter={() => handleNavPrefetch(item.href)}
                       />
                     )
-                  )}
+                  })}
                 </div>
               )
             })}
@@ -428,13 +611,13 @@ export function Sidebar() {
                     'size-8 shrink-0 text-muted-foreground hover:text-destructive',
                     sidebarCollapsed && 'mx-auto'
                   )}
-                  aria-label="Log out"
+                  aria-label={t('nav.log_out', 'Log out')}
                 >
                   <LogOut className="size-4" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent side="right" sideOffset={8}>
-                Log out
+                {t('nav.log_out', 'Log out')}
               </TooltipContent>
             </Tooltip>
           </div>

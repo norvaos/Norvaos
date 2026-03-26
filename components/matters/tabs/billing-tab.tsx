@@ -26,6 +26,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Plus, Trash2, Loader2, FileDown, CheckCircle2, Clock, AlertCircle, DollarSign, Lock } from 'lucide-react'
+import { NorvaWhisper } from '@/components/ui/norva-whisper'
 import { formatDate, formatCurrency } from '@/lib/utils/formatters'
 import { INVOICE_STATUSES, PAYMENT_METHODS } from '@/lib/utils/constants'
 import {
@@ -44,6 +45,7 @@ import {
   useRecordMatterRetainerPayment,
   type MatterRetainerSummary,
 } from '@/lib/queries/invoicing'
+import { GovernmentDisbursementCard } from '@/components/trust/government-disbursement-card'
 import type { Database } from '@/lib/types/database'
 
 type MatterRow = Database['public']['Tables']['matters']['Row']
@@ -104,7 +106,10 @@ function RetainerAgreementCard({ matterId }: { matterId: string }) {
       <Card className="border-blue-200 bg-blue-50/30">
         <CardHeader className="pb-2 flex flex-row items-center justify-between">
           <div className="flex items-center gap-2">
-            <CardTitle className="text-sm font-semibold">Retainer Agreement</CardTitle>
+            <CardTitle className="text-sm font-semibold">
+              Retainer Agreement
+              <NorvaWhisper contentKey="ledger.retainer" />
+            </CardTitle>
             <span
               className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-medium ${statusBadge.cls}`}
             >
@@ -409,6 +414,9 @@ export function BillingTab({ matterId, tenantId, matter }: { matterId: string; t
 
       {/* Retainer Agreement (fee breakdown from signing) */}
       <RetainerAgreementCard matterId={matterId} />
+
+      {/* Government Fee Disbursement */}
+      <GovernmentDisbursementCard matterId={matterId} />
 
       {/* Summary Cards */}
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">

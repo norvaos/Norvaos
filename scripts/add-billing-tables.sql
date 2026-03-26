@@ -1,4 +1,4 @@
--- Add billing / subscription tables for LexCRM
+-- Add billing / subscription tables for NorvaOS
 -- Run this in Supabase SQL Editor
 
 -- =========================================================================

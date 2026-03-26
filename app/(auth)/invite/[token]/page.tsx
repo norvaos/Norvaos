@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { toast } from 'sonner'
+import { norvaToast } from '@/lib/utils/norva-branding'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -85,7 +86,7 @@ export default function AcceptInvitePage() {
             `This firm has reached its seat limit (${data.active_user_count}/${data.max_users} active users). Please ask your administrator to increase the limit or deactivate an existing user.`
           )
         } else {
-          toast.error('Failed to accept invitation', { description: data.error })
+          norvaToast('invite_failed', data.error)
         }
         return
       }
@@ -94,7 +95,7 @@ export default function AcceptInvitePage() {
       toast.success('Account created successfully!')
       setTimeout(() => router.push('/login'), 2000)
     } catch {
-      toast.error('An unexpected error occurred')
+      norvaToast('invite_failed')
     } finally {
       setIsSubmitting(false)
     }

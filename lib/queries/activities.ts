@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient, QueryClient } from '@tanstack/react-query'
 import { createClient } from '@/lib/supabase/client'
 import type { Database } from '@/lib/types/database'
 import { toast } from 'sonner'
@@ -119,6 +119,26 @@ export function useConditionErrors(matterId: string | undefined) {
     },
     enabled: !!matterId,
     staleTime: 2 * 60 * 1000, // 2 minutes — don't re-poll too aggressively
+  })
+}
+
+export function prefetchActivities(queryClient: QueryClient, matterId: string) {
+  return queryClient.prefetchQuery({
+    queryKey: activityKeys.byMatter(matterId),
+    queryFn: async () => {
+      const supabase = createClient()
+
+      const { data, error } = await supabase
+        .from('activities')
+        .select('*')
+        .eq('matter_id', matterId)
+        .order('created_at', { ascending: false })
+        .limit(50)
+
+      if (error) throw error
+      return data as Activity[]
+    },
+    staleTime: 1000 * 60,
   })
 }
 

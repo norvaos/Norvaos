@@ -181,3 +181,279 @@
   }
 }
 
+/* ── Norva Gold-Pulse Animation ────────────────────────────────────────────── */
+@keyframes gold-pulse {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.05); }
+}
+
+/* ── Red-35 Pulse — Directive 41.2 Conflict Alert ─────────────────────────── */
+@keyframes pulse-red-35 {
+  0%, 100% { opacity: 0.35; box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+  50% { opacity: 1; box-shadow: 0 0 12px 4px rgba(239, 68, 68, 0.25); }
+}
+
+.animate-pulse-red-35 {
+  animation: pulse-red-35 1.5s ease-in-out infinite;
+}
+
+/* ── IRON-CANVAS: Directive 25.0 — Layout Drift Prevention ───────────────── */
+
+/*
+ * 1. Recursive-RTL Cascade
+ * When dir="rtl" is set on <html>, ensure the ENTIRE visual stack honours it.
+ * No LTR "leak" from nested components, tooltips, or popovers.
+ */
+html[dir="rtl"] {
+  /* Force RTL text alignment cascade */
+  text-align: right;
+}
+
+html[dir="rtl"] [data-radix-popper-content-wrapper],
+html[dir="rtl"] [role="tooltip"],
+html[dir="rtl"] [role="dialog"],
+html[dir="rtl"] [data-side] {
+  direction: rtl;
+  text-align: right;
+}
+
+/* Flex containers auto-reverse in RTL */
+html[dir="rtl"] .flex-row { flex-direction: row-reverse; }
+html[dir="rtl"] .flex-row-reverse { flex-direction: row; }
+
+/* Margin/padding logical overrides for RTL */
+html[dir="rtl"] .ml-auto { margin-left: 0; margin-right: auto; }
+html[dir="rtl"] .mr-auto { margin-right: 0; margin-left: auto; }
+
+/* Sidebar stays LTR-positioned even in RTL (admin shell is always en/fr) */
+html[dir="rtl"] [data-sidebar] {
+  direction: ltr;
+}
+
+/* Portal and intake forms: full RTL cascade */
+html[dir="rtl"] .portal-force-light,
+html[dir="rtl"] [data-intake-portal] {
+  direction: rtl;
+  text-align: right;
+}
+
+/*
+ * 2. Long-String Overflow Guard
+ * Prevents layout drift from 40%+ longer translations (German, Vietnamese, French legal terms).
+ * Applied to all header labels, badge text, and metric displays.
+ */
+.iron-canvas-guard {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+/* Tooltip on hover for truncated text */
+.iron-canvas-guard[title]:hover {
+  cursor: help;
+}
+
+/* Badge overflow guard — prevent badges from breaking layout */
+html[dir="rtl"] [class*="Badge"],
+html[dir="rtl"] [data-slot="badge"] {
+  direction: inherit;
+  unicode-bidi: plaintext;
+}
+
+/*
+ * 2b. Nastaliq Script Containment — Directive 25.0 + 32.0 Stress-Test
+ * Urdu Nastaliq / Farsi Naskh have ~2.0 line-height vs Latin 1.5.
+ * Without explicit height caps, Nastaliq pushes Action Trident off-screen.
+ * Zero-overflow guarantee on mobile viewports for all 15 languages.
+ */
+
+/* Nastaliq line-height normalisation (clamp at 1.8 in UI chrome) */
+[lang="ur"] .iron-canvas-guard,
+[lang="fa"] .iron-canvas-guard,
+[dir="rtl"] .iron-canvas-guard {
+  line-height: 1.6;
+}
+
+/* Nastaliq-safe containers: fixed max-height with overflow hidden */
+.nastaliq-safe-sm { max-height: 3.5rem; overflow: hidden; }
+.nastaliq-safe-md { max-height: 5rem; overflow: hidden; }
+.nastaliq-safe-lg { max-height: 8rem; overflow: hidden; }
+
+/* line-clamp height caps for Nastaliq (line-height 2.0 → 3 lines = 6em) */
+[lang="ur"] .line-clamp-3,
+[lang="fa"] .line-clamp-3 {
+  max-height: 6.5em;
+}
+
+[lang="ur"] .line-clamp-2,
+[lang="fa"] .line-clamp-2 {
+  max-height: 4.5em;
+}
+
+/*
+ * 3. Biometric Handshake Visual Lock
+ * E-sign/biometric overlays are ALWAYS centered regardless of direction.
+ * Uses logical properties so they work in both LTR and RTL.
+ */
+[data-esign-overlay],
+[data-biometric-overlay] {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  direction: ltr; /* biometric prompts always LTR-centered */
+  text-align: center;
+  z-index: 9999;
+}
+
+[data-esign-overlay] > *,
+[data-biometric-overlay] > * {
+  direction: inherit;
+  text-align: center;
+  margin-inline: auto;
+}
+
+/* Signature pad canvas: always LTR regardless of document direction */
+canvas[data-signature-pad] {
+  direction: ltr;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * Nastaliq & Arabic Script — Sovereign Cutover (Team VELOCITY)
+ *
+ * Noto Nastaliq Urdu: loaded from Google Fonts CDN in layout.tsx
+ * Noto Sans Arabic: loaded alongside for Arabic/Farsi
+ *
+ * Rules: Urdu → Nastaliq calligraphic script
+ *        Arabic/Farsi → Noto Sans Arabic
+ *        All RTL → proper dir + text-align
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Urdu: Nastaliq calligraphic script (Jameel Noori / Noto Nastaliq Urdu) */
+[lang="ur"],
+[data-locale="ur"],
+.font-nastaliq {
+  font-family: 'IranNastaliq', 'Noto Nastaliq Urdu', 'Jameel Noori Nastaleeq', serif;
+  line-height: 2;
+  font-size-adjust: 0.56;
+}
+
+/* Arabic + Farsi: Noto Sans Arabic (clean modern Arabic script) */
+[lang="ar"],
+[lang="fa"],
+[data-locale="ar"],
+[data-locale="fa"] {
+  font-family: 'Noto Sans Arabic', 'Geist', sans-serif;
+  line-height: 1.8;
+}
+
+/* RTL container rules — ensure correct reading direction */
+[dir="rtl"] {
+  text-align: right;
+}
+
+/* Fact-Anchor source text — uses locale-specific font */
+.fact-anchor-source[data-locale="ur"] {
+  font-family: 'Noto Nastaliq Urdu', 'Jameel Noori Nastaleeq', serif;
+  line-height: 2.2;
+  font-size: 1.1em;
+}
+
+.fact-anchor-source[data-locale="ar"],
+.fact-anchor-source[data-locale="fa"] {
+  font-family: 'Noto Sans Arabic', sans-serif;
+  line-height: 1.9;
+  font-size: 1.05em;
+}
+
+/* Hindi / Bengali / Punjabi — system fallbacks (well-supported) */
+[lang="hi"],
+[lang="bn"],
+[lang="pa"],
+[data-locale="hi"],
+[data-locale="bn"],
+[data-locale="pa"] {
+  line-height: 1.7;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * IRON-CANVAS: Directive 36.1 — GPU-Accelerated Shadows
+ *
+ * All dropdowns, inputs, and interactive surfaces in the Command Centre
+ * use GPU-composited shadows via will-change + translateZ(0) for 60fps
+ * snap-resize transitions between 4K and mobile viewports.
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Base Iron Canvas shadow — subtle depth for inputs and selects */
+.iron-shadow {
+  box-shadow:
+    0 1px 2px 0 rgba(0, 0, 0, 0.05),
+    0 1px 3px 0 rgba(0, 0, 0, 0.04);
+  will-change: box-shadow, transform;
+  transform: translateZ(0); /* GPU composite layer */
+}
+
+.iron-shadow:focus-within {
+  box-shadow:
+    0 0 0 2px rgba(59, 130, 246, 0.15),
+    0 1px 3px 0 rgba(0, 0, 0, 0.06),
+    0 4px 6px -1px rgba(0, 0, 0, 0.04);
+}
+
+/* Elevated Iron Canvas — dropdowns, popovers, floating panels */
+.iron-shadow-elevated {
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.07),
+    0 2px 4px -2px rgba(0, 0, 0, 0.05),
+    0 0 0 1px rgba(0, 0, 0, 0.03);
+  will-change: box-shadow, transform;
+  transform: translateZ(0);
+}
+
+/* Card Iron Canvas — kanban cards, summary cards */
+.iron-shadow-card {
+  box-shadow:
+    0 1px 3px 0 rgba(0, 0, 0, 0.06),
+    0 1px 2px -1px rgba(0, 0, 0, 0.04);
+  will-change: box-shadow, transform;
+  transform: translateZ(0);
+  transition: box-shadow 150ms ease, transform 150ms ease;
+}
+
+.iron-shadow-card:hover {
+  box-shadow:
+    0 4px 8px -1px rgba(0, 0, 0, 0.08),
+    0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  transform: translateZ(0) translateY(-1px);
+}
+
+/* Apply Iron Canvas to all Select triggers and Input fields in Leads */
+[data-leads-command] [data-slot="select-trigger"],
+[data-leads-command] input[type="text"],
+[data-leads-command] input[type="search"] {
+  box-shadow:
+    0 1px 2px 0 rgba(0, 0, 0, 0.05),
+    0 1px 3px 0 rgba(0, 0, 0, 0.04);
+  will-change: box-shadow;
+  transform: translateZ(0);
+}
+
+[data-leads-command] [data-slot="select-trigger"]:focus,
+[data-leads-command] input:focus {
+  box-shadow:
+    0 0 0 2px rgba(59, 130, 246, 0.15),
+    0 1px 3px 0 rgba(0, 0, 0, 0.06);
+}
+
+/* Popover content — elevated Iron Canvas shadow */
+[data-leads-command] [data-radix-popper-content-wrapper] > * {
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.07),
+    0 2px 4px -2px rgba(0, 0, 0, 0.05),
+    0 0 0 1px rgba(0, 0, 0, 0.03) !important;
+  will-change: transform;
+  transform: translateZ(0);
+}
+
