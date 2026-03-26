@@ -25,11 +25,11 @@ export async function POST(request: Request) {
     // Find subscriptions expiring within 24 hours
     const expirationThreshold = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
 
-    const { data: expiring } = await admin
+    const { data: expiring } = await (admin as any)
       .from('graph_webhook_subscriptions')
       .select('id, graph_subscription_id, connection_id, error_count')
       .eq('is_active', true)
-      .lt('expiration_datetime', expirationThreshold)
+      .lt('expiration_datetime', expirationThreshold) as { data: { id: string; graph_subscription_id: string; connection_id: string; error_count: number }[] | null }
 
     if (!expiring || expiring.length === 0) {
       return NextResponse.json({ message: 'No subscriptions to renew', stats })
