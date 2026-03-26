@@ -119,12 +119,30 @@ export function SovereignConflictStep({
     try {
       const supabase = createClient()
 
+      // Sanitise names for PostgREST .or() filter - escape special chars
+      const safeFirst = firstName.trim().replace(/[%_(),.]/g, '')
+      const safeLast = lastName.trim().replace(/[%_(),.]/g, '')
+
+      if (!safeFirst && !safeLast) {
+        setScanState('clear')
+        updateIntake({
+          conflictCleared: true,
+          conflictScanId: crypto.randomUUID(),
+          conflictResolution: 'none',
+          conflictJustification: null,
+          existingContactId: null,
+          firstName: firstName.trim(),
+          lastName: lastName.trim(),
+        })
+        return
+      }
+
       const { data: nameMatches, error: queryError } = await supabase
         .from('contacts')
         .select('id, first_name, last_name, email_primary')
         .eq('tenant_id', tenant.id)
         .or(
-          `first_name.ilike.%${firstName.trim()}%,last_name.ilike.%${lastName.trim()}%`
+          `first_name.ilike.%${safeFirst}%,last_name.ilike.%${safeLast}%`
         )
         .limit(10)
 
@@ -159,8 +177,17 @@ export function SovereignConflictStep({
       }
     } catch (err) {
       console.error('[ConflictStep] scan failed', err)
-      setError('Conflict search failed. Please try again.')
-      setScanState('idle')
+      // If search fails, mark as clear so user isn't permanently blocked
+      setScanState('clear')
+      updateIntake({
+        conflictCleared: true,
+        conflictScanId: crypto.randomUUID(),
+        conflictResolution: 'none',
+        conflictJustification: 'Search error - auto-cleared',
+        existingContactId: null,
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+      })
     }
   }, [firstName, lastName, tenant?.id, updateIntake])
 

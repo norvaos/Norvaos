@@ -27,6 +27,8 @@ import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
+import { Radio } from 'lucide-react'
+import { NerveCenterDrawer } from '@/components/matters/nerve-center-drawer'
 import { UnifiedCaseDetailsTab } from '@/components/matters/unified-case-details-tab'
 import { DocumentsTab }           from '@/components/shell/tabs/DocumentsTab'
 import { FormsTab }               from '@/components/shell/tabs/FormsTab'
@@ -131,6 +133,9 @@ export function ZoneD({ matter, tenantId, initialTab = 'details' }: ZoneDProps) 
     staleTime: 60_000,
   })
 
+  // ---- Directive 074: Nerve Center state ----
+  const [nerveCenterOpen, setNerveCenterOpen] = useState(false)
+
   // Priority: initialTab prop (from ?tab= searchParam) > URL hash > 'details'
   const [activeTab, setActiveTab] = useState<TabId>(() => {
     // initialTab is already validated upstream (only set when it's a known TabId)
@@ -176,23 +181,40 @@ export function ZoneD({ matter, tenantId, initialTab = 'details' }: ZoneDProps) 
         className="flex-1 flex flex-col overflow-hidden"
       >
         {/* ── Tab strip ─────────────────────────────────────────────────── */}
-        <TabsList className="flex-none w-full justify-start rounded-none border-b bg-card px-2 h-9 gap-0 overflow-x-auto">
-          {TABS.map(tab => (
-            <TabsTrigger
-              key={tab.id}
-              value={tab.id}
-              className={cn(
-                'text-[11px] px-3 py-1.5 rounded-none border-b-2 border-transparent',
-                'data-[state=active]:border-primary data-[state=active]:bg-transparent',
-                'data-[state=active]:text-foreground data-[state=active]:shadow-none',
-                'text-muted-foreground hover:text-foreground transition-colors',
-                'whitespace-nowrap',
-              )}
-            >
-              {tab.label}
-            </TabsTrigger>
-          ))}
-        </TabsList>
+        <div className="flex-none flex items-center border-b bg-card">
+          <TabsList className="flex-1 justify-start rounded-none px-2 h-9 gap-0 overflow-x-auto border-none">
+            {TABS.map(tab => (
+              <TabsTrigger
+                key={tab.id}
+                value={tab.id}
+                className={cn(
+                  'text-[11px] px-3 py-1.5 rounded-none border-b-2 border-transparent',
+                  'data-[state=active]:border-primary data-[state=active]:bg-transparent',
+                  'data-[state=active]:text-foreground data-[state=active]:shadow-none',
+                  'text-muted-foreground hover:text-foreground transition-colors',
+                  'whitespace-nowrap',
+                )}
+              >
+                {tab.label}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+
+          {/* Directive 074: Nerve Center toggle */}
+          <button
+            type="button"
+            onClick={() => setNerveCenterOpen(true)}
+            className={cn(
+              'mr-3 flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider transition-all',
+              nerveCenterOpen
+                ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 ring-1 ring-emerald-500/30'
+                : 'bg-gray-100 dark:bg-white/[0.06] text-gray-500 dark:text-white/40 hover:bg-emerald-500/10 hover:text-emerald-600 dark:hover:text-emerald-400',
+            )}
+          >
+            <Radio className="h-3 w-3" />
+            Nerve Center
+          </button>
+        </div>
 
         {/* ── Tab panels (each scrolls independently) ────────────────────── */}
 
@@ -330,6 +352,20 @@ export function ZoneD({ matter, tenantId, initialTab = 'details' }: ZoneDProps) 
         </TabsContent>
 
       </Tabs>
+
+      {/* Directive 074: Sovereign Nerve Center */}
+      <NerveCenterDrawer
+        matterId={matter.id}
+        matterTitle={matter.title ?? ''}
+        matterNumber={matter.matter_number}
+        practiceArea={null}
+        contactEmail={null}
+        contactFirstName={null}
+        contactLastName={null}
+        contactPhone={null}
+        open={nerveCenterOpen}
+        onOpenChange={setNerveCenterOpen}
+      />
     </div>
   )
 }

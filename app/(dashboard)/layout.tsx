@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
 import { usePathname, useRouter } from 'next/navigation'
@@ -24,6 +24,18 @@ const SovereignHUD = dynamic(
 )
 const SovereignWalkthrough = dynamic(
   () => import('@/components/onboarding/sovereign-walkthrough').then(m => ({ default: m.SovereignWalkthrough })),
+  { ssr: false },
+)
+const SovereignIntakeDialog = dynamic(
+  () => import('@/components/contacts/sovereign-intake/sovereign-intake-dialog').then(m => ({ default: m.SovereignIntakeDialog })),
+  { ssr: false },
+)
+const SovereignInitiationModal = dynamic(
+  () => import('@/components/matters/sovereign-initiation-modal').then(m => ({ default: m.SovereignInitiationModal })),
+  { ssr: false },
+)
+const SuspensionOverlay = dynamic(
+  () => import('@/components/layout/suspension-overlay').then(m => ({ default: m.SuspensionOverlay })),
   { ssr: false },
 )
 import { ScrollArea } from '@/components/ui/scroll-area'
@@ -511,6 +523,13 @@ export default function DashboardLayout({
     }
   }, [role, router])
 
+  // ─── Global modal state: HUD / command palette / dashboard buttons ──────
+  const activeModal = useUIStore((s) => s.activeModal)
+  const closeModal = useUIStore((s) => s.closeModal)
+
+  const isContactModalOpen = activeModal === 'create-contact'
+  const isMatterModalOpen = activeModal === 'create-matter'
+
   // ─── Hydration gate: branded loading screen while auth resolves ──
   if (userLoading || tenantLoading) {
     return (
@@ -547,11 +566,24 @@ export default function DashboardLayout({
           {/* Mobile navigation sheet */}
           <MobileNav />
 
+          {/* Suspension Overlay  -  Admin Command 001 (blocks all UI if tenant suspended) */}
+          <SuspensionOverlay />
+
           {/* Command palette overlay */}
           <SovereignHUD />
 
           {/* Sovereign Walkthrough  -  first-time onboarding carousel */}
           <SovereignWalkthrough open={walkthroughOpen} onComplete={handleWalkthroughComplete} />
+
+          {/* Global modal renderers  -  wired to Zustand activeModal state */}
+          <SovereignIntakeDialog
+            open={isContactModalOpen}
+            onOpenChange={(v) => { if (!v) closeModal() }}
+          />
+          <SovereignInitiationModal
+            open={isMatterModalOpen}
+            onOpenChange={(v) => { if (!v) closeModal() }}
+          />
 
           {/* NUCLEAR FIX #3: Visual Debug  -  shows locale state vs DB vs localStorage */}
           <LocaleDebugFooter />

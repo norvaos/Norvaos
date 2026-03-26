@@ -112,18 +112,23 @@ export function SovereignContactCreator({ open, onOpenChange, onSuccess }: Sover
 
     try {
       const supabase = createClient()
+      // Sanitise names for PostgREST .or() filter - escape special chars
+      const safeFirst = firstName.trim().replace(/[%_(),.]/g, '')
+      const safeLast = lastName.trim().replace(/[%_(),.]/g, '')
+      const safeOrg = orgName.trim().replace(/[%_(),.]/g, '')
+
       const query = contactType === 'individual'
         ? supabase
             .from('contacts')
             .select('id, first_name, last_name, email_primary')
             .eq('tenant_id', tenant.id)
-            .or(`first_name.ilike.%${firstName.trim()}%,last_name.ilike.%${lastName.trim()}%`)
+            .or(`first_name.ilike.%${safeFirst}%,last_name.ilike.%${safeLast}%`)
             .limit(10)
         : supabase
             .from('contacts')
             .select('id, first_name, last_name, email_primary')
             .eq('tenant_id', tenant.id)
-            .ilike('organization_name', `%${orgName.trim()}%`)
+            .ilike('organization_name', `%${safeOrg}%`)
             .limit(10)
 
       const { data, error } = await query

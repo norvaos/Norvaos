@@ -12,6 +12,47 @@
 
 export type SubscriptionTier = 'starter' | 'professional' | 'enterprise'
 
+// ── Communication Intelligence Flags (Directive 075) ────────────────────────
+// These flags control the AI-powered communication features per tenant.
+// They are stored in tenants.feature_flags JSONB alongside boolean flags.
+export const COMM_FEATURE_FLAGS = {
+  hybrid_ai_ingest: {
+    key: 'hybrid_ai_ingest',
+    label: 'Hybrid AI Ingest',
+    description: 'Enable the "Digital Intern" parser for automatic email/document classification',
+    impact: 'If OFF, the firm only gets manual drag-and-drop.',
+    tier: 'professional' as SubscriptionTier,
+  },
+  ircc_pattern_match: {
+    key: 'ircc_pattern_match',
+    label: 'IRCC Pattern Match',
+    description: 'Toggle the hard-coded IRCC email/document scraper',
+    impact: 'Essential for Canadian Immigration firms.',
+    tier: 'starter' as SubscriptionTier,
+  },
+  voip_bridge: {
+    key: 'voip_bridge',
+    label: 'VoIP Bridge',
+    description: 'Connect/Disconnect the firm\'s phone system integration',
+    impact: 'Allows upselling "Phone Integration" as a Premium Tier.',
+    tier: 'enterprise' as SubscriptionTier,
+  },
+  comm_template_max: {
+    key: 'comm_template_max',
+    label: 'Template Limit',
+    description: 'Maximum number of communication templates allowed',
+    impact: 'Creates a "Basic" vs "Pro" pricing structure.',
+    tier: 'starter' as SubscriptionTier,
+  },
+} as const
+
+// Default comm_template_max per tier
+export const COMM_TEMPLATE_LIMITS: Record<SubscriptionTier, number> = {
+  starter: 5,
+  professional: 25,
+  enterprise: -1, // Unlimited
+}
+
 // ── Platform defaults  -  baseline for ALL tenants regardless of tier ────────
 export const PLATFORM_FEATURE_DEFAULTS: Record<string, boolean> = {
   chat: true,
@@ -22,6 +63,10 @@ export const PLATFORM_FEATURE_DEFAULTS: Record<string, boolean> = {
   notifications_push: false,
   billing: false,
   front_desk_mode: true,
+  // Communication Intelligence (Directive 075)
+  hybrid_ai_ingest: false,
+  ircc_pattern_match: true,
+  voip_bridge: false,
 }
 
 // ── Tier-based feature entitlements (60 / 80 / 100) ─────────────────────────
@@ -62,6 +107,10 @@ export const TIER_FEATURES: Record<SubscriptionTier, Record<string, boolean>> = 
     bulk_operations: false,
     audit_export: false,
     priority_support: false,
+    // Communication Intelligence (Directive 075)
+    hybrid_ai_ingest: false,
+    ircc_pattern_match: true,
+    voip_bridge: false,
   },
 
   // ── Professional (~80%)  -  Automation + integrations ──
@@ -97,6 +146,10 @@ export const TIER_FEATURES: Record<SubscriptionTier, Record<string, boolean>> = 
     multi_office: false,
     audit_export: false,
     priority_support: false,
+    // Communication Intelligence (Directive 075)
+    hybrid_ai_ingest: true,
+    ircc_pattern_match: true,
+    voip_bridge: false,
   },
 
   // ── Enterprise (100%)  -  Everything unlocked ──
@@ -129,6 +182,10 @@ export const TIER_FEATURES: Record<SubscriptionTier, Record<string, boolean>> = 
     bulk_operations: true,
     audit_export: true,
     priority_support: true,
+    // Communication Intelligence (Directive 075)
+    hybrid_ai_ingest: true,
+    ircc_pattern_match: true,
+    voip_bridge: true,
   },
 }
 

@@ -7,12 +7,14 @@ import { toast } from 'sonner'
 
 type CommunicationRow = Database['public']['Tables']['communications']['Row']
 type CommunicationInsert = Database['public']['Tables']['communications']['Insert']
+type TemplateRow = Database['public']['Tables']['communication_templates']['Row']
 
 // ── Query Key Factory ────────────────────────────────────────────────────────
 
 export const commKeys = {
   all: ['communications'] as const,
   matter: (matterId: string) => [...commKeys.all, 'matter', matterId] as const,
+  templates: (tenantId: string) => ['communication-templates', tenantId] as const,
 }
 
 // ── Fetch matter communications ──────────────────────────────────────────────
@@ -60,5 +62,27 @@ export function useCreateCommunication() {
     onError: () => {
       toast.error('Failed to save communication')
     },
+  })
+}
+
+// ── Fetch communication templates ───────────────────────────────────────────
+
+export function useCommunicationTemplates(tenantId: string) {
+  return useQuery({
+    queryKey: commKeys.templates(tenantId),
+    queryFn: async () => {
+      const supabase = createClient()
+      const { data, error } = await supabase
+        .from('communication_templates')
+        .select('*')
+        .eq('tenant_id', tenantId)
+        .eq('is_active', true)
+        .order('category')
+        .order('name')
+      if (error) throw error
+      return data as TemplateRow[]
+    },
+    enabled: !!tenantId,
+    staleTime: 1000 * 60 * 5,
   })
 }

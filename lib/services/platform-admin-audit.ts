@@ -52,6 +52,19 @@ export async function logPlatformAdminAudit(params: PlatformAdminAuditParams): P
     request_id,
   } = params
 
+  // ── Directive 076 hardening: reason must never be empty (LSO paper trail) ──
+  const sanitisedReason = reason?.trim()
+  if (!sanitisedReason || sanitisedReason.length < 3) {
+    log.error('[platform-admin] AUDIT VIOLATION: reason is missing or too short', {
+      action,
+      target_type,
+      target_id,
+      reason: reason ?? '(null)',
+    })
+    // Still log it but with a warning marker  -  never silently drop an audit entry
+  }
+  const finalReason = sanitisedReason || `[AUTO] ${action} - no reason provided`
+
   // Always emit structured log (streaming consumers see every action)
   log.info(`[platform-admin] ${action}`, {
     admin_id: admin_id ?? 'bearer-token',
@@ -65,14 +78,14 @@ export async function logPlatformAdminAudit(params: PlatformAdminAuditParams): P
   const admin = createAdminClient()
 
   await Promise.allSettled([
-    // 1. Immutable cross-tenant audit log
+    // 1. Immutable cross-tenant audit log  -  reason ALWAYS saved (Directive 076)
     admin.from('platform_admin_audit_logs').insert({
       admin_id,
       action,
       target_type,
       target_id,
       changes: changes as Json,
-      reason,
+      reason: finalReason,
       ip,
       user_agent,
       request_id: request_id ?? null,
@@ -89,7 +102,7 @@ export async function logPlatformAdminAudit(params: PlatformAdminAuditParams): P
       metadata: {
         actor: 'platform-admin',
         admin_id: admin_id ?? 'bearer-token',
-        reason,
+        reason: finalReason,
         ip,
         user_agent,
         request_id: request_id ?? null,
@@ -101,14 +114,14 @@ export async function logPlatformAdminAudit(params: PlatformAdminAuditParams): P
       tenant_id,
       activity_type: action,
       title: `Platform admin: ${action}`,
-      description: `${action} by platform-admin. Reason: ${reason}`,
+      description: `${action} by platform-admin. Reason: ${finalReason}`,
       entity_type: target_type,
       entity_id: target_id,
       user_id: null,
       metadata: {
         actor: 'platform-admin',
         admin_id: admin_id ?? 'bearer-token',
-        reason,
+        reason: finalReason,
         ip,
         user_agent,
         request_id: request_id ?? null,

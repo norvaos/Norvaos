@@ -3,7 +3,9 @@
 import { useEffect, useState, useCallback, createContext, useContext } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
+import { useQuery } from '@tanstack/react-query'
 import { useUser } from '@/lib/hooks/use-user'
+import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
 import {
   LayoutDashboard,
@@ -17,6 +19,8 @@ import {
   Sun,
   Moon,
   Rocket,
+  Satellite,
+  Eye,
 } from 'lucide-react'
 
 // ── Theme context ───────────────────────────────────────────────────────────
@@ -51,6 +55,7 @@ const nexusTabs = [
   { title: 'Isolation', href: '/nexus/audit', icon: ShieldCheck },
   { title: 'Health', href: '/nexus/health', icon: Activity },
   { title: 'Launch', href: '/nexus/launch', icon: Rocket },
+  { title: 'Sovereign', href: '/nexus/sovereign-control', icon: Satellite },
 ]
 
 function isActive(href: string, pathname: string): boolean {
@@ -62,10 +67,33 @@ function isActive(href: string, pathname: string): boolean {
 
 export default function NexusLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
-  const { appUser, isLoading } = useUser()
+  const { appUser, isLoading: userLoading } = useUser()
   const router = useRouter()
   const [mounted, setMounted] = useState(false)
   const { dark, toggle } = useNexusTheme()
+
+  // ── DB-level platform_admins check (Directive 076 hardening) ────────────
+  // The API routes are protected by withNexusAdmin → requirePlatformAdmin.
+  // This client-side check ensures the Nexus UI itself is only visible to
+  // users in the `platform_admins` table, not just any logged-in user.
+  const { data: isAdmin, isLoading: adminLoading } = useQuery({
+    queryKey: ['platform-admin-check', appUser?.auth_user_id],
+    queryFn: async () => {
+      if (!appUser?.auth_user_id) return false
+      const supabase = createClient()
+      const { data } = await supabase
+        .from('platform_admins')
+        .select('id')
+        .eq('user_id', appUser.auth_user_id)
+        .is('revoked_at', null)
+        .maybeSingle()
+      return !!data
+    },
+    enabled: !!appUser?.auth_user_id,
+    staleTime: 1000 * 60 * 10, // 10 min  -  admin status rarely changes
+  })
+
+  const isLoading = userLoading || adminLoading
 
   useEffect(() => setMounted(true), [])
 
@@ -88,6 +116,32 @@ export default function NexusLayout({ children }: { children: React.ReactNode })
   if (!appUser) {
     router.push('/login?redirect=/nexus')
     return null
+  }
+
+  // ── Deny non-admins (DB-verified) ──
+  if (!isAdmin) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center bg-[#0c0c0f]">
+        <div className="flex flex-col items-center gap-6 text-center px-6">
+          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-red-500/10 ring-1 ring-red-500/20">
+            <ShieldCheck className="h-8 w-8 text-red-400" />
+          </div>
+          <div>
+            <h1 className="text-xl font-bold text-white mb-2">Access Denied</h1>
+            <p className="text-sm text-white/40 max-w-sm">
+              The Sovereign Control Center requires platform administrator privileges.
+              Your access attempt has been logged.
+            </p>
+          </div>
+          <Link
+            href="/"
+            className="rounded-xl bg-white/5 px-6 py-2.5 text-sm font-medium text-white/50 hover:text-white/80 hover:bg-white/10 transition-all"
+          >
+            Return to Dashboard
+          </Link>
+        </div>
+      </div>
+    )
   }
 
   return (

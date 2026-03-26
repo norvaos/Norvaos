@@ -60,10 +60,10 @@ const stepSchema = z.object({
   email_primary: z.string().email().optional().or(z.literal('')),
   phone_primary: z.string().max(30).optional().or(z.literal('')),
   date_of_birth: z.string().optional().or(z.literal('')),
-  address_line1: z.string().optional().or(z.literal('')),
+  address_line1: z.string().min(1, 'Address is required'),
   city: z.string().optional().or(z.literal('')),
-  country: z.string().optional().or(z.literal('')),
-  province_state: z.string().optional().or(z.literal('')),
+  country: z.string().min(1, 'Country is required for compliance'),
+  province_state: z.string().min(1, 'Jurisdiction required for compliance'),
   postal_code: z.string().optional().or(z.literal('')),
   source: z.string().optional(),
 })
@@ -736,9 +736,9 @@ export function SovereignContactStep({
         )}
       </div>
 
-      {/* Email (optional) */}
+      {/* Email */}
       <div className="animate-in fade-in slide-in-from-bottom-2 delay-225 space-y-2">
-        <Label htmlFor="email_primary">Email (optional)</Label>
+        <Label htmlFor="email_primary">Email</Label>
         <Input
           id="email_primary"
           type="email"
@@ -753,9 +753,9 @@ export function SovereignContactStep({
         )}
       </div>
 
-      {/* Phone (optional) */}
+      {/* Phone */}
       <div className="animate-in fade-in slide-in-from-bottom-2 delay-300 space-y-2">
-        <Label htmlFor="phone_primary">Phone (optional)</Label>
+        <Label htmlFor="phone_primary">Phone</Label>
         <Input
           id="phone_primary"
           type="tel"
@@ -770,9 +770,9 @@ export function SovereignContactStep({
         )}
       </div>
 
-      {/* Date of Birth (optional) */}
+      {/* Date of Birth */}
       <div className="animate-in fade-in slide-in-from-bottom-2 delay-[375ms] space-y-2">
-        <Label htmlFor="date_of_birth">Date of Birth (optional)</Label>
+        <Label htmlFor="date_of_birth">Date of Birth</Label>
         <OcrFieldWrapper field="date_of_birth">
           <TenantDateInput
             id="date_of_birth"
@@ -784,9 +784,9 @@ export function SovereignContactStep({
         </OcrFieldWrapper>
       </div>
 
-      {/* Address Line 1 (optional) */}
+      {/* Address */}
       <div className="animate-in fade-in slide-in-from-bottom-2 delay-[450ms] space-y-2">
-        <Label htmlFor="address_line1">Address (optional)</Label>
+        <Label htmlFor="address_line1">Address</Label>
         <OcrFieldWrapper field="address_line1">
           <Input
             id="address_line1"
@@ -796,11 +796,14 @@ export function SovereignContactStep({
             className={`${ocrHighlight('address_line1')} ${ocrFields.includes('address_line1') ? 'pr-10' : ''}`}
           />
         </OcrFieldWrapper>
+        {errors.address_line1 && (
+          <p className="text-xs font-medium text-amber-600 dark:text-amber-400">{errors.address_line1.message}</p>
+        )}
       </div>
 
-      {/* City (optional) */}
+      {/* City */}
       <div className="animate-in fade-in slide-in-from-bottom-2 delay-[525ms] space-y-2">
-        <Label htmlFor="city">City (optional)</Label>
+        <Label htmlFor="city">City</Label>
         <OcrFieldWrapper field="city">
           <Input
             id="city"
@@ -829,7 +832,7 @@ export function SovereignContactStep({
           <SelectTrigger id="country">
             <SelectValue placeholder="Select country" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="z-[9996]">
             <SelectItem value="CA">Canada</SelectItem>
             <SelectItem value="US">United States</SelectItem>
             <SelectItem value="GB">United Kingdom</SelectItem>
@@ -848,24 +851,27 @@ export function SovereignContactStep({
             <SelectItem value="OTHER">Other</SelectItem>
           </SelectContent>
         </Select>
+        {errors.country && (
+          <p className="text-xs font-medium text-amber-600 dark:text-amber-400">{errors.country.message}</p>
+        )}
       </div>
 
       {/* Province/State  -  dropdown for Canada, free text otherwise */}
       <div className="animate-in fade-in slide-in-from-bottom-2 delay-[675ms] space-y-2">
         <Label htmlFor="province_state">
-          {watch('country') === 'CA' ? 'Province' : 'Province / State'} (optional)
+          {watch('country') === 'CA' ? 'Province' : 'Province / State'}
         </Label>
         {watch('country') === 'CA' ? (
           <OcrFieldWrapper field="province_state">
             <Select
-              value={watch('province_state') || undefined}
+              value={watch('province_state') || ''}
               onValueChange={(val) => setValue('province_state', val)}
               disabled={busy || created}
             >
               <SelectTrigger id="province_state" className={ocrHighlight('province_state')}>
                 <SelectValue placeholder="Select province" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="z-[9996]">
                 {CANADIAN_PROVINCES.map((p) => (
                   <SelectItem key={p.code} value={p.code}>
                     {p.name}
@@ -882,12 +888,15 @@ export function SovereignContactStep({
             disabled={busy || created}
           />
         )}
+        {errors.province_state && (
+          <p className="text-xs font-medium text-amber-600 dark:text-amber-400">{errors.province_state.message}</p>
+        )}
       </div>
 
-      {/* Postal Code (optional) */}
+      {/* Postal Code */}
       <div className="animate-in fade-in slide-in-from-bottom-2 delay-[750ms] space-y-2">
         <Label htmlFor="postal_code">
-          {watch('country') === 'CA' ? 'Postal Code' : 'Postal / ZIP Code'} (optional)
+          {watch('country') === 'CA' ? 'Postal Code' : 'Postal / ZIP Code'}
         </Label>
         <OcrFieldWrapper field="postal_code">
           <Input
@@ -911,7 +920,7 @@ export function SovereignContactStep({
           <SelectTrigger id="source">
             <SelectValue placeholder="How did they find you?" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="z-[9996]">
             {CONTACT_SOURCES.map((src) => (
               <SelectItem key={src} value={src}>
                 {src}
