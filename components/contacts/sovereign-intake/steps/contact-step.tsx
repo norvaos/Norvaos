@@ -47,6 +47,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useTenant } from '@/lib/hooks/use-tenant'
 import { useUser } from '@/lib/hooks/use-user'
 import { CONTACT_SOURCES } from '@/lib/utils/constants'
+import { TenantDateInput } from '@/components/ui/tenant-date-input'
 import type { IntakeState } from '../sovereign-stepper'
 
 /* ------------------------------------------------------------------ */
@@ -61,10 +62,29 @@ const stepSchema = z.object({
   date_of_birth: z.string().optional().or(z.literal('')),
   address_line1: z.string().optional().or(z.literal('')),
   city: z.string().optional().or(z.literal('')),
-  province: z.string().optional().or(z.literal('')),
+  country: z.string().optional().or(z.literal('')),
+  province_state: z.string().optional().or(z.literal('')),
   postal_code: z.string().optional().or(z.literal('')),
   source: z.string().optional(),
 })
+
+// ── Canadian provinces ─────────────────────────────────────────────────────
+
+const CANADIAN_PROVINCES = [
+  { code: 'AB', name: 'Alberta' },
+  { code: 'BC', name: 'British Columbia' },
+  { code: 'MB', name: 'Manitoba' },
+  { code: 'NB', name: 'New Brunswick' },
+  { code: 'NL', name: 'Newfoundland and Labrador' },
+  { code: 'NS', name: 'Nova Scotia' },
+  { code: 'NT', name: 'Northwest Territories' },
+  { code: 'NU', name: 'Nunavut' },
+  { code: 'ON', name: 'Ontario' },
+  { code: 'PE', name: 'Prince Edward Island' },
+  { code: 'QC', name: 'Quebec' },
+  { code: 'SK', name: 'Saskatchewan' },
+  { code: 'YT', name: 'Yukon' },
+]
 
 type StepValues = z.infer<typeof stepSchema>
 
@@ -165,7 +185,8 @@ export function SovereignContactStep({
       date_of_birth: '',
       address_line1: '',
       city: '',
-      province: '',
+      country: 'CA',
+      province_state: '',
       postal_code: '',
       source: '',
     },
@@ -267,7 +288,7 @@ export function SovereignContactStep({
         date_of_birth: 'date_of_birth',
         address_line1: 'address_line1',
         city: 'city',
-        province_state: 'province',  // parser returns province_state
+        province_state: 'province_state',
         postal_code: 'postal_code',
       }
 
@@ -277,6 +298,11 @@ export function SovereignContactStep({
           setValue(formKey, value, { shouldValidate: true })
           filled.push(formKey)
         }
+      }
+
+      // If OCR detected a Canadian province, auto-set country to Canada
+      if (filled.includes('province_state')) {
+        setValue('country', 'CA', { shouldValidate: true })
       }
 
       setOcrFields(filled)
@@ -400,7 +426,8 @@ export function SovereignContactStep({
           date_of_birth: values.date_of_birth || null,
           address_line1: values.address_line1 || null,
           city: values.city || null,
-          province: values.province || null,
+          country: values.country || null,
+          province_state: values.province_state || null,
           postal_code: values.postal_code || null,
           source: values.source || null,
           created_by: appUser.id,
@@ -747,12 +774,12 @@ export function SovereignContactStep({
       <div className="animate-in fade-in slide-in-from-bottom-2 delay-[375ms] space-y-2">
         <Label htmlFor="date_of_birth">Date of Birth (optional)</Label>
         <OcrFieldWrapper field="date_of_birth">
-          <Input
+          <TenantDateInput
             id="date_of_birth"
-            type="date"
-            {...register('date_of_birth')}
+            value={watch('date_of_birth')}
+            onChange={(iso) => setValue('date_of_birth', iso, { shouldValidate: true })}
             disabled={busy || created}
-            className={`${ocrHighlight('date_of_birth')} ${ocrFields.includes('date_of_birth') ? 'pr-10' : ''}`}
+            className={ocrHighlight('date_of_birth')}
           />
         </OcrFieldWrapper>
       </div>
@@ -785,27 +812,87 @@ export function SovereignContactStep({
         </OcrFieldWrapper>
       </div>
 
-      {/* Province (optional) */}
+      {/* Country */}
       <div className="animate-in fade-in slide-in-from-bottom-2 delay-[600ms] space-y-2">
-        <Label htmlFor="province">Province (optional)</Label>
-        <OcrFieldWrapper field="province">
+        <Label htmlFor="country">Country</Label>
+        <Select
+          value={watch('country') || 'CA'}
+          onValueChange={(val) => {
+            setValue('country', val)
+            // Clear province when switching away from Canada
+            if (val !== 'CA') {
+              setValue('province_state', '')
+            }
+          }}
+          disabled={busy || created}
+        >
+          <SelectTrigger id="country">
+            <SelectValue placeholder="Select country" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="CA">Canada</SelectItem>
+            <SelectItem value="US">United States</SelectItem>
+            <SelectItem value="GB">United Kingdom</SelectItem>
+            <SelectItem value="IN">India</SelectItem>
+            <SelectItem value="PK">Pakistan</SelectItem>
+            <SelectItem value="PH">Philippines</SelectItem>
+            <SelectItem value="CN">China</SelectItem>
+            <SelectItem value="NG">Nigeria</SelectItem>
+            <SelectItem value="IR">Iran</SelectItem>
+            <SelectItem value="MX">Mexico</SelectItem>
+            <SelectItem value="BR">Brazil</SelectItem>
+            <SelectItem value="FR">France</SelectItem>
+            <SelectItem value="DE">Germany</SelectItem>
+            <SelectItem value="AE">United Arab Emirates</SelectItem>
+            <SelectItem value="SA">Saudi Arabia</SelectItem>
+            <SelectItem value="OTHER">Other</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* Province/State — dropdown for Canada, free text otherwise */}
+      <div className="animate-in fade-in slide-in-from-bottom-2 delay-[675ms] space-y-2">
+        <Label htmlFor="province_state">
+          {watch('country') === 'CA' ? 'Province' : 'Province / State'} (optional)
+        </Label>
+        {watch('country') === 'CA' ? (
+          <OcrFieldWrapper field="province_state">
+            <Select
+              value={watch('province_state') || undefined}
+              onValueChange={(val) => setValue('province_state', val)}
+              disabled={busy || created}
+            >
+              <SelectTrigger id="province_state" className={ocrHighlight('province_state')}>
+                <SelectValue placeholder="Select province" />
+              </SelectTrigger>
+              <SelectContent>
+                {CANADIAN_PROVINCES.map((p) => (
+                  <SelectItem key={p.code} value={p.code}>
+                    {p.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </OcrFieldWrapper>
+        ) : (
           <Input
-            id="province"
-            placeholder="Ontario"
-            {...register('province')}
+            id="province_state"
+            placeholder="Province or state"
+            {...register('province_state')}
             disabled={busy || created}
-            className={`${ocrHighlight('province')} ${ocrFields.includes('province') ? 'pr-10' : ''}`}
           />
-        </OcrFieldWrapper>
+        )}
       </div>
 
       {/* Postal Code (optional) */}
-      <div className="animate-in fade-in slide-in-from-bottom-2 delay-[675ms] space-y-2">
-        <Label htmlFor="postal_code">Postal Code (optional)</Label>
+      <div className="animate-in fade-in slide-in-from-bottom-2 delay-[750ms] space-y-2">
+        <Label htmlFor="postal_code">
+          {watch('country') === 'CA' ? 'Postal Code' : 'Postal / ZIP Code'} (optional)
+        </Label>
         <OcrFieldWrapper field="postal_code">
           <Input
             id="postal_code"
-            placeholder="M5V 2T6"
+            placeholder={watch('country') === 'CA' ? 'M5V 2T6' : 'Postal / ZIP code'}
             {...register('postal_code')}
             disabled={busy || created}
             className={`${ocrHighlight('postal_code')} ${ocrFields.includes('postal_code') ? 'pr-10' : ''}`}
