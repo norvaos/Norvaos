@@ -84,7 +84,7 @@ interface OcrResult {
     document_number?: string
     expiry_date?: string
   }
-  raw_text: string
+  rawText: string
 }
 
 /* ------------------------------------------------------------------ */
@@ -246,7 +246,14 @@ export function SovereignContactStep({
         throw new Error(body.error || `Scan failed (${res.status})`)
       }
 
-      const data: OcrResult = await res.json()
+      const response = await res.json()
+
+      // API returns { success, data: { fields, rawText } }
+      const ocrData: OcrResult = response.data ?? response
+
+      if (!ocrData?.fields) {
+        throw new Error('OCR could not extract any fields from the document')
+      }
 
       const filled: (keyof StepValues)[] = []
       const fieldMap: Record<string, keyof StepValues> = {
@@ -260,7 +267,7 @@ export function SovereignContactStep({
       }
 
       for (const [ocrKey, formKey] of Object.entries(fieldMap)) {
-        const value = data.fields[ocrKey as keyof OcrResult['fields']]
+        const value = ocrData.fields[ocrKey as keyof OcrResult['fields']]
         if (value) {
           setValue(formKey, value, { shouldValidate: true })
           filled.push(formKey)
