@@ -67,7 +67,7 @@ interface FreezeDocumentParams {
   lawyerSignature?: {
     imageBuffer: Buffer
     lawyerName: string
-    credentials?: string | null // e.g. "LSO #12345P" or "RCIC #R123456"
+    credentials?: string | null // e.g. "LSO #12345P" or "RCIC #R123456"  -  regulatory licence
   } | null
 }
 
@@ -1695,7 +1695,7 @@ export async function sendReminder(
 interface SignatureBlock {
   imageBuffer: Buffer
   signerName: string
-  credentials?: string | null // e.g. "LSO #12345P"  -  shown below name
+  credentials?: string | null // e.g. "LSO #12345P" or "RCIC #R123456"  -  shown below name
   signedAt: Date
   position: 'left' | 'right'
   label: string // e.g. "Client Signature" or "Lawyer Signature"
@@ -1778,7 +1778,7 @@ async function overlaySignaturesOnPdf(
     // Track vertical offset for optional credentials line
     let yOffset = 26
 
-    // Draw credentials (e.g. "LSO #12345P") if provided
+    // Draw credentials (e.g. "LSO #12345P" or "RCIC #R123456") if provided
     if (block.credentials) {
       yOffset += 13
       lastPage.drawText(block.credentials, {

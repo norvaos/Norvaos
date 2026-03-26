@@ -47,7 +47,7 @@ const TOS_LOCKOUT_SECONDS = 10
 const TOS_SECTIONS = [
   {
     title: '1. Platform Access and Licence',
-    content: `By accepting these Terms of Service ("ToS"), the Principal Lawyer ("You") acknowledges that NorvaOS is a compliance-critical platform designed to operate within the regulatory framework of the Law Society of Ontario (LSO) and the Immigration and Refugee Protection Act (IRPA). Your firm is granted a non-exclusive, non-transferable licence to use NorvaOS for the duration of your active subscription.`,
+    content: `By accepting these Terms of Service ("ToS"), the Principal Lawyer ("You") acknowledges that NorvaOS is a compliance-critical platform designed to operate within the regulatory framework of your provincial Law Society or regulatory college and the Immigration and Refugee Protection Act (IRPA). Your firm is granted a non-exclusive, non-transferable licence to use NorvaOS for the duration of your active subscription.`,
   },
   {
     title: '2. Data Sovereignty and Immutability',
@@ -55,7 +55,7 @@ const TOS_SECTIONS = [
   },
   {
     title: '3. Trust Accounting Compliance',
-    content: `NorvaOS enforces LSO Rule 3.7 (Trust Accounting) through automated three-way reconciliation, zero-balance closing verification, and immutable audit trails. The platform does NOT constitute legal or accounting advice. The Principal Lawyer retains full responsibility for trust fund management, regulatory filings, and LSO compliance. NorvaOS is a tool  -  not a substitute for professional judgement.`,
+    content: `NorvaOS enforces applicable trust accounting rules (e.g. Rule 3.7) through automated three-way reconciliation, zero-balance closing verification, and immutable audit trails. The platform does NOT constitute legal or accounting advice. The Principal Lawyer retains full responsibility for trust fund management, regulatory filings, and regulatory compliance. NorvaOS is a tool  -  not a substitute for professional judgement.`,
   },
   {
     title: '4. Genesis Block and Compliance Seal',
@@ -71,7 +71,7 @@ const TOS_SECTIONS = [
   },
   {
     title: '7. Limitation of Liability',
-    content: `TO THE MAXIMUM EXTENT PERMITTED BY LAW, NORVAOS AND ITS DEVELOPERS SHALL NOT BE LIABLE FOR: (a) Any regulatory penalties, fines, or sanctions imposed by the LSO, IRCC, or any other governing body. (b) Any loss of client funds, missed deadlines, or data entry errors attributable to user input. (c) Any indirect, consequential, or punitive damages arising from platform use. (d) Service interruptions due to force majeure, third-party infrastructure failures, or scheduled maintenance. The total aggregate liability of NorvaOS shall not exceed the fees paid by the firm in the twelve (12) months preceding the claim.`,
+    content: `TO THE MAXIMUM EXTENT PERMITTED BY LAW, NORVAOS AND ITS DEVELOPERS SHALL NOT BE LIABLE FOR: (a) Any regulatory penalties, fines, or sanctions imposed by your regulator, IRCC, or any other governing body. (b) Any loss of client funds, missed deadlines, or data entry errors attributable to user input. (c) Any indirect, consequential, or punitive damages arising from platform use. (d) Service interruptions due to force majeure, third-party infrastructure failures, or scheduled maintenance. The total aggregate liability of NorvaOS shall not exceed the fees paid by the firm in the twelve (12) months preceding the claim.`,
   },
   {
     title: '8. Acceptance and Digital Signature',

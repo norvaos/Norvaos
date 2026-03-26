@@ -380,11 +380,11 @@ function renderSignatureBlock(
       )
     }
 
-    // LSO number (for Ontario lawyers)
+    // Regulatory licence number (e.g. LSO, LSBC, RCIC)
     if (signer.include_lso_number) {
       paragraphs.push(
         new Paragraph({
-          children: [new TextRun({ text: 'LSO #: ___________________________________' })],
+          children: [new TextRun({ text: 'Licence #: ___________________________________' })],
           spacing: { after: 120 },
         })
       )

@@ -47,7 +47,7 @@ export function QuickStartChecklist({
     {
       id: 'trust',
       title: 'Configure trust accounting',
-      description: 'Set up your trust bank account for Law Society compliance.',
+      description: 'Set up your trust bank account for regulatory compliance.',
       href: '/settings/trust-accounts',
       icon: Landmark,
       isComplete: hasTrustAccount,

@@ -322,13 +322,13 @@ export function SovereignConflictStep({
               <div className="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-200">
                 <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-600 dark:text-amber-400" />
                 <span>
-                  <strong>Law Society Requirement:</strong> You cannot collect
+                  <strong>Regulatory Requirement:</strong> You cannot collect
                   personal data until a conflict search is cleared.
                 </span>
               </div>
             </TooltipTrigger>
             <TooltipContent side="bottom" className="max-w-xs text-xs">
-              Under Law Society rules, a conflict check must be completed before
+              Under regulatory rules, a conflict check must be completed before
               gathering any personal information from a prospective client.
             </TooltipContent>
           </Tooltip>

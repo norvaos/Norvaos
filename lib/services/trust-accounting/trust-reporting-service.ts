@@ -1,5 +1,5 @@
 // ============================================================================
-// Trust Reporting Service  -  LSO-Compliant Trust Accounting Reports
+// Trust Reporting Service  -  Regulatory-Compliant Trust Accounting Reports
 // ============================================================================
 // Provides read-only reporting functions for trust accounting:
 //   - Client trust listing (By-Law 9 requirement)
@@ -9,7 +9,7 @@
 //   - Cheque register
 //   - Holds report
 //   - Audit trail
-//   - LSO compliance report (annual filing data)
+//   - regulatory compliance report (annual filing data)
 //
 // All monetary values are BIGINT (cents). UI is responsible for conversion.
 // Uses RLS-scoped supabase client for reads; adminClient only for audit writes.
@@ -237,7 +237,7 @@ function buildPaginatedResult<T>(
 
 /**
  * List every matter with a non-zero trust balance on a given account.
- * Required for LSO By-Law 9 reconciliation.
+ * Required for trust accounting by-law reconciliation.
  *
  * Strategy: for each matter that has transactions on this account, take
  * the running_balance_cents from the latest transaction (by effective_date,
@@ -951,10 +951,10 @@ export async function getAuditTrail(
   }
 }
 
-// ─── 8. LSO Compliance Report ────────────────────────────────────────────
+// ─── 8. Regulatory Compliance Report ─────────────────────────────────────
 
 /**
- * Combined report providing all data required for LSO By-Law 9 annual filing.
+ * Combined report providing all data required for regulatory annual filing.
  * Includes account summary, client listing, transaction totals, and
  * reconciliation status for the specified period.
  */
@@ -1086,7 +1086,7 @@ export async function getLSOComplianceReport(
   } catch (err) {
     return {
       success: false,
-      error: `Unexpected error generating LSO compliance report: ${err instanceof Error ? err.message : String(err)}`,
+      error: `Unexpected error generating regulatory compliance report: ${err instanceof Error ? err.message : String(err)}`,
     }
   }
 }

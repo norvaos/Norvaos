@@ -11,10 +11,10 @@
  * 3. "Fix" buttons that deep-link + scroll-and-glow to the exact field
  * 4. Bypass option with explicit user acknowledgement (not just "OK")
  *
- * LSO By-Law References:
+ * Regulatory By-Law References:
  *   - Firm Address: By-Law 7.1, Part II
  *   - Client ID Verification: By-Law 7.1, Part III, Sec. 21 & 23
- *   - Tax Compliance: CRA GST/HST Memorandum 15.1 / LSO RPC 3.6
+ *   - Tax Compliance: CRA GST/HST Memorandum 15.1 / RPC 3.6
  *   - Conflict Check: Rule 3.4 (Rules of Professional Conduct)
  *   - Trust Account: By-Law 9, Section 7
  *   - Engagement Letter: Rule 3.6-1 (Commentary 1)
@@ -204,7 +204,7 @@ const COMPLIANCE_CHECKS: ComplianceCheck[] = [
     label: 'Tax Engine',
     severity: 'mandatory',
     weight: 20,
-    byLaw: 'CRA GST/HST Mem. 15.1 / LSO RPC 3.6',
+    byLaw: 'CRA GST/HST Mem. 15.1 / RPC 3.6',
     byLawUrl: 'https://www.canada.ca/en/revenue-agency/services/forms-publications/publications/15-1.html',
     guidance: 'Fees and disbursements must be fair and reasonable; incorrect tax application can result in overcharging. Tax engine auto-activates when a regulatory body is set.',
     fixLabel: 'Configure Tax',
@@ -324,7 +324,7 @@ export function ComplianceDiagnosticModal({
         colors: ['#10b981', '#059669', '#34d399'],
       })
       toast.success('Regulatory Foundation Complete', {
-        description: `${regBody?.abbr ?? 'LSO'} By-Law 7.1 and Directive 41 protocols are now guarding your practice.`,
+        description: `${regBody?.abbr ?? 'Regulator'} By-Law 7.1 and Directive 41 protocols are now guarding your practice.`,
         duration: 6000,
       })
     }
@@ -466,7 +466,7 @@ export function ComplianceDiagnosticModal({
                     Regulatory Bypass Warning
                   </p>
                   <p className="text-[10px] text-red-700 leading-relaxed">
-                    You are choosing to operate below compliance thresholds. This may expose your firm to regulatory action under {regBody?.abbr ?? 'LSO'} By-Laws. Type <strong>&quot;{BYPASS_PHRASE}&quot;</strong> to continue.
+                    You are choosing to operate below compliance thresholds. This may expose your firm to regulatory action under {regBody?.abbr ?? 'Regulator'} By-Laws. Type <strong>&quot;{BYPASS_PHRASE}&quot;</strong> to continue.
                   </p>
                   <div className="flex gap-2">
                     <input

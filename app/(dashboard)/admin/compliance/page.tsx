@@ -145,7 +145,7 @@ export default function ComplianceDashboard() {
     setIsRefreshing(false)
   }
 
-  const handleSimulateLSO = async () => {
+  const handleSimulateExamination = async () => {
     setIsSimulating(true)
     setSimulationResult(null)
     try {
@@ -387,7 +387,7 @@ export default function ComplianceDashboard() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-lg">
                 <Swords className="h-5 w-5 text-violet-600" />
-                Simulate LSO Examination
+                Simulate Regulatory Examination
               </CardTitle>
               <CardDescription>
                 Directive 026  -  Run a full integrity check on every active matter and generate a Battle-Ready scorecard
@@ -396,7 +396,7 @@ export default function ComplianceDashboard() {
             <CardContent>
               <div className="flex items-center gap-3 mb-4">
                 <Button
-                  onClick={handleSimulateLSO}
+                  onClick={handleSimulateExamination}
                   disabled={isSimulating}
                   className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white"
                 >

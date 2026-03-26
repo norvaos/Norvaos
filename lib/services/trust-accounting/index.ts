@@ -1,7 +1,7 @@
 /**
  * Trust Accounting & IOLTA Compliance  -  Service Layer Barrel
  *
- * Phase 7: LSO By-Law 9 compliant trust accounting.
+ * Phase 7: Regulatory-compliant trust accounting.
  *
  * NOTE: Several services define their own ServiceResult / PaginatedResult /
  * PaginationParams interfaces (structurally identical). To avoid TS2308

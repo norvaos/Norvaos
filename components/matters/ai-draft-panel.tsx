@@ -1207,7 +1207,7 @@ export function AiDraftPanel({ matterId, matterTitle, mountContext = 'modal' }: 
                       <h4 className="text-xs font-bold text-white/90 uppercase tracking-wider">
                         Human-in-the-Loop Verification
                       </h4>
-                      <NorvaWhisper text="Before any AI-generated draft can be finalised, the supervising lawyer must scroll through the entire text and complete all verification steps. This ensures compliance with the 2026 Meaningful Human Control requirements and LSO Technical Competence Rule 3.1." />
+                      <NorvaWhisper text="Before any AI-generated draft can be finalised, the supervising lawyer must scroll through the entire text and complete all verification steps. This ensures compliance with the 2026 Meaningful Human Control requirements and professional competence rules (e.g. Rule 3.1)." />
                     </div>
                     <p className="text-[10px] text-white/40 -mt-1 mb-2">
                       Scroll through the entire draft and complete all checks before finalisation.
@@ -1279,7 +1279,7 @@ export function AiDraftPanel({ matterId, matterTitle, mountContext = 'modal' }: 
                         'text-xs leading-relaxed transition-colors',
                         hitlChecks.professionalResponsibility ? 'text-emerald-300' : 'text-white/60 group-hover:text-white/80',
                       )}>
-                        I take professional responsibility for this submission (LSO Rule 3.1 Compliance).
+                        I take professional responsibility for this submission (Professional Conduct Rule Compliance).
                       </span>
                     </label>
 

@@ -93,17 +93,19 @@ export function enforceRegionCompliance(): {
 
   if (!region) {
     // No region detected
-    if (isDev) {
-      // Dev/local  -  warn but allow
+    if (isDev || isBuildPhase()) {
+      // Dev/local or build phase  -  warn but allow (enforced at runtime)
       console.warn(
         '[RegionGuard] WARNING: Could not detect Supabase region. ' +
-        'Set SUPABASE_REGION=ca-central-1 in .env to suppress this warning.',
+        (isBuildPhase()
+          ? 'Build phase  -  region will be enforced at runtime. Set SUPABASE_REGION in deploy env.'
+          : 'Set SUPABASE_REGION=ca-central-1 in .env to suppress this warning.'),
       )
       _verified = true
-      return { region: null, verified: true, environment: 'development' }
+      return { region: null, verified: true, environment: isDev ? 'development' : 'production' }
     }
 
-    // Production with no region  -  BLOCK
+    // Production runtime with no region  -  BLOCK
     _verified = false
     throw new CriticalComplianceError(
       'Could not verify database region. ' +
@@ -155,4 +157,13 @@ function isDevelopment(): boolean {
     url.includes('127.0.0.1') ||
     process.env.NODE_ENV === 'development'
   )
+}
+
+/**
+ * Detect if we're in a build phase (next build / page data collection).
+ * During build, server modules are imported for static analysis but no
+ * requests are served, so region enforcement should be deferred to runtime.
+ */
+function isBuildPhase(): boolean {
+  return process.env.NEXT_PHASE === 'phase-production-build'
 }

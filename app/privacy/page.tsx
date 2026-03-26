@@ -66,7 +66,7 @@ export default function PrivacyPolicyPage() {
             <li>Firm name, address, and contact information</li>
             <li>Names and email addresses of authorised users</li>
             <li>Billing and payment information (processed by Stripe; we do not store full credit card numbers)</li>
-            <li>Law Society membership numbers and jurisdictional information</li>
+            <li>Regulatory body membership numbers and jurisdictional information</li>
           </ul>
 
           <h3>2.2 End User Information (Client Data)</h3>
@@ -96,7 +96,7 @@ export default function PrivacyPolicyPage() {
           <ul>
             <li><strong>Service delivery:</strong> Operating the NorvaOS platform, including matter management, document storage, conflict checks, billing, and trust accounting</li>
             <li><strong>Account administration:</strong> Managing Subscriber accounts, processing payments, and providing customer support</li>
-            <li><strong>Compliance:</strong> Meeting regulatory requirements, including Law Society trust accounting rules, IRCC submission requirements, and audit obligations</li>
+            <li><strong>Compliance:</strong> Meeting regulatory requirements, including regulatory trust accounting rules, IRCC submission requirements, and audit obligations</li>
             <li><strong>Security:</strong> Detecting, preventing, and responding to security incidents, fraud, or unauthorised access</li>
             <li><strong>Product improvement:</strong> Analysing aggregated, de-identified usage patterns to improve platform performance and features</li>
             <li><strong>Communication:</strong> Sending service-related notifications, security alerts, and (with consent) product updates</li>
@@ -124,7 +124,7 @@ export default function PrivacyPolicyPage() {
           <p>We retain personal information in accordance with the following schedule:</p>
           <ul>
             <li><strong>Active accounts:</strong> Data is retained for the duration of the Subscriber&rsquo;s subscription</li>
-            <li><strong>Trust accounting records:</strong> Retained for a minimum of <strong>seven (7) years</strong> following the completion of a matter, in compliance with Law Society of Ontario By-Law 9 and equivalent provincial requirements</li>
+            <li><strong>Trust accounting records:</strong> Retained for a minimum of <strong>seven (7) years</strong> following the completion of a matter, in compliance with applicable Law Society by-laws (e.g. By-Law 9) and equivalent provincial requirements</li>
             <li><strong>Cancelled accounts:</strong> Subscriber data is retained for 90 days following cancellation, after which it is permanently deleted unless a longer retention period is required by law</li>
             <li><strong>Backup data:</strong> Encrypted backups are retained for 30 days and then automatically purged</li>
           </ul>

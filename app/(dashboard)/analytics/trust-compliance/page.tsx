@@ -165,7 +165,7 @@ export default function TrustCompliancePage() {
         {/* Header */}
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Trust Compliance Dashboard</h1>
-          <p className="text-muted-foreground">LSO By-Law 9 Compliance Monitoring</p>
+          <p className="text-muted-foreground">Trust Accounting Compliance Monitoring</p>
         </div>
 
         {isLoading && <DashboardSkeleton />}

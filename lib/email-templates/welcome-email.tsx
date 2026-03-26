@@ -36,13 +36,13 @@ function WelcomeEmail({ firstName, dashboardUrl }: WelcomeEmailProps) {
               {/* Step 1 */}
               <div style={{ backgroundColor: '#F1F5F9', padding: '16px', borderRadius: '6px', marginBottom: '12px', borderLeft: '4px solid #4C1D95' }}>
                 <div style={{ fontWeight: 700, color: '#4C1D95', fontSize: '14px', textTransform: 'uppercase' as const }}>Step 1: Complete Your Profile</div>
-                <div style={{ fontSize: '14px' }}>Add your Law Society credentials to enable auto-filling for IRCC forms.</div>
+                <div style={{ fontSize: '14px' }}>Add your regulatory credentials to enable auto-filling for IRCC forms.</div>
               </div>
 
               {/* Step 2 */}
               <div style={{ backgroundColor: '#F1F5F9', padding: '16px', borderRadius: '6px', marginBottom: '12px', borderLeft: '4px solid #4C1D95' }}>
                 <div style={{ fontWeight: 700, color: '#4C1D95', fontSize: '14px', textTransform: 'uppercase' as const }}>Step 2: Configure Trust Accounts</div>
-                <div style={{ fontSize: '14px' }}>Set up your bank ledgers to ensure 100% Law Society compliance from day one.</div>
+                <div style={{ fontSize: '14px' }}>Set up your bank ledgers to ensure 100% regulatory compliance from day one.</div>
               </div>
 
               {/* Step 3 */}

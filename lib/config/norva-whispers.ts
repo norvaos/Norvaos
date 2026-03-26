@@ -59,7 +59,7 @@ export const NORVA_WHISPERS = {
   // ─── Norva Vault (formerly Security Logs / PII Shield) ──────────────────
   'vault.audit': {
     title: 'Norva Vault  -  Audit Trail',
-    body: 'Every data change is immutably logged. Stage transitions, field edits, and document uploads are recorded with timestamps and actor IDs for Law Society compliance.',
+    body: 'Every data change is immutably logged. Stage transitions, field edits, and document uploads are recorded with timestamps and actor IDs for regulatory compliance.',
   },
   'vault.encryption': {
     title: 'Norva Vault  -  Encryption',
@@ -69,7 +69,7 @@ export const NORVA_WHISPERS = {
   // ─── Norva Ledger (formerly Trust Accounting / Ledger) ──────────────────
   'ledger.trust': {
     title: 'Norva Ledger  -  Trust Account',
-    body: 'Law Society-compliant trust accounting. Every deposit and disbursement is immutably recorded. The trust balance must reach zero before a matter can be closed.',
+    body: 'Regulatory-compliant trust accounting. Every deposit and disbursement is immutably recorded. The trust balance must reach zero before a matter can be closed.',
   },
   'ledger.billing': {
     title: 'Norva Ledger  -  Billing',

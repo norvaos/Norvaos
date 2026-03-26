@@ -8,7 +8,7 @@
  * Logic: user_role === 'staff' ? ADMIN_LOCALES : CLIENT_LOCALES
  *
  * Regulatory compliance:
- *   - LSO Rule 3.2-2: Communication in client's understood language
+ *   - regulatory rules (e.g. Rule 3.2-2): Communication in client's understood language
  *   - Canadian bilingual standard: Admin shell in en/fr
  *   - IRCC Accessibility: Global 15 for client-facing surfaces
  */

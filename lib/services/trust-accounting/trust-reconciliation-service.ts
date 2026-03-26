@@ -1,5 +1,5 @@
 // ============================================================================
-// Trust Reconciliation Service  -  LSO By-Law 9 Compliant 8-Step Workflow
+// Trust Reconciliation Service  -  Regulatory-Compliant 8-Step Workflow
 // ============================================================================
 // Implements the compliance-grade reconciliation workflow:
 //   Step 1: Set bank statement balance

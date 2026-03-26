@@ -10,7 +10,7 @@ import { createHmac } from 'crypto'
 /**
  * GET /api/matters/[id]/export-audit
  *
- * Directive 016.1 + 022: LSO-Ready "One-Button Examination" Forensic Export.
+ * Directive 016.1 + 022: Regulatory-Ready "One-Button Examination" Forensic Export.
  *
  * Generates a single PDF containing:
  *   1. Genesis Block (compliance seal, 3-pillar breakdown, SHA-256)
@@ -208,7 +208,7 @@ async function handleGet(
 
     // ── Cover Header ────────────────────────────────────────────────
 
-    drawText('NORVAOS  -  LSO COMPLIANCE FORENSIC AUDIT EXPORT', margin, y, { font: fontBold, size: headerSize, color: purple })
+    drawText('NORVAOS  -  REGULATORY COMPLIANCE FORENSIC AUDIT EXPORT', margin, y, { font: fontBold, size: headerSize, color: purple })
     y -= lineHeight * 1.5
     drawText(`Matter: ${matter.matter_number}  -  ${matter.title}`, margin, y, { size: subheaderSize, font: fontBold })
     y -= lineHeight
@@ -390,7 +390,7 @@ async function handleGet(
       y -= lineHeight
     }
 
-    // ── Section 5: Closing Certificate (LSO Rule 3.7) ───────────────
+    // ── Section 5: Closing Certificate (Trust Accounting Rule 3.7) ───
 
     if (isClosed) {
       y -= lineHeight
@@ -398,7 +398,7 @@ async function handleGet(
       drawHr()
       y -= lineHeight
 
-      drawText('SECTION 5: CLOSING CERTIFICATE  -  LSO RULE 3.7', margin, y, { font: fontBold, size: subheaderSize, color: isZeroBalance ? emerald : red })
+      drawText('SECTION 5: CLOSING CERTIFICATE  -  TRUST ACCOUNTING RULE 3.7', margin, y, { font: fontBold, size: subheaderSize, color: isZeroBalance ? emerald : red })
       y -= lineHeight * 1.5
 
       drawText('Zero-Balance Verification:', margin, y, { font: fontBold })
@@ -411,7 +411,7 @@ async function handleGet(
         y -= lineHeight
         drawText('All trust funds have been properly disbursed or returned to the client.', margin + 10, y, { color: gray })
         y -= lineHeight
-        drawText('This matter is compliant with LSO Rule 3.7 for file closure.', margin + 10, y, { color: emerald })
+        drawText('This matter is compliant with trust accounting rules for file closure.', margin + 10, y, { color: emerald })
         y -= lineHeight * 1.5
 
         // Closing certificate stamp
@@ -434,7 +434,7 @@ async function handleGet(
         y -= lineHeight
         drawText(`Current Trust Balance: ${balanceDisplay}`, margin + 10, y, { color: red, font: fontBold, size: subheaderSize })
         y -= lineHeight * 1.5
-        drawText('This matter CANNOT be closed under LSO Rule 3.7 until the trust balance reaches $0.00.', margin + 10, y, { color: red })
+        drawText('This matter CANNOT be closed under trust accounting rules until the trust balance reaches $0.00.', margin + 10, y, { color: red })
         y -= lineHeight
         drawText('Remaining funds must be disbursed to the client or transferred per the retainer agreement.', margin + 10, y, { color: red })
         y -= lineHeight

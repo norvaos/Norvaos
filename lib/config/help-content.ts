@@ -25,7 +25,7 @@ export const HELP_CONTENT = {
   'trust.balance': 'Net trust balance for this matter. Must be zero before the matter can be closed.',
   'billing.hourly_rate': 'The rate per hour charged for time entries on this matter. Can be overridden per team member.',
   'billing.retainer': 'An advance payment held on account. Drawn down as invoices are generated.',
-  'billing.trust_account': 'Law Society-compliant ledger. All transactions are immutably logged for audit purposes.',
+  'billing.trust_account': 'Regulatory-compliant ledger. All transactions are immutably logged for audit purposes.',
 
   // ─── Immigration / IRCC ───
   'ircc.uci_number': '8 or 10-digit Unique Client Identifier assigned by IRCC. Format: 00-0000-0000.',
@@ -39,12 +39,12 @@ export const HELP_CONTENT = {
 
   // ─── Onboarding / Signup ───
   'onboarding.firm_name': 'This name will appear on your invoices, retainers, and client portal. You can edit this in Settings later.',
-  'onboarding.membership_no': 'Optional. Enter your Law Society number (LSO, LSBC, etc.) or CICC licence number (RCICxxxxx). Providing this now allows NorvaOS to auto-populate your IRCC representation forms (Use of Representative, IMM 5476) immediately.',
+  'onboarding.membership_no': 'Optional. Enter your Law Society or College ID (e.g. LSO, LSBC, CICC) or licence number (e.g. RCICxxxxx). Providing this now allows NorvaOS to auto-populate your IRCC representation forms (Use of Representative, IMM 5476) immediately.',
   'onboarding.email_professional': 'Use your firm email. This account will have administrative "Owner" privileges for your firm\'s data.',
   'onboarding.first_name': 'Your first name as it appears on your Law Society membership.',
   'onboarding.last_name': 'Your surname as it appears on your Law Society membership.',
   'onboarding.password': 'Minimum 8 characters. Use a mix of letters, numbers, and symbols for security.',
-  'onboarding.email_verification': 'We require email verification to ensure the security of your legal data and to comply with Law Society digital identity standards.',
+  'onboarding.email_verification': 'We require email verification to ensure the security of your legal data and to comply with regulatory digital identity standards.',
 
   // ─── Dashboard Widgets ───
   'dashboard.todays_appointments': 'Shows all appointments scheduled for today across your matters. Click any appointment to open the matter detail.',
