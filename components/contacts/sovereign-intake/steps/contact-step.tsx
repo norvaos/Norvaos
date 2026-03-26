@@ -74,15 +74,19 @@ type StepValues = z.infer<typeof stepSchema>
 
 interface OcrResult {
   fields: {
-    first_name?: string
-    last_name?: string
-    date_of_birth?: string
-    address_line1?: string
-    city?: string
-    province?: string
-    postal_code?: string
-    document_number?: string
-    expiry_date?: string
+    first_name?: string | null
+    last_name?: string | null
+    middle_name?: string | null
+    date_of_birth?: string | null
+    address_line1?: string | null
+    city?: string | null
+    province_state?: string | null
+    postal_code?: string | null
+    document_number?: string | null
+    expiry_date?: string | null
+    sex?: string | null
+    document_type?: string
+    review_required?: string[]
   }
   rawText: string
 }
@@ -256,18 +260,19 @@ export function SovereignContactStep({
       }
 
       const filled: (keyof StepValues)[] = []
+      // Map OCR parser field names → form field names
       const fieldMap: Record<string, keyof StepValues> = {
         first_name: 'first_name',
         last_name: 'last_name',
         date_of_birth: 'date_of_birth',
         address_line1: 'address_line1',
         city: 'city',
-        province: 'province',
+        province_state: 'province',  // parser returns province_state
         postal_code: 'postal_code',
       }
 
       for (const [ocrKey, formKey] of Object.entries(fieldMap)) {
-        const value = ocrData.fields[ocrKey as keyof OcrResult['fields']]
+        const value = (ocrData.fields as Record<string, string | undefined>)[ocrKey]
         if (value) {
           setValue(formKey, value, { shouldValidate: true })
           filled.push(formKey)

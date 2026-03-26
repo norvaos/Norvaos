@@ -50,49 +50,14 @@ export async function POST(req: NextRequest) {
     // Determine file type from base64 header or fileName
     const fileType = detectFileType(image, fileName)
 
-    // Prepare form data for OCR.space
-    const formData = new FormData()
-    formData.append('apikey', OCR_API_KEY)
-    formData.append('base64Image', ensureDataUri(image, fileType))
-    formData.append('language', 'eng')
-    formData.append('isOverlayRequired', 'false')
-    formData.append('detectOrientation', 'true')
-    formData.append('scale', 'true')
-    formData.append('OCREngine', '1') // Engine 1: faster (~3-5s vs 15-30s)
+    const dataUri = ensureDataUri(image, fileType)
 
-    const ocrRes = await fetch(OCR_SPACE_URL, {
-      method: 'POST',
-      body: formData,
-      signal: AbortSignal.timeout(15000), // 15s timeout
-    })
+    // Try Engine 2 first (higher accuracy for IDs), fall back to Engine 1
+    const rawText = await ocrWithFallback(OCR_API_KEY, dataUri)
 
-    if (!ocrRes.ok) {
-      const errText = await ocrRes.text()
-      console.error('[OCR] API error:', ocrRes.status, errText)
+    if (!rawText) {
       return NextResponse.json(
-        { error: 'OCR service returned an error' },
-        { status: 502 },
-      )
-    }
-
-    const ocrData = await ocrRes.json()
-
-    if (ocrData.IsErroredOnProcessing) {
-      console.error('[OCR] Processing error:', ocrData.ErrorMessage)
-      return NextResponse.json(
-        { error: ocrData.ErrorMessage?.[0] ?? 'OCR processing failed' },
-        { status: 422 },
-      )
-    }
-
-    // Extract raw text from all parsed results
-    const rawText = (ocrData.ParsedResults ?? [])
-      .map((r: { ParsedText?: string }) => r.ParsedText ?? '')
-      .join('\n')
-
-    if (!rawText.trim()) {
-      return NextResponse.json(
-        { error: 'No text detected in the image. Please upload a clearer photo.' },
+        { error: 'No text detected in the image. Please upload a clearer, well-lit photo.' },
         { status: 422 },
       )
     }
@@ -104,12 +69,19 @@ export async function POST(req: NextRequest) {
     const fields = parseIdFields(rawText)
     console.log('[OCR] Parsed fields:', JSON.stringify(fields, null, 2))
 
+    // Count how many key fields were extracted
+    const keyFields = ['first_name', 'last_name', 'date_of_birth', 'address_line1', 'city', 'province_state', 'postal_code'] as const
+    const extractedCount = keyFields.filter(f => fields[f]).length
+    const confidence = extractedCount >= 5 ? 'high' : extractedCount >= 3 ? 'medium' : 'low'
+
     return NextResponse.json({
       success: true,
       data: {
         fields,
         rawText,
-        confidence: ocrData.ParsedResults?.[0]?.TextOverlay?.HasOverlay ? 'high' : 'medium',
+        confidence,
+        extractedFieldCount: extractedCount,
+        totalFieldCount: keyFields.length,
       },
     })
   } catch (err) {
@@ -118,6 +90,68 @@ export async function POST(req: NextRequest) {
       { error: 'Failed to process ID document' },
       { status: 500 },
     )
+  }
+}
+
+/**
+ * Try OCR Engine 2 (premium, better for IDs with complex layouts) first.
+ * If it fails or returns empty, fall back to Engine 1 (faster, simpler).
+ */
+async function ocrWithFallback(apiKey: string, dataUri: string): Promise<string | null> {
+  // Engine 2: Better accuracy for structured documents (IDs, licences)
+  const engine2Text = await callOcrSpace(apiKey, dataUri, '2')
+  if (engine2Text && engine2Text.trim().length > 20) {
+    console.log('[OCR] Engine 2 succeeded')
+    return engine2Text
+  }
+
+  // Fallback: Engine 1 (faster, better for simple text)
+  console.log('[OCR] Engine 2 insufficient, falling back to Engine 1')
+  const engine1Text = await callOcrSpace(apiKey, dataUri, '1')
+  if (engine1Text && engine1Text.trim()) {
+    console.log('[OCR] Engine 1 succeeded')
+    return engine1Text
+  }
+
+  return null
+}
+
+async function callOcrSpace(apiKey: string, dataUri: string, engine: '1' | '2'): Promise<string | null> {
+  try {
+    const formData = new FormData()
+    formData.append('apikey', apiKey)
+    formData.append('base64Image', dataUri)
+    formData.append('language', 'eng')
+    formData.append('isOverlayRequired', 'false')
+    formData.append('detectOrientation', 'true')
+    formData.append('scale', 'true')
+    formData.append('isTable', 'true')           // Better for structured ID layouts
+    formData.append('OCREngine', engine)
+
+    const res = await fetch(OCR_SPACE_URL, {
+      method: 'POST',
+      body: formData,
+      signal: AbortSignal.timeout(engine === '2' ? 30000 : 15000),
+    })
+
+    if (!res.ok) {
+      console.error(`[OCR] Engine ${engine} HTTP error:`, res.status)
+      return null
+    }
+
+    const data = await res.json()
+
+    if (data.IsErroredOnProcessing) {
+      console.error(`[OCR] Engine ${engine} processing error:`, data.ErrorMessage)
+      return null
+    }
+
+    return (data.ParsedResults ?? [])
+      .map((r: { ParsedText?: string }) => r.ParsedText ?? '')
+      .join('\n')
+  } catch (err) {
+    console.error(`[OCR] Engine ${engine} exception:`, err)
+    return null
   }
 }
 
