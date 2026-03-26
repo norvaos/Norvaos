@@ -178,8 +178,8 @@ export function SovereignStepper({ onComplete, onCancel }: SovereignStepperProps
   const canGoBack = currentPhase !== 'conflict_search'
   const canGoNext =
     (currentPhase === 'conflict_search' && intake.conflictCleared) ||
-    (currentPhase === 'contact_details' && intake.conflictCleared && intake.isGeneralContact && !!intake.contactId) ||
-    (currentPhase === 'contact_details' && intake.conflictCleared && !intake.isGeneralContact && !!intake.contactId && !!intake.leadId) ||
+    (currentPhase === 'contact_details' && intake.isGeneralContact && !!intake.contactId) ||
+    (currentPhase === 'contact_details' && !intake.isGeneralContact && !!intake.contactId && !!intake.leadId) ||
     (currentPhase === 'compliance_review' && !!intake.contactId && !!intake.leadId)
 
   const isLastStep =

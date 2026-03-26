@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod/v4'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -23,6 +23,14 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip'
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog'
+import {
   Fingerprint,
   Loader2,
   Upload,
@@ -31,6 +39,9 @@ import {
   Users,
   Check,
   ShieldAlert,
+  ShieldCheck,
+  Link2,
+  UserX,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useTenant } from '@/lib/hooks/use-tenant'
@@ -160,21 +171,22 @@ export function SovereignContactStep({
   const watchedFirstName = watch('first_name')
   const watchedLastName = watch('last_name')
 
-  // ── Conflict re-check: invalidate if name changed from what was searched ──
-  useEffect(() => {
-    if (!intake.conflictCleared) return
-    const nameChanged =
-      watchedFirstName.trim().toLowerCase() !== intake.firstName.trim().toLowerCase() ||
-      watchedLastName.trim().toLowerCase() !== intake.lastName.trim().toLowerCase()
-    if (nameChanged) {
-      updateIntake({
-        conflictCleared: false,
-        conflictResolution: 'none',
-        conflictJustification: null,
-        existingContactId: null,
-      })
-    }
-  }, [watchedFirstName, watchedLastName, intake.firstName, intake.lastName, intake.conflictCleared, updateIntake])
+  // Detect if name has diverged from what was conflict-checked in Step 1
+  const nameDiverged =
+    watchedFirstName.trim().toLowerCase() !== intake.firstName.trim().toLowerCase() ||
+    watchedLastName.trim().toLowerCase() !== intake.lastName.trim().toLowerCase()
+
+  // ── Inline conflict check state (triggered on submit when name changed) ──
+  const [conflictChecking, setConflictChecking] = useState(false)
+  const [conflictMatches, setConflictMatches] = useState<Array<{
+    id: string
+    first_name: string | null
+    last_name: string | null
+    email_primary: string | null
+    phone_primary: string | null
+  }>>([])
+  const [showConflictDialog, setShowConflictDialog] = useState(false)
+  const [pendingValues, setPendingValues] = useState<StepValues | null>(null)
 
   // OCR was used = at least one field was auto-populated
   const ocrWasUsed = ocrFields.length > 0
@@ -294,10 +306,68 @@ export function SovereignContactStep({
   }
 
   /* ---------------------------------------------------------------- */
+  /*  Inline conflict check  -  runs before create when name changed     */
+  /* ---------------------------------------------------------------- */
+
+  const runInlineConflictCheck = useCallback(async (firstName: string, lastName: string): Promise<boolean> => {
+    if (!tenant) return true
+    setConflictChecking(true)
+    try {
+      const supabase = createClient()
+      const { data: matches } = await supabase
+        .from('contacts')
+        .select('id, first_name, last_name, email_primary, phone_primary')
+        .eq('tenant_id', tenant.id)
+        .or(`first_name.ilike.%${firstName}%,last_name.ilike.%${lastName}%`)
+        .limit(20)
+
+      const results = (matches ?? []).filter(
+        (m) =>
+          m.first_name?.toLowerCase().includes(firstName.toLowerCase()) ||
+          m.last_name?.toLowerCase().includes(lastName.toLowerCase())
+      )
+
+      if (results.length === 0) {
+        // Clear  -  update intake with new name and mark conflict cleared
+        updateIntake({
+          firstName,
+          lastName,
+          conflictCleared: true,
+          conflictResolution: 'none',
+        })
+        return true
+      }
+
+      // Matches found  -  show dialog
+      setConflictMatches(results)
+      setShowConflictDialog(true)
+      return false
+    } catch {
+      // On error, allow through but log
+      return true
+    } finally {
+      setConflictChecking(false)
+    }
+  }, [tenant, updateIntake])
+
+  /* ---------------------------------------------------------------- */
   /*  Submit  -  create contact (+ lead unless general contact)          */
   /* ---------------------------------------------------------------- */
 
   async function onSubmit(values: StepValues) {
+    if (!tenant || !appUser) return
+
+    // If name changed from what was conflict-checked, run inline check first
+    if (nameDiverged) {
+      setPendingValues(values)
+      const passed = await runInlineConflictCheck(values.first_name.trim(), values.last_name.trim())
+      if (!passed) return // Dialog will handle resolution
+    }
+
+    await createContactAndLead(values)
+  }
+
+  async function createContactAndLead(values: StepValues) {
     if (!tenant || !appUser) return
 
     setSubmitting(true)
@@ -424,16 +494,11 @@ export function SovereignContactStep({
     }
   }
 
-  const busy = submitting || scanning
-
-  // Name divergence check: block submit if name changed from conflict-checked name
-  const nameDiverged =
-    watchedFirstName.trim().toLowerCase() !== intake.firstName.trim().toLowerCase() ||
-    watchedLastName.trim().toLowerCase() !== intake.lastName.trim().toLowerCase()
+  const busy = submitting || scanning || conflictChecking
 
   // Directive 42.2, Item 3: Submit locked if OCR was used but not verified
   const verificationRequired = ocrWasUsed && !ocrVerified
-  const canSubmit = !busy && !created && !verificationRequired && !nameDiverged
+  const canSubmit = !busy && !created && !verificationRequired
 
   /* ---------------------------------------------------------------- */
   /*  Helper: OCR field wrapper with highlight + checkmark + tooltip    */
@@ -779,22 +844,8 @@ export function SovereignContactStep({
       {/* Error */}
       {error && <p className="text-sm text-destructive">{error}</p>}
 
-      {/* Name changed  -  conflict re-check required */}
-      {nameDiverged && !created && (
-        <div className="flex items-start gap-3 rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-red-900 animate-in fade-in slide-in-from-top-2">
-          <ShieldAlert className="mt-0.5 size-5 shrink-0 text-red-600" />
-          <div>
-            <p className="text-sm font-semibold">Conflict Re-Check Required</p>
-            <p className="mt-0.5 text-xs leading-relaxed">
-              The name has changed from what was originally searched. Please go
-              back to Step 1 and re-run the conflict check with the updated name.
-            </p>
-          </div>
-        </div>
-      )}
-
       {/* Verification warning when submit is blocked */}
-      {verificationRequired && !created && !nameDiverged && (
+      {verificationRequired && !created && (
         <p className="text-xs text-amber-600 text-center">
           Please verify the OCR data and tick the confirmation checkbox above to proceed.
         </p>
@@ -802,12 +853,109 @@ export function SovereignContactStep({
 
       {/* Submit */}
       <Button type="submit" className="w-full" disabled={!canSubmit}>
-        {submitting
-          ? 'Creating...'
-          : created
-            ? 'Contact Created \u2713'
-            : submitLabel}
+        {conflictChecking
+          ? (<><Loader2 className="mr-2 size-4 animate-spin" />Checking for conflicts…</>)
+          : submitting
+            ? 'Creating...'
+            : created
+              ? 'Contact Created \u2713'
+              : submitLabel}
       </Button>
+
+      {/* ── Inline Conflict Dialog  -  shown when name changed and matches found ── */}
+      <Dialog open={showConflictDialog} onOpenChange={setShowConflictDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <ShieldAlert className="size-5 text-amber-600" />
+              Potential Conflicts Found
+            </DialogTitle>
+            <DialogDescription>
+              The name was updated since the original conflict search. We found
+              {conflictMatches.length === 1 ? ' 1 existing contact' : ` ${conflictMatches.length} existing contacts`} matching
+              &ldquo;{watchedFirstName} {watchedLastName}&rdquo;.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="max-h-60 space-y-2 overflow-y-auto">
+            {conflictMatches.map((match) => (
+              <div
+                key={match.id}
+                className="flex items-center justify-between rounded-lg border border-slate-200 bg-slate-50 px-4 py-3"
+              >
+                <div>
+                  <p className="text-sm font-medium text-slate-900">
+                    {match.first_name} {match.last_name}
+                  </p>
+                  {(match.email_primary || match.phone_primary) && (
+                    <p className="text-xs text-slate-500">
+                      {[match.email_primary, match.phone_primary].filter(Boolean).join(' · ')}
+                    </p>
+                  )}
+                </div>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="shrink-0 gap-1.5"
+                  onClick={() => {
+                    // Link to this existing contact
+                    updateIntake({
+                      firstName: watchedFirstName.trim(),
+                      lastName: watchedLastName.trim(),
+                      conflictCleared: true,
+                      existingContactId: match.id,
+                      conflictResolution: 'linked',
+                    })
+                    setShowConflictDialog(false)
+                    setConflictMatches([])
+                  }}
+                >
+                  <Link2 className="size-3.5" />
+                  Link
+                </Button>
+              </div>
+            ))}
+          </div>
+
+          <DialogFooter className="flex-col gap-2 sm:flex-col">
+            <Button
+              variant="outline"
+              className="w-full gap-1.5"
+              onClick={() => {
+                // Declare no conflict  -  proceed with creation
+                updateIntake({
+                  firstName: watchedFirstName.trim(),
+                  lastName: watchedLastName.trim(),
+                  conflictCleared: true,
+                  conflictResolution: 'declared_no_conflict',
+                  conflictJustification: 'Reviewed inline  -  declared not the same person',
+                  existingContactId: null,
+                })
+                setShowConflictDialog(false)
+                setConflictMatches([])
+                // Auto-proceed with the pending creation
+                if (pendingValues) {
+                  createContactAndLead(pendingValues)
+                  setPendingValues(null)
+                }
+              }}
+            >
+              <UserX className="size-4" />
+              Not the Same Person  -  Proceed
+            </Button>
+            <Button
+              variant="ghost"
+              className="w-full text-slate-500"
+              onClick={() => {
+                setShowConflictDialog(false)
+                setPendingValues(null)
+              }}
+            >
+              Cancel
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </form>
   )
 }
