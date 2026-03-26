@@ -119,10 +119,10 @@ export default async function LandingPage() {
               </span>
             </h1>
             <p className="mt-6 text-xl leading-8 text-gray-900 max-w-2xl mx-auto">
-              Most Canadian immigration practices run on four or five different apps that don&rsquo;t talk to each other. NorvaOS brings everything into one place: matters, documents, deadlines, billing, trust accounting, and client communication, all purpose-built for Canadian legal practices.
+              Most Canadian practices run on four or five apps that don&rsquo;t talk to each other. NorvaOS replaces them all — matters, documents, deadlines, billing, trust accounting, and client communication — so your file is audit-ready from day one.
             </p>
             <p className="mt-4 text-base font-medium text-gray-700">
-              If you can use email, you can run NorvaOS. No IT department. No training course. Just open it and go.
+              Close files 80% faster. Always audit-ready. No IT department required — just open it and go.
             </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Link
@@ -455,7 +455,7 @@ export default async function LandingPage() {
               {
                 icon: Landmark,
                 label: 'Norva Ledger',
-                sub: 'Law Society–compliant trust ledger, three-way reconciliation',
+                sub: 'Regulator-compliant trust ledger, three-way reconciliation',
                 color: 'text-emerald-700',
                 bg: 'bg-emerald-100',
                 card: 'bg-white border border-emerald-100',
