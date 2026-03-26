@@ -21,6 +21,7 @@ async function handlePatch(request: Request) {
     const {
       name, primary_color, secondary_color, accent_color, timezone, currency, date_format, home_province,
       matter_number_prefix, matter_number_separator, matter_number_padding, matter_number_include_year, matter_naming_template,
+      address_line1, office_phone,
     } =
       body as {
         name?: string
@@ -36,6 +37,8 @@ async function handlePatch(request: Request) {
         matter_number_padding?: number
         matter_number_include_year?: boolean
         matter_naming_template?: string | null
+        address_line1?: string
+        office_phone?: string
       }
 
     const update: Record<string, unknown> = {}
@@ -98,10 +101,31 @@ async function handlePatch(request: Request) {
       update.matter_naming_template = matter_naming_template
     }
 
+    // Address and phone are stored in the settings JSONB column
+    const hasSettingsUpdate = address_line1 !== undefined || office_phone !== undefined
+    if (hasSettingsUpdate) {
+      // Read current settings to merge
+      const { data: currentTenant } = await admin
+        .from('tenants')
+        .select('settings')
+        .eq('id', auth.tenantId)
+        .single()
+
+      const existingSettings =
+        typeof currentTenant?.settings === 'object' && currentTenant?.settings !== null
+          ? (currentTenant.settings as Record<string, unknown>)
+          : {}
+
+      const settingsPatch: Record<string, unknown> = { ...existingSettings }
+      if (address_line1 !== undefined) settingsPatch.address = address_line1
+      if (office_phone !== undefined) settingsPatch.phone = office_phone
+      update.settings = settingsPatch
+    }
+
     const namingFields = ['matter_number_prefix', 'matter_number_separator', 'matter_number_padding', 'matter_number_include_year', 'matter_naming_template'] as const
     const hasNamingChange = namingFields.some((f) => update[f] !== undefined)
 
-    if (Object.keys(update).length === 0) {
+    if (Object.keys(update).length === 0 && !hasSettingsUpdate) {
       return NextResponse.json({ error: 'No fields to update' }, { status: 400 })
     }
 

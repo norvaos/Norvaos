@@ -281,7 +281,7 @@ export default function ComplianceSetupPage() {
         <Button
           className="w-full h-12 text-base font-semibold"
           size="lg"
-          disabled={!selectedBody || saveMutation.isPending}
+          disabled={!selectedBody || saveMutation.isPending || setupComplete}
           onClick={() => saveMutation.mutate()}
         >
           {saveMutation.isPending ? (
