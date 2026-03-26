@@ -87,7 +87,8 @@ import { Card } from '@/components/ui/card'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import { useVirtualizer } from '@tanstack/react-virtual'
 import { EmptyState } from '@/components/shared/empty-state'
-import { MatterCreateSheet } from '@/components/matters/matter-create-sheet'
+import { SovereignInitiationModal } from '@/components/matters/sovereign-initiation-modal'
+import { InitiationSuccess } from '@/components/matters/initiation-success'
 import { RiskBadge } from '@/components/matters/risk-badge'
 import { IntakeStatusBadge } from '@/components/matters/intake-status-badge'
 
@@ -244,6 +245,12 @@ export default function MattersPage() {
   const [riskLevelFilter, setRiskLevelFilter] = useState<string>(searchParams.get('riskLevel') ?? '')
   const [viewMode, setViewMode] = useState<'table' | 'kanban'>('table')
   const [sheetOpen, setSheetOpen] = useState(false)
+  const [genesisData, setGenesisData] = useState<{
+    matterId: string
+    matterTitle: string
+    matterNumber: string
+    clientName: string
+  } | null>(null)
 
   // Bulk selection
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
@@ -729,8 +736,55 @@ export default function MattersPage() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Create Sheet */}
-      <MatterCreateSheet open={sheetOpen} onOpenChange={setSheetOpen} />
+      {/* Sovereign Initiation Modal (Directive 042) */}
+      <SovereignInitiationModal
+        open={sheetOpen}
+        onOpenChange={setSheetOpen}
+        onSuccess={(matterId) => {
+          setSheetOpen(false)
+          // We need matter info for the Genesis Spark - fetch it
+          const supabase = createClient()
+          ;(supabase as any)
+            .from('matters')
+            .select('id, title, matter_number, contact_id, contacts(first_name, last_name)')
+            .eq('id', matterId)
+            .single()
+            .then(({ data }: { data: any }) => {
+              const contact = data?.contacts
+              setGenesisData({
+                matterId,
+                matterTitle: data?.title ?? 'New Matter',
+                matterNumber: data?.matter_number ?? '',
+                clientName: contact
+                  ? `${contact.first_name ?? ''} ${contact.last_name ?? ''}`.trim()
+                  : '',
+              })
+            })
+            .catch(() => {
+              // Fallback - show Genesis Spark with minimal data
+              setGenesisData({
+                matterId,
+                matterTitle: 'New Matter',
+                matterNumber: '',
+                clientName: '',
+              })
+            })
+        }}
+      />
+
+      {/* Genesis Spark Animation (Directive 043) */}
+      {genesisData && (
+        <InitiationSuccess
+          matterTitle={genesisData.matterTitle}
+          matterNumber={genesisData.matterNumber}
+          clientName={genesisData.clientName}
+          onComplete={() => {
+            const id = genesisData.matterId
+            setGenesisData(null)
+            router.push(`/matters/${id}`)
+          }}
+        />
+      )}
     </div>
   )
 }
