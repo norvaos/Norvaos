@@ -19,6 +19,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { TenantDateInput } from '@/components/ui/tenant-date-input'
 import { Label } from '@/components/ui/label'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
@@ -1011,10 +1012,9 @@ function MilestonesPanel({ matterId, tenantId }: MilestonesPanelProps) {
             <div className="grid grid-cols-2 gap-2">
               <div>
                 <Label className="text-xs">Due Date (optional)</Label>
-                <Input
-                  type="date"
+                <TenantDateInput
                   value={newDueDate}
-                  onChange={(e) => setNewDueDate(e.target.value)}
+                  onChange={(iso) => setNewDueDate(iso)}
                   className="mt-1 h-7 text-xs"
                 />
               </div>

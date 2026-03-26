@@ -32,6 +32,7 @@ import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
+import { TenantDateInput } from '@/components/ui/tenant-date-input'
 import { Label } from '@/components/ui/label'
 import {
   Select,
@@ -183,10 +184,9 @@ function MilestoneRow({
           {/* Date input */}
           <div className="flex flex-col gap-1">
             <Label className="text-xs text-muted-foreground">Date</Label>
-            <Input
-              type="date"
+            <TenantDateInput
               value={date}
-              onChange={e => onDateChange(e.target.value)}
+              onChange={(iso) => onDateChange(iso)}
               className="h-7 text-xs w-36"
             />
           </div>
@@ -540,12 +540,11 @@ export function CorrespondenceTab({ matterId, tenantId }: CorrespondenceTabProps
                 {/* Date */}
                 <div className="flex flex-col gap-1">
                   <Label className="text-xs text-muted-foreground">Date</Label>
-                  <Input
-                    type="date"
+                  <TenantDateInput
                     value={decisionDate}
-                    onChange={e => upsert.mutate({
+                    onChange={(iso) => upsert.mutate({
                       item_type: 'decision_notice',
-                      item_date: e.target.value || null,
+                      item_date: iso || null,
                       decision_type: decisionType || null,
                     })}
                     className="h-7 text-xs w-36"

@@ -40,6 +40,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Input } from '@/components/ui/input'
+import { TenantDateInput } from '@/components/ui/tenant-date-input'
 import { toast } from 'sonner'
 
 // ── Formatters ───────────────────────────────────────────────────────────────
@@ -850,20 +851,16 @@ export default function FinancialAnalyticsPage() {
             {/* Custom date pickers */}
             {periodPreset === 'custom' && (
               <>
-                <Input
-                  type="date"
+                <TenantDateInput
                   className="h-9 w-[150px] text-sm"
                   value={customStart}
-                  onChange={(e) => setCustomStart(e.target.value)}
-                  placeholder="Start date"
+                  onChange={(iso) => setCustomStart(iso)}
                 />
                 <span className="text-sm text-muted-foreground">to</span>
-                <Input
-                  type="date"
+                <TenantDateInput
                   className="h-9 w-[150px] text-sm"
                   value={customEnd}
-                  onChange={(e) => setCustomEnd(e.target.value)}
-                  placeholder="End date"
+                  onChange={(iso) => setCustomEnd(iso)}
                 />
               </>
             )}

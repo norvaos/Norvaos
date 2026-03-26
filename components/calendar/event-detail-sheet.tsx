@@ -44,6 +44,7 @@ import { Separator } from '@/components/ui/separator'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Input } from '@/components/ui/input'
+import { TenantDateInput } from '@/components/ui/tenant-date-input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
@@ -334,10 +335,9 @@ export function EventDetailSheet({ eventId, open, onOpenChange }: EventDetailShe
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1.5">
                     <Label>Start Date</Label>
-                    <Input
-                      type="date"
+                    <TenantDateInput
                       value={editStartDate}
-                      onChange={(e) => setEditStartDate(e.target.value)}
+                      onChange={(iso) => setEditStartDate(iso)}
                     />
                   </div>
                   {!editAllDay && (
@@ -355,10 +355,9 @@ export function EventDetailSheet({ eventId, open, onOpenChange }: EventDetailShe
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1.5">
                     <Label>End Date</Label>
-                    <Input
-                      type="date"
+                    <TenantDateInput
                       value={editEndDate}
-                      onChange={(e) => setEditEndDate(e.target.value)}
+                      onChange={(iso) => setEditEndDate(iso)}
                     />
                   </div>
                   {!editAllDay && (

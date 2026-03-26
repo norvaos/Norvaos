@@ -16,6 +16,7 @@ import type { Database } from '@/lib/types/database'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { TenantDateInput } from '@/components/ui/tenant-date-input'
 import { Textarea } from '@/components/ui/textarea'
 import { Separator } from '@/components/ui/separator'
 import {
@@ -471,10 +472,9 @@ export function LeadForm({
                 <FormItem>
                   <FormLabel>{t('form.lead_follow_up' as any)}</FormLabel>
                   <FormControl>
-                    <Input
-                      type="date"
-                      {...field}
+                    <TenantDateInput
                       value={field.value ?? ''}
+                      onChange={(iso) => field.onChange(iso)}
                     />
                   </FormControl>
                   <FormMessage />

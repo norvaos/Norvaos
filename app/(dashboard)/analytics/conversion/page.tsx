@@ -41,6 +41,7 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Button } from '@/components/ui/button'
+import { TenantDateInput } from '@/components/ui/tenant-date-input'
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -669,15 +670,10 @@ export default function ConversionAnalyticsPage() {
           <label className="text-xs font-medium text-muted-foreground">
             From
           </label>
-          <input
-            type="date"
+          <TenantDateInput
             value={fromDate}
-            onChange={(e) => setFromDate(e.target.value)}
-            className={cn(
-              'flex h-9 w-[160px] rounded-md border border-input bg-background px-3 py-1',
-              'text-sm shadow-sm transition-colours',
-              'focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring',
-            )}
+            onChange={(iso) => setFromDate(iso)}
+            className="h-9 w-[160px]"
           />
         </div>
 
@@ -686,15 +682,10 @@ export default function ConversionAnalyticsPage() {
           <label className="text-xs font-medium text-muted-foreground">
             To
           </label>
-          <input
-            type="date"
+          <TenantDateInput
             value={toDate}
-            onChange={(e) => setToDate(e.target.value)}
-            className={cn(
-              'flex h-9 w-[160px] rounded-md border border-input bg-background px-3 py-1',
-              'text-sm shadow-sm transition-colours',
-              'focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring',
-            )}
+            onChange={(iso) => setToDate(iso)}
+            className="h-9 w-[160px]"
           />
         </div>
       </div>

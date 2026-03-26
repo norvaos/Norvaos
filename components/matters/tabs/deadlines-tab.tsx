@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle, CardAction } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { TenantDateInput } from '@/components/ui/tenant-date-input'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Checkbox } from '@/components/ui/checkbox'
 import {
@@ -146,10 +147,9 @@ export function DeadlinesTab({
                   <label className="block text-xs font-medium text-slate-700 mb-1">
                     Date *
                   </label>
-                  <Input
-                    type="date"
+                  <TenantDateInput
                     value={newDate}
-                    onChange={(e) => setNewDate(e.target.value)}
+                    onChange={(iso) => setNewDate(iso)}
                     className="h-9 text-sm"
                   />
                 </div>

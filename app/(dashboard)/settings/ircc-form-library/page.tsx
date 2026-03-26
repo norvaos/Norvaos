@@ -79,6 +79,7 @@ import { createClient } from '@/lib/supabase/client'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { TenantDateInput } from '@/components/ui/tenant-date-input'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -1391,26 +1392,22 @@ function FolderSyncSection() {
                               setFormNames((prev) => ({ ...prev, [item.formCode]: e.target.value }))
                             }
                           />
-                          <Input
-                            type="date"
+                          <TenantDateInput
                             className="h-7 text-xs"
                             value={formDates[item.formCode] || ''}
-                            title="IRCC form date"
-                            onChange={(e) =>
-                              setFormDates((prev) => ({ ...prev, [item.formCode]: e.target.value }))
+                            onChange={(iso) =>
+                              setFormDates((prev) => ({ ...prev, [item.formCode]: iso }))
                             }
                           />
                         </div>
                       ) : item.status === 'updated' ? (
                         <div className="space-y-1">
                           <span className="text-xs">{item.fileName}</span>
-                          <Input
-                            type="date"
+                          <TenantDateInput
                             className="h-7 text-xs"
                             value={formDates[item.formCode] || ''}
-                            title="IRCC form date"
-                            onChange={(e) =>
-                              setFormDates((prev) => ({ ...prev, [item.formCode]: e.target.value }))
+                            onChange={(iso) =>
+                              setFormDates((prev) => ({ ...prev, [item.formCode]: iso }))
                             }
                           />
                         </div>

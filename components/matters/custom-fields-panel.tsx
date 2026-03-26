@@ -10,6 +10,7 @@
 
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import { Input } from '@/components/ui/input'
+import { TenantDateInput } from '@/components/ui/tenant-date-input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -238,11 +239,10 @@ export function CustomFieldsPanel({
               </Select>
             ) : fieldDef.type === 'string' && fieldDef.format === 'date' ? (
               /* Date field */
-              <Input
+              <TenantDateInput
                 id={`cf-${fieldName}`}
-                type="date"
                 value={(value as string) ?? ''}
-                onChange={(e) => handleChange(fieldName, e.target.value)}
+                onChange={(iso) => handleChange(fieldName, iso)}
                 disabled={readOnly}
                 className="h-9"
               />

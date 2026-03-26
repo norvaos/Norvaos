@@ -18,6 +18,7 @@ import {
 } from '@/lib/utils/screening-questions'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { TenantDateInput } from '@/components/ui/tenant-date-input'
 import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -333,10 +334,9 @@ function ScreeningQuestions({
 
           {/* Date */}
           {q.field_type === 'date' && (
-            <Input
-              type="date"
+            <TenantDateInput
               value={(answers[q.id] as string) ?? ''}
-              onChange={(e) => onAnswer(q.id, e.target.value)}
+              onChange={(iso) => onAnswer(q.id, iso)}
               className="h-9 text-sm"
             />
           )}
@@ -751,11 +751,10 @@ export function QuickCreate({ onCreated }: QuickCreateProps) {
 
             <div className="space-y-1.5">
               <Label htmlFor="qc-dob">Date of Birth</Label>
-              <Input
+              <TenantDateInput
                 id="qc-dob"
-                type="date"
                 value={step1.dateOfBirth}
-                onChange={(e) => updateStep1('dateOfBirth', e.target.value)}
+                onChange={(iso) => updateStep1('dateOfBirth', iso)}
               />
             </div>
 

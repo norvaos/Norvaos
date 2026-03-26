@@ -57,6 +57,7 @@ import { NOC_CODES, getNocTitle } from '@/lib/utils/noc-codes'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { TenantDateInput } from '@/components/ui/tenant-date-input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
@@ -1342,7 +1343,7 @@ function PersonFormFields({ form }: { form: any }) {
       <div className="grid gap-3 sm:grid-cols-3">
         <div className="space-y-1">
           <Label>Date of Birth</Label>
-          <Input type="date" {...form.register('date_of_birth')} />
+          <TenantDateInput value={form.watch('date_of_birth') ?? ''} onChange={(iso) => form.setValue('date_of_birth', iso)} />
           {form.formState.errors.date_of_birth && (
             <p className="text-xs text-destructive">{form.formState.errors.date_of_birth.message}</p>
           )}
@@ -1423,7 +1424,7 @@ function PersonFormFields({ form }: { form: any }) {
         </div>
         <div className="space-y-1">
           <Label>Status Expiry Date</Label>
-          <Input type="date" {...form.register('status_expiry_date')} />
+          <TenantDateInput value={form.watch('status_expiry_date') ?? ''} onChange={(iso) => form.setValue('status_expiry_date', iso)} />
         </div>
         <div className="space-y-1">
           <Label>Country of Residence</Label>

@@ -13,6 +13,7 @@
 import { useState, useCallback } from 'react'
 import { Check, AlertTriangle, Info, Shield } from 'lucide-react'
 import { Input } from '@/components/ui/input'
+import { TenantDateInput } from '@/components/ui/tenant-date-input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
@@ -303,12 +304,10 @@ export function FieldInput({
 
     case 'date': {
       control = (
-        <Input
+        <TenantDateInput
           id={`field-${field.id}`}
-          type="date"
           value={stringValue}
-          onChange={(e) => onChange(e.target.value)}
-          onBlur={onBlur}
+          onChange={(iso) => { onChange(iso); setTimeout(onBlur, 0) }}
           disabled={readOnly}
           className="text-xs h-8"
         />

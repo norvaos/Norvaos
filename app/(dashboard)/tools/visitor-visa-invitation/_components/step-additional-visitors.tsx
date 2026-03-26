@@ -6,6 +6,7 @@ import type { VisitorVisaFormValues } from '@/lib/schemas/visitor-visa-invitatio
 import { COUNTRIES } from '@/lib/utils/visitor-visa-constants'
 
 import { Input } from '@/components/ui/input'
+import { TenantDateInput } from '@/components/ui/tenant-date-input'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 import {
@@ -123,7 +124,7 @@ export function StepAdditionalVisitors() {
                     <FormItem>
                       <FormLabel>Date of Birth</FormLabel>
                       <FormControl>
-                        <Input type="date" {...field} />
+                        <TenantDateInput value={field.value ?? ''} onChange={(iso) => field.onChange(iso)} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

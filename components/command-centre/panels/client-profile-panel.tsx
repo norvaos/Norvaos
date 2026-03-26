@@ -17,6 +17,7 @@ import {
 import { Checkbox } from '@/components/ui/checkbox'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
+import { TenantDateInput } from '@/components/ui/tenant-date-input'
 import { User, CheckCircle2, Loader2, Lock } from 'lucide-react'
 import {
   IMMIGRATION_STATUSES,
@@ -322,13 +323,11 @@ export function ClientProfilePanel() {
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           <div className="space-y-1.5">
             <Label className="text-xs text-slate-500">Date of Birth</Label>
-            <Input
-              type="date"
+            <TenantDateInput
               className="h-9 text-sm"
               value={form.date_of_birth}
               disabled={isLocked}
-              readOnly={isLocked}
-              onChange={(e) => handleString('date_of_birth', e.target.value)}
+              onChange={(iso) => handleString('date_of_birth', iso)}
             />
           </div>
 
@@ -466,13 +465,11 @@ export function ClientProfilePanel() {
 
           <div className="space-y-1.5">
             <Label className="text-xs text-slate-500">Status Expiry</Label>
-            <Input
-              type="date"
+            <TenantDateInput
               className="h-9 text-sm"
               value={form.immigration_status_expiry}
               disabled={isLocked}
-              readOnly={isLocked}
-              onChange={(e) => handleString('immigration_status_expiry', e.target.value)}
+              onChange={(iso) => handleString('immigration_status_expiry', iso)}
             />
           </div>
 

@@ -15,6 +15,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
+import { TenantDateInput } from '@/components/ui/tenant-date-input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -432,7 +433,7 @@ export function CollectionActionsPanel({
             </div>
             <div>
               <Label>Next Follow-Up Date</Label>
-              <Input type="date" value={followUpDate} onChange={(e) => setFollowUpDate(e.target.value)} />
+              <TenantDateInput value={followUpDate} onChange={(iso) => setFollowUpDate(iso)} />
             </div>
           </div>
           <DialogFooter>
@@ -490,7 +491,7 @@ export function CollectionActionsPanel({
               </div>
               <div>
                 <Label>Start Date</Label>
-                <Input type="date" value={planStartDate} onChange={(e) => setPlanStartDate(e.target.value)} />
+                <TenantDateInput value={planStartDate} onChange={(iso) => setPlanStartDate(iso)} />
               </div>
             </div>
             {planAmount && planInstalment && (

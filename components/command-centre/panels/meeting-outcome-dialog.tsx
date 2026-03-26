@@ -6,6 +6,7 @@ import { toast } from 'sonner'
 import { Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { TenantDateInput } from '@/components/ui/tenant-date-input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import {
@@ -201,10 +202,9 @@ export function MeetingOutcomeDialog({
               )}
 
               {field.type === 'date' && (
-                <Input
-                  type="date"
+                <TenantDateInput
                   value={(formData[field.name] as string) ?? ''}
-                  onChange={(e) => updateField(field.name, e.target.value)}
+                  onChange={(iso) => updateField(field.name, iso)}
                   className="text-sm"
                 />
               )}

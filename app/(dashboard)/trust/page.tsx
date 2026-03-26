@@ -66,6 +66,7 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
+import { TenantDateInput } from '@/components/ui/tenant-date-input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { toast } from 'sonner'
@@ -1199,20 +1200,18 @@ function StartReconciliationDialog({
         <div className="space-y-4">
           <div className="space-y-1.5">
             <Label htmlFor="recon-start">Period Start *</Label>
-            <Input
+            <TenantDateInput
               id="recon-start"
-              type="date"
               value={periodStart}
-              onChange={(e) => setPeriodStart(e.target.value)}
+              onChange={(iso) => setPeriodStart(iso)}
             />
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="recon-end">Period End *</Label>
-            <Input
+            <TenantDateInput
               id="recon-end"
-              type="date"
               value={periodEnd}
-              onChange={(e) => setPeriodEnd(e.target.value)}
+              onChange={(iso) => setPeriodEnd(iso)}
             />
           </div>
         </div>

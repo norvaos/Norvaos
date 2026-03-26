@@ -15,6 +15,7 @@ import { getPlaceOfSupplyTax, type ProvinceTaxConfig } from '@/lib/config/tax-ra
 import { RequirePermission } from '@/components/require-permission'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { TenantDateInput } from '@/components/ui/tenant-date-input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import {
@@ -213,7 +214,7 @@ function NewInvoiceContent() {
 
             <div className="space-y-1.5">
               <Label htmlFor="issueDate">Issue Date <span className="text-destructive">*</span></Label>
-              <Input id="issueDate" type="date" {...register('issueDate')} />
+              <TenantDateInput id="issueDate" value={watch('issueDate')} onChange={(iso) => setValue('issueDate', iso)} />
               {errors.issueDate && (
                 <p className="text-xs text-destructive">{errors.issueDate.message}</p>
               )}
@@ -221,7 +222,7 @@ function NewInvoiceContent() {
 
             <div className="space-y-1.5">
               <Label htmlFor="dueDate">Due Date <span className="text-destructive">*</span></Label>
-              <Input id="dueDate" type="date" {...register('dueDate')} />
+              <TenantDateInput id="dueDate" value={watch('dueDate')} onChange={(iso) => setValue('dueDate', iso)} />
               {errors.dueDate && (
                 <p className="text-xs text-destructive">{errors.dueDate.message}</p>
               )}

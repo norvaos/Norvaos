@@ -37,6 +37,7 @@ import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
+import { TenantDateInput } from '@/components/ui/tenant-date-input'
 import { Label } from '@/components/ui/label'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Separator } from '@/components/ui/separator'
@@ -326,10 +327,9 @@ function InlineEditDate({
       <span className="text-xs text-muted-foreground w-28 shrink-0">{label}</span>
       {editing ? (
         <div className="flex items-center gap-2">
-          <Input
-            type="date"
+          <TenantDateInput
             value={draft}
-            onChange={(e) => setDraft(e.target.value)}
+            onChange={(iso) => setDraft(iso)}
             className="h-7 text-xs w-40"
           />
           <Button size="sm" className="h-7 text-xs" onClick={handleSave} disabled={saving}>
@@ -585,10 +585,9 @@ function DynamicIntakeSection({
               )}
 
               {q.type === 'date' && (
-                <Input
-                  type="date"
+                <TenantDateInput
                   value={typeof val === 'string' ? val : ''}
-                  onChange={(e) => handleChange(q.key, e.target.value)}
+                  onChange={(iso) => handleChange(q.key, iso)}
                   className="h-8 text-xs w-40"
                 />
               )}

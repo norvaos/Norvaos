@@ -5,6 +5,7 @@ import { Download, Calendar, Users, BarChart3, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { useAdminFrontDeskKpis, type AdminUserKpiSummary } from '@/lib/queries/admin-kpi-queries'
+import { TenantDateInput } from '@/components/ui/tenant-date-input'
 import type { ShiftKpiValue } from '@/lib/queries/front-desk-queries'
 
 /**
@@ -177,10 +178,9 @@ export default function AdminFrontDeskKpisPage() {
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2 bg-white border border-slate-200 rounded-lg px-3 py-1.5">
             <Calendar className="w-4 h-4 text-slate-400" />
-            <input
-              type="date"
+            <TenantDateInput
               value={date}
-              onChange={(e) => setDate(e.target.value)}
+              onChange={(iso) => setDate(iso)}
               className="text-sm bg-transparent border-none outline-none text-slate-700"
             />
           </div>

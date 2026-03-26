@@ -6,6 +6,7 @@ import { evaluateCondition } from '@/lib/utils/condition-evaluator'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { TenantDateInput } from '@/components/ui/tenant-date-input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -368,11 +369,10 @@ function FieldRenderer({
       )}
 
       {field.field_type === 'date' && (
-        <Input
+        <TenantDateInput
           id={field.id}
-          type="date"
           value={stringValue}
-          onChange={(e) => onChange(e.target.value)}
+          onChange={(iso) => onChange(iso)}
           className={cn(error && 'border-red-300')}
         />
       )}

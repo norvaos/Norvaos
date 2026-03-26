@@ -12,6 +12,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
+import { TenantDateInput } from '@/components/ui/tenant-date-input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import {
@@ -127,18 +128,16 @@ export function OutcomeCaptureDialog({
             <>
               <div>
                 <Label>Issue Date</Label>
-                <Input
-                  type="date"
+                <TenantDateInput
                   value={issueDate}
-                  onChange={(e) => setIssueDate(e.target.value)}
+                  onChange={(iso) => setIssueDate(iso)}
                 />
               </div>
               <div>
                 <Label>Expiry Date (if applicable)</Label>
-                <Input
-                  type="date"
+                <TenantDateInput
                   value={expiryDate}
-                  onChange={(e) => setExpiryDate(e.target.value)}
+                  onChange={(iso) => setExpiryDate(iso)}
                 />
               </div>
             </>

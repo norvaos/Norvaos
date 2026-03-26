@@ -8,6 +8,7 @@ import type { VisitorVisaFormValues } from '@/lib/schemas/visitor-visa-invitatio
 import { VISIT_PURPOSES } from '@/lib/utils/visitor-visa-constants'
 
 import { Input } from '@/components/ui/input'
+import { TenantDateInput } from '@/components/ui/tenant-date-input'
 import { Textarea } from '@/components/ui/textarea'
 import {
   FormControl,
@@ -212,7 +213,7 @@ export function StepVisitDetails() {
                     <FormItem>
                       <FormLabel>Wedding Date</FormLabel>
                       <FormControl>
-                        <Input type="date" {...field} />
+                        <TenantDateInput value={field.value ?? ''} onChange={(iso) => field.onChange(iso)} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -267,7 +268,7 @@ export function StepVisitDetails() {
                 <FormItem>
                   <FormLabel>Planned Arrival Date *</FormLabel>
                   <FormControl>
-                    <Input type="date" {...field} />
+                    <TenantDateInput value={field.value ?? ''} onChange={(iso) => field.onChange(iso)} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -281,7 +282,7 @@ export function StepVisitDetails() {
                 <FormItem>
                   <FormLabel>Planned Departure Date *</FormLabel>
                   <FormControl>
-                    <Input type="date" {...field} />
+                    <TenantDateInput value={field.value ?? ''} onChange={(iso) => field.onChange(iso)} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

@@ -13,6 +13,7 @@ import {
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { TenantDateInput } from '@/components/ui/tenant-date-input'
 import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
 import {
@@ -602,10 +603,9 @@ function FieldRenderer({
         )}
 
         {field.field_type === 'date' && (
-          <Input
-            type="date"
+          <TenantDateInput
             value={strValue}
-            onChange={(e) => onChange(e.target.value)}
+            onChange={(iso) => onChange(iso)}
           />
         )}
 

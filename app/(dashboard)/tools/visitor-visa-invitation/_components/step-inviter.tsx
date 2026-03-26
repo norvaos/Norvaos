@@ -5,6 +5,7 @@ import type { VisitorVisaFormValues } from '@/lib/schemas/visitor-visa-invitatio
 import { CANADIAN_PROVINCES, IMMIGRATION_STATUSES } from '@/lib/utils/visitor-visa-constants'
 
 import { Input } from '@/components/ui/input'
+import { TenantDateInput } from '@/components/ui/tenant-date-input'
 import {
   FormControl,
   FormField,
@@ -61,7 +62,7 @@ export function StepInviter() {
               <FormItem>
                 <FormLabel>Date of Birth *</FormLabel>
                 <FormControl>
-                  <Input type="date" {...field} />
+                  <TenantDateInput value={field.value ?? ''} onChange={(iso) => field.onChange(iso)} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -219,7 +220,7 @@ export function StepInviter() {
                 <FormItem>
                   <FormLabel>Permit Expiry Date *</FormLabel>
                   <FormControl>
-                    <Input type="date" {...field} />
+                    <TenantDateInput value={field.value ?? ''} onChange={(iso) => field.onChange(iso)} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

@@ -32,6 +32,7 @@ import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Separator } from '@/components/ui/separator'
 import { Input } from '@/components/ui/input'
+import { TenantDateInput } from '@/components/ui/tenant-date-input'
 import { Textarea } from '@/components/ui/textarea'
 import { cn, formatCents } from '@/lib/utils'
 import { formatDate } from '@/lib/utils/formatters'
@@ -466,10 +467,9 @@ export function CommandSidebar({
                 if (e.key === 'Escape') setIsAddingTask(false)
               }}
             />
-            <Input
-              type="date"
+            <TenantDateInput
               value={taskDueDate}
-              onChange={(e) => setTaskDueDate(e.target.value)}
+              onChange={(iso) => setTaskDueDate(iso)}
               className="h-7 text-xs"
             />
             <div className="flex items-center gap-1">

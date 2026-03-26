@@ -11,6 +11,7 @@ import { createClient } from '@/lib/supabase/client'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { TenantDateInput } from '@/components/ui/tenant-date-input'
 import { Label } from '@/components/ui/label'
 import { Checkbox } from '@/components/ui/checkbox'
 import {
@@ -174,7 +175,7 @@ export function TimeEntryForm({ open, onOpenChange, editEntry }: TimeEntryFormPr
             </div>
             <div className="space-y-1.5">
               <Label>Date</Label>
-              <Input type="date" {...form.register('entryDate')} />
+              <TenantDateInput value={form.watch('entryDate')} onChange={(iso) => form.setValue('entryDate', iso)} />
             </div>
           </div>
 

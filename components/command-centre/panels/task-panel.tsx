@@ -11,6 +11,7 @@ import { TaskDetailSheet } from '@/components/tasks/task-detail-sheet'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { TenantDateInput } from '@/components/ui/tenant-date-input'
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -370,10 +371,9 @@ export function TaskPanel() {
               className="h-8 text-sm"
             />
             <div className="flex items-center gap-2">
-              <Input
-                type="date"
+              <TenantDateInput
                 value={newDueDate}
-                onChange={(e) => setNewDueDate(e.target.value)}
+                onChange={(iso) => setNewDueDate(iso)}
                 className="h-8 text-xs w-36"
               />
               <Select value={newAssignee} onValueChange={setNewAssignee}>

@@ -16,6 +16,7 @@ import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
+import { TenantDateInput } from '@/components/ui/tenant-date-input'
 import { Label } from '@/components/ui/label'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Separator } from '@/components/ui/separator'
@@ -285,12 +286,11 @@ export function DeadlineRiskPanel({ matterId, tenantId }: DeadlineRiskPanelProps
               <Label htmlFor="deadline-due-date" className="text-xs">
                 Due Date
               </Label>
-              <Input
+              <TenantDateInput
                 id="deadline-due-date"
-                type="date"
                 value={newDeadline.due_date}
-                onChange={(e) =>
-                  setNewDeadline((prev) => ({ ...prev, due_date: e.target.value }))
+                onChange={(iso) =>
+                  setNewDeadline((prev) => ({ ...prev, due_date: iso }))
                 }
                 className="mt-1"
               />

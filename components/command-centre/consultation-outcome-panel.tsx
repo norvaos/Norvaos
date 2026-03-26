@@ -33,6 +33,7 @@ import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
+import { TenantDateInput } from '@/components/ui/tenant-date-input'
 import { Textarea } from '@/components/ui/textarea'
 import {
   Select,
@@ -2002,11 +2003,9 @@ export function ConsultationOutcomePanel() {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div className="space-y-1.5">
                 <Label className="text-xs">Follow-up Date *</Label>
-                <Input
-                  type="date"
+                <TenantDateInput
                   value={followUpDate}
-                  onChange={(e) => setFollowUpDate(e.target.value)}
-                  min={new Date().toISOString().split('T')[0]}
+                  onChange={(iso) => setFollowUpDate(iso)}
                   className="h-9 text-sm"
                 />
               </div>
@@ -2233,11 +2232,9 @@ export function ConsultationOutcomePanel() {
 
             <div className="space-y-1.5">
               <Label className="text-xs">Date *</Label>
-              <Input
-                type="date"
+              <TenantDateInput
                 value={followUpDate}
-                onChange={(e) => setFollowUpDate(e.target.value)}
-                min={new Date().toISOString().split('T')[0]}
+                onChange={(iso) => setFollowUpDate(iso)}
                 className="h-9 text-sm"
               />
             </div>

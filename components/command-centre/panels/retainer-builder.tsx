@@ -28,6 +28,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { TenantDateInput } from '@/components/ui/tenant-date-input'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
@@ -1227,13 +1228,12 @@ function RetainerBuilderContent() {
 
                     {/* Date picker or milestone dropdown */}
                     {inst.dueType === 'date' ? (
-                      <Input
-                        type="date"
+                      <TenantDateInput
                         className="h-7 text-xs w-36"
                         value={inst.dueDate}
-                        onChange={(e) => {
+                        onChange={(iso) => {
                           const next = [...installmentConfigs]
-                          next[i] = { ...next[i], dueDate: e.target.value }
+                          next[i] = { ...next[i], dueDate: iso }
                           setInstallmentConfigs(next)
                         }}
                         disabled={isReadOnly}

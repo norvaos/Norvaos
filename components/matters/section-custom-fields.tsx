@@ -16,6 +16,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { createClient } from '@/lib/supabase/client'
 import type { CustomFieldDef } from '@/lib/types/ircc-forms'
 import { Input } from '@/components/ui/input'
+import { TenantDateInput } from '@/components/ui/tenant-date-input'
 import { Label } from '@/components/ui/label'
 import { Checkbox } from '@/components/ui/checkbox'
 import {
@@ -209,10 +210,9 @@ function CustomFieldInput({
             {field.label}
             {field.required && <span className="text-red-500 ml-0.5">*</span>}
           </Label>
-          <Input
-            type="date"
+          <TenantDateInput
             value={(value as string) ?? ''}
-            onChange={(e) => onChange(e.target.value || null)}
+            onChange={(iso) => onChange(iso || null)}
             className="h-8 text-sm"
           />
         </div>

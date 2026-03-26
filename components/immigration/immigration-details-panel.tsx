@@ -22,6 +22,7 @@ import {
 import { formatDate } from '@/lib/utils/formatters'
 import { cn } from '@/lib/utils'
 
+import { TenantDateInput } from '@/components/ui/tenant-date-input'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
@@ -116,6 +117,21 @@ function InlineTextField({
   }, [value])
 
   const displayValue = type === 'date' && value ? formatDate(value) : value
+
+  // Date fields use TenantDateInput (respects tenant date_format setting)
+  if (type === 'date') {
+    return (
+      <div className="space-y-1">
+        <Label className="text-xs text-slate-500">{label}</Label>
+        <TenantDateInput
+          value={value ?? ''}
+          onChange={(iso) => onSave(fieldKey, iso || null)}
+          className="[&_input]:h-8 [&_input]:text-sm"
+          placeholder={placeholder}
+        />
+      </div>
+    )
+  }
 
   if (isEditing) {
     return (

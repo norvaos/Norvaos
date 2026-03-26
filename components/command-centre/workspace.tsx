@@ -33,6 +33,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { TenantDateInput } from '@/components/ui/tenant-date-input'
 import { Label } from '@/components/ui/label'
 import {
   Select,
@@ -623,11 +624,11 @@ function CoreDataCard({ lead, entityId, tenantId, users, practiceAreas, isConver
               <Calendar className="h-3 w-3" />
               Follow-up
             </Label>
-            <Input
-              type="date"
+            <TenantDateInput
               className="h-9 text-sm"
               disabled={isConverted}
-              {...register('next_follow_up')}
+              value={watch('next_follow_up')}
+              onChange={(iso) => setValue('next_follow_up', iso)}
             />
           </div>
 

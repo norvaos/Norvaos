@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { TenantDateInput } from '@/components/ui/tenant-date-input'
 import { Textarea } from '@/components/ui/textarea'
 import {
   Dialog,
@@ -160,10 +161,9 @@ export function ActionDialog({
               )}
 
               {field.type === 'date' && (
-                <Input
-                  type="date"
+                <TenantDateInput
                   value={(values[field.name] as string) ?? ''}
-                  onChange={(e) => updateField(field.name, e.target.value)}
+                  onChange={(iso) => updateField(field.name, iso)}
                 />
               )}
 

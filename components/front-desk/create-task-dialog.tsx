@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { Loader2, X, Search } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { TenantDateInput } from '@/components/ui/tenant-date-input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import {
@@ -335,10 +336,9 @@ export function CreateTaskDialog({
             <Label>
               Due Date <span className="text-red-500">*</span>
             </Label>
-            <Input
-              type="date"
+            <TenantDateInput
               value={dueDate}
-              onChange={(e) => setDueDate(e.target.value)}
+              onChange={(iso) => setDueDate(iso)}
               disabled={isSubmitting}
               className={submitted && dueDateEmpty ? 'border-red-400' : ''}
             />

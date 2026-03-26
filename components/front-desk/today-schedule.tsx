@@ -7,6 +7,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { TenantDateInput } from '@/components/ui/tenant-date-input'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
   Select,
@@ -272,10 +273,9 @@ export function TodaySchedule({ onCheckIn, onNotifyStaff, onAddNote, onAcknowled
 
         {/* Date Picker + Staff Switcher */}
         <div className="mt-2 flex items-center gap-2 flex-wrap">
-          <Input
-            type="date"
+          <TenantDateInput
             value={selectedDate}
-            onChange={(e) => setSelectedDate(e.target.value)}
+            onChange={(iso) => setSelectedDate(iso)}
             className="w-44 text-sm"
           />
           <Select value={staffFilter} onValueChange={setStaffFilter}>

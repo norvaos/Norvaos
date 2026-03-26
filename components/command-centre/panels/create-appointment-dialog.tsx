@@ -27,6 +27,7 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { CalendarPlus, Loader2, Info } from 'lucide-react'
 import { toast } from 'sonner'
+import { TenantDateInput } from '@/components/ui/tenant-date-input'
 import { cn } from '@/lib/utils'
 
 // ─── Types ──────────────────────────────────────────────────────────
@@ -225,10 +226,9 @@ export function CreateAppointmentDialog({ open, onOpenChange }: CreateAppointmen
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <Label className="text-sm">Date</Label>
-              <Input
-                type="date"
+              <TenantDateInput
                 value={date}
-                onChange={(e) => setDate(e.target.value)}
+                onChange={(iso) => setDate(iso)}
                 className="h-9"
               />
             </div>

@@ -18,6 +18,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Input } from '@/components/ui/input'
+import { TenantDateInput } from '@/components/ui/tenant-date-input'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { useTaskTableStore, type ConditionalColorRule } from '@/lib/stores/task-table-store'
@@ -223,11 +224,10 @@ export function ConditionalColorDialog({
     // For due_date with ends_before / ends_after, show a date-style input
     if (form.column === 'due_date' && (form.condition === 'ends_before' || form.condition === 'ends_after')) {
       return (
-        <Input
-          type="date"
+        <TenantDateInput
           className="h-8 text-xs"
           value={form.value}
-          onChange={(e) => setForm({ ...form, value: e.target.value })}
+          onChange={(iso) => setForm({ ...form, value: iso })}
         />
       )
     }
