@@ -60,26 +60,35 @@ async function handlePost(request: Request) {
       return NextResponse.json({ error: 'Entity adapter not found.' }, { status: 400 })
     }
 
-    // Fetch CSV from storage or require re-upload
-    let csvContent: string | null = null
-    if (batch.storage_path) {
-      const { data: fileData } = await admin.storage
-        .from('import-files')
-        .download(batch.storage_path)
-      if (fileData) {
-        csvContent = await fileData.text()
-      }
-    }
-
-    if (!csvContent) {
+    // Fetch data from storage (CSV for file imports, JSON for API imports)
+    if (!batch.storage_path) {
       return NextResponse.json(
-        { error: 'CSV file not found in storage. Please re-upload.' },
+        { error: 'Import data not found in storage. Please re-upload.' },
         { status: 400 },
       )
     }
 
-    // Parse full CSV
-    const parsedCsv = parseCSV(csvContent)
+    const { data: fileData } = await admin.storage
+      .from('import-files')
+      .download(batch.storage_path)
+
+    if (!fileData) {
+      return NextResponse.json(
+        { error: 'Failed to download import data from storage. Please re-upload.' },
+        { status: 400 },
+      )
+    }
+
+    const fileContent = await fileData.text()
+
+    // API imports store JSON rows; CSV imports store raw CSV
+    let parsedCsv: { rows: Record<string, string>[]; totalRows: number }
+    if (batch.import_mode === 'api') {
+      const apiRows: Record<string, string>[] = JSON.parse(fileContent)
+      parsedCsv = { rows: apiRows, totalRows: apiRows.length }
+    } else {
+      parsedCsv = parseCSV(fileContent)
+    }
 
     // Validate rows
     const { validRows, invalidRows, allErrors } = validateRows(
@@ -103,13 +112,13 @@ async function handlePost(request: Request) {
         column_mapping: columnMapping as unknown as Json,
         validation_errors: allErrors.slice(0, 200) as unknown as Json,
         status: 'validating',
-        total_rows: parsedCsv.totalRows,
+        total_rows: parsedCsv.rows.length,
         updated_at: new Date().toISOString(),
       })
       .eq('id', batchId)
 
     return NextResponse.json({
-      totalRows: parsedCsv.totalRows,
+      totalRows: parsedCsv.rows.length,
       validRows: validRows.length,
       invalidRows: invalidRows.length,
       duplicateRows: duplicates.length,

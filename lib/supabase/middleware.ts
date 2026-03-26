@@ -51,7 +51,10 @@ export async function updateSession(request: NextRequest) {
     !request.nextUrl.pathname.startsWith('/kiosk') &&
     !request.nextUrl.pathname.startsWith('/invite') &&
     !request.nextUrl.pathname.startsWith('/signing') &&
-    !request.nextUrl.pathname.startsWith('/help')
+    !request.nextUrl.pathname.startsWith('/help') &&
+    !request.nextUrl.pathname.startsWith('/privacy') &&
+    !request.nextUrl.pathname.startsWith('/terms') &&
+    !request.nextUrl.pathname.startsWith('/security')
   ) {
     const url = request.nextUrl.clone()
     const redirectPath = request.nextUrl.pathname

@@ -6003,6 +6003,9 @@ export type Database = {
           content_hash: string | null
           hash_verified_at: string | null
           tamper_status: string | null
+          auto_filed: boolean | null
+          auto_filed_path: string | null
+          original_file_name: string | null
         }
         Insert: {
           ai_extracted_data?: Json | null
@@ -6046,6 +6049,9 @@ export type Database = {
           content_hash?: string | null
           hash_verified_at?: string | null
           tamper_status?: string | null
+          auto_filed?: boolean | null
+          auto_filed_path?: string | null
+          original_file_name?: string | null
         }
         Update: {
           ai_extracted_data?: Json | null
@@ -6089,6 +6095,9 @@ export type Database = {
           content_hash?: string | null
           hash_verified_at?: string | null
           tamper_status?: string | null
+          auto_filed?: boolean | null
+          auto_filed_path?: string | null
+          original_file_name?: string | null
         }
         Relationships: [
           {
@@ -17259,6 +17268,7 @@ export type Database = {
           logo_url: string | null
           matter_number_include_year: boolean | null
           matter_number_padding: number | null
+          matter_naming_template: string | null
           matter_number_prefix: string | null
           matter_number_separator: string | null
           max_storage_gb: number | null
@@ -17283,6 +17293,7 @@ export type Database = {
           timezone: string | null
           trial_ends_at: string | null
           brand_activated_at: string | null
+          filing_convention: string | null
           updated_at: string | null
         }
         Insert: {
@@ -17306,6 +17317,7 @@ export type Database = {
           logo_url?: string | null
           matter_number_include_year?: boolean | null
           matter_number_padding?: number | null
+          matter_naming_template?: string | null
           matter_number_prefix?: string | null
           matter_number_separator?: string | null
           max_storage_gb?: number | null
@@ -17330,6 +17342,7 @@ export type Database = {
           timezone?: string | null
           trial_ends_at?: string | null
           brand_activated_at?: string | null
+          filing_convention?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -17353,6 +17366,7 @@ export type Database = {
           logo_url?: string | null
           matter_number_include_year?: boolean | null
           matter_number_padding?: number | null
+          matter_naming_template?: string | null
           matter_number_prefix?: string | null
           matter_number_separator?: string | null
           max_storage_gb?: number | null
@@ -17377,6 +17391,7 @@ export type Database = {
           timezone?: string | null
           trial_ends_at?: string | null
           brand_activated_at?: string | null
+          filing_convention?: string | null
           updated_at?: string | null
         }
         Relationships: []

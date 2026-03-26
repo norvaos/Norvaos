@@ -33,12 +33,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 })
     }
 
-    // Find active Clio connection
+    // Find active Clio connection (OAuth tokens live in platform_connections)
     const admin = createAdminClient()
     const { data: connection } = await (admin as any)
-      .from('clio_connections')
+      .from('platform_connections')
       .select('id')
       .eq('tenant_id', profile.tenant_id)
+      .eq('platform', 'clio')
       .eq('is_active', true)
       .single()
 

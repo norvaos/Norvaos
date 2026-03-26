@@ -4,6 +4,7 @@ import { authenticateRequest, AuthError } from '@/lib/services/auth'
 import { requirePermission } from '@/lib/services/require-role'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { buildAutoRenamedPath } from '@/lib/services/document-slot-engine'
+import { autoFileDocument, type FilingConvention, type AutoFileResult } from '@/lib/services/sovereign-storage-engine'
 import { checkTenantLimit, rateLimitResponse } from '@/lib/middleware/tenant-limiter'
 import { invalidateGating } from '@/lib/services/cache-invalidation'
 import { syncImmigrationIntakeStatus } from '@/lib/services/immigration-status-engine'
@@ -381,6 +382,7 @@ async function handlePost(request: NextRequest) {
     const fileExt = file.name.split('.').pop() ?? 'bin'
     let filePath: string
     let autoFileName: string | null = null
+    let autoFileResult: AutoFileResult | null = null
 
     if (slotData) {
       // Auto-rename: use provisional version 1 (actual version assigned by RPC)
@@ -398,8 +400,52 @@ async function handlePost(request: NextRequest) {
       filePath = `${auth.tenantId}/${Date.now()}-${autoRenamed.fileName}`
       autoFileName = autoRenamed.fileName
     } else {
-      // Legacy path for non-slot uploads
-      filePath = `${auth.tenantId}/${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`
+      // ── Directive 040: Sovereign Auto-Filer for non-slot uploads ──────────
+      // Fetch tenant filing convention + matter info for structured filing
+      let filingConvention: FilingConvention = 'professional'
+
+      const { data: tenantRow } = await (admin as any)
+        .from('tenants')
+        .select('filing_convention')
+        .eq('id', auth.tenantId)
+        .single()
+
+      if (tenantRow?.filing_convention) {
+        filingConvention = tenantRow.filing_convention as FilingConvention
+      }
+
+      // Resolve matter number + client name for filing path
+      let nonSlotMatterNumber: string | null = null
+      let nonSlotClientName: string | null = null
+      const effectiveMatterIdForFiling = matterId
+
+      if (effectiveMatterIdForFiling) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { data: matterInfo } = await (admin as any)
+          .from('matters')
+          .select('matter_number, contacts(first_name, last_name)')
+          .eq('id', effectiveMatterIdForFiling)
+          .single()
+
+        if (matterInfo) {
+          nonSlotMatterNumber = matterInfo.matter_number ?? null
+          const contact = matterInfo.contacts
+          if (contact) {
+            nonSlotClientName = [contact.first_name, contact.last_name].filter(Boolean).join(' ') || null
+          }
+        }
+      }
+
+      autoFileResult = autoFileDocument({
+        tenantId: auth.tenantId,
+        originalFileName: file.name,
+        matterNumber: nonSlotMatterNumber,
+        clientName: nonSlotClientName,
+        filingConvention,
+      })
+
+      filePath = autoFileResult.storagePath
+      autoFileName = autoFileResult.fileName
     }
 
     // ── SENTINEL Vault Hashing: compute SHA-256 of file content ──────────
@@ -436,6 +482,11 @@ async function handlePost(request: NextRequest) {
         description: description,
         content_hash: contentHash,
         tamper_status: 'verified',
+        ...(autoFileResult && {
+          auto_filed: true,
+          auto_filed_path: autoFileResult.directoryPath,
+          original_file_name: autoFileResult.originalFileName,
+        }),
       })
       .select()
       .single()
@@ -533,6 +584,7 @@ async function handlePost(request: NextRequest) {
         success: true,
         document: doc,
         ...(versionNumber !== null && { version_number: versionNumber }),
+        ...(autoFileResult && { filing_label: autoFileResult.filingLabel }),
       },
       { status: 201 }
     )

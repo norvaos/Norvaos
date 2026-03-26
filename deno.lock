@@ -11,6 +11,7 @@
   "workspace": {
     "packageJson": {
       "dependencies": [
+        "npm:@anthropic-ai/sdk@0.80",
         "npm:@dnd-kit/core@^6.3.1",
         "npm:@dnd-kit/sortable@10",
         "npm:@dnd-kit/utilities@^3.2.2",
@@ -25,14 +26,18 @@
         "npm:@tailwindcss/postcss@4",
         "npm:@tanstack/react-query@^5.90.21",
         "npm:@tanstack/react-table@^8.21.3",
+        "npm:@tanstack/react-virtual@^3.13.23",
         "npm:@testing-library/jest-dom@^6.9.1",
         "npm:@testing-library/react@^16.3.2",
+        "npm:@types/canvas-confetti@^1.9.0",
         "npm:@types/node@20",
         "npm:@types/papaparse@^5.5.2",
         "npm:@types/react-dom@19",
         "npm:@types/react@19",
         "npm:@types/web-push@^3.6.4",
         "npm:@upstash/redis@^1.36.3",
+        "npm:@vitest/coverage-v8@^4.0.18",
+        "npm:canvas-confetti@^1.9.4",
         "npm:class-variance-authority@~0.7.1",
         "npm:clsx@^2.1.1",
         "npm:cmdk@^1.1.1",

@@ -35,29 +35,13 @@ export function PlatformConnectionCard({
   const bgColour = platform === 'ghl' ? 'bg-blue-50' : 'bg-indigo-50'
   const textColour = platform === 'ghl' ? 'text-blue-600' : 'text-indigo-600'
   const [connectError, setConnectError] = useState<string | null>(null)
-  const [isConnecting, setIsConnecting] = useState(false)
 
-  const handleConnect = useCallback(async () => {
+  const handleConnect = useCallback(() => {
     setConnectError(null)
-    setIsConnecting(true)
-    try {
-      const res = await fetch(`/api/integrations/${platform}/connect`)
-      if (res.redirected) {
-        window.location.href = res.url
-        return
-      }
-      const data = await res.json().catch(() => ({ message: 'Unknown error' }))
-      if (res.status === 401) {
-        window.location.href = '/login'
-        return
-      }
-      setConnectError(data.message ?? `Failed to connect to ${displayName}.`)
-    } catch {
-      setConnectError('Network error. Please check your connection and try again.')
-    } finally {
-      setIsConnecting(false)
-    }
-  }, [platform, displayName])
+    // Navigate the browser directly — OAuth requires a full page redirect,
+    // not a fetch() call (fetch follows the cross-origin redirect and hits CORS).
+    window.location.href = `/api/integrations/${platform}/connect`
+  }, [platform])
 
   if (isLoading) {
     return (
@@ -123,15 +107,9 @@ export function PlatformConnectionCard({
               )}
             </Button>
           ) : (
-            <Button size="sm" onClick={handleConnect} disabled={isConnecting}>
-              {isConnecting ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <>
-                  <Link2 className="h-3.5 w-3.5 mr-1.5" />
-                  Connect
-                </>
-              )}
+            <Button size="sm" onClick={handleConnect}>
+              <Link2 className="h-3.5 w-3.5 mr-1.5" />
+              Connect
             </Button>
           )}
         </div>

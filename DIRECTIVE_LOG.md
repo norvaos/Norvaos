@@ -863,3 +863,28 @@ Nightly checks across all active tenants:
 - **Navigation**: Ghost "Back"/"Skip" buttons, emerald "Next" button, gold "Complete Tour" on final step
 
 ### TSC: 0 errors ✅
+
+---
+
+## Directive 039  -  Sovereign Naming Architect
+
+**Status:** COMPLETE
+**Date:** 2026-03-26
+
+### Migration 212  -  Matter Naming Template Engine
+- `matter_naming_template` column on `tenants` (nullable text, default NULL = legacy mode)
+- Expanded `fn_next_matter_number` with full template parsing (token substitution: `{PREFIX}`, `{YEAR}`, `{INC_NUM}`, `{RANDOM_HEX}`, `{PRACTICE}`, `{TYPE}`, `{SEP}`)
+- `fn_preview_matter_number` function for live sandbox preview without side effects
+
+### FirmNamingConfig.tsx  -  Live Preview Sandbox
+- Glassmorphism preview card with real-time template rendering
+- Preset templates (Classic, Year-First, Practice-Coded, Hex-Unique)
+- Token builder UI with drag-and-drop token insertion
+- Dynamically loaded via `next/dynamic` with `ssr: false` on Firm Settings page
+
+### API
+- `/api/settings/firm` PATCH route extended with `matter_naming_template` field
+- Validation: template must be a string, max 120 characters, only whitelisted tokens permitted
+
+### Guardrail
+- Amber uniqueness warning surfaced in UI when template lacks `{INC_NUM}` or `{RANDOM_HEX}` (risk of duplicate matter numbers)

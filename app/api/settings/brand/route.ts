@@ -26,7 +26,7 @@ async function handleGet() {
         'name, logo_url, signature_url, letterhead_layout, legal_disclaimer, ' +
         'primary_color, secondary_color, accent_color, brand_activated_at, ' +
         'address_line1, address_line2, city, province, postal_code, country, ' +
-        'office_phone, office_fax'
+        'office_phone, office_fax, filing_convention'
       )
       .eq('id', auth.tenantId)
       .single()
@@ -78,13 +78,14 @@ async function handlePatch(request: Request) {
     requirePermission(auth, 'settings', 'edit')
 
     const body = await request.json()
-    const { letterhead_layout, legal_disclaimer, primary_color, secondary_color, accent_color } =
+    const { letterhead_layout, legal_disclaimer, primary_color, secondary_color, accent_color, filing_convention } =
       body as {
         letterhead_layout?: 'classic' | 'modern' | 'minimal'
         legal_disclaimer?: string | null
         primary_color?: string | null
         secondary_color?: string | null
         accent_color?: string | null
+        filing_convention?: 'professional' | 'chronological' | 'flat'
       }
 
     const update: Record<string, unknown> = {}
@@ -93,6 +94,7 @@ async function handlePatch(request: Request) {
     if (primary_color !== undefined) update.primary_color = primary_color
     if (secondary_color !== undefined) update.secondary_color = secondary_color
     if (accent_color !== undefined) update.accent_color = accent_color
+    if (filing_convention !== undefined) update.filing_convention = filing_convention
 
     if (Object.keys(update).length === 0) {
       return NextResponse.json({ error: 'No fields to update' }, { status: 400 })

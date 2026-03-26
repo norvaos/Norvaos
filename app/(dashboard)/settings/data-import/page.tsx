@@ -8,6 +8,7 @@ import { Upload } from 'lucide-react'
 import { ImportWizard } from '@/components/import/import-wizard'
 import { ImportHistoryTable } from '@/components/import/import-history-table'
 import { PlatformConnectionCard } from '@/components/import/platform-connection-card'
+import { ClioMigrationDashboard } from '@/components/admin/clio-migration-dashboard'
 import { useTenant } from '@/lib/hooks/use-tenant'
 import {
   useGhlConnection,
@@ -102,6 +103,11 @@ export default function DataImportPage() {
               />
             </div>
           </div>
+
+          {/* Clio Migration Dashboard — shown when connected */}
+          {clioConn?.isActive && (
+            <ClioMigrationDashboard />
+          )}
 
           {/* Import history */}
           <div>

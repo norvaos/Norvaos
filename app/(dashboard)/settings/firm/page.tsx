@@ -9,6 +9,12 @@ import { AlertTriangle, Building2, DollarSign, FileCheck2, Loader2, Lock, MapPin
 import { toast } from 'sonner'
 import { norvaToast } from '@/lib/utils/norva-branding'
 import { TenantNotificationTriggers } from '@/components/settings/tenant-notification-triggers'
+import dynamic from 'next/dynamic'
+
+const FirmNamingConfig = dynamic(
+  () => import('@/components/settings/firm-naming-config').then((m) => ({ default: m.FirmNamingConfig })),
+  { ssr: false }
+)
 
 import { useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
@@ -622,6 +628,9 @@ export default function SettingsFirmPage() {
 
       {/* Office Address Card */}
       <FirmAddressCard tenantId={tenant!.id} firmData={firmData} refreshTenant={refreshTenant} homeProvince={tenant?.home_province} />
+
+      {/* Matter Naming Configuration */}
+      <FirmNamingConfig />
 
       {/* ── Consequence Guard: Regulatory Change Warning Modal ────────── */}
       {/* ── Consequence Guard: "The Pause" Modal ────────────────────────── */}

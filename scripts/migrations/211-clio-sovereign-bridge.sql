@@ -8,35 +8,15 @@
 
 BEGIN;
 
--- ── Clio Connections ────────────────────────────────────────────────────────
-
-CREATE TABLE IF NOT EXISTS clio_connections (
-  id              UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  tenant_id       UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
-  clio_user_id    TEXT,
-  clio_user_name  TEXT,
-  access_token_encrypted   TEXT NOT NULL,
-  refresh_token_encrypted  TEXT NOT NULL,
-  token_expires_at         TIMESTAMPTZ,
-  is_active       BOOLEAN NOT NULL DEFAULT true,
-  created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
-  updated_at      TIMESTAMPTZ NOT NULL DEFAULT now()
-);
-
-CREATE INDEX IF NOT EXISTS idx_clio_connections_tenant
-  ON clio_connections (tenant_id) WHERE is_active = true;
-
-ALTER TABLE clio_connections ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "clio_connections_tenant_isolation" ON clio_connections
-  USING (tenant_id = (SELECT tenant_id FROM users WHERE auth_user_id = auth.uid()));
+-- NOTE: Clio OAuth tokens are stored in the existing `platform_connections`
+-- table (platform = 'clio'). No separate clio_connections table needed.
 
 -- ── Clio Migrations ─────────────────────────────────────────────────────────
 
 CREATE TABLE IF NOT EXISTS clio_migrations (
   id              UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   tenant_id       UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
-  connection_id   UUID REFERENCES clio_connections(id),
+  connection_id   UUID REFERENCES platform_connections(id),
   status          TEXT NOT NULL DEFAULT 'pending'
                     CHECK (status IN ('pending', 'in_progress', 'completed', 'failed')),
   started_at      TIMESTAMPTZ,

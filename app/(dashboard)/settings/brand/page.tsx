@@ -11,7 +11,7 @@
  * onto every document (invoice, retainer, cover letter).
  */
 
-import { useState, useCallback, useEffect, useRef } from 'react'
+import { useState, useCallback, useEffect, useRef, useMemo } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -26,9 +26,10 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
-import { Loader2, Upload, Image, Pen, Sparkles, CheckCircle2 } from 'lucide-react'
+import { Loader2, Upload, Image, Pen, Sparkles, CheckCircle2, FolderTree, FileText, ArrowRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { norvaToast } from '@/lib/utils/norva-branding'
+import { generateFilingPreview, type FilingConvention } from '@/lib/services/sovereign-storage-engine'
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -50,6 +51,7 @@ interface BrandData {
   country: string | null
   office_phone: string | null
   office_fax: string | null
+  filing_convention: FilingConvention | null
   logoPublicUrl: string | null
   signaturePublicUrl: string | null
 }
@@ -83,6 +85,7 @@ export default function BrandIdentityPage() {
   const [logoPreviewUrl, setLogoPreviewUrl] = useState<string | null>(null)
   const [signaturePreviewUrl, setSignaturePreviewUrl] = useState<string | null>(null)
   const [uploading, setUploading] = useState<'logo' | 'signature' | null>(null)
+  const [filingConvention, setFilingConvention] = useState<FilingConvention>('professional')
 
   const logoInputRef = useRef<HTMLInputElement>(null)
   const signatureInputRef = useRef<HTMLInputElement>(null)
@@ -95,8 +98,15 @@ export default function BrandIdentityPage() {
       setPrimaryColor(brand.primary_color || '#1a3b65')
       setLogoPreviewUrl(brand.logoPublicUrl)
       setSignaturePreviewUrl(brand.signaturePublicUrl)
+      setFilingConvention(brand.filing_convention || 'professional')
     }
   }, [brand])
+
+  // ── Filing Preview (Directive 040) ─────────────────────────────────────
+  const filingPreview = useMemo(
+    () => generateFilingPreview('2026-WASEER-001', 'Ahmed Khan', filingConvention),
+    [filingConvention],
+  )
 
   // ── Mutations ────────────────────────────────────────────────────────────
 
@@ -109,6 +119,7 @@ export default function BrandIdentityPage() {
           letterhead_layout: layout,
           legal_disclaimer: disclaimer || null,
           primary_color: primaryColor,
+          filing_convention: filingConvention,
         }),
       })
       if (!res.ok) throw new Error('Failed to save')
@@ -488,6 +499,60 @@ export default function BrandIdentityPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* ── Directive 040: Filing Preview Card ──────────────────── */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-sm flex items-center gap-2">
+            <FolderTree className="h-4 w-4" />
+            Sovereign Auto-Filer Preview
+          </CardTitle>
+          <CardDescription>
+            Choose how NorvaOS auto-names and organises uploaded documents.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center gap-3">
+            <Label className="text-xs whitespace-nowrap">Filing Convention</Label>
+            <Select
+              value={filingConvention}
+              onValueChange={(v) => setFilingConvention(v as FilingConvention)}
+            >
+              <SelectTrigger className="w-[260px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="professional">Professional  -  By category folders</SelectItem>
+                <SelectItem value="chronological">Chronological  -  By date</SelectItem>
+                <SelectItem value="flat">Flat  -  All in one folder</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="rounded-lg border bg-muted/30 p-4 space-y-2">
+            <p className="text-xs text-muted-foreground font-medium mb-3">
+              Sample matter: 2026-WASEER-001 (Ahmed Khan)
+            </p>
+            {filingPreview.map((item, i) => (
+              <div
+                key={i}
+                className="flex items-center gap-2 text-xs font-mono bg-background rounded px-3 py-1.5 border"
+              >
+                <FileText className="h-3 w-3 text-muted-foreground shrink-0" />
+                <span className="text-muted-foreground truncate">{item.originalName}</span>
+                <ArrowRight className="h-3 w-3 text-emerald-500 shrink-0" />
+                <span className="text-emerald-700 dark:text-emerald-400 truncate font-medium">
+                  {item.filedPath}
+                </span>
+              </div>
+            ))}
+          </div>
+
+          <p className="text-[11px] text-muted-foreground">
+            Slot-based uploads use the existing auto-rename pattern. This convention applies to ad-hoc (non-slot) uploads only.
+          </p>
+        </CardContent>
+      </Card>
     </div>
   )
 }
