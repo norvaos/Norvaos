@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const trustAccountId = searchParams.get('trustAccountId') ?? undefined
     const matterId = searchParams.get('matterId') ?? undefined
-    const eventType = searchParams.get('eventType') ?? undefined
+    const eventType = (searchParams.get('eventType') ?? undefined) as any
     const dateFrom = searchParams.get('dateFrom') ?? undefined
     const dateTo = searchParams.get('dateTo') ?? undefined
     const page = parseInt(searchParams.get('page') ?? '1', 10)
