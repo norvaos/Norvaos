@@ -6,8 +6,8 @@
  * typed fetchers (lib/services/clio/fetchers/*).
  *
  * Workflow:
- *   1. Contacts → Norva Contacts (PII encrypted, duplicates merged via clio_source_id)
- *   2. Matters → Norva Matters (clio_source_id prevents double-imports)
+ *   1. Contacts → Contacts (PII encrypted, duplicates merged via clio_source_id)
+ *   2. Matters → Matters (clio_source_id prevents double-imports)
  *   3. Documents → Sentinel Eye Scan Queue (OCR + expiry check)
  *   4. Trust Balances → Immutable Ledger Block 1 (hashed + anchored)
  *
@@ -177,7 +177,7 @@ export class ClioMigrationEngine {
     }
 
     try {
-      const { rows } = await fetchClioContacts(this.connectionId, this.admin)
+      const { rows } = await fetchClioContacts(this.connectionId, this.admin, '')
       phase.total = rows.length
 
       for (const row of rows) {

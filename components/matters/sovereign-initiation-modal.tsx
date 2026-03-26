@@ -129,7 +129,7 @@ const modalVariants = {
 
 function StepIndicator({ currentStep }: { currentStep: Step }) {
   const steps = [1, 2, 3] as const
-  const labels = ['Norva Contact', 'Norva Details', 'Norva Team']
+  const labels = ['Identity Anchor', 'Logic Gate', 'Command Assignment']
 
   return (
     <div className="flex items-center justify-center gap-3 pb-6">
@@ -196,7 +196,7 @@ function ReadinessRing({ percentage }: { percentage: number }) {
           {percentage}%
         </span>
       </div>
-      <span className="text-xs font-medium tracking-wide text-gray-500 dark:text-white/60">Initiation Readiness</span>
+      <span className="text-xs font-medium tracking-wide text-gray-500 dark:text-white/60">Case Readiness</span>
     </div>
   )
 }
@@ -457,7 +457,7 @@ export function SovereignInitiationModal({
         <div className="relative min-h-[360px] overflow-hidden px-8 pb-6">
           <AnimatePresence mode="wait" custom={direction}>
             {/* ============================================================ */}
-            {/* STEP 1: Identity Anchor                                      */}
+            {/* STEP 1: Identity Anchor                                        */}
             {/* ============================================================ */}
             {step === 1 && (
               <motion.div
@@ -563,7 +563,7 @@ export function SovereignInitiationModal({
             )}
 
             {/* ============================================================ */}
-            {/* STEP 2: Logic Gate                                           */}
+            {/* STEP 2: Logic Gate                                         */}
             {/* ============================================================ */}
             {step === 2 && (
               <motion.div
@@ -704,7 +704,7 @@ export function SovereignInitiationModal({
             )}
 
             {/* ============================================================ */}
-            {/* STEP 3: Command Assignment                                   */}
+            {/* STEP 3: Command Assignment                                            */}
             {/* ============================================================ */}
             {step === 3 && (
               <motion.div
@@ -787,8 +787,9 @@ export function SovereignInitiationModal({
 
                 {/* Summary */}
                 <div className="rounded-2xl border border-gray-200 dark:border-white/[0.06] bg-gray-50 dark:bg-white/[0.02] p-4">
-                  <h4 className="mb-3 text-[10px] font-medium uppercase tracking-widest text-gray-400 dark:text-white/40">
-                    Initiation Summary
+                  <h4 className="mb-3 flex items-center text-[10px] font-medium uppercase tracking-widest text-gray-400 dark:text-white/40">
+                    Case Summary
+                    <NorvaGuardianTooltip fieldKey="summary" />
                   </h4>
                   <div className="grid grid-cols-2 gap-y-2 gap-x-6 text-xs">
                     <div className="text-gray-400 dark:text-white/40">Contact</div>
@@ -820,8 +821,8 @@ export function SovereignInitiationModal({
           </AnimatePresence>
         </div>
 
-        {/* Footer */}
-        <div className="flex items-center justify-between border-t border-gray-200 dark:border-white/[0.06] px-8 py-5">
+        {/* Sticky footer — always visible so the user never gets stuck */}
+        <div className="sticky bottom-0 z-10 flex items-center justify-between border-t border-gray-200 dark:border-white/[0.06] bg-white/95 dark:bg-zinc-950/95 backdrop-blur-lg px-8 py-5">
           <div>
             {step > 1 && (
               <button
@@ -873,12 +874,12 @@ export function SovereignInitiationModal({
                     >
                       <Sparkles className="h-3.5 w-3.5" />
                     </motion.div>
-                    Initiating...
+                    Creating...
                   </>
                 ) : (
                   <>
                     <Sparkles className="h-3.5 w-3.5" />
-                    Initiate Matter
+                    Create Case
                   </>
                 )}
               </button>
