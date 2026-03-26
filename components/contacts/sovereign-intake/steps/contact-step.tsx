@@ -157,6 +157,24 @@ export function SovereignContactStep({
   })
 
   const sourceValue = watch('source')
+  const watchedFirstName = watch('first_name')
+  const watchedLastName = watch('last_name')
+
+  // ── Conflict re-check: invalidate if name changed from what was searched ──
+  useEffect(() => {
+    if (!intake.conflictCleared) return
+    const nameChanged =
+      watchedFirstName.trim().toLowerCase() !== intake.firstName.trim().toLowerCase() ||
+      watchedLastName.trim().toLowerCase() !== intake.lastName.trim().toLowerCase()
+    if (nameChanged) {
+      updateIntake({
+        conflictCleared: false,
+        conflictResolution: 'none',
+        conflictJustification: null,
+        existingContactId: null,
+      })
+    }
+  }, [watchedFirstName, watchedLastName, intake.firstName, intake.lastName, intake.conflictCleared, updateIntake])
 
   // OCR was used = at least one field was auto-populated
   const ocrWasUsed = ocrFields.length > 0
@@ -408,9 +426,14 @@ export function SovereignContactStep({
 
   const busy = submitting || scanning
 
+  // Name divergence check: block submit if name changed from conflict-checked name
+  const nameDiverged =
+    watchedFirstName.trim().toLowerCase() !== intake.firstName.trim().toLowerCase() ||
+    watchedLastName.trim().toLowerCase() !== intake.lastName.trim().toLowerCase()
+
   // Directive 42.2, Item 3: Submit locked if OCR was used but not verified
   const verificationRequired = ocrWasUsed && !ocrVerified
-  const canSubmit = !busy && !created && !verificationRequired
+  const canSubmit = !busy && !created && !verificationRequired && !nameDiverged
 
   /* ---------------------------------------------------------------- */
   /*  Helper: OCR field wrapper with highlight + checkmark + tooltip    */
@@ -756,8 +779,22 @@ export function SovereignContactStep({
       {/* Error */}
       {error && <p className="text-sm text-destructive">{error}</p>}
 
+      {/* Name changed  -  conflict re-check required */}
+      {nameDiverged && !created && (
+        <div className="flex items-start gap-3 rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-red-900 animate-in fade-in slide-in-from-top-2">
+          <ShieldAlert className="mt-0.5 size-5 shrink-0 text-red-600" />
+          <div>
+            <p className="text-sm font-semibold">Conflict Re-Check Required</p>
+            <p className="mt-0.5 text-xs leading-relaxed">
+              The name has changed from what was originally searched. Please go
+              back to Step 1 and re-run the conflict check with the updated name.
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Verification warning when submit is blocked */}
-      {verificationRequired && !created && (
+      {verificationRequired && !created && !nameDiverged && (
         <p className="text-xs text-amber-600 text-center">
           Please verify the OCR data and tick the confirmation checkbox above to proceed.
         </p>
