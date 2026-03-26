@@ -28,6 +28,7 @@ export type SentinelEventType =
   | 'IDENTITY_VERIFICATION'
   | 'EMERGENCY_LOCKDOWN'
   | 'AUDIT_SIMULATION_EXECUTED'
+  | 'MATTER_IGNITED'
 
 export type SentinelSeverity = 'info' | 'warning' | 'critical' | 'breach'
 

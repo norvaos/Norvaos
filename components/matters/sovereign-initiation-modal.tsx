@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { X, Search, ChevronRight, ChevronLeft, Scale, Briefcase, DollarSign, Clock, Users, Sparkles, Check } from 'lucide-react'
+import { X, Search, ChevronRight, ChevronLeft, Scale, Briefcase, DollarSign, Clock, Users, Sparkles, Check, HelpCircle } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 
 import { useTenant } from '@/lib/hooks/use-tenant'
@@ -14,6 +14,7 @@ import { CANADIAN_TAX_RATES } from '@/lib/config/tax-rates'
 import { createClient } from '@/lib/supabase/client'
 import type { Database } from '@/lib/types/database'
 import { cn } from '@/lib/utils'
+import { NorvaGuardianTooltip } from '@/components/ui/norva-guardian-tooltip'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -128,7 +129,7 @@ const modalVariants = {
 
 function StepIndicator({ currentStep }: { currentStep: Step }) {
   const steps = [1, 2, 3] as const
-  const labels = ['Identity Anchor', 'Logic Gate', 'Command Assignment']
+  const labels = ['Norva Contact', 'Norva Details', 'Norva Team']
 
   return (
     <div className="flex items-center justify-center gap-3 pb-6">
@@ -140,7 +141,7 @@ function StepIndicator({ currentStep }: { currentStep: Step }) {
                 'flex h-8 w-8 items-center justify-center rounded-full border-2 text-xs font-bold transition-all duration-300',
                 s < currentStep && 'border-emerald-500 bg-emerald-500 text-white',
                 s === currentStep && 'border-emerald-500 bg-emerald-500/20 text-emerald-400 shadow-[0_0_12px_rgba(16,185,129,0.4)]',
-                s > currentStep && 'border-white/20 text-white/30',
+                s > currentStep && 'border-gray-300 text-gray-400 dark:border-white/20 dark:text-white/30',
               )}
             >
               {s < currentStep ? <Check className="h-4 w-4" /> : s}
@@ -148,7 +149,7 @@ function StepIndicator({ currentStep }: { currentStep: Step }) {
             <span
               className={cn(
                 'text-[10px] font-medium tracking-wide uppercase transition-colors',
-                s <= currentStep ? 'text-emerald-400' : 'text-white/30',
+                s <= currentStep ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-400 dark:text-white/30',
               )}
             >
               {labels[i]}
@@ -158,7 +159,7 @@ function StepIndicator({ currentStep }: { currentStep: Step }) {
             <div
               className={cn(
                 'mb-5 h-px w-12 transition-colors',
-                s < currentStep ? 'bg-emerald-500' : 'bg-white/10',
+                s < currentStep ? 'bg-emerald-500' : 'bg-gray-200 dark:bg-white/10',
               )}
             />
           )}
@@ -177,7 +178,7 @@ function ReadinessRing({ percentage }: { percentage: number }) {
     <div className="flex items-center gap-3">
       <div className="relative h-12 w-12">
         <svg className="h-12 w-12 -rotate-90" viewBox="0 0 44 44">
-          <circle cx="22" cy="22" r={radius} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="3" />
+          <circle cx="22" cy="22" r={radius} fill="none" className="stroke-gray-200 dark:stroke-white/[0.08]" strokeWidth="3" />
           <circle
             cx="22"
             cy="22"
@@ -191,11 +192,11 @@ function ReadinessRing({ percentage }: { percentage: number }) {
             className="transition-all duration-500"
           />
         </svg>
-        <span className="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-emerald-400">
+        <span className="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-emerald-600 dark:text-emerald-400">
           {percentage}%
         </span>
       </div>
-      <span className="text-xs font-medium tracking-wide text-white/60">Initiation Readiness</span>
+      <span className="text-xs font-medium tracking-wide text-gray-500 dark:text-white/60">Initiation Readiness</span>
     </div>
   )
 }
@@ -418,13 +419,13 @@ export function SovereignInitiationModal({
     >
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/70 backdrop-blur-2xl"
+        className="absolute inset-0 bg-black/40 dark:bg-black/70 backdrop-blur-2xl"
         onClick={handleClose}
       />
 
       {/* Modal shell */}
       <motion.div
-        className="relative z-10 mx-4 flex w-full max-w-3xl flex-col overflow-hidden rounded-3xl border border-white/[0.08] bg-zinc-950/95 shadow-2xl backdrop-blur-xl"
+        className="relative z-10 mx-4 flex w-full max-w-3xl flex-col overflow-hidden rounded-3xl border border-gray-200 dark:border-white/[0.08] bg-white dark:bg-zinc-950/95 shadow-2xl backdrop-blur-xl"
         variants={modalVariants}
         initial="hidden"
         animate="visible"
@@ -433,15 +434,15 @@ export function SovereignInitiationModal({
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-white/[0.06] px-8 pt-7 pb-0">
+        <div className="flex items-center justify-between border-b border-gray-200 dark:border-white/[0.06] px-8 pt-7 pb-0">
           <div>
-            <h2 className="text-lg font-semibold tracking-tight text-white">Sovereign Initiation</h2>
-            <p className="mt-0.5 text-xs text-white/40">New matter creation wizard</p>
+            <h2 className="text-lg font-semibold tracking-tight text-gray-900 dark:text-white">Start New Case</h2>
+            <p className="mt-0.5 text-xs text-gray-500 dark:text-white/40">We&apos;ll walk you through it — step by step</p>
           </div>
           <button
             type="button"
             onClick={handleClose}
-            className="flex h-8 w-8 items-center justify-center rounded-full text-white/40 transition-colors hover:bg-white/[0.06] hover:text-white"
+            className="flex h-8 w-8 items-center justify-center rounded-full text-gray-400 dark:text-white/40 transition-colors hover:bg-gray-100 dark:hover:bg-white/[0.06] hover:text-gray-700 dark:hover:text-white"
           >
             <X className="h-4 w-4" />
           </button>
@@ -470,8 +471,9 @@ export function SovereignInitiationModal({
               >
                 {/* Contact search */}
                 <div>
-                  <label className="mb-2 block text-xs font-medium uppercase tracking-widest text-white/50">
+                  <label className="mb-2 flex items-center text-xs font-medium uppercase tracking-widest text-gray-500 dark:text-white/50">
                     Contact
+                    <NorvaGuardianTooltip fieldKey="contact" />
                   </label>
                   <div className="relative">
                     <Search className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-emerald-400/60" />
@@ -480,19 +482,19 @@ export function SovereignInitiationModal({
                       type="text"
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      placeholder="Search contacts by name, email, or organisation..."
-                      className="w-full rounded-xl border border-emerald-500/30 bg-white/[0.04] py-3.5 pl-12 pr-4 text-sm text-white placeholder-white/30 outline-none transition-shadow focus:border-emerald-500/60 focus:shadow-[0_0_20px_rgba(16,185,129,0.15)] focus:ring-0"
+                      placeholder="Type a name or email — if they're in the system, we'll find them"
+                      className="w-full rounded-xl border border-emerald-500/30 bg-gray-50 dark:bg-white/[0.04] py-3.5 pl-12 pr-4 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-white/30 outline-none transition-shadow focus:border-emerald-500/60 focus:shadow-[0_0_20px_rgba(16,185,129,0.15)] focus:ring-0"
                     />
                   </div>
 
                   {/* Search results dropdown */}
                   {searchTerm.length >= 2 && (
-                    <div className="mt-2 max-h-48 overflow-y-auto rounded-xl border border-white/[0.08] bg-zinc-900/90 backdrop-blur-xl">
+                    <div className="mt-2 max-h-48 overflow-y-auto rounded-xl border border-gray-200 dark:border-white/[0.08] bg-white dark:bg-zinc-900/90 backdrop-blur-xl shadow-lg dark:shadow-none">
                       {contactSearch.isLoading && (
-                        <div className="px-4 py-3 text-xs text-white/40">Searching...</div>
+                        <div className="px-4 py-3 text-xs text-gray-400 dark:text-white/40">Searching...</div>
                       )}
                       {contactSearch.data?.length === 0 && !contactSearch.isLoading && (
-                        <div className="px-4 py-3 text-xs text-white/40">No contacts found</div>
+                        <div className="px-4 py-3 text-xs text-gray-400 dark:text-white/40">No contacts found</div>
                       )}
                       {contactSearch.data?.map((contact) => (
                         <button
@@ -506,10 +508,10 @@ export function SovereignInitiationModal({
                             {(contact.last_name?.[0] ?? '').toUpperCase()}
                           </div>
                           <div className="min-w-0 flex-1">
-                            <p className="truncate text-sm font-medium text-white">
+                            <p className="truncate text-sm font-medium text-gray-900 dark:text-white">
                               {contact.first_name} {contact.last_name}
                             </p>
-                            <p className="truncate text-xs text-white/40">
+                            <p className="truncate text-xs text-gray-500 dark:text-white/40">
                               {contact.email_primary}
                               {contact.organization_name ? ` - ${contact.organization_name}` : ''}
                             </p>
@@ -526,7 +528,7 @@ export function SovereignInitiationModal({
                         {(selectedContact.first_name?.[0] ?? '').toUpperCase()}
                         {(selectedContact.last_name?.[0] ?? '').toUpperCase()}
                       </div>
-                      <span className="text-sm font-medium text-emerald-300">
+                      <span className="text-sm font-medium text-emerald-700 dark:text-emerald-300">
                         {selectedContact.first_name} {selectedContact.last_name}
                       </span>
                       <button
@@ -535,7 +537,7 @@ export function SovereignInitiationModal({
                           setSelectedContactId(null)
                           setSelectedContact(null)
                         }}
-                        className="ml-auto text-emerald-400/60 transition-colors hover:text-emerald-300"
+                        className="ml-auto text-emerald-500/60 dark:text-emerald-400/60 transition-colors hover:text-emerald-600 dark:hover:text-emerald-300"
                       >
                         <X className="h-3.5 w-3.5" />
                       </button>
@@ -545,15 +547,16 @@ export function SovereignInitiationModal({
 
                 {/* Matter title */}
                 <div>
-                  <label className="mb-2 block text-xs font-medium uppercase tracking-widest text-white/50">
-                    Matter Title
+                  <label className="mb-2 flex items-center text-xs font-medium uppercase tracking-widest text-gray-500 dark:text-white/50">
+                    Case Name
+                    <NorvaGuardianTooltip fieldKey="caseTitle" />
                   </label>
                   <input
                     type="text"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    placeholder="e.g. Smith - Spousal Sponsorship"
-                    className="w-full rounded-xl border border-white/[0.1] bg-white/[0.04] px-4 py-3 text-sm text-white placeholder-white/25 outline-none transition-shadow focus:border-emerald-500/40 focus:shadow-[0_0_16px_rgba(16,185,129,0.1)] focus:ring-0"
+                    placeholder="Type the client's last name, then the case type (e.g. Khan — Spousal Sponsorship)"
+                    className="w-full rounded-xl border border-gray-200 dark:border-white/[0.1] bg-gray-50 dark:bg-white/[0.04] px-4 py-3 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-white/25 outline-none transition-shadow focus:border-emerald-500/40 focus:shadow-[0_0_16px_rgba(16,185,129,0.1)] focus:ring-0"
                   />
                 </div>
               </motion.div>
@@ -573,10 +576,11 @@ export function SovereignInitiationModal({
                 className="grid grid-cols-1 gap-5 md:grid-cols-2"
               >
                 {/* Left card: Practice area + matter type */}
-                <div className="rounded-2xl border border-white/[0.08] bg-white/[0.04] p-5 backdrop-blur-xl">
-                  <h3 className="mb-4 flex items-center gap-2 text-xs font-medium uppercase tracking-widest text-white/50">
-                    <Scale className="h-3.5 w-3.5 text-emerald-400/60" />
+                <div className="rounded-2xl border border-gray-200 dark:border-white/[0.08] bg-gray-50 dark:bg-white/[0.04] p-5 backdrop-blur-xl">
+                  <h3 className="mb-4 flex items-center gap-2 text-xs font-medium uppercase tracking-widest text-gray-500 dark:text-white/50">
+                    <Scale className="h-3.5 w-3.5 text-emerald-500/60 dark:text-emerald-400/60" />
                     Practice Area
+                    <NorvaGuardianTooltip fieldKey="practiceArea" />
                   </h3>
 
                   <div className="grid grid-cols-2 gap-2">
@@ -584,9 +588,12 @@ export function SovereignInitiationModal({
                       const Icon = getPracticeIcon(pa.name)
                       const selected = practiceAreaId === pa.id
                       return (
-                        <button
+                        <motion.button
                           key={pa.id}
                           type="button"
+                          whileHover={{ scale: 1.04, y: -2 }}
+                          whileTap={{ scale: 0.97 }}
+                          transition={{ type: 'spring', stiffness: 400, damping: 20 }}
                           onClick={() => {
                             setPracticeAreaId(pa.id)
                             setMatterTypeId(null)
@@ -595,41 +602,45 @@ export function SovereignInitiationModal({
                             'flex flex-col items-center gap-1.5 rounded-xl border px-3 py-3 text-center transition-all',
                             selected
                               ? 'border-emerald-500/50 bg-emerald-500/10 shadow-[0_0_16px_rgba(16,185,129,0.2)]'
-                              : 'border-white/[0.06] bg-white/[0.02] hover:border-white/[0.12] hover:bg-white/[0.04]',
+                              : 'border-gray-200 dark:border-white/[0.06] bg-white dark:bg-white/[0.02] hover:border-gray-300 dark:hover:border-white/[0.12] hover:bg-gray-50 dark:hover:bg-white/[0.04]',
                           )}
                         >
-                          <Icon className={cn('h-4 w-4', selected ? 'text-emerald-400' : 'text-white/40')} />
-                          <span className={cn('text-xs font-medium', selected ? 'text-emerald-300' : 'text-white/60')}>
+                          <Icon className={cn('h-4 w-4', selected ? 'text-emerald-500 dark:text-emerald-400' : 'text-gray-400 dark:text-white/40')} />
+                          <span className={cn('text-xs font-medium', selected ? 'text-emerald-600 dark:text-emerald-300' : 'text-gray-600 dark:text-white/60')}>
                             {pa.name}
                           </span>
-                        </button>
+                        </motion.button>
                       )
                     })}
                   </div>
 
                   {/* Matter types for selected practice area */}
                   {practiceAreaId && matterTypes.data && matterTypes.data.length > 0 && (
-                    <div className="mt-4 border-t border-white/[0.06] pt-4">
-                      <h4 className="mb-2 text-[10px] font-medium uppercase tracking-widest text-white/40">
-                        Matter Type
+                    <div className="mt-4 border-t border-gray-200 dark:border-white/[0.06] pt-4">
+                      <h4 className="mb-2 flex items-center text-[10px] font-medium uppercase tracking-widest text-gray-400 dark:text-white/40">
+                        Case Type
+                        <NorvaGuardianTooltip fieldKey="matterType" />
                       </h4>
                       <div className="flex flex-wrap gap-1.5">
                         {matterTypes.data.map((mt) => {
                           const selected = matterTypeId === mt.id
                           return (
-                            <button
+                            <motion.button
                               key={mt.id}
                               type="button"
+                              whileHover={{ scale: 1.05 }}
+                              whileTap={{ scale: 0.95 }}
+                              transition={{ type: 'spring', stiffness: 400, damping: 20 }}
                               onClick={() => setMatterTypeId(mt.id)}
                               className={cn(
                                 'rounded-lg border px-3 py-1.5 text-xs font-medium transition-all',
                                 selected
-                                  ? 'border-emerald-500/50 bg-emerald-500/15 text-emerald-300'
-                                  : 'border-white/[0.06] text-white/50 hover:border-white/[0.12] hover:text-white/70',
+                                  ? 'border-emerald-500/50 bg-emerald-500/15 text-emerald-700 dark:text-emerald-300'
+                                  : 'border-gray-200 dark:border-white/[0.06] text-gray-500 dark:text-white/50 hover:border-gray-300 dark:hover:border-white/[0.12] hover:text-gray-700 dark:hover:text-white/70',
                               )}
                             >
                               {mt.name}
-                            </button>
+                            </motion.button>
                           )
                         })}
                       </div>
@@ -638,14 +649,15 @@ export function SovereignInitiationModal({
                 </div>
 
                 {/* Right card: Billing configuration */}
-                <div className="rounded-2xl border border-white/[0.08] bg-white/[0.04] p-5 backdrop-blur-xl">
-                  <h3 className="mb-4 flex items-center gap-2 text-xs font-medium uppercase tracking-widest text-white/50">
-                    <DollarSign className="h-3.5 w-3.5 text-emerald-400/60" />
-                    Billing Configuration
+                <div className="rounded-2xl border border-gray-200 dark:border-white/[0.08] bg-gray-50 dark:bg-white/[0.04] p-5 backdrop-blur-xl">
+                  <h3 className="mb-4 flex items-center gap-2 text-xs font-medium uppercase tracking-widest text-gray-500 dark:text-white/50">
+                    <DollarSign className="h-3.5 w-3.5 text-emerald-500/60 dark:text-emerald-400/60" />
+                    Billing Setup
+                    <NorvaGuardianTooltip fieldKey="billingType" />
                   </h3>
 
                   {/* Billing type toggle */}
-                  <div className="flex gap-1.5 rounded-xl bg-white/[0.04] p-1">
+                  <div className="flex gap-1.5 rounded-xl bg-gray-100 dark:bg-white/[0.04] p-1">
                     {([
                       { value: 'flat_fee' as BillingType, label: 'Flat Fee', icon: DollarSign },
                       { value: 'hourly' as BillingType, label: 'Hourly', icon: Clock },
@@ -658,8 +670,8 @@ export function SovereignInitiationModal({
                         className={cn(
                           'flex flex-1 items-center justify-center gap-1.5 rounded-lg px-2 py-2 text-xs font-medium transition-all',
                           billingType === value
-                            ? 'bg-emerald-500/20 text-emerald-300 shadow-sm'
-                            : 'text-white/40 hover:text-white/60',
+                            ? 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 shadow-sm'
+                            : 'text-gray-400 dark:text-white/40 hover:text-gray-600 dark:hover:text-white/60',
                         )}
                       >
                         <BIcon className="h-3 w-3" />
@@ -670,11 +682,12 @@ export function SovereignInitiationModal({
 
                   {/* Fee amount */}
                   <div className="mt-5">
-                    <label className="mb-2 block text-[10px] font-medium uppercase tracking-widest text-white/40">
+                    <label className="mb-2 flex items-center text-[10px] font-medium uppercase tracking-widest text-gray-400 dark:text-white/40">
                       {billingType === 'hourly' ? 'Hourly Rate ($)' : billingType === 'flat_fee' ? 'Flat Fee ($)' : 'Retainer Amount ($)'}
+                      <NorvaGuardianTooltip fieldKey="feeAmount" />
                     </label>
                     <div className="relative">
-                      <DollarSign className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-white/20" />
+                      <DollarSign className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-300 dark:text-white/20" />
                       <input
                         type="number"
                         min="0"
@@ -682,7 +695,7 @@ export function SovereignInitiationModal({
                         value={feeAmount}
                         onChange={(e) => setFeeAmount(e.target.value)}
                         placeholder="0.00"
-                        className="w-full rounded-xl border border-white/[0.1] bg-white/[0.04] py-2.5 pl-9 pr-4 text-sm text-white placeholder-white/20 outline-none transition-shadow focus:border-emerald-500/40 focus:shadow-[0_0_12px_rgba(16,185,129,0.08)] focus:ring-0"
+                        className="w-full rounded-xl border border-gray-200 dark:border-white/[0.1] bg-white dark:bg-white/[0.04] py-2.5 pl-9 pr-4 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-white/20 outline-none transition-shadow focus:border-emerald-500/40 focus:shadow-[0_0_12px_rgba(16,185,129,0.08)] focus:ring-0"
                       />
                     </div>
                   </div>
@@ -704,9 +717,10 @@ export function SovereignInitiationModal({
                 className="flex flex-col gap-6"
               >
                 <div>
-                  <h3 className="mb-4 flex items-center gap-2 text-xs font-medium uppercase tracking-widest text-white/50">
-                    <Users className="h-3.5 w-3.5 text-emerald-400/60" />
-                    Responsible Lawyer
+                  <h3 className="mb-4 flex items-center gap-2 text-xs font-medium uppercase tracking-widest text-gray-500 dark:text-white/50">
+                    <Users className="h-3.5 w-3.5 text-emerald-500/60 dark:text-emerald-400/60" />
+                    Lead Lawyer
+                    <NorvaGuardianTooltip fieldKey="responsibleLawyer" />
                   </h3>
 
                   {/* Horizontal scroll of team avatars */}
@@ -717,23 +731,26 @@ export function SovereignInitiationModal({
                       const displayName = [member.first_name, member.last_name].filter(Boolean).join(' ') || member.email
 
                       return (
-                        <button
+                        <motion.button
                           key={member.id}
                           type="button"
+                          whileHover={{ scale: 1.05, y: -3 }}
+                          whileTap={{ scale: 0.96 }}
+                          transition={{ type: 'spring', stiffness: 400, damping: 20 }}
                           onClick={() => setResponsibleLawyerId(member.id)}
                           className={cn(
                             'group flex shrink-0 flex-col items-center gap-2 rounded-2xl border px-5 py-4 transition-all',
                             selected
                               ? 'border-emerald-500/50 bg-emerald-500/10 shadow-[0_0_20px_rgba(16,185,129,0.2)]'
-                              : 'border-white/[0.06] bg-white/[0.02] hover:border-white/[0.12] hover:bg-white/[0.04]',
+                              : 'border-gray-200 dark:border-white/[0.06] bg-white dark:bg-white/[0.02] hover:border-gray-300 dark:hover:border-white/[0.12] hover:bg-gray-50 dark:hover:bg-white/[0.04]',
                           )}
                         >
                           <div
                             className={cn(
                               'relative flex h-12 w-12 items-center justify-center rounded-full text-sm font-bold transition-all',
                               selected
-                                ? 'bg-emerald-500/30 text-emerald-300 ring-2 ring-emerald-400/60 sovereign-sparkle'
-                                : 'bg-white/[0.08] text-white/50 group-hover:bg-white/[0.12]',
+                                ? 'bg-emerald-500/30 text-emerald-700 dark:text-emerald-300 ring-2 ring-emerald-400/60 sovereign-sparkle'
+                                : 'bg-gray-100 dark:bg-white/[0.08] text-gray-500 dark:text-white/50 group-hover:bg-gray-200 dark:group-hover:bg-white/[0.12]',
                             )}
                           >
                             {member.avatar_url ? (
@@ -755,39 +772,39 @@ export function SovereignInitiationModal({
                               </motion.div>
                             )}
                           </div>
-                          <span className={cn('max-w-[80px] truncate text-xs font-medium', selected ? 'text-emerald-300' : 'text-white/60')}>
+                          <span className={cn('max-w-[80px] truncate text-xs font-medium', selected ? 'text-emerald-700 dark:text-emerald-300' : 'text-gray-500 dark:text-white/60')}>
                             {displayName}
                           </span>
-                        </button>
+                        </motion.button>
                       )
                     })}
 
                     {staff.isLoading && (
-                      <div className="flex items-center px-4 text-xs text-white/30">Loading team...</div>
+                      <div className="flex items-center px-4 text-xs text-gray-400 dark:text-white/30">Loading team...</div>
                     )}
                   </div>
                 </div>
 
                 {/* Summary */}
-                <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-4">
-                  <h4 className="mb-3 text-[10px] font-medium uppercase tracking-widest text-white/40">
+                <div className="rounded-2xl border border-gray-200 dark:border-white/[0.06] bg-gray-50 dark:bg-white/[0.02] p-4">
+                  <h4 className="mb-3 text-[10px] font-medium uppercase tracking-widest text-gray-400 dark:text-white/40">
                     Initiation Summary
                   </h4>
                   <div className="grid grid-cols-2 gap-y-2 gap-x-6 text-xs">
-                    <div className="text-white/40">Contact</div>
-                    <div className="font-medium text-white/80">
+                    <div className="text-gray-400 dark:text-white/40">Contact</div>
+                    <div className="font-medium text-gray-700 dark:text-white/80">
                       {selectedContact
                         ? `${selectedContact.first_name ?? ''} ${selectedContact.last_name ?? ''}`.trim()
                         : 'Not selected'}
                     </div>
-                    <div className="text-white/40">Title</div>
-                    <div className="font-medium text-white/80">{title || 'Not set'}</div>
-                    <div className="text-white/40">Practice Area</div>
-                    <div className="font-medium text-white/80">
+                    <div className="text-gray-400 dark:text-white/40">Title</div>
+                    <div className="font-medium text-gray-700 dark:text-white/80">{title || 'Not set'}</div>
+                    <div className="text-gray-400 dark:text-white/40">Practice Area</div>
+                    <div className="font-medium text-gray-700 dark:text-white/80">
                       {practiceAreas.data?.find((pa) => pa.id === practiceAreaId)?.name ?? 'Not selected'}
                     </div>
-                    <div className="text-white/40">Billing</div>
-                    <div className="font-medium text-white/80">
+                    <div className="text-gray-400 dark:text-white/40">Billing</div>
+                    <div className="font-medium text-gray-700 dark:text-white/80">
                       {billingType === 'flat_fee' ? 'Flat Fee' : billingType === 'hourly' ? 'Hourly' : 'Retainer'}
                       {feeAmount ? ` - $${parseFloat(feeAmount).toFixed(2)}` : ''}
                     </div>
@@ -804,13 +821,13 @@ export function SovereignInitiationModal({
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between border-t border-white/[0.06] px-8 py-5">
+        <div className="flex items-center justify-between border-t border-gray-200 dark:border-white/[0.06] px-8 py-5">
           <div>
             {step > 1 && (
               <button
                 type="button"
                 onClick={goBack}
-                className="flex items-center gap-1.5 rounded-xl border border-white/[0.1] bg-white/[0.04] px-4 py-2 text-xs font-medium text-white/60 transition-colors hover:bg-white/[0.08] hover:text-white"
+                className="flex items-center gap-1.5 rounded-xl border border-gray-200 dark:border-white/[0.1] bg-gray-50 dark:bg-white/[0.04] px-4 py-2 text-xs font-medium text-gray-500 dark:text-white/60 transition-colors hover:bg-gray-100 dark:hover:bg-white/[0.08] hover:text-gray-700 dark:hover:text-white"
               >
                 <ChevronLeft className="h-3.5 w-3.5" />
                 Back
@@ -828,7 +845,7 @@ export function SovereignInitiationModal({
                   'flex items-center gap-1.5 rounded-xl px-5 py-2 text-xs font-semibold tracking-wide uppercase transition-all',
                   (step === 1 ? canProceedStep1 : canProceedStep2)
                     ? 'bg-gradient-to-r from-emerald-600 to-emerald-500 text-white shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40'
-                    : 'cursor-not-allowed bg-white/[0.06] text-white/20',
+                    : 'cursor-not-allowed bg-gray-100 dark:bg-white/[0.06] text-gray-300 dark:text-white/20',
                 )}
               >
                 Next
@@ -844,8 +861,8 @@ export function SovereignInitiationModal({
                 className={cn(
                   'flex items-center gap-2 rounded-xl border px-6 py-2.5 text-xs font-bold uppercase tracking-widest transition-all',
                   canInitiate && !isSubmitting
-                    ? 'border-emerald-500/50 bg-zinc-900 text-emerald-400 hover:shadow-[0_0_30px_rgba(16,185,129,0.4)] hover:text-emerald-300'
-                    : 'cursor-not-allowed border-white/[0.06] bg-zinc-900 text-white/20',
+                    ? 'border-emerald-500/50 bg-white dark:bg-zinc-900 text-emerald-600 dark:text-emerald-400 hover:shadow-[0_0_30px_rgba(16,185,129,0.4)] hover:text-emerald-500 dark:hover:text-emerald-300'
+                    : 'cursor-not-allowed border-gray-200 dark:border-white/[0.06] bg-gray-50 dark:bg-zinc-900 text-gray-300 dark:text-white/20',
                 )}
               >
                 {isSubmitting ? (
