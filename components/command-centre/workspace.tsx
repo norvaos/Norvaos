@@ -61,7 +61,25 @@ import {
   Pencil,
   Lock,
   UserPlus,
+  Shield,
+  CheckCircle2,
+  AlertTriangle,
+  LockKeyhole,
 } from 'lucide-react'
+import {
+  useMasterProfile,
+  isGateUnlocked,
+  isGatePassed,
+  getGateBorderClass,
+  getGateIconClass,
+  type GateState,
+  type GateStatus,
+} from '@/lib/queries/master-profile'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { GoldenThreadOverrideDialog } from './golden-thread-override-dialog'
+import { MeetingOutcomeModal, useAutoMeetingCheckout } from './meeting-outcome-modal'
+import { motion, AnimatePresence } from 'framer-motion'
+import { toast } from 'sonner'
 
 // ─── Types ──────────────────────────────────────────────────────────
 
@@ -108,21 +126,466 @@ function useDebouncedCallback<T extends (...args: any[]) => void>(
   )
 }
 
+// ─── Golden Thread Gate Components ──────────────────────────────────
+
+const GATE_ICONS: Record<string, React.ElementType> = {
+  conflict_check: Shield,
+  strategy_meeting: Calendar,
+  id_capture: UserCheck,
+  retainer: FileText,
+}
+
+const GATE_STATUS_LABELS: Record<GateStatus, string> = {
+  locked: 'Locked',
+  active: 'Active',
+  passed: 'Cleared',
+  overridden: 'Overridden',
+  blocked: 'Blocked',
+}
+
+// ─── Emerald Pulse: Breathing Animation ─────────────────────────────
+
+/** Sovereign-Grade breathing pulse for mission-critical action buttons */
+function BreathingPulseButton({
+  children,
+  onClick,
+  className = '',
+}: {
+  children: React.ReactNode
+  onClick?: () => void
+  className?: string
+}) {
+  return (
+    <motion.button
+      type="button"
+      onClick={onClick}
+      animate={{
+        scale: [1, 1.02, 1],
+        boxShadow: [
+          '0 0 0px rgba(16, 185, 129, 0)',
+          '0 0 15px rgba(16, 185, 129, 0.35)',
+          '0 0 0px rgba(16, 185, 129, 0)',
+        ],
+      }}
+      transition={{
+        duration: 2.5,
+        repeat: Infinity,
+        ease: 'easeInOut' as const,
+      }}
+      className={`inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 transition-colors ${className}`}
+    >
+      {children}
+    </motion.button>
+  )
+}
+
+// ─── Confetti-Lite: Emerald Particle Burst ──────────────────────────
+
+/**
+ * Lightweight confetti particle burst — 8 emerald dots emanating from center.
+ * Renders for 0.6s then auto-removes. No external library needed.
+ */
+function EmeraldBurst({ active }: { active: boolean }) {
+  if (!active) return null
+
+  const particles = Array.from({ length: 8 }, (_, i) => {
+    const angle = (i / 8) * 360
+    const rad = (angle * Math.PI) / 180
+    const x = Math.cos(rad) * 28
+    const y = Math.sin(rad) * 28
+    return { id: i, x, y, delay: i * 0.03 }
+  })
+
+  return (
+    <div className="absolute inset-0 pointer-events-none z-20 flex items-center justify-center overflow-visible">
+      {particles.map((p) => (
+        <motion.div
+          key={p.id}
+          initial={{ opacity: 1, x: 0, y: 0, scale: 1 }}
+          animate={{ opacity: 0, x: p.x, y: p.y, scale: 0.3 }}
+          transition={{
+            duration: 0.6,
+            delay: p.delay,
+            ease: 'easeOut' as const,
+          }}
+          className="absolute h-1.5 w-1.5 rounded-full bg-emerald-400"
+        />
+      ))}
+    </div>
+  )
+}
+
+/**
+ * Hook to detect gate transitions from active → passed.
+ * Returns a set of gate keys that just transitioned.
+ */
+function useGateTransitions(gates: [GateState, GateState, GateState, GateState] | undefined) {
+  const prevRef = useMemo(() => ({ current: null as Record<string, GateStatus> | null }), [])
+  const [bursting, setBursting] = useState<Set<string>>(new Set())
+
+  useEffect(() => {
+    if (!gates) return
+
+    const current: Record<string, GateStatus> = {}
+    gates.forEach((g) => { current[g.key] = g.status })
+
+    if (prevRef.current) {
+      const newBursts = new Set<string>()
+      gates.forEach((g) => {
+        const prev = prevRef.current?.[g.key]
+        if (prev && prev !== 'passed' && prev !== 'overridden' && (g.status === 'passed' || g.status === 'overridden')) {
+          newBursts.add(g.key)
+        }
+      })
+      if (newBursts.size > 0) {
+        setBursting(newBursts)
+        // Clear burst after animation completes
+        setTimeout(() => setBursting(new Set()), 700)
+      }
+    }
+
+    prevRef.current = current
+  }, [gates, prevRef])
+
+  return bursting
+}
+
+// ─── Mission Banner Messages ────────────────────────────────────────
+
+const MISSION_MESSAGES: Record<string, { mission: string; instruction: string }> = {
+  conflict_check: {
+    mission: 'Run Conflict Check',
+    instruction: 'Scan this contact for potential conflicts before proceeding.',
+  },
+  strategy_meeting: {
+    mission: 'Complete Strategy Meeting',
+    instruction: 'Book and complete a consultation. Use Quick-Log below to record the outcome.',
+  },
+  id_capture: {
+    mission: 'Verify Identity',
+    instruction: 'Please trigger the SMS link or use the check-in kiosk to verify.',
+  },
+  retainer: {
+    mission: 'Prepare Retainer',
+    instruction: 'All gates cleared. Build and send the retainer package.',
+  },
+}
+
+/** Vision 2035 Mission Banner — Command Deck typography with breathing CTA */
+function MissionBanner({ gates }: { gates: [GateState, GateState, GateState, GateState] }) {
+  const activeGate = gates.find((g) => g.status === 'active' || g.status === 'blocked')
+  const allComplete = gates.every((g) => g.status === 'passed' || g.status === 'overridden')
+
+  if (allComplete) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: -8 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-500 px-6 py-5 text-white shadow-sm"
+      >
+        <p
+          className="text-xl font-bold tracking-tight"
+          style={{ fontFamily: 'var(--font-geist-mono), ui-monospace, monospace' }}
+        >
+          All Gates Cleared
+        </p>
+        <p className="text-base text-emerald-100 mt-1 leading-relaxed" style={{ fontSize: '16px' }}>
+          This engagement is fully qualified. Proceed with conversion or retainer delivery.
+        </p>
+      </motion.div>
+    )
+  }
+
+  if (!activeGate) return null
+
+  const msg = MISSION_MESSAGES[activeGate.key]
+  const isBlocked = activeGate.status === 'blocked'
+
+  return (
+    <motion.div
+      key={activeGate.key}
+      initial={{ opacity: 0, y: -8 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: 8 }}
+      transition={{ duration: 0.3 }}
+      className={`rounded-xl px-6 py-5 shadow-sm ${
+        isBlocked
+          ? 'bg-gradient-to-r from-red-600 to-red-500 text-white'
+          : 'bg-gradient-to-r from-slate-800 to-slate-700 text-white'
+      }`}
+    >
+      <p
+        className="text-[11px] font-semibold uppercase tracking-[0.2em] text-white/50 mb-1.5"
+        style={{ fontFamily: 'var(--font-geist-mono), ui-monospace, monospace' }}
+      >
+        Current Mission
+      </p>
+      <p
+        className="text-xl font-bold tracking-tight"
+        style={{ fontFamily: 'var(--font-geist-mono), ui-monospace, monospace' }}
+      >
+        {isBlocked ? `Blocked: ${msg?.mission}` : `Mission: ${msg?.mission}`}
+      </p>
+      <p
+        className="text-white/70 mt-1.5 leading-relaxed"
+        style={{ fontSize: '16px' }}
+      >
+        {msg?.instruction}
+      </p>
+    </motion.div>
+  )
+}
+
+/** Horizontal stepper showing the 4 Golden Thread gates with Quick-Log + Override + Confetti */
+function GoldenThreadBar({
+  gates,
+  leadId,
+  onQuickLog,
+  onOverride,
+  burstingGates,
+}: {
+  gates: [GateState, GateState, GateState, GateState]
+  leadId: string
+  onQuickLog: () => void
+  onOverride: (gate: GateState) => void
+  burstingGates: Set<string>
+}) {
+  return (
+    <Card className="border-slate-200">
+      <CardContent className="py-3 px-4">
+        <div className="flex items-center gap-1 mb-2">
+          <Shield className="h-3.5 w-3.5 text-slate-500" />
+          <span
+            className="text-xs font-semibold text-slate-600 tracking-wide uppercase"
+            style={{ fontFamily: 'var(--font-geist-mono), ui-monospace, monospace' }}
+          >
+            Golden Thread — Sequential Gate Enforcement
+          </span>
+        </div>
+        <div className="flex items-center gap-2">
+          {gates.map((gate, idx) => {
+            const Icon = GATE_ICONS[gate.key] ?? Shield
+            const statusLabel = GATE_STATUS_LABELS[gate.status]
+            const isOverridable = (gate.status === 'locked' || gate.status === 'blocked') && gate.key !== 'retainer'
+            const showQuickLog = gate.key === 'strategy_meeting' && gate.status === 'active'
+            const isBursting = burstingGates.has(gate.key)
+
+            return (
+              <TooltipProvider key={gate.key} delayDuration={200}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div className="flex items-center gap-2 flex-1">
+                      <div className="relative flex-1">
+                        {/* Confetti-Lite burst on gate pass */}
+                        <EmeraldBurst active={isBursting} />
+                        <motion.div
+                          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md border text-xs font-medium transition-colors ${getGateBorderClass(gate.status)}`}
+                          animate={
+                            isBursting
+                              ? { scale: [1, 1.05, 1], transition: { duration: 0.3 } }
+                              : {}
+                          }
+                        >
+                          {gate.status === 'passed' ? (
+                            <CheckCircle2 className={`h-3.5 w-3.5 ${getGateIconClass(gate.status)}`} />
+                          ) : gate.status === 'locked' ? (
+                            <LockKeyhole className={`h-3.5 w-3.5 ${getGateIconClass(gate.status)}`} />
+                          ) : gate.status === 'overridden' ? (
+                            <AlertTriangle className={`h-3.5 w-3.5 ${getGateIconClass(gate.status)}`} />
+                          ) : gate.status === 'blocked' ? (
+                            <AlertCircle className={`h-3.5 w-3.5 ${getGateIconClass(gate.status)}`} />
+                          ) : (
+                            <Icon className={`h-3.5 w-3.5 ${getGateIconClass(gate.status)}`} />
+                          )}
+                          <span className={gate.status === 'locked' ? 'text-slate-400' : 'text-slate-700'}>
+                            {gate.label}
+                          </span>
+                          {/* Quick-Log button for Gate B (Strategy Meeting) */}
+                          {showQuickLog && (
+                            <button
+                              type="button"
+                              onClick={(e) => { e.stopPropagation(); onQuickLog() }}
+                              className="ml-auto shrink-0 rounded bg-blue-500 px-1.5 py-0.5 text-[9px] font-semibold text-white hover:bg-blue-600 transition-colors"
+                            >
+                              Quick-Log
+                            </button>
+                          )}
+                          {/* Override button for locked/blocked gates */}
+                          {isOverridable && (
+                            <button
+                              type="button"
+                              onClick={(e) => { e.stopPropagation(); onOverride(gate) }}
+                              className="ml-auto shrink-0 rounded bg-amber-100 px-1.5 py-0.5 text-[9px] font-semibold text-amber-700 hover:bg-amber-200 transition-colors border border-amber-200"
+                            >
+                              Override
+                            </button>
+                          )}
+                        </motion.div>
+                      </div>
+                      {idx < 3 && (
+                        <div className={`w-4 h-px ${isGatePassed(gate) ? 'bg-emerald-300' : 'bg-slate-200'}`} />
+                      )}
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom" className="text-xs">
+                    <p className="font-medium">{gate.label}: {statusLabel}</p>
+                    {gate.currentValue && (
+                      <p className="text-slate-400">Current: {gate.currentValue.replace(/_/g, ' ')}</p>
+                    )}
+                    {gate.overrideId && (
+                      <p className="text-amber-500">⚠ Principal Override active</p>
+                    )}
+                    {isOverridable && (
+                      <p className="text-amber-400 mt-0.5">Click Override to bypass (Partner PIN required)</p>
+                    )}
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )
+          })}
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
+/**
+ * Lock overlay for gated panels. Renders children with a translucent lock
+ * overlay when the gate is not unlocked. Non-interactive when locked.
+ * Phase C: Includes Override button on the lock overlay.
+ */
+function GateLockedOverlay({
+  gate,
+  children,
+  prerequisiteLabel,
+  onOverride,
+}: {
+  gate: GateState
+  children: React.ReactNode
+  prerequisiteLabel: string
+  onOverride?: (gate: GateState) => void
+}) {
+  const unlocked = isGateUnlocked(gate)
+
+  if (unlocked) {
+    return (
+      <motion.div
+        initial={{ opacity: 0.8 }}
+        animate={{ opacity: 1 }}
+        className={`relative rounded-lg border transition-colors ${getGateBorderClass(gate.status)}`}
+      >
+        {gate.status === 'overridden' && (
+          <div className="absolute top-2 right-2 z-10">
+            <Badge variant="outline" className="text-[10px] border-amber-300 text-amber-600 bg-amber-50">
+              <AlertTriangle className="h-2.5 w-2.5 mr-0.5" />
+              Override
+            </Badge>
+          </div>
+        )}
+        {children}
+      </motion.div>
+    )
+  }
+
+  const isOverridable = gate.key !== 'retainer' && onOverride
+
+  return (
+    <div className="relative rounded-lg">
+      {/* Locked content — non-interactive */}
+      <div className="pointer-events-none select-none opacity-40 blur-[1px]" aria-hidden="true">
+        {children}
+      </div>
+      {/* Lock overlay */}
+      <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-50/80 backdrop-blur-[2px] rounded-lg border border-slate-200 z-10">
+        <LockKeyhole className="h-8 w-8 text-slate-300 mb-2" />
+        <p className="text-sm font-medium text-slate-500">Gate Locked</p>
+        <p className="text-xs text-slate-400 mt-1 max-w-xs text-center">
+          Complete <strong>{prerequisiteLabel}</strong> to unlock this panel
+        </p>
+        {isOverridable && (
+          <Button
+            variant="outline"
+            size="sm"
+            className="mt-3 h-7 text-xs gap-1 border-amber-200 text-amber-700 hover:bg-amber-50"
+            onClick={() => onOverride(gate)}
+          >
+            <ShieldAlert className="h-3 w-3" />
+            Compliance Override
+          </Button>
+        )}
+      </div>
+    </div>
+  )
+}
+
 // ─── Component ──────────────────────────────────────────────────────
 
 // CRS calculator shows when the selected matter type is a point-based program
 const CRS_MATTER_TYPE_PATTERNS = /express.?entry|pnp|provincial/i
+
+// ─── Framer Motion Variants ─────────────────────────────────────────
+
+const panelVariants = {
+  hidden: { opacity: 0, y: 12 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.3, ease: 'easeOut' as const } },
+}
 
 export function Workspace() {
   const {
     entityType,
     entityId,
     lead,
+    contact,
     tenantId,
     users,
     practiceAreas,
     isConverted,
   } = useCommandCentre()
+
+  // ── Golden Thread: Master Profile with gate states ─────────────────
+  const { data: masterProfile } = useMasterProfile(
+    entityType === 'lead' ? entityId : ''
+  )
+  const goldenThread = masterProfile?.goldenThread
+  const gateA = goldenThread?.gates[0] // Conflict Check
+  const gateB = goldenThread?.gates[1] // Strategy Meeting
+  const gateC = goldenThread?.gates[2] // ID Capture
+  const gateD = goldenThread?.gates[3] // Retainer
+
+  // ── Emerald Pulse: Confetti-Lite transition detection ──────────────
+  const burstingGates = useGateTransitions(goldenThread?.gates)
+
+  // ── Override dialog state ──────────────────────────────────────────
+  const [overrideGate, setOverrideGate] = useState<GateState | null>(null)
+  const [overrideOpen, setOverrideOpen] = useState(false)
+
+  const handleOverride = useCallback((gate: GateState) => {
+    setOverrideGate(gate)
+    setOverrideOpen(true)
+  }, [])
+
+  // ── Meeting Outcome Modal state ────────────────────────────────────
+  const [meetingOutcomeOpen, setMeetingOutcomeOpen] = useState(false)
+  const [quickLogMode, setQuickLogMode] = useState(false)
+
+  // Auto-trigger meeting checkout when appointment passes end time
+  const { shouldShow: shouldShowMeetingCheckout } = useAutoMeetingCheckout(
+    entityType === 'lead' ? contact?.id : undefined,
+    tenantId,
+  )
+
+  // Auto-open the meeting outcome modal when an appointment passes
+  useEffect(() => {
+    if (shouldShowMeetingCheckout && !meetingOutcomeOpen && entityType === 'lead') {
+      setQuickLogMode(false)
+      setMeetingOutcomeOpen(true)
+    }
+  }, [shouldShowMeetingCheckout, meetingOutcomeOpen, entityType])
+
+  const handleQuickLog = useCallback(() => {
+    setQuickLogMode(true)
+    setMeetingOutcomeOpen(true)
+  }, [])
 
   // Determine if CRS calculator should show based on matter type name
   const { data: allMatterTypes } = useMatterTypes(tenantId, lead?.practice_area_id || undefined)
@@ -172,78 +635,242 @@ export function Workspace() {
     )
   }
 
+  // Closed-stage check for retainer visibility
+  const isClosedStage = ['closed_no_response', 'closed_retainer_not_signed', 'closed_client_declined', 'closed_not_a_fit', 'converted'].includes(lead?.current_stage ?? '')
+
   return (
     <div className="max-w-5xl mx-auto px-4 py-6 space-y-6">
+      {/* ═══ Vision 2035: Mission Banner ═══ */}
+      <AnimatePresence mode="wait">
+        {goldenThread && (
+          <MissionBanner gates={goldenThread.gates} />
+        )}
+      </AnimatePresence>
+
       {/* Compliance Pulse  -  Directive 41.3 (persistent compliance matrix) */}
       <CompliancePulse />
 
+      {/* ═══ Golden Thread Bar — Sequential Gate Enforcement ═══ */}
+      {goldenThread && (
+        <GoldenThreadBar
+          gates={goldenThread.gates}
+          leadId={entityId}
+          onQuickLog={handleQuickLog}
+          onOverride={handleOverride}
+          burstingGates={burstingGates}
+        />
+      )}
+
       {/* Entity Recognition  -  Contact-thinking: link Principal + Sponsor */}
-      <EntityRecognitionCard
-        lead={lead}
-        entityId={entityId}
-        tenantId={tenantId}
-        isConverted={isConverted}
-      />
+      <motion.div variants={panelVariants} initial="hidden" animate="visible">
+        <EntityRecognitionCard
+          lead={lead}
+          entityId={entityId}
+          tenantId={tenantId}
+          isConverted={isConverted}
+        />
+      </motion.div>
 
       {/* Core Data Card */}
-      <CoreDataCard
-        lead={lead}
-        entityId={entityId}
-        tenantId={tenantId}
-        users={users}
-        practiceAreas={practiceAreas}
-        isConverted={isConverted}
-      />
+      <motion.div variants={panelVariants} initial="hidden" animate="visible" transition={{ delay: 0.05 }}>
+        <CoreDataCard
+          lead={lead}
+          entityId={entityId}
+          tenantId={tenantId}
+          users={users}
+          practiceAreas={practiceAreas}
+          isConverted={isConverted}
+        />
+      </motion.div>
 
       {/* Interactive Intake Wizard */}
-      <IntakeWizardPanel />
+      <motion.div variants={panelVariants} initial="hidden" animate="visible" transition={{ delay: 0.1 }}>
+        <IntakeWizardPanel />
+      </motion.div>
 
       {/* Client Profile  -  demographics collected at lead/intake stage */}
-      <ClientProfilePanel />
+      <motion.div variants={panelVariants} initial="hidden" animate="visible" transition={{ delay: 0.15 }}>
+        <ClientProfilePanel />
+      </motion.div>
 
       {/* CRS Calculator  -  only for point-based programs (Express Entry, PNP) */}
-      {showCrsCalculator && <CrsCalculatorPanel />}
+      <AnimatePresence>
+        {showCrsCalculator && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <CrsCalculatorPanel />
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Screening + Documents (side by side) */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <ScreeningAnswers />
-        <DocumentPanelSwitcher />
-      </div>
+      <motion.div variants={panelVariants} initial="hidden" animate="visible" transition={{ delay: 0.2 }}>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <ScreeningAnswers />
+          <DocumentPanelSwitcher />
+        </div>
+      </motion.div>
 
       {/* Regulatory Status  -  LSO/CICC Compliance (Directive 41.2) */}
-      <RegulatorySidebar />
+      <motion.div variants={panelVariants} initial="hidden" animate="visible" transition={{ delay: 0.25 }}>
+        <RegulatorySidebar />
+      </motion.div>
 
       {/* Notes + Call Log (side by side) */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <MeetingNotes />
-        <CallLogPanel />
-      </div>
-
-      {/* Tasks + Appointments (side by side) */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <TaskPanel />
-        <AppointmentPanel />
-      </div>
-
-      {/* Retainer Builder  -  visible once matter type is selected, hidden for closed/declined leads */}
-      {lead?.matter_type_id && !['closed_no_response', 'closed_retainer_not_signed', 'closed_client_declined', 'closed_not_a_fit', 'converted'].includes(lead?.current_stage ?? '') && (
-        <div id="retainer-builder-section">
-          <RetainerBuilder />
+      <motion.div variants={panelVariants} initial="hidden" animate="visible" transition={{ delay: 0.3 }}>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <MeetingNotes />
+          <CallLogPanel />
         </div>
+      </motion.div>
+
+      {/* ═══ GATE A → Appointment Panel (locked until Conflict Check cleared) ═══ */}
+      <motion.div variants={panelVariants} initial="hidden" animate="visible" transition={{ delay: 0.35 }}>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <TaskPanel />
+          {gateA ? (
+            <GateLockedOverlay
+              gate={gateA}
+              prerequisiteLabel="Conflict Check"
+              onOverride={handleOverride}
+            >
+              <AppointmentPanel />
+            </GateLockedOverlay>
+          ) : (
+            <AppointmentPanel />
+          )}
+        </div>
+      </motion.div>
+
+      {/* ═══ GATE C → ID Capture status indicator (locked until Strategy Meeting completed) ═══ */}
+      <AnimatePresence>
+        {gateB && (
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -12 }}
+            transition={{ duration: 0.3 }}
+          >
+            <GateLockedOverlay
+              gate={gateB}
+              prerequisiteLabel="Strategy Meeting"
+              onOverride={handleOverride}
+            >
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm font-medium flex items-center gap-2 text-slate-700">
+                    <UserCheck className="h-4 w-4" />
+                    NorvaOS Capture — Identity Verification
+                    {gateC && isGatePassed(gateC) && (
+                      <Badge className="ml-auto bg-emerald-50 text-emerald-700 border-emerald-200 text-[10px]">
+                        <CheckCircle2 className="h-2.5 w-2.5 mr-0.5" />
+                        Verified
+                      </Badge>
+                    )}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {gateC && !isGatePassed(gateC) && isGateUnlocked(gateB) ? (
+                    <div className="flex flex-col items-center py-4 text-center gap-2">
+                      <UserCheck className="h-8 w-8 text-blue-400" />
+                      <p className="text-sm font-medium text-slate-600">Identity verification pending</p>
+                      <p className="text-xs text-slate-500 max-w-md" style={{ fontSize: '16px' }}>
+                        Use the check-in kiosk or NorvaOS Capture scanner to verify this client&apos;s identity before proceeding to the retainer.
+                      </p>
+                      <BreathingPulseButton
+                        onClick={() => {
+                          toast.info('SMS verification link will be sent to the client\'s phone number on file.')
+                        }}
+                        className="mt-2"
+                      >
+                        <UserCheck className="h-4 w-4" />
+                        Trigger SMS Verification Link
+                      </BreathingPulseButton>
+                    </div>
+                  ) : gateC && isGatePassed(gateC) ? (
+                    <div className="flex items-center gap-2 py-2">
+                      <CheckCircle2 className="h-5 w-5 text-emerald-500" />
+                      <span className="text-sm text-slate-600">
+                        Identity verified — retainer gate unlocked
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center py-4 text-center gap-2">
+                      <LockKeyhole className="h-6 w-6 text-slate-300" />
+                      <p className="text-xs text-slate-400">Complete the strategy meeting to unlock ID capture</p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </GateLockedOverlay>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ═══ GATE D → Retainer Builder (locked until ID Capture verified) ═══ */}
+      <AnimatePresence>
+        {lead?.matter_type_id && !isClosedStage && gateC ? (
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -12 }}
+            transition={{ duration: 0.3 }}
+          >
+            <GateLockedOverlay
+              gate={gateC}
+              prerequisiteLabel="NorvaOS Capture (ID Verification)"
+              onOverride={handleOverride}
+            >
+              <div id="retainer-builder-section">
+                <RetainerBuilder />
+              </div>
+            </GateLockedOverlay>
+          </motion.div>
+        ) : lead?.matter_type_id && !isClosedStage && !gateC ? (
+          /* Fallback: no Golden Thread data yet (loading) — show retainer ungated */
+          <motion.div variants={panelVariants} initial="hidden" animate="visible">
+            <div id="retainer-builder-section">
+              <RetainerBuilder />
+            </div>
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
+
+      {/* Zero Empty States: Retainer action card when no matter type set */}
+      {!lead?.matter_type_id && !isConverted && !isClosedStage && (
+        <motion.div variants={panelVariants} initial="hidden" animate="visible">
+          <Card className="border-dashed border-blue-200 bg-blue-50/30">
+            <CardContent className="py-6 flex flex-col items-center text-center gap-3">
+              <Briefcase className="h-8 w-8 text-blue-400" />
+              <p className="text-sm font-medium text-slate-700">Set a Service Stream to unlock the Retainer</p>
+              <p className="text-xs text-slate-500 max-w-md">
+                Select a matter type in Core Data above, or complete a strategy meeting and use the <strong>Quick-Log</strong> button in the Golden Thread bar to confirm the service stream.
+              </p>
+            </CardContent>
+          </Card>
+        </motion.div>
       )}
 
-      {/* Retainer guidance  -  shown when no matter type is set yet (new leads) */}
-      {!lead?.matter_type_id && !isConverted && !['closed_no_response', 'closed_retainer_not_signed', 'closed_client_declined', 'closed_not_a_fit'].includes(lead?.current_stage ?? '') && (
-        <Card className="border-dashed border-slate-300 bg-slate-50/50">
-          <CardContent className="py-6 flex flex-col items-center text-center gap-2">
-            <FileText className="h-8 w-8 text-slate-400" />
-            <p className="text-sm font-medium text-slate-600">Retainer Package</p>
-            <p className="text-xs text-slate-500 max-w-md">
-              To create a retainer, select <strong>Send Retainer</strong> in the consultation outcome panel above. This will set the matter type, assign a lawyer, and prepare the retainer package.
-            </p>
-          </CardContent>
-        </Card>
+      {/* ═══ Phase C: Override Dialog ═══ */}
+      {overrideGate && (
+        <GoldenThreadOverrideDialog
+          open={overrideOpen}
+          onOpenChange={setOverrideOpen}
+          gate={overrideGate}
+          leadId={entityId}
+        />
       )}
+
+      {/* ═══ Gate B: Meeting Outcome Modal ═══ */}
+      <MeetingOutcomeModal
+        open={meetingOutcomeOpen}
+        onOpenChange={setMeetingOutcomeOpen}
+        quickLog={quickLogMode}
+      />
     </div>
   )
 }

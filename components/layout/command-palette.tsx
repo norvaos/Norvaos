@@ -33,6 +33,7 @@ import {
   Loader2,
   BookOpen,
   ScrollText,
+  Radar,
 } from 'lucide-react'
 
 // ---------------------------------------------------------------------------
@@ -150,16 +151,26 @@ export function CommandPalette() {
               <CommandGroup heading={t('nav.contacts' as any)}>
                 {contacts.map((c) => {
                   const name = [c.first_name, c.last_name].filter(Boolean).join(' ') || c.organization_name || t('common.unnamed' as any)
+                  // Warp-Gate: contacts with lead status route through the corridor
+                  // (page-level redirect handles resolution to /command/lead/)
+                  const isActiveLead = c.client_status === 'lead'
                   return (
                     <CommandItem
                       key={c.id}
                       value={`contact-${c.id}-${name}`}
                       onSelect={() => runAction(() => router.push(`/contacts/${c.id}`))}
                     >
-                      <Users className="mr-2 size-4 text-blue-500" />
+                      {isActiveLead ? (
+                        <Target className="mr-2 size-4 text-orange-500" />
+                      ) : (
+                        <Users className="mr-2 size-4 text-blue-500" />
+                      )}
                       <div className="flex flex-col">
                         <span className="text-sm">{name}</span>
-                        <span className="text-xs text-muted-foreground">{c.email_primary || c.contact_type || t('common.contact' as any)}</span>
+                        <span className="text-xs text-muted-foreground">
+                          {isActiveLead ? `Active Lead · ` : ''}
+                          {c.email_primary || c.contact_type || t('common.contact' as any)}
+                        </span>
                       </div>
                     </CommandItem>
                   )
@@ -337,6 +348,10 @@ export function CommandPalette() {
               <CommandItem onSelect={() => runAction(() => router.push('/settings'))}>
                 <Settings className="mr-2 size-4" />
                 {t('nav.settings' as any)}
+              </CommandItem>
+              <CommandItem onSelect={() => runAction(() => router.push('/principal/radar'))}>
+                <Radar className="mr-2 size-4" />
+                Principal&apos;s Radar
               </CommandItem>
             </CommandGroup>
           </>
