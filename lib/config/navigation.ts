@@ -25,6 +25,7 @@ import {
   Activity,
   BookOpen,
   GraduationCap,
+  Radar,
   type LucideIcon,
 } from 'lucide-react'
 
@@ -124,6 +125,7 @@ export const navigation: NavSection[] = [
           { title: 'Tenants', labelKey: 'nav.tenants', href: '/admin/tenants', icon: Building2 },
           { title: 'Critical Actions', labelKey: 'nav.critical_actions', href: '/admin/critical-actions', icon: AlertTriangle },
           { title: 'Security Command', labelKey: 'nav.security_command', href: '/admin/sentinel-command', icon: Shield },
+          { title: "Principal's Radar", labelKey: 'nav.principal_radar', href: '/principal/radar', icon: Radar },
           { title: 'Communications', labelKey: 'nav.communications', href: '/communications', icon: Mail, deprecated: true },
         ],
       },

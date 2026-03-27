@@ -160,7 +160,20 @@ export async function middleware(request: NextRequest) {
     )
   }
 
-  // 3. Return session response
+  // 3. Warp-Gate: Redirect legacy routes to The Infinite Corridor
+  //    /leads/[id] → /command/lead/[id]
+  //    Principal-Only bypass: owner role can opt out via ?bypass=1 query param
+  const warpLeadMatch = pathname.match(/^\/leads\/([0-9a-f-]{36})$/)
+  if (warpLeadMatch) {
+    const bypassParam = request.nextUrl.searchParams.get('bypass')
+    if (bypassParam !== '1') {
+      const leadId = warpLeadMatch[1]
+      const destination = new URL(`/command/lead/${leadId}`, request.url)
+      return NextResponse.redirect(destination, 301)
+    }
+  }
+
+  // 4. Return session response
   return sessionResponse
 }
 

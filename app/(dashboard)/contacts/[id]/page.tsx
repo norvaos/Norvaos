@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { useTenant } from '@/lib/hooks/use-tenant'
 import { useUser } from '@/lib/hooks/use-user'
@@ -257,6 +257,23 @@ export default function ContactDetailPage() {
   const { role: userRole } = useUserRole()
   const { data: leadReadiness } = useLeadReadiness(activeLead?.id)
   const isRedScore = (leadReadiness?.score ?? 100) <= 35
+
+  // ── Warp-Gate: Redirect to The Infinite Corridor ────────────────────
+  // If this contact has an active lead, redirect staff to /command/lead/[id].
+  // Principal (owner) bypass: add ?bypass=1 to stay on this page.
+  const bypassWarp = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('bypass') === '1'
+  const isPrincipal = userRole?.name?.toLowerCase() === 'owner'
+
+  useEffect(() => {
+    if (activeLead?.id && !bypassWarp && !isPrincipal && !isLoading) {
+      router.replace(`/command/lead/${activeLead.id}`)
+    }
+  }, [activeLead?.id, bypassWarp, isPrincipal, isLoading, router])
+
+  // Show loading while warp-gate resolves
+  if (activeLead?.id && !bypassWarp && !isPrincipal) {
+    return <ContactDetailSkeleton />
+  }
 
   // Loading state
   if (isLoading) {
