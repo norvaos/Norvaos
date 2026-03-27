@@ -21,6 +21,7 @@ import {
   Rocket,
   Satellite,
   Eye,
+  Container,
 } from 'lucide-react'
 
 // ── Theme context ───────────────────────────────────────────────────────────
@@ -56,6 +57,7 @@ const nexusTabs = [
   { title: 'Health', href: '/nexus/health', icon: Activity },
   { title: 'Launch', href: '/nexus/launch', icon: Rocket },
   { title: 'Sovereign', href: '/nexus/sovereign-control', icon: Satellite },
+  { title: 'Releases', href: '/nexus/releases', icon: Container },
 ]
 
 function isActive(href: string, pathname: string): boolean {

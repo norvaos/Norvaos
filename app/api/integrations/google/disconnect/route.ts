@@ -23,8 +23,8 @@ async function handleGet() {
       .update({
         is_active: false,
         sync_enabled: false,
-        encrypted_access_token: null,
-        encrypted_refresh_token: null,
+        encrypted_access_token: undefined,
+        encrypted_refresh_token: undefined,
         updated_at: new Date().toISOString(),
       })
       .eq('user_id', auth.userId)

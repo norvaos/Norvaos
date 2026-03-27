@@ -13,13 +13,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from '@/components/ui/dialog'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -31,10 +24,7 @@ import {
   X,
   ChevronDown,
 } from 'lucide-react'
-import { ContactForm } from '@/components/contacts/contact-form'
-import { useCreateContact } from '@/lib/queries/contacts'
-import type { ContactFormValues } from '@/lib/schemas/contact'
-import { toast } from 'sonner'
+import { SovereignContactModal } from '@/components/contacts/sovereign-contact-modal'
 
 type Contact = Database['public']['Tables']['contacts']['Row']
 
@@ -96,8 +86,6 @@ export function ContactSearch({ value, onChange, tenantId, placeholder = 'Search
   const [showCreateDialog, setShowCreateDialog] = useState(false)
   const { data: contacts, isLoading: searchLoading } = useContactSearch(tenantId, search)
   const { data: selectedContact } = useContactById(value)
-  const createContact = useCreateContact()
-
   const handleSelect = useCallback((contactId: string) => {
     onChange(contactId)
     setOpen(false)
@@ -108,21 +96,6 @@ export function ContactSearch({ value, onChange, tenantId, placeholder = 'Search
     onChange('')
     setSearch('')
   }, [onChange])
-
-  const handleCreateContact = async (values: ContactFormValues) => {
-    try {
-      const result = await createContact.mutateAsync({
-        ...values,
-        tenant_id: tenantId,
-      })
-      onChange(result.id)
-      setShowCreateDialog(false)
-      setSearch('')
-      toast.success('Contact created and linked')
-    } catch {
-      // Error handled by mutation
-    }
-  }
 
   const displayName = selectedContact
     ? formatFullName(selectedContact.first_name, selectedContact.last_name) || selectedContact.organization_name || selectedContact.email_primary
@@ -237,22 +210,15 @@ export function ContactSearch({ value, onChange, tenantId, placeholder = 'Search
         </PopoverContent>
       </Popover>
 
-      {/* Create contact dialog */}
-      <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
-        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Create New Contact</DialogTitle>
-            <DialogDescription>
-              Add a new contact to link to this matter.
-            </DialogDescription>
-          </DialogHeader>
-          <ContactForm
-            mode="create"
-            onSubmit={handleCreateContact}
-            isLoading={createContact.isPending}
-          />
-        </DialogContent>
-      </Dialog>
+      {/* Universal Contact Modal  -  Directive 076 */}
+      <SovereignContactModal
+        open={showCreateDialog}
+        onOpenChange={setShowCreateDialog}
+        onSuccess={(contactId) => {
+          onChange(contactId)
+          setSearch('')
+        }}
+      />
     </>
   )
 }

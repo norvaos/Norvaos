@@ -821,10 +821,10 @@ export function SovereignContactStep({
         <Select
           value={watch('country') || 'CA'}
           onValueChange={(val) => {
-            setValue('country', val)
+            setValue('country', val, { shouldValidate: true })
             // Clear province when switching away from Canada
             if (val !== 'CA') {
-              setValue('province_state', '')
+              setValue('province_state', '', { shouldValidate: true })
             }
           }}
           disabled={busy || created}
@@ -865,10 +865,10 @@ export function SovereignContactStep({
           <OcrFieldWrapper field="province_state">
             <Select
               value={watch('province_state') || ''}
-              onValueChange={(val) => setValue('province_state', val)}
+              onValueChange={(val) => setValue('province_state', val, { shouldValidate: true })}
               disabled={busy || created}
             >
-              <SelectTrigger id="province_state" className={ocrHighlight('province_state')}>
+              <SelectTrigger id="province_state" className={`${ocrHighlight('province_state')} ${errors.province_state ? 'ring-2 ring-amber-500 border-amber-500' : ''}`}>
                 <SelectValue placeholder="Select province" />
               </SelectTrigger>
               <SelectContent className="z-[9996]">

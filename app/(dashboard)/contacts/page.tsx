@@ -10,7 +10,7 @@ import { createClient } from '@/lib/supabase/client'
 import { CONTACT_SOURCES, CONTACT_TYPES } from '@/lib/utils/constants'
 import { ClassificationBadge } from '@/components/contacts/classification-badge'
 import { formatDate, formatPhoneNumber, formatFullName, formatInitials } from '@/lib/utils/formatters'
-import { SovereignContactCreator } from '@/components/contacts/sovereign-contact-creator'
+import { useUIStore } from '@/lib/stores/ui-store'
 import { EmptyState } from '@/components/shared/empty-state'
 
 import { Button } from '@/components/ui/button'
@@ -118,7 +118,7 @@ export default function ContactsPage() {
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc')
   const [page, setPage] = useState(1)
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
-  const [createOpen, setCreateOpen] = useState(false)
+  const openModal = useUIStore((s) => s.openModal)
   const [visibleColumns, setVisibleColumns] = useState<Set<string>>(loadVisibleColumns)
 
   // Persist column visibility
@@ -252,7 +252,7 @@ export default function ContactsPage() {
             {t('contacts.subtitle' as any)}
           </p>
         </div>
-        <Button onClick={() => setCreateOpen(true)}>
+        <Button onClick={() => openModal('create-contact')}>
           <Plus className="mr-2 size-4" />
           {t('dashboard.new_contact')}
         </Button>
@@ -381,7 +381,7 @@ export default function ContactsPage() {
               description={t('contacts.no_yet_desc' as any)}
               quickHint={t('contacts.no_yet_hint' as any)}
               actionLabel={t('contacts.add_contact' as any)}
-              onAction={() => setCreateOpen(true)}
+              onAction={() => openModal('create-contact')}
             />
           )
         ) : (
@@ -567,8 +567,6 @@ export default function ContactsPage() {
         )}
       </div>
 
-      {/* Create Contact Sheet */}
-      <SovereignContactCreator open={createOpen} onOpenChange={setCreateOpen} />
     </div>
   )
 }

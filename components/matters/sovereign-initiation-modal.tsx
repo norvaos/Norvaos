@@ -17,7 +17,7 @@ import { createClient } from '@/lib/supabase/client'
 import type { Database } from '@/lib/types/database'
 import { cn } from '@/lib/utils'
 import { NorvaGuardianTooltip } from '@/components/ui/norva-guardian-tooltip'
-import { SovereignIntakeDialog } from '@/components/contacts/sovereign-intake/sovereign-intake-dialog'
+import { SovereignContactModal } from '@/components/contacts/sovereign-contact-modal'
 import { SovereignConflictShield, type ConflictShieldResult, type ConflictStatus } from '@/components/matters/sovereign-conflict-shield'
 
 // ---------------------------------------------------------------------------
@@ -253,7 +253,7 @@ export function SovereignInitiationModal({
   const [step, setStep] = useState<Step>(1)
   const [direction, setDirection] = useState<'forward' | 'backward'>('forward')
 
-  // ---- Step 1: Norva Contact ----
+  // ---- Step 1: Contact ----
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedContactId, setSelectedContactId] = useState<string | null>(defaultContactId ?? null)
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null)
@@ -537,7 +537,7 @@ export function SovereignInitiationModal({
         <div className="relative min-h-[360px] overflow-hidden px-8 pb-6">
           <AnimatePresence mode="wait" custom={direction}>
             {/* ============================================================ */}
-            {/* STEP 1: Norva Contact                                        */}
+            {/* STEP 1: Contact                                                */}
             {/* ============================================================ */}
             {step === 1 && (
               <motion.div
@@ -1062,13 +1062,13 @@ export function SovereignInitiationModal({
         </div>
       </motion.div>
 
-      {/* Inline contact creator - Directive 068: Sovereign Layering Protocol */}
-      <SovereignIntakeDialog
+      {/* Inline contact creator - Directive 068/076: Universal Contact Modal */}
+      <SovereignContactModal
         open={childModalOpen}
         onOpenChange={(v) => {
           setChildModalOpen(v)
         }}
-        onComplete={async (contactId) => {
+        onSuccess={async (contactId) => {
           // The Handshake: fetch newly created contact and auto-inject
           setChildModalOpen(false)
           try {
@@ -1083,7 +1083,7 @@ export function SovereignInitiationModal({
               // Directive 070: Emerald Success Pulse
               setContactPulseActive(true)
               const contactName = [data.first_name, data.last_name].filter(Boolean).join(' ')
-              toast.success(`Norva Contact Added - ${contactName} has been linked to this matter.`)
+              toast.success(`Contact Added - ${contactName} has been linked to this matter.`)
               setTimeout(() => setContactPulseActive(false), 1200)
             }
           } catch {

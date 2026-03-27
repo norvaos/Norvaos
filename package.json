@@ -10,6 +10,8 @@
     "db:migrate": "node scripts/migrate.mjs",
     "db:migrate:status": "node scripts/migrate.mjs --status",
     "db:migrate:dry-run": "node scripts/migrate.mjs --dry-run",
+    "db:migrate:guard": "node scripts/migration-guard.mjs",
+    "db:migrate:guard:strict": "node scripts/migration-guard.mjs --strict",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",

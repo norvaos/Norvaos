@@ -453,8 +453,8 @@ export function SovereignContactCreator({ open, onOpenChange, onSuccess }: Sover
         if (!v) resetForm()
         onOpenChange(v)
       }}
-      title="Norva Contact Creator"
-      subtitle="Add a new person or organisation to your NorvaOS"
+      title="Contact Creator"
+      subtitle="Add a new person or organisation to your firm"
       steps={steps}
       onSubmit={handleSubmit}
       isSubmitting={createContact.isPending}

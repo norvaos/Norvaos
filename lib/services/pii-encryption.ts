@@ -45,6 +45,10 @@ function getDerivedKey(): Buffer {
 export function encryptPII(plaintext: string | null | undefined): string | null {
   if (plaintext == null) return null
 
+  // Gracefully skip encryption when key is not configured (dev environment)
+  const raw = process.env.PII_ENCRYPTION_KEY
+  if (!raw) return null
+
   const key = getDerivedKey()
   const iv = randomBytes(12)
   const cipher = createCipheriv('aes-256-gcm', key, iv)

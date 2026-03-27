@@ -60,11 +60,9 @@ import {
 } from '@/components/ui/dialog'
 import { Separator } from '@/components/ui/separator'
 import { Checkbox } from '@/components/ui/checkbox'
-import { ContactForm } from '@/components/contacts/contact-form'
+import { SovereignContactModal } from '@/components/contacts/sovereign-contact-modal'
 import { MatterForm } from '@/components/matters/matter-form'
-import { useCreateContact } from '@/lib/queries/contacts'
 import { useCreateMatter } from '@/lib/queries/matters'
-import type { ContactFormValues } from '@/lib/schemas/contact'
 import type { MatterFormValues } from '@/lib/schemas/matter'
 import { toast } from 'sonner'
 
@@ -97,7 +95,6 @@ export function TaskForm({
   const [showCreateContact, setShowCreateContact] = useState(false)
   const [showCreateMatter, setShowCreateMatter] = useState(false)
 
-  const createContact = useCreateContact()
   const createMatter = useCreateMatter()
 
   const form = useForm<TaskFormValues>({
@@ -232,19 +229,6 @@ export function TaskForm({
     return name || user.email
   }
 
-  async function handleCreateContact(values: ContactFormValues) {
-    try {
-      const result = await createContact.mutateAsync({
-        ...values,
-        tenant_id: tenantId,
-      })
-      form.setValue('contact_id', result.id)
-      setShowCreateContact(false)
-      toast.success('Contact created and linked')
-    } catch {
-      // Error handled by mutation
-    }
-  }
 
   async function handleCreateMatter(values: MatterFormValues) {
     try {
@@ -931,22 +915,14 @@ export function TaskForm({
         </div>
       </form>
 
-      {/* Create Contact Dialog */}
-      <Dialog open={showCreateContact} onOpenChange={setShowCreateContact}>
-        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Create New Contact</DialogTitle>
-            <DialogDescription>
-              Add a new contact to link to this task.
-            </DialogDescription>
-          </DialogHeader>
-          <ContactForm
-            mode="create"
-            onSubmit={handleCreateContact}
-            isLoading={createContact.isPending}
-          />
-        </DialogContent>
-      </Dialog>
+      {/* Universal Contact Modal  -  Directive 076 */}
+      <SovereignContactModal
+        open={showCreateContact}
+        onOpenChange={setShowCreateContact}
+        onSuccess={(contactId) => {
+          form.setValue('contact_id', contactId)
+        }}
+      />
 
       {/* Create Matter Dialog */}
       <Dialog open={showCreateMatter} onOpenChange={setShowCreateMatter}>

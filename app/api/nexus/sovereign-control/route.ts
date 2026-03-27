@@ -61,6 +61,7 @@ export const GET = withNexusAdmin(async () => {
         status: t.status,
         logo_url: t.logo_url,
         primary_color: t.primary_color,
+        is_internal_test: false, // Will be patched below
         created_at: t.created_at,
         updated_at: t.updated_at,
         counts: {
@@ -79,6 +80,16 @@ export const GET = withNexusAdmin(async () => {
       }
     })
   )
+
+  // Patch is_internal_test (column exists in DB but not in generated Supabase types)
+  const { data: alphaRows } = await admin
+    .from('tenants')
+    .select('id' as '*')
+    .eq('is_internal_test' as 'id', true as never)
+  const alphaIds = new Set((alphaRows ?? []).map((r: { id: string }) => r.id))
+  for (const t of enriched) {
+    t.is_internal_test = alphaIds.has(t.id)
+  }
 
   // Impersonation history (last 20)
   const { data: impersonationLogs } = await admin
@@ -127,17 +138,70 @@ export const PATCH = withNexusAdmin(async (request, ctx) => {
 
   // ── Global Ignite: toggle for ALL active tenants ──
   if (global) {
+    // Directive 078: Scope — 'alpha_only' restricts to is_internal_test firms
+    const scope = (body as Record<string, unknown>).scope as string | undefined
+
     const { data: allTenants, error: fetchErr } = await admin
       .from('tenants')
-      .select('id, feature_flags')
-      .eq('status', 'active')
+      .select('id, name, feature_flags')
+      .eq('status' as 'id', 'active' as never)
 
     if (fetchErr || !allTenants) {
       return NextResponse.json({ error: 'Failed to fetch tenants.' }, { status: 500 })
     }
 
+    // Directive 078: If alpha_only, filter to alpha firms
+    let targetTenants = allTenants as Array<{ id: string; name: string; feature_flags: Record<string, unknown> | null }>
+    if (scope === 'alpha_only') {
+      const { data: alphaIds } = await admin
+        .from('tenants')
+        .select('id' as '*')
+        .eq('is_internal_test' as 'id', true as never)
+      const alphaSet = new Set((alphaIds ?? []).map((r: { id: string }) => r.id))
+      targetTenants = targetTenants.filter((t) => alphaSet.has(t.id))
+    }
+
+    // Directive 078: Create snapshot BEFORE flipping bits (1-click rollback)
+    const snapshot = targetTenants.map((t) => ({
+      tenant_id: t.id,
+      tenant_name: t.name,
+      previous_flags: t.feature_flags,
+    }))
+
+    // Insert into global_config_history (not in Supabase types yet — use admin client with cast)
+    let snapshotId: string | null = null
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/global_config_history`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': process.env.SUPABASE_SERVICE_ROLE_KEY!,
+          'Authorization': `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY!}`,
+          'Prefer': 'return=representation',
+        },
+        body: JSON.stringify({
+          action: 'global_ignite',
+          flag,
+          previous_value: { snapshot },
+          new_value: { value },
+          scope: scope === 'alpha_only' ? 'alpha_only' : 'global',
+          tenants_affected: targetTenants.length,
+          snapshot: { tenants: snapshot },
+          admin_id: ctx.adminCtx.adminId ?? null,
+          reason: reason.trim(),
+          environment: process.env.NEXT_PUBLIC_DEPLOY_ENV ?? 'production',
+          ip: ctx.ip,
+          user_agent: ctx.userAgent,
+        }),
+      })
+      const rows = await res.json()
+      snapshotId = rows?.[0]?.id ?? null
+    } catch {
+      log.warn('[sovereign-control] Failed to save config history snapshot')
+    }
+
     let updated = 0
-    for (const t of allTenants) {
+    for (const t of targetTenants) {
       const current = (t.feature_flags ?? {}) as Record<string, unknown>
       const merged = { ...current, [flag]: value }
       const { error: updateErr } = await admin
@@ -153,17 +217,17 @@ export const PATCH = withNexusAdmin(async (request, ctx) => {
       target_type: 'tenant',
       target_id: 'ALL',
       tenant_id: 'GLOBAL',
-      changes: { flag, value, tenants_affected: updated },
+      changes: { flag, value, tenants_affected: updated, scope: scope ?? 'global', snapshot_id: snapshotId },
       reason: reason.trim(),
       ip: ctx.ip,
       user_agent: ctx.userAgent,
       request_id: ctx.requestId,
     }).catch(() => {})
 
-    log.info('[sovereign-control] Global ignite', { flag, value, updated })
+    log.info('[sovereign-control] Global ignite', { flag, value, updated, scope: scope ?? 'global' })
 
     return NextResponse.json({
-      data: { flag, value, tenants_updated: updated, total: allTenants.length },
+      data: { flag, value, tenants_updated: updated, total: targetTenants.length, snapshot_id: snapshotId, scope: scope ?? 'global' },
       error: null,
     })
   }

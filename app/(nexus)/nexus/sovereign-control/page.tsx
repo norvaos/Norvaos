@@ -35,6 +35,10 @@ import {
   Clock,
   ArrowRight,
   Sparkles,
+  FlaskConical,
+  History,
+  Undo2,
+  Radio,
 } from 'lucide-react'
 
 // ── Types ───────────────────────────────────────────────────────────────────
@@ -47,6 +51,7 @@ interface TenantCommData {
   status: string
   logo_url: string | null
   primary_color: string | null
+  is_internal_test: boolean
   created_at: string
   updated_at: string
   counts: {
@@ -62,6 +67,20 @@ interface TenantCommData {
     comm_template_max: number
   }
   raw_overrides: Record<string, unknown>
+}
+
+interface ConfigHistoryEntry {
+  id: string
+  action: string
+  flag: string | null
+  scope: string
+  tenants_affected: number
+  admin_id: string | null
+  reason: string
+  environment: string
+  rolled_back_at: string | null
+  rolled_back_by: string | null
+  created_at: string
 }
 
 interface ImpersonationLog {
@@ -151,10 +170,23 @@ export default function SovereignControlPage() {
   const [showCreateTenant, setShowCreateTenant] = useState(false)
   const [newTenantName, setNewTenantName] = useState('')
   const [newTenantTier, setNewTenantTier] = useState<SubscriptionTier>('starter')
+  const [igniteScope, setIgniteScope] = useState<'global' | 'alpha_only'>('global')
+
+  // Directive 078: Config history for rollback
+  const { data: configHistory } = useQuery({
+    queryKey: ['nexus', 'config-history'],
+    queryFn: async () => {
+      const res = await fetch('/api/nexus/sovereign-control/history')
+      if (!res.ok) return []
+      const json = await res.json()
+      return json.data as ConfigHistoryEntry[]
+    },
+    staleTime: 1000 * 30,
+  })
 
   // ── Toggle mutation ──
   const toggleFlag = useMutation({
-    mutationFn: async (params: { tenant_id?: string; flag: string; value: boolean | number; global?: boolean; reason: string }) => {
+    mutationFn: async (params: { tenant_id?: string; flag: string; value: boolean | number; global?: boolean; scope?: string; reason: string }) => {
       const res = await fetch('/api/nexus/sovereign-control', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
@@ -203,6 +235,39 @@ export default function SovereignControlPage() {
     },
   })
 
+  // ── Alpha-firm toggle mutation (Directive 078) ──
+  const toggleAlpha = useMutation({
+    mutationFn: async (params: { tenant_id: string; is_internal_test: boolean }) => {
+      const res = await fetch('/api/nexus/sovereign-control/alpha', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...params, reason: `Alpha designation ${params.is_internal_test ? 'granted' : 'revoked'} via Sovereign Control` }),
+      })
+      if (!res.ok) throw new Error('Alpha toggle failed')
+      return res.json()
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['nexus', 'sovereign-control'] })
+    },
+  })
+
+  // ── Rollback mutation (Directive 078) ──
+  const rollback = useMutation({
+    mutationFn: async (params: { snapshot_id: string }) => {
+      const res = await fetch('/api/nexus/sovereign-control/rollback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...params, reason: 'Global Ignite rollback from Sovereign Control' }),
+      })
+      if (!res.ok) throw new Error('Rollback failed')
+      return res.json()
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['nexus', 'sovereign-control'] })
+      qc.invalidateQueries({ queryKey: ['nexus', 'config-history'] })
+    },
+  })
+
   // ── Create tenant mutation ──
   const createTenant = useMutation({
     mutationFn: async (params: { name: string; subscription_tier: string }) => {
@@ -237,9 +302,10 @@ export default function SovereignControlPage() {
       flag: globalIgniteFlag,
       value: globalIgniteValue,
       global: true,
-      reason: `Global Ignite: ${globalIgniteFlag} → ${globalIgniteValue} for ALL tenants`,
+      scope: igniteScope,
+      reason: `Global Ignite (${igniteScope}): ${globalIgniteFlag} → ${globalIgniteValue}`,
     })
-  }, [globalIgniteFlag, globalIgniteValue, toggleFlag])
+  }, [globalIgniteFlag, globalIgniteValue, igniteScope, toggleFlag])
 
   // Filter tenants
   const filtered = data?.tenants?.filter((t) =>
@@ -394,6 +460,36 @@ export default function SovereignControlPage() {
             </button>
           </div>
 
+          {/* Directive 078: Scope selector */}
+          <div className={cn('flex items-center gap-1 rounded-xl border p-0.5', dark ? 'border-white/10 bg-white/[0.03]' : 'border-gray-200 bg-gray-50')}>
+            <button
+              type="button"
+              onClick={() => setIgniteScope('global')}
+              className={cn(
+                'flex items-center gap-1 rounded-lg px-3 py-2 text-xs font-semibold transition-all',
+                igniteScope === 'global'
+                  ? dark ? 'bg-amber-500/20 text-amber-400' : 'bg-amber-100 text-amber-700'
+                  : dark ? 'text-white/30' : 'text-gray-400',
+              )}
+            >
+              <Globe className="h-3 w-3" />
+              All Firms
+            </button>
+            <button
+              type="button"
+              onClick={() => setIgniteScope('alpha_only')}
+              className={cn(
+                'flex items-center gap-1 rounded-lg px-3 py-2 text-xs font-semibold transition-all',
+                igniteScope === 'alpha_only'
+                  ? dark ? 'bg-cyan-500/20 text-cyan-400' : 'bg-cyan-100 text-cyan-700'
+                  : dark ? 'text-white/30' : 'text-gray-400',
+              )}
+            >
+              <FlaskConical className="h-3 w-3" />
+              Alpha Only
+            </button>
+          </div>
+
           <button
             type="button"
             disabled={!globalIgniteFlag || toggleFlag.isPending}
@@ -412,7 +508,7 @@ export default function SovereignControlPage() {
         {globalIgniteFlag && (
           <p className={cn('mt-3 text-xs', dark ? 'text-amber-400/50' : 'text-amber-600/70')}>
             <AlertTriangle className="inline h-3 w-3 mr-1" />
-            This will {globalIgniteValue ? 'ENABLE' : 'DISABLE'} <strong>{COMM_FEATURE_FLAGS[globalIgniteFlag as keyof typeof COMM_FEATURE_FLAGS]?.label}</strong> for all {data?.total ?? 0} active tenants.
+            This will {globalIgniteValue ? 'ENABLE' : 'DISABLE'} <strong>{COMM_FEATURE_FLAGS[globalIgniteFlag as keyof typeof COMM_FEATURE_FLAGS]?.label}</strong> for {igniteScope === 'alpha_only' ? 'Alpha test firms only' : `all ${data?.total ?? 0} active tenants`}. A snapshot will be taken for 1-click rollback.
           </p>
         )}
       </div>
@@ -474,6 +570,15 @@ export default function SovereignControlPage() {
                       <div className="flex items-center gap-2.5">
                         <span className={cn('text-base font-bold', dark ? 'text-white' : 'text-gray-900')}>{tenant.name}</span>
                         <TierBadge tier={tenant.subscription_tier} dark={dark} />
+                        {tenant.is_internal_test && (
+                          <span className={cn(
+                            'inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider',
+                            dark ? 'border-cyan-500/20 bg-cyan-500/10 text-cyan-400' : 'border-cyan-200 bg-cyan-50 text-cyan-700',
+                          )}>
+                            <FlaskConical className="h-3 w-3" />
+                            Alpha
+                          </span>
+                        )}
                         <span className={cn(
                           'h-2 w-2 rounded-full',
                           tenant.status === 'active' ? 'bg-emerald-400' : tenant.status === 'suspended' ? 'bg-amber-400' : 'bg-red-400',
@@ -733,6 +838,36 @@ export default function SovereignControlPage() {
                               </button>
                             )}
                           </div>
+                        </div>
+
+                        {/* Alpha-Firm Designation (Directive 078) */}
+                        <div className={cn(
+                          'rounded-xl border p-4',
+                          dark ? 'border-white/[0.06] bg-white/[0.02]' : 'border-gray-100 bg-gray-50',
+                        )}>
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <FlaskConical className={cn('h-4 w-4', dark ? 'text-cyan-400' : 'text-cyan-600')} />
+                              <span className={cn('text-sm font-bold', dark ? 'text-white' : 'text-gray-900')}>Alpha Designation</span>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => toggleAlpha.mutate({ tenant_id: tenant.id, is_internal_test: !tenant.is_internal_test })}
+                              disabled={toggleAlpha.isPending}
+                              className="transition-all"
+                            >
+                              {tenant.is_internal_test ? (
+                                <ToggleRight className={cn('h-8 w-8', dark ? 'text-cyan-400' : 'text-cyan-500')} />
+                              ) : (
+                                <ToggleLeft className={cn('h-8 w-8', dark ? 'text-white/20' : 'text-gray-300')} />
+                              )}
+                            </button>
+                          </div>
+                          <p className={cn('text-xs mt-1', dark ? 'text-white/30' : 'text-gray-400')}>
+                            {tenant.is_internal_test
+                              ? 'This firm receives new features before Global Ignite.'
+                              : 'Enable to include in Alpha-only feature deployments.'}
+                          </p>
                         </div>
 
                         {/* Stats grid */}
@@ -1022,6 +1157,95 @@ export default function SovereignControlPage() {
                 Cancel
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Config History + Rollback (Directive 078) ───────────────────── */}
+      {configHistory && configHistory.length > 0 && (
+        <div className="space-y-3">
+          <div className="flex items-center gap-2">
+            <History className={cn('h-4 w-4', dark ? 'text-violet-400/60' : 'text-violet-500')} />
+            <h2 className={cn('text-sm font-bold uppercase tracking-wider', dark ? 'text-white/50' : 'text-gray-500')}>
+              Global Config History — Stealth-to-Global Audit
+            </h2>
+          </div>
+          <div className={cn('rounded-2xl border overflow-hidden', dark ? 'border-white/[0.06]' : 'border-gray-200')}>
+            <table className="w-full text-xs">
+              <thead>
+                <tr className={cn(dark ? 'bg-white/[0.02]' : 'bg-gray-50')}>
+                  <th className={cn('px-4 py-3 text-left font-semibold', dark ? 'text-white/40' : 'text-gray-500')}>Date</th>
+                  <th className={cn('px-4 py-3 text-left font-semibold', dark ? 'text-white/40' : 'text-gray-500')}>Action</th>
+                  <th className={cn('px-4 py-3 text-left font-semibold', dark ? 'text-white/40' : 'text-gray-500')}>Flag</th>
+                  <th className={cn('px-4 py-3 text-left font-semibold', dark ? 'text-white/40' : 'text-gray-500')}>Scope</th>
+                  <th className={cn('px-4 py-3 text-left font-semibold', dark ? 'text-white/40' : 'text-gray-500')}>Affected</th>
+                  <th className={cn('px-4 py-3 text-left font-semibold', dark ? 'text-white/40' : 'text-gray-500')}>Status</th>
+                  <th className={cn('px-4 py-3 text-left font-semibold', dark ? 'text-white/40' : 'text-gray-500')}>Rollback</th>
+                </tr>
+              </thead>
+              <tbody>
+                {configHistory.map((entry) => (
+                  <tr key={entry.id} className={cn('border-t', dark ? 'border-white/[0.04]' : 'border-gray-100')}>
+                    <td className={cn('px-4 py-2.5', dark ? 'text-white/60' : 'text-gray-600')}>
+                      {new Date(entry.created_at).toLocaleString()}
+                    </td>
+                    <td className={cn('px-4 py-2.5 font-semibold', dark ? 'text-amber-400/70' : 'text-amber-600')}>
+                      {entry.action === 'global_ignite' ? 'Ignite' : entry.action}
+                    </td>
+                    <td className={cn('px-4 py-2.5 font-mono', dark ? 'text-white/50' : 'text-gray-500')}>
+                      {entry.flag ?? '—'}
+                    </td>
+                    <td className="px-4 py-2.5">
+                      <span className={cn(
+                        'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold',
+                        entry.scope === 'alpha_only'
+                          ? dark ? 'bg-cyan-500/10 text-cyan-400' : 'bg-cyan-50 text-cyan-700'
+                          : dark ? 'bg-amber-500/10 text-amber-400' : 'bg-amber-50 text-amber-700',
+                      )}>
+                        {entry.scope === 'alpha_only' ? <FlaskConical className="h-3 w-3" /> : <Globe className="h-3 w-3" />}
+                        {entry.scope === 'alpha_only' ? 'Alpha' : 'Global'}
+                      </span>
+                    </td>
+                    <td className={cn('px-4 py-2.5 font-bold', dark ? 'text-white' : 'text-gray-900')}>
+                      {entry.tenants_affected}
+                    </td>
+                    <td className="px-4 py-2.5">
+                      {entry.rolled_back_at ? (
+                        <span className={cn('inline-flex items-center gap-1 text-[10px] font-semibold', dark ? 'text-red-400' : 'text-red-600')}>
+                          <Undo2 className="h-3 w-3" />
+                          Rolled back
+                        </span>
+                      ) : (
+                        <span className={cn('inline-flex items-center gap-1 text-[10px] font-semibold', dark ? 'text-emerald-400' : 'text-emerald-600')}>
+                          <Radio className="h-3 w-3" />
+                          Active
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-4 py-2.5">
+                      {!entry.rolled_back_at && (
+                        <button
+                          type="button"
+                          disabled={rollback.isPending}
+                          onClick={() => {
+                            if (confirm(`ROLLBACK this ignite? This will restore feature_flags to pre-ignite state for ${entry.tenants_affected} tenants.`)) {
+                              rollback.mutate({ snapshot_id: entry.id })
+                            }
+                          }}
+                          className={cn(
+                            'flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-[10px] font-bold transition-all',
+                            dark ? 'bg-red-500/10 text-red-400 hover:bg-red-500/20' : 'bg-red-50 text-red-600 hover:bg-red-100',
+                          )}
+                        >
+                          <Undo2 className="h-3 w-3" />
+                          Rollback
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
       )}

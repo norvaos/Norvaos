@@ -26,8 +26,8 @@ const SovereignWalkthrough = dynamic(
   () => import('@/components/onboarding/sovereign-walkthrough').then(m => ({ default: m.SovereignWalkthrough })),
   { ssr: false },
 )
-const SovereignIntakeDialog = dynamic(
-  () => import('@/components/contacts/sovereign-intake/sovereign-intake-dialog').then(m => ({ default: m.SovereignIntakeDialog })),
+const SovereignContactModal = dynamic(
+  () => import('@/components/contacts/sovereign-contact-modal').then(m => ({ default: m.SovereignContactModal })),
   { ssr: false },
 )
 const SovereignInitiationModal = dynamic(
@@ -576,9 +576,13 @@ export default function DashboardLayout({
           <SovereignWalkthrough open={walkthroughOpen} onComplete={handleWalkthroughComplete} />
 
           {/* Global modal renderers  -  wired to Zustand activeModal state */}
-          <SovereignIntakeDialog
+          <SovereignContactModal
             open={isContactModalOpen}
             onOpenChange={(v) => { if (!v) closeModal() }}
+            onSuccess={(contactId) => {
+              closeModal()
+              router.push(`/contacts/${contactId}`)
+            }}
           />
           <SovereignInitiationModal
             open={isMatterModalOpen}

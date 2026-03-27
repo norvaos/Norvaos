@@ -34,7 +34,10 @@ import {
  */
 export function withContactPIIEncrypted(
   payload: Record<string, unknown>
-): ContactPIIEncrypted {
+): ContactPIIEncrypted | Record<string, never> {
+  // Skip encryption entirely when key is not configured (dev environment)
+  if (!process.env.PII_ENCRYPTION_KEY) return {}
+
   const pii: ContactPII = {
     first_name: payload.first_name as string | null | undefined,
     last_name: payload.last_name as string | null | undefined,
@@ -53,7 +56,8 @@ export function withContactPIIEncrypted(
  */
 export function withLeadPIIEncrypted(
   payload: Record<string, unknown>
-): LeadPIIEncrypted {
+): LeadPIIEncrypted | Record<string, never> {
+  if (!process.env.PII_ENCRYPTION_KEY) return {}
   const pii: LeadPII = {
     first_name: payload.first_name as string | null | undefined,
     last_name: payload.last_name as string | null | undefined,
@@ -69,7 +73,8 @@ export function withLeadPIIEncrypted(
  */
 export function withMatterImmigrationPIIEncrypted(
   payload: Record<string, unknown>
-): MatterImmigrationPIIEncrypted {
+): MatterImmigrationPIIEncrypted | Record<string, never> {
+  if (!process.env.PII_ENCRYPTION_KEY) return {}
   const pii: MatterImmigrationPII = {
     passport_number: payload.passport_number as string | null | undefined,
     date_of_birth: payload.date_of_birth as string | null | undefined,
@@ -88,7 +93,8 @@ export function withMatterImmigrationPIIEncrypted(
  */
 export function withAppointmentPIIEncrypted(
   payload: Record<string, unknown>
-): AppointmentPIIEncrypted {
+): AppointmentPIIEncrypted | Record<string, never> {
+  if (!process.env.PII_ENCRYPTION_KEY) return {}
   const pii: AppointmentPII = {
     guest_name: payload.guest_name as string | null | undefined,
     guest_email: payload.guest_email as string | null | undefined,

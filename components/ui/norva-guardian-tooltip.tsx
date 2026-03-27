@@ -26,6 +26,24 @@ export const GUARDIAN_HELP_TEXT = {
     'The lawyer who owns this case. They\'ll see it on their dashboard and receive all notifications. You can add more team members later.',
   summary:
     'Review everything before you create the case. Once initiated, the case will appear on your dashboard and the client portal.',
+  conflictSearch:
+    'Regulatory requirement: A conflict search must be completed before collecting personal data. This protects both the firm and the client.',
+  contactName:
+    'Enter the person\'s legal name exactly as it appears on their government-issued ID. This is used for conflict checks and official correspondence.',
+  contactType:
+    'Individual = a person. Organisation = a company, trust, or entity. This determines which fields are required.',
+  dateOfBirth:
+    'Date of birth helps distinguish between contacts with similar names during conflict searches.',
+  contactEmail:
+    'Primary email address for client communication. Must be unique per contact in the system.',
+  contactPhone:
+    'Primary phone number including country code. Used for urgent notifications and appointment reminders.',
+  contactAddress:
+    'The client\'s current residential or business address. Required for regulatory compliance and service of documents.',
+  contactJurisdiction:
+    'The province or state where the client resides. This determines which regulatory body governs the engagement.',
+  contactSource:
+    'How the client found your firm. Tracking referral sources helps you understand which channels bring in the best clients.',
 } as const
 
 // ---------------------------------------------------------------------------

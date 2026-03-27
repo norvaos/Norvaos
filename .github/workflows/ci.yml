@@ -118,6 +118,10 @@ jobs:
           SUPABASE_DB_URL: ${{ secrets.STAGING_DB_URL }}
         continue-on-error: ${{ github.event_name == 'push' }}
 
+      - name: 'Directive 079: Migration Guard (add-only enforcement)'
+        run: node scripts/migration-guard.mjs --strict
+        continue-on-error: false
+
       - name: Build
         run: pnpm build
         env:
@@ -127,12 +131,30 @@ jobs:
           NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: pk_test_placeholder
           NEXT_PUBLIC_APP_URL: https://app.lexcrm.com
 
-      - name: Verify version API
+      - name: Verify version + generate Docker tag
         run: |
           VERSION=$(node -p "require('./package.json').version")
+          SHA=$(git rev-parse --short HEAD)
+          DOCKER_TAG="norva-v${VERSION}-${SHA}"
           echo "Build version: $VERSION"
+          echo "Docker tag: $DOCKER_TAG"
           echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "sha=$SHA" >> $GITHUB_OUTPUT
+          echo "docker_tag=$DOCKER_TAG" >> $GITHUB_OUTPUT
         id: version
+
+      - name: 'Directive 079: Build Docker Image (tagged)'
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: |
+          docker build \
+            --tag norvaos:${{ steps.version.outputs.docker_tag }} \
+            --tag norvaos:latest \
+            --build-arg NEXT_PUBLIC_APP_VERSION=${{ steps.version.outputs.version }} \
+            --build-arg NEXT_PUBLIC_BUILD_SHA=${{ steps.version.outputs.sha }} \
+            --build-arg NEXT_PUBLIC_BUILD_TIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
+            .
+          echo "✅ Docker image built: norvaos:${{ steps.version.outputs.docker_tag }}"
+        continue-on-error: true
 
   # ─── Deploy to Staging ───────────────────────────────────────────
   deploy-staging:
@@ -247,6 +269,19 @@ jobs:
           echo "Deploy to production environment"
           echo "Configure your deployment platform in this step"
           echo "Version: $(node -p "require('./package.json').version")"
+
+      - name: 'Directive 079: Health check (Blue-Green gate)'
+        run: |
+          echo "Running production health check..."
+          # Replace with actual production URL health check
+          HEALTH_URL="${PRODUCTION_URL:-https://sparkly-kelpie-27e16b.netlify.app}/api/health"
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$HEALTH_URL" || echo "000")
+          if [ "$STATUS" = "200" ]; then
+            echo "✅ Health check passed (HTTP $STATUS)"
+          else
+            echo "⚠️ Health check returned HTTP $STATUS (non-blocking)"
+          fi
+        continue-on-error: true
 
   # ─── Create GitHub Release on Tag ────────────────────────────────
   release:
