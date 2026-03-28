@@ -416,7 +416,7 @@ function GoldenThreadBar({
                             <button
                               type="button"
                               onClick={(e) => { e.stopPropagation(); onOverride(gate) }}
-                              className="ml-auto shrink-0 rounded bg-amber-100 px-1.5 py-0.5 text-[9px] font-semibold text-amber-400 hover:bg-amber-200 transition-colors border border-amber-200"
+                              className="ml-auto shrink-0 rounded bg-amber-950/40 px-1.5 py-0.5 text-[9px] font-semibold text-amber-400 hover:bg-amber-200 transition-colors border border-amber-500/20"
                             >
                               Override
                             </button>
@@ -477,7 +477,7 @@ function GateLockedOverlay({
       >
         {gate.status === 'overridden' && (
           <div className="absolute top-2 right-2 z-10">
-            <Badge variant="outline" className="text-[10px] border-amber-300 text-amber-600 bg-amber-950/30">
+            <Badge variant="outline" className="text-[10px] border-amber-500/30 text-amber-600 bg-amber-950/30">
               <AlertTriangle className="h-2.5 w-2.5 mr-0.5" />
               Override
             </Badge>
@@ -507,7 +507,7 @@ function GateLockedOverlay({
           <Button
             variant="outline"
             size="sm"
-            className="mt-3 h-7 text-xs gap-1 border-amber-200 text-amber-400 hover:bg-amber-950/30"
+            className="mt-3 h-7 text-xs gap-1 border-amber-500/20 text-amber-400 hover:bg-amber-950/30"
             onClick={() => onOverride(gate)}
           >
             <ShieldAlert className="h-3 w-3" />
@@ -848,7 +848,7 @@ export function Workspace() {
       {/* Zero Empty States: Retainer action card when no matter type set */}
       {!lead?.matter_type_id && !isConverted && !isClosedStage && (
         <motion.div variants={panelVariants} initial="hidden" animate="visible">
-          <Card className="border-dashed border-blue-200 bg-blue-950/30/30">
+          <Card className="border-dashed border-blue-500/20 bg-blue-950/30/30">
             <CardContent className="py-6 flex flex-col items-center text-center gap-3">
               <Briefcase className="h-8 w-8 text-blue-400" />
               <p className="text-sm font-medium text-slate-700">Set a Service Stream to unlock the Retainer</p>
@@ -893,6 +893,8 @@ interface CoreDataCardProps {
 
 function CoreDataCard({ lead, entityId, tenantId, users, practiceAreas, isConverted }: CoreDataCardProps) {
   const updateLead = useUpdateLead()
+  const { data: leadSources } = useLeadSources(tenantId)
+  const leadSourceNames = useMemo(() => (leadSources ?? []).map((s: { name: string }) => s.name), [leadSources])
 
   const customFields = (lead?.custom_fields ?? {}) as Record<string, unknown>
 
@@ -1445,7 +1447,7 @@ function CoreDataCard({ lead, entityId, tenantId, users, practiceAreas, isConver
                 onValueChange={(val) => setValue('has_criminality', val)}
                 disabled={isConverted}
               >
-                <SelectTrigger className={`h-9 text-sm ${watch('has_criminality') === 'yes' ? 'border-red-400 bg-red-50' : ''}`}>
+                <SelectTrigger className={`h-9 text-sm ${watch('has_criminality') === 'yes' ? 'border-red-400 bg-red-950/30' : ''}`}>
                   <SelectValue placeholder="Unknown" />
                 </SelectTrigger>
                 <SelectContent>
@@ -1468,7 +1470,7 @@ function CoreDataCard({ lead, entityId, tenantId, users, practiceAreas, isConver
                 onValueChange={(val) => setValue('has_misrepresentation', val)}
                 disabled={isConverted}
               >
-                <SelectTrigger className={`h-9 text-sm ${watch('has_misrepresentation') === 'yes' ? 'border-red-400 bg-red-50' : ''}`}>
+                <SelectTrigger className={`h-9 text-sm ${watch('has_misrepresentation') === 'yes' ? 'border-red-400 bg-red-950/30' : ''}`}>
                   <SelectValue placeholder="Unknown" />
                 </SelectTrigger>
                 <SelectContent>
@@ -1649,7 +1651,7 @@ function EntityRecognitionCard({ lead, entityId, tenantId, isConverted }: Entity
                     <button
                       key={sp.contact_id}
                       onClick={() => handleSponsorChange(sp.contact_id)}
-                      className="flex items-center justify-between w-full px-2 py-1.5 text-left rounded hover:bg-blue-100/60 transition-colors"
+                      className="flex items-center justify-between w-full px-2 py-1.5 text-left rounded hover:bg-blue-950/40/60 transition-colors"
                     >
                       <div className="min-w-0">
                         <p className="text-xs font-medium text-slate-800 truncate">{name}</p>

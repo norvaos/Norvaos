@@ -194,13 +194,13 @@ export function StaleFieldsPanel({
   return (
     <Card className="overflow-hidden gap-0 py-0">
       {/* Header */}
-      <div className="flex items-center justify-between px-3 py-2 border-b bg-amber-50/50">
+      <div className="flex items-center justify-between px-3 py-2 border-b bg-amber-950/30/50">
         <div className="flex items-center gap-2">
           <AlertTriangle className="h-4 w-4 text-amber-500" />
           <span className="text-xs font-semibold">Stale Fields</span>
           <Badge
             variant="outline"
-            className="text-[10px] py-0 px-1.5 border-amber-300 text-amber-600 bg-amber-50"
+            className="text-[10px] py-0 px-1.5 border-amber-500/30 text-amber-600 bg-amber-950/30"
           >
             {staleFields.length}
           </Badge>
@@ -209,7 +209,7 @@ export function StaleFieldsPanel({
         <Button
           variant="outline"
           size="sm"
-          className="h-7 text-[10px] px-2 border-amber-300 text-amber-700 hover:bg-amber-50"
+          className="h-7 text-[10px] px-2 border-amber-500/30 text-amber-400 hover:bg-amber-950/30"
           onClick={handleReconfirmAll}
           disabled={clearStale.isPending}
         >

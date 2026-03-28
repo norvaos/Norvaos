@@ -33,8 +33,8 @@ import {
 // ── Shared UI helpers ────────────────────────────────────────────────────────
 
 function Callout({ type, title, children }: { type: 'tip' | 'warning' | 'info'; title: string; children: React.ReactNode }) {
-  const styles = { tip: 'bg-emerald-50 border-emerald-200', warning: 'bg-amber-50 border-amber-200', info: 'bg-blue-50 border-blue-200' }
-  const textStyles = { tip: 'text-emerald-800', warning: 'text-amber-800', info: 'text-blue-800' }
+  const styles = { tip: 'bg-emerald-950/30 border-emerald-500/20', warning: 'bg-amber-950/30 border-amber-500/20', info: 'bg-blue-950/30 border-blue-500/20' }
+  const textStyles = { tip: 'text-emerald-400', warning: 'text-amber-400', info: 'text-blue-400' }
   const icons = {
     tip: <Star className="h-4 w-4 text-emerald-600 shrink-0" />,
     warning: <AlertCircle className="h-4 w-4 text-amber-600 shrink-0" />,
@@ -116,9 +116,9 @@ function PortalHeaderMockup() {
           <p className="text-xs text-indigo-600">📞 6479979676</p>
         </div>
         {/* Next Action */}
-        <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-center justify-between">
+        <div className="bg-amber-950/30 border border-amber-500/20 rounded-2xl p-4 flex items-center justify-between">
           <div>
-            <p className="text-xs font-bold text-amber-700 uppercase tracking-wider">What You Need To Do Next</p>
+            <p className="text-xs font-bold text-amber-400 uppercase tracking-wider">What You Need To Do Next</p>
             <p className="font-semibold text-gray-900 text-sm mt-0.5">Upload your Bank Statements  -  Last 3 Months</p>
           </div>
           <button className="rounded-lg bg-gray-900 px-3 py-1.5 text-xs font-semibold text-white whitespace-nowrap">Go →</button>
@@ -126,11 +126,11 @@ function PortalHeaderMockup() {
         {/* Summary Tiles */}
         <div className="grid grid-cols-3 gap-2">
           {[
-            { label: 'Documents', value: '1/2', sub: 'needed', color: 'border-amber-200 bg-amber-50' },
+            { label: 'Documents', value: '1/2', sub: 'needed', color: 'border-amber-500/20 bg-amber-950/30' },
             { label: 'Shared Documents', value: '0', sub: '', color: 'border-gray-200 bg-white' },
-            { label: 'Questions', value: '17%', sub: '', color: 'border-amber-200 bg-amber-50' },
+            { label: 'Questions', value: '17%', sub: '', color: 'border-amber-500/20 bg-amber-950/30' },
             { label: 'Payment & Retainer', value: ' - ', sub: '', color: 'border-gray-200 bg-white' },
-            { label: 'Tasks', value: '1', sub: '1 overdue', color: 'border-red-200 bg-red-50' },
+            { label: 'Tasks', value: '1', sub: '1 overdue', color: 'border-red-500/20 bg-red-950/30' },
             { label: 'Messages', value: '0', sub: '', color: 'border-gray-200 bg-white' },
           ].map(({ label, value, sub, color }) => (
             <div key={label} className={`rounded-xl border p-2.5 ${color}`}>
@@ -157,8 +157,8 @@ function DocumentsSectionMockup() {
             <FileText className="h-4 w-4 text-gray-500" />
             <span className="font-semibold text-gray-900 text-sm">Documents</span>
             <span className="text-xs text-gray-400">1/2 uploaded</span>
-            <SectionLabel label="1 accepted" color="bg-emerald-50 text-emerald-700" />
-            <SectionLabel label="1 needed" color="bg-amber-50 text-amber-700" />
+            <SectionLabel label="1 accepted" color="bg-emerald-950/30 text-emerald-400" />
+            <SectionLabel label="1 needed" color="bg-amber-950/30 text-amber-400" />
           </div>
           <span className="text-gray-400 text-xs">∧</span>
         </div>
@@ -173,12 +173,12 @@ function DocumentsSectionMockup() {
             <div>
               <div className="flex items-center gap-2">
                 <p className="text-sm font-medium text-gray-800">Valid Passport  -  Bio Page & Stamped Pages</p>
-                <SectionLabel label="REQUIRED" color="bg-red-50 text-red-600" />
+                <SectionLabel label="REQUIRED" color="bg-red-950/30 text-red-600" />
               </div>
               <p className="text-xs text-gray-400 mt-0.5">Upload a clear colour scan of your passport bio/data page and ALL stamped pages.</p>
             </div>
             <div className="flex items-center gap-1.5 ml-4 shrink-0">
-              <SectionLabel label="Accepted ✓" color="bg-emerald-50 text-emerald-700" />
+              <SectionLabel label="Accepted ✓" color="bg-emerald-950/30 text-emerald-400" />
             </div>
           </div>
         </div>
@@ -192,13 +192,13 @@ function DocumentsSectionMockup() {
             <div className="flex-1">
               <div className="flex items-center gap-2">
                 <p className="text-sm font-medium text-gray-800">Bank Statements  -  Last 3 Months</p>
-                <SectionLabel label="REQUIRED" color="bg-red-50 text-red-600" />
+                <SectionLabel label="REQUIRED" color="bg-red-950/30 text-red-600" />
               </div>
               <p className="text-xs text-gray-400 mt-0.5">Upload official bank statements showing sufficient funds.</p>
               <p className="text-xs text-gray-300 mt-0.5 italic">Upload a clear colour scan (PDF or image). Photos may be rejected.</p>
             </div>
             <div className="flex items-center gap-2 ml-4 shrink-0">
-              <SectionLabel label="Not uploaded" color="bg-amber-50 text-amber-700" />
+              <SectionLabel label="Not uploaded" color="bg-amber-950/30 text-amber-400" />
               <button className="flex items-center gap-1 rounded-lg border border-gray-200 bg-white px-2.5 py-1 text-xs font-medium text-gray-700">
                 <Upload className="h-3 w-3" /> Upload
               </button>
@@ -222,7 +222,7 @@ function QuestionsSectionMockup() {
             <ClipboardList className="h-4 w-4 text-gray-500" />
             <span className="font-semibold text-gray-900 text-sm">Questions</span>
             <span className="text-xs text-gray-400">0/1 forms done</span>
-            <SectionLabel label="17% complete" color="bg-amber-50 text-amber-700" />
+            <SectionLabel label="17% complete" color="bg-amber-950/30 text-amber-400" />
           </div>
         </div>
         <p className="text-sm font-semibold text-gray-800 mb-1">IRCC Forms</p>
@@ -244,7 +244,7 @@ function QuestionsSectionMockup() {
                 <button className="text-xs font-medium text-gray-700 border border-gray-200 rounded-lg px-3 py-1">Continue ›</button>
               </div>
               <p className="text-xs text-gray-500 mt-0.5">{name}</p>
-              <SectionLabel label={`● ${status}`} color="bg-blue-50 text-blue-700" />
+              <SectionLabel label={`● ${status}`} color="bg-blue-950/30 text-blue-400" />
               <p className="text-xs text-gray-400 mt-1.5">{fields}</p>
               <div className="w-full h-1 rounded-full bg-gray-200 mt-1"><div className="h-1 rounded-full bg-gray-900" style={{ width: `${pct}%` }} /></div>
             </div>
@@ -289,9 +289,9 @@ function FirmSidePortalMockup() {
             <li>4. The link is unique to this matter and works for the life of the file</li>
           </ol>
         </div>
-        <div className="rounded-xl bg-amber-50 border border-amber-100 px-4 py-3">
-          <p className="text-xs font-semibold text-amber-800 mb-1 flex items-center gap-1"><Shield className="h-3.5 w-3.5" /> Security</p>
-          <p className="text-xs text-amber-700">The portal link is a long, unique, unguessable token  -  like a secure one-time key. Do not share it publicly. It gives access to this client's documents and forms.</p>
+        <div className="rounded-xl bg-amber-950/30 border border-amber-100 px-4 py-3">
+          <p className="text-xs font-semibold text-amber-400 mb-1 flex items-center gap-1"><Shield className="h-3.5 w-3.5" /> Security</p>
+          <p className="text-xs text-amber-400">The portal link is a long, unique, unguessable token  -  like a secure one-time key. Do not share it publicly. It gives access to this client's documents and forms.</p>
         </div>
       </div>
     </div>
@@ -393,8 +393,8 @@ export default function ClientPortalHelpPage() {
             <div className="flex gap-3 flex-wrap text-xs">
               <span className="rounded-full bg-gray-100 px-3 py-1 text-gray-600">⏱ 8 min read</span>
               <span className="rounded-full bg-indigo-50 px-3 py-1 text-indigo-700">Firm staff</span>
-              <span className="rounded-full bg-emerald-50 px-3 py-1 text-emerald-700">Clients</span>
-              <span className="rounded-full bg-blue-50 px-3 py-1 text-blue-700">All matter types</span>
+              <span className="rounded-full bg-emerald-950/30 px-3 py-1 text-emerald-400">Clients</span>
+              <span className="rounded-full bg-blue-950/30 px-3 py-1 text-blue-400">All matter types</span>
             </div>
           </div>
 
@@ -422,9 +422,9 @@ export default function ClientPortalHelpPage() {
                     ].map(i => <li key={i} className="flex items-start gap-1.5"><CheckCircle className="h-3.5 w-3.5 shrink-0 mt-0.5 text-indigo-500" />{i}</li>)}
                   </ul>
                 </div>
-                <div className="rounded-xl bg-emerald-50 border border-emerald-100 p-4">
-                  <p className="font-semibold text-emerald-800 text-sm mb-2">What the client gets</p>
-                  <ul className="space-y-1.5 text-xs text-emerald-700">
+                <div className="rounded-xl bg-emerald-950/30 border border-emerald-100 p-4">
+                  <p className="font-semibold text-emerald-400 text-sm mb-2">What the client gets</p>
+                  <ul className="space-y-1.5 text-xs text-emerald-400">
                     {[
                       'One link  -  everything in one place',
                       'Knows exactly what documents are needed and why',
@@ -596,7 +596,7 @@ export default function ClientPortalHelpPage() {
                       '"Sign and return your retainer agreement"',
                       '"All done  -  your lawyer is reviewing your file"',
                     ].map(msg => (
-                      <div key={msg} className="flex items-center gap-2 rounded-lg bg-amber-50 border border-amber-100 px-3 py-2">
+                      <div key={msg} className="flex items-center gap-2 rounded-lg bg-amber-950/30 border border-amber-100 px-3 py-2">
                         <ArrowRight className="h-3.5 w-3.5 text-amber-600 shrink-0" />
                         <p className="text-xs font-medium text-gray-800">{msg}</p>
                       </div>
@@ -692,8 +692,8 @@ export default function ClientPortalHelpPage() {
                 {[
                   {
                     status: 'Not uploaded',
-                    color: 'bg-amber-50 border-amber-200',
-                    badge: 'bg-amber-50 text-amber-700',
+                    color: 'bg-amber-950/30 border-amber-500/20',
+                    badge: 'bg-amber-950/30 text-amber-400',
                     icon: <Upload className="h-5 w-5 text-amber-500" />,
                     firmAction: 'Document is empty. The client needs to upload it.',
                     clientAction: 'Click Upload and select the file from your device.',
@@ -701,8 +701,8 @@ export default function ClientPortalHelpPage() {
                   },
                   {
                     status: 'Under Review',
-                    color: 'bg-blue-50 border-blue-200',
-                    badge: 'bg-blue-50 text-blue-700',
+                    color: 'bg-blue-950/30 border-blue-500/20',
+                    badge: 'bg-blue-950/30 text-blue-400',
                     icon: <Eye className="h-5 w-5 text-blue-500" />,
                     firmAction: 'Client has uploaded  -  firm needs to review and either accept or request re-upload.',
                     clientAction: 'Nothing to do. Wait for the firm to review your upload.',
@@ -710,8 +710,8 @@ export default function ClientPortalHelpPage() {
                   },
                   {
                     status: 'Accepted',
-                    color: 'bg-emerald-50 border-emerald-200',
-                    badge: 'bg-emerald-50 text-emerald-700',
+                    color: 'bg-emerald-950/30 border-emerald-500/20',
+                    badge: 'bg-emerald-950/30 text-emerald-400',
                     icon: <CheckCircle className="h-5 w-5 text-emerald-500" />,
                     firmAction: 'Document is complete. No action needed.',
                     clientAction: 'Done. Your document has been accepted.',
@@ -719,8 +719,8 @@ export default function ClientPortalHelpPage() {
                   },
                   {
                     status: 'Re-upload Required',
-                    color: 'bg-red-50 border-red-200',
-                    badge: 'bg-red-50 text-red-700',
+                    color: 'bg-red-950/30 border-red-500/20',
+                    badge: 'bg-red-950/30 text-red-400',
                     icon: <RefreshCw className="h-5 w-5 text-red-500" />,
                     firmAction: 'Firm rejected the document  -  client will see a reason and must re-upload.',
                     clientAction: 'Read the rejection reason shown below the document name. Upload a corrected version.',
@@ -740,8 +740,8 @@ export default function ClientPortalHelpPage() {
                     <div className="flex items-center gap-3 mb-3">
                       {icon}
                       <span className={`rounded-full px-3 py-1 text-sm font-semibold ${badge}`}>{status}</span>
-                      {blocksProgress && <span className="rounded-full bg-red-100 text-red-700 px-2 py-0.5 text-xs font-medium">Blocks progress</span>}
-                      {!blocksProgress && <span className="rounded-full bg-emerald-100 text-emerald-700 px-2 py-0.5 text-xs font-medium">No action needed</span>}
+                      {blocksProgress && <span className="rounded-full bg-red-950/40 text-red-400 px-2 py-0.5 text-xs font-medium">Blocks progress</span>}
+                      {!blocksProgress && <span className="rounded-full bg-emerald-950/40 text-emerald-400 px-2 py-0.5 text-xs font-medium">No action needed</span>}
                     </div>
                     <div className="grid grid-cols-2 gap-3 text-xs">
                       <div className="rounded-lg bg-white/60 border border-white p-2.5">
@@ -965,7 +965,7 @@ export default function ClientPortalHelpPage() {
                       <span className="rounded-full bg-indigo-50 text-indigo-700 px-2.5 py-0.5 text-xs font-medium">{where}</span>
                     </div>
                     <p className="text-xs text-gray-600 mb-2">{desc}</p>
-                    <div className="flex items-start gap-1.5 text-xs text-emerald-700">
+                    <div className="flex items-start gap-1.5 text-xs text-emerald-400">
                       <ArrowRight className="h-3.5 w-3.5 shrink-0 mt-0.5" />
                       <p><strong>Firm action:</strong> {action}</p>
                     </div>
@@ -1008,11 +1008,11 @@ export default function ClientPortalHelpPage() {
                     { tip: 'Use the portal for all document collection', detail: 'Avoid accepting documents by email. Using the portal keeps everything in one place and creates a clean audit trail.' },
                     { tip: 'Verify portal display using the Open button', detail: 'Before sending the link to a client, click Open to preview exactly what they\'ll see. Make sure the correct documents are listed and the matter details are accurate.' },
                   ].map(({ tip, detail }) => (
-                    <div key={tip} className="flex gap-2 rounded-lg bg-emerald-50 border border-emerald-100 p-3">
+                    <div key={tip} className="flex gap-2 rounded-lg bg-emerald-950/30 border border-emerald-100 p-3">
                       <CheckCircle className="h-4 w-4 text-emerald-500 shrink-0 mt-0.5" />
                       <div>
                         <p className="text-sm font-semibold text-emerald-900">{tip}</p>
-                        <p className="text-xs text-emerald-700 mt-0.5">{detail}</p>
+                        <p className="text-xs text-emerald-400 mt-0.5">{detail}</p>
                       </div>
                     </div>
                   ))}
@@ -1028,11 +1028,11 @@ export default function ClientPortalHelpPage() {
                     { mistake: 'Not adding rejection reasons when declining a document', fix: 'Always type a clear reason in the rejection note. "Please re-upload your passport scan  -  the stamped pages are missing." The client sees this and knows exactly what to fix.' },
                     { mistake: 'Sharing the portal link in a group message or chat', fix: 'The portal link gives access to the client\'s sensitive documents. Send it only to the client directly via a private message or email.' },
                   ].map(({ mistake, fix }) => (
-                    <div key={mistake} className="flex gap-2 rounded-lg bg-red-50 border border-red-100 p-3">
+                    <div key={mistake} className="flex gap-2 rounded-lg bg-red-950/30 border border-red-100 p-3">
                       <AlertCircle className="h-4 w-4 text-red-400 shrink-0 mt-0.5" />
                       <div>
                         <p className="text-sm font-semibold text-red-900">{mistake}</p>
-                        <p className="text-xs text-red-700 mt-0.5"><strong>Fix:</strong> {fix}</p>
+                        <p className="text-xs text-red-400 mt-0.5"><strong>Fix:</strong> {fix}</p>
                       </div>
                     </div>
                   ))}

@@ -33,12 +33,12 @@ type Matter = Database['public']['Tables']['matters']['Row']
 // ── Status display config ────────────────────────────────────────────────────
 
 const STATUS_CONFIG: Record<string, { label: string; className: string }> = {
-  active:            { label: 'Active',              className: 'bg-green-100 text-green-800 border-emerald-500/30' },
-  intake:            { label: 'Intake',              className: 'bg-blue-100 text-blue-800 border-blue-500/30' },
+  active:            { label: 'Active',              className: 'bg-emerald-950/40 text-emerald-400 border-emerald-500/30' },
+  intake:            { label: 'Intake',              className: 'bg-blue-950/40 text-blue-400 border-blue-500/30' },
   closed_won:        { label: 'Closed  -  Won',        className: 'bg-slate-100 text-slate-700 border-slate-300' },
-  closed_refused:    { label: 'Closed  -  Refused',    className: 'bg-red-100 text-red-800 border-red-500/30' },
+  closed_refused:    { label: 'Closed  -  Refused',    className: 'bg-red-950/40 text-red-400 border-red-500/30' },
   closed_withdrawn:  { label: 'Closed  -  Withdrawn',  className: 'bg-amber-950/40 text-amber-400 border-amber-500/30' },
-  on_hold:           { label: 'On Hold',             className: 'bg-yellow-100 text-yellow-800 border-yellow-300' },
+  on_hold:           { label: 'On Hold',             className: 'bg-yellow-950/40 text-yellow-400 border-yellow-500/30' },
 }
 
 const PRIORITY_DOT: Record<string, string> = {

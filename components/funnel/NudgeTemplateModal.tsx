@@ -181,7 +181,7 @@ export function NudgeTemplateModal({
 
         {/* No client email warning */}
         {!contact?.email && (
-          <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-700">
+          <div className="rounded-md border border-amber-500/20 bg-amber-950/30 px-3 py-2 text-xs text-amber-400">
             No email address on file for the primary contact. Add one before
             sending.
           </div>

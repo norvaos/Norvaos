@@ -288,7 +288,7 @@ export default function PublicFormRenderer({ form, utmParams, preview = false, e
     return (
       <div className={cn('bg-slate-50 flex items-center justify-center p-4', embed ? 'min-h-[300px]' : 'min-h-screen')}>
         <div className="w-full max-w-lg text-center">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-emerald-950/40">
             <CheckCircle2 className="h-8 w-8 text-emerald-600" />
           </div>
           <h1 className="mt-4 text-2xl font-semibold text-slate-900">Submitted!</h1>
@@ -306,7 +306,7 @@ export default function PublicFormRenderer({ form, utmParams, preview = false, e
       <div className={cn('bg-slate-50 flex items-start justify-center p-4', embed ? 'pt-4' : 'min-h-screen pt-12')}>
         <div className="w-full max-w-lg">
           {preview && (
-            <div className="mb-4 rounded-lg border border-amber-300 bg-amber-50 px-4 py-2.5 text-center text-sm font-medium text-amber-800">
+            <div className="mb-4 rounded-lg border border-amber-500/30 bg-amber-950/30 px-4 py-2.5 text-center text-sm font-medium text-amber-400">
               Preview Mode  -  This form is not published yet
             </div>
           )}
@@ -328,7 +328,7 @@ export default function PublicFormRenderer({ form, utmParams, preview = false, e
                 />
               ))}
               {errors._form && (
-                <p className="text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2">
+                <p className="text-sm text-red-600 bg-red-950/30 rounded-lg px-3 py-2">
                   {errors._form}
                 </p>
               )}
@@ -353,7 +353,7 @@ export default function PublicFormRenderer({ form, utmParams, preview = false, e
     <div className={cn('bg-slate-50 flex items-start justify-center p-4', embed ? 'pt-4' : 'min-h-screen pt-8 sm:pt-12')}>
       <div className="w-full max-w-lg">
         {preview && (
-          <div className="mb-4 rounded-lg border border-amber-300 bg-amber-50 px-4 py-2.5 text-center text-sm font-medium text-amber-800">
+          <div className="mb-4 rounded-lg border border-amber-500/30 bg-amber-950/30 px-4 py-2.5 text-center text-sm font-medium text-amber-400">
             Preview Mode  -  This form is not published yet
           </div>
         )}
@@ -411,7 +411,7 @@ export default function PublicFormRenderer({ form, utmParams, preview = false, e
               </div>
 
               {errors._form && (
-                <p className="mt-4 text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2">
+                <p className="mt-4 text-sm text-red-600 bg-red-950/30 rounded-lg px-3 py-2">
                   {errors._form}
                 </p>
               )}

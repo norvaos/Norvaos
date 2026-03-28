@@ -86,7 +86,7 @@ export function SectionSummaryStrip({
             }
             className={cn(
               badge.variant === 'warning' &&
-                'border-amber-300 text-amber-700 bg-amber-50'
+                'border-amber-500/30 text-amber-400 bg-amber-950/30'
             )}
           >
             {badge.text}

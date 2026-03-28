@@ -249,7 +249,7 @@ export function SigningPageClient({
           {firmHeader}
 
           <div className="mt-10 text-center space-y-4">
-            <div className="mx-auto w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center">
+            <div className="mx-auto w-16 h-16 rounded-full bg-emerald-950/40 flex items-center justify-center">
               <CheckCircleIcon className="w-8 h-8 text-emerald-600" />
             </div>
             <h1 className="text-2xl font-bold text-slate-900">
@@ -428,8 +428,8 @@ export function SigningPageClient({
 
           {/* Error Message */}
           {errorMessage && (
-            <div className="mt-4 rounded-lg bg-red-50 border border-red-200 p-3">
-              <p className="text-sm text-red-700">{errorMessage}</p>
+            <div className="mt-4 rounded-lg bg-red-950/30 border border-red-500/20 p-3">
+              <p className="text-sm text-red-400">{errorMessage}</p>
             </div>
           )}
 
@@ -500,8 +500,8 @@ export function SigningPageClient({
             </div>
 
             {errorMessage && (
-              <div className="rounded-lg bg-red-50 border border-red-200 p-3">
-                <p className="text-sm text-red-700">{errorMessage}</p>
+              <div className="rounded-lg bg-red-950/30 border border-red-500/20 p-3">
+                <p className="text-sm text-red-400">{errorMessage}</p>
               </div>
             )}
 

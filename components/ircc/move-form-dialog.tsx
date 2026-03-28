@@ -126,14 +126,14 @@ export function MoveFormDialog({
         {/* Impact warning confirmation */}
         {pendingMove && impactCount !== null && impactCount > 0 ? (
           <div className="space-y-4">
-            <div className="rounded-lg border border-amber-200 bg-amber-50 p-4">
+            <div className="rounded-lg border border-amber-500/20 bg-amber-950/30 p-4">
               <div className="flex items-start gap-3">
                 <AlertTriangle className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
                 <div className="space-y-1">
                   <p className="text-sm font-medium text-amber-900">
                     Active Matters Affected
                   </p>
-                  <p className="text-sm text-amber-700">
+                  <p className="text-sm text-amber-400">
                     This form template is used by <strong>{impactCount}</strong> active matter{impactCount !== 1 ? 's' : ''}.
                     Existing matters are unaffected  -  only new matters created after this change will use the updated assignment.
                   </p>

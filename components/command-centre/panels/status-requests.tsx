@@ -179,7 +179,7 @@ export function StatusRequests() {
             <div className="flex items-center gap-1 shrink-0">
               <Badge
                 variant="secondary"
-                className={`text-[10px] ${isPortalExpired ? 'bg-red-100 text-red-700' : 'bg-green-100 text-emerald-400'}`}
+                className={`text-[10px] ${isPortalExpired ? 'bg-red-950/40 text-red-400' : 'bg-emerald-950/40 text-emerald-400'}`}
               >
                 {isPortalExpired ? 'Expired' : 'Active'}
               </Badge>

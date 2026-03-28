@@ -146,7 +146,7 @@ export async function requirePlatformAdmin(request: Request): Promise<PlatformAd
  *
  * Key: IP address from x-forwarded-for or x-real-ip.
  */
-export function checkAdminRateLimit(request: Request): Response | null {
+export async function checkAdminRateLimit(request: Request): Promise<Response | null> {
   const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
     ?? request.headers.get('x-real-ip')
     ?? 'unknown'

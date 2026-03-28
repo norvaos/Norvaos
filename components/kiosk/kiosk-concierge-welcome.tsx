@@ -192,11 +192,11 @@ export function KioskConciergeWelcome({
           <button
             type="button"
             onClick={onNewIntake}
-            className="group relative flex flex-col items-center gap-4 rounded-2xl border-2 border-amber-300 bg-white p-8 shadow-sm transition-all hover:shadow-lg hover:scale-[1.02] active:scale-95"
+            className="group relative flex flex-col items-center gap-4 rounded-2xl border-2 border-amber-500/30 bg-white p-8 shadow-sm transition-all hover:shadow-lg hover:scale-[1.02] active:scale-95"
           >
             {/* Gold pulse ring */}
             <div className="absolute inset-0 rounded-2xl border-2 border-amber-400 animate-pulse opacity-40" />
-            <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-amber-50 group-hover:bg-amber-100 transition-colors">
+            <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-amber-950/30 group-hover:bg-amber-950/40 transition-colors">
               <UserPlus className="h-8 w-8 text-amber-600" />
             </div>
             <div className="text-center">
@@ -209,9 +209,9 @@ export function KioskConciergeWelcome({
           <button
             type="button"
             onClick={onSecureUpload}
-            className="group flex flex-col items-center gap-4 rounded-2xl border-2 border-emerald-300 bg-white p-8 shadow-sm transition-all hover:shadow-lg hover:scale-[1.02] active:scale-95"
+            className="group flex flex-col items-center gap-4 rounded-2xl border-2 border-emerald-500/30 bg-white p-8 shadow-sm transition-all hover:shadow-lg hover:scale-[1.02] active:scale-95"
           >
-            <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-emerald-50 group-hover:bg-emerald-100 transition-colors">
+            <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-emerald-950/30 group-hover:bg-emerald-950/40 transition-colors">
               <ShieldCheck className="h-8 w-8 text-emerald-600" />
             </div>
             <div className="text-center">
@@ -224,9 +224,9 @@ export function KioskConciergeWelcome({
           <button
             type="button"
             onClick={onReturningClient}
-            className="group flex flex-col items-center gap-4 rounded-2xl border-2 border-blue-300 bg-white p-8 shadow-sm transition-all hover:shadow-lg hover:scale-[1.02] active:scale-95"
+            className="group flex flex-col items-center gap-4 rounded-2xl border-2 border-blue-500/30 bg-white p-8 shadow-sm transition-all hover:shadow-lg hover:scale-[1.02] active:scale-95"
           >
-            <div className="relative flex h-16 w-16 items-center justify-center rounded-xl bg-blue-50 group-hover:bg-blue-100 transition-colors">
+            <div className="relative flex h-16 w-16 items-center justify-center rounded-xl bg-blue-950/30 group-hover:bg-blue-950/40 transition-colors">
               <Fingerprint className="h-8 w-8 text-blue-600" />
               {/* Blue glow */}
               <div className="absolute inset-0 rounded-xl bg-blue-400/10 animate-pulse" />
@@ -247,14 +247,14 @@ export function KioskConciergeWelcome({
             className={cn(
               'flex h-14 w-14 items-center justify-center rounded-full transition-all',
               isListening
-                ? 'bg-red-100 text-red-600 scale-110'
+                ? 'bg-red-950/40 text-red-600 scale-110'
                 : 'bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-700 hover:scale-105 active:scale-95',
             )}
           >
             {isListening ? (
               <div className="relative">
                 <Mic className="h-6 w-6 animate-pulse" />
-                <div className="absolute -inset-3 rounded-full border-2 border-red-300 animate-ping" />
+                <div className="absolute -inset-3 rounded-full border-2 border-red-500/30 animate-ping" />
               </div>
             ) : (
               <Mic className="h-6 w-6" />

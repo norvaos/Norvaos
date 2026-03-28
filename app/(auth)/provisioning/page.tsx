@@ -70,7 +70,7 @@ export default function ProvisioningPage() {
               className={cn(
                 'flex items-center gap-3 rounded-lg border px-4 py-3 text-sm transition-all duration-500',
                 i < activeStep
-                  ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
+                  ? 'border-emerald-500/20 bg-emerald-950/30 text-emerald-400'
                   : i === activeStep
                     ? 'border-primary/30 bg-primary/5 text-foreground font-medium'
                     : 'border-transparent bg-transparent text-muted-foreground/40'

@@ -112,8 +112,8 @@ export function GenerateDocumentDialog({
             ) : (
               <>
                 {missingRequired.length > 0 && (
-                  <div className="rounded-md border border-red-200 bg-red-50 p-3">
-                    <div className="flex items-center gap-2 text-sm font-medium text-red-700 mb-2">
+                  <div className="rounded-md border border-red-500/20 bg-red-950/30 p-3">
+                    <div className="flex items-center gap-2 text-sm font-medium text-red-400 mb-2">
                       <AlertCircle className="h-4 w-4" />
                       Missing Required Fields
                     </div>
@@ -133,7 +133,7 @@ export function GenerateDocumentDialog({
                         <span className="text-muted-foreground">{f.display_name}</span>
                         <span className="font-mono text-xs max-w-[200px] truncate">
                           {f.was_empty ? (
-                            <Badge variant="outline" className="text-amber-600 border-amber-200 bg-amber-50 text-[10px]">empty</Badge>
+                            <Badge variant="outline" className="text-amber-600 border-amber-500/20 bg-amber-950/30 text-[10px]">empty</Badge>
                           ) : (
                             f.resolved_value
                           )}

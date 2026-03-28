@@ -77,7 +77,7 @@ export function TimeEntryTable({ entries, onEdit, onDelete }: TimeEntryTableProp
                     </Badge>
                   )}
                   {!!entry.invoice_id && (
-                    <Badge className="text-xs bg-emerald-100 text-emerald-700 hover:bg-emerald-100">
+                    <Badge className="text-xs bg-emerald-950/40 text-emerald-400 hover:bg-emerald-950/40">
                       Billed
                     </Badge>
                   )}

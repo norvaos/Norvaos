@@ -366,9 +366,9 @@ function IntakeWizardInner({
                     </div>
                   )}
                   {rec.deadlineWarning && (
-                    <div className="rounded border border-amber-200 bg-amber-950/30 px-2 py-1.5 flex items-start gap-1.5">
+                    <div className="rounded border border-amber-500/20 bg-amber-950/30 px-2 py-1.5 flex items-start gap-1.5">
                       <AlertTriangle className="h-3.5 w-3.5 text-amber-500 shrink-0 mt-0.5" />
-                      <p className="text-[11px] text-amber-800 font-medium">{rec.deadlineWarning}</p>
+                      <p className="text-[11px] text-amber-400 font-medium">{rec.deadlineWarning}</p>
                     </div>
                   )}
                 </div>
@@ -632,7 +632,7 @@ function ConfidenceBadge({ confidence }: { confidence: 'strong' | 'likely' | 'po
   const config = {
     strong:   { label: 'Strong match', className: 'bg-emerald-950/30 text-emerald-400 border-emerald-500/20' },
     likely:   { label: 'Likely match', className: 'bg-blue-950/30 text-blue-400 border-blue-500/20' },
-    possible: { label: 'Possible',     className: 'bg-amber-950/30 text-amber-400 border-amber-200' },
+    possible: { label: 'Possible',     className: 'bg-amber-950/30 text-amber-400 border-amber-500/20' },
   }[confidence]
 
   return (

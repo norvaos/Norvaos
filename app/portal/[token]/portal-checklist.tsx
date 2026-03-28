@@ -307,9 +307,9 @@ export function PortalChecklist({
 
         {/* Instructions */}
         {portalInfo?.instructions && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <p className="text-xs font-medium text-blue-800 mb-1">{tr.instructions_label}</p>
-            <p className="text-sm text-blue-700 whitespace-pre-line">
+          <div className="bg-blue-950/30 border border-blue-500/20 rounded-lg p-4">
+            <p className="text-xs font-medium text-blue-400 mb-1">{tr.instructions_label}</p>
+            <p className="text-sm text-blue-400 whitespace-pre-line">
               {portalInfo.instructions}
             </p>
           </div>
@@ -412,7 +412,7 @@ export function PortalChecklist({
                           key={item.id}
                           className={cn(
                             'flex items-center gap-3 px-4 py-3',
-                            justUploaded && 'bg-green-50'
+                            justUploaded && 'bg-emerald-950/30'
                           )}
                         >
                           {/* Document info */}
@@ -481,9 +481,9 @@ export function PortalChecklist({
 
         {/* All done message */}
         {completionPercent === 100 && (
-          <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-center">
+          <div className="bg-emerald-950/30 border border-emerald-500/20 rounded-lg p-4 text-center">
             <CheckCircle2 className="h-8 w-8 text-green-500 mx-auto mb-2" />
-            <p className="text-sm font-medium text-green-800">
+            <p className="text-sm font-medium text-emerald-400">
               {tr.all_done_title}
             </p>
             <p className="text-xs text-green-600 mt-1">

@@ -224,7 +224,7 @@ export function ScreeningAnswers() {
               ) : (
                 <ChevronRight className="h-3 w-3 shrink-0" />
               )}
-              <Badge variant="outline" className="text-[10px] gap-1 bg-blue-50 text-blue-700 border-blue-200 ml-0.5">
+              <Badge variant="outline" className="text-[10px] gap-1 bg-blue-950/30 text-blue-400 border-blue-500/20 ml-0.5">
                 Front Desk Intake
               </Badge>
               <span className="text-[10px] text-slate-400 ml-auto">{frontDeskAnswerCount} answers</span>
@@ -301,7 +301,7 @@ export function ScreeningAnswers() {
                 {/* Session header */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <Badge variant="outline" className="text-[10px] gap-1 bg-purple-50 text-purple-700 border-purple-200">
+                    <Badge variant="outline" className="text-[10px] gap-1 bg-purple-950/30 text-purple-400 border-purple-500/20">
                       <Tablet className="h-2.5 w-2.5" />
                       {idx === 0 ? 'Latest Check-In' : 'Previous Check-In'}
                     </Badge>
@@ -322,7 +322,7 @@ export function ScreeningAnswers() {
                   return (
                     <div
                       key={`${ci.id}-${qId}`}
-                      className="rounded-md border border-purple-100 bg-purple-50/30 px-3 py-2 space-y-0.5"
+                      className="rounded-md border border-purple-100 bg-purple-950/30/30 px-3 py-2 space-y-0.5"
                     >
                       <p className="text-[11px] font-medium text-slate-500 leading-snug">
                         {question?.label ?? qId}

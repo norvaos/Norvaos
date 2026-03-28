@@ -78,8 +78,8 @@ function buildComplianceItems(conflictCleared: boolean): ComplianceItemConfig[] 
         ? 'Conflict check passed'
         : 'Conflict check incomplete',
       colourClass: conflictCleared
-        ? 'border-green-300 bg-emerald-950/30 text-emerald-400'
-        : 'border-amber-300 bg-amber-950/30 text-amber-400',
+        ? 'border-emerald-500/30 bg-emerald-950/30 text-emerald-400'
+        : 'border-amber-500/30 bg-amber-950/30 text-amber-400',
     },
     {
       key: 'retainer',
@@ -132,7 +132,7 @@ export function SovereignComplianceStep({ intake }: InternalComplianceStepProps)
     <div className="space-y-6">
       {/* ── Success header ──────────────────────────────────────────────── */}
       <div className="flex items-center gap-3 animate-in fade-in duration-300">
-        <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-green-100">
+        <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-emerald-950/40">
           <CheckCircle2 className="size-5 text-green-600" />
         </div>
         <div>
@@ -181,7 +181,7 @@ export function SovereignComplianceStep({ intake }: InternalComplianceStepProps)
                         className={cn(
                           'text-[9px] px-1.5 py-0',
                           isPassed
-                            ? 'border-green-300 bg-emerald-950/30 text-emerald-400'
+                            ? 'border-emerald-500/30 bg-emerald-950/30 text-emerald-400'
                             : 'border-slate-200 bg-slate-50 text-slate-500',
                         )}
                       >
@@ -274,7 +274,7 @@ export function ComplianceStepStandalone({
     <div className="space-y-6">
       {/* Success header */}
       <div className="flex items-center gap-3 animate-in fade-in duration-300">
-        <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-green-100">
+        <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-emerald-950/40">
           <CheckCircle2 className="size-5 text-green-600" />
         </div>
         <div>
@@ -320,7 +320,7 @@ export function ComplianceStepStandalone({
                         className={cn(
                           'text-[9px] px-1.5 py-0',
                           isPassed
-                            ? 'border-green-300 bg-emerald-950/30 text-emerald-400'
+                            ? 'border-emerald-500/30 bg-emerald-950/30 text-emerald-400'
                             : 'border-slate-200 bg-slate-50 text-slate-500',
                         )}
                       >

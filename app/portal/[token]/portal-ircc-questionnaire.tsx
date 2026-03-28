@@ -223,8 +223,8 @@ export function PortalIRCCQuestionnaire({
 
   if (error) {
     return (
-      <div className="rounded-lg border border-red-200 bg-red-50 p-6 text-center">
-        <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-red-100">
+      <div className="rounded-lg border border-red-500/20 bg-red-950/30 p-6 text-center">
+        <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-red-950/40">
           <svg
             className="h-5 w-5 text-red-600"
             fill="none"
@@ -239,7 +239,7 @@ export function PortalIRCCQuestionnaire({
             />
           </svg>
         </div>
-        <p className="text-sm font-medium text-red-800">
+        <p className="text-sm font-medium text-red-400">
           {tr.ircc_error_title}
         </p>
         <p className="mt-1 text-sm text-red-600">{error}</p>
@@ -262,8 +262,8 @@ export function PortalIRCCQuestionnaire({
 
     return (
       <div className="space-y-6">
-        <div className="rounded-lg border border-green-200 bg-green-50 p-6 text-center">
-          <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-green-100">
+        <div className="rounded-lg border border-emerald-500/20 bg-emerald-950/30 p-6 text-center">
+          <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-emerald-950/40">
             <svg
               className="h-5 w-5 text-green-600"
               fill="none"
@@ -278,10 +278,10 @@ export function PortalIRCCQuestionnaire({
               />
             </svg>
           </div>
-          <h3 className="text-base font-semibold text-green-800">
+          <h3 className="text-base font-semibold text-emerald-400">
             {tr.ircc_submitted_title}
           </h3>
-          <p className="mt-1 text-sm text-green-700">
+          <p className="mt-1 text-sm text-emerald-400">
             {tr.ircc_submitted_message}
           </p>
           {completedAt && (
@@ -312,7 +312,7 @@ export function PortalIRCCQuestionnaire({
         <div className="border-t border-slate-200 pt-4">
           {hasPendingEditRequest || editSubmitted ? (
             // Pending or just submitted
-            <p className="text-xs text-amber-700 flex items-center gap-1.5">
+            <p className="text-xs text-amber-400 flex items-center gap-1.5">
               <svg className="h-3.5 w-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <circle cx="12" cy="12" r="10" />
                 <path d="M12 6v6l4 2" />

@@ -352,7 +352,7 @@ export default function AutomationRulesSettingsPage() {
                     className="flex items-center justify-between rounded-lg border p-4"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="flex size-9 items-center justify-center rounded-lg bg-orange-50 text-orange-600">
+                      <div className="flex size-9 items-center justify-center rounded-lg bg-orange-950/30 text-orange-600">
                         <TriggerIcon className="size-4" />
                       </div>
                       <div>

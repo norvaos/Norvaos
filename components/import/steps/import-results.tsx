@@ -57,19 +57,19 @@ export function ImportResults({ batchId, onImportAnother, onDone }: ImportResult
         {isSuccess && (
           <>
             <CheckCircle2 className="h-16 w-16 text-green-500" />
-            <p className="text-lg font-semibold text-green-700">Import completed successfully!</p>
+            <p className="text-lg font-semibold text-emerald-400">Import completed successfully!</p>
           </>
         )}
         {isPartial && (
           <>
             <AlertTriangle className="h-16 w-16 text-amber-500" />
-            <p className="text-lg font-semibold text-amber-700">Import completed with some errors</p>
+            <p className="text-lg font-semibold text-amber-400">Import completed with some errors</p>
           </>
         )}
         {isFailed && (
           <>
             <XCircle className="h-16 w-16 text-red-500" />
-            <p className="text-lg font-semibold text-red-700">Import failed</p>
+            <p className="text-lg font-semibold text-red-400">Import failed</p>
           </>
         )}
         {isRolledBack && (
@@ -86,19 +86,19 @@ export function ImportResults({ batchId, onImportAnother, onDone }: ImportResult
           <p className="text-2xl font-bold text-slate-900">{batch.totalRows}</p>
           <p className="text-[10px] uppercase tracking-wider text-slate-400">Total</p>
         </div>
-        <div className="rounded-lg border bg-green-50 border-green-200 px-6 py-3 text-center">
-          <p className="text-2xl font-bold text-green-700">{batch.succeededRows}</p>
+        <div className="rounded-lg border bg-emerald-950/30 border-emerald-500/20 px-6 py-3 text-center">
+          <p className="text-2xl font-bold text-emerald-400">{batch.succeededRows}</p>
           <p className="text-[10px] uppercase tracking-wider text-green-600">Imported</p>
         </div>
         {batch.failedRows > 0 && (
-          <div className="rounded-lg border bg-red-50 border-red-200 px-6 py-3 text-center">
-            <p className="text-2xl font-bold text-red-700">{batch.failedRows}</p>
+          <div className="rounded-lg border bg-red-950/30 border-red-500/20 px-6 py-3 text-center">
+            <p className="text-2xl font-bold text-red-400">{batch.failedRows}</p>
             <p className="text-[10px] uppercase tracking-wider text-red-600">Failed</p>
           </div>
         )}
         {batch.skippedRows > 0 && (
-          <div className="rounded-lg border bg-amber-50 border-amber-200 px-6 py-3 text-center">
-            <p className="text-2xl font-bold text-amber-700">{batch.skippedRows}</p>
+          <div className="rounded-lg border bg-amber-950/30 border-amber-500/20 px-6 py-3 text-center">
+            <p className="text-2xl font-bold text-amber-400">{batch.skippedRows}</p>
             <p className="text-[10px] uppercase tracking-wider text-amber-600">Skipped</p>
           </div>
         )}
@@ -106,14 +106,14 @@ export function ImportResults({ batchId, onImportAnother, onDone }: ImportResult
 
       {/* Errors list */}
       {errors.length > 0 && (
-        <div className="rounded-lg border border-red-200 bg-red-50 p-4">
+        <div className="rounded-lg border border-red-500/20 bg-red-950/30 p-4">
           <div className="flex items-center justify-between mb-2">
-            <p className="text-xs font-medium text-red-800">Errors:</p>
+            <p className="text-xs font-medium text-red-400">Errors:</p>
             {hasErrors && (
               <Button
                 variant="outline"
                 size="sm"
-                className="h-6 text-[10px] border-red-300 text-red-700 hover:bg-red-100"
+                className="h-6 text-[10px] border-red-500/30 text-red-400 hover:bg-red-950/40"
                 onClick={handleDownloadReport}
               >
                 <Download className="h-3 w-3 mr-1" />
@@ -123,7 +123,7 @@ export function ImportResults({ batchId, onImportAnother, onDone }: ImportResult
           </div>
           <div className="max-h-40 overflow-y-auto">
             {errors.slice(0, 20).map((err, i) => (
-              <p key={i} className="text-xs text-red-700">
+              <p key={i} className="text-xs text-red-400">
                 {err.rowNumber ? `Row ${err.rowNumber}: ` : ''}{err.message ?? 'Unknown error'}
               </p>
             ))}

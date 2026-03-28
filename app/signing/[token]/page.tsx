@@ -13,7 +13,7 @@ function ExpiredOrInvalidPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4">
       <div className="max-w-md text-center space-y-4">
-        <div className="mx-auto w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center">
+        <div className="mx-auto w-12 h-12 rounded-full bg-amber-950/40 flex items-center justify-center">
           <svg
             className="w-6 h-6 text-amber-600"
             fill="none"

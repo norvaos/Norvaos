@@ -283,7 +283,7 @@ export function NorvaEarPanel({ matterId, matterTitle }: NorvaEarPanelProps) {
           {/* ── Consent Phase ─────────────────────────────────────────── */}
           {state === 'consent' && (
             <div className="space-y-4 pt-2">
-              <div className="rounded-lg border border-amber-200 bg-amber-50 p-4">
+              <div className="rounded-lg border border-amber-500/20 bg-amber-950/30 p-4">
                 <div className="flex items-start gap-3">
                   <AlertTriangle className="h-5 w-5 text-amber-600 mt-0.5 shrink-0" />
                   <div>

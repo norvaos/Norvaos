@@ -562,7 +562,7 @@ export function EventCreateDialog({
             {!showDescription && (
               <button
                 type="button"
-                className="flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-700"
+                className="flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-400"
                 onClick={() => setShowDescription(true)}
               >
                 <AlignLeft className="h-3 w-3" />
@@ -572,7 +572,7 @@ export function EventCreateDialog({
             {!showLocation && (
               <button
                 type="button"
-                className="flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-700"
+                className="flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-400"
                 onClick={() => setShowLocation(true)}
               >
                 <MapPin className="h-3 w-3" />

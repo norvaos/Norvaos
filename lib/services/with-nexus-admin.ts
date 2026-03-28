@@ -39,7 +39,7 @@ export function withNexusAdmin(handler: NexusRouteHandler) {
     if (ipBlock) return ipBlock
 
     // 2. Rate limit
-    const rateLimitResponse = checkAdminRateLimit(request)
+    const rateLimitResponse = await checkAdminRateLimit(request)
     if (rateLimitResponse) return rateLimitResponse
 
     // 3. Wrap in request ID context

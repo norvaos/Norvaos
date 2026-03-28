@@ -462,7 +462,7 @@ export function SovereignConflictStep({
 
         {/* Error */}
         {error && (
-          <div className="animate-in fade-in slide-in-from-bottom-2 duration-300 rounded-lg border border-red-500/20 bg-red-950/30 p-4 text-sm text-red-800 dark:border-red-800 dark:bg-red-950/40 dark:text-red-200">
+          <div className="animate-in fade-in slide-in-from-bottom-2 duration-300 rounded-lg border border-red-500/20 bg-red-950/30 p-4 text-sm text-red-400 dark:border-red-800 dark:bg-red-950/40 dark:text-red-200">
             {error}
           </div>
         )}
@@ -470,9 +470,9 @@ export function SovereignConflictStep({
         {/* Results  -  clear (no matches at all) */}
         {scanState === 'clear' && (
           <div className="animate-in fade-in slide-in-from-bottom-2 duration-300 space-y-4">
-            <div className="flex flex-col items-center gap-3 rounded-lg border border-green-200 bg-emerald-950/30 p-6 text-center dark:border-green-800 dark:bg-green-950/40">
+            <div className="flex flex-col items-center gap-3 rounded-lg border border-emerald-500/20 bg-emerald-950/30 p-6 text-center dark:border-green-800 dark:bg-green-950/40">
               <ShieldCheck className="h-10 w-10 text-green-600 animate-pulse dark:text-green-400" />
-              <p className="text-sm font-medium text-green-800 dark:text-green-200">
+              <p className="text-sm font-medium text-emerald-400 dark:text-green-200">
                 No conflicts found for{' '}
                 <strong>
                   {firstName.trim()} {lastName.trim()}
@@ -480,7 +480,7 @@ export function SovereignConflictStep({
               </p>
               <Badge
                 variant="outline"
-                className="border-green-300 text-emerald-400 dark:border-green-700 dark:text-green-300"
+                className="border-emerald-500/30 text-emerald-400 dark:border-green-700 dark:text-green-300"
               >
                 Cleared
               </Badge>
@@ -491,9 +491,9 @@ export function SovereignConflictStep({
         {/* Results  -  conflict resolved */}
         {scanState === 'resolved' && resolvedMatch && (
           <div className="animate-in fade-in slide-in-from-bottom-2 duration-300 space-y-4">
-            <div className="flex flex-col items-center gap-3 rounded-lg border border-green-200 bg-emerald-950/30 p-6 text-center dark:border-green-800 dark:bg-green-950/40">
+            <div className="flex flex-col items-center gap-3 rounded-lg border border-emerald-500/20 bg-emerald-950/30 p-6 text-center dark:border-green-800 dark:bg-green-950/40">
               <ShieldCheck className="h-10 w-10 text-green-600 animate-pulse dark:text-green-400" />
-              <p className="text-sm font-medium text-green-800 dark:text-green-200">
+              <p className="text-sm font-medium text-emerald-400 dark:text-green-200">
                 Conflict Resolved
               </p>
               <p className="text-xs text-emerald-400 dark:text-green-300">
@@ -515,7 +515,7 @@ export function SovereignConflictStep({
               </p>
               <Badge
                 variant="outline"
-                className="border-green-300 text-emerald-400 dark:border-green-700 dark:text-green-300"
+                className="border-emerald-500/30 text-emerald-400 dark:border-green-700 dark:text-green-300"
               >
                 {intake.conflictResolution === 'linked'
                   ? 'Linked to Existing'
@@ -531,7 +531,7 @@ export function SovereignConflictStep({
             <div className="flex items-start gap-3 rounded-lg border border-amber-500/20 bg-amber-950/30 p-4 dark:border-amber-800 dark:bg-amber-950/40">
               <ShieldAlert className="mt-0.5 h-6 w-6 shrink-0 text-amber-600 dark:text-amber-400" />
               <div className="space-y-1">
-                <p className="text-sm font-medium text-amber-800 dark:text-amber-200">
+                <p className="text-sm font-medium text-amber-400 dark:text-amber-200">
                   Potential conflicts detected
                 </p>
                 <p className="text-xs text-amber-400 dark:text-amber-300">
@@ -690,7 +690,7 @@ export function SovereignConflictStep({
 
             <Badge
               variant="outline"
-              className="border-amber-300 text-amber-400 dark:border-amber-700 dark:text-amber-300"
+              className="border-amber-500/30 text-amber-400 dark:border-amber-700 dark:text-amber-300"
             >
               Resolution Required
             </Badge>

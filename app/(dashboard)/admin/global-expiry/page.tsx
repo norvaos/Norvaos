@@ -44,9 +44,9 @@ function getColourBand(days: number): ColourBand {
 function getRowClasses(band: ColourBand): string {
   switch (band) {
     case 'red':
-      return 'border-red-300 bg-red-50/50 dark:border-red-800 dark:bg-red-950/20'
+      return 'border-red-500/30 bg-red-950/30/50 dark:border-red-800 dark:bg-red-950/20'
     case 'amber':
-      return 'border-amber-300 bg-amber-50/30 dark:border-amber-800 dark:bg-amber-950/10'
+      return 'border-amber-500/30 bg-amber-950/30/30 dark:border-amber-800 dark:bg-amber-950/10'
     case 'grey':
     default:
       return ''
@@ -68,7 +68,7 @@ function getBadgeVariant(band: ColourBand) {
 function getBadgeClasses(band: ColourBand): string {
   switch (band) {
     case 'amber':
-      return 'border-amber-400 bg-amber-100 text-amber-800 dark:border-amber-700 dark:bg-amber-900/40 dark:text-amber-300'
+      return 'border-amber-400 bg-amber-950/40 text-amber-400 dark:border-amber-700 dark:bg-amber-900/40 dark:text-amber-300'
     default:
       return ''
   }
@@ -122,7 +122,7 @@ export default function GlobalExpiryDashboardPage() {
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <Card className="border-red-300 dark:border-red-800">
+        <Card className="border-red-500/30 dark:border-red-800">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
               Sovereign Red (&lt;90 days)
@@ -136,7 +136,7 @@ export default function GlobalExpiryDashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="border-amber-300 dark:border-amber-800">
+        <Card className="border-amber-500/30 dark:border-amber-800">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
               Amber Pulse (90–180 days)

@@ -152,7 +152,7 @@ export function HeroHeader({ onToggleActivity, activityOpen, onToggleScreening, 
             <Button
               variant="outline"
               size="sm"
-              className="h-8 gap-1.5 text-green-600 border-green-200 hover:bg-emerald-950/30 hover:text-emerald-400"
+              className="h-8 gap-1.5 text-green-600 border-emerald-500/20 hover:bg-emerald-950/30 hover:text-emerald-400"
               onClick={startMeetingTimer}
             >
               <Play className="h-3.5 w-3.5 fill-current" />
@@ -160,7 +160,7 @@ export function HeroHeader({ onToggleActivity, activityOpen, onToggleScreening, 
               <span className="hidden sm:inline">Start Meeting</span>
             </Button>
           ) : (
-            <div className="flex items-center gap-1 h-8 px-2 rounded-md bg-red-50 border border-red-200 text-red-600">
+            <div className="flex items-center gap-1 h-8 px-2 rounded-md bg-red-950/30 border border-red-500/20 text-red-600">
               <Timer className="h-3.5 w-3.5 animate-pulse shrink-0" />
               <span className="font-mono text-xs font-bold tabular-nums min-w-[42px]">
                 {formatElapsed(timerElapsed)}
@@ -168,7 +168,7 @@ export function HeroHeader({ onToggleActivity, activityOpen, onToggleScreening, 
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-6 w-6 p-0 text-red-500 hover:text-red-700 hover:bg-red-100"
+                className="h-6 w-6 p-0 text-red-500 hover:text-red-400 hover:bg-red-950/40"
                 onClick={stopMeetingTimer}
                 title="Stop meeting"
               >
@@ -263,7 +263,7 @@ export function HeroHeader({ onToggleActivity, activityOpen, onToggleScreening, 
                 </Badge>
               )}
               {isConverted && (
-                <Badge className="bg-green-100 text-green-800 border-green-200 text-xs">
+                <Badge className="bg-emerald-950/40 text-emerald-400 border-emerald-500/20 text-xs">
                   Converted
                 </Badge>
               )}
@@ -275,7 +275,7 @@ export function HeroHeader({ onToggleActivity, activityOpen, onToggleScreening, 
                 </Badge>
               )}
               {isRotting && !followUpOverdue && (
-                <Badge className="bg-amber-100 text-amber-800 border-amber-200 text-xs gap-1">
+                <Badge className="bg-amber-950/40 text-amber-400 border-amber-500/20 text-xs gap-1">
                   <Clock className="h-3 w-3" />
                   {daysInCurrentStage}d in stage
                 </Badge>

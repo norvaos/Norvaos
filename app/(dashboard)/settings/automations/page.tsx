@@ -1114,11 +1114,11 @@ function AutomationCard({
 
       {/* Trigger → Action flow */}
       <div className="mt-3 flex items-center gap-1.5 flex-wrap">
-        <Badge variant="secondary" className="bg-blue-950/30 text-blue-400 border-blue-200">
+        <Badge variant="secondary" className="bg-blue-950/30 text-blue-400 border-blue-500/20">
           {getTriggerLabel(rule.trigger_type)}
         </Badge>
         <ArrowRight className="h-3 w-3 text-muted-foreground shrink-0" />
-        <Badge variant="secondary" className="bg-emerald-950/30 text-emerald-400 border-green-200">
+        <Badge variant="secondary" className="bg-emerald-950/30 text-emerald-400 border-emerald-500/20">
           {getActionLabel(rule.action_type)}
         </Badge>
       </div>

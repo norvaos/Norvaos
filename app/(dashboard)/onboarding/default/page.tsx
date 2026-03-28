@@ -135,8 +135,8 @@ export default function DefaultSetupPage() {
           ))}
         </div>
 
-        <div className="rounded-md border border-amber-200 bg-amber-50 px-4 py-3">
-          <p className="text-sm text-amber-800">
+        <div className="rounded-md border border-amber-500/20 bg-amber-950/30 px-4 py-3">
+          <p className="text-sm text-amber-400">
             <strong>Note:</strong> Default Setup takes a few seconds. Do not close this tab while it runs.
           </p>
         </div>
@@ -191,7 +191,7 @@ export default function DefaultSetupPage() {
     return (
       <div className="max-w-lg mx-auto text-center space-y-6">
         <div className="flex justify-center">
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100">
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-950/40">
             <CheckCircle2 className="h-9 w-9 text-emerald-600" />
           </div>
         </div>
@@ -203,11 +203,11 @@ export default function DefaultSetupPage() {
           </p>
         </div>
 
-        <div className="rounded-lg border border-emerald-200 bg-emerald-50 divide-y divide-emerald-100">
+        <div className="rounded-lg border border-emerald-500/20 bg-emerald-950/30 divide-y divide-emerald-100">
           {APPLYING_STEPS.map(({ key, label, icon: Icon }) => (
             <div key={key} className="flex items-center gap-3 px-4 py-3">
               <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-500" />
-              <span className="text-sm text-emerald-800">{label}</span>
+              <span className="text-sm text-emerald-400">{label}</span>
             </div>
           ))}
         </div>

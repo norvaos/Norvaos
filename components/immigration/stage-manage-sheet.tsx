@@ -222,12 +222,12 @@ export function StageManageSheet({
                       </span>
                       <div className="flex items-center gap-2 mt-0.5">
                         {stage.is_terminal && (
-                          <span className="text-[10px] font-medium text-orange-600 bg-orange-50 border border-orange-200 rounded px-1 py-0">
+                          <span className="text-[10px] font-medium text-orange-600 bg-orange-950/30 border border-orange-500/20 rounded px-1 py-0">
                             Terminal
                           </span>
                         )}
                         {stage.requires_checklist_complete && (
-                          <span className="text-[10px] font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded px-1 py-0">
+                          <span className="text-[10px] font-medium text-blue-600 bg-blue-950/30 border border-blue-500/20 rounded px-1 py-0">
                             Checklist Gate
                           </span>
                         )}

@@ -31,9 +31,9 @@ const SLIDES = [
 const STYLES = [
   { logo: 'bg-indigo-600', sidebar: 'bg-indigo-50 font-semibold text-indigo-700', dot: 'bg-indigo-400', progress: 'bg-indigo-600' },
   { logo: 'bg-violet-600', sidebar: 'bg-violet-50 font-semibold text-violet-700', dot: 'bg-violet-400', progress: 'bg-violet-600' },
-  { logo: 'bg-blue-600', sidebar: 'bg-blue-50 font-semibold text-blue-700', dot: 'bg-blue-400', progress: 'bg-blue-600' },
-  { logo: 'bg-emerald-600', sidebar: 'bg-emerald-50 font-semibold text-emerald-700', dot: 'bg-emerald-400', progress: 'bg-emerald-600' },
-  { logo: 'bg-amber-500', sidebar: 'bg-amber-50 font-semibold text-amber-700', dot: 'bg-amber-400', progress: 'bg-amber-500' },
+  { logo: 'bg-blue-600', sidebar: 'bg-blue-950/30 font-semibold text-blue-400', dot: 'bg-blue-400', progress: 'bg-blue-600' },
+  { logo: 'bg-emerald-600', sidebar: 'bg-emerald-950/30 font-semibold text-emerald-400', dot: 'bg-emerald-400', progress: 'bg-emerald-600' },
+  { logo: 'bg-amber-500', sidebar: 'bg-amber-950/30 font-semibold text-amber-400', dot: 'bg-amber-400', progress: 'bg-amber-500' },
   { logo: 'bg-rose-600', sidebar: 'bg-rose-50 font-semibold text-rose-700', dot: 'bg-rose-400', progress: 'bg-rose-600' },
 ]
 
@@ -48,8 +48,8 @@ function DashboardSlide() {
         {[
           { label: 'Active Matters', value: '47', color: 'text-indigo-600', bg: 'bg-indigo-50' },
           { label: 'New This Month', value: '8', color: 'text-violet-600', bg: 'bg-violet-50' },
-          { label: 'Revenue MTD', value: '$24.5k', color: 'text-emerald-600', bg: 'bg-emerald-50' },
-          { label: 'Tasks Due', value: '12', color: 'text-amber-600', bg: 'bg-amber-50' },
+          { label: 'Revenue MTD', value: '$24.5k', color: 'text-emerald-600', bg: 'bg-emerald-950/30' },
+          { label: 'Tasks Due', value: '12', color: 'text-amber-600', bg: 'bg-amber-950/30' },
         ].map(stat => (
           <div key={stat.label} className={`rounded-xl ${stat.bg} p-2.5`}>
             <div className={`text-base font-bold ${stat.color}`}>{stat.value}</div>
@@ -61,7 +61,7 @@ function DashboardSlide() {
         <div className="text-xs font-semibold text-gray-400 mb-1">Recent Matters</div>
         {[
           { name: 'Sharma, Patel', type: 'Spousal Sponsorship', stage: 'Filing', cls: 'bg-violet-100 text-violet-700' },
-          { name: 'Chen, Wei', type: 'Work Permit', stage: 'Assessment', cls: 'bg-amber-100 text-amber-700' },
+          { name: 'Chen, Wei', type: 'Work Permit', stage: 'Assessment', cls: 'bg-amber-950/40 text-amber-400' },
           { name: 'Rodriguez, Ana', type: 'PR Application', stage: 'Active', cls: 'bg-indigo-100 text-indigo-700' },
         ].map(m => (
           <div key={m.name} className="flex items-center justify-between rounded-lg bg-white px-3 py-2 shadow-sm border border-gray-100">
@@ -99,7 +99,7 @@ function MattersSlide() {
       <div className="space-y-1.5">
         {[
           { file: '2026-0047', name: 'Sharma, Patel', area: 'Immigration', stage: 'Filing', cls: 'bg-violet-100 text-violet-700', urgent: false },
-          { file: '2026-0048', name: 'Chen, Wei', area: 'Immigration', stage: 'Assessment', cls: 'bg-amber-100 text-amber-700', urgent: true },
+          { file: '2026-0048', name: 'Chen, Wei', area: 'Immigration', stage: 'Assessment', cls: 'bg-amber-950/40 text-amber-400', urgent: true },
           { file: '2026-0039', name: 'Kowalski, Anna', area: 'Family Law', stage: 'Active', cls: 'bg-indigo-100 text-indigo-700', urgent: false },
           { file: '2026-0041', name: 'Rodriguez, Ana', area: 'Immigration', stage: 'Active', cls: 'bg-indigo-100 text-indigo-700', urgent: false },
         ].map(m => (
@@ -125,8 +125,8 @@ function MattersSlide() {
 function DocumentsSlide() {
   return (
     <div className="flex-1 p-4 overflow-hidden">
-      <div className="rounded-xl border border-blue-100 bg-blue-50/60 p-3 mb-3">
-        <div className="mb-2 flex items-center gap-2 text-xs font-semibold text-blue-700">
+      <div className="rounded-xl border border-blue-100 bg-blue-950/30/60 p-3 mb-3">
+        <div className="mb-2 flex items-center gap-2 text-xs font-semibold text-blue-400">
           <Brain className="h-3.5 w-3.5" />
           Auto-classifying new uploads
         </div>
@@ -147,10 +147,10 @@ function DocumentsSlide() {
       </div>
       <div className="space-y-1.5">
         {[
-          { folder: 'Identity Documents', files: 3, color: 'text-blue-600', bg: 'bg-blue-50', border: 'border-blue-100' },
+          { folder: 'Identity Documents', files: 3, color: 'text-blue-600', bg: 'bg-blue-950/30', border: 'border-blue-100' },
           { folder: 'Immigration Forms', files: 4, color: 'text-violet-600', bg: 'bg-violet-50', border: 'border-violet-100' },
-          { folder: 'Financial Records', files: 9, color: 'text-emerald-600', bg: 'bg-emerald-50', border: 'border-emerald-100' },
-          { folder: 'Employment Letters', files: 3, color: 'text-amber-600', bg: 'bg-amber-50', border: 'border-amber-100' },
+          { folder: 'Financial Records', files: 9, color: 'text-emerald-600', bg: 'bg-emerald-950/30', border: 'border-emerald-100' },
+          { folder: 'Employment Letters', files: 3, color: 'text-amber-600', bg: 'bg-amber-950/30', border: 'border-amber-100' },
         ].map(g => (
           <div key={g.folder} className={`rounded-xl border ${g.border} ${g.bg} px-3 py-2 flex items-center justify-between`}>
             <div className={`flex items-center gap-2 text-xs font-semibold ${g.color}`}>
@@ -181,13 +181,13 @@ function ContactsSlide() {
       </div>
       <div className="space-y-1.5">
         {[
-          { name: 'Priya Sharma', matter: '3 matters', status: 'Active', cls: 'bg-emerald-50 text-emerald-700' },
-          { name: 'Wei Chen', matter: '1 matter', status: 'Active', cls: 'bg-emerald-50 text-emerald-700' },
-          { name: 'Ana Rodriguez', matter: 'Consultation booked', status: 'Lead', cls: 'bg-amber-50 text-amber-700' },
-          { name: 'James Kowalski', matter: '2 matters', status: 'Active', cls: 'bg-emerald-50 text-emerald-700' },
+          { name: 'Priya Sharma', matter: '3 matters', status: 'Active', cls: 'bg-emerald-950/30 text-emerald-400' },
+          { name: 'Wei Chen', matter: '1 matter', status: 'Active', cls: 'bg-emerald-950/30 text-emerald-400' },
+          { name: 'Ana Rodriguez', matter: 'Consultation booked', status: 'Lead', cls: 'bg-amber-950/30 text-amber-400' },
+          { name: 'James Kowalski', matter: '2 matters', status: 'Active', cls: 'bg-emerald-950/30 text-emerald-400' },
         ].map(c => (
           <div key={c.name} className="flex items-center gap-3 rounded-xl border border-gray-100 bg-white p-2.5 shadow-sm">
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-xs font-bold text-emerald-700">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-950/40 text-xs font-bold text-emerald-400">
               {c.name.charAt(0)}
             </div>
             <div className="flex-1 min-w-0">
@@ -224,8 +224,8 @@ function CalendarSlide() {
         {[
           { time: '9:00 AM', client: 'Sharma, Patel', type: 'Consultation', cls: 'border-l-indigo-500 bg-indigo-50' },
           { time: '10:30 AM', client: 'Chen, Wei', type: 'Document Review', cls: 'border-l-violet-500 bg-violet-50' },
-          { time: '2:00 PM', client: 'Rodriguez, Ana', type: 'Video Call', cls: 'border-l-amber-500 bg-amber-50' },
-          { time: '3:30 PM', client: 'Kowalski, Anna', type: 'Consultation', cls: 'border-l-emerald-500 bg-emerald-50' },
+          { time: '2:00 PM', client: 'Rodriguez, Ana', type: 'Video Call', cls: 'border-l-amber-500 bg-amber-950/30' },
+          { time: '3:30 PM', client: 'Kowalski, Anna', type: 'Consultation', cls: 'border-l-emerald-500 bg-emerald-950/30' },
         ].map(a => (
           <div key={a.time} className={`rounded-r-xl border-l-2 px-3 py-2 ${a.cls}`}>
             <div className="flex items-center justify-between">
@@ -247,8 +247,8 @@ function BillingSlide() {
     <div className="flex-1 p-4 overflow-hidden">
       <div className="mb-3 grid grid-cols-3 gap-2">
         {[
-          { label: 'Revenue MTD', value: '$24,500', color: 'text-emerald-600', bg: 'bg-emerald-50' },
-          { label: 'Outstanding', value: '$3,200', color: 'text-amber-600', bg: 'bg-amber-50' },
+          { label: 'Revenue MTD', value: '$24,500', color: 'text-emerald-600', bg: 'bg-emerald-950/30' },
+          { label: 'Outstanding', value: '$3,200', color: 'text-amber-600', bg: 'bg-amber-950/30' },
           { label: 'Trust Held', value: '$18,750', color: 'text-indigo-600', bg: 'bg-indigo-50' },
         ].map(s => (
           <div key={s.label} className={`rounded-xl ${s.bg} p-2.5`}>
@@ -260,9 +260,9 @@ function BillingSlide() {
       <div className="space-y-1.5">
         <div className="text-xs font-semibold text-gray-400 mb-1">Recent Invoices</div>
         {[
-          { id: '#INV-0021', client: 'Sharma, Patel', amount: '$3,500', status: 'Paid', cls: 'bg-emerald-100 text-emerald-700' },
-          { id: '#INV-0022', client: 'Chen, Wei', amount: '$1,800', status: 'Paid', cls: 'bg-emerald-100 text-emerald-700' },
-          { id: '#INV-0023', client: 'Rodriguez, Ana', amount: '$2,400', status: 'Sent', cls: 'bg-blue-100 text-blue-700' },
+          { id: '#INV-0021', client: 'Sharma, Patel', amount: '$3,500', status: 'Paid', cls: 'bg-emerald-950/40 text-emerald-400' },
+          { id: '#INV-0022', client: 'Chen, Wei', amount: '$1,800', status: 'Paid', cls: 'bg-emerald-950/40 text-emerald-400' },
+          { id: '#INV-0023', client: 'Rodriguez, Ana', amount: '$2,400', status: 'Sent', cls: 'bg-blue-950/40 text-blue-400' },
           { id: '#INV-0024', client: 'Kowalski, Anna', amount: '$1,000', status: 'Draft', cls: 'bg-gray-100 text-gray-500' },
         ].map(inv => (
           <div key={inv.id} className="flex items-center justify-between rounded-lg bg-white px-3 py-2 shadow-sm border border-gray-100">

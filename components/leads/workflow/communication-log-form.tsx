@@ -128,7 +128,7 @@ export function CommunicationLogForm({
           {templateSource && (
             <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${
               templateSource === 'workspace'
-                ? 'bg-blue-50 text-blue-600'
+                ? 'bg-blue-950/30 text-blue-600'
                 : 'bg-muted text-muted-foreground'
             }`}>
               {templateSource === 'workspace' ? 'Workspace Template' : 'System Default'}

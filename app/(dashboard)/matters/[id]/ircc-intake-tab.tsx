@@ -368,7 +368,7 @@ export function IRCCIntakeTab({ matterId, contactId, tenantId, matterTypeId, ini
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Badge variant="outline" className="gap-1 text-green-600 border-green-200 bg-emerald-950/30">
+                    <Badge variant="outline" className="gap-1 text-green-600 border-emerald-500/20 bg-emerald-950/30">
                       <CheckCircle2 className="h-3 w-3" />
                       Ready
                     </Badge>

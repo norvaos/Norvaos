@@ -62,8 +62,8 @@ const STATUS_COLORS: Record<string, string> = {
   pending: 'bg-amber-950/30 text-amber-400 border-amber-500/20',
   checked_in: 'bg-emerald-950/30 text-emerald-400 border-emerald-500/20',
   completed: 'bg-slate-50 text-slate-500 border-slate-200',
-  cancelled: 'bg-red-950/30 text-red-400 border-red-200',
-  no_show: 'bg-red-950/30 text-red-500 border-red-200',
+  cancelled: 'bg-red-950/30 text-red-400 border-red-500/20',
+  no_show: 'bg-red-950/30 text-red-500 border-red-500/20',
 }
 
 /**

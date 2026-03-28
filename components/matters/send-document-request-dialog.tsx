@@ -203,14 +203,14 @@ export function SendDocumentRequestDialog({
             )}
 
             {effectiveSlots.length === 0 && allAccepted && (
-              <div className="rounded-md border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800 space-y-2">
+              <div className="rounded-md border border-emerald-500/20 bg-emerald-950/30 px-4 py-3 text-sm text-emerald-400 space-y-2">
                 <p className="font-medium">All required documents have been accepted ✓</p>
-                <p className="text-xs text-green-700">
+                <p className="text-xs text-emerald-400">
                   You can still send a follow-up request for re-submission or additional documents.
                 </p>
                 <button
                   type="button"
-                  className="text-xs font-medium text-green-700 underline underline-offset-2 hover:text-green-900"
+                  className="text-xs font-medium text-emerald-400 underline underline-offset-2 hover:text-green-900"
                   onClick={() => {
                     setIncludeAccepted(true)
                     setSelectedIds(new Set(allActiveSlots.map((s) => s.id)))
@@ -287,7 +287,7 @@ export function SendDocumentRequestDialog({
                         variant="outline"
                         className={
                           slot.status === 'accepted'
-                            ? 'border-green-300 text-green-700 bg-green-50'
+                            ? 'border-emerald-500/30 text-emerald-400 bg-emerald-950/30'
                             : slot.status === 'needs_re_upload'
                               ? 'border-orange-500/30 text-orange-400 bg-orange-950/30'
                               : slot.status === 'rejected'

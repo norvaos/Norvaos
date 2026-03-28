@@ -179,7 +179,7 @@ export function MeetingOutcomeModal({
 
         {/* Appointment info */}
         {targetAppointment && (
-          <div className="rounded-md border border-blue-100 bg-blue-50/50 p-3 flex items-center gap-3">
+          <div className="rounded-md border border-blue-100 bg-blue-950/30/50 p-3 flex items-center gap-3">
             <CalendarCheck className="h-5 w-5 text-blue-400 shrink-0" />
             <div>
               <p className="text-sm font-medium text-slate-700">
@@ -195,7 +195,7 @@ export function MeetingOutcomeModal({
                 {targetAppointment.duration_minutes}min consultation
               </p>
             </div>
-            <Badge className="ml-auto bg-amber-50 text-amber-700 border-amber-200 text-[10px]">
+            <Badge className="ml-auto bg-amber-950/30 text-amber-400 border-amber-500/20 text-[10px]">
               Pending Outcome
             </Badge>
           </div>

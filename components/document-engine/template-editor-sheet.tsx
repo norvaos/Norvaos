@@ -246,7 +246,7 @@ function MappingsSection({ mappings }: { mappings: Record<string, unknown>[] }) 
                   {`{{${m.field_key as string}}}`}
                 </code>
                 {Boolean(m.is_required) && (
-                  <Badge variant="outline" className="text-[9px] text-red-600 border-red-200">Required</Badge>
+                  <Badge variant="outline" className="text-[9px] text-red-600 border-red-500/20">Required</Badge>
                 )}
               </div>
               <p className="text-xs text-muted-foreground mt-0.5">

@@ -76,7 +76,7 @@ export function FormPacksGateSection({
             <Button
               variant="ghost"
               size="sm"
-              className="h-6 px-2 text-[11px] gap-1 text-blue-600 hover:text-blue-700"
+              className="h-6 px-2 text-[11px] gap-1 text-blue-600 hover:text-blue-400"
               onClick={onOpenIRCCIntake}
             >
               <Pencil className="h-3 w-3" />
@@ -108,7 +108,7 @@ export function FormPacksGateSection({
               {onOpenIRCCIntake && (
                 <button
                   onClick={onOpenIRCCIntake}
-                  className="text-[11px] text-blue-600 hover:text-blue-800 hover:underline"
+                  className="text-[11px] text-blue-600 hover:text-blue-400 hover:underline"
                 >
                   {f.status === 'completed' ? 'Review' : f.status === 'in_progress' ? 'Continue' : 'Start'} →
                 </button>
@@ -144,7 +144,7 @@ export function FormPacksGateSection({
                       {' '}{blockersRemaining} blocker{blockersRemaining > 1 ? 's' : ''} remaining.{' '}
                       <button
                         onClick={() => onNavigateToSection('review')}
-                        className="text-blue-600 hover:text-blue-800 underline"
+                        className="text-blue-600 hover:text-blue-400 underline"
                       >
                         View in Review section
                       </button>
@@ -197,11 +197,11 @@ export function FormPacksGateSection({
         <div className="flex items-center gap-2 px-4 py-2.5 border-b">
           <Unlock className="h-4 w-4 text-green-600" />
           <span className="text-sm font-medium">Norva Submission Engine</span>
-          <Badge variant="outline" className="text-[10px] border-green-300 text-green-700 bg-green-50 ml-1">
+          <Badge variant="outline" className="text-[10px] border-emerald-500/30 text-emerald-400 bg-emerald-950/30 ml-1">
             UNLOCKED
           </Badge>
           {readinessData.formPacks.stale.length > 0 && (
-            <Badge variant="outline" className="text-[10px] border-amber-300 text-amber-400 bg-amber-950/30 ml-1">
+            <Badge variant="outline" className="text-[10px] border-amber-500/30 text-amber-400 bg-amber-950/30 ml-1">
               {readinessData.formPacks.stale.length} outdated
             </Badge>
           )}

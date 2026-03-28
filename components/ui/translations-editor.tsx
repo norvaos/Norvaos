@@ -93,7 +93,7 @@ export function TranslationsEditor({
             />
             <button
               type="button"
-              className="mt-1.5 rounded p-0.5 text-slate-400 hover:text-red-500 hover:bg-red-50 shrink-0"
+              className="mt-1.5 rounded p-0.5 text-slate-400 hover:text-red-500 hover:bg-red-950/30 shrink-0"
               onClick={() => removeLocale(locale)}
             >
               <X className="h-3.5 w-3.5" />

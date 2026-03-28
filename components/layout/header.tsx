@@ -217,9 +217,9 @@ export function Header() {
               className={cn(
                 'shrink-0 text-[10px]',
                 matterContext.status === 'active' && 'bg-emerald-950/40 text-emerald-400 hover:bg-emerald-950/40',
-                matterContext.status === 'on_hold' && 'bg-amber-100 text-amber-400 hover:bg-amber-100',
+                matterContext.status === 'on_hold' && 'bg-amber-950/40 text-amber-400 hover:bg-amber-950/40',
                 matterContext.status === 'closed_won' && 'bg-slate-100 text-slate-600 hover:bg-slate-100',
-                matterContext.status === 'closed_lost' && 'bg-red-100 text-red-600 hover:bg-red-100',
+                matterContext.status === 'closed_lost' && 'bg-red-950/40 text-red-600 hover:bg-red-950/40',
                 matterContext.status === 'closed_withdrawn' && 'bg-slate-100 text-slate-500 hover:bg-slate-100',
               )}
             >

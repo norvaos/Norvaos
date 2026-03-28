@@ -126,7 +126,7 @@ export default function IsolationAuditPage() {
       {latest && (latest.tables_missing_rls.length > 0 || latest.tables_without_tenant_id.length > 0) && (
         <div className="space-y-4">
           {latest.tables_missing_rls.length > 0 && (
-            <div className={cn('rounded-xl border p-5', dark ? 'border-red-500/20 bg-red-500/5' : 'border-red-200 bg-red-50')}>
+            <div className={cn('rounded-xl border p-5', dark ? 'border-red-500/20 bg-red-500/5' : 'border-red-500/20 bg-red-950/30')}>
               <div className="flex items-center gap-2 mb-3">
                 <AlertTriangle className="h-5 w-5 text-red-500" />
                 <span className="text-sm font-bold text-red-500">Tables Missing RLS</span>
@@ -139,7 +139,7 @@ export default function IsolationAuditPage() {
             </div>
           )}
           {latest.tables_without_tenant_id.length > 0 && (
-            <div className={cn('rounded-xl border p-5', dark ? 'border-amber-500/20 bg-amber-500/5' : 'border-amber-200 bg-amber-50')}>
+            <div className={cn('rounded-xl border p-5', dark ? 'border-amber-500/20 bg-amber-500/5' : 'border-amber-500/20 bg-amber-950/30')}>
               <div className="flex items-center gap-2 mb-3">
                 <AlertTriangle className="h-5 w-5 text-amber-500" />
                 <span className="text-sm font-bold text-amber-500">Tables Without tenant_id</span>

@@ -80,10 +80,10 @@ export function AdvanceStageDialog({
 
           {/* Blocked reasons */}
           {isBlocked && transition.blockedReasons.length > 0 && (
-            <div className="rounded-md bg-red-50 border border-red-200 px-3 py-2">
+            <div className="rounded-md bg-red-950/30 border border-red-500/20 px-3 py-2">
               <div className="flex items-center gap-2 mb-1">
                 <ShieldAlert className="h-4 w-4 text-red-500" />
-                <span className="text-sm font-medium text-red-700">Cannot advance</span>
+                <span className="text-sm font-medium text-red-400">Cannot advance</span>
               </div>
               <ul className="space-y-0.5 ml-6">
                 {transition.blockedReasons.map((reason, idx) => (

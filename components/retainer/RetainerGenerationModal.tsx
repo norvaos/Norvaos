@@ -183,8 +183,8 @@ function GateCheckStep({
             className={cn(
               'flex items-start gap-3 rounded-md border p-3',
               gate.passed
-                ? 'border-green-200 bg-green-50'
-                : 'border-red-200 bg-red-50',
+                ? 'border-emerald-500/20 bg-emerald-950/30'
+                : 'border-red-500/20 bg-red-950/30',
             )}
           >
             {gate.passed ? (
@@ -193,12 +193,12 @@ function GateCheckStep({
               <XCircle className="h-4 w-4 text-red-600 mt-0.5 shrink-0" />
             )}
             <div className="space-y-0.5">
-              <p className={cn('text-xs font-medium', gate.passed ? 'text-green-800' : 'text-red-800')}>
+              <p className={cn('text-xs font-medium', gate.passed ? 'text-emerald-400' : 'text-red-400')}>
                 {gate.name}
               </p>
               {!gate.passed && gate.error && (
                 <>
-                  <p className="text-xs text-red-700">{gate.error.message}</p>
+                  <p className="text-xs text-red-400">{gate.error.message}</p>
                   <p className="text-xs text-red-600 font-medium">{gate.error.action}</p>
                 </>
               )}
@@ -1033,7 +1033,7 @@ function Step4ClientDetails({
             )}
           </div>
         ) : (
-          <div className="flex items-center gap-2 text-xs text-amber-700">
+          <div className="flex items-center gap-2 text-xs text-amber-400">
             <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
             No client contact found on this matter. Retainer will be generated without client details.
           </div>

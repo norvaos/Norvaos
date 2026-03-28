@@ -29,10 +29,10 @@ import { cn } from '@/lib/utils'
 const STATUS_TYPE_CONFIG: Record<string, { label: string; color: string; bg: string; border: string }> = {
   work_permit:  { label: 'Work Permit',  color: 'text-blue-400',   bg: 'bg-blue-950/30',   border: 'border-blue-500/20' },
   study_permit: { label: 'Study Permit', color: 'text-indigo-700', bg: 'bg-indigo-50', border: 'border-indigo-200' },
-  pr:           { label: 'PR Card',      color: 'text-emerald-400',  bg: 'bg-emerald-950/30',  border: 'border-green-200' },
+  pr:           { label: 'PR Card',      color: 'text-emerald-400',  bg: 'bg-emerald-950/30',  border: 'border-emerald-500/20' },
   citizenship:  { label: 'Citizenship',  color: 'text-emerald-400',bg: 'bg-emerald-950/30',border: 'border-emerald-500/20' },
-  visa:         { label: 'Visa',         color: 'text-purple-400', bg: 'bg-purple-950/30', border: 'border-purple-200' },
-  passport:     { label: 'Passport',     color: 'text-amber-400',  bg: 'bg-amber-950/30',  border: 'border-amber-200' },
+  visa:         { label: 'Visa',         color: 'text-purple-400', bg: 'bg-purple-950/30', border: 'border-purple-500/20' },
+  passport:     { label: 'Passport',     color: 'text-amber-400',  bg: 'bg-amber-950/30',  border: 'border-amber-500/20' },
 }
 
 function getStatusConfig(type: string) {
@@ -41,7 +41,7 @@ function getStatusConfig(type: string) {
 
 function getUrgencyBadge(days: number) {
   if (days <= 30) return { label: `${days}d`, variant: 'destructive' as const, cls: '' }
-  if (days <= 90) return { label: `${days}d`, variant: 'outline' as const, cls: 'text-amber-400 border-amber-300' }
+  if (days <= 90) return { label: `${days}d`, variant: 'outline' as const, cls: 'text-amber-400 border-amber-500/30' }
   if (days <= 365) return { label: `${Math.ceil(days / 30)}mo`, variant: 'outline' as const, cls: 'text-blue-400 border-blue-500/20' }
   return { label: `${Math.round(days / 365)}yr`, variant: 'outline' as const, cls: 'text-slate-500 border-slate-200' }
 }
@@ -247,7 +247,7 @@ export default function GuardianDashboardPage() {
             <p className="text-2xl font-bold tabular-nums">{totalTracked}</p>
           </CardContent>
         </Card>
-        <Card className={expiring30 > 0 ? 'border-red-200' : undefined}>
+        <Card className={expiring30 > 0 ? 'border-red-500/20' : undefined}>
           <CardContent className="p-4">
             <p className="text-xs text-muted-foreground flex items-center gap-1">
               <AlertTriangle className="h-3 w-3 text-red-500" />
@@ -258,7 +258,7 @@ export default function GuardianDashboardPage() {
             </p>
           </CardContent>
         </Card>
-        <Card className={expiring90 > 0 ? 'border-amber-200' : undefined}>
+        <Card className={expiring90 > 0 ? 'border-amber-500/20' : undefined}>
           <CardContent className="p-4">
             <p className="text-xs text-muted-foreground flex items-center gap-1">
               <Clock className="h-3 w-3 text-amber-500" />

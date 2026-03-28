@@ -79,7 +79,7 @@ export default function SignupPage() {
     return (
       <Card>
         <CardContent className="py-12 text-center">
-          <div className="mx-auto mb-4 flex size-16 items-center justify-center rounded-full bg-emerald-100">
+          <div className="mx-auto mb-4 flex size-16 items-center justify-center rounded-full bg-emerald-950/40">
             <CheckCircle2 className="size-8 text-emerald-600" />
           </div>
           <h2 className="text-xl font-semibold text-foreground">Account Created</h2>

@@ -992,7 +992,7 @@ export function ConsultationOutcomePanel() {
         </div>
 
         {Object.keys(summary.currentStatus).length > 0 && (
-          <div className="bg-blue-50 rounded-lg p-3 space-y-1.5">
+          <div className="bg-blue-950/30 rounded-lg p-3 space-y-1.5">
             <p className="text-xs font-medium text-blue-600 uppercase tracking-wide">
               Current Status
             </p>
@@ -1043,10 +1043,10 @@ export function ConsultationOutcomePanel() {
                 variant="secondary"
                 className={cn('text-[10px] h-5', {
                   'bg-slate-100 text-slate-600': retainerState === 'draft' || retainerState === 'saved',
-                  'bg-blue-100 text-blue-700': retainerState === 'sent' || retainerState === 'viewed',
-                  'bg-amber-100 text-amber-700': retainerState === 'signed',
-                  'bg-orange-100 text-orange-700': retainerState === 'partial',
-                  'bg-green-100 text-green-700': retainerState === 'paid',
+                  'bg-blue-950/40 text-blue-400': retainerState === 'sent' || retainerState === 'viewed',
+                  'bg-amber-950/40 text-amber-400': retainerState === 'signed',
+                  'bg-orange-950/40 text-orange-400': retainerState === 'partial',
+                  'bg-emerald-950/40 text-emerald-400': retainerState === 'paid',
                 })}
               >
                 {retainerState === 'draft' && 'Draft'}
@@ -1099,7 +1099,7 @@ export function ConsultationOutcomePanel() {
                   </p>
                   <p className="text-xs font-medium text-slate-800">
                     {retainerState === 'partial' && paymentBalance ? (
-                      <span className="text-orange-700">
+                      <span className="text-orange-400">
                         ${(paymentBalance.balance / 100).toLocaleString('en-CA', { minimumFractionDigits: 2 })} remaining
                       </span>
                     ) : (
@@ -1157,7 +1157,7 @@ export function ConsultationOutcomePanel() {
                         <Button
                           size="sm"
                           variant="outline"
-                          className="h-7 text-xs gap-1.5 text-green-700 border-green-200 hover:bg-green-50"
+                          className="h-7 text-xs gap-1.5 text-emerald-400 border-emerald-500/20 hover:bg-emerald-950/30"
                           onClick={() => setPaperSignDialogOpen(true)}
                           disabled={isUploadingSigned}
                         >
@@ -1231,7 +1231,7 @@ export function ConsultationOutcomePanel() {
                         <Button
                           size="sm"
                           variant="outline"
-                          className="h-7 text-xs gap-1.5 text-green-700 border-green-200 hover:bg-green-50"
+                          className="h-7 text-xs gap-1.5 text-emerald-400 border-emerald-500/20 hover:bg-emerald-950/30"
                           onClick={() => setPaperSignDialogOpen(true)}
                           disabled={isUploadingSigned}
                         >
@@ -1367,7 +1367,7 @@ export function ConsultationOutcomePanel() {
                             <Button
                               size="sm"
                               variant="outline"
-                              className="h-7 text-xs gap-1.5 text-green-700 border-green-200 hover:bg-green-50"
+                              className="h-7 text-xs gap-1.5 text-emerald-400 border-emerald-500/20 hover:bg-emerald-950/30"
                               onClick={() => setPaperSignDialogOpen(true)}
                               disabled={isUploadingSigned}
                             >
@@ -1424,7 +1424,7 @@ export function ConsultationOutcomePanel() {
                 {/* PAID  -  fully retained */}
                 {retainerState === 'paid' && (
                   <>
-                    <Badge className="bg-green-100 text-green-700 text-xs gap-1 h-7 px-2.5">
+                    <Badge className="bg-emerald-950/40 text-emerald-400 text-xs gap-1 h-7 px-2.5">
                       <CheckCircle2 className="h-3 w-3" /> Fully Retained
                     </Badge>
                     <Tooltip>
@@ -1453,7 +1453,7 @@ export function ConsultationOutcomePanel() {
                             <Button
                               size="sm"
                               variant="outline"
-                              className="h-7 text-xs gap-1.5 text-green-700 border-green-200 hover:bg-green-50"
+                              className="h-7 text-xs gap-1.5 text-emerald-400 border-emerald-500/20 hover:bg-emerald-950/30"
                               onClick={() => setPaperSignDialogOpen(true)}
                               disabled={isUploadingSigned}
                             >
@@ -1487,7 +1487,7 @@ export function ConsultationOutcomePanel() {
                       <Button
                         size="sm"
                         variant="ghost"
-                        className="h-7 text-xs gap-1.5 text-red-600 hover:text-red-700 hover:bg-red-50"
+                        className="h-7 text-xs gap-1.5 text-red-600 hover:text-red-400 hover:bg-red-950/30"
                         onClick={cancelRetainer}
                         disabled={isCancelling}
                       >
@@ -1521,11 +1521,11 @@ export function ConsultationOutcomePanel() {
 
             {/* ── E-Sign dialog (inline) ──────────────────────────── */}
             {esignDialogOpen && (
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 space-y-2">
-                <p className="text-xs font-semibold text-blue-800">Send Retainer for E-Signature</p>
+              <div className="bg-blue-950/30 border border-blue-500/20 rounded-lg p-3 space-y-2">
+                <p className="text-xs font-semibold text-blue-400">Send Retainer for E-Signature</p>
                 <div className="grid grid-cols-2 gap-2">
                   <div className="space-y-1">
-                    <Label className="text-[11px] text-blue-700">Signer Name *</Label>
+                    <Label className="text-[11px] text-blue-400">Signer Name *</Label>
                     <Input
                       value={esignSignerName}
                       onChange={(e) => setEsignSignerName(e.target.value)}
@@ -1534,7 +1534,7 @@ export function ConsultationOutcomePanel() {
                     />
                   </div>
                   <div className="space-y-1">
-                    <Label className="text-[11px] text-blue-700">Signer Email *</Label>
+                    <Label className="text-[11px] text-blue-400">Signer Email *</Label>
                     <Input
                       value={esignSignerEmail}
                       onChange={(e) => setEsignSignerEmail(e.target.value)}
@@ -1563,14 +1563,14 @@ export function ConsultationOutcomePanel() {
 
             {/* ── Paper Sign Verification Dialog ─────────────────── */}
             {paperSignDialogOpen && (
-              <div className="bg-green-50 border border-green-200 rounded-lg p-3 space-y-3">
-                <p className="text-xs font-semibold text-green-800">Verify & Upload Signed Retainer</p>
-                <p className="text-[11px] text-green-700">
+              <div className="bg-emerald-950/30 border border-emerald-500/20 rounded-lg p-3 space-y-3">
+                <p className="text-xs font-semibold text-emerald-400">Verify & Upload Signed Retainer</p>
+                <p className="text-[11px] text-emerald-400">
                   Enter the verification code printed on the retainer document footer, then upload the scanned signed copy.
                 </p>
                 <div className="space-y-2">
                   <div className="space-y-1">
-                    <Label className="text-[11px] text-green-700">Verification Code *</Label>
+                    <Label className="text-[11px] text-emerald-400">Verification Code *</Label>
                     <Input
                       placeholder="RET-XXXX-XXXX"
                       value={verificationCode}
@@ -1579,12 +1579,12 @@ export function ConsultationOutcomePanel() {
                     />
                   </div>
                   <div className="space-y-1">
-                    <Label className="text-[11px] text-green-700">Signed Document (optional)</Label>
+                    <Label className="text-[11px] text-emerald-400">Signed Document (optional)</Label>
                     <input
                       ref={fileInputRef}
                       type="file"
                       accept=".pdf,.jpg,.jpeg,.png"
-                      className="text-xs file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-green-100 file:text-green-700 hover:file:bg-green-200"
+                      className="text-xs file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-emerald-950/40 file:text-emerald-400 hover:file:bg-green-200"
                       onChange={(e) => {
                         const file = e.target.files?.[0]
                         if (file) setSelectedSignedFile(file)
@@ -1615,11 +1615,11 @@ export function ConsultationOutcomePanel() {
 
             {/* ── Payment dialog (inline) ──────────────────────────── */}
             {paymentDialogOpen && (
-              <div className="bg-green-50 border border-green-200 rounded-lg p-3 space-y-2">
-                <p className="text-xs font-semibold text-green-800">Record Payment</p>
+              <div className="bg-emerald-950/30 border border-emerald-500/20 rounded-lg p-3 space-y-2">
+                <p className="text-xs font-semibold text-emerald-400">Record Payment</p>
                 <div className="grid grid-cols-3 gap-2">
                   <div className="space-y-1">
-                    <Label className="text-[11px] text-green-700">Method *</Label>
+                    <Label className="text-[11px] text-emerald-400">Method *</Label>
                     <Select value={paymentMethod} onValueChange={setPaymentMethod}>
                       <SelectTrigger className="h-8 text-xs bg-white">
                         <SelectValue />
@@ -1634,7 +1634,7 @@ export function ConsultationOutcomePanel() {
                     </Select>
                   </div>
                   <div className="space-y-1">
-                    <Label className="text-[11px] text-green-700">Amount ($) *</Label>
+                    <Label className="text-[11px] text-emerald-400">Amount ($) *</Label>
                     <Input
                       value={paymentAmount}
                       onChange={(e) => setPaymentAmount(e.target.value)}
@@ -1645,7 +1645,7 @@ export function ConsultationOutcomePanel() {
                     />
                   </div>
                   <div className="space-y-1">
-                    <Label className="text-[11px] text-green-700">Reference</Label>
+                    <Label className="text-[11px] text-emerald-400">Reference</Label>
                     <Input
                       value={paymentRef}
                       onChange={(e) => setPaymentRef(e.target.value)}
@@ -1737,11 +1737,11 @@ export function ConsultationOutcomePanel() {
                           ? conversionBlockedReasons
                           : conversionBlockedMessage.split('\n').filter(Boolean)
                         ).map((reason, i) => (
-                          <div key={i} className="flex items-start gap-2.5 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2.5">
-                            <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-amber-200 text-amber-800 text-xs font-bold">
+                          <div key={i} className="flex items-start gap-2.5 bg-amber-950/30 border border-amber-500/20 rounded-lg px-3 py-2.5">
+                            <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-amber-200 text-amber-400 text-xs font-bold">
                               {i + 1}
                             </span>
-                            <p className="text-amber-800 text-xs leading-relaxed">{reason}</p>
+                            <p className="text-amber-400 text-xs leading-relaxed">{reason}</p>
                           </div>
                         ))}
                       </div>
@@ -1853,7 +1853,7 @@ export function ConsultationOutcomePanel() {
           <>
             {/* Practice area required warning */}
             {!lead?.practice_area_id && (
-              <div className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded p-2 flex items-center gap-1.5">
+              <div className="text-xs text-amber-400 bg-amber-950/30 border border-amber-500/20 rounded p-2 flex items-center gap-1.5">
                 <AlertTriangle className="h-3.5 w-3.5 text-amber-500 shrink-0" />
                 Please select a <strong>Practice Area</strong> in the Core Data card above before sending the retainer.
               </div>
@@ -1861,7 +1861,7 @@ export function ConsultationOutcomePanel() {
 
             {/* Pre-filled from Core Data notice */}
             {lead?.matter_type_id && (
-              <div className="text-xs text-green-700 bg-green-50 border border-green-200 rounded p-2 flex items-center gap-1.5">
+              <div className="text-xs text-emerald-400 bg-emerald-950/30 border border-emerald-500/20 rounded p-2 flex items-center gap-1.5">
                 <CheckCircle2 className="h-3.5 w-3.5 text-green-500 shrink-0" />
                 Matter type and person scope pre-filled from Core Data. You can override below if needed.
               </div>
@@ -1984,7 +1984,7 @@ export function ConsultationOutcomePanel() {
 
             {/* Missing Core Data warning */}
             {!lead?.matter_type_id && (
-              <div className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded p-2 flex items-center gap-1.5">
+              <div className="text-xs text-amber-400 bg-amber-950/30 border border-amber-500/20 rounded p-2 flex items-center gap-1.5">
                 <AlertTriangle className="h-3.5 w-3.5 text-amber-500 shrink-0" />
                 Tip: Set the matter type in Core Data below so it auto-fills here next time.
               </div>
@@ -2198,14 +2198,14 @@ export function ConsultationOutcomePanel() {
 
         {/* ── NO SHOW  -  confirmation only ────────────────────── */}
         {selectedOutcome === 'no_show' && (
-          <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-sm text-amber-800">
+          <div className="bg-amber-950/30 border border-amber-500/20 rounded-lg p-3 text-sm text-amber-400">
             <div className="flex items-start gap-2">
               <UserX className="h-4 w-4 mt-0.5 shrink-0" />
               <div>
                 <p className="font-medium">
                   Mark {contact?.first_name ?? 'this lead'} as No-Show?
                 </p>
-                <p className="text-xs mt-1 text-amber-700">
+                <p className="text-xs mt-1 text-amber-400">
                   A high-priority follow-up task will be created for tomorrow.
                   The lead will remain at its current pipeline stage.
                 </p>
@@ -2279,8 +2279,8 @@ export function ConsultationOutcomePanel() {
           : billingType === 'hourly' ? 'hourly billing' : billingType === 'contingency' ? 'contingency basis' : 'retainer-based billing'
 
         return (
-          <div className="rounded-lg border border-emerald-200 bg-emerald-50/70 p-3 space-y-2">
-            <p className="text-[11px] font-semibold text-emerald-800 uppercase tracking-wide">
+          <div className="rounded-lg border border-emerald-500/20 bg-emerald-950/30/70 p-3 space-y-2">
+            <p className="text-[11px] font-semibold text-emerald-400 uppercase tracking-wide">
               ✓ Consultation Summary  -  Ready to Send
             </p>
             <ul className="space-y-1">
@@ -2291,7 +2291,7 @@ export function ConsultationOutcomePanel() {
                 'Client has been informed of the process, timeline, and next steps',
                 'Retainer agreement will be sent for review and signature',
               ].map((line, i) => (
-                <li key={i} className="flex items-start gap-1.5 text-[11px] text-emerald-800">
+                <li key={i} className="flex items-start gap-1.5 text-[11px] text-emerald-400">
                   <span className="text-emerald-500 mt-0.5 shrink-0">✓</span>
                   {line}
                 </li>

@@ -307,7 +307,7 @@ export function CoreDataCardTab({ matterId, tenantId, fieldConfig }: CoreDataCar
                             )}
                             <button
                               type="button"
-                              className="ml-auto flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 hover:underline"
+                              className="ml-auto flex items-center gap-1 text-xs text-blue-600 hover:text-blue-400 hover:underline"
                               onClick={() => setStreamEditUnlocked(true)}
                             >
                               <Pencil className="size-3" />
@@ -322,7 +322,7 @@ export function CoreDataCardTab({ matterId, tenantId, fieldConfig }: CoreDataCar
                     return (
                       <div className="space-y-1">
                         {streamEditUnlocked && (
-                          <div className="flex items-center gap-1.5 rounded-md border border-amber-200 bg-amber-50 px-2.5 py-1.5 text-[11px] text-amber-700">
+                          <div className="flex items-center gap-1.5 rounded-md border border-amber-500/20 bg-amber-950/30 px-2.5 py-1.5 text-[11px] text-amber-400">
                             <AlertTriangle className="size-3 shrink-0" />
                             Changing the processing stream will update document slots and questionnaire sections.
                           </div>
@@ -612,8 +612,8 @@ export function CoreDataCardTab({ matterId, tenantId, fieldConfig }: CoreDataCar
                       className={cn(
                         'flex items-start gap-2 rounded-md px-3 py-2 text-sm',
                         flag.severity === 'hard_stop'
-                          ? 'bg-red-50 text-red-700 border border-red-200'
-                          : 'bg-amber-50 text-amber-700 border border-amber-200'
+                          ? 'bg-red-950/30 text-red-400 border border-red-500/20'
+                          : 'bg-amber-950/30 text-amber-400 border border-amber-500/20'
                       )}
                     >
                       {flag.severity === 'hard_stop' ? (

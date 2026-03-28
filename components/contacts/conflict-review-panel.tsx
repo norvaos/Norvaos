@@ -208,7 +208,7 @@ function ConflictScoreGauge({ score }: { score: number }) {
     score >= 50
       ? 'text-red-600 border-red-500/20 bg-red-950/30'
       : score >= 25
-        ? 'text-amber-600 border-amber-200 bg-amber-950/30'
+        ? 'text-amber-600 border-amber-500/20 bg-amber-950/30'
         : 'text-emerald-600 border-emerald-500/20 bg-emerald-950/30'
 
   const icon =
@@ -252,7 +252,7 @@ export function ConflictStatusBadge({ status, className }: { status: string; cla
     },
     review_suggested: {
       label: 'Review Suggested',
-      variant: 'bg-amber-950/30 text-amber-400 border-amber-200',
+      variant: 'bg-amber-950/30 text-amber-400 border-amber-500/20',
       icon: <AlertTriangle className="size-3" />,
     },
     review_required: {
@@ -272,7 +272,7 @@ export function ConflictStatusBadge({ status, className }: { status: string; cla
     },
     waiver_required: {
       label: 'Waiver Required',
-      variant: 'bg-orange-950/30 text-orange-400 border-orange-200',
+      variant: 'bg-orange-950/30 text-orange-400 border-orange-500/20',
       icon: <AlertTriangle className="size-3" />,
     },
     waiver_obtained: {
@@ -336,9 +336,9 @@ function MatchCard({ match }: { match: ConflictMatch }) {
   const categoryColors: Record<string, string> = {
     possible_duplicate: 'bg-blue-950/30 text-blue-400 border-blue-500/20',
     adverse_party: 'bg-red-950/30 text-red-400 border-red-500/20',
-    same_household: 'bg-purple-950/30 text-purple-400 border-purple-200',
+    same_household: 'bg-purple-950/30 text-purple-400 border-purple-500/20',
     related_corporate: 'bg-indigo-50 text-indigo-700 border-indigo-200',
-    former_client: 'bg-amber-950/30 text-amber-400 border-amber-200',
+    former_client: 'bg-amber-950/30 text-amber-400 border-amber-500/20',
     shared_payor: 'bg-teal-50 text-teal-700 border-teal-200',
     opposing_party: 'bg-red-950/30 text-red-400 border-red-500/20',
   }

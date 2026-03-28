@@ -11137,33 +11137,6 @@ export type Database = {
           },
         ]
       }
-      lead_sources: {
-        Row: {
-          id: string
-          tenant_id: string
-          name: string
-          sort_order: number
-          is_active: boolean
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          tenant_id: string
-          name: string
-          sort_order?: number
-          is_active?: boolean
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          tenant_id?: string
-          name?: string
-          sort_order?: number
-          is_active?: boolean
-          created_at?: string
-        }
-        Relationships: []
-      }
       leads: {
         Row: {
           assigned_intake_staff_id: string | null

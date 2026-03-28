@@ -23,7 +23,7 @@ function IntakeExpired() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4">
       <div className="max-w-md text-center space-y-4">
-        <div className="mx-auto w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center">
+        <div className="mx-auto w-12 h-12 rounded-full bg-amber-950/40 flex items-center justify-center">
           <svg className="w-6 h-6 text-amber-600" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
           </svg>
@@ -41,7 +41,7 @@ function IntakeClosed() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4">
       <div className="max-w-md text-center space-y-4">
-        <div className="mx-auto w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
+        <div className="mx-auto w-12 h-12 rounded-full bg-emerald-950/40 flex items-center justify-center">
           <svg className="w-6 h-6 text-green-600" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
           </svg>

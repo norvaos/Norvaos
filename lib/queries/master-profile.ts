@@ -486,10 +486,10 @@ export function isGatePassed(gate: GateState): boolean {
 export function getGateBorderClass(status: GateStatus): string {
   switch (status) {
     case 'locked': return 'border-slate-200 bg-slate-50/50'
-    case 'active': return 'border-blue-300 bg-white'
-    case 'passed': return 'border-emerald-300 bg-emerald-50/30'
-    case 'overridden': return 'border-amber-300 bg-amber-50/30'
-    case 'blocked': return 'border-red-300 bg-red-50/30'
+    case 'active': return 'border-blue-500/30 bg-white'
+    case 'passed': return 'border-emerald-500/30 bg-emerald-950/30/30'
+    case 'overridden': return 'border-amber-500/30 bg-amber-950/30/30'
+    case 'blocked': return 'border-red-500/30 bg-red-950/30/30'
     default: return 'border-slate-200'
   }
 }

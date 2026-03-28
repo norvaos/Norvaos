@@ -269,7 +269,7 @@ export function IntakeClient({
             {saveStatus === 'saved' && (
               <Badge
                 variant="outline"
-                className="gap-1.5 text-xs border-green-300 text-green-700 bg-green-50"
+                className="gap-1.5 text-xs border-emerald-500/30 text-emerald-400 bg-emerald-950/30"
               >
                 <CheckCircle2 className="h-3 w-3" />
                 {lastSavedAt ? t('intake.draft_saved_at').replace('{{time}}', lastSavedAt) : t('intake.draft_saved')}
@@ -297,8 +297,8 @@ export function IntakeClient({
       {/* ── Welcome / Instructions ──────────────────────────────────────── */}
       <div className="mx-auto max-w-3xl px-4 py-6">
         {branding.welcomeMessage && (
-          <div className="mb-4 rounded-lg border border-blue-200 bg-blue-50 p-4">
-            <p className="text-sm text-blue-800">{branding.welcomeMessage}</p>
+          <div className="mb-4 rounded-lg border border-blue-500/20 bg-blue-950/30 p-4">
+            <p className="text-sm text-blue-400">{branding.welcomeMessage}</p>
           </div>
         )}
 
@@ -341,7 +341,7 @@ export function IntakeClient({
                   <div className="flex items-center gap-3 w-full">
                     <div className={cn(
                       'h-8 w-8 rounded-full flex items-center justify-center shrink-0',
-                      isComplete ? 'bg-green-100 text-green-600' : 'bg-slate-100 text-slate-400',
+                      isComplete ? 'bg-emerald-950/40 text-green-600' : 'bg-slate-100 text-slate-400',
                     )}>
                       {isComplete ? (
                         <CheckCircle2 className="h-4 w-4" />
@@ -366,7 +366,7 @@ export function IntakeClient({
                     {isComplete && (
                       <Badge
                         variant="outline"
-                        className="text-xs border-green-300 text-green-700 bg-green-50"
+                        className="text-xs border-emerald-500/30 text-emerald-400 bg-emerald-950/30"
                       >
                         {t('intake.ready')}
                       </Badge>
@@ -383,10 +383,10 @@ export function IntakeClient({
                   <div className="border-t pt-3">
                     {/* Scan-to-Autofill banner */}
                     {scanFieldCount > 0 && (
-                      <div className="mb-3 rounded-lg border border-emerald-200 bg-emerald-50 p-3 flex items-start gap-2">
+                      <div className="mb-3 rounded-lg border border-emerald-500/20 bg-emerald-950/30 p-3 flex items-start gap-2">
                         <ScanSearch className="h-4 w-4 text-emerald-600 mt-0.5 shrink-0" />
                         <div>
-                          <p className="text-xs font-medium text-emerald-800">
+                          <p className="text-xs font-medium text-emerald-400">
                             {t('intake.scan_autofill').replace('{{count}}', String(scanFieldCount))}
                           </p>
                           <p className="text-[10px] text-emerald-600 mt-0.5">

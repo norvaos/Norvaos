@@ -214,9 +214,9 @@ export function MatterCommandCenter({
 
               <TabsContent value="documents" className="space-y-4">
                 {enforcementEnabled && intake?.intake_status === 'incomplete' ? (
-                  <div className="flex flex-col items-center justify-center py-12 text-center rounded-lg border border-dashed border-amber-300 bg-amber-50/50">
+                  <div className="flex flex-col items-center justify-center py-12 text-center rounded-lg border border-dashed border-amber-500/30 bg-amber-950/30/50">
                     <Shield className="size-8 text-amber-400 mb-3" />
-                    <h3 className="text-sm font-medium text-amber-700">Documents Locked</h3>
+                    <h3 className="text-sm font-medium text-amber-400">Documents Locked</h3>
                     <p className="text-sm text-amber-600 mt-1 max-w-md">
                       Complete the Core Data Card before uploading documents.
                     </p>

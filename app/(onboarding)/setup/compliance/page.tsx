@@ -75,12 +75,12 @@ function SuccessState({ body, tax }: { body: RegulatoryBodyDef; tax: { rate: num
   return (
     <div className="w-full max-w-xl space-y-8 text-center">
       {/* Animated success icon */}
-      <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-emerald-100 animate-in zoom-in-50 duration-500">
+      <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-emerald-950/40 animate-in zoom-in-50 duration-500">
         <CheckCircle2 className="h-10 w-10 text-emerald-600" />
       </div>
 
       <div className="space-y-2 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-200">
-        <h1 className="text-3xl font-bold tracking-tight text-emerald-800">
+        <h1 className="text-3xl font-bold tracking-tight text-emerald-400">
           System Ready
         </h1>
         <p className="text-lg text-muted-foreground">
@@ -88,8 +88,8 @@ function SuccessState({ body, tax }: { body: RegulatoryBodyDef; tax: { rate: num
         </p>
       </div>
 
-      <div className="mx-auto max-w-sm rounded-lg border border-emerald-200 bg-emerald-50/80 p-4 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-300">
-        <div className="flex items-center justify-center gap-2 text-sm font-semibold text-emerald-800">
+      <div className="mx-auto max-w-sm rounded-lg border border-emerald-500/20 bg-emerald-950/30/80 p-4 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-300">
+        <div className="flex items-center justify-center gap-2 text-sm font-semibold text-emerald-400">
           <ShieldCheck className="h-5 w-5" />
           {body.name}  -  Compliance Active
         </div>
@@ -230,13 +230,13 @@ export default function ComplianceSetupPage() {
         {/* Resolved Badge + Tax Preview */}
         {resolved && (
           <div className="space-y-3 animate-in fade-in slide-in-from-bottom-2 duration-300">
-            <div className="flex items-start gap-3 rounded-lg border border-emerald-200 bg-emerald-50/80 px-4 py-4">
+            <div className="flex items-start gap-3 rounded-lg border border-emerald-500/20 bg-emerald-950/30/80 px-4 py-4">
               <ShieldCheck className="h-6 w-6 text-emerald-600 shrink-0 mt-0.5" />
               <div className="space-y-1 flex-1">
-                <p className="text-sm font-bold text-emerald-800">
+                <p className="text-sm font-bold text-emerald-400">
                   {resolved.name} ({resolved.abbr})
                 </p>
-                <p className="text-xs text-emerald-700 leading-relaxed">
+                <p className="text-xs text-emerald-400 leading-relaxed">
                   {resolved.scope === 'federal'
                     ? 'Federal regulatory body  -  applies across all provinces'
                     : resolved.description}
@@ -245,9 +245,9 @@ export default function ComplianceSetupPage() {
             </div>
 
             {/* Tax auto-detection */}
-            <div className="flex items-center gap-2 rounded-md border bg-blue-50 border-blue-200 px-3 py-2.5">
+            <div className="flex items-center gap-2 rounded-md border bg-blue-950/30 border-blue-500/20 px-3 py-2.5">
               <Sparkles className="h-4 w-4 text-blue-600 shrink-0" />
-              <p className="text-xs text-blue-800">
+              <p className="text-xs text-blue-400">
                 <strong>Tax Engine:</strong> Automatically set to{' '}
                 <span className="font-bold">{tax.rate}% {tax.type}</span>{' '}
                 based on your selection.

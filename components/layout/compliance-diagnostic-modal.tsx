@@ -462,7 +462,7 @@ export function ComplianceDiagnosticModal({
               <div className="flex items-start gap-2 rounded-lg border border-red-500/20 bg-red-950/30 p-3">
                 <AlertTriangle className="size-4 text-red-600 shrink-0 mt-0.5" />
                 <div className="space-y-1.5">
-                  <p className="text-xs font-semibold text-red-800">
+                  <p className="text-xs font-semibold text-red-400">
                     Regulatory Bypass Warning
                   </p>
                   <p className="text-[10px] text-red-400 leading-relaxed">

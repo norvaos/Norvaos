@@ -29,9 +29,9 @@ import {
 
 function Callout({ type, title, children }: { type: 'tip' | 'warning' | 'info'; title: string; children: React.ReactNode }) {
   const styles = {
-    tip: 'bg-emerald-50 border-emerald-200 text-emerald-800',
-    warning: 'bg-amber-50 border-amber-200 text-amber-800',
-    info: 'bg-blue-50 border-blue-200 text-blue-800',
+    tip: 'bg-emerald-950/30 border-emerald-500/20 text-emerald-400',
+    warning: 'bg-amber-950/30 border-amber-500/20 text-amber-400',
+    info: 'bg-blue-950/30 border-blue-500/20 text-blue-400',
   }
   const icons = {
     tip: <Star className="h-4 w-4 text-emerald-600 shrink-0" />,
@@ -64,11 +64,11 @@ function FieldDoc({ name, required, desc, example, note }: { name: string; requi
     <div className="rounded-lg border border-gray-100 bg-gray-50 p-4">
       <div className="flex items-center gap-2 mb-1">
         <span className="font-semibold text-gray-900 text-sm">{name}</span>
-        {required && <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700">Required</span>}
+        {required && <span className="rounded-full bg-red-950/40 px-2 py-0.5 text-xs font-medium text-red-400">Required</span>}
       </div>
       <p className="text-sm text-gray-600">{desc}</p>
       {example && <p className="mt-1.5 text-xs text-indigo-700 font-mono bg-indigo-50 rounded px-2 py-1">Example: {example}</p>}
-      {note && <p className="mt-1.5 text-xs text-amber-700 flex items-center gap-1"><AlertCircle className="h-3 w-3" />{note}</p>}
+      {note && <p className="mt-1.5 text-xs text-amber-400 flex items-center gap-1"><AlertCircle className="h-3 w-3" />{note}</p>}
     </div>
   )
 }
@@ -125,8 +125,8 @@ function MattersListMockup() {
                 <td className="py-2.5 text-indigo-600 font-medium">{row.num}</td>
                 <td className="py-2.5 text-gray-700">{row.title}</td>
                 <td className="py-2.5 text-gray-500">{row.area}</td>
-                <td className="py-2.5"><MockupBadge color="bg-emerald-50 text-emerald-700" label={row.status} /></td>
-                <td className="py-2.5"><MockupBadge color={row.priority === 'Urgent' ? 'bg-red-50 text-red-700' : 'bg-blue-50 text-blue-700'} label={row.priority} /></td>
+                <td className="py-2.5"><MockupBadge color="bg-emerald-950/30 text-emerald-400" label={row.status} /></td>
+                <td className="py-2.5"><MockupBadge color={row.priority === 'Urgent' ? 'bg-red-950/30 text-red-400' : 'bg-blue-950/30 text-blue-400'} label={row.priority} /></td>
                 <td className="py-2.5 text-gray-600">{row.lawyer}</td>
               </tr>
             ))}
@@ -251,23 +251,23 @@ function MatterWorkspaceMockup() {
           <p className="font-semibold text-gray-900 text-sm">Inaaya Zia  -  Visitor / Work Permit / Entry Matters</p>
           <span className="text-gray-400 text-xs"> -  Inaaya Zia</span>
           <MockupBadge color="bg-gray-100 text-gray-600" label="# 2026-0017" />
-          <MockupBadge color="bg-emerald-50 text-emerald-700" label="Active" />
-          <MockupBadge color="bg-red-50 text-red-700" label="Urgent" />
+          <MockupBadge color="bg-emerald-950/30 text-emerald-400" label="Active" />
+          <MockupBadge color="bg-red-950/30 text-red-400" label="Urgent" />
           <MockupBadge color="bg-indigo-50 text-indigo-700" label="Immigration" />
         </div>
       </div>
       {/* Readiness Bar */}
       <div className="border-b border-gray-100 px-5 py-2.5 flex items-center gap-3 flex-wrap bg-gray-50 text-xs">
-        <MockupBadge color="bg-emerald-100 text-emerald-700" label="Ready for Filing" />
+        <MockupBadge color="bg-emerald-950/40 text-emerald-400" label="Ready for Filing" />
         <div className="flex items-center gap-1.5">
           <span className="text-gray-500">Readiness</span>
           <div className="w-20 h-1.5 rounded-full bg-gray-200"><div className="h-1.5 rounded-full bg-amber-500 w-4/5" /></div>
           <span className="font-semibold text-gray-700">83%</span>
         </div>
-        <div className="flex items-center gap-1"><span className="text-gray-500">Drafting</span><MockupBadge color="bg-emerald-100 text-emerald-600" label="READY" /></div>
-        <div className="flex items-center gap-1"><span className="text-gray-500">Filing</span><MockupBadge color="bg-emerald-100 text-emerald-600" label="READY" /></div>
-        <MockupBadge color="bg-blue-50 text-blue-700" label="Forms 100%" />
-        <MockupBadge color="bg-blue-50 text-blue-700" label="Docs 100%" />
+        <div className="flex items-center gap-1"><span className="text-gray-500">Drafting</span><MockupBadge color="bg-emerald-950/40 text-emerald-600" label="READY" /></div>
+        <div className="flex items-center gap-1"><span className="text-gray-500">Filing</span><MockupBadge color="bg-emerald-950/40 text-emerald-600" label="READY" /></div>
+        <MockupBadge color="bg-blue-950/30 text-blue-400" label="Forms 100%" />
+        <MockupBadge color="bg-blue-950/30 text-blue-400" label="Docs 100%" />
       </div>
       {/* Tabs */}
       <div className="border-b border-gray-100 px-5 flex gap-5 text-xs">
@@ -276,9 +276,9 @@ function MatterWorkspaceMockup() {
         ))}
       </div>
       {/* Next Action Panel */}
-      <div className="mx-5 my-3 rounded-xl bg-emerald-50 border border-emerald-200 px-4 py-3 flex items-center justify-between">
+      <div className="mx-5 my-3 rounded-xl bg-emerald-950/30 border border-emerald-500/20 px-4 py-3 flex items-center justify-between">
         <div>
-          <p className="text-xs font-semibold text-emerald-800 uppercase tracking-wide">Next Action</p>
+          <p className="text-xs font-semibold text-emerald-400 uppercase tracking-wide">Next Action</p>
           <p className="text-sm font-medium text-emerald-900 mt-0.5">All checks passed  -  file the application with IRCC</p>
         </div>
         <button className="rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-semibold text-white whitespace-nowrap">Proceed to IRCC Filing</button>
@@ -287,15 +287,15 @@ function MatterWorkspaceMockup() {
       <div className="px-5 pb-4 space-y-2">
         <div className="flex items-center justify-between rounded-lg border border-gray-100 px-4 py-2.5">
           <div className="flex items-center gap-2"><FileText className="h-3.5 w-3.5 text-gray-400" /><span className="text-xs font-medium text-gray-700">Questions</span><span className="text-xs text-emerald-600">Fields satisfied: 100%</span></div>
-          <MockupBadge color="bg-emerald-100 text-emerald-700" label="Complete" />
+          <MockupBadge color="bg-emerald-950/40 text-emerald-400" label="Complete" />
         </div>
-        <div className="rounded-lg border border-amber-200 bg-amber-50/50 px-4 py-2.5">
-          <div className="flex items-center justify-between mb-2"><div className="flex items-center gap-2"><FolderOpen className="h-3.5 w-3.5 text-amber-500" /><span className="text-xs font-medium text-gray-700">Documents</span><span className="text-xs text-emerald-600">Accepted: 5/5</span></div><MockupBadge color="bg-emerald-100 text-emerald-700" label="Complete" /></div>
+        <div className="rounded-lg border border-amber-500/20 bg-amber-950/30/50 px-4 py-2.5">
+          <div className="flex items-center justify-between mb-2"><div className="flex items-center gap-2"><FolderOpen className="h-3.5 w-3.5 text-amber-500" /><span className="text-xs font-medium text-gray-700">Documents</span><span className="text-xs text-emerald-600">Accepted: 5/5</span></div><MockupBadge color="bg-emerald-950/40 text-emerald-400" label="Complete" /></div>
           <div className="space-y-1.5">
             {['Passport bio page + stamps', 'Digital photos (IRCC specs)', 'Proof of funds', 'Bank statements (3 months)'].map(doc => (
               <div key={doc} className="flex items-center justify-between text-xs text-gray-600">
                 <span>{doc}</span>
-                <MockupBadge color="bg-emerald-100 text-emerald-700" label="✓ Accepted" />
+                <MockupBadge color="bg-emerald-950/40 text-emerald-400" label="✓ Accepted" />
               </div>
             ))}
           </div>
@@ -393,8 +393,8 @@ export default function AddMatterHelpPage() {
             </div>
             <div className="flex gap-3 flex-wrap text-xs">
               <span className="rounded-full bg-gray-100 px-3 py-1 text-gray-600">⏱ 5 min read</span>
-              <span className="rounded-full bg-blue-50 px-3 py-1 text-blue-700">Matters module</span>
-              <span className="rounded-full bg-emerald-50 px-3 py-1 text-emerald-700">All practice areas</span>
+              <span className="rounded-full bg-blue-950/30 px-3 py-1 text-blue-400">Matters module</span>
+              <span className="rounded-full bg-emerald-950/30 px-3 py-1 text-emerald-400">All practice areas</span>
             </div>
           </div>
 
@@ -532,9 +532,9 @@ export default function AddMatterHelpPage() {
                 />
               </div>
 
-              <div className="rounded-xl bg-blue-50 border border-blue-100 p-4">
-                <p className="text-sm font-semibold text-blue-800 mb-2">Why Practice Area and Matter Type matter</p>
-                <div className="space-y-1.5 text-xs text-blue-700">
+              <div className="rounded-xl bg-blue-950/30 border border-blue-100 p-4">
+                <p className="text-sm font-semibold text-blue-400 mb-2">Why Practice Area and Matter Type matter</p>
+                <div className="space-y-1.5 text-xs text-blue-400">
                   {[
                     'Immigration matters get the full immigration workspace  -  readiness matrix, IRCC questionnaire, form generation',
                     'Non-immigration matters use the standard tab layout  -  tasks, docs, billing, notes',
@@ -643,9 +643,9 @@ export default function AddMatterHelpPage() {
                 <div className="grid grid-cols-4 gap-2">
                   {[
                     { label: 'Low', color: 'bg-gray-100 text-gray-600', desc: 'No immediate pressure' },
-                    { label: 'Medium', color: 'bg-blue-50 text-blue-700', desc: 'Normal workload' },
-                    { label: 'High', color: 'bg-orange-50 text-orange-700', desc: 'Needs attention soon' },
-                    { label: 'Urgent', color: 'bg-red-50 text-red-700', desc: 'Deadline imminent' },
+                    { label: 'Medium', color: 'bg-blue-950/30 text-blue-400', desc: 'Normal workload' },
+                    { label: 'High', color: 'bg-orange-950/30 text-orange-400', desc: 'Needs attention soon' },
+                    { label: 'Urgent', color: 'bg-red-950/30 text-red-400', desc: 'Deadline imminent' },
                   ].map(({ label, color, desc }) => (
                     <div key={label} className="rounded-lg border border-gray-100 p-2 text-center">
                       <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${color}`}>{label}</span>
@@ -823,13 +823,13 @@ export default function AddMatterHelpPage() {
                     n: 1, title: 'Fill in the Onboarding tab',
                     desc: 'Go to Onboarding → fill in the intake questions, check for risk flags, and add any initial notes. This takes 2–5 minutes and ensures nothing is missed from the first client meeting.',
                     tag: 'Do this first',
-                    tagColor: 'bg-red-50 text-red-700',
+                    tagColor: 'bg-red-950/30 text-red-400',
                   },
                   {
                     n: 2, title: 'Add all relevant contacts',
                     desc: 'Click the Contacts tab → add spouse, dependants, sponsor, or any other person relevant to the case. For immigration, each person gets their own document slots and questionnaire section.',
                     tag: 'If applicable',
-                    tagColor: 'bg-blue-50 text-blue-700',
+                    tagColor: 'bg-blue-950/30 text-blue-400',
                   },
                   {
                     n: 3, title: 'Complete the IRCC Intake questionnaire (immigration only)',
@@ -841,13 +841,13 @@ export default function AddMatterHelpPage() {
                     n: 4, title: 'Request documents from the client',
                     desc: 'Go to the Documents section → for each required document slot, click "Request from Client". The client receives a notification in their portal and can upload directly.',
                     tag: 'Recommended',
-                    tagColor: 'bg-emerald-50 text-emerald-700',
+                    tagColor: 'bg-emerald-950/30 text-emerald-400',
                   },
                   {
                     n: 5, title: 'Create the retainer agreement',
                     desc: 'Go to More → Billing → Create Retainer. Generate the retainer agreement, send for e-signature. Payment can be collected online through the client portal.',
                     tag: 'Required before filing',
-                    tagColor: 'bg-amber-50 text-amber-700',
+                    tagColor: 'bg-amber-950/30 text-amber-400',
                   },
                   {
                     n: 6, title: 'Create initial tasks',
@@ -885,11 +885,11 @@ export default function AddMatterHelpPage() {
                     { tip: 'Set the Next Deadline immediately', detail: 'Even a rough date is better than none. The dashboard deadline widget keeps your whole team aware of upcoming pressure.' },
                     { tip: 'Watch the Next Action panel', detail: 'It\'s the fastest way to know what\'s blocking the file. Check it every time you open a matter.' },
                   ].map(({ tip, detail }) => (
-                    <div key={tip} className="flex gap-2 rounded-lg bg-emerald-50 border border-emerald-100 p-3">
+                    <div key={tip} className="flex gap-2 rounded-lg bg-emerald-950/30 border border-emerald-100 p-3">
                       <CheckCircle className="h-4 w-4 text-emerald-500 shrink-0 mt-0.5" />
                       <div>
                         <p className="text-sm font-semibold text-emerald-900">{tip}</p>
-                        <p className="text-xs text-emerald-700 mt-0.5">{detail}</p>
+                        <p className="text-xs text-emerald-400 mt-0.5">{detail}</p>
                       </div>
                     </div>
                   ))}
@@ -905,11 +905,11 @@ export default function AddMatterHelpPage() {
                     { mistake: 'Leaving the Responsible Lawyer blank', fix: 'The system requires a responsible lawyer. Without one, notifications won\'t be sent and the matter won\'t appear on anyone\'s dashboard.' },
                     { mistake: 'Setting priority to Urgent for all matters', fix: 'If everything is urgent, nothing is urgent. Reserve Urgent for matters with real imminent deadlines. Use High for matters needing attention soon.' },
                   ].map(({ mistake, fix }) => (
-                    <div key={mistake} className="flex gap-2 rounded-lg bg-red-50 border border-red-100 p-3">
+                    <div key={mistake} className="flex gap-2 rounded-lg bg-red-950/30 border border-red-100 p-3">
                       <AlertCircle className="h-4 w-4 text-red-400 shrink-0 mt-0.5" />
                       <div>
                         <p className="text-sm font-semibold text-red-900">{mistake}</p>
-                        <p className="text-xs text-red-700 mt-0.5"><strong>Fix:</strong> {fix}</p>
+                        <p className="text-xs text-red-400 mt-0.5"><strong>Fix:</strong> {fix}</p>
                       </div>
                     </div>
                   ))}

@@ -32,8 +32,8 @@ export function PortalInstructions({
   if (lines.length === 0) return null
 
   return (
-    <div className="rounded-xl border border-blue-100 bg-blue-50/50 p-4">
-      <h3 className="text-xs font-semibold uppercase tracking-wider text-blue-700 mb-2">
+    <div className="rounded-xl border border-blue-100 bg-blue-950/30/50 p-4">
+      <h3 className="text-xs font-semibold uppercase tracking-wider text-blue-400 mb-2">
         {tr.section_instructions ?? tr.instructions_label ?? 'Instructions'}
       </h3>
       <ul className="space-y-1.5">

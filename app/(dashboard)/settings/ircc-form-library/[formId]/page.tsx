@@ -450,7 +450,7 @@ function FieldRow({ field }: { field: IrccFormField }) {
         </TableCell>
         <TableCell className="text-center">
           {field.is_mapped ? (
-            <Badge variant="outline" className="text-[10px] px-1 py-0 h-4 border-green-300 text-emerald-400 bg-emerald-950/30">
+            <Badge variant="outline" className="text-[10px] px-1 py-0 h-4 border-emerald-500/30 text-emerald-400 bg-emerald-950/30">
               mapped
             </Badge>
           ) : (

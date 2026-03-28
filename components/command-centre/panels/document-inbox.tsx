@@ -26,7 +26,7 @@ export function DocumentInbox() {
       </CardHeader>
       <CardContent className="space-y-3">
         {/* Info banner */}
-        <div className="flex items-start gap-2 rounded-md border border-blue-100 bg-blue-50/50 px-3 py-2">
+        <div className="flex items-start gap-2 rounded-md border border-blue-100 bg-blue-950/30/50 px-3 py-2">
           <Info className="mt-0.5 h-3.5 w-3.5 text-blue-400 shrink-0" />
           <p className="text-xs text-blue-600">
             Documents uploaded here are for staff reference only. Slot-based requirements activate after retention.

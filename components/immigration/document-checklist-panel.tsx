@@ -621,7 +621,7 @@ export function DocumentChecklistPanel({
                                   <Asterisk className="h-3 w-3 text-red-500 flex-shrink-0" />
                                 )}
                                 {isCustom && (
-                                  <Badge variant="outline" className="text-[10px] px-1 py-0 border-blue-300 text-blue-600 bg-blue-950/30">
+                                  <Badge variant="outline" className="text-[10px] px-1 py-0 border-blue-500/30 text-blue-600 bg-blue-950/30">
                                     Custom
                                   </Badge>
                                 )}

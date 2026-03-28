@@ -187,7 +187,7 @@ export default function DevGhostReviewPage() {
         </Button>
       </div>
 
-      <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-4 text-xs text-amber-700 dark:text-amber-300 space-y-2">
+      <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-4 text-xs text-amber-400 dark:text-amber-300 space-y-2">
         <p className="font-semibold">Testing Checklist:</p>
         <ul className="space-y-1 list-disc list-inside">
           <li>50/50 split renders evenly on 14-inch screen</li>

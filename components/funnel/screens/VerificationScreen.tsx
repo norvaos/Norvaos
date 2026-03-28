@@ -521,7 +521,7 @@ export default function VerificationScreen() {
           </div>
           <Badge
             variant="outline"
-            className="border-green-300 bg-green-50 text-green-700 dark:border-green-800 dark:bg-green-950/40 dark:text-green-300 gap-1.5"
+            className="border-emerald-500/30 bg-emerald-950/30 text-emerald-400 dark:border-green-800 dark:bg-green-950/40 dark:text-green-300 gap-1.5"
           >
             <Lock className="h-3 w-3" />
             Confirmed
@@ -576,7 +576,7 @@ export default function VerificationScreen() {
             </Badge>
           )}
           {isQuebec && (
-            <Badge variant="secondary" className="border-amber-300 bg-amber-50 text-amber-700">
+            <Badge variant="secondary" className="border-amber-500/30 bg-amber-950/30 text-amber-400">
               Quebec  -  CAQ Required
             </Badge>
           )}
@@ -649,7 +649,7 @@ export default function VerificationScreen() {
               onChange={(e) => setField('passport_number', e.target.value)}
               className={
                 !form.passport_number.trim()
-                  ? 'border-amber-300 focus-visible:ring-amber-400'
+                  ? 'border-amber-500/30 focus-visible:ring-amber-400'
                   : ''
               }
             />
@@ -682,7 +682,7 @@ export default function VerificationScreen() {
             {isInland ? (
               <Badge
                 variant="outline"
-                className="border-blue-300 bg-blue-50 text-blue-700 dark:border-blue-800 dark:bg-blue-950/40 dark:text-blue-300 gap-1"
+                className="border-blue-500/30 bg-blue-950/30 text-blue-400 dark:border-blue-800 dark:bg-blue-950/40 dark:text-blue-300 gap-1"
               >
                 <MapPin className="h-3 w-3" />
                 In-Land Application (currently in Canada)
@@ -690,7 +690,7 @@ export default function VerificationScreen() {
             ) : (
               <Badge
                 variant="outline"
-                className="border-purple-300 bg-purple-50 text-purple-700 dark:border-purple-800 dark:bg-purple-950/40 dark:text-purple-300 gap-1"
+                className="border-purple-500/30 bg-purple-950/30 text-purple-400 dark:border-purple-800 dark:bg-purple-950/40 dark:text-purple-300 gap-1"
               >
                 <Plane className="h-3 w-3" />
                 Out-of-Land Application
@@ -723,7 +723,7 @@ export default function VerificationScreen() {
                 className={cn(
                   'h-9',
                   !form.program_category &&
-                    'border-amber-300 focus:ring-amber-400',
+                    'border-amber-500/30 focus:ring-amber-400',
                 )}
               >
                 <SelectValue placeholder="Select a processing stream..." />
@@ -775,9 +775,9 @@ export default function VerificationScreen() {
 
         {/* Quebec CAQ Warning */}
         {isQuebec && (
-          <div className="mt-3 flex items-center gap-2 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 dark:border-amber-800 dark:bg-amber-950/40">
+          <div className="mt-3 flex items-center gap-2 rounded-lg border border-amber-500/30 bg-amber-950/30 px-4 py-3 dark:border-amber-800 dark:bg-amber-950/40">
             <AlertTriangle className="h-4 w-4 shrink-0 text-amber-600" />
-            <p className="text-sm text-amber-800 dark:text-amber-300">
+            <p className="text-sm text-amber-400 dark:text-amber-300">
               Quebec destination selected  -  a{' '}
               <strong>Certificat d'acceptation du Québec (CAQ)</strong> will be
               added to the document requirements.
@@ -787,9 +787,9 @@ export default function VerificationScreen() {
 
         {/* Spousal Sponsorship hint */}
         {isSpousal && (
-          <div className="mt-3 flex items-center gap-2 rounded-lg border border-blue-300 bg-blue-50 px-4 py-3 dark:border-blue-800 dark:bg-blue-950/40">
+          <div className="mt-3 flex items-center gap-2 rounded-lg border border-blue-500/30 bg-blue-950/30 px-4 py-3 dark:border-blue-800 dark:bg-blue-950/40">
             <Users className="h-4 w-4 shrink-0 text-blue-600" />
-            <p className="text-sm text-blue-800 dark:text-blue-300">
+            <p className="text-sm text-blue-400 dark:text-blue-300">
               Spousal Sponsorship selected  -  the{' '}
               <strong>Sponsor Details</strong> section will be shown in the
               workspace questionnaire.
@@ -838,11 +838,11 @@ export default function VerificationScreen() {
 
       {/* ═══ Validation Errors ════════════════════════════════════════════ */}
       {validationErrors.length > 0 && (
-        <div className="mb-6 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 dark:border-amber-800 dark:bg-amber-950/40">
-          <p className="text-sm font-medium text-amber-800 dark:text-amber-300 mb-1">
+        <div className="mb-6 rounded-lg border border-amber-500/30 bg-amber-950/30 px-4 py-3 dark:border-amber-800 dark:bg-amber-950/40">
+          <p className="text-sm font-medium text-amber-400 dark:text-amber-300 mb-1">
             Complete these before confirming:
           </p>
-          <ul className="list-disc list-inside text-sm text-amber-700 dark:text-amber-400 space-y-0.5">
+          <ul className="list-disc list-inside text-sm text-amber-400 dark:text-amber-400 space-y-0.5">
             {validationErrors.map((e) => (
               <li key={e}>{e}</li>
             ))}

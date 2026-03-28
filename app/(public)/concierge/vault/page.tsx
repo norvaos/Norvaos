@@ -198,7 +198,7 @@ export default function VaultDropPage() {
           className={cn(
             'w-full rounded-xl border-2 border-dashed p-10 text-center cursor-pointer transition-all',
             isDragOver
-              ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-950/20'
+              ? 'border-emerald-500 bg-emerald-950/30 dark:bg-emerald-950/20'
               : 'border-muted-foreground/20 hover:border-muted-foreground/40'
           )}
         >
@@ -245,7 +245,7 @@ export default function VaultDropPage() {
                       </Badge>
                     )}
                     {entry.status === 'hashed' && (
-                      <Badge variant="outline" className="text-[9px] gap-1 border-emerald-300 text-emerald-700 dark:text-emerald-400">
+                      <Badge variant="outline" className="text-[9px] gap-1 border-emerald-500/30 text-emerald-400 dark:text-emerald-400">
                         <ShieldCheck className="h-2.5 w-2.5" />
                         Verified
                       </Badge>
@@ -263,7 +263,7 @@ export default function VaultDropPage() {
                           Secure
                         </Badge>
                         {entry.autoScan && (
-                          <Badge variant="outline" className="text-[9px] gap-1 border-blue-300 text-blue-700 dark:text-blue-400">
+                          <Badge variant="outline" className="text-[9px] gap-1 border-blue-500/30 text-blue-400 dark:text-blue-400">
                             <ScanSearch className="h-2.5 w-2.5" />
                             Scanning
                           </Badge>

@@ -95,17 +95,17 @@ function statusBadgeStyle(status: string): string {
     case 'pending':
       return 'border-zinc-300 text-zinc-600 bg-zinc-50'
     case 'in_progress':
-      return 'border-blue-300 text-blue-400 bg-blue-950/30'
+      return 'border-blue-500/30 text-blue-400 bg-blue-950/30'
     case 'ready_for_review':
-      return 'border-amber-300 text-amber-400 bg-amber-950/30'
+      return 'border-amber-500/30 text-amber-400 bg-amber-950/30'
     case 'approved':
-      return 'border-green-300 text-emerald-400 bg-emerald-950/30'
+      return 'border-emerald-500/30 text-emerald-400 bg-emerald-950/30'
     case 'rejected':
-      return 'border-red-300 text-red-400 bg-red-950/30'
+      return 'border-red-500/30 text-red-400 bg-red-950/30'
     case 'generated':
-      return 'border-purple-300 text-purple-400 bg-purple-950/30'
+      return 'border-purple-500/30 text-purple-400 bg-purple-950/30'
     case 'submitted':
-      return 'border-emerald-300 text-emerald-400 bg-emerald-950/30'
+      return 'border-emerald-500/30 text-emerald-400 bg-emerald-950/30'
     default:
       return 'border-zinc-300 text-zinc-600 bg-zinc-50'
   }
@@ -119,9 +119,9 @@ function formatStatus(status: string): string {
 /** Source indicator badge styling */
 function sourceBadgeStyle(source: AnswerSource): string {
   const trust = SOURCE_TRUST_LEVEL[source] ?? 0
-  if (trust >= 6) return 'border-green-300 text-emerald-400 bg-emerald-950/30'
-  if (trust >= 5) return 'border-blue-300 text-blue-400 bg-blue-950/30'
-  if (trust >= 3) return 'border-purple-300 text-purple-400 bg-purple-950/30'
+  if (trust >= 6) return 'border-emerald-500/30 text-emerald-400 bg-emerald-950/30'
+  if (trust >= 5) return 'border-blue-500/30 text-blue-400 bg-blue-950/30'
+  if (trust >= 3) return 'border-purple-500/30 text-purple-400 bg-purple-950/30'
   return 'border-zinc-300 text-zinc-600 bg-zinc-50'
 }
 
@@ -151,7 +151,7 @@ function SourceIndicator({ record }: { record: AnswerRecord }) {
       {record.verified && (
         <Badge
           variant="outline"
-          className="text-[9px] py-0 px-1 leading-3 border-green-300 text-emerald-400 bg-emerald-950/30"
+          className="text-[9px] py-0 px-1 leading-3 border-emerald-500/30 text-emerald-400 bg-emerald-950/30"
         >
           <ShieldCheck className="h-2 w-2 mr-0.5" />
           Verified
@@ -238,7 +238,7 @@ function ComparisonRow({
         <Button
           variant="outline"
           size="sm"
-          className="h-6 text-[10px] px-2 border-green-300 text-emerald-400 hover:bg-emerald-950/30"
+          className="h-6 text-[10px] px-2 border-emerald-500/30 text-emerald-400 hover:bg-emerald-950/30"
           onClick={() => onAccept(profilePath)}
           disabled={isAccepting || record.verified}
         >
@@ -253,7 +253,7 @@ function ComparisonRow({
         <Button
           variant="outline"
           size="sm"
-          className="h-6 text-[10px] px-2 border-amber-300 text-amber-400 hover:bg-amber-950/30"
+          className="h-6 text-[10px] px-2 border-amber-500/30 text-amber-400 hover:bg-amber-950/30"
           onClick={() => onOverride(profilePath, staffOverride)}
           disabled={isOverriding || !staffOverride}
         >
@@ -268,7 +268,7 @@ function ComparisonRow({
         {record.verified && (
           <Badge
             variant="outline"
-            className="text-[9px] py-0 px-1 border-green-300 text-emerald-400 bg-emerald-950/30 ml-auto"
+            className="text-[9px] py-0 px-1 border-emerald-500/30 text-emerald-400 bg-emerald-950/30 ml-auto"
           >
             <CheckCircle2 className="h-2 w-2 mr-0.5" />
             Verified
@@ -612,7 +612,7 @@ export function StaffReviewPanel({
               <button onClick={() => setActiveTab('stale')}>
                 <Badge
                   variant="outline"
-                  className="text-[10px] py-0 px-1.5 border-amber-300 text-amber-400 bg-amber-950/30 cursor-pointer hover:bg-amber-100 transition-colors"
+                  className="text-[10px] py-0 px-1.5 border-amber-500/30 text-amber-400 bg-amber-950/30 cursor-pointer hover:bg-amber-950/40 transition-colors"
                 >
                   <AlertTriangle className="h-2.5 w-2.5 mr-0.5" />
                   {staleCount} stale
@@ -626,7 +626,7 @@ export function StaffReviewPanel({
               className={cn(
                 'text-[10px] py-0 px-1.5',
                 verifiedCount === totalFields && totalFields > 0
-                  ? 'border-green-300 text-emerald-400 bg-emerald-950/30'
+                  ? 'border-emerald-500/30 text-emerald-400 bg-emerald-950/30'
                   : 'border-zinc-200 text-muted-foreground',
               )}
             >
@@ -639,7 +639,7 @@ export function StaffReviewPanel({
             <Button
               variant="outline"
               size="sm"
-              className="h-7 text-[10px] px-2.5 border-green-300 text-emerald-400 hover:bg-emerald-950/30"
+              className="h-7 text-[10px] px-2.5 border-emerald-500/30 text-emerald-400 hover:bg-emerald-950/30"
               onClick={handleApproveAll}
               disabled={actionInProgress !== null || unverifiedCount === 0}
             >
@@ -654,7 +654,7 @@ export function StaffReviewPanel({
             <Button
               variant="outline"
               size="sm"
-              className="h-7 text-[10px] px-2.5 border-red-300 text-red-400 hover:bg-red-950/30"
+              className="h-7 text-[10px] px-2.5 border-red-500/30 text-red-400 hover:bg-red-950/30"
               onClick={() => setShowRejectDialog(true)}
               disabled={actionInProgress !== null}
             >
@@ -680,7 +680,7 @@ export function StaffReviewPanel({
         {/* Reject dialog (inline) */}
         {showRejectDialog && (
           <div className="px-3 pb-2">
-            <Card className="gap-0 py-0 border-red-200">
+            <Card className="gap-0 py-0 border-red-500/20">
               <div className="p-3">
                 <p className="text-xs font-semibold text-red-400 mb-2">
                   Reject and send back to client
@@ -695,7 +695,7 @@ export function StaffReviewPanel({
                   <Button
                     variant="outline"
                     size="sm"
-                    className="h-7 text-[10px] px-2.5 border-red-300 text-red-400 hover:bg-red-950/30"
+                    className="h-7 text-[10px] px-2.5 border-red-500/30 text-red-400 hover:bg-red-950/30"
                     onClick={handleReject}
                     disabled={actionInProgress === 'reject'}
                   >
@@ -746,7 +746,7 @@ export function StaffReviewPanel({
             <Shield className="h-3 w-3 inline mr-1" />
             Comparison
             {trustConflicts.length > 0 && (
-              <span className="ml-1 text-[9px] bg-amber-200 text-amber-800 rounded-full px-1">
+              <span className="ml-1 text-[9px] bg-amber-200 text-amber-400 rounded-full px-1">
                 {trustConflicts.length}
               </span>
             )}
@@ -763,7 +763,7 @@ export function StaffReviewPanel({
             <AlertTriangle className="h-3 w-3 inline mr-1" />
             Stale
             {staleCount > 0 && (
-              <span className="ml-1 text-[9px] bg-amber-200 text-amber-800 rounded-full px-1">
+              <span className="ml-1 text-[9px] bg-amber-200 text-amber-400 rounded-full px-1">
                 {staleCount}
               </span>
             )}
@@ -810,7 +810,7 @@ export function StaffReviewPanel({
                   <Button
                     variant="outline"
                     size="sm"
-                    className="h-7 text-[10px] px-2.5 border-green-300 text-emerald-400 hover:bg-emerald-950/30"
+                    className="h-7 text-[10px] px-2.5 border-emerald-500/30 text-emerald-400 hover:bg-emerald-950/30"
                     onClick={handleVerifyAllUncontested}
                     disabled={actionInProgress !== null || uncontestedFields.length === 0}
                   >

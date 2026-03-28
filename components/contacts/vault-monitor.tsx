@@ -143,17 +143,17 @@ const STATUS_CONFIG: Record<IntegrityStatus, {
   verified: {
     label: 'SHA-256 Verified',
     icon: ShieldCheck,
-    badgeClass: 'border-green-300 bg-emerald-950/30 text-emerald-400 dark:border-green-700 dark:bg-green-900/30 dark:text-green-400',
+    badgeClass: 'border-emerald-500/30 bg-emerald-950/30 text-emerald-400 dark:border-green-700 dark:bg-green-900/30 dark:text-green-400',
   },
   pending: {
     label: 'Hash Pending',
     icon: Clock,
-    badgeClass: 'border-amber-300 bg-amber-950/30 text-amber-400 dark:border-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
+    badgeClass: 'border-amber-500/30 bg-amber-950/30 text-amber-400 dark:border-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
   },
   tampered: {
     label: 'Integrity Alert',
     icon: ShieldAlert,
-    badgeClass: 'border-red-300 bg-red-950/30 text-red-400 dark:border-red-700 dark:bg-red-900/30 dark:text-red-400',
+    badgeClass: 'border-red-500/30 bg-red-950/30 text-red-400 dark:border-red-700 dark:bg-red-900/30 dark:text-red-400',
   },
   untracked: {
     label: 'Untracked',
@@ -356,7 +356,7 @@ export function VaultMonitor({ contactId, tenantId, contactName }: VaultMonitorP
               className={cn(
                 'flex items-center gap-2 rounded-md px-2 py-1.5 transition-colors group',
                 isTampered
-                  ? 'border border-red-300 bg-red-950/30/50 hover:bg-red-950/30'
+                  ? 'border border-red-500/30 bg-red-950/30/50 hover:bg-red-950/30'
                   : 'hover:bg-muted/50',
               )}
             >
@@ -367,7 +367,7 @@ export function VaultMonitor({ contactId, tenantId, contactName }: VaultMonitorP
                     <TooltipTrigger asChild>
                       <p className={cn(
                         'text-xs font-medium truncate',
-                        isTampered ? 'text-red-800' : 'text-foreground',
+                        isTampered ? 'text-red-400' : 'text-foreground',
                       )}>
                         {sovereignName}
                       </p>
@@ -404,8 +404,8 @@ export function VaultMonitor({ contactId, tenantId, contactName }: VaultMonitorP
                         // Always visible on touch devices, hover-reveal on desktop
                         'opacity-100 sm:opacity-0 sm:group-hover:opacity-100',
                         isTampered
-                          ? 'hover:bg-red-100 text-red-600 active:bg-red-200'
-                          : 'hover:bg-blue-950/30 text-blue-600 active:bg-blue-100',
+                          ? 'hover:bg-red-950/40 text-red-600 active:bg-red-200'
+                          : 'hover:bg-blue-950/30 text-blue-600 active:bg-blue-950/40',
                       )}
                     >
                       <Eye className="size-4 sm:size-3.5 drop-shadow-sm" />

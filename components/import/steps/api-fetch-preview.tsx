@@ -131,11 +131,11 @@ export function ApiFetchPreview({
       </div>
 
       {displayError && (
-        <div className="flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 p-4">
+        <div className="flex items-start gap-3 rounded-lg border border-red-500/20 bg-red-950/30 p-4">
           <AlertCircle className="h-5 w-5 text-red-600 shrink-0 mt-0.5" />
           <div>
             <p className="text-sm font-medium text-red-900">Fetch failed</p>
-            <p className="text-xs text-red-700 mt-0.5">{displayError}</p>
+            <p className="text-xs text-red-400 mt-0.5">{displayError}</p>
           </div>
           <Button variant="outline" size="sm" onClick={handleClick} className="ml-auto shrink-0">
             Retry
@@ -145,7 +145,7 @@ export function ApiFetchPreview({
 
       {!displayDone && !displayError && (
         <div className="flex flex-col items-center gap-4 py-8">
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-amber-100">
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-amber-950/40">
             <Database className="h-8 w-8 text-amber-600" />
           </div>
 
@@ -184,13 +184,13 @@ export function ApiFetchPreview({
 
       {displayDone && !displayError && (
         <div className="space-y-4">
-          <div className="flex items-center gap-3 rounded-lg bg-green-50 border border-green-200 p-4">
+          <div className="flex items-center gap-3 rounded-lg bg-emerald-950/30 border border-emerald-500/20 p-4">
             <CheckCircle className="h-5 w-5 text-green-600 shrink-0" />
             <div>
               <p className="text-sm font-medium text-green-900">
                 {displayTotal.toLocaleString()} {entityType.replace(/_/g, ' ')} fetched
               </p>
-              <p className="text-xs text-green-700 mt-0.5">
+              <p className="text-xs text-emerald-400 mt-0.5">
                 Data has been retrieved from your {platformName} account and is ready to import.
               </p>
             </div>

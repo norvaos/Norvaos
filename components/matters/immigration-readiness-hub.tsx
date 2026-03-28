@@ -200,25 +200,25 @@ export function ImmigrationReadinessHub({ matterId, userId, userRole }: Props) {
               </Badge>
             )}
             {contradictions.warningCount > 0 && (
-              <Badge variant="outline" className="flex items-centre gap-1 border-amber-300 text-amber-600">
+              <Badge variant="outline" className="flex items-centre gap-1 border-amber-500/30 text-amber-600">
                 <AlertTriangle className="h-3 w-3" />
                 {contradictions.warningCount} Warning{contradictions.warningCount > 1 ? 's' : ''}
               </Badge>
             )}
             {documents.pendingReview > 0 && (
-              <Badge variant="outline" className="flex items-centre gap-1 border-blue-300 text-blue-600">
+              <Badge variant="outline" className="flex items-centre gap-1 border-blue-500/30 text-blue-600">
                 <Clock className="h-3 w-3" />
                 {documents.pendingReview} Pending Review
               </Badge>
             )}
             {documents.needsReUpload > 0 && (
-              <Badge variant="outline" className="flex items-centre gap-1 border-orange-300 text-orange-600">
+              <Badge variant="outline" className="flex items-centre gap-1 border-orange-500/30 text-orange-600">
                 <AlertCircle className="h-3 w-3" />
                 {documents.needsReUpload} Needs Re-upload
               </Badge>
             )}
             {formPacks.stale.length > 0 && (
-              <Badge variant="outline" className="flex items-centre gap-1 border-red-300 text-red-600">
+              <Badge variant="outline" className="flex items-centre gap-1 border-red-500/30 text-red-600">
                 <XCircle className="h-3 w-3" />
                 {formPacks.stale.length} Stale Pack{formPacks.stale.length > 1 ? 's' : ''}
               </Badge>
@@ -230,7 +230,7 @@ export function ImmigrationReadinessHub({ matterId, userId, userRole }: Props) {
               </Badge>
             )}
             {lawyerReview.status === 'approved' && (
-              <Badge variant="outline" className="flex items-centre gap-1 border-green-300 text-green-600">
+              <Badge variant="outline" className="flex items-centre gap-1 border-emerald-500/30 text-green-600">
                 <CheckCircle2 className="h-3 w-3" />
                 Lawyer Approved
               </Badge>
@@ -239,8 +239,8 @@ export function ImmigrationReadinessHub({ matterId, userId, userRole }: Props) {
 
           {/* ── Contradictions Detail ── */}
           {contradictions.flags.length > 0 && (
-            <div className="rounded-lg border border-red-200 bg-red-950/30 p-3 dark:border-red-900 dark:bg-red-950/30">
-              <p className="text-xs font-medium text-red-800 dark:text-red-300 mb-2">
+            <div className="rounded-lg border border-red-500/20 bg-red-950/30 p-3 dark:border-red-900 dark:bg-red-950/30">
+              <p className="text-xs font-medium text-red-400 dark:text-red-300 mb-2">
                 Contradictions Detected
               </p>
               <ul className="space-y-1">
@@ -270,8 +270,8 @@ export function ImmigrationReadinessHub({ matterId, userId, userRole }: Props) {
 
           {/* ── Blocked Reasons ── */}
           {blockedReasons.length > 0 && (
-            <div className="rounded-lg border border-amber-200 bg-amber-950/30 p-3 dark:border-amber-900 dark:bg-amber-950/30">
-              <p className="text-xs font-medium text-amber-800 dark:text-amber-300 mb-1">
+            <div className="rounded-lg border border-amber-500/20 bg-amber-950/30 p-3 dark:border-amber-900 dark:bg-amber-950/30">
+              <p className="text-xs font-medium text-amber-400 dark:text-amber-300 mb-1">
                 Blocked
               </p>
               <ul className="space-y-0.5">
@@ -322,16 +322,16 @@ function NextActionSection({
 }) {
   // Status-aware accent colours  -  use full static class strings for Tailwind JIT
   const wrapperClass = intakeStatus === 'ready_for_filing'
-    ? 'flex items-center justify-between rounded-lg border-l-4 border-l-green-500 border bg-green-50/50 dark:bg-green-950/20 p-3'
+    ? 'flex items-center justify-between rounded-lg border-l-4 border-l-green-500 border bg-emerald-950/30/50 dark:bg-green-950/20 p-3'
     : intakeStatus === 'deficiency_outstanding'
       ? 'flex items-center justify-between rounded-lg border-l-4 border-l-red-500 border bg-red-950/30/50 dark:bg-red-950/20 p-3'
-      : 'flex items-center justify-between rounded-lg border-l-4 border-l-blue-500 border bg-blue-50/50 dark:bg-blue-950/20 p-3'
+      : 'flex items-center justify-between rounded-lg border-l-4 border-l-blue-500 border bg-blue-950/30/50 dark:bg-blue-950/20 p-3'
 
   const labelClass = intakeStatus === 'ready_for_filing'
-    ? 'text-xs font-medium text-green-800 dark:text-green-300'
+    ? 'text-xs font-medium text-emerald-400 dark:text-green-300'
     : intakeStatus === 'deficiency_outstanding'
-      ? 'text-xs font-medium text-red-800 dark:text-red-300'
-      : 'text-xs font-medium text-blue-800 dark:text-blue-300'
+      ? 'text-xs font-medium text-red-400 dark:text-red-300'
+      : 'text-xs font-medium text-blue-400 dark:text-blue-300'
 
   return (
     <div className={wrapperClass}>
@@ -507,9 +507,9 @@ function BlockerSection({
   open: boolean
   onToggle: () => void
 }) {
-  const borderClass = color === 'red' ? 'border-red-200 dark:border-red-900' : 'border-amber-200 dark:border-amber-900'
+  const borderClass = color === 'red' ? 'border-red-500/20 dark:border-red-900' : 'border-amber-500/20 dark:border-amber-900'
   const bgClass = color === 'red' ? 'bg-red-950/30 dark:bg-red-950/30' : 'bg-amber-950/30 dark:bg-amber-950/30'
-  const textClass = color === 'red' ? 'text-red-800 dark:text-red-300' : 'text-amber-800 dark:text-amber-300'
+  const textClass = color === 'red' ? 'text-red-400 dark:text-red-300' : 'text-amber-400 dark:text-amber-300'
   const itemClass = color === 'red' ? 'text-red-400 dark:text-red-400' : 'text-amber-400 dark:text-amber-400'
 
   return (

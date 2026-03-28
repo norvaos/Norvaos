@@ -79,7 +79,7 @@ export function IRCCSideBySideEngine({ matterId, tenantId, contactId }: IRCCSide
   if (!contactId) {
     return (
       <div className="flex flex-col items-center justify-center h-full text-center px-6">
-        <div className="h-12 w-12 rounded-full bg-blue-50 dark:bg-blue-950/30 flex items-center justify-center mb-4">
+        <div className="h-12 w-12 rounded-full bg-blue-950/30 dark:bg-blue-950/30 flex items-center justify-center mb-4">
           <UserPlus className="h-6 w-6 text-blue-500" />
         </div>
         <p className="text-sm font-semibold">Norva Submission Engine</p>
@@ -102,14 +102,14 @@ export function IRCCSideBySideEngine({ matterId, tenantId, contactId }: IRCCSide
   return (
     <div className="flex flex-col h-full">
       {/* Top bar  -  Norva Submission Engine mode hint */}
-      <div className="flex-none px-3 py-1.5 bg-blue-50 dark:bg-blue-950/20 border-b flex items-center gap-2">
+      <div className="flex-none px-3 py-1.5 bg-blue-950/30 dark:bg-blue-950/20 border-b flex items-center gap-2">
         <Monitor className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
-        <span className="text-[10px] text-blue-700 dark:text-blue-300 flex-1">
+        <span className="text-[10px] text-blue-400 dark:text-blue-300 flex-1">
           Norva Submission Engine  -  split your screen 50/50 with the IRCC Portal for one-click data entry
         </span>
         <Tooltip>
           <TooltipTrigger asChild>
-            <button className="text-[9px] text-blue-500 underline underline-offset-2 hover:text-blue-700">
+            <button className="text-[9px] text-blue-500 underline underline-offset-2 hover:text-blue-400">
               How it works
             </button>
           </TooltipTrigger>

@@ -117,8 +117,8 @@ export function PortalMatterSummary({
             </p>
           </div>
         ) : outstandingItems.length > 0 ? (
-          <div className="flex items-center gap-2 rounded-xl bg-amber-950/30/80 border border-amber-200/60 px-3 py-2">
-            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-amber-100">
+          <div className="flex items-center gap-2 rounded-xl bg-amber-950/30/80 border border-amber-500/20/60 px-3 py-2">
+            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-amber-950/40">
               <svg className="h-3.5 w-3.5 text-amber-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>
             </div>
             <p className="text-sm font-medium text-slate-700">

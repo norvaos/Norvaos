@@ -1518,7 +1518,7 @@ function LeadsTable({
                   <Link
                     href={`/leads/${lead.id}/consultation`}
                     onClick={(e) => e.stopPropagation()}
-                    className="inline-flex items-center gap-1 rounded-md border border-blue-500/20 bg-blue-950/30 px-2 py-1 text-[11px] font-medium text-blue-400 hover:bg-blue-100 hover:border-blue-300 transition-colors"
+                    className="inline-flex items-center gap-1 rounded-md border border-blue-500/20 bg-blue-950/30 px-2 py-1 text-[11px] font-medium text-blue-400 hover:bg-blue-950/40 hover:border-blue-500/30 transition-colors"
                   >
                     <ClipboardList className="h-3 w-3" />
                     {t('leads.consult', 'Consult')}

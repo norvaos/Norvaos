@@ -304,9 +304,9 @@ export function UploadSheet({
         <div className="flex-1 overflow-y-auto px-4 space-y-4">
           {/* Error message */}
           {sheetError && (
-            <div className="flex items-start gap-2 rounded-md border border-red-200 bg-red-50 px-3 py-2">
+            <div className="flex items-start gap-2 rounded-md border border-red-500/20 bg-red-950/30 px-3 py-2">
               <AlertCircle className="mt-0.5 h-4 w-4 text-red-500 shrink-0" />
-              <p className="text-xs text-red-700">{sheetError}</p>
+              <p className="text-xs text-red-400">{sheetError}</p>
             </div>
           )}
 

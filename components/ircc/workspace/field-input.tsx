@@ -138,7 +138,7 @@ export function FieldInput({
             <TooltipTrigger asChild>
               <Badge
                 variant="outline"
-                className="text-[10px] py-0 px-1.5 leading-4 border-amber-300 text-amber-400 bg-amber-950/30 gap-0.5"
+                className="text-[10px] py-0 px-1.5 leading-4 border-amber-500/30 text-amber-400 bg-amber-950/30 gap-0.5"
               >
                 <AlertTriangle className="h-2.5 w-2.5" />
                 Stale

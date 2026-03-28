@@ -561,7 +561,7 @@ export default function DocumentsPage() {
       <div className="grid grid-cols-3 gap-4">
         <Card>
           <CardContent className="flex items-center gap-3 p-4">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-100">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-950/40">
               <FileText className="h-4 w-4 text-blue-600" />
             </div>
             <div>

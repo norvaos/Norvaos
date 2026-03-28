@@ -610,8 +610,8 @@ export default function SetupWizardPage() {
           </div>
 
           {invitedEmails.length > 0 && (
-            <div className="rounded-md bg-emerald-50 border border-emerald-200 p-3">
-              <p className="text-xs font-medium text-emerald-700 mb-1">
+            <div className="rounded-md bg-emerald-950/30 border border-emerald-500/20 p-3">
+              <p className="text-xs font-medium text-emerald-400 mb-1">
                 {invitedEmails.length} invitation{invitedEmails.length !== 1 ? 's' : ''} sent:
               </p>
               <ul className="space-y-0.5">
@@ -707,7 +707,7 @@ export default function SetupWizardPage() {
       {currentStep === 3 && (
         <div className="rounded-lg border border-slate-200 bg-white p-6 space-y-5 text-center">
           <div className="flex justify-center">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100">
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-950/40">
               <CheckCircle2 className="h-9 w-9 text-emerald-600" />
             </div>
           </div>

@@ -74,8 +74,8 @@ function getPriorityLabel(
 function getPriorityColor(priority: string | null): string {
   if (!priority) return ''
   const p = priority.toLowerCase()
-  if (p === 'high' || p === 'urgent') return 'text-red-600 bg-red-950/30 border-red-200'
-  if (p === 'medium' || p === 'normal') return 'text-amber-600 bg-amber-950/30 border-amber-200'
+  if (p === 'high' || p === 'urgent') return 'text-red-600 bg-red-950/30 border-red-500/20'
+  if (p === 'medium' || p === 'normal') return 'text-amber-600 bg-amber-950/30 border-amber-500/20'
   return 'text-slate-500 bg-slate-50 border-slate-200'
 }
 
@@ -226,7 +226,7 @@ export function PortalTasks({ token, primaryColor, language = 'en' }: PortalTask
                   <div
                     key={task.id}
                     className={`rounded-2xl border p-4 backdrop-blur-sm transition-all duration-200 ${
-                      overdue ? 'border-red-200/60 bg-gradient-to-br from-red-50/50 to-white shadow-sm shadow-red-100/30' : 'border-slate-200/60 bg-gradient-to-br from-slate-50/50 to-white hover:shadow-sm'
+                      overdue ? 'border-red-500/20/60 bg-gradient-to-br from-red-50/50 to-white shadow-sm shadow-red-100/30' : 'border-slate-200/60 bg-gradient-to-br from-slate-50/50 to-white hover:shadow-sm'
                     }`}
                   >
                     <div className="flex items-start justify-between gap-3">

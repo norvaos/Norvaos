@@ -144,7 +144,7 @@ export default async function LandingPage() {
               <div className="inline-flex items-center gap-2 rounded-full border border-indigo-300 bg-indigo-50 px-4 py-1.5 text-sm font-bold text-indigo-800 shadow-sm">
                 🇨🇦 Data stored in Canada
               </div>
-              <div className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-4 py-1.5 text-sm font-semibold text-emerald-800">
+              <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-950/30 px-4 py-1.5 text-sm font-semibold text-emerald-400">
                 <Shield className="h-3.5 w-3.5 text-emerald-600" />
                 PIPEDA-compliant
               </div>
@@ -233,7 +233,7 @@ export default async function LandingPage() {
                   {
                     icon: RefreshCw,
                     color: 'text-emerald-600',
-                    bg: 'bg-emerald-50',
+                    bg: 'bg-emerald-950/30',
                     title: 'OneDrive & Google Drive sync',
                     desc: 'Two-way sync with your existing cloud storage. Documents uploaded on either side stay in perfect sync, in real time.',
                   },
@@ -247,7 +247,7 @@ export default async function LandingPage() {
                   {
                     icon: Shield,
                     color: 'text-amber-600',
-                    bg: 'bg-amber-50',
+                    bg: 'bg-amber-950/30',
                     title: 'Version history & audit trail',
                     desc: 'Every upload, replacement, and deletion is logged with timestamps. PIPEDA-compliant from day one.',
                   },
@@ -299,9 +299,9 @@ export default async function LandingPage() {
                   </div>
 
                   {[
-                    { folder: 'Identity Documents', files: ['Sharma_Passport_2025.pdf', 'Patel_PR_Card_2026.jpg', 'Marriage_Certificate.pdf'], color: 'text-blue-600', bg: 'bg-blue-50', border: 'border-blue-100' },
+                    { folder: 'Identity Documents', files: ['Sharma_Passport_2025.pdf', 'Patel_PR_Card_2026.jpg', 'Marriage_Certificate.pdf'], color: 'text-blue-600', bg: 'bg-blue-950/30', border: 'border-blue-100' },
                     { folder: 'Immigration Forms', files: ['IMM5257E_v3_DRAFT.pdf', 'IMM5476E_signed.pdf'], color: 'text-violet-600', bg: 'bg-violet-50', border: 'border-violet-100' },
-                    { folder: 'Financial Records', files: ['Bank_Statement_Jan.pdf', 'T4_2025.pdf', 'NOA_2024.pdf'], color: 'text-emerald-600', bg: 'bg-emerald-50', border: 'border-emerald-100' },
+                    { folder: 'Financial Records', files: ['Bank_Statement_Jan.pdf', 'T4_2025.pdf', 'NOA_2024.pdf'], color: 'text-emerald-600', bg: 'bg-emerald-950/30', border: 'border-emerald-100' },
                   ].map(group => (
                     <div key={group.folder} className={`rounded-xl border ${group.border} ${group.bg} p-3`}>
                       <div className={`mb-2 flex items-center gap-2 text-xs font-semibold ${group.color}`}>
@@ -401,7 +401,7 @@ export default async function LandingPage() {
                 label: 'Invoicing & Payments',
                 sub: 'Stripe-powered checkout, trust accounting, AR tracking',
                 color: 'text-emerald-600',
-                bg: 'bg-emerald-100',
+                bg: 'bg-emerald-950/40',
                 card: 'bg-white border border-emerald-100',
               },
               {
@@ -409,7 +409,7 @@ export default async function LandingPage() {
                 label: 'Document Storage',
                 sub: 'AI-sorted vaults with OneDrive, Google Drive two-way sync',
                 color: 'text-amber-600',
-                bg: 'bg-amber-100',
+                bg: 'bg-amber-950/40',
                 card: 'bg-white border border-amber-100',
               },
               {
@@ -433,7 +433,7 @@ export default async function LandingPage() {
                 label: 'Financial Reports',
                 sub: 'Revenue by practice area, AR aging, trust ledger reports',
                 color: 'text-purple-600',
-                bg: 'bg-purple-100',
+                bg: 'bg-purple-950/40',
                 card: 'bg-white border border-purple-100',
               },
               {
@@ -441,7 +441,7 @@ export default async function LandingPage() {
                 label: 'Task Automation',
                 sub: 'Workflows trigger tasks automatically on every stage change',
                 color: 'text-orange-600',
-                bg: 'bg-orange-100',
+                bg: 'bg-orange-950/40',
                 card: 'bg-white border border-orange-100',
               },
               {
@@ -456,8 +456,8 @@ export default async function LandingPage() {
                 icon: Landmark,
                 label: 'Norva Ledger',
                 sub: 'Regulator-compliant trust ledger, three-way reconciliation',
-                color: 'text-emerald-700',
-                bg: 'bg-emerald-100',
+                color: 'text-emerald-400',
+                bg: 'bg-emerald-950/40',
                 card: 'bg-white border border-emerald-100',
               },
               {
@@ -473,7 +473,7 @@ export default async function LandingPage() {
                 label: 'Appointment Booking',
                 sub: 'Public booking page, Google & Outlook sync, auto-reminders',
                 color: 'text-blue-600',
-                bg: 'bg-blue-100',
+                bg: 'bg-blue-950/40',
                 card: 'bg-white border border-blue-100',
               },
               {
@@ -489,15 +489,15 @@ export default async function LandingPage() {
                 label: 'Conflict Checking',
                 sub: 'Automatic conflict detection before opening every new matter',
                 color: 'text-red-600',
-                bg: 'bg-red-100',
+                bg: 'bg-red-950/40',
                 card: 'bg-white border border-red-100',
               },
               {
                 icon: Receipt,
                 label: 'Disbursement Tracking',
                 sub: 'Government fees, courier, translation costs tracked per matter',
-                color: 'text-yellow-700',
-                bg: 'bg-yellow-100',
+                color: 'text-yellow-400',
+                bg: 'bg-yellow-950/40',
                 card: 'bg-white border border-yellow-100',
               },
             ].map(item => (
@@ -636,7 +636,7 @@ export default async function LandingPage() {
             </div>
 
             {/* Pillar 3  -  Deliver */}
-            <div className="relative overflow-hidden rounded-2xl border border-emerald-200 bg-gradient-to-b from-emerald-50 to-white p-8 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg">
+            <div className="relative overflow-hidden rounded-2xl border border-emerald-500/20 bg-gradient-to-b from-emerald-50 to-white p-8 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg">
               <div className="absolute top-0 left-0 right-0 h-1 rounded-t-2xl bg-gradient-to-r from-emerald-500 to-teal-500" />
               <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-600">
                 <CreditCard className="h-6 w-6 text-white" />
@@ -693,7 +693,7 @@ export default async function LandingPage() {
                       <p className="text-sm font-semibold text-gray-900">Sharma, Patel</p>
                       <p className="text-xs text-gray-500">Spousal Sponsorship, PR Application</p>
                     </div>
-                    <span className="rounded-full border border-amber-100 bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-700">
+                    <span className="rounded-full border border-amber-100 bg-amber-950/30 px-2.5 py-0.5 text-xs font-medium text-amber-400">
                       In Progress
                     </span>
                   </div>
@@ -719,8 +719,8 @@ export default async function LandingPage() {
                 </div>
 
                 {/* Retainer status banner */}
-                <div className="flex items-center justify-between border-b border-gray-100 bg-emerald-50 px-4 py-2">
-                  <div className="flex items-center gap-2 text-xs font-medium text-emerald-700">
+                <div className="flex items-center justify-between border-b border-gray-100 bg-emerald-950/30 px-4 py-2">
+                  <div className="flex items-center gap-2 text-xs font-medium text-emerald-400">
                     <CheckCircle className="h-3.5 w-3.5" />
                     Retainer Agreement signed, $3,500 received
                   </div>
@@ -774,9 +774,9 @@ export default async function LandingPage() {
                 </div>
 
                 {/* Action banner */}
-                <div className="mx-4 mb-3 rounded-xl border border-red-100 bg-red-50 p-2.5">
-                  <p className="text-xs font-semibold text-red-800">2 actions required to continue</p>
-                  <p className="mt-0.5 text-xs text-red-700">
+                <div className="mx-4 mb-3 rounded-xl border border-red-100 bg-red-950/30 p-2.5">
+                  <p className="text-xs font-semibold text-red-400">2 actions required to continue</p>
+                  <p className="mt-0.5 text-xs text-red-400">
                     Re-upload T4 2023 (original CRA copy) · Upload Employment Letter
                   </p>
                 </div>
@@ -825,7 +825,7 @@ export default async function LandingPage() {
                   {
                     icon: CheckCircle,
                     color: 'text-emerald-600',
-                    bg: 'bg-emerald-50',
+                    bg: 'bg-emerald-950/30',
                     title: 'Document validation in real time',
                     desc: 'Clients see exactly which documents are accepted, under review, or rejected, with a clear reason and a one-click re-upload.',
                   },
@@ -846,7 +846,7 @@ export default async function LandingPage() {
                   {
                     icon: Shield,
                     color: 'text-amber-600',
-                    bg: 'bg-amber-50',
+                    bg: 'bg-amber-950/30',
                     title: 'Matter progress at a glance',
                     desc: 'Stage-by-stage progress bar so clients always know where their file is and what comes next in the process.',
                   },
@@ -873,7 +873,7 @@ export default async function LandingPage() {
           <div className="grid grid-cols-1 items-center gap-16 lg:grid-cols-2">
             {/* Text */}
             <div>
-              <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-emerald-100 bg-emerald-50 px-3 py-1 text-sm font-semibold text-emerald-700">
+              <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-emerald-100 bg-emerald-950/30 px-3 py-1 text-sm font-semibold text-emerald-400">
                 <DollarSign className="h-3.5 w-3.5" />
                 Billing & Invoicing
               </div>
@@ -895,7 +895,7 @@ export default async function LandingPage() {
                   {
                     icon: Receipt,
                     color: 'text-emerald-600',
-                    bg: 'bg-emerald-50',
+                    bg: 'bg-emerald-950/30',
                     title: 'Professional invoice generation',
                     desc: 'Generate branded invoices from time entries and flat fees in one click. Itemised disbursements included automatically.',
                   },
@@ -916,7 +916,7 @@ export default async function LandingPage() {
                   {
                     icon: Wallet,
                     color: 'text-amber-600',
-                    bg: 'bg-amber-50',
+                    bg: 'bg-amber-950/30',
                     title: 'Retainer management',
                     desc: 'Track retainer balances in real time. Automatic low-balance alerts tell clients when to top up, so work never stops.',
                   },
@@ -946,7 +946,7 @@ export default async function LandingPage() {
               <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-xl">
                 <div className="border-b border-gray-100 bg-gray-50 px-4 py-3 flex items-center justify-between">
                   <span className="text-sm font-semibold text-gray-700">Invoice: INV-2026-0047</span>
-                  <span className="rounded-full border border-amber-100 bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-700">Awaiting Payment</span>
+                  <span className="rounded-full border border-amber-100 bg-amber-950/30 px-2.5 py-0.5 text-xs font-medium text-amber-400">Awaiting Payment</span>
                 </div>
                 <div className="p-5 space-y-4">
                   {/* Invoice header */}
@@ -985,7 +985,7 @@ export default async function LandingPage() {
                   </div>
 
                   {/* Totals */}
-                  <div className="rounded-xl border border-emerald-100 bg-emerald-50/60 p-3 space-y-1.5">
+                  <div className="rounded-xl border border-emerald-100 bg-emerald-950/30/60 p-3 space-y-1.5">
                     {[
                       { label: 'Subtotal', value: '$2,832.50', bold: false },
                       { label: 'HST (13%)', value: '$368.23', bold: false },
@@ -996,9 +996,9 @@ export default async function LandingPage() {
                         <span className={row.bold ? 'font-bold text-gray-900' : 'text-gray-700'}>{row.value}</span>
                       </div>
                     ))}
-                    <div className="border-t border-emerald-200 pt-1.5 flex justify-between text-sm font-bold">
+                    <div className="border-t border-emerald-500/20 pt-1.5 flex justify-between text-sm font-bold">
                       <span className="text-gray-900">Total Due</span>
-                      <span className="text-emerald-700">$1,400.73</span>
+                      <span className="text-emerald-400">$1,400.73</span>
                     </div>
                   </div>
 
@@ -1050,9 +1050,9 @@ export default async function LandingPage() {
                 {/* Summary cards */}
                 <div className="grid grid-cols-3 gap-px bg-gray-100 border-b border-gray-100">
                   {[
-                    { label: 'Total in Trust', value: '$47,250.00', color: 'text-emerald-700' },
+                    { label: 'Total in Trust', value: '$47,250.00', color: 'text-emerald-400' },
                     { label: 'Active Matters', value: '18', color: 'text-indigo-700' },
-                    { label: 'Pending Draw', value: '$8,400.00', color: 'text-amber-700' },
+                    { label: 'Pending Draw', value: '$8,400.00', color: 'text-amber-400' },
                   ].map(s => (
                     <div key={s.label} className="bg-white px-4 py-3">
                       <p className="text-[10px] text-gray-500 uppercase tracking-wide">{s.label}</p>
@@ -1087,11 +1087,11 @@ export default async function LandingPage() {
                 </div>
 
                 {/* Reconciliation banner */}
-                <div className="mx-4 mb-4 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2.5">
+                <div className="mx-4 mb-4 rounded-xl border border-emerald-500/20 bg-emerald-950/30 px-3 py-2.5">
                   <div className="flex items-center gap-2">
                     <CheckCircle className="h-4 w-4 text-emerald-600 shrink-0" />
                     <div>
-                      <p className="text-xs font-semibold text-emerald-800">3-Way Reconciliation: Passed</p>
+                      <p className="text-xs font-semibold text-emerald-400">3-Way Reconciliation: Passed</p>
                       <p className="text-[10px] text-emerald-600">Bank · Ledger · Client balances all match as of Mar 19, 2026</p>
                     </div>
                   </div>
@@ -1112,7 +1112,7 @@ export default async function LandingPage() {
 
             {/* Text */}
             <div>
-              <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-emerald-100 bg-emerald-50 px-3 py-1 text-sm font-semibold text-emerald-700">
+              <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-emerald-100 bg-emerald-950/30 px-3 py-1 text-sm font-semibold text-emerald-400">
                 <Landmark className="h-3.5 w-3.5" />
                 Norva Ledger
               </div>
@@ -1134,7 +1134,7 @@ export default async function LandingPage() {
                   {
                     icon: PiggyBank,
                     color: 'text-emerald-600',
-                    bg: 'bg-emerald-50',
+                    bg: 'bg-emerald-950/30',
                     title: 'Per-matter trust ledger',
                     desc: 'Every client matter has its own trust sub-ledger. Deposits, disbursements, and transfers are tracked individually, never commingled.',
                   },
@@ -1155,7 +1155,7 @@ export default async function LandingPage() {
                   {
                     icon: Shield,
                     color: 'text-amber-600',
-                    bg: 'bg-amber-50',
+                    bg: 'bg-amber-950/30',
                     title: 'Compliance-ready audit log',
                     desc: 'Every trust transaction is immutably logged with timestamp, user, and reason. Ready for an examination by your Law Society or College at any time.',
                   },
@@ -1232,14 +1232,14 @@ export default async function LandingPage() {
                   {
                     icon: Video,
                     color: 'text-emerald-600',
-                    bg: 'bg-emerald-50',
+                    bg: 'bg-emerald-950/30',
                     title: 'Built-in video consultations',
                     desc: 'Virtual appointments include an auto-generated video link. No Zoom account needed. HD calls are hosted inside NorvaOS.',
                   },
                   {
                     icon: Briefcase,
                     color: 'text-amber-600',
-                    bg: 'bg-amber-50',
+                    bg: 'bg-amber-950/30',
                     title: 'Linked to matter files',
                     desc: 'Every appointment is attached to the client\'s matter. Meeting notes, documents shared during the call, and outcomes are all stored in one place.',
                   },
@@ -1320,8 +1320,8 @@ export default async function LandingPage() {
                       mode: 'Video Call',
                       matter: '#2025-0198',
                       color: 'border-l-emerald-500',
-                      bg: 'bg-emerald-50',
-                      badge: 'text-emerald-700 bg-emerald-100',
+                      bg: 'bg-emerald-950/30',
+                      badge: 'text-emerald-400 bg-emerald-950/40',
                     },
                   ].map(appt => (
                     <div key={appt.time} className={`rounded-xl border-l-4 ${appt.color} ${appt.bg} p-3`}>
@@ -1392,7 +1392,7 @@ export default async function LandingPage() {
               {
                 icon: RefreshCw,
                 color: 'text-emerald-600',
-                bg: 'bg-emerald-50',
+                bg: 'bg-emerald-950/30',
                 title: 'Cloud Storage Sync',
                 desc: 'Two-way sync with OneDrive and Google Drive. Your team can work in the tools they know while NorvaOS stays the single source of truth.',
               },
@@ -1406,7 +1406,7 @@ export default async function LandingPage() {
               {
                 icon: Shield,
                 color: 'text-amber-600',
-                bg: 'bg-amber-50',
+                bg: 'bg-amber-950/30',
                 title: 'Legal Compliance by Design',
                 desc: 'Row-level security, full audit logs, PIPEDA-aligned storage, and guarded stage transitions. Compliance isn\'t an add-on. It\'s the foundation.',
               },
@@ -1427,7 +1427,7 @@ export default async function LandingPage() {
               {
                 icon: BellRing,
                 color: 'text-purple-600',
-                bg: 'bg-purple-50',
+                bg: 'bg-purple-950/30',
                 title: 'Automated Client Updates',
                 desc: 'Clients receive automatic SMS and email updates at every stage. No more "what\'s the status?" calls interrupting your day.',
               },
@@ -1514,7 +1514,7 @@ export default async function LandingPage() {
                   {
                     icon: Clock,
                     color: 'text-emerald-600',
-                    bg: 'bg-emerald-50',
+                    bg: 'bg-emerald-950/30',
                     title: 'Queue and wait time display',
                     desc: 'Clients see their queue position and estimated wait time. Walk-in inquiries can register and join a digital queue without speaking to anyone.',
                   },
@@ -1556,12 +1556,12 @@ export default async function LandingPage() {
                         </div>
                       </div>
 
-                      <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3">
+                      <div className="rounded-xl border border-emerald-500/20 bg-emerald-950/30 px-4 py-3">
                         <div className="flex items-center gap-2 mb-1">
                           <Calendar className="h-3.5 w-3.5 text-emerald-600" />
-                          <span className="text-xs font-semibold text-emerald-800">Appointment confirmed</span>
+                          <span className="text-xs font-semibold text-emerald-400">Appointment confirmed</span>
                         </div>
-                        <div className="text-xs text-emerald-700">Today at 2:00 PM with Zia Waseer</div>
+                        <div className="text-xs text-emerald-400">Today at 2:00 PM with Zia Waseer</div>
                         <div className="text-xs text-emerald-600">Spousal Sponsorship, Matter #2026-0047</div>
                       </div>
 
@@ -1663,8 +1663,8 @@ export default async function LandingPage() {
                 {[
                   { label: 'Microsoft Certified Professional, 1998',    color: 'bg-sky-50 text-sky-700 border-sky-100' },
                   { label: 'M.Sc. Computer Science, 2003',              color: 'bg-indigo-50 text-indigo-700 border-indigo-100' },
-                  { label: 'LLM, Master of Laws, UK, 2007',             color: 'bg-emerald-50 text-emerald-700 border-emerald-100' },
-                  { label: 'Qualified Solicitor, England & Wales, 2012', color: 'bg-amber-50 text-amber-700 border-amber-100' },
+                  { label: 'LLM, Master of Laws, UK, 2007',             color: 'bg-emerald-950/30 text-emerald-400 border-emerald-100' },
+                  { label: 'Qualified Solicitor, England & Wales, 2012', color: 'bg-amber-950/30 text-amber-400 border-amber-100' },
                   { label: 'Barrister & Solicitor, Ontario, 2019',       color: 'bg-rose-50 text-rose-700 border-rose-100' },
                 ].map(c => (
                   <span key={c.label} className={`rounded-full border px-3 py-1 text-[11px] font-semibold ${c.color}`}>{c.label}</span>
@@ -1736,7 +1736,7 @@ export default async function LandingPage() {
                   {[
                     { icon: BadgeCheck, title: 'Founder & Principal Lawyer', org: 'Waseer Law Office, Ontario', period: '2007 to Present', color: 'bg-indigo-50', iconColor: 'text-indigo-600', border: 'border-indigo-100' },
                     { icon: Scale,      title: 'Barrister & Solicitor, Ontario (Example)', org: 'Law Society of Ontario (Example)', period: '2019 to Present', color: 'bg-rose-50', iconColor: 'text-rose-600', border: 'border-rose-100' },
-                    { icon: Scale,      title: 'Immigration Law Practice', org: 'Immigration, Appeals & Refugee', period: '2012 to Present', color: 'bg-emerald-50', iconColor: 'text-emerald-700', border: 'border-emerald-100' },
+                    { icon: Scale,      title: 'Immigration Law Practice', org: 'Immigration, Appeals & Refugee', period: '2012 to Present', color: 'bg-emerald-950/30', iconColor: 'text-emerald-400', border: 'border-emerald-100' },
                     { icon: BookOpen,   title: 'Qualified Solicitor, England & Wales', org: 'Solicitors Regulation Authority', period: '2012', color: 'bg-teal-50', iconColor: 'text-teal-700', border: 'border-teal-100' },
                     { icon: Building2,  title: 'Project Manager, Government IT', org: 'Land Registry, Transport, Immigration', period: '2003 to 2006', color: 'bg-violet-50', iconColor: 'text-violet-600', border: 'border-violet-100' },
                     { icon: BadgeCheck, title: 'Project Manager, World Bank', org: 'Enterprise Technology Delivery', period: '2002 to 2003', color: 'bg-sky-50', iconColor: 'text-sky-600', border: 'border-sky-100' },
@@ -1765,7 +1765,7 @@ export default async function LandingPage() {
                       title: 'Best Lawyers: Ones to Watch',
                       org: 'Best Lawyers Canada',
                       year: '2025',
-                      color: 'bg-amber-50', iconColor: 'text-amber-600', border: 'border-amber-100',
+                      color: 'bg-amber-950/30', iconColor: 'text-amber-600', border: 'border-amber-100',
                     },
                     {
                       icon: Star,

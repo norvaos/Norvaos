@@ -390,7 +390,7 @@ export default function ExpiryRemindersSettingsPage() {
                       className="flex items-center justify-between rounded-lg border p-4"
                     >
                       <div className="flex items-center gap-3">
-                        <div className="flex size-9 items-center justify-center rounded-lg bg-amber-50 text-amber-600">
+                        <div className="flex size-9 items-center justify-center rounded-lg bg-amber-950/30 text-amber-600">
                           <TypeIcon className="size-4" />
                         </div>
                         <div>

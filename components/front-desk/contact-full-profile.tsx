@@ -388,7 +388,7 @@ function NotesTab({ contactId, tenantId }: { contactId: string; tenantId: string
             <div
               key={note.id}
               className={`p-3 rounded-lg border ${
-                note.is_pinned ? 'border-amber-200 bg-amber-950/30/50' : 'bg-background border-border'
+                note.is_pinned ? 'border-amber-500/20 bg-amber-950/30/50' : 'bg-background border-border'
               }`}
             >
               {editingId === note.id ? (
@@ -597,11 +597,11 @@ function ActivityTab({ contactId, tenantId }: { contactId: string; tenantId: str
     wrong_number: 'Wrong #',
   }
   const outcomeColours: Record<string, string> = {
-    connected: 'bg-green-100 text-emerald-400',
+    connected: 'bg-emerald-950/40 text-emerald-400',
     no_answer: 'bg-slate-100 text-slate-600',
-    voicemail: 'bg-blue-100 text-blue-400',
-    busy: 'bg-orange-100 text-orange-400',
-    wrong_number: 'bg-red-100 text-red-600',
+    voicemail: 'bg-blue-950/40 text-blue-400',
+    busy: 'bg-orange-950/40 text-orange-400',
+    wrong_number: 'bg-red-950/40 text-red-600',
   }
 
   return (
@@ -758,10 +758,10 @@ function TasksTab({ contactId, tenantId }: { contactId: string; tenantId: string
   }
 
   const statusColours: Record<string, string> = {
-    done: 'bg-green-100 text-emerald-400',
+    done: 'bg-emerald-950/40 text-emerald-400',
     not_started: 'bg-slate-100 text-slate-600',
-    working_on_it: 'bg-blue-100 text-blue-400',
-    stuck: 'bg-red-100 text-red-600',
+    working_on_it: 'bg-blue-950/40 text-blue-400',
+    stuck: 'bg-red-950/40 text-red-600',
     cancelled: 'bg-slate-100 text-slate-400',
   }
 
@@ -1008,12 +1008,12 @@ function AppointmentsTab({ contactId }: { contactId: string }) {
   }
 
   const statusColours: Record<string, string> = {
-    confirmed: 'bg-blue-100 text-blue-400',
-    checked_in: 'bg-green-100 text-emerald-400',
+    confirmed: 'bg-blue-950/40 text-blue-400',
+    checked_in: 'bg-emerald-950/40 text-emerald-400',
     completed: 'bg-slate-100 text-slate-600',
-    cancelled: 'bg-red-100 text-red-600',
-    no_show: 'bg-orange-100 text-orange-400',
-    pending: 'bg-amber-100 text-amber-400',
+    cancelled: 'bg-red-950/40 text-red-600',
+    no_show: 'bg-orange-950/40 text-orange-400',
+    pending: 'bg-amber-950/40 text-amber-400',
   }
 
   const today = new Date().toISOString().split('T')[0]

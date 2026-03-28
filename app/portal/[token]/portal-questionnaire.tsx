@@ -181,9 +181,9 @@ export function PortalQuestionnaire({
   // ── Submitted state ─────────────────────────────────────────
   if (submitted) {
     return (
-      <div className="bg-green-50 border border-green-200 rounded-lg p-6 text-center">
+      <div className="bg-emerald-950/30 border border-emerald-500/20 rounded-lg p-6 text-center">
         <CheckCircle2 className="h-10 w-10 text-green-500 mx-auto mb-3" />
-        <p className="text-sm font-medium text-green-800">
+        <p className="text-sm font-medium text-emerald-400">
           {isFr ? 'Questionnaire soumis avec succès !' : 'Questionnaire submitted successfully!'}
         </p>
         <p className="text-xs text-green-600 mt-1">
@@ -249,7 +249,7 @@ export function PortalQuestionnaire({
 
       {/* Submit error */}
       {submitError && (
-        <div className="flex items-center gap-2 text-xs text-red-600 bg-red-50 border border-red-200 rounded-md p-3">
+        <div className="flex items-center gap-2 text-xs text-red-600 bg-red-950/30 border border-red-500/20 rounded-md p-3">
           <AlertCircle className="h-3.5 w-3.5 flex-shrink-0" />
           {submitError}
         </div>
@@ -331,7 +331,7 @@ function FieldRenderer({
           value={stringValue}
           onChange={(e) => onChange(e.target.value)}
           placeholder={field.placeholder}
-          className={cn(error && 'border-red-300')}
+          className={cn(error && 'border-red-500/30')}
         />
       )}
 
@@ -342,7 +342,7 @@ function FieldRenderer({
           value={stringValue}
           onChange={(e) => onChange(e.target.value)}
           placeholder={field.placeholder || 'your@email.com'}
-          className={cn(error && 'border-red-300')}
+          className={cn(error && 'border-red-500/30')}
         />
       )}
 
@@ -353,7 +353,7 @@ function FieldRenderer({
           value={stringValue}
           onChange={(e) => onChange(e.target.value)}
           placeholder={field.placeholder || '+1 555 000 0000'}
-          className={cn(error && 'border-red-300')}
+          className={cn(error && 'border-red-500/30')}
         />
       )}
 
@@ -364,7 +364,7 @@ function FieldRenderer({
           value={stringValue}
           onChange={(e) => onChange(e.target.value)}
           placeholder={field.placeholder || '0'}
-          className={cn(error && 'border-red-300')}
+          className={cn(error && 'border-red-500/30')}
         />
       )}
 
@@ -373,7 +373,7 @@ function FieldRenderer({
           id={field.id}
           value={stringValue}
           onChange={(iso) => onChange(iso)}
-          className={cn(error && 'border-red-300')}
+          className={cn(error && 'border-red-500/30')}
         />
       )}
 
@@ -384,7 +384,7 @@ function FieldRenderer({
           onChange={(e) => onChange(e.target.value)}
           placeholder={field.placeholder}
           rows={3}
-          className={cn('resize-none', error && 'border-red-300')}
+          className={cn('resize-none', error && 'border-red-500/30')}
         />
       )}
 
@@ -406,7 +406,7 @@ function FieldRenderer({
           value={stringValue}
           onValueChange={(v) => onChange(v)}
         >
-          <SelectTrigger id={field.id} className={cn(error && 'border-red-300')}>
+          <SelectTrigger id={field.id} className={cn(error && 'border-red-500/30')}>
             <SelectValue placeholder={language === 'fr' ? 'Sélectionner...' : 'Select...'} />
           </SelectTrigger>
           <SelectContent>
@@ -426,7 +426,7 @@ function FieldRenderer({
           value={stringValue}
           onChange={(e) => onChange(e.target.value)}
           placeholder={field.placeholder || 'https://...'}
-          className={cn(error && 'border-red-300')}
+          className={cn(error && 'border-red-500/30')}
         />
       )}
 

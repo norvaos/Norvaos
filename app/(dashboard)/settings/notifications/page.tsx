@@ -210,8 +210,8 @@ export default function NotificationPreferencesPage() {
           {pushSupported && !pushActive && prefs.push_notifications && (
             <>
               <Separator />
-              <div className="flex items-center justify-between rounded-md border border-amber-200 bg-amber-50 p-3">
-                <p className="text-xs text-amber-800">
+              <div className="flex items-center justify-between rounded-md border border-amber-500/20 bg-amber-950/30 p-3">
+                <p className="text-xs text-amber-400">
                   Push notifications are enabled but your browser hasn&apos;t been registered yet.
                 </p>
                 <Button size="sm" variant="outline" onClick={handleEnablePush}>

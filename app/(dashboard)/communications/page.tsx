@@ -87,17 +87,17 @@ export default function CommunicationsPage() {
       <UnmatchedEmailTriage />
 
       {/* Deprecation Banner */}
-      <div className="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4">
+      <div className="flex items-start gap-3 rounded-lg border border-amber-500/20 bg-amber-950/30 p-4">
         <AlertTriangle className="mt-0.5 size-5 shrink-0 text-amber-600" />
         <div className="flex-1">
           <p className="text-sm font-medium text-amber-900">
             This view has been deprecated
           </p>
-          <p className="mt-1 text-sm text-amber-800">
+          <p className="mt-1 text-sm text-amber-400">
             This view has been replaced by the Communication Panel in the Matter Workplace.
             Navigate to any matter to access the new email experience.
           </p>
-          <Link href="/matters" className="mt-2 inline-flex items-center gap-1.5 text-sm font-medium text-amber-700 hover:text-amber-900 transition-colors">
+          <Link href="/matters" className="mt-2 inline-flex items-center gap-1.5 text-sm font-medium text-amber-400 hover:text-amber-900 transition-colors">
             Go to Matters
             <ArrowRight className="size-3.5" />
           </Link>

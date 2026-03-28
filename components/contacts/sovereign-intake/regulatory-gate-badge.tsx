@@ -27,19 +27,19 @@ const GATE_CONFIG: Record<GateType, {
     label: 'INQUIRY GATE',
     tooltip: 'LSO/LSBC Requirement: Conflict search must be completed before collecting personal data.',
     icon: Shield,
-    colour: 'border-blue-300 bg-blue-950/30 text-blue-400',
+    colour: 'border-blue-500/30 bg-blue-950/30 text-blue-400',
   },
   screening: {
     label: 'SCREENING GATE',
     tooltip: 'CICC/LSO Requirement: Identity must be verified before retaining a client.',
     icon: UserPlus,
-    colour: 'border-amber-300 bg-amber-950/30 text-amber-400',
+    colour: 'border-amber-500/30 bg-amber-950/30 text-amber-400',
   },
   retained: {
     label: 'RETAINED GATE',
     tooltip: 'All compliance checks must pass: KYC verified, conflict cleared, retainer signed and hash-locked.',
     icon: Lock,
-    colour: 'border-emerald-300 bg-emerald-950/30 text-emerald-400',
+    colour: 'border-emerald-500/30 bg-emerald-950/30 text-emerald-400',
   },
 }
 

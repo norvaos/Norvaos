@@ -89,7 +89,7 @@ export default function CriticalActionsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-red-100">
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-red-950/40">
             <AlertTriangle className="h-5 w-5 text-red-600" />
           </div>
           <div>
@@ -161,7 +161,7 @@ export default function CriticalActionsPage() {
                   <div className="flex items-start gap-2 min-w-0">
                     <Badge
                       variant="outline"
-                      className="shrink-0 bg-red-50 text-red-700 border-red-300 text-[10px] px-1.5 py-0 uppercase tracking-wider font-bold"
+                      className="shrink-0 bg-red-950/30 text-red-400 border-red-500/30 text-[10px] px-1.5 py-0 uppercase tracking-wider font-bold"
                     >
                       CRITICAL
                     </Badge>

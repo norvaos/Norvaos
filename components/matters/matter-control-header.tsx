@@ -52,8 +52,8 @@ export function MatterControlHeader({
   const pctClasses = pct >= threshold
     ? 'text-emerald-400 bg-emerald-950/40 border-emerald-500/30'
     : pct >= 60
-      ? 'text-amber-400 bg-amber-100 border-amber-300'
-      : 'text-red-400 bg-red-100 border-red-300'
+      ? 'text-amber-400 bg-amber-950/40 border-amber-500/30'
+      : 'text-red-400 bg-red-950/40 border-red-500/30'
 
   // Drafting / Filing status
   const hasDraftingBlockers = (matrix?.draftingBlockers.length ?? 0) > 0
@@ -72,8 +72,8 @@ export function MatterControlHeader({
   const formsColour = formsPct >= 80
     ? 'text-emerald-400 bg-emerald-950/30 border-emerald-500/20'
     : formsPct >= 50
-      ? 'text-amber-400 bg-amber-950/30 border-amber-200'
-      : 'text-red-400 bg-red-950/30 border-red-200'
+      ? 'text-amber-400 bg-amber-950/30 border-amber-500/20'
+      : 'text-red-400 bg-red-950/30 border-red-500/20'
 
   // Doc completion % (accepted / total)
   const docs = readinessData.documents
@@ -83,8 +83,8 @@ export function MatterControlHeader({
   const docsColour = docsPct >= 80
     ? 'text-emerald-400 bg-emerald-950/30 border-emerald-500/20'
     : docsPct >= 50
-      ? 'text-amber-400 bg-amber-950/30 border-amber-200'
-      : 'text-red-400 bg-red-950/30 border-red-200'
+      ? 'text-amber-400 bg-amber-950/30 border-amber-500/20'
+      : 'text-red-400 bg-red-950/30 border-red-500/20'
 
   return (
     <div className="rounded-lg border bg-card px-4 py-2.5 space-y-1.5">
@@ -148,7 +148,7 @@ export function MatterControlHeader({
                 BLOCKED
               </Badge>
             ) : (
-              <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-green-300 text-green-700 bg-green-50">
+              <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-emerald-500/30 text-emerald-400 bg-emerald-950/30">
                 READY
               </Badge>
             )}
@@ -165,7 +165,7 @@ export function MatterControlHeader({
                 BLOCKED
               </Badge>
             ) : (
-              <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-green-300 text-green-700 bg-green-50">
+              <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-emerald-500/30 text-emerald-400 bg-emerald-950/30">
                 READY
               </Badge>
             )}
@@ -176,7 +176,7 @@ export function MatterControlHeader({
         {lawyerReviewNeeded && (
           <>
             <Divider />
-            <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-amber-300 text-amber-400 bg-amber-950/30 iron-canvas-guard max-w-[200px]" title="Lawyer Review Required">
+            <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-amber-500/30 text-amber-400 bg-amber-950/30 iron-canvas-guard max-w-[200px]" title="Lawyer Review Required">
               Lawyer Review Required
             </Badge>
           </>
@@ -186,7 +186,7 @@ export function MatterControlHeader({
         {stalePacks > 0 && (
           <>
             <Divider />
-            <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-amber-300 text-amber-400 bg-amber-950/30 iron-canvas-guard max-w-[200px]" title={`${stalePacks} outdated ${stalePacks === 1 ? 'form pack' : 'form packs'}`}>
+            <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-amber-500/30 text-amber-400 bg-amber-950/30 iron-canvas-guard max-w-[200px]" title={`${stalePacks} outdated ${stalePacks === 1 ? 'form pack' : 'form packs'}`}>
               {stalePacks} outdated {stalePacks === 1 ? 'form pack' : 'form packs'}
             </Badge>
           </>

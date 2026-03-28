@@ -468,7 +468,7 @@ export function CaseInsightsPanel({ matterId, tenantId, stageEnteredAt, currentS
         {insights.insights.length === 0 && (
           <div className="flex items-center gap-2 py-3 px-4 bg-emerald-950/30 border border-emerald-500/30 rounded-lg">
             <CheckCircle2 className="h-4 w-4 text-green-600" />
-            <span className="text-xs font-medium text-green-800">
+            <span className="text-xs font-medium text-emerald-400">
               No issues found  -  case is on track
             </span>
           </div>

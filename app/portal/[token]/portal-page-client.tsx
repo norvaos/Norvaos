@@ -743,7 +743,7 @@ export function PortalPageClient({
 
         {/* 5b. Book a Consultation  -  prominent standalone section */}
         <section
-          className="rounded-2xl border border-blue-200/60 p-5 shadow-lg backdrop-blur-sm relative overflow-hidden"
+          className="rounded-2xl border border-blue-500/20/60 p-5 shadow-lg backdrop-blur-sm relative overflow-hidden"
           style={{
             background: `linear-gradient(135deg, #eff6ff 0%, white 50%, ${accent}04 100%)`,
             boxShadow: '0 4px 20px rgba(59,130,246,0.08), 0 1px 3px rgba(0,0,0,0.04)',
@@ -1023,7 +1023,7 @@ export function PortalPageClient({
               <a
                 href={`mailto:${supportContact.email}`}
                 onClick={() => track('portal_help_contact_clicked', { contact_type: 'email', target: supportContact.email! })}
-                className="text-blue-600 hover:text-blue-800 transition-colors"
+                className="text-blue-600 hover:text-blue-400 transition-colors"
               >
                 {supportContact.email}
               </a>

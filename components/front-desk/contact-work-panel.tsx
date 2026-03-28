@@ -75,22 +75,22 @@ interface ContactWorkPanelProps {
 const RISK_FLAG_CONFIG: Record<string, { label: string; className: string; icon: React.ReactNode }> = {
   do_not_contact: {
     label: 'Do Not Contact',
-    className: 'bg-red-100 text-red-800 border-red-200',
+    className: 'bg-red-950/40 text-red-400 border-red-500/20',
     icon: <AlertTriangle className="size-3" />,
   },
   billing_restricted: {
     label: 'Billing Restricted',
-    className: 'bg-amber-100 text-amber-800 border-amber-500/20',
+    className: 'bg-amber-950/40 text-amber-400 border-amber-500/20',
     icon: <Shield className="size-3" />,
   },
   id_verification_required: {
     label: 'ID Verification Required',
-    className: 'bg-blue-100 text-blue-800 border-blue-500/20',
+    className: 'bg-blue-950/40 text-blue-400 border-blue-500/20',
     icon: <Shield className="size-3" />,
   },
   vip: {
     label: 'VIP',
-    className: 'bg-purple-100 text-purple-800 border-purple-200',
+    className: 'bg-purple-950/40 text-purple-400 border-purple-500/20',
     icon: <User className="size-3" />,
   },
   special_needs: {
@@ -598,10 +598,10 @@ export function ContactWorkPanel({ contactId, onClose, onCreateIntake }: Contact
                             )}
                           </div>
                           <span className={`ml-2 shrink-0 text-xs px-1.5 py-0.5 rounded font-medium capitalize ${
-                            m.status === 'active' ? 'bg-green-100 text-emerald-400' :
-                            m.status === 'pending' ? 'bg-amber-100 text-amber-400' :
+                            m.status === 'active' ? 'bg-emerald-950/40 text-emerald-400' :
+                            m.status === 'pending' ? 'bg-amber-950/40 text-amber-400' :
                             m.status === 'closed_won' ? 'bg-slate-100 text-slate-600' :
-                            'bg-red-100 text-red-400'
+                            'bg-red-950/40 text-red-400'
                           }`}>
                             {m.status.replace('_', ' ')}
                           </span>
@@ -633,10 +633,10 @@ export function ContactWorkPanel({ contactId, onClose, onCreateIntake }: Contact
                           <div className="flex items-center justify-between">
                             <span className="font-medium">{a.appointment_date}</span>
                             <span className={`text-xs px-1.5 py-0.5 rounded font-medium capitalize ${
-                              a.status === 'confirmed' ? 'bg-blue-100 text-blue-400' :
-                              a.status === 'checked_in' ? 'bg-green-100 text-emerald-400' :
+                              a.status === 'confirmed' ? 'bg-blue-950/40 text-blue-400' :
+                              a.status === 'checked_in' ? 'bg-emerald-950/40 text-emerald-400' :
                               a.status === 'completed' ? 'bg-slate-100 text-slate-600' :
-                              'bg-amber-100 text-amber-400'
+                              'bg-amber-950/40 text-amber-400'
                             }`}>
                               {a.status.replace('_', ' ')}
                             </span>

@@ -83,13 +83,13 @@ function getEventTypeColor(type: string | null): string {
   if (!type) return 'bg-slate-100 text-slate-600 border-slate-200'
   const t = type.toLowerCase()
   if (t.includes('hearing') || t.includes('court'))
-    return 'bg-red-50 text-red-600 border-red-200'
+    return 'bg-red-950/30 text-red-600 border-red-500/20'
   if (t.includes('meeting') || t.includes('consultation'))
-    return 'bg-blue-50 text-blue-600 border-blue-200'
+    return 'bg-blue-950/30 text-blue-600 border-blue-500/20'
   if (t.includes('deadline') || t.includes('filing'))
-    return 'bg-amber-50 text-amber-600 border-amber-200'
+    return 'bg-amber-950/30 text-amber-600 border-amber-500/20'
   if (t.includes('appointment') || t.includes('biometric'))
-    return 'bg-purple-50 text-purple-600 border-purple-200'
+    return 'bg-purple-950/30 text-purple-600 border-purple-500/20'
   return 'bg-slate-100 text-slate-600 border-slate-200'
 }
 

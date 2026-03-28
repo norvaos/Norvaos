@@ -46,7 +46,7 @@ By proceeding, you acknowledge and consent to the temporary storage of your iden
 
   return (
     <div className="flex flex-col items-center gap-6 w-full max-w-lg mx-auto px-4">
-      <div className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center">
+      <div className="w-16 h-16 rounded-full bg-blue-950/30 flex items-center justify-center">
         <Shield className="w-8 h-8 text-blue-600" />
       </div>
 
@@ -67,7 +67,7 @@ By proceeding, you acknowledge and consent to the temporary storage of your iden
         onClick={() => setAcknowledged(!acknowledged)}
         className={`w-full flex items-center gap-3 p-4 rounded-xl border-2 transition-colors ${
           acknowledged
-            ? 'border-emerald-500 bg-emerald-50'
+            ? 'border-emerald-500 bg-emerald-950/30'
             : 'border-slate-200 bg-white hover:border-slate-300'
         }`}
       >

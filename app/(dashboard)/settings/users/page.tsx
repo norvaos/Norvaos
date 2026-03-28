@@ -160,7 +160,7 @@ function CreatedCredentialsModal({
           </div>
         </div>
 
-        <p className="text-xs text-amber-400 bg-amber-950/30 border border-amber-200 rounded-md px-3 py-2">
+        <p className="text-xs text-amber-400 bg-amber-950/30 border border-amber-500/20 rounded-md px-3 py-2">
           <strong>Note:</strong> This password will not be shown again. Copy it now before closing.
         </p>
 

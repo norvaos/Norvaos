@@ -375,7 +375,7 @@ export default function PlaybookEditorPage({
                 'flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium transition-colors',
                 status === 'published'
                   ? 'bg-emerald-950/30 text-emerald-400 hover:bg-emerald-950/40'
-                  : 'bg-amber-950/30 text-amber-400 hover:bg-amber-100',
+                  : 'bg-amber-950/30 text-amber-400 hover:bg-amber-950/40',
               )}
             >
               <Globe className="h-3.5 w-3.5" />
@@ -456,7 +456,7 @@ export default function PlaybookEditorPage({
               onChange={e => setTagInput(e.target.value)}
               onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addTag() } }}
               placeholder="+ Add tag"
-              className="rounded-lg border border-dashed border-border bg-transparent px-2.5 py-1 text-xs placeholder:text-muted-foreground outline-none focus:border-blue-300 w-24"
+              className="rounded-lg border border-dashed border-border bg-transparent px-2.5 py-1 text-xs placeholder:text-muted-foreground outline-none focus:border-blue-500/30 w-24"
             />
           </div>
 
@@ -478,7 +478,7 @@ export default function PlaybookEditorPage({
           <div className="mt-4 flex justify-center">
             <button
               onClick={() => addBlockAfter(blocks[blocks.length - 1].id)}
-              className="flex items-center gap-1.5 rounded-lg border-2 border-dashed border-border px-4 py-2 text-xs text-muted-foreground hover:border-blue-300 hover:text-blue-500 transition-colors"
+              className="flex items-center gap-1.5 rounded-lg border-2 border-dashed border-border px-4 py-2 text-xs text-muted-foreground hover:border-blue-500/30 hover:text-blue-500 transition-colors"
             >
               <Plus className="h-3.5 w-3.5" />
               Add Block

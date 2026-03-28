@@ -477,7 +477,7 @@ export default function ReleasesPage() {
               >
                 <div className="flex items-center gap-2">
                   <Lock className={cn('h-3 w-3', dark ? 'text-red-400/60' : 'text-red-500')} />
-                  <span className={cn('mono font-medium', dark ? 'text-red-300/80' : 'text-red-700')}>
+                  <span className={cn('mono font-medium', dark ? 'text-red-300/80' : 'text-red-400')}>
                     {m.migration_name}
                   </span>
                 </div>
@@ -569,7 +569,7 @@ export default function ReleasesPage() {
                           'flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider transition-all',
                           dark
                             ? 'border-red-500/20 text-red-400/60 hover:bg-red-500/10 hover:text-red-400 hover:border-red-500/30'
-                            : 'border-red-200 text-red-500/60 hover:bg-red-50 hover:text-red-600 hover:border-red-300',
+                            : 'border-red-500/20 text-red-500/60 hover:bg-red-950/30 hover:text-red-600 hover:border-red-500/30',
                         )}
                       >
                         <Undo2 className="h-3 w-3" />
@@ -696,7 +696,7 @@ export default function ReleasesPage() {
               'mx-4 w-full max-w-md rounded-2xl border p-6 shadow-2xl',
               dark
                 ? 'border-red-500/20 bg-zinc-950'
-                : 'border-red-200 bg-white',
+                : 'border-red-500/20 bg-white',
             )}
           >
             <div className="flex items-center gap-3 mb-4">

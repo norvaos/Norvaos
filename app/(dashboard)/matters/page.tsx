@@ -612,7 +612,7 @@ export default function MattersPage() {
           ))}
         </div>
       ) : isError ? (
-        <div className="rounded-lg border border-red-200 bg-red-950/30 p-8 text-center">
+        <div className="rounded-lg border border-red-500/20 bg-red-950/30 p-8 text-center">
           <p className="text-sm text-red-600">{t('matters.load_error' as any)}</p>
         </div>
       ) : matters.length === 0 ? (
@@ -633,7 +633,7 @@ export default function MattersPage() {
           {/* Bulk action bar */}
           {selectedIds.size > 0 && (
             <div className="flex items-center justify-between rounded-lg border border-blue-500/20 bg-blue-950/30 px-4 py-2.5">
-              <span className="text-sm font-medium text-blue-800">
+              <span className="text-sm font-medium text-blue-400">
                 {selectedIds.size} {selectedIds.size !== 1 ? t('matters.matters_plural' as any) : t('matters.matter_singular' as any)} {t('matters.selected' as any)}
               </span>
               <div className="flex items-center gap-2">

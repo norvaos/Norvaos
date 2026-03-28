@@ -25,7 +25,7 @@ export function ConflictResultCard({
   return (
     <Card
       className={cn(
-        'border-amber-200 bg-amber-50/50 animate-in fade-in slide-in-from-bottom-2 duration-300',
+        'border-amber-500/20 bg-amber-950/30/50 animate-in fade-in slide-in-from-bottom-2 duration-300',
         className
       )}
     >
@@ -33,7 +33,7 @@ export function ConflictResultCard({
         <div
           className={cn(
             'size-8 rounded-full flex items-center justify-center shrink-0',
-            'bg-amber-100 text-amber-600'
+            'bg-amber-950/40 text-amber-600'
           )}
         >
           {isContact ? (
@@ -47,7 +47,7 @@ export function ConflictResultCard({
             <p className="text-xs font-medium text-slate-800 truncate">{name}</p>
             <Badge
               variant="outline"
-              className="text-[8px] shrink-0 border-amber-300 bg-amber-50 text-amber-700"
+              className="text-[8px] shrink-0 border-amber-500/30 bg-amber-950/30 text-amber-400"
             >
               {isContact ? 'Existing Contact' : 'Active Matter'}
             </Badge>

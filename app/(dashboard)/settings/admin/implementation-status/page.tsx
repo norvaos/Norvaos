@@ -280,8 +280,8 @@ function StatusRow({
         className={cn(
           'shrink-0 text-xs font-medium',
           status === 'ok' && 'border-emerald-500/20 bg-emerald-950/30 text-emerald-400',
-          status === 'warn' && 'border-amber-200 bg-amber-950/30 text-amber-400',
-          status === 'error' && 'border-red-200 bg-red-950/30 text-red-400',
+          status === 'warn' && 'border-amber-500/20 bg-amber-950/30 text-amber-400',
+          status === 'error' && 'border-red-500/20 bg-red-950/30 text-red-400',
           status === 'neutral' && 'border-slate-200 bg-slate-50 text-slate-500'
         )}
       >

@@ -715,7 +715,7 @@ export function ContactForm({
                     <FormControl>
                       <Input
                         placeholder="Toronto"
-                        className={cn(reviewRequiredFields.has('city') && !field.value && 'border-amber-400 ring-1 ring-amber-200 bg-amber-50/50')}
+                        className={cn(reviewRequiredFields.has('city') && !field.value && 'border-amber-400 ring-1 ring-amber-200 bg-amber-950/30/50')}
                         {...field}
                         value={field.value ?? ''}
                         onChange={(e) => {
@@ -740,7 +740,7 @@ export function ContactForm({
                     <FormControl>
                       <Input
                         placeholder="Ontario"
-                        className={cn(reviewRequiredFields.has('province_state') && !field.value && 'border-amber-400 ring-1 ring-amber-200 bg-amber-50/50')}
+                        className={cn(reviewRequiredFields.has('province_state') && !field.value && 'border-amber-400 ring-1 ring-amber-200 bg-amber-950/30/50')}
                         {...field}
                         value={field.value ?? ''}
                         onChange={(e) => {
@@ -767,7 +767,7 @@ export function ContactForm({
                     <FormControl>
                       <Input
                         placeholder="M5V 2T6"
-                        className={cn(reviewRequiredFields.has('postal_code') && !field.value && 'border-amber-400 ring-1 ring-amber-200 bg-amber-50/50')}
+                        className={cn(reviewRequiredFields.has('postal_code') && !field.value && 'border-amber-400 ring-1 ring-amber-200 bg-amber-950/30/50')}
                         {...field}
                         value={field.value ?? ''}
                         onChange={(e) => {

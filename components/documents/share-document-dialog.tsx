@@ -90,7 +90,7 @@ export function ShareDocumentDialog({
 
         <div className="space-y-4 py-2">
           {isCurrentlyShared && (
-            <div className="rounded-lg border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-700">
+            <div className="rounded-lg border border-emerald-500/20 bg-emerald-950/30 px-3 py-2 text-sm text-emerald-400">
               This document is currently shared with the client.
             </div>
           )}
@@ -139,7 +139,7 @@ export function ShareDocumentDialog({
               variant="outline"
               onClick={handleUnshare}
               disabled={shareDoc.isPending}
-              className="text-red-600 border-red-200 hover:bg-red-50"
+              className="text-red-600 border-red-500/20 hover:bg-red-950/30"
             >
               <XCircle className="h-4 w-4 mr-1" />
               Stop Sharing

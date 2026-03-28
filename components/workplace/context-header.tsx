@@ -125,10 +125,10 @@ export function ContextHeader({
 
   const readinessPct = readinessData?.readinessMatrix?.overallPct ?? 0
   const readinessColour = readinessPct >= 85
-    ? 'text-emerald-700 bg-emerald-100'
+    ? 'text-emerald-400 bg-emerald-950/40'
     : readinessPct >= 60
-      ? 'text-amber-700 bg-amber-100'
-      : 'text-red-700 bg-red-100'
+      ? 'text-amber-400 bg-amber-950/40'
+      : 'text-red-400 bg-red-950/40'
 
   const lawyerName = responsibleLawyer
     ? [responsibleLawyer.first_name, responsibleLawyer.last_name].filter(Boolean).join(' ')

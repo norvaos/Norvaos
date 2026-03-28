@@ -78,13 +78,13 @@ export function CentralActionPanel({
   // ── Accent colour based on status ────────────────────────────────────────
 
   const wrapperClass = intakeStatus === 'ready_for_filing'
-    ? 'rounded-lg border-l-4 border-l-green-500 border bg-green-50/50 dark:bg-green-950/20 p-4'
+    ? 'rounded-lg border-l-4 border-l-green-500 border bg-emerald-950/30/50 dark:bg-green-950/20 p-4'
     : intakeStatus === 'deficiency_outstanding'
-      ? 'rounded-lg border-l-4 border-l-red-500 border bg-red-50/50 dark:bg-red-950/20 p-4'
-      : 'rounded-lg border-l-4 border-l-blue-500 border bg-blue-50/50 dark:bg-blue-950/20 p-4'
+      ? 'rounded-lg border-l-4 border-l-red-500 border bg-red-950/30/50 dark:bg-red-950/20 p-4'
+      : 'rounded-lg border-l-4 border-l-blue-500 border bg-blue-950/30/50 dark:bg-blue-950/20 p-4'
 
   const labelClass = intakeStatus === 'ready_for_filing'
-    ? 'text-[10px] font-semibold uppercase tracking-wider text-green-700 dark:text-green-300'
+    ? 'text-[10px] font-semibold uppercase tracking-wider text-emerald-400 dark:text-green-300'
     : intakeStatus === 'deficiency_outstanding'
       ? 'text-[10px] font-semibold uppercase tracking-wider text-red-400 dark:text-red-300'
       : 'text-[10px] font-semibold uppercase tracking-wider text-blue-400 dark:text-blue-300'

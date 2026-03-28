@@ -100,7 +100,7 @@ function SectionRow({
         {section.stale > 0 && (
           <Badge
             variant="outline"
-            className="text-[10px] py-0 px-1.5 border-amber-300 text-amber-600 bg-amber-950/30 shrink-0"
+            className="text-[10px] py-0 px-1.5 border-amber-500/30 text-amber-600 bg-amber-950/30 shrink-0"
           >
             {section.stale} stale
           </Badge>
@@ -108,7 +108,7 @@ function SectionRow({
         {section.blocked > 0 && (
           <Badge
             variant="outline"
-            className="text-[10px] py-0 px-1.5 border-red-300 text-red-600 bg-red-950/30 shrink-0"
+            className="text-[10px] py-0 px-1.5 border-red-500/30 text-red-600 bg-red-950/30 shrink-0"
           >
             {section.blocked} blocked
           </Badge>
@@ -271,7 +271,7 @@ export function InstanceProgress({
           {total_stale > 0 && (
             <Badge
               variant="outline"
-              className="text-[10px] py-0 px-1.5 border-amber-300 text-amber-600 bg-amber-950/30"
+              className="text-[10px] py-0 px-1.5 border-amber-500/30 text-amber-600 bg-amber-950/30"
             >
               {total_stale} stale
             </Badge>
@@ -279,7 +279,7 @@ export function InstanceProgress({
           {total_blocked > 0 && (
             <Badge
               variant="outline"
-              className="text-[10px] py-0 px-1.5 border-red-300 text-red-600 bg-red-950/30"
+              className="text-[10px] py-0 px-1.5 border-red-500/30 text-red-600 bg-red-950/30"
             >
               {total_blocked} blocked
             </Badge>

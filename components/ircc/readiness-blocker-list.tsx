@@ -190,8 +190,8 @@ export function ReadinessBlockerList({
               className={cn(
                 'group flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-[11px] transition-all',
                 blocker.blocks_filing
-                  ? 'bg-red-500/8 text-red-700 dark:text-red-300 hover:bg-red-500/15'
-                  : 'bg-amber-500/8 text-amber-700 dark:text-amber-300 hover:bg-amber-500/15',
+                  ? 'bg-red-500/8 text-red-400 dark:text-red-300 hover:bg-red-500/15'
+                  : 'bg-amber-500/8 text-amber-400 dark:text-amber-300 hover:bg-amber-500/15',
               )}
             >
               {/* Icon */}

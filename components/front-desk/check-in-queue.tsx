@@ -23,7 +23,7 @@ const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   started: { label: 'In Progress', color: 'bg-amber-950/30 text-amber-400 border-amber-500/20' },
   identity_verified: { label: 'Verified', color: 'bg-blue-950/30 text-blue-400 border-blue-500/20' },
   completed: { label: 'Checked In', color: 'bg-emerald-950/30 text-emerald-400 border-emerald-500/20' },
-  acknowledged: { label: 'In Meeting', color: 'bg-purple-950/30 text-purple-400 border-purple-200' },
+  acknowledged: { label: 'In Meeting', color: 'bg-purple-950/30 text-purple-400 border-purple-500/20' },
   abandoned: { label: 'Abandoned', color: 'bg-slate-50 text-slate-400 border-slate-200' },
 }
 

@@ -189,7 +189,7 @@ export default function AcademyPage() {
       <Card className={cn(
         'border-2 transition-colors',
         isCertified
-          ? 'border-amber-300 bg-gradient-to-r from-amber-50 to-yellow-50 dark:from-amber-900/10 dark:to-yellow-900/10 dark:border-amber-700'
+          ? 'border-amber-500/30 bg-gradient-to-r from-amber-50 to-yellow-50 dark:from-amber-900/10 dark:to-yellow-900/10 dark:border-amber-700'
           : 'border-violet-200 dark:border-violet-800',
       )}>
         <CardContent className="py-4">
@@ -327,13 +327,13 @@ export default function AcademyPage() {
 
       {/* Certification Card */}
       {isCertified && (
-        <Card className="border-2 border-amber-300 bg-gradient-to-r from-amber-50 via-yellow-50 to-amber-50 dark:from-amber-900/10 dark:via-yellow-900/10 dark:to-amber-900/10 dark:border-amber-700">
+        <Card className="border-2 border-amber-500/30 bg-gradient-to-r from-amber-50 via-yellow-50 to-amber-50 dark:from-amber-900/10 dark:via-yellow-900/10 dark:to-amber-900/10 dark:border-amber-700">
           <CardContent className="py-6 text-center space-y-3">
             <div className="relative inline-block">
               <Trophy className="h-12 w-12 text-amber-500 mx-auto" />
               <Sparkles className="h-5 w-5 text-yellow-500 absolute -top-1 -right-1 animate-sovereign-sparkle" />
             </div>
-            <h2 className="text-xl font-bold text-amber-800 dark:text-amber-300">
+            <h2 className="text-xl font-bold text-amber-400 dark:text-amber-300">
               Sovereign Certified
             </h2>
             <p className="text-sm text-amber-400/80 dark:text-amber-400/80 max-w-md mx-auto">

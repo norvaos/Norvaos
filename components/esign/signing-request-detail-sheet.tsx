@@ -45,11 +45,11 @@ interface SigningRequestDetailSheetProps {
 // ─── Status Badge Styles ─────────────────────────────────────────────────────
 
 const STATUS_STYLES: Record<string, string> = {
-  pending: 'bg-yellow-100 text-yellow-700',
-  sent: 'bg-blue-100 text-blue-700',
-  viewed: 'bg-purple-100 text-purple-700',
-  signed: 'bg-emerald-100 text-emerald-700',
-  declined: 'bg-red-100 text-red-700',
+  pending: 'bg-yellow-950/40 text-yellow-400',
+  sent: 'bg-blue-950/40 text-blue-400',
+  viewed: 'bg-purple-950/40 text-purple-400',
+  signed: 'bg-emerald-950/40 text-emerald-400',
+  declined: 'bg-red-950/40 text-red-400',
   expired: 'bg-slate-100 text-slate-500',
   cancelled: 'bg-slate-100 text-slate-500',
   superseded: 'bg-slate-100 text-slate-400',
@@ -148,24 +148,24 @@ function TimelineItem({ event }: { event: SigningEvent }) {
 
           {/* Signed event extras */}
           {event.event_type === 'signed' && (
-            <div className="mt-1.5 rounded-md bg-emerald-50 p-2 space-y-1">
+            <div className="mt-1.5 rounded-md bg-emerald-950/30 p-2 space-y-1">
               {event.signature_mode && (
-                <p className="text-xs text-emerald-700">
+                <p className="text-xs text-emerald-400">
                   Mode: <span className="font-medium capitalize">{event.signature_mode}</span>
                 </p>
               )}
               {event.typed_name && (
-                <p className="text-xs text-emerald-700">
+                <p className="text-xs text-emerald-400">
                   Typed name: <span className="font-medium">{event.typed_name}</span>
                 </p>
               )}
               {event.source_document_hash && (
-                <p className="text-xs text-emerald-700 font-mono">
+                <p className="text-xs text-emerald-400 font-mono">
                   Source hash: {truncateHash(event.source_document_hash)}
                 </p>
               )}
               {event.signed_document_hash && (
-                <p className="text-xs text-emerald-700 font-mono">
+                <p className="text-xs text-emerald-400 font-mono">
                   Signed hash: {truncateHash(event.signed_document_hash)}
                 </p>
               )}
@@ -179,7 +179,7 @@ function TimelineItem({ event }: { event: SigningEvent }) {
 
           {/* Declined reason via metadata */}
           {event.event_type === 'declined' && event.metadata && (
-            <div className="mt-1.5 rounded-md bg-red-50 p-2">
+            <div className="mt-1.5 rounded-md bg-red-950/30 p-2">
               {typeof event.metadata === 'object' && 'reason' in event.metadata && (
                 <p className="text-xs text-red-600">
                   Reason: {String(event.metadata.reason)}
@@ -382,7 +382,7 @@ export function SigningRequestDetailSheet({
                   href={`/api/esign/requests/${requestId}/document`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 text-xs text-blue-600 hover:text-blue-700 hover:underline"
+                  className="inline-flex items-center gap-1.5 text-xs text-blue-600 hover:text-blue-400 hover:underline"
                 >
                   <Download className="h-3.5 w-3.5" />
                   Download Source PDF
@@ -393,7 +393,7 @@ export function SigningRequestDetailSheet({
                     href={`/api/esign/requests/${requestId}/signed`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 text-xs text-emerald-600 hover:text-emerald-700 hover:underline"
+                    className="inline-flex items-center gap-1.5 text-xs text-emerald-600 hover:text-emerald-400 hover:underline"
                   >
                     <Download className="h-3.5 w-3.5" />
                     Download Signed PDF
@@ -446,7 +446,7 @@ export function SigningRequestDetailSheet({
                         size="sm"
                         onClick={handleCancel}
                         disabled={cancelMutation.isPending}
-                        className="text-xs text-red-600 hover:text-red-700 border-red-200 hover:border-red-300 hover:bg-red-50"
+                        className="text-xs text-red-600 hover:text-red-400 border-red-500/20 hover:border-red-500/30 hover:bg-red-950/30"
                       >
                         {cancelMutation.isPending ? (
                           <Loader2 className="mr-1.5 h-3 w-3 animate-spin" />

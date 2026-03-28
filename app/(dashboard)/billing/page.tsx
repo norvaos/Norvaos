@@ -334,7 +334,7 @@ function BillingPageContent() {
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <Card>
           <CardContent className="flex items-center gap-3 p-4">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-100">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-950/40">
               <DollarSign className="h-4 w-4 text-blue-600" />
             </div>
             <div>
@@ -347,7 +347,7 @@ function BillingPageContent() {
         </Card>
         <Card>
           <CardContent className="flex items-center gap-3 p-4">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-red-100">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-red-950/40">
               <AlertTriangle className="h-4 w-4 text-red-600" />
             </div>
             <div>
@@ -373,7 +373,7 @@ function BillingPageContent() {
         </Card>
         <Card>
           <CardContent className="flex items-center gap-3 p-4">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-amber-100">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-amber-950/40">
               <Clock className="h-4 w-4 text-amber-600" />
             </div>
             <div>

@@ -60,7 +60,7 @@ function getUrgencyInfo(dueDate: string) {
     return {
       label: `${Math.abs(days)} day${Math.abs(days) !== 1 ? 's' : ''} overdue`,
       colorClass: 'text-red-600',
-      bgClass: 'bg-red-50 border-red-200',
+      bgClass: 'bg-red-950/30 border-red-500/20',
       level: 'overdue' as const,
     }
   }
@@ -68,7 +68,7 @@ function getUrgencyInfo(dueDate: string) {
     return {
       label: days === 0 ? 'Due today' : `${days} day${days !== 1 ? 's' : ''} remaining`,
       colorClass: 'text-orange-600',
-      bgClass: 'bg-orange-50 border-orange-200',
+      bgClass: 'bg-orange-950/30 border-orange-500/20',
       level: 'at_risk' as const,
     }
   }
@@ -76,7 +76,7 @@ function getUrgencyInfo(dueDate: string) {
     return {
       label: `${days} days remaining`,
       colorClass: 'text-amber-600',
-      bgClass: 'bg-amber-50 border-amber-200',
+      bgClass: 'bg-amber-950/30 border-amber-500/20',
       level: 'upcoming' as const,
     }
   }
@@ -227,16 +227,16 @@ export function DeadlineRiskPanel({ matterId, tenantId }: DeadlineRiskPanelProps
 
       {/* Summary cards */}
       <div className="grid grid-cols-4 gap-3">
-        <div className="rounded-lg border border-blue-200 bg-blue-50 p-3 text-center">
-          <p className="text-2xl font-bold text-blue-700">{summary.upcoming}</p>
+        <div className="rounded-lg border border-blue-500/20 bg-blue-950/30 p-3 text-center">
+          <p className="text-2xl font-bold text-blue-400">{summary.upcoming}</p>
           <p className="text-xs text-blue-600 font-medium">Upcoming</p>
         </div>
-        <div className="rounded-lg border border-orange-200 bg-orange-50 p-3 text-center">
-          <p className="text-2xl font-bold text-orange-700">{summary.atRisk}</p>
+        <div className="rounded-lg border border-orange-500/20 bg-orange-950/30 p-3 text-center">
+          <p className="text-2xl font-bold text-orange-400">{summary.atRisk}</p>
           <p className="text-xs text-orange-600 font-medium">At Risk</p>
         </div>
-        <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-center">
-          <p className="text-2xl font-bold text-red-700">{summary.overdue}</p>
+        <div className="rounded-lg border border-red-500/20 bg-red-950/30 p-3 text-center">
+          <p className="text-2xl font-bold text-red-400">{summary.overdue}</p>
           <p className="text-xs text-red-600 font-medium">Overdue</p>
         </div>
         {riskSummary && (() => {

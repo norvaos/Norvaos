@@ -215,12 +215,12 @@ export default function HelpPage() {
                 <StepCard number={5} title="Create your first matter" desc="Go to Matters → New Matter. Select the client, matter type, and assign a responsible lawyer. The system will guide you through the rest." />
               </div>
 
-              <div className="mt-6 rounded-xl bg-amber-50 border border-amber-100 p-4">
+              <div className="mt-6 rounded-xl bg-amber-950/30 border border-amber-100 p-4">
                 <div className="flex gap-2">
                   <AlertCircle className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />
                   <div>
-                    <p className="text-sm font-semibold text-amber-800">Invitation-only access</p>
-                    <p className="text-xs text-amber-700 mt-0.5">NorvaOS is currently in early access. New accounts are created by invitation only. Contact your firm administrator if you haven't received your invite.</p>
+                    <p className="text-sm font-semibold text-amber-400">Invitation-only access</p>
+                    <p className="text-xs text-amber-400 mt-0.5">NorvaOS is currently in early access. New accounts are created by invitation only. Contact your firm administrator if you haven't received your invite.</p>
                   </div>
                 </div>
               </div>
@@ -281,7 +281,7 @@ export default function HelpPage() {
               <div>
                 <div className="flex items-center gap-2 mb-2">
                   <h3 className="font-semibold text-gray-900">Contacts</h3>
-                  <SectionTag color="bg-emerald-50 text-emerald-700" label="Clients & People" />
+                  <SectionTag color="bg-emerald-950/30 text-emerald-400" label="Clients & People" />
                 </div>
                 <p className="text-sm text-gray-600 leading-relaxed">A contact is any person associated with your firm  -  current client, former client, opposing counsel, or witness. Every matter must be linked to a contact.</p>
                 <ul className="mt-3 space-y-1.5">
@@ -297,7 +297,7 @@ export default function HelpPage() {
               <div className="border-t border-gray-100 pt-5">
                 <div className="flex items-center gap-2 mb-2">
                   <h3 className="font-semibold text-gray-900">Leads</h3>
-                  <SectionTag color="bg-blue-50 text-blue-700" label="Pre-client pipeline" />
+                  <SectionTag color="bg-blue-950/30 text-blue-400" label="Pre-client pipeline" />
                 </div>
                 <p className="text-sm text-gray-600 leading-relaxed">Leads are prospective clients who haven't retained yet. They move through a pipeline from initial inquiry to retained client.</p>
                 <div className="mt-3 flex gap-2 flex-wrap">
@@ -339,7 +339,7 @@ export default function HelpPage() {
                     { stage: 'Closed', desc: 'Matter complete and archived. Can be reopened if needed.' },
                   ].map(({ stage, desc }) => (
                     <div key={stage} className="flex gap-3 rounded-lg border border-gray-100 p-3">
-                      <span className="rounded-md bg-blue-50 px-2 py-0.5 text-xs font-semibold text-blue-700 self-start mt-0.5">{stage}</span>
+                      <span className="rounded-md bg-blue-950/30 px-2 py-0.5 text-xs font-semibold text-blue-400 self-start mt-0.5">{stage}</span>
                       <p className="text-sm text-gray-600">{desc}</p>
                     </div>
                   ))}
@@ -403,7 +403,7 @@ export default function HelpPage() {
                   { title: 'Templates', desc: 'Build document templates with smart fields that auto-fill from matter data.' },
                   { title: 'Version History', desc: 'Every upload is versioned. See who uploaded what and when.' },
                 ].map(item => (
-                  <div key={item.title} className="rounded-xl border border-gray-100 bg-amber-50/40 p-4">
+                  <div key={item.title} className="rounded-xl border border-gray-100 bg-amber-950/30/40 p-4">
                     <p className="font-semibold text-sm text-gray-900">{item.title}</p>
                     <p className="mt-1 text-xs text-gray-500">{item.desc}</p>
                   </div>
@@ -463,9 +463,9 @@ export default function HelpPage() {
               <div className="grid grid-cols-2 gap-3">
                 {[
                   { label: 'To Do', color: 'bg-gray-100 text-gray-700' },
-                  { label: 'In Progress', color: 'bg-blue-100 text-blue-700' },
-                  { label: 'Awaiting Client', color: 'bg-amber-100 text-amber-700' },
-                  { label: 'Completed', color: 'bg-emerald-100 text-emerald-700' },
+                  { label: 'In Progress', color: 'bg-blue-950/40 text-blue-400' },
+                  { label: 'Awaiting Client', color: 'bg-amber-950/40 text-amber-400' },
+                  { label: 'Completed', color: 'bg-emerald-950/40 text-emerald-400' },
                 ].map(({ label, color }) => (
                   <div key={label} className={`rounded-lg px-3 py-2 text-sm font-medium text-center ${color}`}>{label}</div>
                 ))}
@@ -583,8 +583,8 @@ export default function HelpPage() {
                 ))}
               </div>
 
-              <div className="rounded-xl bg-blue-50 border border-blue-100 p-4">
-                <p className="text-sm font-semibold text-blue-700">How the readiness system works</p>
+              <div className="rounded-xl bg-blue-950/30 border border-blue-100 p-4">
+                <p className="text-sm font-semibold text-blue-400">How the readiness system works</p>
                 <p className="text-xs text-blue-600 mt-1">The system checks 6 domains: Identity Documents, Family Documents, Financial Documents, Travel History, Employment, and Supporting Evidence. Each domain has rules based on the application stream. Blockers are shown in plain language  -  "Spouse passport missing", "Marriage certificate needs re-upload"  -  so anyone on the team knows exactly what to do next.</p>
               </div>
             </div>
@@ -613,7 +613,7 @@ export default function HelpPage() {
                   { title: 'Document Turnaround', desc: 'Average time from request to upload' },
                   { title: 'Time Utilization', desc: 'Billable vs non-billable hours by lawyer' },
                 ].map(item => (
-                  <div key={item.title} className="rounded-xl border border-gray-100 bg-orange-50/40 p-3">
+                  <div key={item.title} className="rounded-xl border border-gray-100 bg-orange-950/30/40 p-3">
                     <p className="font-semibold text-sm text-gray-900">{item.title}</p>
                     <p className="mt-0.5 text-xs text-gray-500">{item.desc}</p>
                   </div>

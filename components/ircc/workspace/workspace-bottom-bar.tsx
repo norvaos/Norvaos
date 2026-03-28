@@ -52,9 +52,9 @@ function getProcessingTime(matterType: string | null): { weeks: string; updated:
 
 function statusColour(status: string): string {
   switch (status) {
-    case 'active':       return 'text-emerald-400 bg-emerald-950/30 border-green-300'
-    case 'pending':      return 'text-amber-400 bg-amber-950/30 border-amber-300'
-    case 'closed_won':   return 'text-blue-400 bg-blue-950/30 border-blue-300'
+    case 'active':       return 'text-emerald-400 bg-emerald-950/30 border-emerald-500/30'
+    case 'pending':      return 'text-amber-400 bg-amber-950/30 border-amber-500/30'
+    case 'closed_won':   return 'text-blue-400 bg-blue-950/30 border-blue-500/30'
     case 'closed_lost':  return 'text-zinc-600 bg-zinc-50 border-zinc-300'
     case 'archived':     return 'text-zinc-500 bg-zinc-50 border-zinc-200'
     default:             return 'text-muted-foreground'

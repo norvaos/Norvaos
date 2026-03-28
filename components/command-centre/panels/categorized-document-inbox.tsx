@@ -187,7 +187,7 @@ export function CategorizedDocumentInbox() {
       </CardHeader>
       <CardContent className="space-y-3">
         {/* Info banner */}
-        <div className="flex items-start gap-2 rounded-md border border-blue-100 bg-blue-50/50 px-3 py-2">
+        <div className="flex items-start gap-2 rounded-md border border-blue-100 bg-blue-950/30/50 px-3 py-2">
           <Info className="mt-0.5 h-3.5 w-3.5 text-blue-400 shrink-0" />
           <p className="text-xs text-blue-600">
             Documents uploaded here are for staff reference only. Slot-based requirements activate after retention.
@@ -293,7 +293,7 @@ export function CategorizedDocumentInbox() {
                             </button>
                             <button
                               type="button"
-                              className="h-6 w-6 flex items-center justify-center rounded text-slate-400 hover:text-red-500 hover:bg-red-50"
+                              className="h-6 w-6 flex items-center justify-center rounded text-slate-400 hover:text-red-500 hover:bg-red-950/30"
                               onClick={() =>
                                 setDeleteTarget({
                                   id: doc.id,

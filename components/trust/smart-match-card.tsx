@@ -43,11 +43,11 @@ function fmtCents(cents: number): string {
 function matchTypeBadge(type: TransactionMatch['match_type']) {
   switch (type) {
     case 'exact':
-      return { label: 'Exact Match', cls: 'bg-green-100 text-green-700 border-green-200' }
+      return { label: 'Exact Match', cls: 'bg-emerald-950/40 text-emerald-400 border-emerald-500/20' }
     case 'partial':
-      return { label: 'Partial', cls: 'bg-amber-100 text-amber-700 border-amber-200' }
+      return { label: 'Partial', cls: 'bg-amber-950/40 text-amber-400 border-amber-500/20' }
     case 'overpayment':
-      return { label: 'Overpayment', cls: 'bg-blue-100 text-blue-700 border-blue-200' }
+      return { label: 'Overpayment', cls: 'bg-blue-950/40 text-blue-400 border-blue-500/20' }
   }
 }
 
@@ -65,7 +65,7 @@ function MatchSuggestion({
   const badge = matchTypeBadge(match.match_type)
 
   return (
-    <div className="flex items-start gap-3 rounded-lg border border-dashed border-green-300 bg-green-50/50 dark:border-green-700 dark:bg-green-950/20 p-3 transition-colors hover:bg-green-50 dark:hover:bg-green-950/30">
+    <div className="flex items-start gap-3 rounded-lg border border-dashed border-emerald-500/30 bg-emerald-950/30/50 dark:border-green-700 dark:bg-green-950/20 p-3 transition-colors hover:bg-emerald-950/30 dark:hover:bg-green-950/30">
       {/* Left  -  Deposit info */}
       <div className="flex-1 min-w-0 space-y-1">
         <div className="flex items-center gap-2 flex-wrap">
@@ -81,7 +81,7 @@ function MatchSuggestion({
 
         <p className="text-sm font-medium text-foreground">
           Deposit of{' '}
-          <span className="tabular-nums text-green-700 dark:text-green-400">
+          <span className="tabular-nums text-emerald-400 dark:text-green-400">
             {fmtCents(match.deposit_cents)}
           </span>
         </p>
@@ -148,7 +148,7 @@ export function SmartMatchCard({ matterId }: SmartMatchCardProps) {
   // Don't render anything if loading or no suggestions
   if (isLoading) {
     return (
-      <Card className="border-dashed border-green-300 dark:border-green-700">
+      <Card className="border-dashed border-emerald-500/30 dark:border-green-700">
         <CardHeader className="pb-2">
           <div className="flex items-center gap-2">
             <Sparkles className="h-4 w-4 text-green-600" />
@@ -192,7 +192,7 @@ export function SmartMatchCard({ matterId }: SmartMatchCardProps) {
 
   return (
     <>
-      <Card className="border-dashed border-green-300 bg-green-50/30 dark:border-green-700 dark:bg-green-950/10">
+      <Card className="border-dashed border-emerald-500/30 bg-emerald-950/30/30 dark:border-green-700 dark:bg-green-950/10">
         <CardHeader className="pb-2">
           <CardTitle className="flex items-center gap-2 text-sm font-semibold">
             <Sparkles className="h-4 w-4 text-green-600 dark:text-green-400" />
@@ -268,7 +268,7 @@ export function SmartMatchCard({ matterId }: SmartMatchCardProps) {
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Amount to Apply</span>
-                <span className="font-bold tabular-nums text-green-700 dark:text-green-400">
+                <span className="font-bold tabular-nums text-emerald-400 dark:text-green-400">
                   {fmtCents(confirmMatch.apply_cents)}
                 </span>
               </div>

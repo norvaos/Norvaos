@@ -35,7 +35,7 @@ async function handlePatch(
   { params }: { params: Promise<{ id: string }> }
 ) {
   // ── Rate limit ──
-  const rateLimitResponse = checkAdminRateLimit(request)
+  const rateLimitResponse = await checkAdminRateLimit(request)
   if (rateLimitResponse) return rateLimitResponse
 
   try {

@@ -91,14 +91,14 @@ const PLAN_ICONS: Record<string, React.ReactNode> = {
 function getStatusColor(status: string): string {
   switch (status) {
     case 'active':
-      return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
+      return 'bg-emerald-950/40 text-emerald-400 dark:bg-green-900/30 dark:text-green-400'
     case 'trialing':
-      return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'
+      return 'bg-yellow-950/40 text-yellow-400 dark:bg-yellow-900/30 dark:text-yellow-400'
     case 'past_due':
-      return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
+      return 'bg-red-950/40 text-red-400 dark:bg-red-900/30 dark:text-red-400'
     case 'cancelled':
     case 'canceled':
-      return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
+      return 'bg-red-950/40 text-red-400 dark:bg-red-900/30 dark:text-red-400'
     default:
       return 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400'
   }
@@ -107,11 +107,11 @@ function getStatusColor(status: string): string {
 function getInvoiceStatusColor(status: string): string {
   switch (status) {
     case 'paid':
-      return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
+      return 'bg-emerald-950/40 text-emerald-400 dark:bg-green-900/30 dark:text-green-400'
     case 'failed':
-      return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
+      return 'bg-red-950/40 text-red-400 dark:bg-red-900/30 dark:text-red-400'
     case 'open':
-      return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'
+      return 'bg-yellow-950/40 text-yellow-400 dark:bg-yellow-900/30 dark:text-yellow-400'
     default:
       return 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400'
   }
@@ -224,7 +224,7 @@ export default function BillingPlanPage() {
             <CardContent className="space-y-4">
               {/* Trial info */}
               {subscriptionStatus === 'trialing' && trialEndsAt && (
-                <div className="flex items-center gap-2 rounded-lg border border-yellow-200 bg-yellow-950/30 p-3 text-sm dark:border-yellow-900/50 dark:bg-yellow-900/20">
+                <div className="flex items-center gap-2 rounded-lg border border-yellow-500/20 bg-yellow-950/30 p-3 text-sm dark:border-yellow-900/50 dark:bg-yellow-900/20">
                   <AlertTriangle className="size-4 text-yellow-600 dark:text-yellow-400" />
                   <span>
                     Trial ends on{' '}
@@ -252,9 +252,9 @@ export default function BillingPlanPage() {
 
               {/* Cancel at period end warning */}
               {subscription?.cancel_at_period_end && (
-                <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-950/30 p-3 text-sm dark:border-red-900/50 dark:bg-red-900/20">
+                <div className="flex items-center gap-2 rounded-lg border border-red-500/20 bg-red-950/30 p-3 text-sm dark:border-red-900/50 dark:bg-red-900/20">
                   <AlertTriangle className="size-4 text-red-600 dark:text-red-400" />
-                  <span className="text-red-800 dark:text-red-300">
+                  <span className="text-red-400 dark:text-red-300">
                     Your plan will be cancelled at the end of the billing period.
                   </span>
                 </div>

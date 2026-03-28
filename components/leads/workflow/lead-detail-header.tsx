@@ -35,9 +35,9 @@ function temperatureToRiskLevel(temperature: string | null | undefined): string 
 // ─── Temperature config ─────────────────────────────────────────────────────
 
 const TEMP_BADGES: Record<string, { label: string; className: string }> = {
-  hot: { label: 'Hot', className: 'bg-red-50 text-red-700 border-red-200' },
-  warm: { label: 'Warm', className: 'bg-orange-50 text-orange-700 border-orange-200' },
-  cold: { label: 'Cold', className: 'bg-blue-50 text-blue-700 border-blue-200' },
+  hot: { label: 'Hot', className: 'bg-red-950/30 text-red-400 border-red-500/20' },
+  warm: { label: 'Warm', className: 'bg-orange-950/30 text-orange-400 border-orange-500/20' },
+  cold: { label: 'Cold', className: 'bg-blue-950/30 text-blue-400 border-blue-500/20' },
 }
 
 // ─── Component ──────────────────────────────────────────────────────────────
@@ -140,7 +140,7 @@ export function LeadDetailHeader({
           variant="outline"
           size="sm"
           onClick={onClose}
-          className="shrink-0 hidden lg:flex border-red-200 text-red-700 hover:bg-red-50"
+          className="shrink-0 hidden lg:flex border-red-500/20 text-red-400 hover:bg-red-950/30"
         >
           <Archive className="mr-1.5 h-3.5 w-3.5" />
           Archive Mission

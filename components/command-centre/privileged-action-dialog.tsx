@@ -100,8 +100,8 @@ export function PrivilegedActionDialog({
         </AlertDialogHeader>
 
         {!hasPermission ? (
-          <div className="rounded-md border border-red-200 bg-red-50 p-3">
-            <p className="text-sm text-red-700 font-medium">
+          <div className="rounded-md border border-red-500/20 bg-red-950/30 p-3">
+            <p className="text-sm text-red-400 font-medium">
               You do not have permission to perform this action.
             </p>
             <p className="text-xs text-red-600 mt-1">
@@ -110,8 +110,8 @@ export function PrivilegedActionDialog({
           </div>
         ) : (
           <div className="space-y-3">
-            <div className="rounded-md border border-amber-200 bg-amber-50 p-3">
-              <p className="text-xs text-amber-700">
+            <div className="rounded-md border border-amber-500/20 bg-amber-950/30 p-3">
+              <p className="text-xs text-amber-400">
                 This action requires authorization and will be logged in the audit trail.
               </p>
             </div>

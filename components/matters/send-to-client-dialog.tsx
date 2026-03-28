@@ -261,7 +261,7 @@ function PortalLinkTab({
                   variant="outline"
                   className={
                     new Date(activePortalLink.expires_at) < new Date(Date.now() + 7 * 86400000)
-                      ? 'text-amber-400 border-amber-300 bg-amber-950/30 text-xs'
+                      ? 'text-amber-400 border-amber-500/30 bg-amber-950/30 text-xs'
                       : 'text-slate-600 border-slate-300 text-xs'
                   }
                 >
@@ -298,7 +298,7 @@ function PortalLinkTab({
           <Button
             variant="outline"
             size="sm"
-            className="w-full h-8 text-xs text-amber-600 border-amber-300 hover:bg-amber-950/30"
+            className="w-full h-8 text-xs text-amber-600 border-amber-500/30 hover:bg-amber-950/30"
             onClick={() => revokePortalLink.mutate({ id: activePortalLink.id, matterId })}
             disabled={revokePortalLink.isPending}
           >

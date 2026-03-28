@@ -203,7 +203,7 @@ export function FormDetailView({
             </div>
           </div>
           {form.scan_error && (
-            <div className="mt-3 rounded-md bg-red-50 p-3 text-xs text-red-700">
+            <div className="mt-3 rounded-md bg-red-950/30 p-3 text-xs text-red-400">
               <strong>Scan Error:</strong> {form.scan_error}
             </div>
           )}

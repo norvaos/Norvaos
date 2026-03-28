@@ -141,9 +141,9 @@ const FLAG_COLOURS: Record<string, string> = {
 
 function TierBadge({ tier, dark }: { tier: string; dark: boolean }) {
   const colors: Record<string, string> = {
-    starter: dark ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' : 'bg-blue-50 text-blue-700 border-blue-200',
+    starter: dark ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' : 'bg-blue-950/30 text-blue-400 border-blue-500/20',
     professional: dark ? 'bg-violet-500/10 text-violet-400 border-violet-500/20' : 'bg-violet-50 text-violet-700 border-violet-200',
-    enterprise: dark ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' : 'bg-amber-50 text-amber-700 border-amber-200',
+    enterprise: dark ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' : 'bg-amber-950/30 text-amber-400 border-amber-500/20',
   }
   const TierIcon = tier === 'enterprise' ? Crown : tier === 'professional' ? Rocket : Zap
   return (
@@ -323,7 +323,7 @@ export default function SovereignControlPage() {
 
   if (error) {
     return (
-      <div className={cn('rounded-2xl border p-8 text-center', dark ? 'border-red-500/20 bg-red-500/5' : 'border-red-200 bg-red-50')}>
+      <div className={cn('rounded-2xl border p-8 text-center', dark ? 'border-red-500/20 bg-red-500/5' : 'border-red-500/20 bg-red-950/30')}>
         <XCircle className="mx-auto h-10 w-10 text-red-400 mb-3" />
         <p className={cn('font-medium', dark ? 'text-red-400' : 'text-red-600')}>Failed to load Sovereign Control data</p>
       </div>
@@ -409,7 +409,7 @@ export default function SovereignControlPage() {
         'rounded-2xl border p-6',
         dark
           ? 'border-amber-500/10 bg-gradient-to-r from-amber-500/[0.03] to-orange-500/[0.03]'
-          : 'border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50',
+          : 'border-amber-500/20 bg-gradient-to-r from-amber-50 to-orange-50',
       )}>
         <div className="flex items-center gap-3 mb-4">
           <Globe className={cn('h-5 w-5', dark ? 'text-amber-400' : 'text-amber-600')} />
@@ -440,7 +440,7 @@ export default function SovereignControlPage() {
               className={cn(
                 'rounded-lg px-3 py-2 text-xs font-semibold transition-all',
                 globalIgniteValue
-                  ? dark ? 'bg-emerald-500/20 text-emerald-400 ring-1 ring-emerald-500/30' : 'bg-emerald-100 text-emerald-700 ring-1 ring-emerald-300'
+                  ? dark ? 'bg-emerald-500/20 text-emerald-400 ring-1 ring-emerald-500/30' : 'bg-emerald-950/40 text-emerald-400 ring-1 ring-emerald-300'
                   : dark ? 'bg-white/5 text-white/40' : 'bg-gray-100 text-gray-400',
               )}
             >
@@ -452,7 +452,7 @@ export default function SovereignControlPage() {
               className={cn(
                 'rounded-lg px-3 py-2 text-xs font-semibold transition-all',
                 !globalIgniteValue
-                  ? dark ? 'bg-red-500/20 text-red-400 ring-1 ring-red-500/30' : 'bg-red-100 text-red-700 ring-1 ring-red-300'
+                  ? dark ? 'bg-red-500/20 text-red-400 ring-1 ring-red-500/30' : 'bg-red-950/40 text-red-400 ring-1 ring-red-300'
                   : dark ? 'bg-white/5 text-white/40' : 'bg-gray-100 text-gray-400',
               )}
             >
@@ -468,7 +468,7 @@ export default function SovereignControlPage() {
               className={cn(
                 'flex items-center gap-1 rounded-lg px-3 py-2 text-xs font-semibold transition-all',
                 igniteScope === 'global'
-                  ? dark ? 'bg-amber-500/20 text-amber-400' : 'bg-amber-100 text-amber-700'
+                  ? dark ? 'bg-amber-500/20 text-amber-400' : 'bg-amber-950/40 text-amber-400'
                   : dark ? 'text-white/30' : 'text-gray-400',
               )}
             >
@@ -550,7 +550,7 @@ export default function SovereignControlPage() {
                   dark
                     ? 'border-white/[0.06] bg-white/[0.02] hover:border-white/[0.1]'
                     : 'border-gray-200 bg-white hover:shadow-md',
-                  isExpanded && (dark ? 'border-amber-500/20 bg-amber-500/[0.02]' : 'border-amber-300 bg-amber-50/30'),
+                  isExpanded && (dark ? 'border-amber-500/20 bg-amber-500/[0.02]' : 'border-amber-500/30 bg-amber-950/30/30'),
                 )}
               >
                 {/* Collapsed row */}
@@ -606,7 +606,7 @@ export default function SovereignControlPage() {
                             className={cn(
                               'flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold',
                               val
-                                ? dark ? 'bg-emerald-500/10 text-emerald-400' : 'bg-emerald-50 text-emerald-600'
+                                ? dark ? 'bg-emerald-500/10 text-emerald-400' : 'bg-emerald-950/30 text-emerald-600'
                                 : dark ? 'bg-white/5 text-white/20' : 'bg-gray-100 text-gray-400',
                             )}
                           >
@@ -617,7 +617,7 @@ export default function SovereignControlPage() {
                       })}
                       <span className={cn(
                         'rounded-full px-2 py-0.5 text-[10px] font-semibold',
-                        dark ? 'bg-amber-500/10 text-amber-400' : 'bg-amber-50 text-amber-600',
+                        dark ? 'bg-amber-500/10 text-amber-400' : 'bg-amber-950/30 text-amber-600',
                       )}>
                         {tenant.comm_flags.comm_template_max === -1 ? '∞' : tenant.comm_flags.comm_template_max} templates
                       </span>
@@ -678,7 +678,7 @@ export default function SovereignControlPage() {
                                       className={cn(
                                         'rounded-lg px-2.5 py-1.5 text-xs font-bold transition-all',
                                         tenant.comm_flags.comm_template_max === limit
-                                          ? dark ? 'bg-amber-500/20 text-amber-400 ring-1 ring-amber-500/30' : 'bg-amber-100 text-amber-700 ring-1 ring-amber-300'
+                                          ? dark ? 'bg-amber-500/20 text-amber-400 ring-1 ring-amber-500/30' : 'bg-amber-950/40 text-amber-400 ring-1 ring-amber-300'
                                           : dark ? 'bg-white/5 text-white/30 hover:text-white/50' : 'bg-gray-100 text-gray-400 hover:text-gray-600',
                                       )}
                                     >
@@ -758,7 +758,7 @@ export default function SovereignControlPage() {
                                   onClick={() => impersonate.mutate({ tenant_id: tenant.id, reason: impersonateReason })}
                                   className={cn(
                                     'flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-bold transition-all disabled:opacity-30',
-                                    dark ? 'bg-amber-500/20 text-amber-400 hover:bg-amber-500/30' : 'bg-amber-100 text-amber-700 hover:bg-amber-200',
+                                    dark ? 'bg-amber-500/20 text-amber-400 hover:bg-amber-500/30' : 'bg-amber-950/40 text-amber-400 hover:bg-amber-200',
                                   )}
                                 >
                                   {impersonate.isPending ? <Loader2 className="h-3 w-3 animate-spin" /> : <Eye className="h-3 w-3" />}
@@ -820,7 +820,7 @@ export default function SovereignControlPage() {
                                 }}
                                 className={cn(
                                   'rounded-lg px-3 py-1.5 text-xs font-bold transition-all',
-                                  dark ? 'bg-red-500/10 text-red-400 hover:bg-red-500/20 ring-1 ring-red-500/20' : 'bg-red-50 text-red-600 hover:bg-red-100 ring-1 ring-red-200',
+                                  dark ? 'bg-red-500/10 text-red-400 hover:bg-red-500/20 ring-1 ring-red-500/20' : 'bg-red-950/30 text-red-600 hover:bg-red-950/40 ring-1 ring-red-200',
                                 )}
                               >
                                 SUSPEND
@@ -831,7 +831,7 @@ export default function SovereignControlPage() {
                                 onClick={() => suspendTenant.mutate({ tenant_id: tenant.id, status: 'active', reason: 'Reactivated via Sovereign Control' })}
                                 className={cn(
                                   'rounded-lg px-3 py-1.5 text-xs font-bold transition-all',
-                                  dark ? 'bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 ring-1 ring-emerald-500/20' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100 ring-1 ring-emerald-200',
+                                  dark ? 'bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 ring-1 ring-emerald-500/20' : 'bg-emerald-950/30 text-emerald-600 hover:bg-emerald-950/40 ring-1 ring-emerald-200',
                                 )}
                               >
                                 ACTIVATE
@@ -931,7 +931,7 @@ export default function SovereignControlPage() {
                                   className={cn(
                                     'flex flex-col items-center gap-1 rounded-lg border p-2.5 text-[10px] font-bold uppercase transition-all',
                                     isCurrentTier
-                                      ? dark ? 'border-amber-500/30 bg-amber-500/10 text-amber-400' : 'border-amber-400 bg-amber-50 text-amber-700'
+                                      ? dark ? 'border-amber-500/30 bg-amber-500/10 text-amber-400' : 'border-amber-400 bg-amber-950/30 text-amber-400'
                                       : dark ? 'border-white/[0.06] text-white/20 hover:text-white/40 hover:border-white/10' : 'border-gray-200 text-gray-400 hover:text-gray-600',
                                   )}
                                 >
@@ -963,7 +963,7 @@ export default function SovereignControlPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
           <div className={cn(
             'relative w-full max-w-4xl max-h-[85vh] overflow-y-auto rounded-3xl border p-8',
-            dark ? 'border-amber-500/20 bg-[#111114]' : 'border-amber-200 bg-white',
+            dark ? 'border-amber-500/20 bg-[#111114]' : 'border-amber-500/20 bg-white',
           )}>
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
@@ -986,7 +986,7 @@ export default function SovereignControlPage() {
                 onClick={() => setImpersonating(null)}
                 className={cn(
                   'rounded-xl px-4 py-2 text-sm font-bold transition-all',
-                  dark ? 'bg-red-500/10 text-red-400 hover:bg-red-500/20' : 'bg-red-50 text-red-600 hover:bg-red-100',
+                  dark ? 'bg-red-500/10 text-red-400 hover:bg-red-500/20' : 'bg-red-950/30 text-red-600 hover:bg-red-950/40',
                 )}
               >
                 <EyeOff className="inline h-4 w-4 mr-1" />
@@ -1038,7 +1038,7 @@ export default function SovereignControlPage() {
                       <span className={cn(
                         'rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase',
                         m.status === 'open'
-                          ? dark ? 'bg-emerald-500/10 text-emerald-400' : 'bg-emerald-50 text-emerald-600'
+                          ? dark ? 'bg-emerald-500/10 text-emerald-400' : 'bg-emerald-950/30 text-emerald-600'
                           : dark ? 'bg-white/5 text-white/30' : 'bg-gray-100 text-gray-400',
                       )}>
                         {m.status}
@@ -1077,7 +1077,7 @@ export default function SovereignControlPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
           <div className={cn(
             'relative w-full max-w-lg rounded-3xl border p-8',
-            dark ? 'border-amber-500/20 bg-[#111114]' : 'border-amber-200 bg-white',
+            dark ? 'border-amber-500/20 bg-[#111114]' : 'border-amber-500/20 bg-white',
           )}>
             <div className="flex items-center gap-3 mb-6">
               <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-500 shadow-lg shadow-emerald-500/20">
@@ -1118,7 +1118,7 @@ export default function SovereignControlPage() {
                         className={cn(
                           'flex flex-col items-center gap-1 rounded-xl border p-3 text-xs font-semibold uppercase transition-all',
                           newTenantTier === tier
-                            ? dark ? 'border-amber-500/30 bg-amber-500/10 text-amber-400' : 'border-amber-400 bg-amber-50 text-amber-700'
+                            ? dark ? 'border-amber-500/30 bg-amber-500/10 text-amber-400' : 'border-amber-400 bg-amber-950/30 text-amber-400'
                             : dark ? 'border-white/[0.06] bg-white/[0.02] text-white/30 hover:text-white/50' : 'border-gray-200 text-gray-400 hover:text-gray-600',
                         )}
                       >
@@ -1200,7 +1200,7 @@ export default function SovereignControlPage() {
                         'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold',
                         entry.scope === 'alpha_only'
                           ? dark ? 'bg-cyan-500/10 text-cyan-400' : 'bg-cyan-50 text-cyan-700'
-                          : dark ? 'bg-amber-500/10 text-amber-400' : 'bg-amber-50 text-amber-700',
+                          : dark ? 'bg-amber-500/10 text-amber-400' : 'bg-amber-950/30 text-amber-400',
                       )}>
                         {entry.scope === 'alpha_only' ? <FlaskConical className="h-3 w-3" /> : <Globe className="h-3 w-3" />}
                         {entry.scope === 'alpha_only' ? 'Alpha' : 'Global'}
@@ -1234,7 +1234,7 @@ export default function SovereignControlPage() {
                           }}
                           className={cn(
                             'flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-[10px] font-bold transition-all',
-                            dark ? 'bg-red-500/10 text-red-400 hover:bg-red-500/20' : 'bg-red-50 text-red-600 hover:bg-red-100',
+                            dark ? 'bg-red-500/10 text-red-400 hover:bg-red-500/20' : 'bg-red-950/30 text-red-600 hover:bg-red-950/40',
                           )}
                         >
                           <Undo2 className="h-3 w-3" />

@@ -189,8 +189,8 @@ export function PortalFormQuestionnaire({
     return (
       <div className="space-y-4">
         <BackButton onBack={onBack} primaryColor={primaryColor} />
-        <div className="rounded-2xl border border-red-200/60 bg-gradient-to-br from-red-50 to-white p-6 text-center shadow-sm">
-          <p className="text-sm font-bold text-red-800">{tr.ircc_error_title}</p>
+        <div className="rounded-2xl border border-red-500/20/60 bg-gradient-to-br from-red-50 to-white p-6 text-center shadow-sm">
+          <p className="text-sm font-bold text-red-400">{tr.ircc_error_title}</p>
           <p className="mt-1 text-sm text-red-600">{error}</p>
         </div>
       </div>

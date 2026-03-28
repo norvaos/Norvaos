@@ -105,7 +105,7 @@ export function GovernmentDisbursementCard({ matterId }: GovernmentDisbursementC
   // Loading skeleton
   if (isLoading) {
     return (
-      <Card className="border-dashed border-amber-300 dark:border-amber-700">
+      <Card className="border-dashed border-amber-500/30 dark:border-amber-700">
         <CardHeader className="pb-2">
           <div className="flex items-center gap-2">
             <Banknote className="h-4 w-4 text-amber-600" />
@@ -149,9 +149,9 @@ export function GovernmentDisbursementCard({ matterId }: GovernmentDisbursementC
 
   // ── Card border colour based on state ─────────────────────────────────────
   const borderClass = isDisbursed
-    ? 'border-green-400 dark:border-green-700 bg-green-50/30 dark:bg-green-950/20'
+    ? 'border-green-400 dark:border-green-700 bg-emerald-950/30/30 dark:bg-green-950/20'
     : isReserved
-      ? 'border-amber-400 dark:border-amber-700 bg-amber-50/30 dark:bg-amber-950/20'
+      ? 'border-amber-400 dark:border-amber-700 bg-amber-950/30/30 dark:bg-amber-950/20'
       : 'border-dashed border-slate-300 dark:border-slate-700'
 
   return (
@@ -166,13 +166,13 @@ export function GovernmentDisbursementCard({ matterId }: GovernmentDisbursementC
               </CardTitle>
             </div>
             {isDisbursed && (
-              <Badge variant="outline" className="border-green-500 text-green-700 dark:text-green-400 text-xs">
+              <Badge variant="outline" className="border-green-500 text-emerald-400 dark:text-green-400 text-xs">
                 <CheckCircle2 className="mr-1 h-3 w-3" />
                 Disbursed
               </Badge>
             )}
             {isReserved && (
-              <Badge variant="outline" className="border-amber-500 text-amber-700 dark:text-amber-400 text-xs">
+              <Badge variant="outline" className="border-amber-500 text-amber-400 dark:text-amber-400 text-xs">
                 <Lock className="mr-1 h-3 w-3" />
                 Reserved for Filing
               </Badge>
@@ -201,7 +201,7 @@ export function GovernmentDisbursementCard({ matterId }: GovernmentDisbursementC
                 ) : (
                   <Lock className="h-3.5 w-3.5 text-muted-foreground" />
                 )}
-                <span className={readiness_gate_met ? 'text-green-700 dark:text-green-400' : 'text-muted-foreground'}>
+                <span className={readiness_gate_met ? 'text-emerald-400 dark:text-green-400' : 'text-muted-foreground'}>
                   Readiness: {readiness_score}%
                   {!readiness_gate_met && ' (95% required)'}
                 </span>
@@ -220,7 +220,7 @@ export function GovernmentDisbursementCard({ matterId }: GovernmentDisbursementC
                   ) : (
                     <AlertTriangle className="h-3.5 w-3.5 text-red-500" />
                   )}
-                  <span className={funds_sufficient ? 'text-green-700 dark:text-green-400' : 'text-red-600'}>
+                  <span className={funds_sufficient ? 'text-emerald-400 dark:text-green-400' : 'text-red-600'}>
                     Trust Balance: ${(trust_balance_cents / 100).toFixed(2)}
                     {!funds_sufficient && ` (need $${government_fee_dollars})`}
                   </span>
@@ -232,8 +232,8 @@ export function GovernmentDisbursementCard({ matterId }: GovernmentDisbursementC
 
           {/* ── Payment Reference (only when reserved + readiness met) ────── */}
           {isReserved && readiness_gate_met && disbursement?.payment_reference && (
-            <div className="rounded-md border border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-950/40 p-3 space-y-1.5">
-              <div className="flex items-center gap-1.5 text-xs font-medium text-amber-800 dark:text-amber-300">
+            <div className="rounded-md border border-amber-500/30 dark:border-amber-700 bg-amber-950/30 dark:bg-amber-950/40 p-3 space-y-1.5">
+              <div className="flex items-center gap-1.5 text-xs font-medium text-amber-400 dark:text-amber-300">
                 <Banknote className="h-3.5 w-3.5" />
                 IRCC Payment Reference
               </div>
@@ -257,12 +257,12 @@ export function GovernmentDisbursementCard({ matterId }: GovernmentDisbursementC
 
           {/* ── Completed State ───────────────────────────────────────────── */}
           {isDisbursed && (
-            <div className="rounded-md border border-green-300 dark:border-green-700 bg-green-50 dark:bg-green-950/40 p-3 space-y-1">
-              <div className="flex items-center gap-1.5 text-xs font-medium text-green-800 dark:text-green-300">
+            <div className="rounded-md border border-emerald-500/30 dark:border-green-700 bg-emerald-950/30 dark:bg-green-950/40 p-3 space-y-1">
+              <div className="flex items-center gap-1.5 text-xs font-medium text-emerald-400 dark:text-green-300">
                 <CheckCircle2 className="h-3.5 w-3.5" />
                 Disbursement Complete
               </div>
-              <p className="text-xs text-green-700 dark:text-green-400">
+              <p className="text-xs text-emerald-400 dark:text-green-400">
                 ${(disbursement.amount_cents / 100).toFixed(2)} transferred.
                 Trust-to-General ledger entry recorded automatically.
                 Ref: {disbursement.payment_reference}

@@ -82,23 +82,23 @@ export function SandboxReviewStep({
       {/* Summary badges */}
       {summary && (
         <div className="flex flex-wrap items-center gap-2">
-          <Badge variant="outline" className="text-emerald-700 border-emerald-300">
+          <Badge variant="outline" className="text-emerald-400 border-emerald-500/30">
             <CheckCircle2 className="h-3 w-3 mr-1" />
             {summary.clear ?? 0} clear
           </Badge>
           {(summary.conflicts ?? 0) > 0 && (
-            <Badge variant="outline" className="text-amber-700 border-amber-300">
+            <Badge variant="outline" className="text-amber-400 border-amber-500/30">
               <AlertTriangle className="h-3 w-3 mr-1" />
               {summary.conflicts} conflicts
             </Badge>
           )}
           {(summary.needs_review ?? 0) > 0 && (
-            <Badge variant="outline" className="text-blue-700 border-blue-300">
+            <Badge variant="outline" className="text-blue-400 border-blue-500/30">
               {summary.needs_review} need review
             </Badge>
           )}
           {(summary.invalid ?? 0) > 0 && (
-            <Badge variant="outline" className="text-red-700 border-red-300">
+            <Badge variant="outline" className="text-red-400 border-red-500/30">
               <XCircle className="h-3 w-3 mr-1" />
               {summary.invalid} invalid
             </Badge>
@@ -108,9 +108,9 @@ export function SandboxReviewStep({
 
       {/* Bulk actions */}
       {summary && ((summary.conflicts ?? 0) > 0 || (summary.needs_review ?? 0) > 0) && (
-        <div className="flex items-center gap-2 p-3 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800">
+        <div className="flex items-center gap-2 p-3 rounded-lg bg-amber-950/30 dark:bg-amber-950/30 border border-amber-500/20 dark:border-amber-800">
           <AlertTriangle className="h-4 w-4 text-amber-600 shrink-0" />
-          <span className="text-sm text-amber-800 dark:text-amber-200 flex-1">
+          <span className="text-sm text-amber-400 dark:text-amber-200 flex-1">
             The Norva Gatekeeper flagged rows that need your decision before import.
           </span>
           {(summary.conflicts ?? 0) > 0 && (

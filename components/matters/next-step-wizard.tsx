@@ -142,11 +142,11 @@ export function NextStepWizard({
         <div className="space-y-4">
           {/* Refusal grounds summary */}
           {refusalGrounds && (
-            <div className="rounded-lg bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900 p-3">
+            <div className="rounded-lg bg-red-950/30 dark:bg-red-950/20 border border-red-500/20 dark:border-red-900 p-3">
               <div className="text-xs font-medium text-red-600 dark:text-red-400 uppercase tracking-wider mb-1">
                 Refusal Grounds
               </div>
-              <p className="text-sm text-red-700 dark:text-red-300">{refusalGrounds}</p>
+              <p className="text-sm text-red-400 dark:text-red-300">{refusalGrounds}</p>
             </div>
           )}
 

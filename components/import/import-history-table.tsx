@@ -180,7 +180,7 @@ function ImportRowDetail({ batchId }: { batchId: string }) {
             <Button
               variant="outline"
               size="sm"
-              className="h-7 text-xs text-amber-700 border-amber-300 hover:bg-amber-50"
+              className="h-7 text-xs text-amber-400 border-amber-500/30 hover:bg-amber-950/30"
               onClick={() => window.open(`/api/import/${batchId}/skipped-report`, '_blank')}
             >
               <FileDown className="h-3 w-3 mr-1" />
@@ -295,7 +295,7 @@ export function ImportHistoryTable({ tenantId }: ImportHistoryTableProps) {
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="h-7 text-xs text-amber-600 hover:text-amber-700 hover:bg-amber-50"
+                          className="h-7 text-xs text-amber-600 hover:text-amber-400 hover:bg-amber-950/30"
                           onClick={() => pauseBatch.mutate(batch.id)}
                           disabled={pauseBatch.isPending}
                         >
@@ -336,7 +336,7 @@ export function ImportHistoryTable({ tenantId }: ImportHistoryTableProps) {
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="h-7 text-xs text-red-600 hover:text-red-700 hover:bg-red-50"
+                          className="h-7 text-xs text-red-600 hover:text-red-400 hover:bg-red-950/30"
                           onClick={() => setConfirmDeleteId(batch.id)}
                         >
                           <Trash2 className="h-3 w-3 mr-1" />

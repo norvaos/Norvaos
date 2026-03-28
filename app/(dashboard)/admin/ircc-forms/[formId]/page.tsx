@@ -601,7 +601,7 @@ export default function AdminIrccFormDetailPage() {
                       <>
                         <TableRow
                           key={field.id}
-                          className={`${isPending ? 'bg-yellow-50 dark:bg-yellow-950/20' : ''} ${
+                          className={`${isPending ? 'bg-yellow-950/30 dark:bg-yellow-950/20' : ''} ${
                             field.is_meta_field ? 'opacity-50' : ''
                           }`}
                         >

@@ -239,9 +239,9 @@ export function PortalClientUpload({
 
         {/* Error */}
         {error && (
-          <div className="flex items-center gap-2 rounded-xl bg-red-50 border border-red-200/60 px-3 py-2">
+          <div className="flex items-center gap-2 rounded-xl bg-red-950/30 border border-red-500/20/60 px-3 py-2">
             <svg className="h-4 w-4 text-red-500 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><line x1="15" y1="9" x2="9" y2="15" /><line x1="9" y1="9" x2="15" y2="15" /></svg>
-            <p className="text-xs text-red-700 font-medium">{error}</p>
+            <p className="text-xs text-red-400 font-medium">{error}</p>
           </div>
         )}
 
@@ -306,7 +306,7 @@ export function PortalClientUpload({
                   {doc.file_size ? ` · ${formatFileSize(doc.file_size)}` : ''}
                 </p>
               </div>
-              <span className="inline-flex items-center rounded-full border border-green-200 bg-emerald-950/30 px-2 py-0.5 text-[10px] font-medium text-emerald-400">
+              <span className="inline-flex items-center rounded-full border border-emerald-500/20 bg-emerald-950/30 px-2 py-0.5 text-[10px] font-medium text-emerald-400">
                 Submitted
               </span>
             </div>

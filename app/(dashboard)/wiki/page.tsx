@@ -138,7 +138,7 @@ export default function WikiPage() {
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder="Search playbooks, snippets, tags... (VELOCITY engine)"
-              className="w-full rounded-xl border border-border bg-muted py-3 pl-10 pr-4 text-sm placeholder:text-muted-foreground focus:border-blue-300 focus:bg-card focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all"
+              className="w-full rounded-xl border border-border bg-muted py-3 pl-10 pr-4 text-sm placeholder:text-muted-foreground focus:border-blue-500/30 focus:bg-card focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all"
             />
             {isSearching && (
               <div className="absolute right-3 top-1/2 -translate-y-1/2">
@@ -185,7 +185,7 @@ export default function WikiPage() {
                           <p className="text-sm font-semibold text-foreground truncate">{result.title}</p>
                           <span className={cn(
                             'shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium uppercase',
-                            result.item_type === 'playbook' ? 'bg-blue-100 text-blue-400' : 'bg-amber-100 text-amber-400',
+                            result.item_type === 'playbook' ? 'bg-blue-950/40 text-blue-400' : 'bg-amber-950/40 text-amber-400',
                           )}>
                             {result.item_type}
                           </span>
@@ -300,7 +300,7 @@ function PlaybookCard({
   const statusColor = playbook.status === 'published'
     ? 'bg-emerald-950/40 text-emerald-400'
     : playbook.status === 'draft'
-    ? 'bg-amber-100 text-amber-400'
+    ? 'bg-amber-950/40 text-amber-400'
     : 'bg-muted text-muted-foreground'
 
   return (

@@ -186,7 +186,7 @@ export default function NexusLayout({ children }: { children: React.ReactNode })
                     <span className={cn('text-sm font-medium', dark ? 'text-white/25' : 'text-gray-400')}>
                       /
                     </span>
-                    <span className={cn('text-base font-semibold', dark ? 'text-amber-400/80' : 'text-amber-700')}>
+                    <span className={cn('text-base font-semibold', dark ? 'text-amber-400/80' : 'text-amber-400')}>
                       Control Center
                     </span>
                   </div>
@@ -231,7 +231,7 @@ export default function NexusLayout({ children }: { children: React.ReactNode })
                 'flex items-center gap-2 rounded-lg border px-3 py-1.5 text-[10px] font-medium uppercase tracking-wider',
                 dark
                   ? 'border-emerald-500/20 bg-emerald-500/5 text-emerald-400'
-                  : 'border-emerald-200 bg-emerald-50 text-emerald-600',
+                  : 'border-emerald-500/20 bg-emerald-950/30 text-emerald-600',
               )}>
                 <span className="relative flex h-2 w-2">
                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-50" />
@@ -275,7 +275,7 @@ export default function NexusLayout({ children }: { children: React.ReactNode })
                     active
                       ? dark
                         ? 'border-amber-400 text-amber-400 bg-amber-400/[0.04]'
-                        : 'border-amber-600 text-amber-700 bg-amber-50/50'
+                        : 'border-amber-600 text-amber-400 bg-amber-950/30/50'
                       : dark
                         ? 'border-transparent text-white/25 hover:text-white/50 hover:bg-white/[0.02]'
                         : 'border-transparent text-gray-400 hover:text-gray-600 hover:bg-gray-50',

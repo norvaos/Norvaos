@@ -62,7 +62,7 @@ export function FrontDeskHeader({ userId, userName, avatarUrl, firmName }: Front
     ? (Date.now() - new Date(activeShift.started_at).getTime()) / 3600000
     : 0
   const shiftColor = shiftHours > 10 ? 'text-red-600' : shiftHours > 8 ? 'text-amber-600' : 'text-emerald-600'
-  const shiftBg = shiftHours > 10 ? 'bg-red-950/30 border-red-200' : shiftHours > 8 ? 'bg-amber-950/30 border-amber-500/20' : 'bg-emerald-950/30 border-emerald-500/20'
+  const shiftBg = shiftHours > 10 ? 'bg-red-950/30 border-red-500/20' : shiftHours > 8 ? 'bg-amber-950/30 border-amber-500/20' : 'bg-emerald-950/30 border-emerald-500/20'
 
   const shiftMutation = useMutation({
     mutationFn: async (actionType: 'front_desk_start_shift' | 'front_desk_end_shift') => {
@@ -140,7 +140,7 @@ export function FrontDeskHeader({ userId, userName, avatarUrl, firmName }: Front
         <div className="flex items-center gap-6">
           <Link href="/front-desk" className="flex items-center gap-2">
             <span className="text-lg font-bold text-slate-900">{firmName}</span>
-            <span className="text-xs font-medium bg-blue-100 text-blue-400 px-2 py-0.5 rounded-full">
+            <span className="text-xs font-medium bg-blue-950/40 text-blue-400 px-2 py-0.5 rounded-full">
               Front Desk
             </span>
           </Link>
@@ -184,7 +184,7 @@ export function FrontDeskHeader({ userId, userName, avatarUrl, firmName }: Front
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-6 px-2 text-xs text-red-600 hover:text-red-400 hover:bg-red-100"
+                className="h-6 px-2 text-xs text-red-600 hover:text-red-400 hover:bg-red-950/40"
                 onClick={() => shiftMutation.mutate('front_desk_end_shift')}
                 disabled={shiftMutation.isPending}
               >

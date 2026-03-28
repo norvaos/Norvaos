@@ -30,12 +30,12 @@ export function OverdueInvoiceBanner({ invoices, matterId }: OverdueInvoiceBanne
   const totalOverdueCents = invoices.reduce((sum, inv) => sum + inv.amount_cents, 0)
 
   return (
-    <Alert className="border-red-300 bg-red-50 text-red-800">
+    <Alert className="border-red-500/30 bg-red-950/30 text-red-400">
       <AlertTriangle className="h-4 w-4 text-red-600" />
-      <AlertTitle className="text-red-800 font-semibold">
+      <AlertTitle className="text-red-400 font-semibold">
         {invoices.length} Invoice{invoices.length > 1 ? 's' : ''} Overdue ({'>'}30 Days)
       </AlertTitle>
-      <AlertDescription className="text-red-700">
+      <AlertDescription className="text-red-400">
         <p className="text-sm mt-1">
           Total overdue: <span className="font-semibold">{fmtCents(totalOverdueCents)}</span>
         </p>

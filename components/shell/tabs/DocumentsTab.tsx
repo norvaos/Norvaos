@@ -140,7 +140,7 @@ function getExpiryBadge(expiryDate: string | null) {
     return <Badge variant="destructive" className="text-xs">Expired {Math.abs(daysUntilExpiry)}d ago</Badge>
   }
   if (daysUntilExpiry <= 30) {
-    return <Badge className="bg-amber-950/40 text-amber-800 border-amber-200 text-xs">Expires in {daysUntilExpiry}d</Badge>
+    return <Badge className="bg-amber-950/40 text-amber-400 border-amber-500/20 text-xs">Expires in {daysUntilExpiry}d</Badge>
   }
   return null // No badge needed if >30 days away
 }

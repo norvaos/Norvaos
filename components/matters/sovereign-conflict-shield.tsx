@@ -356,7 +356,7 @@ export function SovereignConflictShield({
               <div className="flex items-center gap-3 rounded-2xl border border-blue-500/30 bg-blue-500/5 p-4">
                 <Loader2 className="h-5 w-5 shrink-0 animate-spin text-blue-500" />
                 <div>
-                  <p className="text-sm font-medium text-blue-700 dark:text-blue-300">
+                  <p className="text-sm font-medium text-blue-400 dark:text-blue-300">
                     Scanning the Global Ledger...
                   </p>
                   <p className="mt-0.5 text-xs text-blue-600/70 dark:text-blue-400/60">
@@ -435,7 +435,7 @@ export function SovereignConflictShield({
               <Check className="h-4 w-4 text-emerald-500" />
             </div>
             <div className="flex-1">
-              <p className="text-sm font-medium text-emerald-700 dark:text-emerald-300">
+              <p className="text-sm font-medium text-emerald-400 dark:text-emerald-300">
                 Conflict Search Verified
               </p>
               <p className="mt-0.5 text-xs text-emerald-600/70 dark:text-emerald-400/60">
@@ -461,7 +461,7 @@ export function SovereignConflictShield({
               <ShieldCheck className="h-4 w-4 text-emerald-500" />
             </div>
             <div className="flex-1">
-              <p className="text-sm font-medium text-emerald-700 dark:text-emerald-300">
+              <p className="text-sm font-medium text-emerald-400 dark:text-emerald-300">
                 Conflict Waiver Approved
               </p>
               <p className="mt-0.5 text-xs text-emerald-600/70 dark:text-emerald-400/60">
@@ -488,7 +488,7 @@ export function SovereignConflictShield({
               <div className="flex items-start gap-3">
                 <ShieldAlert className="mt-0.5 h-5 w-5 shrink-0 text-red-500" />
                 <div>
-                  <p className="text-sm font-semibold text-red-700 dark:text-red-300">
+                  <p className="text-sm font-semibold text-red-400 dark:text-red-300">
                     Fortress Lockdown - Conflict Detected
                   </p>
                   <p className="mt-1 text-xs text-red-600/80 dark:text-red-400/70">
@@ -500,7 +500,7 @@ export function SovereignConflictShield({
               {/* Guardian Alert */}
               <div className="mt-3 flex items-start gap-2 rounded-xl border border-amber-500/30 bg-amber-500/5 px-3 py-2.5">
                 <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
-                <p className="text-[11px] leading-relaxed text-amber-700 dark:text-amber-300">
+                <p className="text-[11px] leading-relaxed text-amber-400 dark:text-amber-300">
                   <span className="font-semibold">Guardian Alert:</span> Under Law Society Rule 3.4-1, you must identify and resolve conflicts before accepting a mandate. Proceeding without resolution puts the firm&apos;s licence at risk.
                 </p>
               </div>
@@ -530,7 +530,7 @@ export function SovereignConflictShield({
                 <div className="flex items-center gap-3 rounded-xl border border-amber-500/30 bg-amber-500/5 px-4 py-3">
                   <FileText className="h-4 w-4 shrink-0 text-amber-500" />
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium text-amber-700 dark:text-amber-300">
+                    <p className="truncate text-sm font-medium text-amber-400 dark:text-amber-300">
                       {waiverFile?.name ?? 'CONF-WAIVER (System Generated)'}
                     </p>
                     <p className="text-[10px] text-amber-600/60 dark:text-amber-400/50">
@@ -578,7 +578,7 @@ export function SovereignConflictShield({
                       'flex items-center justify-center gap-2 rounded-xl border-2 border-dashed px-4 py-3.5 text-xs font-medium transition-all',
                       isGenerating || !conflictNotes.trim()
                         ? 'border-gray-200 dark:border-white/[0.06] text-gray-300 dark:text-white/20 cursor-not-allowed'
-                        : 'border-amber-500/30 bg-amber-500/5 text-amber-700 dark:text-amber-400 hover:border-amber-500/50 hover:bg-amber-500/10',
+                        : 'border-amber-500/30 bg-amber-500/5 text-amber-400 dark:text-amber-400 hover:border-amber-500/50 hover:bg-amber-500/10',
                     )}
                   >
                     {isGenerating ? (

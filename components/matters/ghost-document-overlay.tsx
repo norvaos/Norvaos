@@ -86,7 +86,7 @@ export function GhostDocumentOverlay({
               className={cn(
                 'group flex items-center gap-3 px-3 py-2.5 rounded-lg border border-dashed transition-all text-left w-full',
                 doc.is_required
-                  ? 'border-amber-300/60 bg-amber-50/30 dark:bg-amber-950/10 hover:border-amber-400 hover:bg-amber-50/50'
+                  ? 'border-amber-500/30/60 bg-amber-950/30/30 dark:bg-amber-950/10 hover:border-amber-400 hover:bg-amber-950/30/50'
                   : 'border-muted-foreground/20 bg-muted/20 hover:border-muted-foreground/40 hover:bg-muted/30',
               )}
             >
@@ -95,7 +95,7 @@ export function GhostDocumentOverlay({
                 className={cn(
                   'flex items-center justify-center h-8 w-8 rounded-md shrink-0',
                   doc.is_required
-                    ? 'bg-amber-100/60 dark:bg-amber-900/20'
+                    ? 'bg-amber-950/40/60 dark:bg-amber-900/20'
                     : 'bg-muted/40',
                 )}
               >
@@ -115,7 +115,7 @@ export function GhostDocumentOverlay({
                   className={cn(
                     'text-xs font-medium truncate',
                     doc.is_required
-                      ? 'text-amber-700/70 dark:text-amber-400/70'
+                      ? 'text-amber-400/70 dark:text-amber-400/70'
                       : 'text-muted-foreground/50',
                   )}
                 >

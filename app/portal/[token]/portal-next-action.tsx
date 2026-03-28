@@ -126,7 +126,7 @@ export function PortalNextActionPanel({
             </svg>
           </div>
           <div className="flex-1">
-            <h3 className="text-sm font-semibold text-green-800">
+            <h3 className="text-sm font-semibold text-emerald-400">
               {tr.next_action_awaiting_review_title ?? 'All items submitted'}
             </h3>
             <p className="text-sm text-emerald-400 mt-1">

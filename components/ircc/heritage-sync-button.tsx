@@ -211,7 +211,7 @@ export function HeritageSyncButton({
                 <span className={cn(
                   'font-medium',
                   f.category === 'stable' && 'text-emerald-400 dark:text-emerald-300',
-                  f.category === 'semi_stable' && 'text-amber-700 dark:text-amber-300',
+                  f.category === 'semi_stable' && 'text-amber-400 dark:text-amber-300',
                   f.category === 'matter_specific' && 'text-muted-foreground line-through',
                 )}>
                   {f.label}

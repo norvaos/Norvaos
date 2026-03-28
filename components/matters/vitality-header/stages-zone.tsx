@@ -45,13 +45,13 @@ function slaColour(status: 'ok' | 'warning' | 'exceeded') {
     case 'ok':
       return {
         text: 'text-green-600 dark:text-green-400',
-        bg: 'bg-green-100 dark:bg-green-900/40',
+        bg: 'bg-emerald-950/40 dark:bg-green-900/40',
         badge: 'bg-emerald-950/30 text-emerald-400 dark:bg-green-900/40 dark:text-green-400',
       }
     case 'warning':
       return {
         text: 'text-amber-600 dark:text-amber-400',
-        bg: 'bg-amber-100 dark:bg-amber-900/40',
+        bg: 'bg-amber-950/40 dark:bg-amber-900/40',
         badge: 'bg-amber-950/30 text-amber-400 dark:bg-amber-900/40 dark:text-amber-400',
       }
     case 'exceeded':

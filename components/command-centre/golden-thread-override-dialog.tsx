@@ -145,11 +145,11 @@ export function GoldenThreadOverrideDialog({
         </AlertDialogHeader>
 
         {/* Warning banner */}
-        <div className="rounded-md border border-red-200 bg-red-50 p-3 space-y-2">
+        <div className="rounded-md border border-red-500/20 bg-red-950/30 p-3 space-y-2">
           <div className="flex items-start gap-2">
             <AlertTriangle className="h-4 w-4 text-red-500 shrink-0 mt-0.5" />
             <div>
-              <p className="text-sm font-medium text-red-800">
+              <p className="text-sm font-medium text-red-400">
                 This is a Compliance Override
               </p>
               <p className="text-xs text-red-600 mt-1">
@@ -158,7 +158,7 @@ export function GoldenThreadOverrideDialog({
             </div>
           </div>
           <div className="flex items-center gap-2 pt-1">
-            <Badge variant="outline" className="text-[10px] border-red-300 text-red-600 bg-red-100">
+            <Badge variant="outline" className="text-[10px] border-red-500/30 text-red-600 bg-red-950/40">
               RED_FLAG
             </Badge>
             <span className="text-[10px] text-red-500">
@@ -180,7 +180,7 @@ export function GoldenThreadOverrideDialog({
             value={justification}
             onChange={(e) => setJustification(e.target.value)}
             rows={4}
-            className={!isJustificationValid && charCount > 0 ? 'border-red-300 focus-visible:ring-red-200' : ''}
+            className={!isJustificationValid && charCount > 0 ? 'border-red-500/30 focus-visible:ring-red-200' : ''}
           />
           {charCount > 0 && !isJustificationValid && (
             <p className="text-[10px] text-red-500">
@@ -210,8 +210,8 @@ export function GoldenThreadOverrideDialog({
 
         {/* Error display */}
         {error && (
-          <div className="rounded-md border border-red-200 bg-red-50 p-2">
-            <p className="text-xs text-red-700">{error}</p>
+          <div className="rounded-md border border-red-500/20 bg-red-950/30 p-2">
+            <p className="text-xs text-red-400">{error}</p>
           </div>
         )}
 

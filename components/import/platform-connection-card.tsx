@@ -32,7 +32,7 @@ export function PlatformConnectionCard({
   onDisconnect,
   isDisconnecting,
 }: PlatformConnectionCardProps) {
-  const bgColour = platform === 'ghl' ? 'bg-blue-50' : 'bg-indigo-50'
+  const bgColour = platform === 'ghl' ? 'bg-blue-950/30' : 'bg-indigo-50'
   const textColour = platform === 'ghl' ? 'text-blue-600' : 'text-indigo-600'
   const [connectError, setConnectError] = useState<string | null>(null)
 
@@ -63,7 +63,7 @@ export function PlatformConnectionCard({
             <div className="flex items-center gap-2">
               <p className="text-sm font-semibold text-slate-900">{displayName}</p>
               {isConnected ? (
-                <Badge className="bg-green-100 text-green-800 text-[10px]">
+                <Badge className="bg-emerald-950/40 text-emerald-400 text-[10px]">
                   <CheckCircle className="h-3 w-3 mr-1" />
                   Connected
                 </Badge>
@@ -95,7 +95,7 @@ export function PlatformConnectionCard({
               size="sm"
               onClick={onDisconnect}
               disabled={isDisconnecting}
-              className="text-red-600 hover:text-red-700 hover:bg-red-50"
+              className="text-red-600 hover:text-red-400 hover:bg-red-950/30"
             >
               {isDisconnecting ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -116,9 +116,9 @@ export function PlatformConnectionCard({
       </div>
 
       {connectError && (
-        <div className="flex items-start gap-2 mt-3 rounded-md border border-red-200 bg-red-50 p-3">
+        <div className="flex items-start gap-2 mt-3 rounded-md border border-red-500/20 bg-red-950/30 p-3">
           <AlertCircle className="h-4 w-4 text-red-600 shrink-0 mt-0.5" />
-          <p className="text-xs text-red-700 flex-1">{connectError}</p>
+          <p className="text-xs text-red-400 flex-1">{connectError}</p>
           <button onClick={() => setConnectError(null)} className="text-red-400 hover:text-red-600 shrink-0">
             <X className="h-3.5 w-3.5" />
           </button>

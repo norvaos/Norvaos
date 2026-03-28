@@ -577,7 +577,7 @@ export function CommandSidebar({
             <Button
               variant="ghost"
               size="sm"
-              className="h-6 w-full text-[10px] text-amber-600 hover:text-amber-700 hover:bg-amber-50"
+              className="h-6 w-full text-[10px] text-amber-600 hover:text-amber-400 hover:bg-amber-950/30"
               onClick={() => revokePortalLink.mutate({ id: activePortalLink.id, matterId })}
               disabled={revokePortalLink.isPending}
             >
@@ -693,7 +693,7 @@ export function CommandSidebar({
             ))}
             <button
               onClick={() => onOpenSheet('history')}
-              className="text-[10px] text-blue-600 hover:text-blue-800 underline"
+              className="text-[10px] text-blue-600 hover:text-blue-400 underline"
             >
               View all history
             </button>

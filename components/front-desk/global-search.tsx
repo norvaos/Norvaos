@@ -73,22 +73,22 @@ function formatNextAppointment(appt: { date: string; time: string } | null): str
 const RISK_FLAG_CONFIG: Record<string, { label: string; className: string; icon: React.ReactNode }> = {
   do_not_contact: {
     label: 'Do Not Contact',
-    className: 'bg-red-100 text-red-800 border-red-200',
+    className: 'bg-red-950/40 text-red-400 border-red-500/20',
     icon: <AlertTriangle className="w-3 h-3" />,
   },
   billing_restricted: {
     label: 'Billing Restricted',
-    className: 'bg-amber-100 text-amber-800 border-amber-200',
+    className: 'bg-amber-950/40 text-amber-400 border-amber-500/20',
     icon: <Shield className="w-3 h-3" />,
   },
   id_verification_required: {
     label: 'ID Verification Required',
-    className: 'bg-blue-100 text-blue-800 border-blue-200',
+    className: 'bg-blue-950/40 text-blue-400 border-blue-500/20',
     icon: <Shield className="w-3 h-3" />,
   },
   vip: {
     label: 'VIP',
-    className: 'bg-purple-100 text-purple-800 border-purple-200',
+    className: 'bg-purple-950/40 text-purple-400 border-purple-500/20',
     icon: <Star className="w-3 h-3" />,
   },
 }

@@ -237,8 +237,8 @@ export function DeadlinesTab({
                     className={cn(
                       'group flex items-start gap-3 py-3 px-3 rounded-md transition-colors',
                       isComplete && 'opacity-50',
-                      isRed && 'bg-red-50 border-l-4 border-l-red-500',
-                      isAmber && 'bg-amber-50/50 border-l-4 border-l-amber-400',
+                      isRed && 'bg-red-950/30 border-l-4 border-l-red-500',
+                      isAmber && 'bg-amber-950/30/50 border-l-4 border-l-amber-400',
                       isGreen && 'border-l-4 border-l-emerald-300',
                     )}
                   >
@@ -277,13 +277,13 @@ export function DeadlinesTab({
                           <Badge variant="destructive" className="text-xs">Due today</Badge>
                         )}
                         {isAmber && (
-                          <Badge variant="outline" className="text-xs border-amber-400 text-amber-600 bg-amber-50">
+                          <Badge variant="outline" className="text-xs border-amber-400 text-amber-600 bg-amber-950/30">
                             {countdownLabel}
                           </Badge>
                         )}
                         {/* Automation sync badge for active deadlines */}
                         {!isComplete && (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-medium text-emerald-600">
+                          <span className="inline-flex items-center gap-1 rounded-full bg-emerald-950/30 px-2 py-0.5 text-[10px] font-medium text-emerald-600">
                             <Check className="size-3" />
                             Reminders active
                           </span>

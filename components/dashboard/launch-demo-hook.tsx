@@ -114,7 +114,7 @@ export function LaunchDemoHook({ tenantId, userId }: LaunchDemoHookProps) {
   if (dismissed || isLoading || !demoMatter) return null
 
   return (
-    <Card className="relative overflow-hidden border-amber-300 bg-gradient-to-r from-amber-50 via-white to-amber-50 dark:from-amber-950/20 dark:via-card dark:to-amber-950/20">
+    <Card className="relative overflow-hidden border-amber-500/30 bg-gradient-to-r from-amber-50 via-white to-amber-50 dark:from-amber-950/20 dark:via-card dark:to-amber-950/20">
       {/* Amber glow pulse */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-amber-600 animate-pulse" />
@@ -133,7 +133,7 @@ export function LaunchDemoHook({ tenantId, userId }: LaunchDemoHookProps) {
         <div className="flex items-start gap-4">
           {/* Amber pulse ring icon */}
           <div className="relative shrink-0 mt-0.5">
-            <div className="w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-full bg-amber-950/40 dark:bg-amber-900/30 flex items-center justify-center">
               <AlertCircle className="h-5 w-5 text-amber-600" />
             </div>
             <span className="absolute -top-0.5 -right-0.5 w-3 h-3 rounded-full bg-amber-950/300 animate-ping" />
@@ -164,7 +164,7 @@ export function LaunchDemoHook({ tenantId, userId }: LaunchDemoHookProps) {
 
             {/* Feature badges */}
             <div className="flex flex-wrap gap-1.5 mb-3">
-              <Badge variant="outline" className="text-[10px] border-amber-200 bg-amber-950/30 text-amber-400 dark:bg-amber-900/20 dark:text-amber-400">
+              <Badge variant="outline" className="text-[10px] border-amber-500/20 bg-amber-950/30 text-amber-400 dark:bg-amber-900/20 dark:text-amber-400">
                 <Globe className="h-2.5 w-2.5 mr-0.5" />
                 Global 15 Active
               </Badge>
@@ -172,7 +172,7 @@ export function LaunchDemoHook({ tenantId, userId }: LaunchDemoHookProps) {
                 <Shield className="h-2.5 w-2.5 mr-0.5" />
                 Sentinel Secured
               </Badge>
-              <Badge variant="outline" className="text-[10px] border-blue-200 bg-blue-950/30 text-blue-400 dark:bg-blue-900/20 dark:text-blue-400">
+              <Badge variant="outline" className="text-[10px] border-blue-500/20 bg-blue-950/30 text-blue-400 dark:bg-blue-900/20 dark:text-blue-400">
                 <Sparkles className="h-2.5 w-2.5 mr-0.5" />
                 Fact-Anchors Linked
               </Badge>

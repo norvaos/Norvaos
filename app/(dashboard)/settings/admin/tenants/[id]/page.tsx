@@ -78,8 +78,8 @@ const STARTER_PACKS = [
 function getTierBadge(tier: string) {
   const colours: Record<string, string> = {
     starter: 'bg-slate-100 text-slate-700',
-    professional: 'bg-blue-100 text-blue-700',
-    enterprise: 'bg-purple-100 text-purple-700',
+    professional: 'bg-blue-950/40 text-blue-400',
+    enterprise: 'bg-purple-950/40 text-purple-400',
   }
   return (
     <span

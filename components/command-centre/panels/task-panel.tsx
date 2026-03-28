@@ -358,7 +358,7 @@ export function TaskPanel() {
       <CardContent className="space-y-1">
         {/* Add task row */}
         {showAddRow && (
-          <div className="flex flex-col gap-2 p-3 rounded-lg border border-blue-200 bg-blue-50/50 mb-3">
+          <div className="flex flex-col gap-2 p-3 rounded-lg border border-blue-500/20 bg-blue-950/30/50 mb-3">
             <Input
               autoFocus
               placeholder="Task title..."

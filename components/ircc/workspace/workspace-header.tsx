@@ -218,9 +218,9 @@ export function WorkspaceHeader({ matter, matterId, immigrationData, principalAp
         variant="outline"
         className={cn(
           'text-xs shrink-0',
-          matter.status === 'active' ? 'border-green-300 text-emerald-400 bg-emerald-950/30' :
+          matter.status === 'active' ? 'border-emerald-500/30 text-emerald-400 bg-emerald-950/30' :
           matter.status?.startsWith('closed') ? 'border-zinc-300 text-zinc-600 bg-zinc-50' :
-          'border-amber-300 text-amber-400 bg-amber-950/30'
+          'border-amber-500/30 text-amber-400 bg-amber-950/30'
         )}
       >
         {matter.status ?? 'Unknown'}

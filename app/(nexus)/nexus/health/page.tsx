@@ -152,8 +152,8 @@ export default function HealthPage() {
 
       {/* Overall status */}
       <div className={cn('rounded-xl border p-6', allHealthy
-        ? dark ? 'border-emerald-500/20 bg-emerald-500/5' : 'border-emerald-200 bg-emerald-50'
-        : dark ? 'border-amber-500/20 bg-amber-500/5' : 'border-amber-200 bg-amber-50',
+        ? dark ? 'border-emerald-500/20 bg-emerald-500/5' : 'border-emerald-500/20 bg-emerald-950/30'
+        : dark ? 'border-amber-500/20 bg-amber-500/5' : 'border-amber-500/20 bg-amber-950/30',
       )}>
         <div className="flex items-center gap-3">
           {allHealthy

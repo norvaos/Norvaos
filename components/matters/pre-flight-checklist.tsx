@@ -235,7 +235,7 @@ export function PreFlightChecklist({
             'rounded-lg border p-3 text-center',
             allPassed
               ? 'border-emerald-500/30 bg-emerald-950/30 dark:border-emerald-700 dark:bg-emerald-900/20'
-              : 'border-red-300 bg-red-950/30 dark:border-red-700 dark:bg-red-900/20',
+              : 'border-red-500/30 bg-red-950/30 dark:border-red-700 dark:bg-red-900/20',
           )}>
             {allPassed ? (
               <div className="flex items-center justify-center gap-2 text-emerald-400 dark:text-emerald-400">
@@ -296,7 +296,7 @@ function PreFlightCheckRow({ check }: { check: PreFlightCheck }) {
       'flex items-start gap-3 rounded-lg border p-3 transition-colors',
       isPassed
         ? 'border-emerald-500/20 bg-emerald-950/30/50 dark:border-emerald-800 dark:bg-emerald-900/10'
-        : 'border-red-200 bg-red-950/30/50 dark:border-red-800 dark:bg-red-900/10',
+        : 'border-red-500/20 bg-red-950/30/50 dark:border-red-800 dark:bg-red-900/10',
     )}>
       {/* Status icon */}
       <div className={cn(
@@ -323,7 +323,7 @@ function PreFlightCheckRow({ check }: { check: PreFlightCheck }) {
               'text-[10px] px-1.5',
               isPassed
                 ? 'border-emerald-500/30 text-emerald-400 bg-emerald-950/30'
-                : 'border-red-300 text-red-400 bg-red-950/30',
+                : 'border-red-500/30 text-red-400 bg-red-950/30',
             )}
           >
             {isPassed ? 'PASS' : 'FAIL'}

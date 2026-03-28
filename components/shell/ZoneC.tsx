@@ -400,7 +400,7 @@ export function ZoneC({ matter, tenantId }: ZoneCProps) {
           {latestRetainer?.status === 'signed' && (
             <div className="rounded-md border border-emerald-500/20 bg-emerald-950/30 px-2.5 py-1.5 flex items-center gap-1.5">
               <CheckCircle2 className="h-3 w-3 text-green-600 shrink-0" />
-              <span className="text-[10px] text-green-800 font-medium">Retainer Signed</span>
+              <span className="text-[10px] text-emerald-400 font-medium">Retainer Signed</span>
             </div>
           )}
 

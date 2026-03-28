@@ -248,8 +248,8 @@ export function PortalMessages({ token, primaryColor, language = 'en' }: PortalM
   if (error && messages.length === 0) {
     return (
       <div>
-        <div className="rounded-2xl border border-red-200/60 bg-gradient-to-br from-red-50 to-white p-6 text-center shadow-sm">
-          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-red-100 shadow-sm">
+        <div className="rounded-2xl border border-red-500/20/60 bg-gradient-to-br from-red-50 to-white p-6 text-center shadow-sm">
+          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-red-950/40 shadow-sm">
             <svg
               className="h-5 w-5 text-red-600"
               fill="none"
@@ -264,7 +264,7 @@ export function PortalMessages({ token, primaryColor, language = 'en' }: PortalM
               />
             </svg>
           </div>
-          <p className="text-sm font-bold text-red-800">{tr.messages_error_title}</p>
+          <p className="text-sm font-bold text-red-400">{tr.messages_error_title}</p>
           <p className="mt-1 text-sm text-red-600">{error}</p>
         </div>
       </div>
@@ -357,7 +357,7 @@ export function PortalMessages({ token, primaryColor, language = 'en' }: PortalM
 
       {/* Send error banner */}
       {error && messages.length > 0 && (
-        <div className="mx-4 mb-2 rounded-lg border border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-800">
+        <div className="mx-4 mb-2 rounded-lg border border-amber-500/20 bg-amber-950/30 px-4 py-2 text-sm text-amber-400">
           {error}
           <button
             className="ml-2 font-medium underline"

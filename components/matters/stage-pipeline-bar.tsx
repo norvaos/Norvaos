@@ -160,7 +160,7 @@ export const StagePipelineBar = memo(function StagePipelineBar({
                       // Upcoming
                       isUpcoming && !isGated && 'bg-slate-100 text-slate-400',
                       // Gated
-                      isGated && isUpcoming && 'bg-red-50 text-red-400 border border-dashed border-red-300'
+                      isGated && isUpcoming && 'bg-red-950/30 text-red-400 border border-dashed border-red-500/30'
                     )}
                     style={{
                       backgroundColor: isCompleted || isCurrent ? stage.color : undefined,

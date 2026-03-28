@@ -163,7 +163,7 @@ export function QuestionsWorkflowSection({
                         className={cn(
                           'text-[10px]',
                           isComplete
-                            ? 'border-green-300 text-green-700 bg-green-50'
+                            ? 'border-emerald-500/30 text-emerald-400 bg-emerald-950/30'
                             : 'border-slate-300 text-slate-600'
                         )}
                       >
@@ -178,7 +178,7 @@ export function QuestionsWorkflowSection({
                         </Badge>
                       )}
                       {domainQuestionBlockers.some((b) => b.blocks_filing && !b.blocks_drafting) && (
-                        <Badge variant="outline" className="text-[9px] px-1 py-0 border-amber-300 text-amber-400 bg-amber-950/30">
+                        <Badge variant="outline" className="text-[9px] px-1 py-0 border-amber-500/30 text-amber-400 bg-amber-950/30">
                           Blocks Filing
                         </Badge>
                       )}
@@ -206,7 +206,7 @@ export function QuestionsWorkflowSection({
                             <Button
                               variant="ghost"
                               size="sm"
-                              className="h-5 text-[10px] text-blue-600 hover:text-blue-800 px-1"
+                              className="h-5 text-[10px] text-blue-600 hover:text-blue-400 px-1"
                               onClick={() => onNavigateToField(blocker.identifier)}
                             >
                               Complete in Questionnaire

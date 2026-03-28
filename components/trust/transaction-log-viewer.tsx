@@ -19,29 +19,29 @@ function fmtCents(cents: number): string {
 function eventTypeBadge(eventType: string): { label: string; cls: string } {
   switch (eventType) {
     case 'deposit_recorded':
-      return { label: 'Deposit Recorded', cls: 'bg-green-50 text-green-700 border-green-200' }
+      return { label: 'Deposit Recorded', cls: 'bg-emerald-950/30 text-emerald-400 border-emerald-500/20' }
     case 'disbursement_recorded':
-      return { label: 'Disbursement Recorded', cls: 'bg-red-50 text-red-700 border-red-200' }
+      return { label: 'Disbursement Recorded', cls: 'bg-red-950/30 text-red-400 border-red-500/20' }
     case 'transfer_recorded':
-      return { label: 'Transfer Recorded', cls: 'bg-purple-50 text-purple-700 border-purple-200' }
+      return { label: 'Transfer Recorded', cls: 'bg-purple-950/30 text-purple-400 border-purple-500/20' }
     case 'reversal_recorded':
-      return { label: 'Reversal Recorded', cls: 'bg-orange-50 text-orange-700 border-orange-200' }
+      return { label: 'Reversal Recorded', cls: 'bg-orange-950/30 text-orange-400 border-orange-500/20' }
     case 'hold_created':
-      return { label: 'Hold Created', cls: 'bg-amber-50 text-amber-700 border-amber-200' }
+      return { label: 'Hold Created', cls: 'bg-amber-950/30 text-amber-400 border-amber-500/20' }
     case 'hold_released':
-      return { label: 'Hold Released', cls: 'bg-amber-50 text-amber-700 border-amber-200' }
+      return { label: 'Hold Released', cls: 'bg-amber-950/30 text-amber-400 border-amber-500/20' }
     case 'hold_cancelled':
-      return { label: 'Hold Cancelled', cls: 'bg-amber-50 text-amber-700 border-amber-200' }
+      return { label: 'Hold Cancelled', cls: 'bg-amber-950/30 text-amber-400 border-amber-500/20' }
     case 'reconciliation_started':
-      return { label: 'Reconciliation Started', cls: 'bg-blue-50 text-blue-700 border-blue-200' }
+      return { label: 'Reconciliation Started', cls: 'bg-blue-950/30 text-blue-400 border-blue-500/20' }
     case 'reconciliation_completed':
-      return { label: 'Reconciliation Completed', cls: 'bg-blue-50 text-blue-700 border-blue-200' }
+      return { label: 'Reconciliation Completed', cls: 'bg-blue-950/30 text-blue-400 border-blue-500/20' }
     case 'reconciliation_discrepancy':
-      return { label: 'Reconciliation Discrepancy', cls: 'bg-blue-50 text-blue-700 border-blue-200' }
+      return { label: 'Reconciliation Discrepancy', cls: 'bg-blue-950/30 text-blue-400 border-blue-500/20' }
     case 'balance_warning':
-      return { label: 'Balance Warning', cls: 'bg-yellow-50 text-yellow-700 border-yellow-200' }
+      return { label: 'Balance Warning', cls: 'bg-yellow-950/30 text-yellow-400 border-yellow-500/20' }
     case 'overdraft_prevented':
-      return { label: 'Overdraft Prevented', cls: 'bg-red-50 text-red-700 border-red-200' }
+      return { label: 'Overdraft Prevented', cls: 'bg-red-950/30 text-red-400 border-red-500/20' }
     default:
       return { label: eventType.replace(/_/g, ' '), cls: 'bg-slate-50 text-slate-700 border-slate-200' }
   }
@@ -153,7 +153,7 @@ export function TransactionLogViewer({
                   <span className="text-xs truncate">{entry.description}</span>
                   <span
                     className={`text-xs font-medium text-right ${
-                      isPositive ? 'text-green-700' : 'text-red-700'
+                      isPositive ? 'text-emerald-400' : 'text-red-400'
                     }`}
                   >
                     {isPositive ? '+' : ''}

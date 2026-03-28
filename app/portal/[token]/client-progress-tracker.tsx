@@ -174,9 +174,9 @@ function MissingDocsList({
 
   if (docs.length === 0) {
     return (
-      <div className="flex items-center gap-2 py-4 px-3 rounded-xl bg-green-50 border border-green-200">
+      <div className="flex items-center gap-2 py-4 px-3 rounded-xl bg-emerald-950/30 border border-emerald-500/20">
         <CheckCircle2 className="h-5 w-5 text-green-600 shrink-0" />
-        <p className="text-sm font-medium text-green-700">
+        <p className="text-sm font-medium text-emerald-400">
           All documents received  -  nothing to upload.
         </p>
       </div>
@@ -191,7 +191,7 @@ function MissingDocsList({
           className={cn(
             'flex items-start gap-3 rounded-xl border p-3 transition-all',
             doc.needsReUpload
-              ? 'border-amber-200 bg-amber-50'
+              ? 'border-amber-500/20 bg-amber-950/30'
               : 'border-slate-200 bg-white',
           )}
         >
@@ -210,7 +210,7 @@ function MissingDocsList({
               )}
             </p>
             {doc.needsReUpload && (
-              <p className="text-xs text-amber-700 mt-0.5">
+              <p className="text-xs text-amber-400 mt-0.5">
                 Please re-upload  -  the previous version needs correction.
               </p>
             )}
@@ -379,11 +379,11 @@ export function ClientProgressTracker({
   // ── Error State ──────────────────────────────────────────────────────────
   if (!data && error) {
     return (
-      <div className="rounded-xl border border-red-200 bg-red-50 p-4">
+      <div className="rounded-xl border border-red-500/20 bg-red-950/30 p-4">
         <div className="flex items-start gap-2">
           <AlertTriangle className="h-5 w-5 text-red-500 shrink-0 mt-0.5" />
           <div>
-            <p className="text-sm font-semibold text-red-700">Access Denied</p>
+            <p className="text-sm font-semibold text-red-400">Access Denied</p>
             <p className="text-xs text-red-600 mt-0.5">{error}</p>
           </div>
         </div>
@@ -401,12 +401,12 @@ export function ClientProgressTracker({
     <div className="space-y-6">
       {/* ── Upload Success Toast ────────────────────────────────────────── */}
       {uploadSuccess && (
-        <div className="flex items-center gap-2 rounded-xl bg-green-50 border border-green-200 px-4 py-3 animate-in slide-in-from-top-2">
+        <div className="flex items-center gap-2 rounded-xl bg-emerald-950/30 border border-emerald-500/20 px-4 py-3 animate-in slide-in-from-top-2">
           <CheckCircle2 className="h-4 w-4 text-green-600 shrink-0" />
-          <p className="text-sm font-medium text-green-700 flex-1">{uploadSuccess}</p>
+          <p className="text-sm font-medium text-emerald-400 flex-1">{uploadSuccess}</p>
           <button
             onClick={() => setUploadSuccess(null)}
-            className="text-green-500 hover:text-green-700 text-xs"
+            className="text-green-500 hover:text-emerald-400 text-xs"
           >
             Dismiss
           </button>
@@ -415,9 +415,9 @@ export function ClientProgressTracker({
 
       {/* ── Inline error toast ──────────────────────────────────────────── */}
       {error && data && (
-        <div className="flex items-center gap-2 rounded-xl bg-red-50 border border-red-200 px-4 py-3">
+        <div className="flex items-center gap-2 rounded-xl bg-red-950/30 border border-red-500/20 px-4 py-3">
           <AlertTriangle className="h-4 w-4 text-red-500 shrink-0" />
-          <p className="text-sm text-red-700 flex-1">{error}</p>
+          <p className="text-sm text-red-400 flex-1">{error}</p>
         </div>
       )}
 
@@ -462,9 +462,9 @@ export function ClientProgressTracker({
           <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-start sm:gap-6">
             <CompletionRing pct={documents.completionPct} accentColor={accentColor} />
             <div className="grid grid-cols-2 gap-3 flex-1 w-full">
-              <StatPill label="Accepted" value={documents.accepted} colour="text-green-600" bg="bg-green-50" />
-              <StatPill label="Pending Review" value={documents.pendingReview} colour="text-amber-600" bg="bg-amber-50" />
-              <StatPill label="Re-upload" value={documents.needsReUpload} colour="text-red-600" bg="bg-red-50" />
+              <StatPill label="Accepted" value={documents.accepted} colour="text-green-600" bg="bg-emerald-950/30" />
+              <StatPill label="Pending Review" value={documents.pendingReview} colour="text-amber-600" bg="bg-amber-950/30" />
+              <StatPill label="Re-upload" value={documents.needsReUpload} colour="text-red-600" bg="bg-red-950/30" />
               <StatPill label="Not Uploaded" value={documents.empty} colour="text-slate-500" bg="bg-slate-50" />
             </div>
           </div>

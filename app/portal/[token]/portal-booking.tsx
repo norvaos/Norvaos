@@ -456,7 +456,7 @@ export function PortalBooking({ token, primaryColor, language = 'en' }: PortalBo
 
       {/* ── Error banner ── */}
       {error && (
-        <div className="mb-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
+        <div className="mb-3 rounded-lg border border-red-500/20 bg-red-950/30 px-3 py-2 text-xs text-red-400">
           {error}
         </div>
       )}
@@ -641,7 +641,7 @@ export function PortalBooking({ token, primaryColor, language = 'en' }: PortalBo
 
       {/* ── Step 4: Confirmation ── */}
       {step === 'confirmed' && selectedDate && selectedTime && (
-        <div className="rounded-xl border border-green-200 bg-green-50 p-5 text-center shadow-sm">
+        <div className="rounded-xl border border-emerald-500/20 bg-emerald-950/30 p-5 text-center shadow-sm">
           <div className="flex justify-center mb-3">
             <CheckCircleIcon />
           </div>
@@ -649,9 +649,9 @@ export function PortalBooking({ token, primaryColor, language = 'en' }: PortalBo
             {tr.booking_confirmed_title ?? 'Booking Confirmed!'}
           </h4>
           <p className="text-xs text-slate-500 mb-4">{confirmationMessage}</p>
-          <div className="rounded-lg bg-white border border-green-200 p-3 text-left">
+          <div className="rounded-lg bg-white border border-emerald-500/20 p-3 text-left">
             <div className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-green-100 text-green-600 shrink-0">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-950/40 text-green-600 shrink-0">
                 <CalendarIcon />
               </div>
               <div>

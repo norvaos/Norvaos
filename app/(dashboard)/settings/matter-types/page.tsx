@@ -290,13 +290,13 @@ function SortableStageRow({
             {stage.name}
           </span>
           {stage.is_terminal && (
-            <Badge variant="secondary" className="gap-1 text-[10px] text-orange-400 bg-orange-950/30 border-orange-200">
+            <Badge variant="secondary" className="gap-1 text-[10px] text-orange-400 bg-orange-950/30 border-orange-500/20">
               <AlertTriangle className="h-3 w-3" />
               Terminal
             </Badge>
           )}
           {stage.auto_close_matter && (
-            <Badge variant="secondary" className="gap-1 text-[10px] text-red-400 bg-red-950/30 border-red-200">
+            <Badge variant="secondary" className="gap-1 text-[10px] text-red-400 bg-red-950/30 border-red-500/20">
               <XCircle className="h-3 w-3" />
               Auto-close
             </Badge>
@@ -1489,7 +1489,7 @@ function DocumentSlotSection({
                               {t.slot_name}
                             </span>
                             {t.is_required && (
-                              <Badge variant="secondary" className="text-[10px] text-red-400 bg-red-950/30 border-red-200">
+                              <Badge variant="secondary" className="text-[10px] text-red-400 bg-red-950/30 border-red-500/20">
                                 Required
                               </Badge>
                             )}
@@ -1499,7 +1499,7 @@ function DocumentSlotSection({
                               </Badge>
                             )}
                             {t.library_slot_id && (
-                              <Badge variant="outline" className="text-[10px] text-blue-600 border-blue-200">
+                              <Badge variant="outline" className="text-[10px] text-blue-600 border-blue-500/20">
                                 library
                               </Badge>
                             )}
@@ -1589,12 +1589,12 @@ function DocumentSlotSection({
                       <div className="flex items-center gap-1.5 flex-wrap">
                         <span className="text-sm font-medium">{entry.slot_name}</span>
                         {entry.is_required && (
-                          <Badge variant="secondary" className="text-[10px] text-red-400 bg-red-950/30 border-red-200">
+                          <Badge variant="secondary" className="text-[10px] text-red-400 bg-red-950/30 border-red-500/20">
                             Required
                           </Badge>
                         )}
                         {alreadyAdded && (
-                          <Badge variant="outline" className="text-[10px] text-green-600 border-green-200">
+                          <Badge variant="outline" className="text-[10px] text-green-600 border-emerald-500/20">
                             added
                           </Badge>
                         )}
@@ -3582,7 +3582,7 @@ function IntakeQuestionsSection({ matterTypeId }: { matterTypeId: string }) {
                       <div className="flex items-center gap-2">
                         <span className="font-medium text-xs">{q.label || <span className="text-muted-foreground italic">Untitled</span>}</span>
                         <Badge variant="outline" className="text-[10px] py-0">{QUESTION_TYPE_LABELS[q.type]}</Badge>
-                        {q.required && <Badge variant="outline" className="text-[10px] py-0 border-amber-300 text-amber-400 bg-amber-950/30">Required</Badge>}
+                        {q.required && <Badge variant="outline" className="text-[10px] py-0 border-amber-500/30 text-amber-400 bg-amber-950/30">Required</Badge>}
                         {q.show_if && <span className="text-[10px] text-muted-foreground">if {q.show_if.question_key}={q.show_if.equals}</span>}
                       </div>
                     )}

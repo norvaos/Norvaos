@@ -44,7 +44,7 @@ export function DocumentPanelSwitcher() {
     return (
       <div>
         <div className="mb-2 flex items-center gap-2">
-          <Badge variant="secondary" className="text-[10px] bg-green-100 text-emerald-400 border-green-200">
+          <Badge variant="secondary" className="text-[10px] bg-emerald-950/40 text-emerald-400 border-emerald-500/20">
             Post-Retained
           </Badge>
           <span className="text-[10px] text-slate-500">

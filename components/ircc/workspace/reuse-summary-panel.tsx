@@ -85,7 +85,7 @@ function CategoryBadge({ category }: { category: string }) {
       return (
         <Badge
           variant="outline"
-          className="text-[10px] py-0 px-1.5 border-green-300 text-emerald-400 bg-emerald-950/30"
+          className="text-[10px] py-0 px-1.5 border-emerald-500/30 text-emerald-400 bg-emerald-950/30"
         >
           Stable
         </Badge>
@@ -94,7 +94,7 @@ function CategoryBadge({ category }: { category: string }) {
       return (
         <Badge
           variant="outline"
-          className="text-[10px] py-0 px-1.5 border-amber-300 text-amber-400 bg-amber-950/30"
+          className="text-[10px] py-0 px-1.5 border-amber-500/30 text-amber-400 bg-amber-950/30"
         >
           Needs Review
         </Badge>
@@ -185,7 +185,7 @@ export function ReuseSummaryPanel({
         {totalConflicts > 0 && (
           <Badge
             variant="outline"
-            className="text-[10px] py-0 px-1.5 border-red-300 text-red-600 bg-red-950/30"
+            className="text-[10px] py-0 px-1.5 border-red-500/30 text-red-600 bg-red-950/30"
           >
             {totalConflicts} conflict{totalConflicts !== 1 ? 's' : ''}
           </Badge>
@@ -193,7 +193,7 @@ export function ReuseSummaryPanel({
         {reviewCount > 0 && (
           <Badge
             variant="outline"
-            className="text-[10px] py-0 px-1.5 border-amber-300 text-amber-600 bg-amber-950/30"
+            className="text-[10px] py-0 px-1.5 border-amber-500/30 text-amber-600 bg-amber-950/30"
           >
             {reviewCount} to review
           </Badge>

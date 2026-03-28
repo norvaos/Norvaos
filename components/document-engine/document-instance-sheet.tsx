@@ -226,7 +226,7 @@ export function DocumentInstanceSheet({
                       <div className="flex items-center gap-2">
                         <Badge variant="outline" className="text-[10px]">{a.artifact_type as string}</Badge>
                         {Boolean(a.is_final) && (
-                          <Badge variant="outline" className="text-green-600 border-green-200 bg-green-50 text-[10px]">Final</Badge>
+                          <Badge variant="outline" className="text-green-600 border-emerald-500/20 bg-emerald-950/30 text-[10px]">Final</Badge>
                         )}
                       </div>
                     </div>

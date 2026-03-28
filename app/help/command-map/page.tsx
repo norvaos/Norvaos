@@ -120,7 +120,7 @@ export default function CommandMapPage() {
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2.5">
                         <Icon className="h-4 w-4 text-emerald-400 shrink-0 print:text-emerald-600" />
-                        <code className="rounded bg-emerald-500/10 print:bg-emerald-50 px-2 py-0.5 text-xs font-mono text-emerald-400 print:text-emerald-700">
+                        <code className="rounded bg-emerald-500/10 print:bg-emerald-950/30 px-2 py-0.5 text-xs font-mono text-emerald-400 print:text-emerald-400">
                           {cmd}
                         </code>
                       </div>
@@ -191,7 +191,7 @@ export default function CommandMapPage() {
                 key={i}
                 className="flex items-start gap-3 rounded-lg border border-white/5 print:border-gray-200 bg-white/[0.02] print:bg-gray-50 px-4 py-3"
               >
-                <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-500/20 text-[10px] font-bold text-emerald-400 print:bg-emerald-100 print:text-emerald-700">
+                <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-500/20 text-[10px] font-bold text-emerald-400 print:bg-emerald-950/40 print:text-emerald-400">
                   {i + 1}
                 </span>
                 <p className="text-sm text-white/60 print:text-gray-600">{tip}</p>

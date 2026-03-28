@@ -81,10 +81,10 @@ function getExpiryBadge(days: number, t: (key: DictionaryKey, fallback?: string)
     return <Badge variant="destructive">{remaining}</Badge>
   }
   if (days <= 30) {
-    return <Badge className="bg-orange-100 text-orange-700 dark:bg-orange-950 dark:text-orange-300">{remaining}</Badge>
+    return <Badge className="bg-orange-950/40 text-orange-400 dark:bg-orange-950 dark:text-orange-300">{remaining}</Badge>
   }
   if (days <= 60) {
-    return <Badge className="bg-yellow-100 text-yellow-700 dark:bg-yellow-950 dark:text-yellow-300">{remaining}</Badge>
+    return <Badge className="bg-yellow-950/40 text-yellow-400 dark:bg-yellow-950 dark:text-yellow-300">{remaining}</Badge>
   }
   return <Badge variant="secondary">{remaining}</Badge>
 }
@@ -133,9 +133,9 @@ export function ExpiryTracker({ contactId }: ExpiryTrackerProps) {
               key={record.id}
               className={cn(
                 'flex items-center gap-3 rounded-lg border p-3 transition-colors',
-                days < 0 && 'border-red-300 bg-red-50/50 dark:border-red-800 dark:bg-red-950/20',
-                days >= 0 && days <= 30 && 'border-red-200 bg-red-50/30 dark:border-red-900 dark:bg-red-950/10 animate-pulse',
-                days > 30 && days <= 90 && 'border-amber-300 bg-amber-50/30 dark:border-amber-800 dark:bg-amber-950/10',
+                days < 0 && 'border-red-500/30 bg-red-950/30/50 dark:border-red-800 dark:bg-red-950/20',
+                days >= 0 && days <= 30 && 'border-red-500/20 bg-red-950/30/30 dark:border-red-900 dark:bg-red-950/10 animate-pulse',
+                days > 30 && days <= 90 && 'border-amber-500/30 bg-amber-950/30/30 dark:border-amber-800 dark:bg-amber-950/10',
               )}
             >
               <div className={cn('shrink-0', config.colour)}>

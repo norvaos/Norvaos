@@ -37,7 +37,7 @@ export function ConversionGatesCard({
   const totalEnabled = enabledGates.length
 
   return (
-    <Card className={canConvert ? 'border-green-200' : 'border-amber-200'}>
+    <Card className={canConvert ? 'border-emerald-500/20' : 'border-amber-500/20'}>
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2 text-sm font-semibold">
@@ -49,8 +49,8 @@ export function ConversionGatesCard({
             size="xs"
             className={
               canConvert
-                ? 'bg-green-50 text-green-700 border-green-200'
-                : 'bg-amber-50 text-amber-700 border-amber-200'
+                ? 'bg-emerald-950/30 text-emerald-400 border-emerald-500/20'
+                : 'bg-amber-950/30 text-amber-400 border-amber-500/20'
             }
           >
             {canConvert ? 'Ready' : `${totalEnabled - passedCount} blocking`}
@@ -88,11 +88,11 @@ export function ConversionGatesCard({
 
         {/* Blocked reasons summary */}
         {blockedReasons.length > 0 && (
-          <div className="rounded-md bg-amber-50 border border-amber-200 px-3 py-2">
-            <p className="text-xs font-medium text-amber-800 mb-1">Blocking Issues</p>
+          <div className="rounded-md bg-amber-950/30 border border-amber-500/20 px-3 py-2">
+            <p className="text-xs font-medium text-amber-400 mb-1">Blocking Issues</p>
             <ul className="space-y-0.5">
               {blockedReasons.map((reason, idx) => (
-                <li key={idx} className="text-xs text-amber-700">• {reason}</li>
+                <li key={idx} className="text-xs text-amber-400">• {reason}</li>
               ))}
             </ul>
           </div>

@@ -88,10 +88,10 @@ export default function BillingWorkspace() {
 
   const statusColour = (status: string | null) => {
     switch (status) {
-      case 'overdue': return 'bg-red-100 text-red-700'
-      case 'partially_paid': return 'bg-orange-100 text-orange-700'
-      case 'sent': return 'bg-blue-100 text-blue-700'
-      case 'viewed': return 'bg-purple-100 text-purple-700'
+      case 'overdue': return 'bg-red-950/40 text-red-400'
+      case 'partially_paid': return 'bg-orange-950/40 text-orange-400'
+      case 'sent': return 'bg-blue-950/40 text-blue-400'
+      case 'viewed': return 'bg-purple-950/40 text-purple-400'
       default: return 'bg-gray-100 text-gray-600'
     }
   }
@@ -252,7 +252,7 @@ export default function BillingWorkspace() {
                     ? differenceInDays(new Date(), parseISO(inv.due_date))
                     : 0
                   return (
-                    <li key={inv.id} className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm">
+                    <li key={inv.id} className="rounded-md border border-red-500/20 bg-red-950/30 px-3 py-2 text-sm">
                       <div className="flex items-center justify-between">
                         <p className="font-medium">{inv.invoice_number ?? inv.id.slice(0, 8)}</p>
                         <p className="text-xs text-red-600 font-medium">{daysOverdue}d overdue</p>

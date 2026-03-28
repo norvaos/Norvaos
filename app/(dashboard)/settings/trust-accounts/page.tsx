@@ -554,7 +554,7 @@ function OperatingAccountRow({ account, onEdit, onToggle }: OperatingAccountRowP
       <td className="px-4 py-3 text-slate-600">{account.bank_name}</td>
       <td className="px-4 py-3">
         {account.is_default && (
-          <Badge variant="default" className="bg-blue-100 text-blue-800 hover:bg-blue-100">
+          <Badge variant="default" className="bg-blue-950/40 text-blue-400 hover:bg-blue-950/40">
             Default
           </Badge>
         )}

@@ -34,9 +34,9 @@ interface PortalDashboardCardsProps {
 const CARD_COLORS: Record<string, { bg: string; text: string; border: string; iconBg: string; glow: string }> = {
   default: { bg: 'bg-white', text: 'text-slate-700', border: 'border-slate-200/60', iconBg: 'bg-slate-100', glow: '' },
   green: { bg: 'bg-gradient-to-br from-emerald-50 to-white', text: 'text-emerald-400', border: 'border-emerald-500/20/60', iconBg: 'bg-emerald-950/40', glow: 'shadow-emerald-100/50' },
-  amber: { bg: 'bg-gradient-to-br from-amber-50 to-white', text: 'text-amber-700', border: 'border-amber-200/60', iconBg: 'bg-amber-100', glow: 'shadow-amber-100/50' },
-  red: { bg: 'bg-gradient-to-br from-red-50 to-white', text: 'text-red-700', border: 'border-red-200/60', iconBg: 'bg-red-100', glow: 'shadow-red-100/50' },
-  blue: { bg: 'bg-gradient-to-br from-blue-50 to-white', text: 'text-blue-700', border: 'border-blue-200/60', iconBg: 'bg-blue-100', glow: 'shadow-blue-100/50' },
+  amber: { bg: 'bg-gradient-to-br from-amber-50 to-white', text: 'text-amber-400', border: 'border-amber-500/20/60', iconBg: 'bg-amber-950/40', glow: 'shadow-amber-100/50' },
+  red: { bg: 'bg-gradient-to-br from-red-50 to-white', text: 'text-red-400', border: 'border-red-500/20/60', iconBg: 'bg-red-950/40', glow: 'shadow-red-100/50' },
+  blue: { bg: 'bg-gradient-to-br from-blue-50 to-white', text: 'text-blue-400', border: 'border-blue-500/20/60', iconBg: 'bg-blue-950/40', glow: 'shadow-blue-100/50' },
 }
 
 // ── Icons ────────────────────────────────────────────────────────────────────

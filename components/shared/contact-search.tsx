@@ -167,7 +167,7 @@ export function ContactSearch({ value, onChange, tenantId, placeholder = 'Search
                       key={contact.id}
                       onClick={() => handleSelect(contact.id)}
                       className={`flex items-center gap-3 w-full px-2 py-1.5 text-left rounded-md hover:bg-slate-100 ${
-                        value === contact.id ? 'bg-blue-50' : ''
+                        value === contact.id ? 'bg-blue-950/30' : ''
                       }`}
                     >
                       <div className="flex-shrink-0 h-7 w-7 rounded-full bg-slate-200 flex items-center justify-center">
@@ -201,7 +201,7 @@ export function ContactSearch({ value, onChange, tenantId, placeholder = 'Search
           <div className="p-1">
             <button
               onClick={() => { setShowCreateDialog(true); setOpen(false) }}
-              className="flex items-center gap-2 w-full px-2 py-1.5 text-sm text-blue-600 rounded-md hover:bg-blue-50"
+              className="flex items-center gap-2 w-full px-2 py-1.5 text-sm text-blue-600 rounded-md hover:bg-blue-950/30"
             >
               <Plus className="h-4 w-4" />
               Create New Contact

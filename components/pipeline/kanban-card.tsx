@@ -162,7 +162,7 @@ export const KanbanCard = memo(function KanbanCard({
     return (
       <div
         ref={setNodeRef}
-        className="group cursor-pointer rounded-lg border border-emerald-300 bg-emerald-50/60 p-3 shadow-sm transition-shadow hover:shadow-md hover:border-emerald-400"
+        className="group cursor-pointer rounded-lg border border-emerald-500/30 bg-emerald-950/30/60 p-3 shadow-sm transition-shadow hover:shadow-md hover:border-emerald-400"
         onClick={() => onViewMatter?.(lead.converted_matter_id!) ?? onClick?.(lead.id)}
       >
         <div className="flex items-start gap-2">
@@ -176,7 +176,7 @@ export const KanbanCard = memo(function KanbanCard({
                 Retained
               </Badge>
               {activeMatterCount != null && activeMatterCount > 0 && (
-                <Badge variant="outline" className="border-emerald-300 text-[10px] font-normal text-emerald-700">
+                <Badge variant="outline" className="border-emerald-500/30 text-[10px] font-normal text-emerald-400">
                   {activeMatterCount} Active Matter{activeMatterCount !== 1 ? 's' : ''}
                 </Badge>
               )}
@@ -188,7 +188,7 @@ export const KanbanCard = memo(function KanbanCard({
           <span className="text-emerald-600/70">
             {lead.converted_at ? formatDate(lead.converted_at) : 'Converted'}
           </span>
-          <div className="flex items-center gap-1 font-medium text-emerald-700 opacity-0 transition-opacity group-hover:opacity-100">
+          <div className="flex items-center gap-1 font-medium text-emerald-400 opacity-0 transition-opacity group-hover:opacity-100">
             <span>View Matter</span>
             <ExternalLink className="h-3 w-3" />
           </div>

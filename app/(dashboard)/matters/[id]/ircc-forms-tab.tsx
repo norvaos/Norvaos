@@ -238,10 +238,10 @@ export function IRCCFormsTab({ matterId, contactId, tenantId, caseTypeId }: IRCC
       {/* ── Missing Fields (Collapsible) ─────────────────────────────────── */}
       {readiness && readiness.fields.missing.length > 0 && (
         <Collapsible open={missingFieldsOpen} onOpenChange={setMissingFieldsOpen}>
-          <Card className="border-amber-200 bg-amber-50/50 dark:border-amber-800 dark:bg-amber-950/20">
+          <Card className="border-amber-500/20 bg-amber-950/30/50 dark:border-amber-800 dark:bg-amber-950/20">
             <CollapsibleTrigger asChild>
               <CardHeader className="cursor-pointer pb-2">
-                <CardTitle className="flex items-center gap-2 text-sm font-medium text-amber-800 dark:text-amber-200">
+                <CardTitle className="flex items-center gap-2 text-sm font-medium text-amber-400 dark:text-amber-200">
                   <AlertTriangle className="h-4 w-4" />
                   {readiness.fields.missing.length} required field{readiness.fields.missing.length !== 1 ? 's' : ''} missing
                   {missingFieldsOpen ? (
@@ -258,7 +258,7 @@ export function IRCCFormsTab({ matterId, contactId, tenantId, caseTypeId }: IRCC
                   {readiness.fields.missing.map((field) => (
                     <div
                       key={field.profile_path}
-                      className="flex items-center gap-2 text-sm text-amber-700 dark:text-amber-300"
+                      className="flex items-center gap-2 text-sm text-amber-400 dark:text-amber-300"
                     >
                       <span className="font-mono text-xs text-muted-foreground">
                         {field.section}

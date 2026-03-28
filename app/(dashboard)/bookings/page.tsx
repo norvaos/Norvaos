@@ -261,10 +261,10 @@ export default function BookingsPage() {
 
       {/* ── Calendar Sync Status Banner ── */}
       {!msConnected && (
-        <div className="flex items-center gap-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3">
+        <div className="flex items-center gap-3 rounded-lg border border-amber-500/20 bg-amber-950/30 px-4 py-3">
           <AlertTriangle className="h-5 w-5 flex-shrink-0 text-amber-600" />
           <div className="flex-1">
-            <p className="text-sm font-medium text-amber-800">
+            <p className="text-sm font-medium text-amber-400">
               Outlook Calendar not connected
             </p>
             <p className="text-xs text-amber-600">
@@ -272,17 +272,17 @@ export default function BookingsPage() {
             </p>
           </div>
           <Link href="/settings/integrations">
-            <Button variant="outline" size="sm" className="border-amber-300 text-amber-700 hover:bg-amber-100">
+            <Button variant="outline" size="sm" className="border-amber-500/30 text-amber-400 hover:bg-amber-950/40">
               Connect
             </Button>
           </Link>
         </div>
       )}
       {msConnected && !calendarSyncEnabled && (
-        <div className="flex items-center gap-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3">
+        <div className="flex items-center gap-3 rounded-lg border border-amber-500/20 bg-amber-950/30 px-4 py-3">
           <Calendar className="h-5 w-5 flex-shrink-0 text-amber-600" />
           <div className="flex-1">
-            <p className="text-sm font-medium text-amber-800">
+            <p className="text-sm font-medium text-amber-400">
               Calendar sync is disabled
             </p>
             <p className="text-xs text-amber-600">
@@ -290,17 +290,17 @@ export default function BookingsPage() {
             </p>
           </div>
           <Link href="/settings/integrations">
-            <Button variant="outline" size="sm" className="border-amber-300 text-amber-700 hover:bg-amber-100">
+            <Button variant="outline" size="sm" className="border-amber-500/30 text-amber-400 hover:bg-amber-950/40">
               Enable Sync
             </Button>
           </Link>
         </div>
       )}
       {msConnected && calendarSyncEnabled && (
-        <div className="flex items-center gap-3 rounded-lg border border-green-200 bg-green-50 px-4 py-3">
+        <div className="flex items-center gap-3 rounded-lg border border-emerald-500/20 bg-emerald-950/30 px-4 py-3">
           <Calendar className="h-5 w-5 flex-shrink-0 text-green-600" />
           <div className="flex-1">
-            <p className="text-sm font-medium text-green-800">
+            <p className="text-sm font-medium text-emerald-400">
               Outlook Calendar synced
             </p>
             <p className="text-xs text-green-600">
@@ -313,7 +313,7 @@ export default function BookingsPage() {
           <Button
             variant="outline"
             size="sm"
-            className="border-green-300 text-green-700 hover:bg-green-100"
+            className="border-emerald-500/30 text-emerald-400 hover:bg-emerald-950/40"
             onClick={() => triggerSync.mutate('calendar')}
             disabled={triggerSync.isPending}
           >

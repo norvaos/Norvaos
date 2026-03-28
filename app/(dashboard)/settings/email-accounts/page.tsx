@@ -74,14 +74,14 @@ function StatusBadge({ status }: { status: string }) {
   switch (status) {
     case 'syncing':
       return (
-        <Badge variant="outline" className="gap-1 border-green-200 bg-emerald-950/30 text-emerald-400">
+        <Badge variant="outline" className="gap-1 border-emerald-500/20 bg-emerald-950/30 text-emerald-400">
           <CheckCircle2 className="size-3" />
           Syncing
         </Badge>
       )
     case 'error':
       return (
-        <Badge variant="outline" className="gap-1 border-red-200 bg-red-950/30 text-red-400">
+        <Badge variant="outline" className="gap-1 border-red-500/20 bg-red-950/30 text-red-400">
           <XCircle className="size-3" />
           Error
         </Badge>
@@ -95,7 +95,7 @@ function StatusBadge({ status }: { status: string }) {
       )
     default:
       return (
-        <Badge variant="outline" className="gap-1 border-amber-200 bg-amber-950/30 text-amber-400">
+        <Badge variant="outline" className="gap-1 border-amber-500/20 bg-amber-950/30 text-amber-400">
           <RefreshCw className="size-3" />
           Pending
         </Badge>

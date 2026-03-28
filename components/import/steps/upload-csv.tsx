@@ -66,7 +66,7 @@ export function UploadCsv({ onUpload, isUploading, onBack }: UploadCsvProps) {
         className={cn(
           'flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-10 transition-all',
           isDragOver ? 'border-primary bg-primary/5' : 'border-slate-200 bg-slate-50',
-          file && 'border-green-300 bg-green-50',
+          file && 'border-emerald-500/30 bg-emerald-950/30',
         )}
       >
         {file ? (

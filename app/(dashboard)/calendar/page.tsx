@@ -279,8 +279,8 @@ function DroppableDayCell({
       className={cn(
         'group/cell relative min-h-[110px] border-b border-r border-slate-100 p-1.5 transition-all duration-150',
         !isCurrentMonth && 'opacity-40',
-        isTodayDate && 'bg-blue-50/60',
-        isOver && 'bg-blue-100/60 ring-2 ring-inset ring-blue-400/40',
+        isTodayDate && 'bg-blue-950/30/60',
+        isOver && 'bg-blue-950/40/60 ring-2 ring-inset ring-blue-400/40',
         isCurrentMonth && !isTodayDate && 'hover:bg-slate-50/80'
       )}
       onClick={(e) => {
@@ -305,7 +305,7 @@ function DroppableDayCell({
           {format(day, 'd')}
         </button>
         <button
-          className="flex h-5 w-5 items-center justify-center rounded-full text-slate-400 opacity-0 transition-all hover:bg-blue-100 hover:text-blue-600 group-hover/cell:opacity-100"
+          className="flex h-5 w-5 items-center justify-center rounded-full text-slate-400 opacity-0 transition-all hover:bg-blue-950/40 hover:text-blue-600 group-hover/cell:opacity-100"
           onClick={(e) => {
             e.stopPropagation()
             onDayClick(dateKey)
@@ -423,8 +423,8 @@ function DroppableTimeColumn({
       ref={setNodeRef}
       className={cn(
         'relative min-h-full border-r border-slate-100 transition-colors',
-        isTodayDate && 'bg-blue-50/40',
-        over && 'bg-blue-100/50'
+        isTodayDate && 'bg-blue-950/30/40',
+        over && 'bg-blue-950/40/50'
       )}
     >
       {children}
@@ -498,7 +498,7 @@ function TimeGridView({
               key={dk}
               className={cn(
                 'px-2 py-2.5 text-center transition-colors hover:bg-slate-50',
-                isTodayDate && 'bg-blue-50/60'
+                isTodayDate && 'bg-blue-950/30/60'
               )}
               onClick={() => onDayClick(dk)}
             >
@@ -1153,7 +1153,7 @@ function QuickCreateDialog({
           ) : (
             <button
               type="button"
-              className="text-xs font-medium text-blue-600 hover:text-blue-700"
+              className="text-xs font-medium text-blue-600 hover:text-blue-400"
               onClick={() => setShowNotes(true)}
             >
               + Add notes

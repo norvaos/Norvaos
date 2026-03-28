@@ -386,7 +386,7 @@ export function ReadinessZone({ data, isLoading, onDrillDown }: ReadinessZonePro
               <Badge
                 variant="outline"
                 size="sm"
-                className="gap-1 w-fit border-yellow-400 bg-gradient-to-r from-yellow-950/30 to-amber-950/30 text-yellow-800 dark:from-yellow-900/30 dark:to-amber-900/30 dark:text-yellow-300 dark:border-yellow-600"
+                className="gap-1 w-fit border-yellow-400 bg-gradient-to-r from-yellow-950/30 to-amber-950/30 text-yellow-400 dark:from-yellow-900/30 dark:to-amber-900/30 dark:text-yellow-300 dark:border-yellow-600"
                 style={{ animation: 'gold-pulse 2s ease-in-out infinite' }}
               >
                 <CheckCircle2 className="size-3 text-yellow-600" />
@@ -444,7 +444,7 @@ export function ReadinessZone({ data, isLoading, onDrillDown }: ReadinessZonePro
             <Badge
               variant="outline"
               size="xs"
-              className="gap-1 border-amber-300 bg-amber-950/30 text-amber-400 dark:border-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
+              className="gap-1 border-amber-500/30 bg-amber-950/30 text-amber-400 dark:border-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
             >
               <Eye className="size-2.5" />
               Review Req.
@@ -457,7 +457,7 @@ export function ReadinessZone({ data, isLoading, onDrillDown }: ReadinessZonePro
                 <Badge
                   variant="outline"
                   size="xs"
-                  className="gap-1 border-amber-300 bg-amber-950/30 text-amber-400 dark:border-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
+                  className="gap-1 border-amber-500/30 bg-amber-950/30 text-amber-400 dark:border-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
                 >
                   <AlertTriangle className="size-2.5" />
                   {stalePacks} Stale
@@ -504,8 +504,8 @@ export function ReadinessZone({ data, isLoading, onDrillDown }: ReadinessZonePro
                     className={cn(
                       'gap-1 cursor-pointer animate-pulse',
                       complianceDomain.pct <= 0
-                        ? 'border-red-400 bg-red-100 text-red-800 dark:border-red-600 dark:bg-red-900/40 dark:text-red-300'
-                        : 'border-amber-400 bg-amber-100 text-amber-800 dark:border-amber-600 dark:bg-amber-900/40 dark:text-amber-300'
+                        ? 'border-red-400 bg-red-950/40 text-red-400 dark:border-red-600 dark:bg-red-900/40 dark:text-red-300'
+                        : 'border-amber-400 bg-amber-950/40 text-amber-400 dark:border-amber-600 dark:bg-amber-900/40 dark:text-amber-300'
                     )}
                     onClick={(e) => {
                       e.stopPropagation()

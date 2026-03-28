@@ -89,13 +89,13 @@ async function handlePost(request: NextRequest) {
       if (!matterId && input.leadId) {
         const { data: lead } = await admin
           .from('leads')
-          .select('matter_id')
+          .select('converted_matter_id')
           .eq('id', input.leadId)
           .eq('tenant_id', auth.tenantId)
           .single()
 
-        if (lead?.matter_id) {
-          matterId = lead.matter_id
+        if (lead?.converted_matter_id) {
+          matterId = lead.converted_matter_id
         }
       }
     }

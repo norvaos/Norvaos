@@ -138,8 +138,8 @@ export function BlockerCards({
               className={cn(
                 'cursor-pointer transition-colors hover:bg-accent/50',
                 blocker.severity === 'critical'
-                  ? 'border-red-200 bg-red-50/50 dark:border-red-900 dark:bg-red-950/20'
-                  : 'border-amber-200 bg-amber-50/50 dark:border-amber-900 dark:bg-amber-950/20'
+                  ? 'border-red-500/20 bg-red-950/30/50 dark:border-red-900 dark:bg-red-950/20'
+                  : 'border-amber-500/20 bg-amber-950/30/50 dark:border-amber-900 dark:bg-amber-950/20'
               )}
               onClick={blocker.onClick}
             >

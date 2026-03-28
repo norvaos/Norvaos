@@ -89,7 +89,7 @@ export function ComplianceGateModal({
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-amber-700">
+          <DialogTitle className="flex items-center gap-2 text-amber-400">
             <ShieldAlert className="h-5 w-5" />
             Compliance Alert
           </DialogTitle>
@@ -100,11 +100,11 @@ export function ComplianceGateModal({
 
         <div className="space-y-4 py-2">
           {/* Warning Banner */}
-          <div className="rounded-lg border border-amber-200 bg-amber-50 p-4">
+          <div className="rounded-lg border border-amber-500/20 bg-amber-950/30 p-4">
             <div className="flex gap-3">
               <AlertTriangle className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
               <div>
-                <p className="text-sm font-medium text-amber-800">
+                <p className="text-sm font-medium text-amber-400">
                   A signed retainer agreement is required before converting this lead to a matter.
                 </p>
                 <p className="text-xs text-amber-600 mt-1">
@@ -118,8 +118,8 @@ export function ComplianceGateModal({
           {/* Option 1: Generate & Send Retainer */}
           <div className="rounded-lg border p-4">
             <div className="flex items-start gap-3">
-              <div className="rounded-full bg-blue-100 p-2">
-                <FileSignature className="h-4 w-4 text-blue-700" />
+              <div className="rounded-full bg-blue-950/40 p-2">
+                <FileSignature className="h-4 w-4 text-blue-400" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium">Generate &amp; Send Retainer Now</p>
@@ -146,7 +146,7 @@ export function ComplianceGateModal({
                   )}
                 </Button>
               </div>
-              <Badge className="bg-blue-100 text-blue-700 text-[10px]">
+              <Badge className="bg-blue-950/40 text-blue-400 text-[10px]">
                 Recommended
               </Badge>
             </div>
@@ -155,13 +155,13 @@ export function ComplianceGateModal({
           <Separator />
 
           {/* Option 2: Bypass (Emergency) */}
-          <div className="rounded-lg border border-dashed border-red-200 p-4">
+          <div className="rounded-lg border border-dashed border-red-500/20 p-4">
             <div className="flex items-start gap-3">
-              <div className="rounded-full bg-red-100 p-2">
-                <Shield className="h-4 w-4 text-red-700" />
+              <div className="rounded-full bg-red-950/40 p-2">
+                <Shield className="h-4 w-4 text-red-400" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-red-800">
+                <p className="text-sm font-medium text-red-400">
                   Bypass  -  Emergency Case
                 </p>
                 <p className="text-xs text-muted-foreground mt-0.5">
@@ -174,7 +174,7 @@ export function ComplianceGateModal({
                   <Button
                     variant="outline"
                     size="sm"
-                    className="mt-3 border-red-200 text-red-700 hover:bg-red-50"
+                    className="mt-3 border-red-500/20 text-red-400 hover:bg-red-950/30"
                     onClick={() => setShowBypassForm(true)}
                   >
                     <ShieldAlert className="mr-2 h-4 w-4" />
@@ -190,7 +190,7 @@ export function ComplianceGateModal({
 
                 {showBypassForm && (
                   <div className="mt-3 space-y-2">
-                    <Label className="text-xs text-red-700">
+                    <Label className="text-xs text-red-400">
                       Bypass Reason <span className="text-red-500">*</span>
                       <span className="text-muted-foreground font-normal ml-1">(min. 10 characters)</span>
                     </Label>
@@ -198,7 +198,7 @@ export function ComplianceGateModal({
                       value={bypassReason}
                       onChange={(e) => setBypassReason(e.target.value)}
                       placeholder="e.g. Emergency protective order  -  client in immediate danger, retainer to follow within 24 hours."
-                      className="text-sm resize-none border-red-200 focus-visible:ring-red-400"
+                      className="text-sm resize-none border-red-500/20 focus-visible:ring-red-400"
                       rows={3}
                     />
                     <div className="flex items-center justify-between">

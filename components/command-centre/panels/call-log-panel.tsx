@@ -310,13 +310,13 @@ export function CallLogPanel() {
                     </Badge>
                   )}
                   {counts.email > 0 && (
-                    <Badge variant="outline" className="text-[10px] px-1.5 py-0 gap-0.5 bg-amber-950/30 text-amber-400 border-amber-200">
+                    <Badge variant="outline" className="text-[10px] px-1.5 py-0 gap-0.5 bg-amber-950/30 text-amber-400 border-amber-500/20">
                       <Mail className="h-2.5 w-2.5" />
                       {counts.email}
                     </Badge>
                   )}
                   {counts.meeting > 0 && (
-                    <Badge variant="outline" className="text-[10px] px-1.5 py-0 gap-0.5 bg-purple-950/30 text-purple-400 border-purple-200">
+                    <Badge variant="outline" className="text-[10px] px-1.5 py-0 gap-0.5 bg-purple-950/30 text-purple-400 border-purple-500/20">
                       <Calendar className="h-2.5 w-2.5" />
                       {counts.meeting}
                     </Badge>
@@ -339,7 +339,7 @@ export function CallLogPanel() {
               <Button
                 variant="outline"
                 size="sm"
-                className="h-7 text-xs gap-1 text-green-600 border-green-200 hover:bg-emerald-950/30"
+                className="h-7 text-xs gap-1 text-green-600 border-emerald-500/20 hover:bg-emerald-950/30"
                 onClick={(e) => { e.stopPropagation(); handleQuickLog('inbound') }}
                 title="Log inbound call"
               >
@@ -369,13 +369,13 @@ export function CallLogPanel() {
                 </Badge>
               )}
               {counts.email > 0 && (
-                <Badge variant="outline" className="text-[10px] px-1.5 py-0.5 gap-0.5 bg-amber-950/30 text-amber-400 border-amber-200">
+                <Badge variant="outline" className="text-[10px] px-1.5 py-0.5 gap-0.5 bg-amber-950/30 text-amber-400 border-amber-500/20">
                   <Mail className="h-2.5 w-2.5" />
                   {counts.email} email{counts.email !== 1 ? 's' : ''}
                 </Badge>
               )}
               {counts.meeting > 0 && (
-                <Badge variant="outline" className="text-[10px] px-1.5 py-0.5 gap-0.5 bg-purple-950/30 text-purple-400 border-purple-200">
+                <Badge variant="outline" className="text-[10px] px-1.5 py-0.5 gap-0.5 bg-purple-950/30 text-purple-400 border-purple-500/20">
                   <Calendar className="h-2.5 w-2.5" />
                   {counts.meeting} meeting{counts.meeting !== 1 ? 's' : ''}
                 </Badge>

@@ -129,7 +129,7 @@ function DiffView({ details }: { details: Record<string, unknown> }) {
               className={cn(
                 'py-0.5 px-1 rounded',
                 changed && bVal !== undefined
-                  ? 'bg-red-500/10 dark:bg-red-500/20 text-red-700 dark:text-red-300'
+                  ? 'bg-red-500/10 dark:bg-red-500/20 text-red-400 dark:text-red-300'
                   : 'text-muted-foreground',
               )}
             >
@@ -140,7 +140,7 @@ function DiffView({ details }: { details: Record<string, unknown> }) {
               className={cn(
                 'py-0.5 px-1 rounded',
                 changed && aVal !== undefined
-                  ? 'bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300'
+                  ? 'bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-400 dark:text-emerald-300'
                   : 'text-muted-foreground',
               )}
             >

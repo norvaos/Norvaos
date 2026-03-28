@@ -75,19 +75,19 @@ export function PreviewValidate({
           <p className="text-2xl font-bold text-slate-900">{totalRows}</p>
           <p className="text-[10px] uppercase tracking-wider text-slate-400">Total Rows</p>
         </div>
-        <div className="rounded-lg border bg-emerald-950/30 border-green-200 px-4 py-2 text-center">
+        <div className="rounded-lg border bg-emerald-950/30 border-emerald-500/20 px-4 py-2 text-center">
           <p className="text-2xl font-bold text-emerald-400">{validRows}</p>
           <p className="text-[10px] uppercase tracking-wider text-green-600">Valid</p>
         </div>
         {invalidRows > 0 && (
-          <div className="rounded-lg border bg-red-950/30 border-red-200 px-4 py-2 text-center">
-            <p className="text-2xl font-bold text-red-700">{invalidRows}</p>
+          <div className="rounded-lg border bg-red-950/30 border-red-500/20 px-4 py-2 text-center">
+            <p className="text-2xl font-bold text-red-400">{invalidRows}</p>
             <p className="text-[10px] uppercase tracking-wider text-red-600">Errors</p>
           </div>
         )}
         {duplicateRows > 0 && (
-          <div className="rounded-lg border bg-amber-50 border-amber-200 px-4 py-2 text-center">
-            <p className="text-2xl font-bold text-amber-700">{duplicateRows}</p>
+          <div className="rounded-lg border bg-amber-950/30 border-amber-500/20 px-4 py-2 text-center">
+            <p className="text-2xl font-bold text-amber-400">{duplicateRows}</p>
             <p className="text-[10px] uppercase tracking-wider text-amber-600">Duplicates</p>
           </div>
         )}
@@ -95,8 +95,8 @@ export function PreviewValidate({
 
       {/* Duplicate strategy */}
       {duplicateRows > 0 && (
-        <div className="flex items-center gap-3 rounded-lg bg-amber-50 border border-amber-200 px-4 py-3">
-          <p className="text-xs text-amber-800 font-medium shrink-0">Handle duplicates:</p>
+        <div className="flex items-center gap-3 rounded-lg bg-amber-950/30 border border-amber-500/20 px-4 py-3">
+          <p className="text-xs text-amber-400 font-medium shrink-0">Handle duplicates:</p>
           <Select
             value={duplicateStrategy}
             onValueChange={(val) => onDuplicateStrategyChange(val as DuplicateStrategy)}
@@ -115,14 +115,14 @@ export function PreviewValidate({
 
       {/* Errors */}
       {errors.length > 0 && (
-        <div className="rounded-lg border border-red-200 bg-red-950/30 p-4 space-y-2">
+        <div className="rounded-lg border border-red-500/20 bg-red-950/30 p-4 space-y-2">
           <div className="flex items-center justify-between">
-            <p className="text-xs font-medium text-red-800">Validation errors:</p>
+            <p className="text-xs font-medium text-red-400">Validation errors:</p>
             {batchId && (
               <a
                 href={`/api/import/validate/errors?batchId=${batchId}`}
                 download
-                className="inline-flex items-center gap-1.5 text-xs text-red-700 hover:text-red-900 underline underline-offset-2"
+                className="inline-flex items-center gap-1.5 text-xs text-red-400 hover:text-red-900 underline underline-offset-2"
               >
                 <Download className="h-3 w-3" />
                 Download all {invalidRows} error rows as CSV
@@ -131,7 +131,7 @@ export function PreviewValidate({
           </div>
           <div className="max-h-40 overflow-y-auto space-y-1">
             {errors.slice(0, 20).map((err, i) => (
-              <p key={i} className="text-xs text-red-700">
+              <p key={i} className="text-xs text-red-400">
                 Row {err.rowNumber}: {err.message}
               </p>
             ))}
@@ -170,7 +170,7 @@ export function PreviewValidate({
                     {row.isDuplicate ? (
                       <Badge variant="secondary" className="text-[10px]">Duplicate</Badge>
                     ) : (
-                      <Badge variant="outline" className="text-[10px] text-emerald-400 border-green-300">Valid</Badge>
+                      <Badge variant="outline" className="text-[10px] text-emerald-400 border-emerald-500/30">Valid</Badge>
                     )}
                   </TableCell>
                 </TableRow>

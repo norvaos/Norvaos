@@ -94,17 +94,17 @@ export function CentrePanel({
     <div className="space-y-4 p-4">
       {/* Linked matter card (converted leads) */}
       {showLinkedMatter && (
-        <Card className="border-green-200 bg-green-50/30">
+        <Card className="border-emerald-500/20 bg-emerald-950/30/30">
           <CardContent className="flex items-center justify-between py-3">
             <div>
-              <p className="text-sm font-medium text-green-800">
+              <p className="text-sm font-medium text-emerald-400">
                 This lead has been converted to a matter
               </p>
               <p className="text-xs text-green-600">
                 Matter ID: {lead.converted_matter_id}
               </p>
             </div>
-            <Button variant="outline" size="sm" asChild className="border-green-200 text-green-700">
+            <Button variant="outline" size="sm" asChild className="border-emerald-500/20 text-emerald-400">
               <a href={`/matters/${lead.converted_matter_id}`}>
                 <ExternalLink className="mr-1 h-3 w-3" />
                 Open Matter

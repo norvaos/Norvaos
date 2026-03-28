@@ -124,7 +124,7 @@ function StatCounter({
         active
           ? 'border-primary/30 bg-primary/5 shadow-sm'
           : value > 0
-            ? 'border-green-200 bg-green-50/50 dark:border-green-800 dark:bg-green-900/20'
+            ? 'border-emerald-500/20 bg-emerald-950/30/50 dark:border-green-800 dark:bg-green-900/20'
             : 'border-muted bg-muted/30 opacity-50'
       )}
     >
@@ -280,7 +280,7 @@ export function MigrationProgressBar({
         {isComplete && (
           <Badge
             variant="outline"
-            className="gap-1 border-green-300 bg-green-50 text-green-700 dark:border-green-700 dark:bg-green-900/30 dark:text-green-400"
+            className="gap-1 border-emerald-500/30 bg-emerald-950/30 text-emerald-400 dark:border-green-700 dark:bg-green-900/30 dark:text-green-400"
           >
             <CheckCircle2 className="size-3" />
             All Data Secured
@@ -322,14 +322,14 @@ export function MigrationProgressBar({
 
       {/* Completion celebration */}
       {isComplete && (
-        <div className="rounded-lg border border-green-200 bg-gradient-to-r from-green-50 to-emerald-50 p-4 dark:border-green-800 dark:from-green-900/20 dark:to-emerald-900/20">
+        <div className="rounded-lg border border-emerald-500/20 bg-gradient-to-r from-green-50 to-emerald-50 p-4 dark:border-green-800 dark:from-green-900/20 dark:to-emerald-900/20">
           <div className="flex items-start gap-3">
             <Shield className="size-5 text-green-600 mt-0.5 shrink-0" />
             <div>
-              <p className="font-medium text-green-800 dark:text-green-300">
+              <p className="font-medium text-emerald-400 dark:text-green-300">
                 Your data is safe with Norva.
               </p>
-              <p className="text-sm text-green-700 dark:text-green-400 mt-1">
+              <p className="text-sm text-emerald-400 dark:text-green-400 mt-1">
                 All contacts, matters, trust balances, and deadlines have been securely migrated.
                 Your practice is ready to go.
               </p>

@@ -54,15 +54,15 @@ function fmtCents(cents: number): string {
 function txTypeBadge(type: string) {
   switch (type) {
     case 'deposit':
-      return { label: 'Deposit', cls: 'bg-emerald-950/30 text-emerald-400 border-green-200' }
+      return { label: 'Deposit', cls: 'bg-emerald-950/30 text-emerald-400 border-emerald-500/20' }
     case 'opening_balance':
-      return { label: 'Opening Balance', cls: 'bg-blue-950/30 text-blue-400 border-blue-200' }
+      return { label: 'Opening Balance', cls: 'bg-blue-950/30 text-blue-400 border-blue-500/20' }
     case 'disbursement':
-      return { label: 'Disbursement', cls: 'bg-red-950/30 text-red-400 border-red-200' }
+      return { label: 'Disbursement', cls: 'bg-red-950/30 text-red-400 border-red-500/20' }
     case 'transfer':
-      return { label: 'Transfer', cls: 'bg-purple-50 text-purple-700 border-purple-200' }
+      return { label: 'Transfer', cls: 'bg-purple-950/30 text-purple-400 border-purple-500/20' }
     case 'refund':
-      return { label: 'Refund', cls: 'bg-orange-50 text-orange-700 border-orange-200' }
+      return { label: 'Refund', cls: 'bg-orange-950/30 text-orange-400 border-orange-500/20' }
     case 'interest':
       return { label: 'Interest', cls: 'bg-teal-50 text-teal-700 border-teal-200' }
     default:
@@ -73,11 +73,11 @@ function txTypeBadge(type: string) {
 function statusBadge(status: string) {
   switch (status) {
     case 'cleared':
-      return { label: 'Cleared', cls: 'bg-emerald-950/30 text-emerald-400 border-green-200' }
+      return { label: 'Cleared', cls: 'bg-emerald-950/30 text-emerald-400 border-emerald-500/20' }
     case 'held':
-      return { label: 'Held', cls: 'bg-amber-50 text-amber-700 border-amber-200' }
+      return { label: 'Held', cls: 'bg-amber-950/30 text-amber-400 border-amber-500/20' }
     case 'pending':
-      return { label: 'Pending', cls: 'bg-yellow-50 text-yellow-700 border-yellow-200' }
+      return { label: 'Pending', cls: 'bg-yellow-950/30 text-yellow-400 border-yellow-500/20' }
     case 'voided':
       return { label: 'Voided', cls: 'bg-slate-50 text-slate-500 border-slate-200' }
     default:
@@ -261,13 +261,13 @@ export function TrustTab({ matterId, tenantId, matter }: TrustTabProps) {
   const balanceCents = matter.trust_balance ?? 0
   const hasOverdue = overdueInvoices.length > 0
   const isZeroOrNegative = balanceCents <= 0
-  const balanceColour = isZeroOrNegative ? 'text-red-700' : 'text-green-700'
+  const balanceColour = isZeroOrNegative ? 'text-red-400' : 'text-emerald-400'
 
   return (
     <div className="space-y-6">
       {/* Header  -  Trust Balance Summary */}
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
-        <Card className={isZeroOrNegative ? 'border-red-300 bg-red-50' : ''}>
+        <Card className={isZeroOrNegative ? 'border-red-500/30 bg-red-950/30' : ''}>
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <p className="text-xs text-muted-foreground">Trust Balance</p>
@@ -293,7 +293,7 @@ export function TrustTab({ matterId, tenantId, matter }: TrustTabProps) {
         <Card className="col-span-2 lg:col-span-1">
           <CardContent className="p-4">
             <p className="text-xs text-muted-foreground">Pending Disbursements</p>
-            <p className="text-lg font-semibold text-amber-700">
+            <p className="text-lg font-semibold text-amber-400">
               {pendingDisbursements.length}
             </p>
           </CardContent>
@@ -393,13 +393,13 @@ export function TrustTab({ matterId, tenantId, matter }: TrustTabProps) {
                     <span className="text-xs truncate">{tx.description}</span>
                     <span
                       className={`text-xs font-medium text-right ${
-                        isPositive ? 'text-green-700' : 'text-red-700'
+                        isPositive ? 'text-emerald-400' : 'text-red-400'
                       }`}
                     >
                       {isPositive ? '+' : ''}
                       {fmtCents(tx.amount_cents)}
                     </span>
-                    <span className={`text-xs font-medium text-right ${tx.running_balance_cents <= 0 ? 'text-red-700 font-bold' : ''}`}>
+                    <span className={`text-xs font-medium text-right ${tx.running_balance_cents <= 0 ? 'text-red-400 font-bold' : ''}`}>
                       {fmtCents(tx.running_balance_cents)}
                     </span>
                     <span className="text-xs text-muted-foreground truncate">
@@ -421,7 +421,7 @@ export function TrustTab({ matterId, tenantId, matter }: TrustTabProps) {
 
       {/* Pending Disbursements */}
       {pendingDisbursements.length > 0 && (
-        <Card className="border-amber-200 bg-amber-50/30">
+        <Card className="border-amber-500/20 bg-amber-950/30/30">
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-semibold">
               Pending Disbursement Requests
@@ -440,7 +440,7 @@ export function TrustTab({ matterId, tenantId, matter }: TrustTabProps) {
               {pendingDisbursements.map((req) => (
                 <div
                   key={req.id}
-                  className="grid grid-cols-[80px_1fr_120px_100px_100px_140px] gap-2 px-2 py-2 text-sm items-center rounded hover:bg-amber-50"
+                  className="grid grid-cols-[80px_1fr_120px_100px_100px_140px] gap-2 px-2 py-2 text-sm items-center rounded hover:bg-amber-950/30"
                 >
                   <span className="text-xs">
                     {new Date(req.created_at).toLocaleDateString('en-CA', {
@@ -450,7 +450,7 @@ export function TrustTab({ matterId, tenantId, matter }: TrustTabProps) {
                   </span>
                   <span className="text-xs truncate">{req.description}</span>
                   <span className="text-xs truncate">{req.payee_name}</span>
-                  <span className="text-xs font-medium text-right text-red-700">
+                  <span className="text-xs font-medium text-right text-red-400">
                     {fmtCents(req.amount_cents)}
                   </span>
                   <span className="text-xs text-muted-foreground truncate">
@@ -462,7 +462,7 @@ export function TrustTab({ matterId, tenantId, matter }: TrustTabProps) {
                       <Button
                         variant="outline"
                         size="sm"
-                        className="h-6 text-xs px-2 text-green-700 border-green-300 hover:bg-green-50"
+                        className="h-6 text-xs px-2 text-emerald-400 border-emerald-500/30 hover:bg-emerald-950/30"
                         onClick={() => handleApprove(req.id)}
                         disabled={approveDisbursement.isPending}
                       >
@@ -477,7 +477,7 @@ export function TrustTab({ matterId, tenantId, matter }: TrustTabProps) {
                     <Button
                       variant="outline"
                       size="sm"
-                      className="h-6 text-xs px-2 text-red-700 border-red-300 hover:bg-red-50"
+                      className="h-6 text-xs px-2 text-red-400 border-red-500/30 hover:bg-red-950/30"
                       onClick={() => setRejectingId(req.id)}
                       disabled={rejectDisbursement.isPending}
                     >

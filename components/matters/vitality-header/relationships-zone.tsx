@@ -79,13 +79,13 @@ function formatDate(dateStr: string): string {
 function roleBadgeStyle(role: RelationshipPerson['role']): string {
   switch (role) {
     case 'principal_applicant':
-      return 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400'
+      return 'bg-blue-950/40 text-blue-400 dark:bg-blue-900/40 dark:text-blue-400'
     case 'spouse':
-      return 'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-400'
+      return 'bg-purple-950/40 text-purple-400 dark:bg-purple-900/40 dark:text-purple-400'
     case 'dependent':
       return 'bg-teal-100 text-teal-700 dark:bg-teal-900/40 dark:text-teal-400'
     case 'co_sponsor':
-      return 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400'
+      return 'bg-amber-950/40 text-amber-400 dark:bg-amber-900/40 dark:text-amber-400'
     default:
       return 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400'
   }
@@ -343,9 +343,9 @@ export function RelationshipsZone({
                 return (
                   <div className={cn(
                     'flex items-center gap-2 min-w-0 rounded-md px-1.5 py-0.5 -mx-1.5 transition-colors',
-                    expired && 'bg-red-50/80 dark:bg-red-950/30',
-                    urgent && 'bg-red-50/60 dark:bg-red-950/20 animate-pulse',
-                    expiringSoon && !urgent && 'bg-amber-50/60 dark:bg-amber-950/20',
+                    expired && 'bg-red-950/30/80 dark:bg-red-950/30',
+                    urgent && 'bg-red-950/30/60 dark:bg-red-950/20 animate-pulse',
+                    expiringSoon && !urgent && 'bg-amber-950/30/60 dark:bg-amber-950/20',
                   )}>
                     <Shield className={cn(
                       'size-3 shrink-0',
@@ -370,7 +370,7 @@ export function RelationshipsZone({
                         size="xs"
                         className={cn(
                           'gap-0.5 shrink-0',
-                          !expired && 'bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-300 border-amber-300 dark:border-amber-700',
+                          !expired && 'bg-amber-950/40 text-amber-400 dark:bg-amber-900 dark:text-amber-300 border-amber-500/30 dark:border-amber-700',
                         )}
                       >
                         <AlertTriangle className="size-2.5" />

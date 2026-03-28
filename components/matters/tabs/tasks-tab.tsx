@@ -270,7 +270,7 @@ export function TasksTab({
                       {task.assigned_to ? (
                         getUserName(task.assigned_to, users)
                       ) : (
-                        <Badge variant="outline" className="text-[10px] px-1.5 py-0 text-amber-600 border-amber-200 bg-amber-50">
+                        <Badge variant="outline" className="text-[10px] px-1.5 py-0 text-amber-600 border-amber-500/20 bg-amber-950/30">
                           Unassigned
                         </Badge>
                       )}

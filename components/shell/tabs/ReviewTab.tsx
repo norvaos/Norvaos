@@ -137,7 +137,7 @@ function GateBlockersSection({
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-6 shrink-0 text-[11px] text-blue-600 hover:text-blue-800 px-2 gap-0.5"
+                className="h-6 shrink-0 text-[11px] text-blue-600 hover:text-blue-400 px-2 gap-0.5"
                 onClick={() => onNavigateToSection(item.section)}
               >
                 Go to {sectionLabel[item.section]}

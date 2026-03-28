@@ -330,7 +330,7 @@ export function LiveIntakeSidebar({
               variant="outline"
               className={cn(
                 'text-[10px] font-mono',
-                isPaused ? 'border-amber-300 text-amber-600' : 'border-red-300 text-red-600 animate-pulse'
+                isPaused ? 'border-amber-500/30 text-amber-600' : 'border-red-500/30 text-red-600 animate-pulse'
               )}
             >
               {isPaused ? 'PAUSED' : 'REC'} {formatTime(elapsed)}
@@ -428,7 +428,7 @@ export function LiveIntakeSidebar({
                   >
                     <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
                     <div className="min-w-0 flex-1">
-                      <span className="text-xs font-medium text-emerald-800 capitalize">
+                      <span className="text-xs font-medium text-emerald-400 capitalize">
                         {entity.field?.replace(/_/g, ' ')}
                       </span>
                       <span className="text-xs text-emerald-600 ml-1.5">{entity.value}</span>

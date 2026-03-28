@@ -50,19 +50,19 @@ const STATUS_CONFIG: Record<SlotStatus, {
     label: 'Empty',
     variant: 'outline',
     icon: AlertCircle,
-    className: 'border-amber-300 text-amber-400 bg-amber-950/30',
+    className: 'border-amber-500/30 text-amber-400 bg-amber-950/30',
   },
   pending_review: {
     label: 'Pending Review',
     variant: 'outline',
     icon: Clock,
-    className: 'border-blue-300 text-blue-400 bg-blue-950/30',
+    className: 'border-blue-500/30 text-blue-400 bg-blue-950/30',
   },
   accepted: {
     label: 'Accepted',
     variant: 'outline',
     icon: CheckCircle2,
-    className: 'border-green-300 text-emerald-400 bg-emerald-950/30',
+    className: 'border-emerald-500/30 text-emerald-400 bg-emerald-950/30',
   },
   needs_re_upload: {
     label: 'Needs Re-upload',

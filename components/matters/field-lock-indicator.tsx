@@ -38,8 +38,8 @@ export function FieldLockIndicator({
       {/* Render the child field but disable pointer events */}
       <div className="pointer-events-none opacity-60">{children}</div>
       {/* Lock overlay */}
-      <div className="absolute inset-0 flex items-center justify-center rounded-md bg-amber-50/80 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800">
-        <div className="flex items-center gap-1.5 text-xs text-amber-700 dark:text-amber-400">
+      <div className="absolute inset-0 flex items-center justify-center rounded-md bg-amber-950/30/80 dark:bg-amber-950/40 border border-amber-500/20 dark:border-amber-800">
+        <div className="flex items-center gap-1.5 text-xs text-amber-400 dark:text-amber-400">
           <Pencil className="h-3 w-3 animate-pulse" />
           <span className="font-medium">
             {lockInfo.lockedBy.displayName} is editing...

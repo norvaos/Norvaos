@@ -57,7 +57,7 @@ export function withPlatformAdmin(handler: AdminRouteHandler) {
     routeContext?: { params?: Promise<Record<string, string>> },
   ): Promise<NextResponse | Response> {
     // 1. Rate limit  -  before any auth to prevent DoS
-    const rateLimitResponse = checkAdminRateLimit(request)
+    const rateLimitResponse = await checkAdminRateLimit(request)
     if (rateLimitResponse) return rateLimitResponse
 
     // 2. Wrap in request ID context for log correlation

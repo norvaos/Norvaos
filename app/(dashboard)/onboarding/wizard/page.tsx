@@ -650,7 +650,7 @@ function StepDone({ firmName }: { firmName: string }) {
   return (
     <div className="py-6 text-center space-y-5">
       <div className="flex justify-center">
-        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-emerald-100">
+        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-emerald-950/40">
           <CheckCircle2 className="h-11 w-11 text-emerald-600" />
         </div>
       </div>
@@ -660,7 +660,7 @@ function StepDone({ firmName }: { firmName: string }) {
           {firmName ? `${firmName} is` : 'Your workspace is'} fully configured and ready to open matters, serve clients, and grow.
         </p>
       </div>
-      <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800 text-left max-w-sm mx-auto">
+      <div className="rounded-lg border border-emerald-500/20 bg-emerald-950/30 px-4 py-3 text-sm text-emerald-400 text-left max-w-sm mx-auto">
         <p className="font-medium mb-1.5">What&apos;s set up:</p>
         <ul className="space-y-1 text-xs">
           <li>✓ Firm profile &amp; branding</li>
@@ -999,7 +999,7 @@ export default function SimpleOnboardingWizard() {
           {/* Invite results (shown on done step if any failed) */}
           {isDoneStep && inviteResults.some((r) => !r.ok) && (
             <div className="px-6 pb-4">
-              <div className="rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+              <div className="rounded-md border border-amber-500/20 bg-amber-950/30 px-4 py-3 text-sm text-amber-400">
                 <p className="font-medium mb-1">Some invitations could not be sent:</p>
                 <ul className="text-xs space-y-0.5">
                   {inviteResults.filter((r) => !r.ok).map((r) => (

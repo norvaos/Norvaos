@@ -558,8 +558,8 @@ function VerifyStepContent({
 
           <div className="ml-8 space-y-1.5">
             {conflictMatches.map((m) => (
-              <div key={m.id} className="flex items-center gap-2 rounded-lg bg-amber-100/50 dark:bg-amber-500/10 px-3 py-2 text-xs">
-                <span className="font-medium text-amber-800 dark:text-amber-200">
+              <div key={m.id} className="flex items-center gap-2 rounded-lg bg-amber-950/40/50 dark:bg-amber-500/10 px-3 py-2 text-xs">
+                <span className="font-medium text-amber-400 dark:text-amber-200">
                   {m.first_name} {m.last_name}
                 </span>
                 {m.email_primary && (

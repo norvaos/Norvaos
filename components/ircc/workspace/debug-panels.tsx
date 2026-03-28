@@ -440,7 +440,7 @@ interface CompletionDebugPanelProps {
 
 function completionColour(pct: number): string {
   if (pct >= 100) return 'bg-emerald-950/40 text-emerald-400 dark:bg-green-950/30 dark:text-green-400'
-  if (pct > 0) return 'bg-amber-100 text-amber-800 dark:bg-amber-950/30 dark:text-amber-400'
+  if (pct > 0) return 'bg-amber-950/40 text-amber-400 dark:bg-amber-950/30 dark:text-amber-400'
   return 'bg-red-950/30 text-red-400 dark:bg-red-950/30 dark:text-red-400'
 }
 
@@ -730,7 +730,7 @@ export function DebugInspector({
 
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-      <Card className="border-dashed border-amber-300 dark:border-amber-700">
+      <Card className="border-dashed border-amber-500/30 dark:border-amber-700">
         <CollapsibleTrigger asChild>
           <CardHeader className="py-2 px-4 cursor-pointer hover:bg-muted/50 transition-colors">
             <div className="flex items-center justify-between">

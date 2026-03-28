@@ -269,22 +269,22 @@ function SortableFieldRow({
             {field.label}
           </span>
           {field.is_required && (
-            <Badge variant="secondary" className="text-[10px] text-red-600 bg-red-950/30 border-red-200">
+            <Badge variant="secondary" className="text-[10px] text-red-600 bg-red-950/30 border-red-500/20">
               Required
             </Badge>
           )}
           {field.mapping && (
-            <Badge variant="secondary" className="text-[10px] text-blue-600 bg-blue-950/30 border-blue-200">
+            <Badge variant="secondary" className="text-[10px] text-blue-600 bg-blue-950/30 border-blue-500/20">
               {CONTACT_MAPPINGS.find((m) => m.value === field.mapping)?.label ?? field.mapping}
             </Badge>
           )}
           {field.allow_other && (
-            <Badge variant="secondary" className="text-[10px] text-purple-600 bg-purple-950/30 border-purple-200">
+            <Badge variant="secondary" className="text-[10px] text-purple-600 bg-purple-950/30 border-purple-500/20">
               +Other
             </Badge>
           )}
           {field.condition && (
-            <Badge variant="secondary" className="text-[10px] text-amber-600 bg-amber-950/30 border-amber-200">
+            <Badge variant="secondary" className="text-[10px] text-amber-600 bg-amber-950/30 border-amber-500/20">
               Conditional
             </Badge>
           )}
@@ -1054,8 +1054,8 @@ function SubmissionDetailSheet({
                   submission.status === 'processed'
                     ? 'bg-emerald-950/30 text-emerald-400 border-emerald-500/20'
                     : submission.status === 'error'
-                      ? 'bg-red-950/30 text-red-400 border-red-200'
-                      : 'bg-blue-950/30 text-blue-400 border-blue-200'
+                      ? 'bg-red-950/30 text-red-400 border-red-500/20'
+                      : 'bg-blue-950/30 text-blue-400 border-blue-500/20'
                 )}
               >
                 {submission.status}
@@ -1192,8 +1192,8 @@ function SubmissionsPanel({ formId, fields }: { formId: string; fields: IntakeFi
                     sub.status === 'processed'
                       ? 'bg-emerald-950/30 text-emerald-400 border-emerald-500/20'
                       : sub.status === 'error'
-                        ? 'bg-red-950/30 text-red-400 border-red-200'
-                        : 'bg-blue-950/30 text-blue-400 border-blue-200'
+                        ? 'bg-red-950/30 text-red-400 border-red-500/20'
+                        : 'bg-blue-950/30 text-blue-400 border-blue-500/20'
                   )}
                 >
                   {sub.status}
@@ -1869,16 +1869,16 @@ function FormBuilderPanel({
 
               {/* Embed Code */}
               {isPublished && (
-                <div className="rounded-lg border border-blue-200 bg-blue-950/30 p-3">
+                <div className="rounded-lg border border-blue-500/20 bg-blue-950/30 p-3">
                   <div className="flex items-center gap-2">
                     <Code2 className="h-4 w-4 text-blue-600" />
-                    <span className="text-sm font-medium text-blue-800">Embed on Your Website</span>
+                    <span className="text-sm font-medium text-blue-400">Embed on Your Website</span>
                   </div>
                   <p className="mt-1 text-xs text-blue-400/70">
                     Copy the code below and paste it into your website&apos;s HTML.
                   </p>
                   <div className="mt-2">
-                    <code className="block rounded bg-white px-2.5 py-2 text-[11px] font-mono text-blue-800 border border-blue-200 overflow-x-auto whitespace-nowrap">
+                    <code className="block rounded bg-white px-2.5 py-2 text-[11px] font-mono text-blue-400 border border-blue-500/20 overflow-x-auto whitespace-nowrap">
                       {`<iframe src="${typeof window !== 'undefined' ? window.location.origin : ''}/forms/${form.slug}?embed=true" width="100%" height="700" frameborder="0" style="border:none;"></iframe>`}
                     </code>
                     <Button
@@ -1962,7 +1962,7 @@ function FormCard({
                   ? 'bg-emerald-950/30 text-emerald-400 border-emerald-500/20'
                   : form.status === 'archived'
                     ? 'bg-slate-100 text-slate-500 border-slate-200'
-                    : 'bg-amber-950/30 text-amber-400 border-amber-200'
+                    : 'bg-amber-950/30 text-amber-400 border-amber-500/20'
               )}
             >
               {form.status}

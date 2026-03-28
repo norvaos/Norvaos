@@ -86,7 +86,7 @@ export function CommunicationEventCard({ event, users }: CommunicationEventCardP
 
           {/* Contact attempt indicator */}
           {event.counts_as_contact_attempt && (
-            <Badge variant="outline" size="xs" className="bg-blue-50 text-blue-600 border-blue-200">
+            <Badge variant="outline" size="xs" className="bg-blue-950/30 text-blue-600 border-blue-500/20">
               Contact Attempt
             </Badge>
           )}

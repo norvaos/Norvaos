@@ -40,7 +40,7 @@ export function getStageColour(stage: string, currentStage: string | null): {
   }
 
   if (activeIndex < currentIndex) {
-    return { bg: 'bg-green-50', border: 'border-green-200', text: 'text-green-700', icon: 'text-green-600', state: 'past' }
+    return { bg: 'bg-emerald-950/30', border: 'border-emerald-500/20', text: 'text-emerald-400', icon: 'text-green-600', state: 'past' }
   }
   if (activeIndex === currentIndex) {
     return { bg: 'bg-primary/5', border: 'border-primary/30', text: 'text-primary', icon: 'text-primary', state: 'current' }
@@ -77,18 +77,18 @@ export function getTerminalBannerConfig(stage: string): {
   if (stage === LEAD_STAGES.CONVERTED) {
     return {
       label: 'Converted to Matter',
-      bg: 'bg-green-50',
-      border: 'border-green-200',
-      text: 'text-green-800',
+      bg: 'bg-emerald-950/30',
+      border: 'border-emerald-500/20',
+      text: 'text-emerald-400',
       icon: 'check',
     }
   }
   if (isClosedStage(stage)) {
     return {
       label: getStageLabel(stage),
-      bg: 'bg-amber-50',
-      border: 'border-amber-200',
-      text: 'text-amber-800',
+      bg: 'bg-amber-950/30',
+      border: 'border-amber-500/20',
+      text: 'text-amber-400',
       icon: 'x',
     }
   }
@@ -157,14 +157,14 @@ export function getActorDisplay(
     case 'user': {
       const user = users?.find((u) => u.id === actorUserId)
       const name = user ? (formatFullName(user.first_name, user.last_name) || user.email) : 'User'
-      return { label: name, badgeClass: 'bg-blue-50 text-blue-700 border-blue-200', iconName: 'user' }
+      return { label: name, badgeClass: 'bg-blue-950/30 text-blue-400 border-blue-500/20', iconName: 'user' }
     }
     case 'system':
       return { label: 'System', badgeClass: 'bg-slate-100 text-slate-600 border-slate-200', iconName: 'bot' }
     case 'integration':
-      return { label: 'Integration', badgeClass: 'bg-purple-50 text-purple-700 border-purple-200', iconName: 'plug' }
+      return { label: 'Integration', badgeClass: 'bg-purple-950/30 text-purple-400 border-purple-500/20', iconName: 'plug' }
     case 'ai':
-      return { label: 'AI', badgeClass: 'bg-amber-50 text-amber-700 border-amber-200', iconName: 'sparkles' }
+      return { label: 'AI', badgeClass: 'bg-amber-950/30 text-amber-400 border-amber-500/20', iconName: 'sparkles' }
     default:
       return { label: 'Unknown', badgeClass: 'bg-slate-100 text-slate-600 border-slate-200', iconName: 'user' }
   }
@@ -188,18 +188,18 @@ export function getTaskStatusConfig(status: string, dueAt: string | null): {
       iconName: 'circle',
       iconClass: 'text-red-500',
       textClass: 'text-red-600',
-      bgClass: 'bg-red-50/30 border-l-2 border-l-red-400',
+      bgClass: 'bg-red-950/30/30 border-l-2 border-l-red-400',
       isOverdue: true,
     }
   }
 
   switch (status) {
     case 'completed':
-      return { iconName: 'check-circle-2', iconClass: 'text-green-600', textClass: 'text-green-700', bgClass: 'bg-green-50', isOverdue: false }
+      return { iconName: 'check-circle-2', iconClass: 'text-green-600', textClass: 'text-emerald-400', bgClass: 'bg-emerald-950/30', isOverdue: false }
     case 'skipped':
       return { iconName: 'minus-circle', iconClass: 'text-slate-400', textClass: 'text-slate-400 line-through', bgClass: 'bg-slate-50', isOverdue: false }
     case 'blocked':
-      return { iconName: 'x-circle', iconClass: 'text-red-600', textClass: 'text-red-600', bgClass: 'bg-red-50', isOverdue: false }
+      return { iconName: 'x-circle', iconClass: 'text-red-600', textClass: 'text-red-600', bgClass: 'bg-red-950/30', isOverdue: false }
     case 'pending':
     default:
       return { iconName: 'circle', iconClass: 'text-slate-400', textClass: 'text-slate-700', bgClass: '', isOverdue: false }
@@ -211,9 +211,9 @@ export function getCompletionSourceBadge(source: string | null): { label: string
   if (!source) return null
   switch (source) {
     case 'manual':
-      return { label: 'Manual', className: 'bg-blue-50 text-blue-700 border-blue-200' }
+      return { label: 'Manual', className: 'bg-blue-950/30 text-blue-400 border-blue-500/20' }
     case 'auto_completed':
-      return { label: 'Auto', className: 'bg-amber-50 text-amber-700 border-amber-200' }
+      return { label: 'Auto', className: 'bg-amber-950/30 text-amber-400 border-amber-500/20' }
     case 'system':
       return { label: 'System', className: 'bg-slate-100 text-slate-600 border-slate-200' }
     default:

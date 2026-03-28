@@ -243,11 +243,11 @@ function gaugeColour(score: number) {
 
 function riskLabel(level: string) {
   switch (level) {
-    case 'ready': return { label: 'Ready', classes: 'border-green-300 bg-emerald-950/30 text-emerald-400' }
-    case 'high': return { label: 'High', classes: 'border-green-300 bg-emerald-950/30 text-emerald-400' }
-    case 'medium': return { label: 'Medium', classes: 'border-amber-300 bg-amber-950/30 text-amber-400' }
-    case 'low': return { label: 'Low', classes: 'border-red-300 bg-red-950/30 text-red-400' }
-    case 'critical': return { label: 'Critical', classes: 'border-red-400 bg-red-100 text-red-800' }
+    case 'ready': return { label: 'Ready', classes: 'border-emerald-500/30 bg-emerald-950/30 text-emerald-400' }
+    case 'high': return { label: 'High', classes: 'border-emerald-500/30 bg-emerald-950/30 text-emerald-400' }
+    case 'medium': return { label: 'Medium', classes: 'border-amber-500/30 bg-amber-950/30 text-amber-400' }
+    case 'low': return { label: 'Low', classes: 'border-red-500/30 bg-red-950/30 text-red-400' }
+    case 'critical': return { label: 'Critical', classes: 'border-red-400 bg-red-950/40 text-red-400' }
     default: return { label: level, classes: 'border-slate-300 bg-slate-50 text-slate-700' }
   }
 }
@@ -308,7 +308,7 @@ function ClientReadinessView({ matterId }: { matterId: string }) {
             </span>
           </div>
           {isRed35 && (
-            <span className="inline-flex items-center gap-1 rounded-full bg-red-100 border border-red-300 px-2 py-0.5 text-[10px] font-bold text-red-400 animate-pulse">
+            <span className="inline-flex items-center gap-1 rounded-full bg-red-950/40 border border-red-500/30 px-2 py-0.5 text-[10px] font-bold text-red-400 animate-pulse">
               <AlertTriangle className="size-2.5" />
               Red {score}
             </span>
@@ -368,8 +368,8 @@ function ClientReadinessView({ matterId }: { matterId: string }) {
                     className={cn(
                       'gap-1 text-[9px]',
                       draftingReady
-                        ? 'border-green-300 bg-emerald-950/30 text-emerald-400'
-                        : 'border-red-300 bg-red-950/30 text-red-400',
+                        ? 'border-emerald-500/30 bg-emerald-950/30 text-emerald-400'
+                        : 'border-red-500/30 bg-red-950/30 text-red-400',
                     )}
                   >
                     {draftingReady ? <CheckCircle2 className="size-2.5" /> : <XCircle className="size-2.5" />}
@@ -388,8 +388,8 @@ function ClientReadinessView({ matterId }: { matterId: string }) {
                     className={cn(
                       'gap-1 text-[9px]',
                       filingReady
-                        ? 'border-green-300 bg-emerald-950/30 text-emerald-400'
-                        : 'border-red-300 bg-red-950/30 text-red-400',
+                        ? 'border-emerald-500/30 bg-emerald-950/30 text-emerald-400'
+                        : 'border-red-500/30 bg-red-950/30 text-red-400',
                     )}
                   >
                     {filingReady ? <CheckCircle2 className="size-2.5" /> : <XCircle className="size-2.5" />}

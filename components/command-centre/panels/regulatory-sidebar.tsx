@@ -115,9 +115,9 @@ export function RegulatorySidebar() {
               <Badge variant="outline" className={cn(
                 'text-[9px]',
                 conflictScan.status === 'completed' && (conflictScan.score ?? 0) < 50
-                  ? 'border-green-200 bg-emerald-950/30 text-emerald-400'
+                  ? 'border-emerald-500/20 bg-emerald-950/30 text-emerald-400'
                   : conflictScan.status === 'completed'
-                    ? 'border-amber-200 bg-amber-950/30 text-amber-400'
+                    ? 'border-amber-500/20 bg-amber-950/30 text-amber-400'
                     : 'border-slate-200 text-slate-500',
               )}>
                 {conflictScan.status === 'completed' ? `Score: ${conflictScan.score ?? 0}` : conflictScan.status}
@@ -153,7 +153,7 @@ export function RegulatorySidebar() {
                     className={cn(
                       'ml-auto text-[9px]',
                       amlResult?.hashMatch
-                        ? 'border-green-300 bg-emerald-950/30 text-emerald-400'
+                        ? 'border-emerald-500/30 bg-emerald-950/30 text-emerald-400'
                         : 'border-slate-200 text-slate-500',
                     )}
                   >
@@ -204,7 +204,7 @@ export function RegulatorySidebar() {
                   <ExternalLink className="size-2.5" />
                 </a>
                 {retainer.signed_at && (
-                  <Badge variant="outline" className="text-[8px] border-green-200 bg-emerald-950/30 text-emerald-400">
+                  <Badge variant="outline" className="text-[8px] border-emerald-500/20 bg-emerald-950/30 text-emerald-400">
                     SIGNED
                   </Badge>
                 )}

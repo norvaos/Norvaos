@@ -415,7 +415,7 @@ function DocumentArchiveCard({
         {/* Category icon */}
         <div className={cn(
           'flex h-9 w-9 items-center justify-center rounded-lg flex-none',
-          isTampered ? 'bg-red-100 dark:bg-red-950/50' : meta.bgColour,
+          isTampered ? 'bg-red-950/40 dark:bg-red-950/50' : meta.bgColour,
         )}>
           {isTampered ? (
             <ShieldAlert className="h-4.5 w-4.5 text-red-600 dark:text-red-400" />
@@ -429,7 +429,7 @@ function DocumentArchiveCard({
           <div className="flex items-center gap-1.5">
             <p className={cn(
               'text-[12px] font-medium leading-tight truncate',
-              isTampered && 'text-red-700 dark:text-red-400',
+              isTampered && 'text-red-400 dark:text-red-400',
             )}>
               {doc.file_name}
             </p>
@@ -486,7 +486,7 @@ function DocumentArchiveCard({
 
           {/* Tamper alert banner */}
           {isTampered && (
-            <div className="flex items-center gap-1.5 text-[10px] font-semibold text-red-700 dark:text-red-400 bg-red-100/80 dark:bg-red-950/40 rounded px-2 py-1 mt-0.5" data-locale={locale}>
+            <div className="flex items-center gap-1.5 text-[10px] font-semibold text-red-400 dark:text-red-400 bg-red-950/40/80 dark:bg-red-950/40 rounded px-2 py-1 mt-0.5" data-locale={locale}>
               <ShieldAlert className="h-3 w-3 shrink-0" />
               {t('status.sentinel_tamper_body', 'Document hash mismatch detected. This document has been modified outside NorvaOS.')}
             </div>

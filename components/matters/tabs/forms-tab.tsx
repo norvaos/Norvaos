@@ -119,7 +119,7 @@ export function FormsTab({ matterId, matterStatus }: FormsTabProps) {
           </span>
         )}
         {isReadOnly && (
-          <Badge variant="outline" className="text-xs text-amber-600 border-amber-200">
+          <Badge variant="outline" className="text-xs text-amber-600 border-amber-500/20">
             Read-only
           </Badge>
         )}

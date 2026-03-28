@@ -126,7 +126,7 @@ function StepCard({
     <div
       className={cn(
         'rounded-lg border transition-colors',
-        confirmed ? 'border-emerald-200 bg-emerald-50/40' : 'border-slate-200 bg-white'
+        confirmed ? 'border-emerald-500/20 bg-emerald-950/30/40' : 'border-slate-200 bg-white'
       )}
     >
       {/* Header row */}
@@ -140,7 +140,7 @@ function StepCard({
         <div className={cn('text-slate-500 shrink-0', confirmed && 'text-emerald-600')}>
           {icon}
         </div>
-        <span className={cn('flex-1 text-sm font-medium', confirmed ? 'text-emerald-800' : 'text-slate-800')}>
+        <span className={cn('flex-1 text-sm font-medium', confirmed ? 'text-emerald-400' : 'text-slate-800')}>
           {title}
         </span>
         {confirmed && (
@@ -149,7 +149,7 @@ function StepCard({
           </span>
         )}
         {!confirmed && (
-          <Badge variant="secondary" className="bg-amber-100 text-amber-700 border-amber-200 text-[10px] shrink-0">
+          <Badge variant="secondary" className="bg-amber-950/40 text-amber-400 border-amber-500/20 text-[10px] shrink-0">
             Pending
           </Badge>
         )}
@@ -486,16 +486,16 @@ function DynamicIntakeSection({
       {/* Risk flags */}
       {riskFlags.length > 0 && (
         <div className="space-y-1.5">
-          <p className="text-xs font-medium text-red-700">Risk Flags Detected</p>
+          <p className="text-xs font-medium text-red-400">Risk Flags Detected</p>
           {riskFlags.map((flag) => (
-            <div key={flag.id} className="flex items-start gap-2 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-xs">
+            <div key={flag.id} className="flex items-start gap-2 rounded-md border border-red-500/20 bg-red-950/30 px-3 py-2 text-xs">
               <AlertCircle className={cn('h-3.5 w-3.5 shrink-0 mt-0.5', flag.severity === 'critical' ? 'text-red-600' : 'text-amber-500')} />
               <div className="flex-1 min-w-0">
                 <span className="font-medium capitalize">{flag.field_key.replace(/_/g, ' ')}</span>
                 {flag.intake_value && <span className="text-muted-foreground">  -  Intake: {flag.intake_value}</span>}
                 {flag.ircc_value && <span className="text-muted-foreground"> / IRCC: {flag.ircc_value}</span>}
               </div>
-              <Badge variant="outline" className={cn('text-[10px] shrink-0', flag.severity === 'critical' ? 'border-red-300 text-red-700 bg-red-50' : 'border-amber-300 text-amber-700 bg-amber-50')}>
+              <Badge variant="outline" className={cn('text-[10px] shrink-0', flag.severity === 'critical' ? 'border-red-500/30 text-red-400 bg-red-950/30' : 'border-amber-500/30 text-amber-400 bg-amber-950/30')}>
                 {flag.severity}
               </Badge>
               <Button
@@ -530,7 +530,7 @@ function DynamicIntakeSection({
                 {q.label}
                 {q.required && <span className="text-red-500 ml-1">*</span>}
                 {isFromSnapshot && (
-                  <span className="ml-2 inline-flex items-center rounded-full bg-blue-50 px-1.5 py-0.5 text-[10px] font-medium text-blue-700 border border-blue-200">
+                  <span className="ml-2 inline-flex items-center rounded-full bg-blue-950/30 px-1.5 py-0.5 text-[10px] font-medium text-blue-400 border border-blue-500/20">
                     Previously collected
                   </span>
                 )}
@@ -692,7 +692,7 @@ export function OnboardingTab({ matter, users, matterId, tenantId }: OnboardingT
       {/* Summary bar */}
       <div className={cn(
         'flex items-center gap-3 rounded-lg border px-4 py-3',
-        allComplete ? 'border-emerald-200 bg-emerald-50' : 'border-amber-200 bg-amber-50'
+        allComplete ? 'border-emerald-500/20 bg-emerald-950/30' : 'border-amber-500/20 bg-amber-950/30'
       )}>
         {allComplete ? (
           <CheckCircle2 className="h-5 w-5 text-emerald-600 shrink-0" />
@@ -700,19 +700,19 @@ export function OnboardingTab({ matter, users, matterId, tenantId }: OnboardingT
           <AlertTriangle className="h-5 w-5 text-amber-500 shrink-0" />
         )}
         <div className="flex-1">
-          <p className={cn('text-sm font-medium', allComplete ? 'text-emerald-800' : 'text-amber-800')}>
+          <p className={cn('text-sm font-medium', allComplete ? 'text-emerald-400' : 'text-amber-400')}>
             {allComplete
               ? 'Onboarding complete  -  matter is ready for active work'
               : `${incompleteCount} of ${ONBOARDING_STEPS.length} onboarding steps remaining`}
           </p>
           {!allComplete && (
-            <p className="text-xs text-amber-700 mt-0.5">
+            <p className="text-xs text-amber-400 mt-0.5">
               Confirm each section to ensure the matter is properly set up before work begins.
             </p>
           )}
         </div>
         {!allComplete && (
-          <div className="text-xs font-semibold text-amber-700 shrink-0">
+          <div className="text-xs font-semibold text-amber-400 shrink-0">
             {ONBOARDING_STEPS.length - incompleteCount}/{ONBOARDING_STEPS.length}
           </div>
         )}
@@ -789,7 +789,7 @@ export function OnboardingTab({ matter, users, matterId, tenantId }: OnboardingT
             }}
           />
           {matter.next_deadline && new Date(matter.next_deadline) < new Date() && (
-            <div className="flex items-center gap-2 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
+            <div className="flex items-center gap-2 rounded-md border border-red-500/20 bg-red-950/30 px-3 py-2 text-xs text-red-400">
               <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
               Next deadline has passed  -  please update
             </div>
@@ -858,7 +858,7 @@ export function OnboardingTab({ matter, users, matterId, tenantId }: OnboardingT
             matterTypeId={matter.matter_type_id}
           />
         ) : (
-          <div className="flex items-center gap-2 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-700">
+          <div className="flex items-center gap-2 rounded-md border border-amber-500/20 bg-amber-950/30 px-3 py-2 text-xs text-amber-400">
             <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
             No matter type assigned  -  please assign one to unlock case configuration
           </div>
@@ -910,7 +910,7 @@ export function OnboardingTab({ matter, users, matterId, tenantId }: OnboardingT
           </div>
 
           {(notifSent || !!getStep('notifications').confirmed_at) && (
-            <div className="flex items-center gap-2 rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs text-emerald-700">
+            <div className="flex items-center gap-2 rounded-md border border-emerald-500/20 bg-emerald-950/30 px-3 py-2 text-xs text-emerald-400">
               <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
               Notifications sent
             </div>

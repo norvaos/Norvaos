@@ -203,7 +203,7 @@ export default function SnippetsPage() {
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder="Search snippets..."
-              className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-10 pr-4 text-sm placeholder:text-slate-400 focus:border-amber-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-100 transition-all"
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-10 pr-4 text-sm placeholder:text-slate-400 focus:border-amber-500/30 focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-100 transition-all"
             />
           </div>
           <div className="flex gap-2">
@@ -266,7 +266,7 @@ export default function SnippetsPage() {
                   {/* Header */}
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex items-center gap-2 min-w-0">
-                      <div className="rounded-lg bg-amber-50 p-1.5 shrink-0">
+                      <div className="rounded-lg bg-amber-950/30 p-1.5 shrink-0">
                         <TypeIcon className="h-3.5 w-3.5 text-amber-600" />
                       </div>
                       <h3 className="text-sm font-semibold text-slate-900 truncate">{snippet.title}</h3>
@@ -308,7 +308,7 @@ export default function SnippetsPage() {
                     <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button
                         onClick={() => copySnippet(snippet.id, snippet.content)}
-                        className="rounded-lg p-1.5 text-slate-400 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                        className="rounded-lg p-1.5 text-slate-400 hover:bg-blue-950/30 hover:text-blue-600 transition-colors"
                         title="Copy to clipboard"
                       >
                         <Copy className="h-3.5 w-3.5" />
@@ -322,7 +322,7 @@ export default function SnippetsPage() {
                       </button>
                       <button
                         onClick={() => handleDelete(snippet.id)}
-                        className="rounded-lg p-1.5 text-slate-400 hover:bg-red-50 hover:text-red-600 transition-colors"
+                        className="rounded-lg p-1.5 text-slate-400 hover:bg-red-950/30 hover:text-red-600 transition-colors"
                         title="Delete"
                       >
                         <Trash2 className="h-3.5 w-3.5" />
@@ -357,7 +357,7 @@ export default function SnippetsPage() {
                   value={formTitle}
                   onChange={e => setFormTitle(e.target.value)}
                   placeholder="e.g. Spousal Sponsorship Confirmation Email"
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-100"
+                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-amber-500/30 focus:outline-none focus:ring-2 focus:ring-amber-100"
                 />
               </div>
 
@@ -368,7 +368,7 @@ export default function SnippetsPage() {
                   onChange={e => setFormContent(e.target.value)}
                   placeholder="Dear [Client Name],&#10;&#10;We are pleased to confirm..."
                   rows={6}
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm font-mono focus:border-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-100 resize-none"
+                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm font-mono focus:border-amber-500/30 focus:outline-none focus:ring-2 focus:ring-amber-100 resize-none"
                 />
               </div>
 
@@ -404,7 +404,7 @@ export default function SnippetsPage() {
                 <label className="block text-xs font-medium text-slate-700 mb-1">Tags</label>
                 <div className="flex flex-wrap gap-1 mb-2">
                   {formTags.map(tag => (
-                    <span key={tag} className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-1 text-xs text-amber-700">
+                    <span key={tag} className="inline-flex items-center gap-1 rounded-full bg-amber-950/30 px-2.5 py-1 text-xs text-amber-400">
                       {tag}
                       <button onClick={() => setFormTags(prev => prev.filter(t => t !== tag))} className="hover:text-red-500">
                         <X className="h-3 w-3" />
@@ -418,7 +418,7 @@ export default function SnippetsPage() {
                   onChange={e => setFormTagInput(e.target.value)}
                   onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addFormTag() } }}
                   placeholder="Add tag and press Enter"
-                  className="w-full rounded-lg border border-dashed border-slate-200 px-3 py-2 text-xs focus:border-amber-300 focus:outline-none"
+                  className="w-full rounded-lg border border-dashed border-slate-200 px-3 py-2 text-xs focus:border-amber-500/30 focus:outline-none"
                 />
               </div>
             </div>

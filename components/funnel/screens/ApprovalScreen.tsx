@@ -165,7 +165,7 @@ export default function ApprovalScreen() {
           {blockers.map((reason, i) => (
             <div
               key={i}
-              className="flex items-center gap-3 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 dark:border-amber-800 dark:bg-amber-950/40"
+              className="flex items-center gap-3 rounded-lg border border-amber-500/30 bg-amber-950/30 px-4 py-3 dark:border-amber-800 dark:bg-amber-950/40"
             >
               <AlertTriangle className="h-5 w-5 shrink-0 text-amber-600" />
               <span className="text-sm text-amber-900 dark:text-amber-200">
@@ -175,7 +175,7 @@ export default function ApprovalScreen() {
           ))}
 
           {lawyerPending && (
-            <div className="flex items-center gap-3 rounded-lg border border-blue-300 bg-blue-50 px-4 py-3 dark:border-blue-800 dark:bg-blue-950/40">
+            <div className="flex items-center gap-3 rounded-lg border border-blue-500/30 bg-blue-950/30 px-4 py-3 dark:border-blue-800 dark:bg-blue-950/40">
               <Clock className="h-5 w-5 shrink-0 text-blue-600" />
               <span className="text-sm font-medium text-blue-900 dark:text-blue-200">
                 Lawyer review pending

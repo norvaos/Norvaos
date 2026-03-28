@@ -405,7 +405,7 @@ function DocumentsDetailView({
     <div className="space-y-4">
       {/* Bulk accept bar */}
       {pendingSlotIds.length >= 2 && (
-        <div className="flex items-center gap-3 rounded-md border border-blue-200 bg-blue-950/30 px-3 py-2">
+        <div className="flex items-center gap-3 rounded-md border border-blue-500/20 bg-blue-950/30 px-3 py-2">
           <span className="text-xs font-medium text-blue-400">
             {pendingSlotIds.length} pending review
           </span>
@@ -905,7 +905,7 @@ function InlineSlotRow({
             <Button
               variant="outline"
               size="sm"
-              className="h-7 text-xs text-blue-400 border-blue-200 hover:bg-blue-950/30 shrink-0 ml-1"
+              className="h-7 text-xs text-blue-400 border-blue-500/20 hover:bg-blue-950/30 shrink-0 ml-1"
               onClick={() => fileInputRef.current?.click()}
               disabled={uploadSlot.isPending}
             >
@@ -925,7 +925,7 @@ function InlineSlotRow({
             <Button
               variant="outline"
               size="sm"
-              className="h-7 text-xs text-green-700 border-green-200 hover:bg-green-50"
+              className="h-7 text-xs text-emerald-400 border-emerald-500/20 hover:bg-emerald-950/30"
               onClick={handleAccept}
               disabled={reviewSlot.isPending}
             >
@@ -939,7 +939,7 @@ function InlineSlotRow({
             <Button
               variant="outline"
               size="sm"
-              className="h-7 text-xs text-orange-700 border-orange-200 hover:bg-orange-50"
+              className="h-7 text-xs text-orange-400 border-orange-500/20 hover:bg-orange-950/30"
               onClick={() => setRejectDialogOpen(true)}
               disabled={reviewSlot.isPending}
             >

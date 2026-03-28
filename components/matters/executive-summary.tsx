@@ -93,9 +93,9 @@ function readinessProgressColour(score: number): string {
 
 function riskBadgeVariant(level: string): string {
   switch (level) {
-    case 'low': return 'bg-green-100 text-green-800 border-green-300'
-    case 'medium': return 'bg-amber-950/30 text-amber-400 border-amber-300'
-    case 'high': return 'bg-red-950/30 text-red-400 border-red-300'
+    case 'low': return 'bg-emerald-950/40 text-emerald-400 border-emerald-500/30'
+    case 'medium': return 'bg-amber-950/30 text-amber-400 border-amber-500/30'
+    case 'high': return 'bg-red-950/30 text-red-400 border-red-500/30'
     case 'critical': return 'bg-red-200 text-red-900 border-red-500'
     default: return 'bg-muted text-muted-foreground'
   }
@@ -736,7 +736,7 @@ function AuditDocsFooter({
       <Card className="col-span-3">
         <CardContent className="flex items-center justify-center gap-2 py-4 px-4">
           <CheckCircle2 className="h-4 w-4 text-green-600" />
-          <span className="text-sm font-medium text-green-700">
+          <span className="text-sm font-medium text-emerald-400">
             All documents received
           </span>
         </CardContent>

@@ -211,7 +211,7 @@ export default function RetainerPresetsPage() {
         title="Professional Services"
         description="Immigration and legal service fee presets"
         icon={Briefcase}
-        iconColor="text-blue-600 bg-blue-50"
+        iconColor="text-blue-600 bg-blue-950/30"
         items={services ?? []}
         loading={servicesLoading}
         onAdd={() => openAdd('services')}
@@ -226,7 +226,7 @@ export default function RetainerPresetsPage() {
         title="Government Fees"
         description="Filing fees, biometrics, and other government charges"
         icon={Landmark}
-        iconColor="text-amber-600 bg-amber-50"
+        iconColor="text-amber-600 bg-amber-950/30"
         items={govFees ?? []}
         loading={govFeesLoading}
         onAdd={() => openAdd('govFees')}
@@ -241,7 +241,7 @@ export default function RetainerPresetsPage() {
         title="Disbursements"
         description="Courier, translation, and other third-party costs"
         icon={Receipt}
-        iconColor="text-purple-600 bg-purple-50"
+        iconColor="text-purple-600 bg-purple-950/30"
         items={disbursements ?? []}
         loading={disbursementsLoading}
         onAdd={() => openAdd('disbursements')}

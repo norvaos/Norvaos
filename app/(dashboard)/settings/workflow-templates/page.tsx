@@ -738,7 +738,7 @@ function DeadlineCountBadge({ workflowTemplateId }: { workflowTemplateId: string
   if (!bindings || bindings.length === 0) return null
 
   return (
-    <Badge variant="outline" className="text-[10px] px-1.5 py-0 font-normal text-amber-600 border-amber-200 bg-amber-950/30">
+    <Badge variant="outline" className="text-[10px] px-1.5 py-0 font-normal text-amber-600 border-amber-500/20 bg-amber-950/30">
       <Clock className="h-3 w-3 mr-0.5" />
       {bindings.length} deadline{bindings.length !== 1 ? 's' : ''}
     </Badge>

@@ -735,7 +735,7 @@ export function IRCCQuestionnaire({
                               </Badge>
                               <button
                                 type="button"
-                                className="flex items-center gap-1 text-[11px] text-blue-600 hover:text-blue-800 transition-colors font-medium"
+                                className="flex items-center gap-1 text-[11px] text-blue-600 hover:text-blue-400 transition-colors font-medium"
                                 disabled={verifyField.isPending}
                                 onClick={() => verifyField.mutate({ profile_path: field.profile_path, verified_value: fieldValue })}
                               >
@@ -764,7 +764,7 @@ export function IRCCQuestionnaire({
                           <div className="flex items-center gap-2">
                             <button
                               type="button"
-                              className="flex items-center gap-1 text-[11px] text-blue-600 hover:text-blue-800 transition-colors font-medium"
+                              className="flex items-center gap-1 text-[11px] text-blue-600 hover:text-blue-400 transition-colors font-medium"
                               disabled={verifyField.isPending}
                               onClick={() => verifyField.mutate({ profile_path: field.profile_path, verified_value: fieldValue })}
                             >

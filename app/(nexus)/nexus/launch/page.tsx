@@ -243,8 +243,8 @@ export default function LaunchChecklistPage() {
       {/* Summary strip */}
       {allDone && (
         <div className={cn('rounded-xl border p-5', allPass
-          ? dark ? 'border-emerald-500/20 bg-emerald-500/5' : 'border-emerald-200 bg-emerald-50'
-          : dark ? 'border-amber-500/20 bg-amber-500/5' : 'border-amber-200 bg-amber-50',
+          ? dark ? 'border-emerald-500/20 bg-emerald-500/5' : 'border-emerald-500/20 bg-emerald-950/30'
+          : dark ? 'border-amber-500/20 bg-amber-500/5' : 'border-amber-500/20 bg-amber-950/30',
         )}>
           <div className="flex items-center gap-3">
             {allPass
@@ -284,7 +284,7 @@ export default function LaunchChecklistPage() {
               .map((check) => {
                 const Icon = check.icon
                 return (
-                  <div key={check.id} className={cn('flex items-start gap-4 p-4 transition-colors', check.status === 'checking' && (dark ? 'bg-amber-500/5' : 'bg-amber-50/50'))}>
+                  <div key={check.id} className={cn('flex items-start gap-4 p-4 transition-colors', check.status === 'checking' && (dark ? 'bg-amber-500/5' : 'bg-amber-950/30/50'))}>
                     <div className="pt-0.5">{statusIcon(check.status)}</div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
@@ -320,7 +320,7 @@ export default function LaunchChecklistPage() {
             { step: 'C', title: 'Genesis Meeting', desc: '15-minute Zoom  -  create first real matter together. Trigger the Genesis Spark live.' },
           ].map((s) => (
             <div key={s.step} className="flex items-start gap-3">
-              <div className={cn('flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-sm font-bold', dark ? 'bg-amber-400/10 text-amber-400' : 'bg-amber-50 text-amber-700')}>
+              <div className={cn('flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-sm font-bold', dark ? 'bg-amber-400/10 text-amber-400' : 'bg-amber-950/30 text-amber-400')}>
                 {s.step}
               </div>
               <div>

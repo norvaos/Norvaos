@@ -22,7 +22,7 @@ function StatItem({ icon, label, value, highlight }: StatItemProps) {
       <div
         className={`flex items-center justify-center w-8 h-8 rounded-lg ${
           highlight
-            ? 'bg-red-100 text-red-600'
+            ? 'bg-red-950/40 text-red-600'
             : 'bg-slate-100 text-slate-500'
         }`}
       >
@@ -31,7 +31,7 @@ function StatItem({ icon, label, value, highlight }: StatItemProps) {
       <div className="flex flex-col">
         <span
           className={`text-sm font-semibold leading-tight ${
-            highlight ? 'text-red-700' : 'text-slate-900'
+            highlight ? 'text-red-400' : 'text-slate-900'
           }`}
         >
           {value}

@@ -101,14 +101,14 @@ function statusBadge(status: string) {
       )
     case 'in_progress':
       return (
-        <Badge className="bg-amber-950/30 text-amber-400 border-amber-200 gap-1 animate-pulse">
+        <Badge className="bg-amber-950/30 text-amber-400 border-amber-500/20 gap-1 animate-pulse">
           <Loader2 className="h-3 w-3 animate-spin" />
           Processing
         </Badge>
       )
     case 'failed':
       return (
-        <Badge className="bg-red-950/30 text-red-400 border-red-200 gap-1">
+        <Badge className="bg-red-950/30 text-red-400 border-red-500/20 gap-1">
           <XCircle className="h-3 w-3" />
           Failed
         </Badge>
@@ -267,7 +267,7 @@ export function ClioMigrationDashboard() {
                 isDone
                   ? 'border-emerald-500/20/60 bg-gradient-to-br from-emerald-50/80 to-white shadow-sm'
                   : isActive
-                    ? 'border-amber-200/60 bg-gradient-to-br from-amber-50/50 to-white shadow-md'
+                    ? 'border-amber-500/20/60 bg-gradient-to-br from-amber-50/50 to-white shadow-md'
                     : 'border-gray-200 bg-white',
               )}
             >
@@ -277,7 +277,7 @@ export function ClioMigrationDashboard() {
                   <div
                     className={cn(
                       'flex h-9 w-9 items-center justify-center rounded-xl',
-                      isDone ? 'bg-emerald-950/40' : isActive ? 'bg-amber-100' : 'bg-gray-100',
+                      isDone ? 'bg-emerald-950/40' : isActive ? 'bg-amber-950/40' : 'bg-gray-100',
                     )}
                   >
                     <Icon
@@ -335,7 +335,7 @@ export function ClioMigrationDashboard() {
 
       {/* Gap Alerts */}
       {isComplete && gapAlerts > 0 && (
-        <div className="rounded-2xl border border-amber-200 bg-amber-950/30 p-5">
+        <div className="rounded-2xl border border-amber-500/20 bg-amber-950/30 p-5">
           <div className="flex items-start gap-3">
             <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-600" />
             <div>

@@ -136,7 +136,7 @@ export default function PlaybooksPage() {
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder="Search playbooks by title, description, or tag..."
-              className="w-full rounded-xl border border-border bg-muted py-3 pl-10 pr-4 text-sm placeholder:text-muted-foreground focus:border-blue-300 focus:bg-card focus:outline-none focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 transition-all"
+              className="w-full rounded-xl border border-border bg-muted py-3 pl-10 pr-4 text-sm placeholder:text-muted-foreground focus:border-blue-500/30 focus:bg-card focus:outline-none focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 transition-all"
             />
           </div>
         </div>
@@ -244,7 +244,7 @@ function PlaybookCard({
   const statusColor = playbook.status === 'published'
     ? 'bg-emerald-950/40 text-emerald-400 dark:bg-emerald-950 dark:text-emerald-300'
     : playbook.status === 'draft'
-    ? 'bg-amber-100 text-amber-400 dark:bg-amber-950 dark:text-amber-300'
+    ? 'bg-amber-950/40 text-amber-400 dark:bg-amber-950 dark:text-amber-300'
     : 'bg-muted text-muted-foreground'
 
   return (

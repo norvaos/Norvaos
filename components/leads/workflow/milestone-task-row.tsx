@@ -43,7 +43,7 @@ export function MilestoneTaskRow({ task, users, isReadOnly, onComplete, onSkip, 
           type="button"
           onClick={() => onComplete?.(task.id)}
           disabled={isUpdating}
-          className="flex shrink-0 items-center justify-center rounded-full hover:bg-green-100 transition-colors disabled:opacity-50"
+          className="flex shrink-0 items-center justify-center rounded-full hover:bg-emerald-950/40 transition-colors disabled:opacity-50"
           title="Mark complete"
         >
           {isUpdating ? (

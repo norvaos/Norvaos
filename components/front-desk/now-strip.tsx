@@ -197,7 +197,7 @@ export function NowStrip({ userId }: NowStripProps) {
         <button
           onClick={() => endBreakMutation.mutate()}
           disabled={endBreakMutation.isPending}
-          className="flex items-center gap-1 rounded px-3 py-1 text-xs font-semibold bg-white text-amber-700 hover:bg-amber-50 disabled:opacity-50 transition-colors"
+          className="flex items-center gap-1 rounded px-3 py-1 text-xs font-semibold bg-white text-amber-400 hover:bg-amber-950/30 disabled:opacity-50 transition-colors"
         >
           <RotateCcw className="w-3 h-3" />
           {endBreakMutation.isPending ? 'Returning...' : 'Return from Lunch'}
@@ -302,11 +302,11 @@ export function NowStrip({ userId }: NowStripProps) {
               <button
                 onClick={() => startBreakMutation.mutate()}
                 disabled={startBreakMutation.isPending}
-                className="flex flex-col items-center gap-2 rounded-lg border-2 border-amber-400 bg-amber-50 hover:bg-amber-100 p-4 transition-colors disabled:opacity-50"
+                className="flex flex-col items-center gap-2 rounded-lg border-2 border-amber-400 bg-amber-950/30 hover:bg-amber-950/40 p-4 transition-colors disabled:opacity-50"
               >
                 <Coffee className="w-6 h-6 text-amber-600" />
                 <div className="text-center">
-                  <p className="text-sm font-semibold text-amber-800">Lunch Break</p>
+                  <p className="text-sm font-semibold text-amber-400">Lunch Break</p>
                   <p className="text-xs text-amber-600 mt-0.5">1 hour · Clock keeps running</p>
                 </div>
               </button>
@@ -315,11 +315,11 @@ export function NowStrip({ userId }: NowStripProps) {
               <button
                 onClick={() => endShiftMutation.mutate()}
                 disabled={endShiftMutation.isPending}
-                className="flex flex-col items-center gap-2 rounded-lg border-2 border-red-300 bg-red-50 hover:bg-red-100 p-4 transition-colors disabled:opacity-50"
+                className="flex flex-col items-center gap-2 rounded-lg border-2 border-red-500/30 bg-red-950/30 hover:bg-red-950/40 p-4 transition-colors disabled:opacity-50"
               >
                 <Square className="w-6 h-6 text-red-600" />
                 <div className="text-center">
-                  <p className="text-sm font-semibold text-red-800">End Shift</p>
+                  <p className="text-sm font-semibold text-red-400">End Shift</p>
                   <p className="text-xs text-red-600 mt-0.5">Done for the day</p>
                 </div>
               </button>

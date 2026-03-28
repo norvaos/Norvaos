@@ -171,10 +171,10 @@ export function IdScanner({ onScanComplete, compact, className }: IdScannerProps
     <div
       className={cn(
         'relative rounded-lg border-2 border-dashed p-6 text-center transition-colors',
-        state === 'idle' && 'border-slate-200 hover:border-blue-300 hover:bg-blue-950/30/30',
-        state === 'processing' && 'border-blue-300 bg-blue-950/30/30',
+        state === 'idle' && 'border-slate-200 hover:border-blue-500/30 hover:bg-blue-950/30/30',
+        state === 'processing' && 'border-blue-500/30 bg-blue-950/30/30',
         state === 'success' && 'border-emerald-500/30 bg-emerald-950/30/30',
-        state === 'error' && 'border-red-300 bg-red-950/30/30',
+        state === 'error' && 'border-red-500/30 bg-red-950/30/30',
         className,
       )}
       onDrop={handleDrop}

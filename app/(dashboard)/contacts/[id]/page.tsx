@@ -512,7 +512,7 @@ export default function ContactDetailPage() {
                   Retained Client
                 </Badge>
               ) : (stats?.leadCount ?? 0) > 0 ? (
-                <Badge className="gap-1.5 bg-amber-950/30 text-amber-400 border-amber-300 hover:bg-amber-950/30 font-semibold tracking-wide text-[11px] uppercase">
+                <Badge className="gap-1.5 bg-amber-950/30 text-amber-400 border-amber-500/30 hover:bg-amber-950/30 font-semibold tracking-wide text-[11px] uppercase">
                   <UserCircle className="size-3.5" />
                   Prospective Lead
                 </Badge>
@@ -613,7 +613,7 @@ export default function ContactDetailPage() {
                   </Button>
                 </TooltipTrigger>
                 {isRedScore && (
-                  <TooltipContent side="bottom" className="bg-red-950/30 text-red-800 border-red-200">
+                  <TooltipContent side="bottom" className="bg-red-950/30 text-red-400 border-red-500/20">
                     Readiness score is critically low  -  immediate attention required
                   </TooltipContent>
                 )}
@@ -781,7 +781,7 @@ export default function ContactDetailPage() {
             </DialogDescription>
           </DialogHeader>
           {deps?.hasLinkedRecords && (
-            <div className="rounded-md border border-amber-200 bg-amber-950/30 p-3 text-sm text-amber-800">
+            <div className="rounded-md border border-amber-500/20 bg-amber-950/30 p-3 text-sm text-amber-400">
               <p className="font-medium mb-1">This contact has linked records:</p>
               <ul className="list-disc list-inside space-y-0.5 text-xs">
                 {deps.matterCount > 0 && (
@@ -1756,9 +1756,9 @@ function ContactTasksTab({
 
   function getPriorityColor(priority: string) {
     switch (priority) {
-      case 'urgent': return 'text-red-600 bg-red-950/30 border-red-200'
-      case 'high': return 'text-orange-600 bg-orange-950/30 border-orange-200'
-      case 'medium': return 'text-yellow-600 bg-yellow-950/30 border-yellow-200'
+      case 'urgent': return 'text-red-600 bg-red-950/30 border-red-500/20'
+      case 'high': return 'text-orange-600 bg-orange-950/30 border-orange-500/20'
+      case 'medium': return 'text-yellow-600 bg-yellow-950/30 border-yellow-500/20'
       default: return 'text-slate-600 bg-slate-50 border-slate-200'
     }
   }

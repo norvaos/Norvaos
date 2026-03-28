@@ -273,17 +273,17 @@ export function CreateAppointmentDialog({ open, onOpenChange }: CreateAppointmen
 
           {/* Info banners */}
           {appointmentType === 'paid' && (
-            <div className="flex items-start gap-2 rounded-md border border-amber-200 bg-amber-50 px-3 py-2">
+            <div className="flex items-start gap-2 rounded-md border border-amber-500/20 bg-amber-950/30 px-3 py-2">
               <Info className="mt-0.5 h-3.5 w-3.5 text-amber-500 shrink-0" />
-              <p className="text-xs text-amber-700">
+              <p className="text-xs text-amber-400">
                 Payment link will be sent to the lead (integration coming soon).
               </p>
             </div>
           )}
           {format === 'online' && (
-            <div className="flex items-start gap-2 rounded-md border border-blue-200 bg-blue-50 px-3 py-2">
+            <div className="flex items-start gap-2 rounded-md border border-blue-500/20 bg-blue-950/30 px-3 py-2">
               <Info className="mt-0.5 h-3.5 w-3.5 text-blue-500 shrink-0" />
-              <p className="text-xs text-blue-700">
+              <p className="text-xs text-blue-400">
                 Teams link will be sent automatically (integration coming soon).
               </p>
             </div>

@@ -75,7 +75,7 @@ function CommentItem({ comment, currentUserId, matterId, onReply, depth }: Comme
       <div
         className={cn(
           'flex gap-3 rounded-lg p-3 transition-colors',
-          comment.is_internal && 'bg-amber-50/60 dark:bg-amber-950/20'
+          comment.is_internal && 'bg-amber-950/30/60 dark:bg-amber-950/20'
         )}
       >
         {/* Avatar */}
@@ -89,7 +89,7 @@ function CommentItem({ comment, currentUserId, matterId, onReply, depth }: Comme
           <div className="flex items-center gap-2 flex-wrap">
             <span className="text-sm font-medium">{comment.authorName ?? 'Unknown'}</span>
             {comment.is_internal && (
-              <Badge variant="outline" className="gap-1 text-xs text-amber-700 border-amber-300">
+              <Badge variant="outline" className="gap-1 text-xs text-amber-400 border-amber-500/30">
                 <Lock className="size-3" />
                 Internal
               </Badge>

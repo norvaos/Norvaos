@@ -32,10 +32,10 @@ export function ClosureRecordCard({ record, users, onReopen }: ClosureRecordCard
   const closedByUser = getActorDisplay('user', record.closed_by, users)
 
   return (
-    <Card className="border-amber-200 bg-amber-50/30">
+    <Card className="border-amber-500/20 bg-amber-950/30/30">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2 text-sm font-semibold text-amber-800">
+          <CardTitle className="flex items-center gap-2 text-sm font-semibold text-amber-400">
             <XCircle className="h-4 w-4" />
             Lead Closed
           </CardTitle>
@@ -51,7 +51,7 @@ export function ClosureRecordCard({ record, users, onReopen }: ClosureRecordCard
         {/* Closed stage */}
         <div className="flex items-center gap-2">
           <span className="text-xs text-muted-foreground">Stage:</span>
-          <Badge variant="outline" size="xs" className="bg-amber-50 text-amber-700 border-amber-200">
+          <Badge variant="outline" size="xs" className="bg-amber-950/30 text-amber-400 border-amber-500/20">
             {getStageLabel(record.closed_stage)}
           </Badge>
         </div>

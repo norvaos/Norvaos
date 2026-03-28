@@ -66,7 +66,7 @@ function WinBadge({ pct }: { pct: number }) {
     : pct >= 50
       ? 'text-blue-400 bg-blue-950/30 border-blue-500/20'
       : pct >= 20
-        ? 'text-amber-400 bg-amber-950/30 border-amber-200'
+        ? 'text-amber-400 bg-amber-950/30 border-amber-500/20'
         : 'text-slate-500 bg-slate-50 border-slate-200'
 
   const Icon = pct >= 50 ? TrendingUp : pct === 0 ? TrendingDown : Minus
@@ -168,7 +168,7 @@ export function StageAdvanceDialog({
           {/* Stage description */}
           {proposedStageDescription && (
             <div className="rounded-md border border-blue-100 bg-blue-950/30/60 px-3 py-2.5">
-              <p className="text-xs text-blue-800 leading-relaxed">
+              <p className="text-xs text-blue-400 leading-relaxed">
                 <span className="font-semibold">What this means: </span>
                 {proposedStageDescription}
               </p>
@@ -192,7 +192,7 @@ export function StageAdvanceDialog({
 
           {/* Lost-move warning */}
           {isLostMove && (
-            <div className="rounded-md border border-red-200 bg-red-950/30 px-3 py-2.5">
+            <div className="rounded-md border border-red-500/20 bg-red-950/30 px-3 py-2.5">
               <p className="text-xs text-red-400 font-medium">
                 ⚠ This will close the lead as <strong>Lost</strong>. This action can only be undone by a manager.
               </p>

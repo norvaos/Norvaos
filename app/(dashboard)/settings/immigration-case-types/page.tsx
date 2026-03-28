@@ -222,7 +222,7 @@ function SortableStageRow({
             {stage.name}
           </span>
           {stage.is_terminal && (
-            <Badge variant="secondary" className="gap-1 text-[10px] text-orange-400 bg-orange-950/30 border-orange-200">
+            <Badge variant="secondary" className="gap-1 text-[10px] text-orange-400 bg-orange-950/30 border-orange-500/20">
               <AlertTriangle className="h-3 w-3" />
               Terminal
             </Badge>
@@ -1238,7 +1238,7 @@ function ChecklistSection({
                                 {t.document_name}
                               </span>
                               {t.is_required && (
-                                <Badge variant="secondary" className="text-[10px] text-red-400 bg-red-950/30 border-red-200">
+                                <Badge variant="secondary" className="text-[10px] text-red-400 bg-red-950/30 border-red-500/20">
                                   Required
                                 </Badge>
                               )}
@@ -1476,7 +1476,7 @@ function DocumentSlotTemplatesSection({
                               {t.slot_name}
                             </span>
                             {t.is_required && (
-                              <Badge variant="secondary" className="text-[10px] text-red-400 bg-red-950/30 border-red-200">
+                              <Badge variant="secondary" className="text-[10px] text-red-400 bg-red-950/30 border-red-500/20">
                                 Required
                               </Badge>
                             )}
@@ -1486,7 +1486,7 @@ function DocumentSlotTemplatesSection({
                               </Badge>
                             )}
                             {t.library_slot_id && (
-                              <Badge variant="outline" className="text-[10px] text-blue-600 border-blue-200">
+                              <Badge variant="outline" className="text-[10px] text-blue-600 border-blue-500/20">
                                 library
                               </Badge>
                             )}
@@ -1576,12 +1576,12 @@ function DocumentSlotTemplatesSection({
                       <div className="flex items-center gap-1.5 flex-wrap">
                         <span className="text-sm font-medium">{entry.slot_name}</span>
                         {entry.is_required && (
-                          <Badge variant="secondary" className="text-[10px] text-red-400 bg-red-950/30 border-red-200">
+                          <Badge variant="secondary" className="text-[10px] text-red-400 bg-red-950/30 border-red-500/20">
                             Required
                           </Badge>
                         )}
                         {alreadyAdded && (
-                          <Badge variant="outline" className="text-[10px] text-green-600 border-green-200">
+                          <Badge variant="outline" className="text-[10px] text-green-600 border-emerald-500/20">
                             added
                           </Badge>
                         )}
@@ -1724,7 +1724,7 @@ function StreamFormsSection({
                           {sf.form?.form_code ?? 'Unknown Form'}
                         </span>
                         {sf.is_required && (
-                          <Badge variant="secondary" className="text-[10px] text-red-400 bg-red-950/30 border-red-200">
+                          <Badge variant="secondary" className="text-[10px] text-red-400 bg-red-950/30 border-red-500/20">
                             Required
                           </Badge>
                         )}
@@ -2007,11 +2007,11 @@ export default function ImmigrationCaseTypesPage() {
   return (
     <div className="space-y-6">
       {/* Deprecation Banner */}
-      <div className="rounded-lg border border-amber-200 bg-amber-950/30 p-4">
+      <div className="rounded-lg border border-amber-500/20 bg-amber-950/30 p-4">
         <div className="flex items-start gap-3">
           <AlertTriangle className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
           <div>
-            <p className="text-sm font-semibold text-amber-800">
+            <p className="text-sm font-semibold text-amber-400">
               Immigration Case Types are being replaced by Matter Types
             </p>
             <p className="text-sm text-amber-400 mt-1">

@@ -10,9 +10,9 @@ import type { LeadConsultationRow, UserRow } from './lead-workflow-types'
 // ─── Status Config ──────────────────────────────────────────────────────────
 
 const CONSULTATION_STATUS: Record<string, { label: string; className: string }> = {
-  booked: { label: 'Booked', className: 'bg-blue-50 text-blue-700 border-blue-200' },
-  completed: { label: 'Completed', className: 'bg-green-50 text-green-700 border-green-200' },
-  no_show: { label: 'No Show', className: 'bg-red-50 text-red-600 border-red-200' },
+  booked: { label: 'Booked', className: 'bg-blue-950/30 text-blue-400 border-blue-500/20' },
+  completed: { label: 'Completed', className: 'bg-emerald-950/30 text-emerald-400 border-emerald-500/20' },
+  no_show: { label: 'No Show', className: 'bg-red-950/30 text-red-600 border-red-500/20' },
   cancelled: { label: 'Cancelled', className: 'bg-muted text-muted-foreground border-border' },
 }
 
@@ -82,7 +82,7 @@ export function ConsultationCard({ consultation, users }: ConsultationCardProps)
 
         {/* No-show indicator (status-based) */}
         {consultation.status === 'no_show' && (
-          <div className="flex items-center gap-2 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700 border border-red-200">
+          <div className="flex items-center gap-2 rounded-md bg-red-950/30 px-3 py-2 text-sm text-red-400 border border-red-500/20">
             <AlertTriangle className="h-4 w-4 shrink-0" />
             <span>Client did not attend</span>
           </div>
@@ -90,7 +90,7 @@ export function ConsultationCard({ consultation, users }: ConsultationCardProps)
 
         {/* Completion indicator (status-based) */}
         {consultation.status === 'completed' && (
-          <div className="flex items-center gap-2 rounded-md bg-green-50 px-3 py-2 text-sm text-green-700 border border-green-200">
+          <div className="flex items-center gap-2 rounded-md bg-emerald-950/30 px-3 py-2 text-sm text-emerald-400 border border-emerald-500/20">
             <CheckCircle2 className="h-4 w-4 shrink-0" />
             <span>Consultation completed</span>
           </div>

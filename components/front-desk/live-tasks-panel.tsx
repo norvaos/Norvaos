@@ -30,14 +30,14 @@ interface LiveTasksQueueProps {
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   not_started: { label: 'Not Started', color: 'bg-slate-50 text-slate-600 border-slate-200' },
-  working_on_it: { label: 'In Progress', color: 'bg-blue-50 text-blue-700 border-blue-200' },
-  stuck: { label: 'Stuck', color: 'bg-red-50 text-red-700 border-red-200' },
+  working_on_it: { label: 'In Progress', color: 'bg-blue-950/30 text-blue-400 border-blue-500/20' },
+  stuck: { label: 'Stuck', color: 'bg-red-950/30 text-red-400 border-red-500/20' },
 }
 
 const PRIORITY_INDICATORS: Record<string, { label: string; color: string }> = {
-  critical: { label: 'Critical', color: 'bg-red-100 text-red-800 border-red-300' },
-  high: { label: 'High', color: 'bg-orange-100 text-orange-800 border-orange-300' },
-  medium: { label: 'Medium', color: 'bg-amber-100 text-amber-800 border-amber-300' },
+  critical: { label: 'Critical', color: 'bg-red-950/40 text-red-400 border-red-500/30' },
+  high: { label: 'High', color: 'bg-orange-950/40 text-orange-400 border-orange-500/30' },
+  medium: { label: 'Medium', color: 'bg-amber-950/40 text-amber-400 border-amber-500/30' },
   low: { label: 'Low', color: 'bg-slate-100 text-slate-600 border-slate-200' },
 }
 
@@ -304,7 +304,7 @@ export function LiveTasksQueue({ onCompleteTask, onSelectContact }: LiveTasksQue
           const rot = getRotIndicator(t.due_date, t.due_time)
           return rot.label === 'Overdue'
         }).length > 0 && (
-          <div className="flex items-center gap-2 mt-3 p-2 bg-red-50 rounded-md border border-red-200">
+          <div className="flex items-center gap-2 mt-3 p-2 bg-red-950/30 rounded-md border border-red-500/20">
             <AlertCircle className="w-4 h-4 text-red-500 flex-shrink-0" />
             <p className="text-xs text-red-600">
               {filteredTasks.filter((t) => getRotIndicator(t.due_date, t.due_time).label === 'Overdue').length} overdue{' '}

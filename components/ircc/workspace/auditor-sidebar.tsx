@@ -344,12 +344,12 @@ export function AuditorSidebar({
         </span>
         <div className="flex items-center gap-1.5">
           {failItems > 0 && (
-            <Badge variant="outline" className="text-[10px] py-0 px-1.5 border-red-300 text-red-600 bg-red-50">
+            <Badge variant="outline" className="text-[10px] py-0 px-1.5 border-red-500/30 text-red-600 bg-red-950/30">
               {failItems} fail
             </Badge>
           )}
           {warnItems > 0 && (
-            <Badge variant="outline" className="text-[10px] py-0 px-1.5 border-amber-300 text-amber-600 bg-amber-50">
+            <Badge variant="outline" className="text-[10px] py-0 px-1.5 border-amber-500/30 text-amber-600 bg-amber-950/30">
               {warnItems} warn
             </Badge>
           )}

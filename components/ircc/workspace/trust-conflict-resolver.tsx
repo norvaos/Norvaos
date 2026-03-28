@@ -104,7 +104,7 @@ function ConflictCard({
         {isResolved && (
           <Badge
             variant="outline"
-            className="text-[10px] py-0 px-1.5 border-green-300 text-emerald-400 bg-emerald-950/30 shrink-0"
+            className="text-[10px] py-0 px-1.5 border-emerald-500/30 text-emerald-400 bg-emerald-950/30 shrink-0"
           >
             <Check className="h-2.5 w-2.5 mr-0.5" />
             Resolved
@@ -146,7 +146,7 @@ function ConflictCard({
             <Button
               variant="outline"
               size="sm"
-              className="h-7 text-[10px] px-2 mt-2 w-full border-blue-300 text-blue-400 hover:bg-blue-950/40"
+              className="h-7 text-[10px] px-2 mt-2 w-full border-blue-500/30 text-blue-400 hover:bg-blue-950/40"
               onClick={onChooseClient}
             >
               <Check className="h-3 w-3 mr-1" />
@@ -180,7 +180,7 @@ function ConflictCard({
             <Button
               variant="outline"
               size="sm"
-              className="h-7 text-[10px] px-2 mt-2 w-full border-green-300 text-emerald-400 hover:bg-emerald-950/40"
+              className="h-7 text-[10px] px-2 mt-2 w-full border-emerald-500/30 text-emerald-400 hover:bg-emerald-950/40"
               onClick={onChooseCanonical}
             >
               <Check className="h-3 w-3 mr-1" />
@@ -265,7 +265,7 @@ export function TrustConflictResolver({
         <Button
           variant="outline"
           size="sm"
-          className="h-7 text-[10px] px-2.5 border-blue-300 text-blue-400 hover:bg-blue-950/30"
+          className="h-7 text-[10px] px-2.5 border-blue-500/30 text-blue-400 hover:bg-blue-950/30"
           onClick={handleAcceptAllClient}
           disabled={unresolvedCount === 0}
         >
@@ -275,7 +275,7 @@ export function TrustConflictResolver({
         <Button
           variant="outline"
           size="sm"
-          className="h-7 text-[10px] px-2.5 border-green-300 text-emerald-400 hover:bg-emerald-950/30"
+          className="h-7 text-[10px] px-2.5 border-emerald-500/30 text-emerald-400 hover:bg-emerald-950/30"
           onClick={handleAcceptAllCanonical}
           disabled={unresolvedCount === 0}
         >
@@ -286,7 +286,7 @@ export function TrustConflictResolver({
         {unresolvedCount === 0 && (
           <Badge
             variant="outline"
-            className="text-[10px] py-0 px-1.5 border-green-300 text-emerald-400 bg-emerald-950/30 ml-auto"
+            className="text-[10px] py-0 px-1.5 border-emerald-500/30 text-emerald-400 bg-emerald-950/30 ml-auto"
           >
             All conflicts resolved
           </Badge>

@@ -135,33 +135,33 @@ export function getRiskLevelConfig(level: RiskLevel): {
     case 'critical':
       return {
         label: 'Critical',
-        text: 'text-red-700',
-        bg: 'bg-red-50',
-        border: 'border-red-200',
+        text: 'text-red-400',
+        bg: 'bg-red-950/30',
+        border: 'border-red-500/20',
         barColor: 'bg-red-500',
       }
     case 'high':
       return {
         label: 'High',
-        text: 'text-orange-700',
-        bg: 'bg-orange-50',
-        border: 'border-orange-200',
+        text: 'text-orange-400',
+        bg: 'bg-orange-950/30',
+        border: 'border-orange-500/20',
         barColor: 'bg-orange-500',
       }
     case 'moderate':
       return {
         label: 'Moderate',
-        text: 'text-amber-700',
-        bg: 'bg-amber-50',
-        border: 'border-amber-200',
+        text: 'text-amber-400',
+        bg: 'bg-amber-950/30',
+        border: 'border-amber-500/20',
         barColor: 'bg-amber-500',
       }
     case 'low':
       return {
         label: 'Low',
-        text: 'text-green-700',
-        bg: 'bg-green-50',
-        border: 'border-green-200',
+        text: 'text-emerald-400',
+        bg: 'bg-emerald-950/30',
+        border: 'border-emerald-500/20',
         barColor: 'bg-green-500',
       }
   }

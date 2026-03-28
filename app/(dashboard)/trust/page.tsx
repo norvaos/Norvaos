@@ -470,7 +470,7 @@ function TrustDashboard() {
                             </TableCell>
                             <TableCell>
                               {t.hold_status === 'held' ? (
-                                <Badge variant="outline" className="text-amber-400 border-amber-300 bg-amber-950/30">
+                                <Badge variant="outline" className="text-amber-400 border-amber-500/30 bg-amber-950/30">
                                   <Clock className="mr-1 h-3 w-3" />
                                   On Hold
                                 </Badge>
@@ -555,7 +555,7 @@ function TrustDashboard() {
                                   <Button
                                     size="sm"
                                     variant="ghost"
-                                    className="h-7 text-red-400 hover:text-red-800 hover:bg-red-950/30"
+                                    className="h-7 text-red-400 hover:text-red-400 hover:bg-red-950/30"
                                     onClick={() => {
                                       setRejectTargetId(req.id!)
                                       setRejectDialogOpen(true)

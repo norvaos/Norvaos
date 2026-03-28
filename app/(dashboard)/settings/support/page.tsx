@@ -38,7 +38,7 @@ interface SystemHealthStatus {
 function HealthBadge({ status }: { status: 'healthy' | 'degraded' | 'down' | 'connected' | 'disconnected' | 'error' }) {
   if (status === 'healthy' || status === 'connected') {
     return (
-      <Badge className="bg-green-100 text-green-800 border-green-200">
+      <Badge className="bg-emerald-950/40 text-emerald-400 border-emerald-500/20">
         <CheckCircle className="mr-1 h-3 w-3" />
         {status === 'connected' ? 'Connected' : 'Healthy'}
       </Badge>
@@ -46,14 +46,14 @@ function HealthBadge({ status }: { status: 'healthy' | 'degraded' | 'down' | 'co
   }
   if (status === 'degraded' || status === 'disconnected') {
     return (
-      <Badge className="bg-yellow-100 text-yellow-800 border-yellow-200">
+      <Badge className="bg-yellow-950/40 text-yellow-400 border-yellow-500/20">
         <AlertTriangle className="mr-1 h-3 w-3" />
         {status === 'disconnected' ? 'Disconnected' : 'Degraded'}
       </Badge>
     )
   }
   return (
-    <Badge className="bg-red-100 text-red-800 border-red-200">
+    <Badge className="bg-red-950/40 text-red-400 border-red-500/20">
       <XCircle className="mr-1 h-3 w-3" />
       {status === 'error' ? 'Error' : 'Down'}
     </Badge>
@@ -113,7 +113,7 @@ export default function SupportDashboardPage() {
 
       {/* Error state */}
       {error && (
-        <Card className="border-red-200">
+        <Card className="border-red-500/20">
           <CardContent className="pt-6">
             <div className="flex items-center gap-2 text-red-400">
               <XCircle className="h-4 w-4" />

@@ -131,7 +131,7 @@ export function MeetingNotes() {
                     <Button
                       variant="outline"
                       size="sm"
-                      className="h-7 text-xs gap-1 text-green-600 border-green-200 hover:bg-emerald-950/30"
+                      className="h-7 text-xs gap-1 text-green-600 border-emerald-500/20 hover:bg-emerald-950/30"
                       onClick={startMeetingTimer}
                     >
                       <Play className="h-3 w-3 fill-current" />

@@ -66,8 +66,8 @@ export function MapColumns({
       </div>
 
       {missingRequired.length > 0 && (
-        <div className="rounded-lg bg-amber-50 border border-amber-200 px-4 py-3">
-          <p className="text-xs text-amber-800">
+        <div className="rounded-lg bg-amber-950/30 border border-amber-500/20 px-4 py-3">
+          <p className="text-xs text-amber-400">
             <span className="font-medium">Required fields not yet mapped:</span>{' '}
             {missingRequired.map((f) => f.label).join(', ')}
           </p>

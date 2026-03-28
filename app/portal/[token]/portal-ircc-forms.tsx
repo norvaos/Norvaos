@@ -202,13 +202,13 @@ export function PortalIRCCForms({
 
   if (error) {
     return (
-      <div className="rounded-2xl border border-red-200/60 bg-gradient-to-br from-red-50 to-white p-6 text-center shadow-sm">
-        <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-red-100 shadow-sm">
+      <div className="rounded-2xl border border-red-500/20/60 bg-gradient-to-br from-red-50 to-white p-6 text-center shadow-sm">
+        <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-red-950/40 shadow-sm">
           <svg className="h-5 w-5 text-red-600" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
           </svg>
         </div>
-        <p className="text-sm font-bold text-red-800">{tr.ircc_error_title}</p>
+        <p className="text-sm font-bold text-red-400">{tr.ircc_error_title}</p>
         <p className="mt-1 text-sm text-red-600">{error}</p>
       </div>
     )
@@ -425,7 +425,7 @@ function FormCard({
   const statusConfig = isCompleted
     ? { icon: '✓', label: 'Completed', className: 'bg-emerald-950/30 text-emerald-400 border-emerald-500/20/60' }
     : isInProgress
-      ? { icon: '●', label: `In Progress  -  ${form.progress_percent}%`, className: 'bg-blue-950/30 text-blue-400 border-blue-200/60' }
+      ? { icon: '●', label: `In Progress  -  ${form.progress_percent}%`, className: 'bg-blue-950/30 text-blue-400 border-blue-500/20/60' }
       : { icon: '○', label: 'Not Started', className: 'bg-slate-50 text-slate-500 border-slate-200/60' }
 
   // Action button

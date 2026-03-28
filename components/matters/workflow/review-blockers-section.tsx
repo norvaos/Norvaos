@@ -319,7 +319,7 @@ export function ReviewBlockersWorkflowSection({
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="h-5 text-[10px] text-blue-600 hover:text-blue-800 px-1 shrink-0"
+                          className="h-5 text-[10px] text-blue-600 hover:text-blue-400 px-1 shrink-0"
                           onClick={() => {
                             if (item.action.specialAction === 'lawyer_review') {
                               onOpenLawyerReview?.()
@@ -345,11 +345,11 @@ export function ReviewBlockersWorkflowSection({
 
           {/* Overridden contradictions  -  shown outside the active tiers */}
           {readinessData.contradictions.overridden && readinessData.contradictions.blockingCount > 0 && (
-            <div className="rounded-lg border p-3 text-green-700 bg-green-50 border-green-200">
+            <div className="rounded-lg border p-3 text-emerald-400 bg-emerald-950/30 border-emerald-500/20">
               <div className="flex items-center gap-2 mb-2">
                 <CheckCircle2 className="h-3.5 w-3.5 text-green-600" />
                 <span className="text-xs font-semibold">Contradictions Overridden</span>
-                <Badge variant="outline" className="text-[9px] px-1 py-0 border-green-300 text-green-600">
+                <Badge variant="outline" className="text-[9px] px-1 py-0 border-emerald-500/30 text-green-600">
                   {readinessData.contradictions.blockingCount} resolved
                 </Badge>
               </div>
@@ -471,7 +471,7 @@ function DocumentUploadButton({
       <Button
         variant="ghost"
         size="sm"
-        className="h-5 text-[10px] text-green-700 hover:text-green-900 hover:bg-green-50 px-1 shrink-0"
+        className="h-5 text-[10px] text-emerald-400 hover:text-green-900 hover:bg-emerald-950/30 px-1 shrink-0"
         onClick={handleAccept}
       >
         ✓ Accept Document
@@ -482,7 +482,7 @@ function DocumentUploadButton({
   return (
     <label
       htmlFor={inputId}
-      className="flex items-center gap-0.5 text-[10px] text-blue-600 hover:text-blue-800 cursor-pointer px-1 shrink-0 select-none"
+      className="flex items-center gap-0.5 text-[10px] text-blue-600 hover:text-blue-400 cursor-pointer px-1 shrink-0 select-none"
     >
       <input
         id={inputId}

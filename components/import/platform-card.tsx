@@ -13,15 +13,15 @@ interface PlatformCardProps {
 }
 
 const platformColours: Record<SourcePlatform, string> = {
-  ghl: 'border-blue-200 bg-blue-50',
+  ghl: 'border-blue-500/20 bg-blue-950/30',
   clio: 'border-indigo-200 bg-indigo-50',
-  officio: 'border-emerald-200 bg-emerald-50',
+  officio: 'border-emerald-500/20 bg-emerald-950/30',
 }
 
 const platformSelectedColours: Record<SourcePlatform, string> = {
-  ghl: 'border-blue-500 bg-blue-50 ring-2 ring-blue-200',
+  ghl: 'border-blue-500 bg-blue-950/30 ring-2 ring-blue-200',
   clio: 'border-indigo-500 bg-indigo-50 ring-2 ring-indigo-200',
-  officio: 'border-emerald-500 bg-emerald-50 ring-2 ring-emerald-200',
+  officio: 'border-emerald-500 bg-emerald-950/30 ring-2 ring-emerald-200',
 }
 
 export function PlatformCard({

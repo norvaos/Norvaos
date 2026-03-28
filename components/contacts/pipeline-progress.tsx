@@ -220,7 +220,7 @@ function CompactPipeline({
               onClick={() => onStageChange(nextStage.key)}
               className={cn(
                 'flex w-full items-center justify-center gap-1.5 rounded-md border border-blue-500/20 bg-blue-950/30 px-2.5 py-1.5 text-xs font-medium text-blue-400 transition-colors',
-                'hover:bg-blue-100 hover:border-blue-300',
+                'hover:bg-blue-950/40 hover:border-blue-500/30',
                 isUpdating && 'opacity-50 cursor-not-allowed'
               )}
             >
@@ -254,10 +254,10 @@ export function PipelineStageBadge({ stage, className }: PipelineStageBadgeProps
     index < 3
       ? 'bg-blue-950/30 text-blue-400 border-blue-500/20'
       : index < 6
-        ? 'bg-amber-950/30 text-amber-400 border-amber-200'
+        ? 'bg-amber-950/30 text-amber-400 border-amber-500/20'
         : index < 8
           ? 'bg-emerald-950/30 text-emerald-400 border-emerald-500/20'
-          : 'bg-emerald-950/30 text-emerald-400 border-green-200'
+          : 'bg-emerald-950/30 text-emerald-400 border-emerald-500/20'
 
   return (
     <span

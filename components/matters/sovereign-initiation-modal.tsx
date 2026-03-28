@@ -638,7 +638,7 @@ export function SovereignInitiationModal({
                         {(selectedContact.first_name?.[0] ?? '').toUpperCase()}
                         {(selectedContact.last_name?.[0] ?? '').toUpperCase()}
                       </div>
-                      <span className="text-sm font-medium text-emerald-700 dark:text-emerald-300">
+                      <span className="text-sm font-medium text-emerald-400 dark:text-emerald-300">
                         {selectedContact.first_name} {selectedContact.last_name}
                       </span>
                       {contactPulseActive && (
@@ -676,7 +676,7 @@ export function SovereignInitiationModal({
                   >
                     <div className="flex items-center gap-2 rounded-xl border border-emerald-500/20 bg-emerald-500/5 px-3.5 py-2">
                       <Hash className="h-3.5 w-3.5 text-emerald-500/60" />
-                      <span className="font-mono text-sm font-semibold tracking-wider text-emerald-700 dark:text-emerald-300">
+                      <span className="font-mono text-sm font-semibold tracking-wider text-emerald-400 dark:text-emerald-300">
                         {typewriterText}
                       </span>
                       <span className="inline-block h-4 w-px animate-pulse bg-emerald-500/60" />
@@ -794,7 +794,7 @@ export function SovereignInitiationModal({
                               className={cn(
                                 'rounded-lg border px-3 py-1.5 text-xs font-medium transition-all',
                                 selected
-                                  ? 'border-emerald-500/50 bg-emerald-500/15 text-emerald-700 dark:text-emerald-300'
+                                  ? 'border-emerald-500/50 bg-emerald-500/15 text-emerald-400 dark:text-emerald-300'
                                   : 'border-gray-200 dark:border-white/[0.06] text-gray-500 dark:text-white/50 hover:border-gray-300 dark:hover:border-white/[0.12] hover:text-gray-700 dark:hover:text-white/70',
                               )}
                             >
@@ -829,7 +829,7 @@ export function SovereignInitiationModal({
                         className={cn(
                           'flex flex-1 items-center justify-center gap-1.5 rounded-lg px-2 py-2 text-xs font-medium transition-all',
                           billingType === value
-                            ? 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 shadow-sm'
+                            ? 'bg-emerald-500/20 text-emerald-400 dark:text-emerald-300 shadow-sm'
                             : 'text-gray-400 dark:text-white/40 hover:text-gray-600 dark:hover:text-white/60',
                         )}
                       >
@@ -908,7 +908,7 @@ export function SovereignInitiationModal({
                             className={cn(
                               'relative flex h-12 w-12 items-center justify-center rounded-full text-sm font-bold transition-all',
                               selected
-                                ? 'bg-emerald-500/30 text-emerald-700 dark:text-emerald-300 ring-2 ring-emerald-400/60 sovereign-sparkle'
+                                ? 'bg-emerald-500/30 text-emerald-400 dark:text-emerald-300 ring-2 ring-emerald-400/60 sovereign-sparkle'
                                 : 'bg-gray-100 dark:bg-white/[0.08] text-gray-500 dark:text-white/50 group-hover:bg-gray-200 dark:group-hover:bg-white/[0.12]',
                             )}
                           >
@@ -931,7 +931,7 @@ export function SovereignInitiationModal({
                               </motion.div>
                             )}
                           </div>
-                          <span className={cn('max-w-[80px] truncate text-xs font-medium', selected ? 'text-emerald-700 dark:text-emerald-300' : 'text-gray-500 dark:text-white/60')}>
+                          <span className={cn('max-w-[80px] truncate text-xs font-medium', selected ? 'text-emerald-400 dark:text-emerald-300' : 'text-gray-500 dark:text-white/60')}>
                             {displayName}
                           </span>
                         </motion.button>

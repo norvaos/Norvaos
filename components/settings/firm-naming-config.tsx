@@ -525,7 +525,7 @@ export function FirmNamingConfig() {
                                 <ChevronRight className="size-3 rotate-180" />
                               </button>
                             )}
-                            <span className="text-xs font-medium text-emerald-700 dark:text-emerald-300">
+                            <span className="text-xs font-medium text-emerald-400 dark:text-emerald-300">
                               {token.label}
                             </span>
                             {index < activeTokenIds.length - 1 && (
@@ -566,7 +566,7 @@ export function FirmNamingConfig() {
               <div className="flex items-start gap-3 rounded-xl border border-amber-500/30 bg-amber-500/[0.06] p-3">
                 <Shield className="mt-0.5 size-4 shrink-0 text-amber-500" />
                 <div>
-                  <p className="text-sm font-medium text-amber-700 dark:text-amber-300">
+                  <p className="text-sm font-medium text-amber-400 dark:text-amber-300">
                     Warning: This convention may create duplicate IDs.
                   </p>
                   <p className="mt-0.5 text-xs text-amber-600/80 dark:text-amber-400/80">

@@ -282,7 +282,7 @@ function EntryRow({
         <div className="flex items-center gap-2 flex-wrap">
           <span className="text-sm font-medium text-slate-900 truncate">{entry.slot_name}</span>
           {entry.is_required && (
-            <Badge variant="secondary" className="text-[10px] text-red-700 bg-red-50 border-red-200 shrink-0">
+            <Badge variant="secondary" className="text-[10px] text-red-400 bg-red-950/30 border-red-500/20 shrink-0">
               Required
             </Badge>
           )}

@@ -1123,7 +1123,7 @@ export function MatterForm({ mode, defaultValues, onSubmit, isLoading }: MatterF
                               form.setValue('estimated_value', templateDefaultValue)
                               setIsManualOverride(false)
                             }}
-                            className="text-xs text-blue-600 hover:text-blue-800 hover:underline mt-0.5"
+                            className="text-xs text-blue-600 hover:text-blue-400 hover:underline mt-0.5"
                           >
                             Reset to template ({formatCents(templateDefaultValue)})
                           </button>

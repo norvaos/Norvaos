@@ -154,10 +154,10 @@ export function CentralActionSurface({
                     className={cn(
                       'text-[10px] ml-auto',
                       docStats.pct >= 100
-                        ? 'border-green-200 text-green-700'
+                        ? 'border-emerald-500/20 text-emerald-400'
                         : docStats.pct >= 50
-                          ? 'border-amber-200 text-amber-700'
-                          : 'border-red-200 text-red-700'
+                          ? 'border-amber-500/20 text-amber-400'
+                          : 'border-red-500/20 text-red-400'
                     )}
                   >
                     {docStats.pct}%
@@ -187,10 +187,10 @@ export function CentralActionSurface({
                     className={cn(
                       'text-[10px] ml-auto',
                       formStats.pct >= 100
-                        ? 'border-green-200 text-green-700'
+                        ? 'border-emerald-500/20 text-emerald-400'
                         : formStats.pct >= 50
-                          ? 'border-amber-200 text-amber-700'
-                          : 'border-red-200 text-red-700'
+                          ? 'border-amber-500/20 text-amber-400'
+                          : 'border-red-500/20 text-red-400'
                     )}
                   >
                     {formStats.pct}%
@@ -222,10 +222,10 @@ export function CentralActionSurface({
                     className={cn(
                       'text-xs',
                       item.satisfied
-                        ? 'text-green-700'
+                        ? 'text-emerald-400'
                         : item.severity === 'critical'
-                          ? 'text-red-700'
-                          : 'text-amber-700'
+                          ? 'text-red-400'
+                          : 'text-amber-400'
                     )}
                   >
                     {item.label}

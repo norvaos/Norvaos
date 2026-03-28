@@ -231,7 +231,7 @@ export function SovereignContactStep({
   if (intake.existingContactId) {
     return (
       <div className="space-y-6">
-        <div className="flex items-center gap-3 rounded-lg border border-blue-200 bg-blue-50 p-4 text-blue-800">
+        <div className="flex items-center gap-3 rounded-lg border border-blue-500/20 bg-blue-950/30 p-4 text-blue-400">
           <Users className="size-5 shrink-0" />
           <p className="text-sm font-medium">
             Linked to existing contact. Click Next to proceed to compliance
@@ -567,7 +567,7 @@ export function SovereignContactStep({
             <div className="relative">
               {children}
               {/* Directive 42.2, Item 2: Checkmark inside OCR fields */}
-              <div className="absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center justify-center size-5 rounded-full bg-emerald-100 text-emerald-600">
+              <div className="absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center justify-center size-5 rounded-full bg-emerald-950/40 text-emerald-600">
                 <Check className="size-3" />
               </div>
             </div>
@@ -595,7 +595,7 @@ export function SovereignContactStep({
         <div className="flex justify-center">
           <Badge
             variant="outline"
-            className="border-yellow-400 bg-yellow-50 text-yellow-800 animate-in zoom-in"
+            className="border-yellow-400 bg-yellow-950/30 text-yellow-400 animate-in zoom-in"
           >
             {intake.isGeneralContact ? 'CONTACT CREATED' : 'PROSPECTIVE LEAD'}
           </Badge>
@@ -604,7 +604,7 @@ export function SovereignContactStep({
 
       {/* ── Directive 42.2, Item 1: Sovereign Caution Banner ──────── */}
       {ocrWasUsed && !created && (
-        <div className="animate-in fade-in slide-in-from-top-2 flex items-start gap-3 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-amber-900 dark:border-amber-700 dark:bg-amber-950/40 dark:text-amber-200 animate-pulse [animation-duration:3s]">
+        <div className="animate-in fade-in slide-in-from-top-2 flex items-start gap-3 rounded-lg border border-amber-500/30 bg-amber-950/30 px-4 py-3 text-amber-900 dark:border-amber-700 dark:bg-amber-950/40 dark:text-amber-200 animate-pulse [animation-duration:3s]">
           <ShieldAlert className="mt-0.5 size-5 shrink-0 text-amber-600 dark:text-amber-400" />
           <div>
             <p className="text-sm font-semibold">Sovereign Caution</p>
@@ -630,7 +630,7 @@ export function SovereignContactStep({
               gap-3 rounded-lg border-2 border-dashed p-6 transition-all
               ${
                 dragOver
-                  ? 'border-emerald-500 bg-emerald-50'
+                  ? 'border-emerald-500 bg-emerald-950/30'
                   : 'border-muted-foreground/25 hover:border-muted-foreground/50 hover:bg-muted/30'
               }
               ${scanning ? 'pointer-events-none opacity-60' : ''}
@@ -676,7 +676,7 @@ export function SovereignContactStep({
 
           {/* OCR success banner */}
           {scanSuccess && (
-            <div className="flex items-center gap-2 rounded-lg border border-emerald-300 bg-emerald-50 px-4 py-3 text-emerald-800 animate-in fade-in slide-in-from-top-2">
+            <div className="flex items-center gap-2 rounded-lg border border-emerald-500/30 bg-emerald-950/30 px-4 py-3 text-emerald-400 animate-in fade-in slide-in-from-top-2">
               <CheckCircle2 className="size-4 shrink-0" />
               <p className="text-sm font-medium">
                 Identity data extracted  -  auto-filled fields are highlighted
@@ -687,7 +687,7 @@ export function SovereignContactStep({
 
           {/* OCR error banner */}
           {scanError && (
-            <div className="flex items-center gap-2 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-amber-800 animate-in fade-in slide-in-from-top-2">
+            <div className="flex items-center gap-2 rounded-lg border border-amber-500/30 bg-amber-950/30 px-4 py-3 text-amber-400 animate-in fade-in slide-in-from-top-2">
               <AlertTriangle className="size-4 shrink-0" />
               <p className="text-sm">
                 {scanError}  -  you can fill the fields manually.
@@ -933,7 +933,7 @@ export function SovereignContactStep({
 
       {/* ── Directive 42.2, Item 3: Manual Confirmation Toggle ──── */}
       {ocrWasUsed && !created && (
-        <div className="animate-in fade-in slide-in-from-bottom-2 flex items-start gap-3 rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-950/40">
+        <div className="animate-in fade-in slide-in-from-bottom-2 flex items-start gap-3 rounded-lg border border-blue-500/20 bg-blue-950/30 p-4 dark:border-blue-800 dark:bg-blue-950/40">
           <Checkbox
             id="ocr-verification-toggle"
             checked={ocrVerified}

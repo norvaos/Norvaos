@@ -92,7 +92,7 @@ export function RetainerGatePanel({
 
         {isBlocked && (
           <div className="space-y-2 pt-1">
-            <p className="text-sm text-amber-700 dark:text-amber-400">
+            <p className="text-sm text-amber-400 dark:text-amber-400">
               {retainerCondition.details ??
                 'A signed Retainer Agreement is required before advancing this matter.'}
             </p>
@@ -101,7 +101,7 @@ export function RetainerGatePanel({
                 variant="outline"
                 size="sm"
                 onClick={onCreateRetainer}
-                className="border-amber-500/50 text-amber-700 hover:bg-amber-100 dark:text-amber-400"
+                className="border-amber-500/50 text-amber-400 hover:bg-amber-950/40 dark:text-amber-400"
               >
                 <FileText className="mr-1.5 h-3.5 w-3.5" />
                 Generate Retainer Agreement

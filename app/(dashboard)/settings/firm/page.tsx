@@ -646,7 +646,7 @@ export default function SettingsFirmPage() {
       >
         <AlertDialogContent className="max-w-lg">
           <AlertDialogHeader className="space-y-3 text-center items-center">
-            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-red-100">
+            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-red-950/40">
               <AlertTriangle className="h-7 w-7 text-red-600" />
             </div>
             <AlertDialogTitle className="text-2xl text-red-400 text-center w-full leading-snug">
@@ -697,7 +697,7 @@ export default function SettingsFirmPage() {
                 </div>
 
                 {/* Responsibility notice */}
-                <div className="rounded-md border border-red-200 bg-red-950/30 px-3 py-2.5 text-xs text-red-400 leading-relaxed text-center">
+                <div className="rounded-md border border-red-500/20 bg-red-950/30 px-3 py-2.5 text-xs text-red-400 leading-relaxed text-center">
                   We strongly recommend reviewing the compliance requirements of both
                   your current and new regulatory body before proceeding. The administering
                   user assumes full responsibility for ensuring continued compliance

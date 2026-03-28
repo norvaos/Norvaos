@@ -233,7 +233,7 @@ function FeeLineEditor({
         <button
           type="button"
           onClick={() => setShowNewPresetForm(true)}
-          className="text-[11px] text-blue-600 hover:text-blue-700 hover:underline flex items-center gap-1"
+          className="text-[11px] text-blue-600 hover:text-blue-400 hover:underline flex items-center gap-1"
         >
           <Plus className="h-3 w-3" />
           Add new fee to presets
@@ -658,7 +658,7 @@ export default function FeeTemplatesPage() {
                               {t.name}
                             </span>
                             {t.is_default && (
-                              <Badge className="bg-amber-100 text-amber-700 border-amber-200 text-[10px] gap-0.5">
+                              <Badge className="bg-amber-950/40 text-amber-400 border-amber-500/20 text-[10px] gap-0.5">
                                 <Star className="h-2.5 w-2.5 fill-current" />
                                 Default
                               </Badge>
@@ -907,7 +907,7 @@ export default function FeeTemplatesPage() {
             {/* Professional Fees */}
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <div className="rounded p-1 bg-blue-50">
+                <div className="rounded p-1 bg-blue-950/30">
                   <Briefcase className="h-3.5 w-3.5 text-blue-600" />
                 </div>
                 <h4 className="text-sm font-medium text-slate-700">Professional Fees</h4>
@@ -931,7 +931,7 @@ export default function FeeTemplatesPage() {
             {/* Government Fees */}
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <div className="rounded p-1 bg-amber-50">
+                <div className="rounded p-1 bg-amber-950/30">
                   <Landmark className="h-3.5 w-3.5 text-amber-600" />
                 </div>
                 <h4 className="text-sm font-medium text-slate-700">Government Fees</h4>
@@ -954,7 +954,7 @@ export default function FeeTemplatesPage() {
             {/* Disbursements */}
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <div className="rounded p-1 bg-purple-50">
+                <div className="rounded p-1 bg-purple-950/30">
                   <Receipt className="h-3.5 w-3.5 text-purple-600" />
                 </div>
                 <h4 className="text-sm font-medium text-slate-700">Disbursements</h4>

@@ -110,7 +110,7 @@ export default function NexusDashboardPage() {
 
   if (error) return (
     <div className="flex items-center justify-center min-h-[60vh]">
-      <div className={cn('rounded-xl border p-8 text-center', dark ? 'border-red-500/20 bg-red-500/5' : 'border-red-200 bg-red-50')}>
+      <div className={cn('rounded-xl border p-8 text-center', dark ? 'border-red-500/20 bg-red-500/5' : 'border-red-500/20 bg-red-950/30')}>
         <Shield className="h-8 w-8 mx-auto mb-3 text-red-500" />
         <p className={cn('text-sm font-bold', h)}>Access Denied</p>
         <p className={cn('mt-1 text-xs', sub)}>{error.message}</p>
@@ -140,14 +140,14 @@ export default function NexusDashboardPage() {
           <h1 className={cn('text-2xl font-bold tracking-tight', h)}>Control Center</h1>
           <p className={cn('text-sm mt-0.5', sub)}>Platform overview and system metrics</p>
         </div>
-        <div className={cn('hidden lg:flex items-center gap-2 rounded-lg border px-3 py-1.5 text-[10px] font-medium uppercase tracking-wider', dark ? 'border-emerald-500/20 bg-emerald-500/5 text-emerald-400' : 'border-emerald-200 bg-emerald-50 text-emerald-600')}>
+        <div className={cn('hidden lg:flex items-center gap-2 rounded-lg border px-3 py-1.5 text-[10px] font-medium uppercase tracking-wider', dark ? 'border-emerald-500/20 bg-emerald-500/5 text-emerald-400' : 'border-emerald-500/20 bg-emerald-950/30 text-emerald-600')}>
           <Pulse colour="#34d399" />
           All Systems Nominal
         </div>
       </div>
 
       {/* ── System Performance Strip ─────────────────────────────────── */}
-      <Link href="/nexus/health" className={cn('block rounded-xl border p-5 transition-all hover:scale-[1.005]', card, dark ? 'hover:border-amber-400/20' : 'hover:border-amber-300 hover:shadow-md')}>
+      <Link href="/nexus/health" className={cn('block rounded-xl border p-5 transition-all hover:scale-[1.005]', card, dark ? 'hover:border-amber-400/20' : 'hover:border-amber-500/30 hover:shadow-md')}>
         <div className="flex items-center gap-2 mb-4">
           <Server className={cn('h-5 w-5', dark ? 'text-amber-400/50' : 'text-amber-500')} />
           <span className={cn('text-sm font-semibold uppercase tracking-wider', sub)}>System Metrics</span>
@@ -190,9 +190,9 @@ export default function NexusDashboardPage() {
         ].map((kpi) => {
           const Icon = kpi.icon
           return (
-            <Link key={kpi.label} href={kpi.href} className={cn('group rounded-xl border p-6 transition-all hover:scale-[1.02] cursor-pointer', card, dark ? 'hover:border-amber-400/20' : 'hover:border-amber-300 hover:shadow-md')}>
+            <Link key={kpi.label} href={kpi.href} className={cn('group rounded-xl border p-6 transition-all hover:scale-[1.02] cursor-pointer', card, dark ? 'hover:border-amber-400/20' : 'hover:border-amber-500/30 hover:shadow-md')}>
               <div className="flex items-start justify-between mb-4">
-                <div className={cn('flex h-12 w-12 items-center justify-center rounded-xl', dark ? 'bg-amber-400/[0.08]' : 'bg-amber-50')}>
+                <div className={cn('flex h-12 w-12 items-center justify-center rounded-xl', dark ? 'bg-amber-400/[0.08]' : 'bg-amber-950/30')}>
                   <Icon className={cn('h-6 w-6', dark ? 'text-amber-400/60' : 'text-amber-600')} />
                 </div>
                 <Spark values={kpi.spark} dark={dark} />
@@ -211,7 +211,7 @@ export default function NexusDashboardPage() {
       {/* ── Tier Distribution Row ────────────────────────────────────── */}
       <div className="grid gap-4 lg:grid-cols-[260px_1fr]">
         {/* Donut */}
-        <Link href="/nexus/features" className={cn('rounded-xl border p-6 flex flex-col items-center transition-all hover:scale-[1.02]', card, dark ? 'hover:border-amber-400/20' : 'hover:border-amber-300 hover:shadow-md')}>
+        <Link href="/nexus/features" className={cn('rounded-xl border p-6 flex flex-col items-center transition-all hover:scale-[1.02]', card, dark ? 'hover:border-amber-400/20' : 'hover:border-amber-500/30 hover:shadow-md')}>
           <span className={cn('text-sm font-semibold uppercase tracking-wider mb-5', sub)}>Tier Breakdown</span>
           <Donut dark={dark} segments={o.tier_coverage.map((t) => ({ value: t.tenant_count, colour: t.colour, label: t.label }))} />
           <div className="mt-5 space-y-2.5 w-full">
@@ -234,7 +234,7 @@ export default function NexusDashboardPage() {
               starter: <Zap className="h-5 w-5" />, professional: <Rocket className="h-5 w-5" />, enterprise: <Crown className="h-5 w-5" />,
             }
             return (
-              <Link href="/nexus/features" key={tier.tier} className={cn('rounded-xl border p-5 flex flex-col justify-between transition-all hover:scale-[1.02]', card, dark ? 'hover:border-amber-400/20' : 'hover:border-amber-300 hover:shadow-md')}>
+              <Link href="/nexus/features" key={tier.tier} className={cn('rounded-xl border p-5 flex flex-col justify-between transition-all hover:scale-[1.02]', card, dark ? 'hover:border-amber-400/20' : 'hover:border-amber-500/30 hover:shadow-md')}>
                 <div>
                   <div className="flex h-11 w-11 items-center justify-center rounded-xl mb-3"
                     style={{ backgroundColor: tier.colour + '15', color: tier.colour }}>

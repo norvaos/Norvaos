@@ -222,7 +222,7 @@ function SortableStageRow({
             </Badge>
           )}
           {stage.is_lost_stage && (
-            <Badge variant="secondary" className="gap-1 text-[10px] text-red-400 bg-red-950/30 border-red-200">
+            <Badge variant="secondary" className="gap-1 text-[10px] text-red-400 bg-red-950/30 border-red-500/20">
               <XCircle className="h-3 w-3" />
               Lost
             </Badge>
@@ -956,8 +956,8 @@ function PipelineCard({
               className={cn(
                 'text-[10px]',
                 pipeline.pipeline_type === 'lead'
-                  ? 'bg-blue-950/30 text-blue-400 border-blue-200'
-                  : 'bg-purple-950/30 text-purple-400 border-purple-200'
+                  ? 'bg-blue-950/30 text-blue-400 border-blue-500/20'
+                  : 'bg-purple-950/30 text-purple-400 border-purple-500/20'
               )}
             >
               {pipeline.pipeline_type === 'lead' ? 'Lead' : 'Matter'}

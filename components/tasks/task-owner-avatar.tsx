@@ -53,7 +53,7 @@ export function TaskOwnerAvatar({ userId, users }: TaskOwnerAvatarProps) {
   if (!userId) {
     return (
       <div className="flex h-7 shrink-0 items-center">
-        <span className="inline-flex items-center rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-[10px] font-medium text-amber-600">
+        <span className="inline-flex items-center rounded-full border border-amber-500/20 bg-amber-950/30 px-2 py-0.5 text-[10px] font-medium text-amber-600">
           Unassigned
         </span>
       </div>

@@ -92,19 +92,19 @@ function UrgencyIndicators({ item }: { item: ReviewQueueItem }) {
         </Badge>
       )}
       {item.pendingReviewCount > 0 && (
-        <Badge variant="outline" className="flex items-centre gap-1 border-blue-300 text-blue-600 text-xs">
+        <Badge variant="outline" className="flex items-centre gap-1 border-blue-500/30 text-blue-600 text-xs">
           <FileText className="h-3 w-3" />
           {item.pendingReviewCount}
         </Badge>
       )}
       {item.deficientCount > 0 && (
-        <Badge variant="outline" className="flex items-centre gap-1 border-orange-300 text-orange-600 text-xs">
+        <Badge variant="outline" className="flex items-centre gap-1 border-orange-500/30 text-orange-600 text-xs">
           <AlertCircle className="h-3 w-3" />
           {item.deficientCount}
         </Badge>
       )}
       {item.stalePacks > 0 && (
-        <Badge variant="outline" className="flex items-centre gap-1 border-red-300 text-red-600 text-xs">
+        <Badge variant="outline" className="flex items-centre gap-1 border-red-500/30 text-red-600 text-xs">
           <XCircle className="h-3 w-3" />
           {item.stalePacks} stale
         </Badge>

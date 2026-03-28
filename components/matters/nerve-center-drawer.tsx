@@ -447,7 +447,7 @@ export function NerveCenterDrawer({
                       className={cn(
                         'flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-medium transition-all whitespace-nowrap',
                         active
-                          ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 ring-1 ring-emerald-500/30'
+                          ? 'bg-emerald-500/15 text-emerald-400 dark:text-emerald-300 ring-1 ring-emerald-500/30'
                           : 'bg-gray-100 dark:bg-white/[0.06] text-gray-500 dark:text-white/40 hover:bg-gray-200 dark:hover:bg-white/[0.1]',
                       )}
                     >

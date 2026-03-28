@@ -222,7 +222,7 @@ function RetainerFeeCard({
         </h3>
         <button
           onClick={() => setExpanded((p) => !p)}
-          className="text-[11px] text-blue-600 hover:text-blue-800"
+          className="text-[11px] text-blue-600 hover:text-blue-400"
         >
           {expanded ? 'Hide details' : 'View details'}
         </button>
@@ -357,7 +357,7 @@ function InvoiceRow({
       className={cn(
         'rounded-2xl border p-4 backdrop-blur-sm transition-all',
         invoice.isOverdue
-          ? 'border-red-200/60 bg-gradient-to-br from-red-50/50 to-white shadow-sm shadow-red-100/30'
+          ? 'border-red-500/20/60 bg-gradient-to-br from-red-50/50 to-white shadow-sm shadow-red-100/30'
           : 'border-slate-200/60 bg-gradient-to-br from-slate-50/30 to-white',
       )}
     >
@@ -368,12 +368,12 @@ function InvoiceRow({
               {t(tr.payment_invoice ?? 'Invoice #{number}', { number: invoice.invoiceNumber })}
             </span>
             {invoice.isOverdue && (
-              <span className="rounded-full bg-red-100 border border-red-200 px-2 py-0.5 text-[10px] font-semibold text-red-400 uppercase">
+              <span className="rounded-full bg-red-950/40 border border-red-500/20 px-2 py-0.5 text-[10px] font-semibold text-red-400 uppercase">
                 {tr.payment_overdue_badge ?? 'Overdue'}
               </span>
             )}
             {isPaidInFull && (
-              <span className="rounded-full bg-green-100 border border-green-200 px-2 py-0.5 text-[10px] font-semibold text-emerald-400 uppercase">
+              <span className="rounded-full bg-emerald-950/40 border border-emerald-500/20 px-2 py-0.5 text-[10px] font-semibold text-emerald-400 uppercase">
                 {tr.payment_paid_in_full ?? 'Paid in full'}
               </span>
             )}
@@ -433,7 +433,7 @@ function InvoiceRow({
               <button
                 onClick={handleMarkSent}
                 disabled={marking}
-                className="text-xs font-medium text-blue-600 hover:text-blue-800 transition-colors disabled:opacity-50"
+                className="text-xs font-medium text-blue-600 hover:text-blue-400 transition-colors disabled:opacity-50"
               >
                 {marking ? '...' : (tr.payment_mark_sent_button ?? "I've sent an e-transfer")}
               </button>

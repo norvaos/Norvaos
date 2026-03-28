@@ -118,7 +118,7 @@ function SidebarLink({
         </span>
       )}
       {!collapsed && item.deprecated && (
-        <span className="ml-auto rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-medium text-amber-600">
+        <span className="ml-auto rounded bg-amber-950/40 px-1.5 py-0.5 text-[10px] font-medium text-amber-600">
           Legacy
         </span>
       )}

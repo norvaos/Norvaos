@@ -47,32 +47,32 @@ const STATUS_CONFIG: Record<
   in_progress: {
     label: 'In Progress',
     variant: 'outline',
-    className: 'border-blue-300 text-blue-400 bg-blue-950/30',
+    className: 'border-blue-500/30 text-blue-400 bg-blue-950/30',
   },
   ready_for_review: {
     label: 'Submitted',
     variant: 'outline',
-    className: 'border-amber-300 text-amber-400 bg-amber-950/30',
+    className: 'border-amber-500/30 text-amber-400 bg-amber-950/30',
   },
   approved: {
     label: 'Approved',
     variant: 'outline',
-    className: 'border-green-300 text-emerald-400 bg-emerald-950/30',
+    className: 'border-emerald-500/30 text-emerald-400 bg-emerald-950/30',
   },
   rejected: {
     label: 'Needs Revision',
     variant: 'outline',
-    className: 'border-red-300 text-red-400 bg-red-950/30',
+    className: 'border-red-500/30 text-red-400 bg-red-950/30',
   },
   generated: {
     label: 'Generated',
     variant: 'outline',
-    className: 'border-green-300 text-emerald-400 bg-emerald-950/30',
+    className: 'border-emerald-500/30 text-emerald-400 bg-emerald-950/30',
   },
   submitted: {
     label: 'Submitted',
     variant: 'outline',
-    className: 'border-green-300 text-emerald-400 bg-emerald-950/30',
+    className: 'border-emerald-500/30 text-emerald-400 bg-emerald-950/30',
   },
 }
 

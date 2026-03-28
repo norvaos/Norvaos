@@ -75,8 +75,8 @@ export default function OnboardingGatePage() {
 
       {/* Resume banner */}
       {hasProgress && wizard?.mode === 'custom' && (
-        <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-2 text-sm text-amber-800">
+        <div className="rounded-lg border border-amber-500/20 bg-amber-950/30 px-4 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-2 text-sm text-amber-400">
             <Clock className="h-4 w-4 shrink-0" />
             <span>
               You have an unfinished custom setup  -  step {(wizard.current_step ?? 0) + 1} of 15.
@@ -85,7 +85,7 @@ export default function OnboardingGatePage() {
           <Button
             size="sm"
             variant="outline"
-            className="text-amber-800 border-amber-300 hover:bg-amber-100"
+            className="text-amber-400 border-amber-500/30 hover:bg-amber-950/40"
             onClick={() => router.push('/onboarding/wizard')}
           >
             Resume
@@ -99,10 +99,10 @@ export default function OnboardingGatePage() {
         {/* Default Setup */}
         <PathCard
           icon={Zap}
-          iconClass="text-emerald-600 bg-emerald-50"
+          iconClass="text-emerald-600 bg-emerald-950/30"
           title="Default Setup"
           badge="Recommended  -  ready in seconds"
-          badgeClass="bg-emerald-100 text-emerald-700"
+          badgeClass="bg-emerald-950/40 text-emerald-400"
           description="Apply a safe, opinionated baseline configuration immediately. You can customise everything later from Settings."
           includes={DEFAULT_INCLUDES}
           includesLabel="Configures:"
@@ -229,7 +229,7 @@ function AlreadyActivated({
   return (
     <div className="max-w-lg mx-auto text-center space-y-6">
       <div className="flex justify-center">
-        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100">
+        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-950/40">
           <CheckCircle2 className="h-9 w-9 text-emerald-600" />
         </div>
       </div>

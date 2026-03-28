@@ -559,7 +559,7 @@ function TourOverlay({
               'rounded-2xl border-2 p-4 mb-4',
               isDark
                 ? 'bg-amber-500/[0.06] border-amber-500/20'
-                : 'bg-amber-50 border-amber-200',
+                : 'bg-amber-950/30 border-amber-500/20',
             )}>
               <div className="flex items-start gap-2.5">
                 <Scale className={cn(
@@ -569,13 +569,13 @@ function TourOverlay({
                 <div>
                   <p className={cn(
                     'text-[10px] font-bold uppercase tracking-wider mb-1',
-                    isDark ? 'text-amber-400/70' : 'text-amber-700',
+                    isDark ? 'text-amber-400/70' : 'text-amber-400',
                   )}>
                     Regulatory Compliance Note
                   </p>
                   <p className={cn(
                     'text-xs leading-relaxed',
-                    isDark ? 'text-amber-300/60' : 'text-amber-800/80',
+                    isDark ? 'text-amber-300/60' : 'text-amber-400/80',
                   )}>
                     {tourStep.complianceNote}
                   </p>

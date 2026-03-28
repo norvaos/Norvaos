@@ -173,7 +173,7 @@ export function ReturnForCorrectionModal({
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="max-w-lg">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-amber-700">
+          <DialogTitle className="flex items-center gap-2 text-amber-400">
             <AlertTriangle className="h-5 w-5" />
             Return for Correction
           </DialogTitle>

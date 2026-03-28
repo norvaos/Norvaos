@@ -160,7 +160,7 @@ export function KioskIdScanner({
   if (mode === 'done') {
     return (
       <div className="flex flex-col items-center gap-4 py-8">
-        <div className="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center">
+        <div className="w-16 h-16 rounded-full bg-emerald-950/40 flex items-center justify-center">
           <Check className="w-8 h-8 text-emerald-600" />
         </div>
         <p className="text-lg font-medium text-slate-900">ID scan uploaded successfully</p>

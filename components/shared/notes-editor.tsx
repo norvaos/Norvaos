@@ -133,7 +133,7 @@ export function NotesEditor({ tenantId, matterId, contactId, leadId }: NotesEdit
             <div
               key={note.id}
               className={`p-3 rounded-lg border ${
-                note.is_pinned ? 'border-amber-200 bg-amber-50/50' : 'bg-white'
+                note.is_pinned ? 'border-amber-500/20 bg-amber-950/30/50' : 'bg-white'
               }`}
             >
               {editingId === note.id ? (

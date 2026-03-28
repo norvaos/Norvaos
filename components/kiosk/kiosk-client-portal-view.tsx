@@ -61,10 +61,10 @@ interface KioskClientPortalViewProps {
 
 function statusBadge(status: string) {
   const map: Record<string, { label: string; cls: string }> = {
-    active:      { label: 'Active',      cls: 'bg-emerald-100 text-emerald-700' },
-    open:        { label: 'Open',        cls: 'bg-emerald-100 text-emerald-700' },
-    in_progress: { label: 'In Progress', cls: 'bg-blue-100 text-blue-700' },
-    pending:     { label: 'Pending',     cls: 'bg-amber-100 text-amber-700' },
+    active:      { label: 'Active',      cls: 'bg-emerald-950/40 text-emerald-400' },
+    open:        { label: 'Open',        cls: 'bg-emerald-950/40 text-emerald-400' },
+    in_progress: { label: 'In Progress', cls: 'bg-blue-950/40 text-blue-400' },
+    pending:     { label: 'Pending',     cls: 'bg-amber-950/40 text-amber-400' },
     closed_won:  { label: 'Closed',      cls: 'bg-slate-100 text-slate-600' },
     closed:      { label: 'Closed',      cls: 'bg-slate-100 text-slate-600' },
   }
@@ -74,11 +74,11 @@ function statusBadge(status: string) {
 
 function docStatusBadge(status: string) {
   const map: Record<string, { label: string; cls: string }> = {
-    empty:          { label: 'Not uploaded',       cls: 'bg-amber-50 text-amber-700 border-amber-200' },
-    pending_review: { label: 'Under review',       cls: 'bg-blue-50 text-blue-700 border-blue-200' },
-    accepted:       { label: 'Accepted',           cls: 'bg-green-50 text-green-700 border-green-200' },
-    needs_re_upload:{ label: 'Re-upload needed',   cls: 'bg-orange-50 text-orange-700 border-orange-200' },
-    rejected:       { label: 'Re-upload needed',   cls: 'bg-red-50 text-red-700 border-red-200' },
+    empty:          { label: 'Not uploaded',       cls: 'bg-amber-950/30 text-amber-400 border-amber-500/20' },
+    pending_review: { label: 'Under review',       cls: 'bg-blue-950/30 text-blue-400 border-blue-500/20' },
+    accepted:       { label: 'Accepted',           cls: 'bg-emerald-950/30 text-emerald-400 border-emerald-500/20' },
+    needs_re_upload:{ label: 'Re-upload needed',   cls: 'bg-orange-950/30 text-orange-400 border-orange-500/20' },
+    rejected:       { label: 'Re-upload needed',   cls: 'bg-red-950/30 text-red-400 border-red-500/20' },
   }
   return map[status] ?? { label: status, cls: 'bg-slate-50 text-slate-600 border-slate-200' }
 }
@@ -207,16 +207,16 @@ function SummaryTab({ matter, primaryColor, locale }: {
 
       {/* Action items summary */}
       {hasPending && (
-        <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 space-y-2">
-          <p className="text-sm font-semibold text-amber-800">Action Items</p>
+        <div className="bg-amber-950/30 border border-amber-500/20 rounded-2xl p-4 space-y-2">
+          <p className="text-sm font-semibold text-amber-400">Action Items</p>
           {matter.pendingDocuments > 0 && (
-            <div className="flex items-center gap-2 text-sm text-amber-700">
+            <div className="flex items-center gap-2 text-sm text-amber-400">
               <AlertCircle className="w-4 h-4 flex-shrink-0" />
               <span>{interpolate(getKioskTranslations(locale).returning_client_pending_docs, { count: String(matter.pendingDocuments) })}</span>
             </div>
           )}
           {matter.pendingTasks > 0 && (
-            <div className="flex items-center gap-2 text-sm text-amber-700">
+            <div className="flex items-center gap-2 text-sm text-amber-400">
               <ClipboardList className="w-4 h-4 flex-shrink-0" />
               <span>{interpolate(getKioskTranslations(locale).returning_client_pending_tasks, { count: String(matter.pendingTasks) })}</span>
             </div>
@@ -248,7 +248,7 @@ function TasksTab({ tasks }: { tasks: KioskTask[] }) {
     return (
       <div
         key={task.id}
-        className={`bg-white rounded-xl border p-4 ${overdue ? 'border-red-200' : 'border-slate-200'}`}
+        className={`bg-white rounded-xl border p-4 ${overdue ? 'border-red-500/20' : 'border-slate-200'}`}
       >
         <div className="flex items-start gap-3">
           <div className={`mt-0.5 w-2.5 h-2.5 rounded-full flex-shrink-0 ${taskStatusDot(task.status)}`} />
@@ -332,7 +332,7 @@ function DocumentsTab({ slots }: { slots: KioskDocumentSlot[] }) {
               <p className="text-xs text-slate-500 mt-0.5">{slot.description}</p>
             )}
             {slot.latest_review_reason && (needsUpload) && (
-              <p className="text-xs text-orange-700 bg-orange-50 border border-orange-200 rounded-md px-2 py-1 mt-2">
+              <p className="text-xs text-orange-400 bg-orange-950/30 border border-orange-500/20 rounded-md px-2 py-1 mt-2">
                 Reason: {slot.latest_review_reason}
               </p>
             )}

@@ -337,8 +337,8 @@ export function ConversionDialog({ open, onOpenChange }: ConversionDialogProps) 
                 variant="outline"
                 className={`ml-auto text-[9px] ${
                   gates.jurisdictionSet
-                    ? 'border-green-300 bg-emerald-950/30 text-emerald-400'
-                    : 'border-red-300 bg-red-950/30 text-red-400'
+                    ? 'border-emerald-500/30 bg-emerald-950/30 text-emerald-400'
+                    : 'border-red-500/30 bg-red-950/30 text-red-400'
                 }`}
               >
                 {gates.jurisdictionSet ? (regBody?.abbr ?? 'SET') : 'NOT SET'}
@@ -361,8 +361,8 @@ export function ConversionDialog({ open, onOpenChange }: ConversionDialogProps) 
                 variant="outline"
                 className={`ml-auto text-[9px] ${
                   gates.idVerified
-                    ? 'border-green-300 bg-emerald-950/30 text-emerald-400'
-                    : 'border-red-300 bg-red-950/30 text-red-400'
+                    ? 'border-emerald-500/30 bg-emerald-950/30 text-emerald-400'
+                    : 'border-red-500/30 bg-red-950/30 text-red-400'
                 }`}
               >
                 {gates.idVerified ? 'VERIFIED' : 'REQUIRED'}
@@ -385,8 +385,8 @@ export function ConversionDialog({ open, onOpenChange }: ConversionDialogProps) 
                 variant="outline"
                 className={`ml-auto text-[9px] ${
                   gates.conflictPassed
-                    ? 'border-green-300 bg-emerald-950/30 text-emerald-400'
-                    : 'border-red-300 bg-red-950/30 text-red-400'
+                    ? 'border-emerald-500/30 bg-emerald-950/30 text-emerald-400'
+                    : 'border-red-500/30 bg-red-950/30 text-red-400'
                 }`}
               >
                 {gates.conflictPassed ? 'PASSED' : conflictStatus === 'not_run' ? 'NOT RUN' : 'BLOCKED'}
@@ -407,7 +407,7 @@ export function ConversionDialog({ open, onOpenChange }: ConversionDialogProps) 
 
           {/* Block message */}
           {!gatesLoading && !gates.canConvert && (
-            <div className="mt-2 rounded-md border border-red-200 bg-red-950/30 px-3 py-2 flex items-start gap-2">
+            <div className="mt-2 rounded-md border border-red-500/20 bg-red-950/30 px-3 py-2 flex items-start gap-2">
               <Lock className="mt-0.5 size-3.5 text-red-600 shrink-0" />
               <p className="text-[11px] text-red-400 font-medium">
                 {gates.blockReason}
@@ -420,17 +420,17 @@ export function ConversionDialog({ open, onOpenChange }: ConversionDialogProps) 
         {!gatesLoading && (() => {
           const configs: Record<string, { icon: typeof ShieldCheck; color: string; bg: string; border: string; label: string; message: string }> = {
             auto_scan_complete: {
-              icon: ShieldCheck, color: 'text-emerald-400', bg: 'bg-emerald-950/30', border: 'border-green-200',
+              icon: ShieldCheck, color: 'text-emerald-400', bg: 'bg-emerald-950/30', border: 'border-emerald-500/20',
               label: 'Conflict Check: Clear',
               message: 'No conflicts found. This matter can proceed.',
             },
             review_suggested: {
-              icon: ShieldAlert, color: 'text-amber-400', bg: 'bg-amber-950/30', border: 'border-amber-200',
+              icon: ShieldAlert, color: 'text-amber-400', bg: 'bg-amber-950/30', border: 'border-amber-500/20',
               label: 'Conflict Check: Review Suggested',
               message: `Score ${conflictScore}/100  -  minor potential matches found. Proceed with caution.`,
             },
             cleared_by_lawyer: {
-              icon: ShieldCheck, color: 'text-emerald-400', bg: 'bg-emerald-950/30', border: 'border-green-200',
+              icon: ShieldCheck, color: 'text-emerald-400', bg: 'bg-emerald-950/30', border: 'border-emerald-500/20',
               label: 'Conflict Check: Cleared by Lawyer',
               message: 'A lawyer has reviewed and cleared this conflict check.',
             },
@@ -440,17 +440,17 @@ export function ConversionDialog({ open, onOpenChange }: ConversionDialogProps) 
               message: 'A conflict waiver has been obtained.',
             },
             review_required: {
-              icon: ShieldAlert, color: 'text-red-400', bg: 'bg-red-950/30', border: 'border-red-200',
+              icon: ShieldAlert, color: 'text-red-400', bg: 'bg-red-950/30', border: 'border-red-500/20',
               label: 'Conflict Check: Review Required',
               message: `Score ${conflictScore}/100  -  potential conflicts detected. Blocked until reviewed.`,
             },
             conflict_confirmed: {
-              icon: ShieldX, color: 'text-red-400', bg: 'bg-red-950/30', border: 'border-red-200',
+              icon: ShieldX, color: 'text-red-400', bg: 'bg-red-950/30', border: 'border-red-500/20',
               label: 'Conflict of Interest Confirmed',
               message: 'A conflict of interest has been confirmed. This matter cannot be opened.',
             },
             blocked: {
-              icon: ShieldX, color: 'text-red-400', bg: 'bg-red-950/30', border: 'border-red-200',
+              icon: ShieldX, color: 'text-red-400', bg: 'bg-red-950/30', border: 'border-red-500/20',
               label: 'Matter Blocked',
               message: 'This matter is blocked due to a conflict of interest.',
             },
@@ -476,8 +476,8 @@ export function ConversionDialog({ open, onOpenChange }: ConversionDialogProps) 
         })()}
 
         {/* What will happen */}
-        <div className="rounded-lg border bg-emerald-950/30/50 border-green-200 p-3 space-y-1.5">
-          <p className="text-xs font-medium text-green-800">This will:</p>
+        <div className="rounded-lg border bg-emerald-950/30/50 border-emerald-500/20 p-3 space-y-1.5">
+          <p className="text-xs font-medium text-emerald-400">This will:</p>
           <div className="grid grid-cols-1 gap-1 text-xs text-emerald-400">
             <span className="flex items-center gap-1.5">
               <CheckCircle2 className="h-3 w-3 shrink-0" /> Create matter record
@@ -611,7 +611,7 @@ export function ConversionDialog({ open, onOpenChange }: ConversionDialogProps) 
 
         {/* Error */}
         {error && (
-          <div className="flex items-start gap-2 rounded-md border border-red-200 bg-red-950/30 px-3 py-2">
+          <div className="flex items-start gap-2 rounded-md border border-red-500/20 bg-red-950/30 px-3 py-2">
             <AlertTriangle className="mt-0.5 h-4 w-4 text-red-500 shrink-0" />
             <div className="space-y-1">
               <p className="text-xs text-red-400 font-medium">{error}</p>
@@ -632,7 +632,7 @@ export function ConversionDialog({ open, onOpenChange }: ConversionDialogProps) 
           </Button>
           {/* Red-Gate Protocol: DOM-unmount claimVaultDrops button when conflict detected (Directive 41.2) */}
           {!gatesLoading && !gates.canConvert ? (
-            <div className="flex items-center gap-2 rounded-md border border-red-200 bg-red-950/30 px-3 py-2 animate-pulse-red-35">
+            <div className="flex items-center gap-2 rounded-md border border-red-500/20 bg-red-950/30 px-3 py-2 animate-pulse-red-35">
               <Lock className="h-4 w-4 text-red-600" />
               <span className="text-xs font-semibold text-red-400">Sovereign Block  -  Conversion Locked</span>
             </div>

@@ -136,7 +136,7 @@ export function KioskIdentityVerify({
       </div>
 
       {error && (
-        <div className="flex items-center gap-2 text-red-600 bg-red-50 px-4 py-3 rounded-lg w-full">
+        <div className="flex items-center gap-2 text-red-600 bg-red-950/30 px-4 py-3 rounded-lg w-full">
           <AlertCircle className="w-5 h-5 flex-shrink-0" />
           <p className="text-sm">{error}</p>
         </div>

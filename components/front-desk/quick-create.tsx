@@ -142,7 +142,7 @@ function CountryPicker({ value, onChange }: { value: string; onChange: (v: strin
         </div>
       )}
       {value && !search && (
-        <p className="text-xs text-green-700 font-medium">✓ {value}</p>
+        <p className="text-xs text-emerald-400 font-medium">✓ {value}</p>
       )}
     </div>
   )
@@ -248,8 +248,8 @@ function ScreeningQuestions({
                     className={`rounded-lg border-2 py-2.5 text-sm font-semibold transition-all ${
                       sel
                         ? val === 'yes'
-                          ? 'border-green-500 bg-green-50 text-green-700'
-                          : 'border-red-400 bg-red-50 text-red-700'
+                          ? 'border-green-500 bg-emerald-950/30 text-emerald-400'
+                          : 'border-red-400 bg-red-950/30 text-red-400'
                         : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'
                     }`}
                   >
@@ -272,7 +272,7 @@ function ScreeningQuestions({
                     onClick={() => { onAnswer(q.id, opt.value); if (!isLast) setTimeout(goNext, 180) }}
                     className={`w-full text-left rounded-md border px-3 py-2 text-sm transition-all ${
                       sel
-                        ? 'border-blue-500 bg-blue-50 text-blue-700 font-medium'
+                        ? 'border-blue-500 bg-blue-950/30 text-blue-400 font-medium'
                         : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50'
                     }`}
                   >
@@ -299,7 +299,7 @@ function ScreeningQuestions({
                     }}
                     className={`w-full text-left rounded-md border px-3 py-2 text-sm transition-all ${
                       sel
-                        ? 'border-blue-500 bg-blue-50 text-blue-700 font-medium'
+                        ? 'border-blue-500 bg-blue-950/30 text-blue-400 font-medium'
                         : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300'
                     }`}
                   >
@@ -874,7 +874,7 @@ export function QuickCreate({ onCreated }: QuickCreateProps) {
                   onClick={() => updateStep2('entityType', 'lead')}
                   className={`flex flex-col items-center gap-1 rounded-lg border-2 p-4 text-sm font-medium transition-colors ${
                     step2.entityType === 'lead'
-                      ? 'border-blue-600 bg-blue-50 text-blue-700'
+                      ? 'border-blue-600 bg-blue-950/30 text-blue-400'
                       : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'
                   }`}
                 >
@@ -898,9 +898,9 @@ export function QuickCreate({ onCreated }: QuickCreateProps) {
 
             {/* Contact-only: retaining toggle */}
             {step2.entityType === 'contact' && (
-              <div className="flex items-center justify-between rounded-lg border border-amber-200 bg-amber-50 p-3">
+              <div className="flex items-center justify-between rounded-lg border border-amber-500/20 bg-amber-950/30 p-3">
                 <div>
-                  <Label htmlFor="qc-retaining" className="cursor-pointer text-amber-800 font-medium">
+                  <Label htmlFor="qc-retaining" className="cursor-pointer text-amber-400 font-medium">
                     Retaining for services?
                   </Label>
                   <p className="text-xs text-amber-600 mt-0.5">

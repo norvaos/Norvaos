@@ -29,10 +29,10 @@ import { frontDeskKeys } from '@/lib/queries/front-desk-queries'
 
 const OUTCOMES = [
   { value: 'connected',    label: 'Connected',    icon: Phone,       color: 'border-emerald-500/30 text-emerald-400 hover:bg-emerald-950/30',  activeColor: 'bg-emerald-600 text-white border-emerald-600' },
-  { value: 'no_answer',   label: 'No Answer',    icon: PhoneOff,    color: 'border-amber-300  text-amber-400  hover:bg-amber-950/30',     activeColor: 'bg-amber-600  text-white border-amber-600' },
-  { value: 'voicemail',   label: 'Voicemail',    icon: Voicemail,   color: 'border-blue-300   text-blue-400   hover:bg-blue-950/30',      activeColor: 'bg-blue-600   text-white border-blue-600' },
-  { value: 'busy',        label: 'Busy',         icon: PhoneMissed, color: 'border-orange-300 text-orange-400 hover:bg-orange-950/30',    activeColor: 'bg-orange-600 text-white border-orange-600' },
-  { value: 'wrong_number',label: 'Wrong #',      icon: XCircle,     color: 'border-red-300    text-red-400    hover:bg-red-950/30',       activeColor: 'bg-red-600    text-white border-red-600' },
+  { value: 'no_answer',   label: 'No Answer',    icon: PhoneOff,    color: 'border-amber-500/30  text-amber-400  hover:bg-amber-950/30',     activeColor: 'bg-amber-600  text-white border-amber-600' },
+  { value: 'voicemail',   label: 'Voicemail',    icon: Voicemail,   color: 'border-blue-500/30   text-blue-400   hover:bg-blue-950/30',      activeColor: 'bg-blue-600   text-white border-blue-600' },
+  { value: 'busy',        label: 'Busy',         icon: PhoneMissed, color: 'border-orange-500/30 text-orange-400 hover:bg-orange-950/30',    activeColor: 'bg-orange-600 text-white border-orange-600' },
+  { value: 'wrong_number',label: 'Wrong #',      icon: XCircle,     color: 'border-red-500/30    text-red-400    hover:bg-red-950/30',       activeColor: 'bg-red-600    text-white border-red-600' },
 ]
 
 // Quick-action tags that can be appended to notes for fast logging

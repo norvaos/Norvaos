@@ -316,7 +316,7 @@ export function GenerationBlockerPanel({
             {validationSummary.missing_required > 0 && (
               <Badge
                 variant="outline"
-                className="text-[10px] py-0 px-1.5 border-red-300 text-red-600 bg-red-950/30"
+                className="text-[10px] py-0 px-1.5 border-red-500/30 text-red-600 bg-red-950/30"
               >
                 {validationSummary.missing_required} missing
               </Badge>
@@ -324,7 +324,7 @@ export function GenerationBlockerPanel({
             {validationSummary.stale > 0 && (
               <Badge
                 variant="outline"
-                className="text-[10px] py-0 px-1.5 border-amber-300 text-amber-600 bg-amber-950/30"
+                className="text-[10px] py-0 px-1.5 border-amber-500/30 text-amber-600 bg-amber-950/30"
               >
                 {validationSummary.stale} stale
               </Badge>
@@ -332,7 +332,7 @@ export function GenerationBlockerPanel({
             {validationSummary.pattern_errors > 0 && (
               <Badge
                 variant="outline"
-                className="text-[10px] py-0 px-1.5 border-orange-300 text-orange-600 bg-orange-950/30"
+                className="text-[10px] py-0 px-1.5 border-orange-500/30 text-orange-600 bg-orange-950/30"
               >
                 {validationSummary.pattern_errors} format errors
               </Badge>
@@ -340,7 +340,7 @@ export function GenerationBlockerPanel({
             {validationSummary.composite_failures > 0 && (
               <Badge
                 variant="outline"
-                className="text-[10px] py-0 px-1.5 border-purple-300 text-purple-600 bg-purple-950/30"
+                className="text-[10px] py-0 px-1.5 border-purple-500/30 text-purple-600 bg-purple-950/30"
               >
                 {validationSummary.composite_failures} rule failures
               </Badge>
@@ -348,7 +348,7 @@ export function GenerationBlockerPanel({
             {readiness.unresolved_conflicts.length > 0 && (
               <Badge
                 variant="outline"
-                className="text-[10px] py-0 px-1.5 border-orange-300 text-orange-600 bg-orange-950/30"
+                className="text-[10px] py-0 px-1.5 border-orange-500/30 text-orange-600 bg-orange-950/30"
               >
                 {readiness.unresolved_conflicts.length} conflicts
               </Badge>

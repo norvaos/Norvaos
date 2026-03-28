@@ -52,16 +52,16 @@ export function TrustStatusIndicator({
 
   const colorMap = {
     healthy: {
-      badge: 'bg-green-50 text-green-700 border-green-200',
+      badge: 'bg-emerald-950/30 text-emerald-400 border-emerald-500/20',
       icon: 'text-green-600',
     },
     warning: {
-      badge: 'bg-red-50 text-red-700 border-red-200',
+      badge: 'bg-red-950/30 text-red-400 border-red-500/20',
       icon: 'text-red-600',
     },
     critical: {
-      badge: 'bg-red-100 text-red-800 border-red-300',
-      icon: 'text-red-700',
+      badge: 'bg-red-950/40 text-red-400 border-red-500/30',
+      icon: 'text-red-400',
     },
   }
 

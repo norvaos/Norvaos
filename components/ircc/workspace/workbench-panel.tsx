@@ -240,7 +240,7 @@ function FieldRow({
             'w-full text-xs px-2 py-1 rounded border bg-background transition-colors',
             'focus:outline-none focus:ring-1 focus:ring-primary/40',
             isDirty && 'border-amber-400 bg-amber-950/30',
-            isVerified && !isDirty && 'border-green-300 bg-emerald-950/20',
+            isVerified && !isDirty && 'border-emerald-500/30 bg-emerald-950/20',
             isLocked && 'bg-muted cursor-not-allowed opacity-60',
           )}
         />
@@ -324,8 +324,8 @@ function SectionBlock({ section, profile, ver, isLocked, savingPaths, onSave, on
             variant="outline"
             className={cn(
               'text-[10px] py-0 px-1.5 leading-4 border',
-              pct === 100 ? 'border-green-300 text-emerald-400 bg-emerald-950/30' :
-              pct > 0     ? 'border-blue-300 text-blue-400 bg-blue-950/30' :
+              pct === 100 ? 'border-emerald-500/30 text-emerald-400 bg-emerald-950/30' :
+              pct > 0     ? 'border-blue-500/30 text-blue-400 bg-blue-950/30' :
               'border-zinc-200 text-muted-foreground'
             )}
           >
@@ -554,7 +554,7 @@ export function WorkbenchPanel({
         </span>
         <div className="flex items-center gap-2">
           {isLocked && (
-            <Badge variant="outline" className="text-[10px] border-amber-300 text-amber-400 bg-amber-950/30">
+            <Badge variant="outline" className="text-[10px] border-amber-500/30 text-amber-400 bg-amber-950/30">
               <Lock className="h-2.5 w-2.5 mr-1" />
               Profile Locked
             </Badge>

@@ -163,9 +163,9 @@ function RetainerTimeline({
                 className={cn(
                   'w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-medium',
                   isCompleted
-                    ? 'bg-green-100 text-emerald-400'
+                    ? 'bg-emerald-950/40 text-emerald-400'
                     : isCurrent
-                      ? 'bg-blue-100 text-blue-400'
+                      ? 'bg-blue-950/40 text-blue-400'
                       : 'bg-slate-100 text-slate-400'
                 )}
               >
@@ -997,7 +997,7 @@ function RetainerBuilderContent() {
                   isAdded={isDisbursementAdded}
                   onToggle={toggleDisbursementPreset}
                   triggerLabel="Quick Add"
-                  triggerColor="text-purple-600 hover:text-purple-700"
+                  triggerColor="text-purple-600 hover:text-purple-400"
                   disabled={isReadOnly}
                 />
                 <Button

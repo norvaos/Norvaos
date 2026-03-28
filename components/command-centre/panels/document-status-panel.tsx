@@ -43,10 +43,10 @@ function useMatterDocumentSlots(matterId: string, tenantId: string) {
 // ─── Status config ──────────────────────────────────────────────────
 
 const SLOT_STATUS: Record<string, { label: string; icon: React.ReactNode; color: string }> = {
-  pending: { label: 'Pending', icon: <File className="h-3.5 w-3.5" />, color: 'text-amber-600 bg-amber-950/30 border-amber-200' },
-  uploaded: { label: 'Uploaded', icon: <FileCheck className="h-3.5 w-3.5" />, color: 'text-blue-600 bg-blue-950/30 border-blue-200' },
-  approved: { label: 'Approved', icon: <CheckCircle2 className="h-3.5 w-3.5" />, color: 'text-green-600 bg-emerald-950/30 border-green-200' },
-  rejected: { label: 'Rejected', icon: <FileX2 className="h-3.5 w-3.5" />, color: 'text-red-600 bg-red-950/30 border-red-200' },
+  pending: { label: 'Pending', icon: <File className="h-3.5 w-3.5" />, color: 'text-amber-600 bg-amber-950/30 border-amber-500/20' },
+  uploaded: { label: 'Uploaded', icon: <FileCheck className="h-3.5 w-3.5" />, color: 'text-blue-600 bg-blue-950/30 border-blue-500/20' },
+  approved: { label: 'Approved', icon: <CheckCircle2 className="h-3.5 w-3.5" />, color: 'text-green-600 bg-emerald-950/30 border-emerald-500/20' },
+  rejected: { label: 'Rejected', icon: <FileX2 className="h-3.5 w-3.5" />, color: 'text-red-600 bg-red-950/30 border-red-500/20' },
   not_applicable: { label: 'N/A', icon: <File className="h-3.5 w-3.5" />, color: 'text-slate-400 bg-slate-50 border-slate-200' },
 }
 
@@ -122,7 +122,7 @@ export function DocumentStatusPanel() {
 
             {/* Warnings */}
             {pending > 0 && (
-              <div className="flex items-center gap-2 p-2 bg-amber-950/30 rounded-md border border-amber-200">
+              <div className="flex items-center gap-2 p-2 bg-amber-950/30 rounded-md border border-amber-500/20">
                 <AlertTriangle className="h-4 w-4 text-amber-600 shrink-0" />
                 <span className="text-xs text-amber-400">
                   {pending} required document{pending > 1 ? 's' : ''} still pending
@@ -130,7 +130,7 @@ export function DocumentStatusPanel() {
               </div>
             )}
             {rejected > 0 && (
-              <div className="flex items-center gap-2 p-2 bg-red-950/30 rounded-md border border-red-200">
+              <div className="flex items-center gap-2 p-2 bg-red-950/30 rounded-md border border-red-500/20">
                 <FileX2 className="h-4 w-4 text-red-600 shrink-0" />
                 <span className="text-xs text-red-400">
                   {rejected} document{rejected > 1 ? 's' : ''} rejected  -  needs resubmission

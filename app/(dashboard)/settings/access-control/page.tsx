@@ -335,8 +335,8 @@ function GrantBreakGlassDialog({
         </DialogHeader>
 
         <div className="space-y-4 py-4">
-          <div className="rounded-md border border-amber-200 bg-amber-50 p-3">
-            <p className="text-xs text-amber-800">
+          <div className="rounded-md border border-amber-500/20 bg-amber-950/30 p-3">
+            <p className="text-xs text-amber-400">
               Break-glass access should only be used in emergencies. This action will be logged in the audit trail
               and all activity during the grant period will be tracked.
             </p>
@@ -534,7 +534,7 @@ export default function AccessControlSettingsPage() {
                       className="flex items-center justify-between rounded-lg border p-3"
                     >
                       <div className="flex items-center gap-3">
-                        <div className="flex size-8 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
+                        <div className="flex size-8 items-center justify-center rounded-lg bg-blue-950/30 text-blue-600">
                           <Eye className="size-3.5" />
                         </div>
                         <div>
@@ -656,7 +656,7 @@ export default function AccessControlSettingsPage() {
                 </CardDescription>
               </div>
               {canEdit && (
-                <Button size="sm" variant="outline" className="border-amber-200 text-amber-700 hover:bg-amber-50" onClick={() => setBreakGlassDialogOpen(true)}>
+                <Button size="sm" variant="outline" className="border-amber-500/20 text-amber-400 hover:bg-amber-950/30" onClick={() => setBreakGlassDialogOpen(true)}>
                   <Plus className="mr-2 size-3.5" />
                   Grant Access
                 </Button>
@@ -683,7 +683,7 @@ export default function AccessControlSettingsPage() {
                         className="flex items-center justify-between rounded-lg border p-3"
                       >
                         <div className="flex items-center gap-3">
-                          <div className={`flex size-8 items-center justify-center rounded-lg ${isExpired ? 'bg-slate-50 text-slate-400' : 'bg-amber-50 text-amber-600'}`}>
+                          <div className={`flex size-8 items-center justify-center rounded-lg ${isExpired ? 'bg-slate-50 text-slate-400' : 'bg-amber-950/30 text-amber-600'}`}>
                             <AlertTriangle className="size-3.5" />
                           </div>
                           <div>
@@ -694,7 +694,7 @@ export default function AccessControlSettingsPage() {
                               {isExpired ? (
                                 <Badge variant="secondary" className="text-xs">Expired</Badge>
                               ) : (
-                                <Badge variant="outline" className="border-amber-200 bg-amber-50 text-amber-700 text-xs">
+                                <Badge variant="outline" className="border-amber-500/20 bg-amber-950/30 text-amber-400 text-xs">
                                   Active
                                 </Badge>
                               )}

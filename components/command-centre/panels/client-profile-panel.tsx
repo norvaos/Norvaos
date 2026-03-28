@@ -272,7 +272,7 @@ export function ClientProfilePanel() {
     }
     if (saveState === 'saved') {
       return (
-        <Badge variant="outline" className="text-[11px] text-emerald-600 border-emerald-200 bg-emerald-950/30 gap-1 py-0 px-2">
+        <Badge variant="outline" className="text-[11px] text-emerald-600 border-emerald-500/20 bg-emerald-950/30 gap-1 py-0 px-2">
           <CheckCircle2 className="h-3 w-3" />
           Saved
         </Badge>
@@ -314,7 +314,7 @@ export function ClientProfilePanel() {
         </p>
 
         {isLocked && (
-          <p className="text-[11px] text-amber-600 bg-amber-950/30 border border-amber-200 rounded-md px-3 py-2">
+          <p className="text-[11px] text-amber-600 bg-amber-950/30 border border-amber-500/20 rounded-md px-3 py-2">
             Data locked after conversion  -  edit in the matter.
           </p>
         )}

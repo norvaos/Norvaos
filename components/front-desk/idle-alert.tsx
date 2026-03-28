@@ -30,7 +30,7 @@ export function IdleAlert({ idleMinutes, isIdle, isLongIdle, onDismiss }: IdleAl
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
         <div className="bg-white rounded-xl shadow-2xl p-8 max-w-md mx-4 text-center space-y-4">
           <div className="flex justify-center">
-            <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center">
+            <div className="w-16 h-16 rounded-full bg-red-950/40 flex items-center justify-center">
               <AlertTriangle className="w-8 h-8 text-red-600" />
             </div>
           </div>
@@ -53,10 +53,10 @@ export function IdleAlert({ idleMinutes, isIdle, isLongIdle, onDismiss }: IdleAl
 
   // 10-min: amber banner
   return (
-    <div className="bg-amber-50 border border-amber-200 rounded-lg px-4 py-2.5 flex items-center justify-between">
+    <div className="bg-amber-950/30 border border-amber-500/20 rounded-lg px-4 py-2.5 flex items-center justify-between">
       <div className="flex items-center gap-2">
         <Clock className="w-4 h-4 text-amber-600" />
-        <span className="text-sm text-amber-800">
+        <span className="text-sm text-amber-400">
           <span className="font-medium">Idle for {idleMinutes} minutes</span>
           {'  -  '}activity tracking paused
         </span>
@@ -64,7 +64,7 @@ export function IdleAlert({ idleMinutes, isIdle, isLongIdle, onDismiss }: IdleAl
       <Button
         variant="ghost"
         size="sm"
-        className="h-7 px-2 text-amber-600 hover:text-amber-700 hover:bg-amber-100"
+        className="h-7 px-2 text-amber-600 hover:text-amber-400 hover:bg-amber-950/40"
         onClick={onDismiss}
       >
         <X className="w-3.5 h-3.5" />

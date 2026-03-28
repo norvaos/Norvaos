@@ -21,7 +21,7 @@ const INSIGHT_FIELDS: Array<{
   { key: 'qualification_suggestion', label: 'Qualification', className: 'bg-purple-950/30 text-purple-400 border-purple-500/20', type: 'text' },
   { key: 'next_action_suggestion', label: 'Next Action', className: 'bg-emerald-950/30 text-emerald-400 border-emerald-500/20', type: 'text' },
   { key: 'urgency_flags', label: 'Urgency', className: 'bg-amber-950/30 text-amber-400 border-amber-500/20', type: 'json_list' },
-  { key: 'missing_data_flags', label: 'Missing Data', className: 'bg-red-50 text-red-600 border-red-200', type: 'json_list' },
+  { key: 'missing_data_flags', label: 'Missing Data', className: 'bg-red-950/30 text-red-600 border-red-500/20', type: 'json_list' },
 ]
 
 // ─── Component ──────────────────────────────────────────────────────────────

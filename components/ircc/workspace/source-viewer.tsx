@@ -149,7 +149,7 @@ function PDFViewer({ slot }: {
         </p>
         <Badge
           variant="outline"
-          className={slot.is_required ? 'border-red-300 text-red-600' : 'text-muted-foreground'}
+          className={slot.is_required ? 'border-red-500/30 text-red-600' : 'text-muted-foreground'}
         >
           {slot.is_required ? 'Required' : 'Optional'}
         </Badge>
