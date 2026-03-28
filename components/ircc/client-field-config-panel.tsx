@@ -362,7 +362,7 @@ export function ClientFieldConfigPanel({ formId }: { formId: string }) {
                       className={cn(
                         'text-[10px] px-1.5 py-0 h-4',
                         sectionVisible > 0
-                          ? 'text-emerald-600 border-emerald-200 bg-emerald-50'
+                          ? 'text-emerald-600 border-emerald-500/20 bg-emerald-950/30'
                           : 'text-slate-400'
                       )}
                     >
@@ -372,7 +372,7 @@ export function ClientFieldConfigPanel({ formId }: { formId: string }) {
                       <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
                         <button
                           type="button"
-                          className="text-[10px] text-blue-500 hover:text-blue-700 px-1"
+                          className="text-[10px] text-blue-500 hover:text-blue-400 px-1"
                           onClick={() => handleSelectAllInSection(section.fields)}
                         >
                           All
@@ -417,7 +417,7 @@ export function ClientFieldConfigPanel({ formId }: { formId: string }) {
             {/* System fields (collapsed by default) */}
             {showSystemFields && systemFieldCount > 0 && (
               <div>
-                <div className="px-4 py-2 bg-amber-50/50 text-xs text-amber-600 font-medium flex items-center gap-1.5">
+                <div className="px-4 py-2 bg-amber-950/20 text-xs text-amber-600 font-medium flex items-center gap-1.5">
                   <Filter className="h-3 w-3" />
                   System / Meta Fields ({systemFieldCount})  -  auto-hidden from clients
                 </div>
@@ -472,7 +472,7 @@ function ClientFieldRow({
       className={cn(
         'grid grid-cols-[36px_36px_1fr_120px] gap-2 px-4 py-2 items-center transition-colors',
         field.is_client_visible
-          ? 'bg-blue-50/30 hover:bg-blue-50/50'
+          ? 'bg-blue-950/30/30 hover:bg-blue-950/30/50'
           : 'hover:bg-slate-50/50'
       )}
     >

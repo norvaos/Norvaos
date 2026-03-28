@@ -9,19 +9,19 @@ import type { LeadRetainerPackageRow } from './lead-workflow-types'
 // ─── Status Config ──────────────────────────────────────────────────────────
 
 const RETAINER_STATUS: Record<string, { label: string; className: string }> = {
-  draft: { label: 'Draft', className: 'bg-slate-100 text-slate-600 border-slate-200' },
-  sent: { label: 'Sent', className: 'bg-blue-50 text-blue-700 border-blue-200' },
-  signed: { label: 'Signed', className: 'bg-green-50 text-green-700 border-green-200' },
-  declined: { label: 'Declined', className: 'bg-red-50 text-red-600 border-red-200' },
-  expired: { label: 'Expired', className: 'bg-amber-50 text-amber-700 border-amber-200' },
+  draft: { label: 'Draft', className: 'bg-muted text-muted-foreground border-border' },
+  sent: { label: 'Sent', className: 'bg-blue-950/30 text-blue-400 border-blue-500/20' },
+  signed: { label: 'Signed', className: 'bg-emerald-950/30 text-emerald-400 border-emerald-500/20' },
+  declined: { label: 'Declined', className: 'bg-red-950/30 text-red-600 border-red-500/20' },
+  expired: { label: 'Expired', className: 'bg-amber-950/30 text-amber-400 border-amber-500/20' },
 }
 
 const PAYMENT_STATUS: Record<string, { label: string; className: string }> = {
-  pending: { label: 'Payment Pending', className: 'bg-amber-50 text-amber-700 border-amber-200' },
-  partial: { label: 'Partial Payment', className: 'bg-blue-50 text-blue-700 border-blue-200' },
-  paid: { label: 'Paid', className: 'bg-green-50 text-green-700 border-green-200' },
-  waived: { label: 'Waived', className: 'bg-slate-100 text-slate-600 border-slate-200' },
-  refunded: { label: 'Refunded', className: 'bg-red-50 text-red-600 border-red-200' },
+  pending: { label: 'Payment Pending', className: 'bg-amber-950/30 text-amber-400 border-amber-500/20' },
+  partial: { label: 'Partial Payment', className: 'bg-blue-950/30 text-blue-400 border-blue-500/20' },
+  paid: { label: 'Paid', className: 'bg-emerald-950/30 text-emerald-400 border-emerald-500/20' },
+  waived: { label: 'Waived', className: 'bg-muted text-muted-foreground border-border' },
+  refunded: { label: 'Refunded', className: 'bg-red-950/30 text-red-600 border-red-500/20' },
 }
 
 // ─── Component ──────────────────────────────────────────────────────────────

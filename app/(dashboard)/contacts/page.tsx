@@ -7,7 +7,8 @@ import { useI18n } from '@/lib/i18n/i18n-provider'
 import { useQueryClient } from '@tanstack/react-query'
 import { useContacts, contactKeys, CONTACT_DETAIL_COLUMNS } from '@/lib/queries/contacts'
 import { createClient } from '@/lib/supabase/client'
-import { CONTACT_SOURCES, CONTACT_TYPES } from '@/lib/utils/constants'
+import { CONTACT_TYPES } from '@/lib/utils/constants'
+import { useLeadSources } from '@/lib/queries/leads'
 import { ClassificationBadge } from '@/components/contacts/classification-badge'
 import { formatDate, formatPhoneNumber, formatFullName, formatInitials } from '@/lib/utils/formatters'
 import { useUIStore } from '@/lib/stores/ui-store'
@@ -108,6 +109,7 @@ export default function ContactsPage() {
   const queryClient = useQueryClient()
   const { tenant } = useTenant()
   const { t } = useI18n()
+  const { data: leadSources } = useLeadSources(tenant?.id ?? '')
 
   const prefetchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [search, setSearch] = useState('')
@@ -302,9 +304,9 @@ export default function ContactsPage() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">{t('contacts.all_sources' as any)}</SelectItem>
-            {CONTACT_SOURCES.map((s) => (
-              <SelectItem key={s} value={s}>
-                {s}
+            {(leadSources ?? []).map((s) => (
+              <SelectItem key={s.id} value={s.name}>
+                {s.name}
               </SelectItem>
             ))}
           </SelectContent>

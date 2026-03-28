@@ -101,11 +101,11 @@ export function EmailLogTable({ emails, isLoading, onDelete }: EmailLogTableProp
                 {/* Direction icon */}
                 <TableCell>
                   {isOutbound ? (
-                    <div className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-50">
+                    <div className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-950/30">
                       <ArrowUpRight className="h-3.5 w-3.5 text-emerald-600" />
                     </div>
                   ) : (
-                    <div className="flex h-7 w-7 items-center justify-center rounded-full bg-blue-50">
+                    <div className="flex h-7 w-7 items-center justify-center rounded-full bg-blue-950/30">
                       <ArrowDownLeft className="h-3.5 w-3.5 text-blue-600" />
                     </div>
                   )}
@@ -121,8 +121,8 @@ export function EmailLogTable({ emails, isLoading, onDelete }: EmailLogTableProp
                       variant="outline"
                       className={`mt-0.5 w-fit text-[10px] ${
                         isOutbound
-                          ? 'border-emerald-200 text-emerald-700'
-                          : 'border-blue-200 text-blue-700'
+                          ? 'border-emerald-500/20 text-emerald-400'
+                          : 'border-blue-500/20 text-blue-400'
                       }`}
                     >
                       {isOutbound ? 'Sent' : 'Received'}
@@ -209,8 +209,8 @@ export function EmailLogTable({ emails, isLoading, onDelete }: EmailLogTableProp
                     variant="outline"
                     className={`mt-1 ${
                       selectedEmail.direction === 'outbound'
-                        ? 'border-emerald-200 text-emerald-700'
-                        : 'border-blue-200 text-blue-700'
+                        ? 'border-emerald-500/20 text-emerald-400'
+                        : 'border-blue-500/20 text-blue-400'
                     }`}
                   >
                     {selectedEmail.direction === 'outbound' ? 'Sent' : 'Received'}

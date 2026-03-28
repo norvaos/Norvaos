@@ -19,7 +19,7 @@ async function handlePost(
       request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ??
       request.headers.get('x-real-ip') ??
       'unknown'
-    const rateLimitResult = submitLimiter.check(ip)
+    const rateLimitResult = await submitLimiter.check(ip)
     if (!rateLimitResult.allowed) {
       return NextResponse.json(
         { error: 'Rate limit exceeded. Please wait before submitting again.' },

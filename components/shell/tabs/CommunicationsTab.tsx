@@ -13,6 +13,7 @@
 
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { useQuery } from '@tanstack/react-query'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { format } from 'date-fns'
@@ -57,6 +58,7 @@ import {
 import { useMatterCommunications, useCreateCommunication } from '@/lib/queries/communications'
 import { useMatterPeople } from '@/lib/queries/matter-people'
 import { createClient } from '@/lib/supabase/client'
+import { CommunicationStream } from '@/components/shared/communication-stream'
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
@@ -80,10 +82,10 @@ const CHANNELS = ['Email', 'Portal', 'SMS', 'Letter'] as const
 function StatusBadge({ status }: { status: string | null }) {
   const s = (status ?? 'draft').toLowerCase()
   const map: Record<string, string> = {
-    sent:      'bg-green-100 text-green-800 border-green-200',
+    sent:      'bg-emerald-950/40 text-emerald-400 border-emerald-500/20',
     draft:     'bg-slate-100 text-slate-700 border-slate-200',
-    scheduled: 'bg-blue-100 text-blue-800 border-blue-200',
-    failed:    'bg-red-100 text-red-800 border-red-200',
+    scheduled: 'bg-blue-950/40 text-blue-400 border-blue-500/20',
+    failed:    'bg-red-950/40 text-red-400 border-red-500/20',
   }
   const cls = map[s] ?? map['draft']
   return (
@@ -132,6 +134,37 @@ export function CommunicationsTab({ matterId, tenantId }: CommunicationsTabProps
   const { data: comms, isLoading } = useMatterCommunications(matterId)
   const { data: people } = useMatterPeople(matterId)
   const createComm = useCreateCommunication()
+
+  // ── Primary client contact lookup for Communication Stream ──────────────
+  const { data: primaryContact } = useQuery({
+    queryKey: ['matter-primary-contact', matterId],
+    queryFn: async () => {
+      const supabase = createClient()
+      const { data, error } = await supabase
+        .from('matter_contacts')
+        .select('contact_id, contacts!inner(id, email_primary, first_name, last_name)')
+        .eq('matter_id', matterId)
+        .eq('role', 'client')
+        .eq('is_primary', true)
+        .limit(1)
+        .maybeSingle()
+      if (error) throw error
+      if (!data) return null
+      const c = data.contacts as unknown as {
+        id: string
+        email_primary: string | null
+        first_name: string | null
+        last_name: string | null
+      }
+      return {
+        contactId: c.id,
+        email: c.email_primary,
+        name: [c.first_name, c.last_name].filter(Boolean).join(' ') || 'Client',
+      }
+    },
+    enabled: !!matterId,
+    staleTime: 1000 * 60 * 5,
+  })
 
   const form = useForm<NewCommValues>({
     resolver: zodResolver(newCommSchema),
@@ -193,7 +226,19 @@ export function CommunicationsTab({ matterId, tenantId }: CommunicationsTabProps
         </Button>
       </div>
 
-      {/* List */}
+      {/* Communication Stream  -  Microsoft 365 email timeline for primary contact */}
+      {primaryContact?.email && (
+        <div className="border-b">
+          <CommunicationStream
+            contactEmail={primaryContact.email}
+            contactName={primaryContact.name}
+            matterId={matterId}
+            contactId={primaryContact.contactId}
+          />
+        </div>
+      )}
+
+      {/* Internal Communications Log */}
       <div className="flex-1 overflow-y-auto">
         {isLoading && (
           <div className="p-4 space-y-3">

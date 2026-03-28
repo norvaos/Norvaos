@@ -118,8 +118,8 @@ export function SovereignSparkle({ firmName, onDismiss }: SovereignSparkleProps)
       tabIndex={0}
       onKeyDown={(e) => e.key === 'Escape' && onDismiss()}
     >
-      {/* Dark backdrop */}
-      <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
+      {/* Backdrop */}
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-xl" />
 
       {/* Canvas for particles */}
       <canvas ref={canvasRef} className="absolute inset-0" />
@@ -127,32 +127,32 @@ export function SovereignSparkle({ firmName, onDismiss }: SovereignSparkleProps)
       {/* Central message */}
       <div
         className={cn(
-          'relative z-10 max-w-lg text-center px-8 py-10 transition-all duration-1000',
+          'relative z-10 max-w-lg text-center px-8 py-10 rounded-2xl bg-background/90 backdrop-blur-xl border border-border shadow-2xl transition-all duration-1000',
           showText ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4',
         )}
       >
         <div className="flex justify-center mb-6">
           <div className="rounded-full bg-emerald-500/20 p-4 ring-2 ring-emerald-500/40">
-            <ShieldCheck className="h-12 w-12 text-emerald-400" />
+            <ShieldCheck className="h-12 w-12 text-emerald-500" />
           </div>
         </div>
 
-        <h1 className="text-2xl font-bold text-white mb-2">
+        <h1 className="text-2xl font-bold text-foreground mb-2">
           Sovereign Fortress Active
         </h1>
 
         {firmName && (
-          <p className="text-amber-400 font-medium text-sm mb-4">
+          <p className="text-amber-500 font-medium text-sm mb-4">
             {firmName}
           </p>
         )}
 
-        <p className="text-emerald-200/80 text-sm leading-relaxed">
+        <p className="text-muted-foreground text-sm leading-relaxed">
           Your firm is now protected by NorvaOS Integrity. All matters are sealed,
           all ledgers are hashed, and your compliance is mathematically guaranteed.
         </p>
 
-        <p className="mt-6 text-xs text-white/40">
+        <p className="mt-6 text-xs text-muted-foreground/60">
           Click anywhere to continue
         </p>
       </div>

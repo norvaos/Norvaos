@@ -417,7 +417,7 @@ function DocumentSlotList({ matterTypeId }: { matterTypeId: string }) {
                   {DOCUMENT_SLOT_CATEGORIES.find((c) => c.value === slot.category)?.label ?? slot.category}
                 </Badge>
                 {slot.is_required && (
-                  <Badge variant="secondary" className="text-[10px] px-1.5 py-0 text-amber-600 bg-amber-50">
+                  <Badge variant="secondary" className="text-[10px] px-1.5 py-0 text-amber-600 bg-amber-950/30">
                     Required
                   </Badge>
                 )}
@@ -433,7 +433,7 @@ function DocumentSlotList({ matterTypeId }: { matterTypeId: string }) {
                 </button>
                 <button
                   type="button"
-                  className="opacity-0 group-hover:opacity-100 rounded p-1 hover:bg-red-50 text-slate-400 hover:text-red-500 transition-opacity"
+                  className="opacity-0 group-hover:opacity-100 rounded p-1 hover:bg-red-950/30 text-slate-400 hover:text-red-500 transition-opacity"
                   onClick={() => setDeleteTarget(slot)}
                 >
                   <Trash2 className="h-3.5 w-3.5" />
@@ -773,7 +773,7 @@ function FolderTemplateRow({
           </button>
           <button
             type="button"
-            className="opacity-0 group-hover:opacity-100 rounded p-1 hover:bg-red-50 text-slate-400 hover:text-red-500 transition-opacity"
+            className="opacity-0 group-hover:opacity-100 rounded p-1 hover:bg-red-950/30 text-slate-400 hover:text-red-500 transition-opacity"
             onClick={() => onDelete(folder)}
           >
             <Trash2 className="h-3.5 w-3.5" />
@@ -1323,12 +1323,12 @@ function FolderSyncSection() {
           {/* Summary badges */}
           <div className="flex items-center gap-2 mb-3">
             {scanResult.summary.new > 0 && (
-              <Badge className="bg-green-50 text-green-700 border-green-200">
+              <Badge className="bg-emerald-950/30 text-emerald-400 border-green-200">
                 {scanResult.summary.new} new
               </Badge>
             )}
             {scanResult.summary.updated > 0 && (
-              <Badge className="bg-amber-50 text-amber-700 border-amber-200">
+              <Badge className="bg-amber-950/30 text-amber-400 border-amber-200">
                 {scanResult.summary.updated} updated
               </Badge>
             )}
@@ -1338,7 +1338,7 @@ function FolderSyncSection() {
               </Badge>
             )}
             {scanResult.summary.missing > 0 && (
-              <Badge className="bg-red-50 text-red-700 border-red-200">
+              <Badge className="bg-red-950/30 text-red-400 border-red-200">
                 {scanResult.summary.missing} missing from folder
               </Badge>
             )}
@@ -1361,16 +1361,16 @@ function FolderSyncSection() {
                   <TableRow key={item.formCode + item.status} className="text-sm">
                     <TableCell>
                       {item.status === 'new' && (
-                        <Badge className="text-[10px] bg-green-50 text-green-700 border-green-200">New</Badge>
+                        <Badge className="text-[10px] bg-emerald-950/30 text-emerald-400 border-green-200">New</Badge>
                       )}
                       {item.status === 'updated' && (
-                        <Badge className="text-[10px] bg-amber-50 text-amber-700 border-amber-200">Updated</Badge>
+                        <Badge className="text-[10px] bg-amber-950/30 text-amber-400 border-amber-200">Updated</Badge>
                       )}
                       {item.status === 'unchanged' && (
                         <Badge variant="outline" className="text-[10px] text-slate-400">OK</Badge>
                       )}
                       {item.status === 'missing' && (
-                        <Badge className="text-[10px] bg-red-50 text-red-700 border-red-200">Missing</Badge>
+                        <Badge className="text-[10px] bg-red-950/30 text-red-400 border-red-200">Missing</Badge>
                       )}
                     </TableCell>
                     <TableCell className="font-medium">

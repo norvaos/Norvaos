@@ -111,7 +111,7 @@ export default function OnboardingChecklistPage() {
           </div>
           <div className="h-2 w-full rounded-full bg-slate-100 overflow-hidden">
             <div
-              className="h-2 rounded-full bg-emerald-500 transition-all duration-500"
+              className="h-2 rounded-full bg-emerald-950/300 transition-all duration-500"
               style={{ width: `${summary.percent}%` }}
             />
           </div>
@@ -159,7 +159,7 @@ export default function OnboardingChecklistPage() {
                   {item.completed && (
                     <Badge
                       variant="outline"
-                      className="text-xs text-emerald-700 border-emerald-200 bg-emerald-50"
+                      className="text-xs text-emerald-400 border-emerald-500/20 bg-emerald-950/30"
                     >
                       Done
                     </Badge>
@@ -221,8 +221,8 @@ export default function OnboardingChecklistPage() {
       )}
 
       {summary?.percent === 100 && (
-        <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-center">
-          <p className="text-sm font-medium text-emerald-800">
+        <div className="rounded-lg border border-emerald-500/20 bg-emerald-950/30 p-4 text-center">
+          <p className="text-sm font-medium text-emerald-400">
             All items complete  -  your workspace is ready.
           </p>
         </div>

@@ -43,7 +43,7 @@ export function StepIndicator({ currentStep, steps = DEFAULT_STEPS }: StepIndica
               <span
                 className={cn(
                   'text-[10px] font-medium mt-1.5 text-center',
-                  isCurrent ? 'text-blue-700' : isCompleted ? 'text-emerald-700' : 'text-slate-400'
+                  isCurrent ? 'text-blue-400' : isCompleted ? 'text-emerald-400' : 'text-slate-400'
                 )}
               >
                 {step.label}

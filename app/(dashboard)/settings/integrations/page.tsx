@@ -40,6 +40,13 @@ export default function IntegrationsPage() {
       </div>
 
       <div className="space-y-4">
+        <div>
+          <h3 className="text-lg font-semibold tracking-tight">Communication Sovereignty</h3>
+          <p className="text-sm text-muted-foreground">
+            Unified email, calendar, and file sync with your Microsoft 365 or Google Workspace account.
+          </p>
+        </div>
+
         <MicrosoftConnectionCard userId={userId} />
 
         {connection && (

@@ -46,7 +46,7 @@ import {
 import { createClient } from '@/lib/supabase/client'
 import { useTenant } from '@/lib/hooks/use-tenant'
 import { useUser } from '@/lib/hooks/use-user'
-import { CONTACT_SOURCES } from '@/lib/utils/constants'
+import { useLeadSources } from '@/lib/queries/leads'
 import { TenantDateInput } from '@/components/ui/tenant-date-input'
 import type { IntakeState } from '../sovereign-stepper'
 
@@ -154,6 +154,7 @@ export function SovereignContactStep({
 }: ContactStepProps) {
   const { tenant } = useTenant()
   const { appUser } = useUser()
+  const { data: leadSources } = useLeadSources(tenant?.id ?? '')
 
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -921,9 +922,9 @@ export function SovereignContactStep({
             <SelectValue placeholder="How did they find you?" />
           </SelectTrigger>
           <SelectContent className="z-[9996]">
-            {CONTACT_SOURCES.map((src) => (
-              <SelectItem key={src} value={src}>
-                {src}
+            {(leadSources ?? []).map((src) => (
+              <SelectItem key={src.id} value={src.name}>
+                {src.name}
               </SelectItem>
             ))}
           </SelectContent>

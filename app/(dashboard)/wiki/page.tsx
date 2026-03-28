@@ -70,7 +70,7 @@ export default function WikiPage() {
           className={cn(
             'flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors text-left',
             !activeCategory
-              ? 'bg-blue-50 text-blue-700 font-medium'
+              ? 'bg-blue-950/30 text-blue-400 font-medium'
               : 'text-muted-foreground hover:bg-muted',
           )}
         >
@@ -84,7 +84,7 @@ export default function WikiPage() {
             className={cn(
               'flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors text-left',
               activeCategory === cat.id
-                ? 'bg-blue-50 text-blue-700 font-medium'
+                ? 'bg-blue-950/30 text-blue-400 font-medium'
                 : 'text-muted-foreground hover:bg-muted',
             )}
           >
@@ -172,7 +172,7 @@ export default function WikiPage() {
                     >
                       <div className={cn(
                         'mt-0.5 rounded-lg p-2',
-                        result.item_type === 'playbook' ? 'bg-blue-50' : 'bg-amber-50',
+                        result.item_type === 'playbook' ? 'bg-blue-950/30' : 'bg-amber-950/30',
                       )}>
                         {result.item_type === 'playbook' ? (
                           <FileText className="h-4 w-4 text-blue-600" />
@@ -185,7 +185,7 @@ export default function WikiPage() {
                           <p className="text-sm font-semibold text-foreground truncate">{result.title}</p>
                           <span className={cn(
                             'shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium uppercase',
-                            result.item_type === 'playbook' ? 'bg-blue-100 text-blue-700' : 'bg-amber-100 text-amber-700',
+                            result.item_type === 'playbook' ? 'bg-blue-100 text-blue-400' : 'bg-amber-100 text-amber-400',
                           )}>
                             {result.item_type}
                           </span>
@@ -298,9 +298,9 @@ function PlaybookCard({
   onClick: () => void
 }) {
   const statusColor = playbook.status === 'published'
-    ? 'bg-emerald-100 text-emerald-700'
+    ? 'bg-emerald-950/40 text-emerald-400'
     : playbook.status === 'draft'
-    ? 'bg-amber-100 text-amber-700'
+    ? 'bg-amber-100 text-amber-400'
     : 'bg-muted text-muted-foreground'
 
   return (

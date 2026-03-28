@@ -387,7 +387,7 @@ export function SovereignHUD() {
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 z-[9990] bg-black/40 backdrop-blur-sm"
+        className="fixed inset-0 z-[9990] bg-black/60 backdrop-blur-sm"
         onClick={() => setOpen(false)}
       />
 
@@ -396,19 +396,19 @@ export function SovereignHUD() {
         className={cn(
           'fixed top-[15%] left-1/2 -translate-x-1/2 z-[9991]',
           'w-full max-w-[640px] rounded-2xl overflow-hidden',
-          'bg-black/80 backdrop-blur-3xl border border-emerald-500/20',
+          'bg-[#09090b]/90 backdrop-blur-xl border border-zinc-800/60',
           'shadow-2xl shadow-emerald-900/20',
           'animate-in fade-in-0 zoom-in-95 duration-200',
         )}
         onKeyDown={handleKeyDown}
       >
         {/* Search Input with Ghost Auto-Complete */}
-        <div className="flex items-center gap-3 px-5 py-4 border-b border-white/10">
+        <div className="flex items-center gap-3 px-5 py-4 border-b border-zinc-800/60">
           <Search className="h-4 w-4 text-emerald-400 shrink-0" />
           <div className="relative flex-1">
             {/* Ghost suggestion (appears behind the real input) */}
             {ghostSuggestion && (
-              <span className="absolute inset-0 flex items-center text-sm text-white/15 pointer-events-none font-mono">
+              <span className="absolute inset-0 flex items-center text-sm text-zinc-600 pointer-events-none font-mono">
                 {ghostSuggestion}
               </span>
             )}
@@ -418,15 +418,15 @@ export function SovereignHUD() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search or type / for commands..."
-              className="relative w-full bg-transparent text-sm text-white placeholder:text-white/30 outline-none"
+              className="relative w-full bg-transparent text-sm text-white placeholder:text-zinc-500 outline-none"
             />
           </div>
           {ghostSuggestion && (
-            <span className="hidden sm:inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-white/10 text-[10px] text-white/30 font-mono">
+            <span className="hidden sm:inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-white/[0.06] text-[10px] text-zinc-500 font-mono">
               Tab ↹
             </span>
           )}
-          <kbd className="hidden sm:inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-white/10 text-[10px] text-white/40 font-mono">
+          <kbd className="hidden sm:inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-white/[0.06] text-[10px] text-zinc-500 font-mono">
             ESC
           </kbd>
         </div>
@@ -436,11 +436,11 @@ export function SovereignHUD() {
           {/* Slash Commands Mode */}
           {isSlashMode && (
             <div className="space-y-0.5">
-              <p className="px-3 py-1 text-[10px] uppercase tracking-wider text-white/30">
+              <p className="px-3 py-1 text-[10px] uppercase tracking-wider text-zinc-600">
                 Sovereign Commands
               </p>
               {filteredSlashCommands.length === 0 && (
-                <p className="px-3 py-4 text-xs text-white/40 text-center">No matching commands</p>
+                <p className="px-3 py-4 text-xs text-zinc-400 text-center">No matching commands</p>
               )}
               {filteredSlashCommands.map((cmd) => {
                 const idx = nextIndex()
@@ -454,19 +454,19 @@ export function SovereignHUD() {
                     className={cn(
                       'flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-left transition-colors',
                       selectedIndex === idx
-                        ? 'bg-emerald-500/20 text-white'
-                        : 'text-white/70 hover:bg-white/5',
+                        ? 'bg-white/[0.08] text-white'
+                        : 'text-white/70 hover:bg-white/[0.04]',
                     )}
                   >
-                    <div className="flex items-center justify-center h-8 w-8 rounded-lg bg-emerald-500/15 border border-emerald-500/20 shrink-0">
+                    <div className="flex items-center justify-center h-8 w-8 rounded-lg bg-white/[0.04] border border-white/[0.06] shrink-0">
                       <Icon className="h-4 w-4 text-emerald-400" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-mono">{cmd.label}</p>
-                      <p className="text-xs text-white/40">{cmd.description}</p>
+                      <p className="text-xs text-zinc-400">{cmd.description}</p>
                     </div>
                     {cmd.minRole && (
-                      <span className="text-[9px] uppercase tracking-wider text-emerald-400/50 border border-emerald-500/20 px-1.5 py-0.5 rounded">
+                      <span className="text-[9px] uppercase tracking-wider text-zinc-500 border border-white/[0.06] px-1.5 py-0.5 rounded">
                         {cmd.minRole}
                       </span>
                     )}
@@ -480,20 +480,20 @@ export function SovereignHUD() {
           {!isSlashMode && hasQuery && (
             <>
               {isSearching && !results && (
-                <div className="flex items-center justify-center py-6 text-sm text-white/40">
+                <div className="flex items-center justify-center py-6 text-sm text-zinc-400">
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Searching...
                 </div>
               )}
               {!isSearching && !hasResults && (
-                <p className="px-3 py-6 text-xs text-white/40 text-center">
+                <p className="px-3 py-6 text-xs text-zinc-400 text-center">
                   No results for &quot;{query}&quot;
                 </p>
               )}
 
               {matters.length > 0 && (
                 <div className="space-y-0.5 mb-2">
-                  <p className="px-3 py-1 text-[10px] uppercase tracking-wider text-white/30">Matters</p>
+                  <p className="px-3 py-1 text-[10px] uppercase tracking-wider text-zinc-600">Matters</p>
                   {matters.map((m) => {
                     const idx = nextIndex()
                     return (
@@ -504,13 +504,13 @@ export function SovereignHUD() {
                         onClick={() => { setOpen(false); router.push(`/matters/${m.id}`) }}
                         className={cn(
                           'flex items-center gap-3 w-full px-3 py-2 rounded-lg text-left transition-colors',
-                          selectedIndex === idx ? 'bg-emerald-500/20 text-white' : 'text-white/70 hover:bg-white/5',
+                          selectedIndex === idx ? 'bg-white/[0.08] text-white' : 'text-white/70 hover:bg-white/[0.04]',
                         )}
                       >
                         <Briefcase className="h-4 w-4 text-emerald-400 shrink-0" />
                         <div className="flex-1 min-w-0">
                           <p className="text-sm truncate">{m.title}</p>
-                          <p className="text-xs text-white/40 truncate">
+                          <p className="text-xs text-zinc-400 truncate">
                             {m.matter_number ? `#${m.matter_number}` : ''} {m.status ? `· ${m.status}` : ''}
                           </p>
                         </div>
@@ -522,7 +522,7 @@ export function SovereignHUD() {
 
               {contacts.length > 0 && (
                 <div className="space-y-0.5 mb-2">
-                  <p className="px-3 py-1 text-[10px] uppercase tracking-wider text-white/30">Contacts</p>
+                  <p className="px-3 py-1 text-[10px] uppercase tracking-wider text-zinc-600">Contacts</p>
                   {contacts.map((c) => {
                     const idx = nextIndex()
                     const name = [c.first_name, c.last_name].filter(Boolean).join(' ') || c.organization_name || 'Unnamed'
@@ -534,13 +534,13 @@ export function SovereignHUD() {
                         onClick={() => { setOpen(false); router.push(`/contacts/${c.id}`) }}
                         className={cn(
                           'flex items-center gap-3 w-full px-3 py-2 rounded-lg text-left transition-colors',
-                          selectedIndex === idx ? 'bg-emerald-500/20 text-white' : 'text-white/70 hover:bg-white/5',
+                          selectedIndex === idx ? 'bg-white/[0.08] text-white' : 'text-white/70 hover:bg-white/[0.04]',
                         )}
                       >
                         <Users className="h-4 w-4 text-blue-400 shrink-0" />
                         <div className="flex-1 min-w-0">
                           <p className="text-sm truncate">{name}</p>
-                          <p className="text-xs text-white/40 truncate">{c.email_primary || c.contact_type || 'Contact'}</p>
+                          <p className="text-xs text-zinc-400 truncate">{c.email_primary || c.contact_type || 'Contact'}</p>
                         </div>
                       </button>
                     )
@@ -550,7 +550,7 @@ export function SovereignHUD() {
 
               {leads.length > 0 && (
                 <div className="space-y-0.5 mb-2">
-                  <p className="px-3 py-1 text-[10px] uppercase tracking-wider text-white/30">Leads</p>
+                  <p className="px-3 py-1 text-[10px] uppercase tracking-wider text-zinc-600">Leads</p>
                   {leads.map((l) => {
                     const idx = nextIndex()
                     const name = [l.contact_first_name, l.contact_last_name].filter(Boolean).join(' ') || 'Unknown'
@@ -562,13 +562,13 @@ export function SovereignHUD() {
                         onClick={() => { setOpen(false); router.push(`/command/lead/${l.id}`) }}
                         className={cn(
                           'flex items-center gap-3 w-full px-3 py-2 rounded-lg text-left transition-colors',
-                          selectedIndex === idx ? 'bg-emerald-500/20 text-white' : 'text-white/70 hover:bg-white/5',
+                          selectedIndex === idx ? 'bg-white/[0.08] text-white' : 'text-white/70 hover:bg-white/[0.04]',
                         )}
                       >
                         <Target className="h-4 w-4 text-orange-400 shrink-0" />
                         <div className="flex-1 min-w-0">
                           <p className="text-sm truncate">{name}</p>
-                          <p className="text-xs text-white/40 truncate">Lead {l.source ? `· ${l.source}` : ''}</p>
+                          <p className="text-xs text-zinc-400 truncate">Lead {l.source ? `· ${l.source}` : ''}</p>
                         </div>
                       </button>
                     )
@@ -578,7 +578,7 @@ export function SovereignHUD() {
 
               {tasks.length > 0 && (
                 <div className="space-y-0.5 mb-2">
-                  <p className="px-3 py-1 text-[10px] uppercase tracking-wider text-white/30">Tasks</p>
+                  <p className="px-3 py-1 text-[10px] uppercase tracking-wider text-zinc-600">Tasks</p>
                   {tasks.map((tk) => {
                     const idx = nextIndex()
                     return (
@@ -589,13 +589,13 @@ export function SovereignHUD() {
                         onClick={() => { setOpen(false); router.push('/tasks') }}
                         className={cn(
                           'flex items-center gap-3 w-full px-3 py-2 rounded-lg text-left transition-colors',
-                          selectedIndex === idx ? 'bg-emerald-500/20 text-white' : 'text-white/70 hover:bg-white/5',
+                          selectedIndex === idx ? 'bg-white/[0.08] text-white' : 'text-white/70 hover:bg-white/[0.04]',
                         )}
                       >
                         <CheckSquare className="h-4 w-4 text-purple-400 shrink-0" />
                         <div className="flex-1 min-w-0">
                           <p className="text-sm truncate">{tk.title}</p>
-                          <p className="text-xs text-white/40 truncate">
+                          <p className="text-xs text-zinc-400 truncate">
                             {(tk.status ?? '').replace(/_/g, ' ')} {tk.priority ? `· ${tk.priority}` : ''}
                           </p>
                         </div>
@@ -607,7 +607,7 @@ export function SovereignHUD() {
 
               {wiki.length > 0 && (
                 <div className="space-y-0.5 mb-2">
-                  <p className="px-3 py-1 text-[10px] uppercase tracking-wider text-white/30">Knowledge Base</p>
+                  <p className="px-3 py-1 text-[10px] uppercase tracking-wider text-zinc-600">Knowledge Base</p>
                   {wiki.map((w) => {
                     const idx = nextIndex()
                     return (
@@ -621,7 +621,7 @@ export function SovereignHUD() {
                         }}
                         className={cn(
                           'flex items-center gap-3 w-full px-3 py-2 rounded-lg text-left transition-colors',
-                          selectedIndex === idx ? 'bg-emerald-500/20 text-white' : 'text-white/70 hover:bg-white/5',
+                          selectedIndex === idx ? 'bg-white/[0.08] text-white' : 'text-white/70 hover:bg-white/[0.04]',
                         )}
                       >
                         {w.item_type === 'playbook' ? (
@@ -631,7 +631,7 @@ export function SovereignHUD() {
                         )}
                         <div className="flex-1 min-w-0">
                           <p className="text-sm truncate">{w.title}</p>
-                          <p className="text-xs text-white/40 truncate">
+                          <p className="text-xs text-zinc-400 truncate">
                             {w.category_name ? `${w.category_name} · ` : ''}
                             {w.item_type === 'playbook' ? 'Playbook' : 'Snippet'}
                           </p>
@@ -648,10 +648,10 @@ export function SovereignHUD() {
           {!isSlashMode && !hasQuery && (
             <>
               {/* Floating Slash Command Suggestions */}
-              <div className="mb-3 rounded-lg bg-emerald-500/5 border border-emerald-500/10 px-3 py-3">
+              <div className="mb-3 rounded-lg bg-white/[0.02] border border-white/[0.06] px-3 py-3">
                 <div className="flex items-center gap-2 mb-2">
                   <Zap className="h-3 w-3 text-emerald-400" />
-                  <p className="text-[11px] text-white/40">
+                  <p className="text-[11px] text-zinc-400">
                     Type <span className="font-mono text-emerald-400">/</span> for instant commands
                   </p>
                 </div>
@@ -667,12 +667,12 @@ export function SovereignHUD() {
                     <button
                       key={cmd}
                       onClick={() => setQuery(cmd)}
-                      className="flex items-center gap-1.5 px-2 py-1.5 rounded-md text-left transition-colors hover:bg-emerald-500/10 group"
+                      className="flex items-center gap-1.5 px-2 py-1.5 rounded-md text-left transition-colors hover:bg-white/[0.06] group"
                     >
                       <CmdIcon className="h-3 w-3 text-emerald-400/50 group-hover:text-emerald-400" />
                       <div className="min-w-0">
                         <span className="block text-[11px] font-mono text-emerald-400/70 group-hover:text-emerald-400">{cmd}</span>
-                        <span className="block text-[9px] text-white/25">{desc}</span>
+                        <span className="block text-[9px] text-zinc-700">{desc}</span>
                       </div>
                     </button>
                   ))}
@@ -680,7 +680,7 @@ export function SovereignHUD() {
               </div>
 
               <div className="space-y-0.5 mb-2">
-                <p className="px-3 py-1 text-[10px] uppercase tracking-wider text-white/30">Quick Actions</p>
+                <p className="px-3 py-1 text-[10px] uppercase tracking-wider text-zinc-600">Quick Actions</p>
                 {quickActions.map((a) => {
                   const idx = nextIndex()
                   const Icon = a.icon
@@ -692,10 +692,10 @@ export function SovereignHUD() {
                       onClick={a.action}
                       className={cn(
                         'flex items-center gap-3 w-full px-3 py-2 rounded-lg text-left transition-colors',
-                        selectedIndex === idx ? 'bg-emerald-500/20 text-white' : 'text-white/70 hover:bg-white/5',
+                        selectedIndex === idx ? 'bg-white/[0.08] text-white' : 'text-white/70 hover:bg-white/[0.04]',
                       )}
                     >
-                      <Icon className="h-4 w-4 text-white/40" />
+                      <Icon className="h-4 w-4 text-zinc-400" />
                       <span className="text-sm">{a.label}</span>
                     </button>
                   )
@@ -703,7 +703,7 @@ export function SovereignHUD() {
               </div>
 
               <div className="space-y-0.5">
-                <p className="px-3 py-1 text-[10px] uppercase tracking-wider text-white/30">Navigate</p>
+                <p className="px-3 py-1 text-[10px] uppercase tracking-wider text-zinc-600">Navigate</p>
                 {navigationItems.map((n) => {
                   const idx = nextIndex()
                   const Icon = n.icon
@@ -715,10 +715,10 @@ export function SovereignHUD() {
                       onClick={() => { setOpen(false); router.push(n.path) }}
                       className={cn(
                         'flex items-center gap-3 w-full px-3 py-2 rounded-lg text-left transition-colors',
-                        selectedIndex === idx ? 'bg-emerald-500/20 text-white' : 'text-white/70 hover:bg-white/5',
+                        selectedIndex === idx ? 'bg-white/[0.08] text-white' : 'text-white/70 hover:bg-white/[0.04]',
                       )}
                     >
-                      <Icon className="h-4 w-4 text-white/40" />
+                      <Icon className="h-4 w-4 text-zinc-400" />
                       <span className="text-sm">{n.label}</span>
                     </button>
                   )
@@ -729,8 +729,8 @@ export function SovereignHUD() {
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between px-4 py-2 border-t border-white/10">
-          <div className="flex items-center gap-3 text-[10px] text-white/30">
+        <div className="flex items-center justify-between px-4 py-2 border-t border-zinc-800/60">
+          <div className="flex items-center gap-3 text-[10px] text-zinc-600">
             <span>
               <kbd className="font-mono">↑↓</kbd> navigate
             </span>

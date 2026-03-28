@@ -264,7 +264,7 @@ export function SovereignTaskCreator({
                     className={cn(
                       'rounded-lg border px-2 py-2 text-xs font-medium transition-all',
                       priority === p.value
-                        ? 'border-emerald-500/50 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300'
+                        ? 'border-emerald-500/50 bg-emerald-500/10 text-emerald-400 dark:text-emerald-300'
                         : 'border-gray-200 dark:border-white/[0.06] text-gray-500 dark:text-white/50 hover:border-gray-300 dark:hover:border-white/[0.12]',
                     )}
                   >
@@ -312,11 +312,11 @@ export function SovereignTaskCreator({
                   >
                     <div className={cn(
                       'flex h-7 w-7 items-center justify-center rounded-full text-[10px] font-bold',
-                      selected ? 'bg-emerald-500/30 text-emerald-700 dark:text-emerald-300' : 'bg-gray-100 dark:bg-white/[0.08] text-gray-500 dark:text-white/50',
+                      selected ? 'bg-emerald-500/30 text-emerald-400 dark:text-emerald-300' : 'bg-gray-100 dark:bg-white/[0.08] text-gray-500 dark:text-white/50',
                     )}>
                       {initials}
                     </div>
-                    <span className={cn('text-xs font-medium', selected ? 'text-emerald-700 dark:text-emerald-300' : 'text-gray-600 dark:text-white/60')}>
+                    <span className={cn('text-xs font-medium', selected ? 'text-emerald-400 dark:text-emerald-300' : 'text-gray-600 dark:text-white/60')}>
                       {name}
                     </span>
                     {selected && <Check className="ml-1 h-3.5 w-3.5 text-emerald-500" />}
@@ -394,7 +394,7 @@ export function SovereignTaskCreator({
           <div className="flex items-start gap-3 rounded-2xl border border-emerald-500/30 bg-emerald-500/5 p-4">
             <Check className="mt-0.5 h-5 w-5 shrink-0 text-emerald-500" />
             <div>
-              <p className="text-sm font-medium text-emerald-700 dark:text-emerald-300">Ready to create</p>
+              <p className="text-sm font-medium text-emerald-400 dark:text-emerald-300">Ready to create</p>
               <p className="mt-1 text-xs text-emerald-600/80 dark:text-emerald-400/70">
                 {TASK_HELP.verify}
               </p>

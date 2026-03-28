@@ -151,7 +151,7 @@ export function checkAdminRateLimit(request: Request): Response | null {
     ?? request.headers.get('x-real-ip')
     ?? 'unknown'
 
-  const { allowed, retryAfterMs } = adminRateLimiter.check(ip)
+  const { allowed, retryAfterMs } = await adminRateLimiter.check(ip)
   if (!allowed) {
     return Response.json(
       { error: 'Too many requests to admin routes. Please try again later.' },

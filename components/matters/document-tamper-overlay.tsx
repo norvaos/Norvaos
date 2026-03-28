@@ -152,7 +152,7 @@ export function TamperStatusIndicator({
     return (
       <Badge
         variant="outline"
-        className="gap-1 text-[10px] border-emerald-300 text-emerald-700 bg-emerald-50"
+        className="gap-1 text-[10px] border-emerald-500/30 text-emerald-400 bg-emerald-950/30"
         title="SHA-256 integrity verified"
       >
         <ShieldAlert className="h-2.5 w-2.5" />

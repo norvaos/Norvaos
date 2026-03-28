@@ -60,9 +60,9 @@ function isPast(dateStr: string): boolean {
 }
 
 const STATUS_CONFIG: Record<string, { label: string; className: string }> = {
-  confirmed: { label: 'Confirmed', className: 'bg-green-100 text-green-700 border-green-200' },
-  cancelled: { label: 'Cancelled', className: 'bg-red-100 text-red-700 border-red-200' },
-  no_show: { label: 'No Show', className: 'bg-amber-100 text-amber-700 border-amber-200' },
+  confirmed: { label: 'Confirmed', className: 'bg-green-100 text-emerald-400 border-green-200' },
+  cancelled: { label: 'Cancelled', className: 'bg-red-100 text-red-400 border-red-200' },
+  no_show: { label: 'No Show', className: 'bg-amber-100 text-amber-400 border-amber-200' },
   completed: { label: 'Completed', className: 'bg-slate-100 text-slate-700 border-slate-200' },
 }
 
@@ -379,7 +379,7 @@ export function AppointmentPanel() {
                   <Button
                     variant="outline"
                     size="sm"
-                    className="text-xs gap-1 text-red-600 border-red-200 hover:bg-red-50"
+                    className="text-xs gap-1 text-red-600 border-red-200 hover:bg-red-950/30"
                     onClick={handleCancel}
                     disabled={actionPending}
                   >
@@ -389,7 +389,7 @@ export function AppointmentPanel() {
                   <Button
                     variant="outline"
                     size="sm"
-                    className="text-xs gap-1 text-amber-600 border-amber-200 hover:bg-amber-50"
+                    className="text-xs gap-1 text-amber-600 border-amber-200 hover:bg-amber-950/30"
                     onClick={handleNoShow}
                     disabled={actionPending}
                   >

@@ -21,7 +21,16 @@ import {
   Lock,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { Switch } from '@/components/ui/switch'
+import { Label } from '@/components/ui/label'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
 import { useIgniteChecklist, useIgniteMatter } from '@/lib/queries/ignite'
+import { useMicrosoftConnection } from '@/lib/queries/microsoft-integration'
+import { useUser } from '@/lib/hooks/use-user'
 
 // ─── Props ──────────────────────────────────────────────────────────────────
 
@@ -117,6 +126,11 @@ export function IgniteRitualModal({
   readinessScore,
 }: IgniteRitualModalProps) {
   const [showSealing, setShowSealing] = useState(false)
+  const [sendWelcomeEmail, setSendWelcomeEmail] = useState(false)
+
+  const { appUser } = useUser()
+  const { data: msConnection } = useMicrosoftConnection(appUser?.id || '')
+  const isMicrosoftConnected = !!msConnection && msConnection.is_active
 
   // Only render when readiness >= 100
   if (readinessScore < 100) return null
@@ -134,13 +148,13 @@ export function IgniteRitualModal({
     if (!allPassed || igniteMutation.isPending) return
 
     try {
-      await igniteMutation.mutateAsync()
+      await igniteMutation.mutateAsync({ sendWelcomeEmail })
       // Show sealing animation on success
       setShowSealing(true)
     } catch {
       // Error handled by mutation's onError
     }
-  }, [allPassed, igniteMutation])
+  }, [allPassed, igniteMutation, sendWelcomeEmail])
 
   const handleSealingComplete = useCallback(() => {
     setShowSealing(false)
@@ -193,8 +207,8 @@ export function IgniteRitualModal({
                     className={cn(
                       'flex items-start gap-3 rounded-lg border px-4 py-3 transition-colours',
                       check.passed
-                        ? 'border-emerald-200 bg-emerald-50 dark:border-emerald-900/50 dark:bg-emerald-950/30'
-                        : 'border-red-200 bg-red-50 dark:border-red-900/50 dark:bg-red-950/30',
+                        ? 'border-emerald-500/20 bg-emerald-950/30 dark:border-emerald-900/50 dark:bg-emerald-950/30'
+                        : 'border-red-500/20 bg-red-950/30 dark:border-red-900/50 dark:bg-red-950/30',
                     )}
                   >
                     {check.passed ? (
@@ -207,8 +221,8 @@ export function IgniteRitualModal({
                         className={cn(
                           'text-sm font-medium',
                           check.passed
-                            ? 'text-emerald-800 dark:text-emerald-300'
-                            : 'text-red-800 dark:text-red-300',
+                            ? 'text-emerald-400 dark:text-emerald-300'
+                            : 'text-red-400 dark:text-red-300',
                         )}
                       >
                         {check.label}
@@ -250,6 +264,43 @@ export function IgniteRitualModal({
                     : 'Loading checks...'}
                 </span>
               </>
+            )}
+          </div>
+
+          {/* Send Welcome Email Toggle */}
+          <div className="mt-4 flex items-center justify-between rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-3 dark:border-zinc-800 dark:bg-zinc-950">
+            <div className="flex items-center gap-3">
+              <Label
+                htmlFor="send-welcome-email"
+                className={cn(
+                  'text-sm font-medium',
+                  !isMicrosoftConnected && 'text-muted-foreground',
+                )}
+              >
+                Send Welcome Email on Ignition
+              </Label>
+            </div>
+            {isMicrosoftConnected ? (
+              <Switch
+                id="send-welcome-email"
+                checked={sendWelcomeEmail}
+                onCheckedChange={setSendWelcomeEmail}
+              />
+            ) : (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span>
+                    <Switch
+                      id="send-welcome-email"
+                      checked={false}
+                      disabled
+                    />
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Connect Microsoft 365 to enable</p>
+                </TooltipContent>
+              </Tooltip>
             )}
           </div>
 

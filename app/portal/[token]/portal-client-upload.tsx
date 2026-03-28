@@ -166,7 +166,7 @@ export function PortalClientUpload({
             dragOver
               ? 'border-emerald-400 scale-[1.01]'
               : selectedFile
-                ? 'border-emerald-300'
+                ? 'border-emerald-500/30'
                 : 'border-slate-200 hover:border-slate-300',
           )}
           style={{
@@ -203,13 +203,13 @@ export function PortalClientUpload({
           />
           {selectedFile ? (
             <div className="relative flex flex-col items-center gap-2">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-100 shadow-sm">
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-950/40 shadow-sm">
                 <svg className="h-6 w-6 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
                   <polyline points="14 2 14 8 20 8" />
                 </svg>
               </div>
-              <span className="text-sm font-semibold text-emerald-800 truncate max-w-full">{selectedFile.name}</span>
+              <span className="text-sm font-semibold text-emerald-400 truncate max-w-full">{selectedFile.name}</span>
               <span className="text-xs text-emerald-600 font-medium">{formatFileSize(selectedFile.size)}</span>
             </div>
           ) : (
@@ -247,9 +247,9 @@ export function PortalClientUpload({
 
         {/* Success */}
         {success && (
-          <div className="flex items-center gap-2 rounded-xl bg-emerald-50 border border-emerald-200/60 px-3 py-2">
+          <div className="flex items-center gap-2 rounded-xl bg-emerald-950/30 border border-emerald-500/20/60 px-3 py-2">
             <svg className="h-4 w-4 text-emerald-500 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
-            <p className="text-xs text-emerald-700 font-medium">
+            <p className="text-xs text-emerald-400 font-medium">
               {tr.client_upload_success ?? 'Document submitted successfully'}
             </p>
           </div>
@@ -306,7 +306,7 @@ export function PortalClientUpload({
                   {doc.file_size ? ` · ${formatFileSize(doc.file_size)}` : ''}
                 </p>
               </div>
-              <span className="inline-flex items-center rounded-full border border-green-200 bg-green-50 px-2 py-0.5 text-[10px] font-medium text-green-700">
+              <span className="inline-flex items-center rounded-full border border-green-200 bg-emerald-950/30 px-2 py-0.5 text-[10px] font-medium text-emerald-400">
                 Submitted
               </span>
             </div>

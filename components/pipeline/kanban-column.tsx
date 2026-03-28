@@ -8,6 +8,12 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Skeleton } from '@/components/ui/skeleton'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
 import { cn } from '@/lib/utils'
 import { formatCurrency } from '@/lib/utils/formatters'
 import { KanbanCard } from './kanban-card'
@@ -83,14 +89,29 @@ export const KanbanColumn = memo(function KanbanColumn({
         style={{ borderTopColor: stageColour }}
       >
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <h3 className="text-sm font-semibold text-slate-900">
-              {stage.name}
-            </h3>
-            <Badge variant="secondary" className="text-[10px]">
-              {leads.length}
-            </Badge>
-          </div>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="flex items-center gap-2 cursor-default">
+                  <h3 className="text-sm font-semibold text-slate-900">
+                    {stage.name}
+                  </h3>
+                  <Badge variant="secondary" className="text-[10px]">
+                    {leads.length}
+                  </Badge>
+                </div>
+              </TooltipTrigger>
+              {stage.description && (
+                <TooltipContent side="bottom">
+                  <p className="font-semibold text-[11px] text-emerald-400">{stage.name}</p>
+                  <p className="text-[11px] text-white mt-0.5">{stage.description}</p>
+                  {stage.win_probability != null && (
+                    <p className="text-[10px] text-zinc-400 mt-1.5 border-t border-zinc-700/50 pt-1.5">Win probability: {stage.win_probability}%{stage.rotting_days ? ` · Stale after ${stage.rotting_days}d` : ''}</p>
+                  )}
+                </TooltipContent>
+              )}
+            </Tooltip>
+          </TooltipProvider>
         </div>
         {showValues && totalValue > 0 && (
           <p className="mt-0.5 text-xs text-slate-500">

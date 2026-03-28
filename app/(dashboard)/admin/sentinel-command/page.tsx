@@ -223,7 +223,7 @@ function ChainVerificationBanner() {
   if (status === 'valid') {
     return (
       <div className="flex items-center justify-between rounded-lg border border-green-500/30 bg-green-500/5 p-3">
-        <div className="flex items-center gap-2 text-sm text-green-700 dark:text-green-400">
+        <div className="flex items-center gap-2 text-sm text-emerald-400 dark:text-green-400">
           <Link2 className="h-4 w-4" />
           <span className="font-medium">Chain INTACT</span>
           <span className="text-green-600/70 dark:text-green-500/70">
@@ -241,7 +241,7 @@ function ChainVerificationBanner() {
   return (
     <div className="rounded-lg border border-red-500/30 bg-red-500/10 p-3">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2 text-sm text-red-700 dark:text-red-400 font-semibold">
+        <div className="flex items-center gap-2 text-sm text-red-400 dark:text-red-400 font-semibold">
           <Link2Off className="h-4 w-4" />
           CHAIN BROKEN  -  Tampering Detected
         </div>

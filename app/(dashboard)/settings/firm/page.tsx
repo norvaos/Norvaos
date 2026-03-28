@@ -404,10 +404,10 @@ export default function SettingsFirmPage() {
 
                       {/* Resolved Regulatory Badge */}
                       {resolved && (
-                        <div className="mt-3 flex items-center gap-2 rounded-md border border-emerald-200 bg-emerald-50 px-4 py-3">
+                        <div className="mt-3 flex items-center gap-2 rounded-md border border-emerald-500/20 bg-emerald-950/30 px-4 py-3">
                           <ShieldCheck className="h-5 w-5 text-emerald-600 shrink-0" />
                           <div>
-                            <p className="text-sm font-semibold text-emerald-800">
+                            <p className="text-sm font-semibold text-emerald-400">
                               {resolved.name} ({resolved.abbr})
                             </p>
                             <p className="text-xs text-emerald-600">
@@ -649,7 +649,7 @@ export default function SettingsFirmPage() {
             <div className="flex h-14 w-14 items-center justify-center rounded-full bg-red-100">
               <AlertTriangle className="h-7 w-7 text-red-600" />
             </div>
-            <AlertDialogTitle className="text-2xl text-red-700 text-center w-full leading-snug">
+            <AlertDialogTitle className="text-2xl text-red-400 text-center w-full leading-snug">
               Wait - This is a Regulatory Change
               <span className="block text-sm font-normal text-muted-foreground mt-2">
                 Changing your firm&apos;s home jurisdiction isn&apos;t just a setting - it changes how you practise law in this system.
@@ -697,7 +697,7 @@ export default function SettingsFirmPage() {
                 </div>
 
                 {/* Responsibility notice */}
-                <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2.5 text-xs text-red-700 leading-relaxed text-center">
+                <div className="rounded-md border border-red-200 bg-red-950/30 px-3 py-2.5 text-xs text-red-400 leading-relaxed text-center">
                   We strongly recommend reviewing the compliance requirements of both
                   your current and new regulatory body before proceeding. The administering
                   user assumes full responsibility for ensuring continued compliance

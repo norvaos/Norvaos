@@ -288,8 +288,8 @@ export function TosAcceptanceModal({
 
         {/* Acceptance signature preview */}
         {acceptTos.isSuccess && acceptTos.data && (
-          <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-3 dark:border-emerald-800 dark:bg-emerald-900/20">
-            <div className="flex items-center gap-2 text-emerald-700 dark:text-emerald-400">
+          <div className="rounded-lg border border-emerald-500/20 bg-emerald-950/30 p-3 dark:border-emerald-800 dark:bg-emerald-900/20">
+            <div className="flex items-center gap-2 text-emerald-400 dark:text-emerald-400">
               <Sparkles className="h-4 w-4" />
               <span className="font-semibold text-sm">Signature Hash Sealed</span>
             </div>

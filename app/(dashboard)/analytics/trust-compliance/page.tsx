@@ -113,9 +113,9 @@ function EmptyState() {
 
 function SeverityBadge({ severity }: { severity: 'info' | 'warning' | 'critical' }) {
   const variants: Record<typeof severity, { label: string; className: string }> = {
-    info: { label: 'Info', className: 'bg-blue-100 text-blue-800 hover:bg-blue-100' },
-    warning: { label: 'Warning', className: 'bg-amber-100 text-amber-800 hover:bg-amber-100' },
-    critical: { label: 'Critical', className: 'bg-red-100 text-red-800 hover:bg-red-100' },
+    info: { label: 'Info', className: 'bg-blue-950/40 text-blue-400 hover:bg-blue-950/40' },
+    warning: { label: 'Warning', className: 'bg-amber-950/40 text-amber-400 hover:bg-amber-950/40' },
+    critical: { label: 'Critical', className: 'bg-red-950/40 text-red-400 hover:bg-red-950/40' },
   }
   const v = variants[severity]
   return <Badge className={v.className}>{v.label}</Badge>
@@ -136,9 +136,9 @@ function SeverityIcon({ severity }: { severity: 'info' | 'warning' | 'critical' 
 
 function ReconciliationBadge({ status }: { status: 'ok' | 'warning' | 'overdue' }) {
   const map: Record<typeof status, { label: string; className: string }> = {
-    ok: { label: 'Current', className: 'bg-green-100 text-green-800 hover:bg-green-100' },
-    warning: { label: 'Due Soon', className: 'bg-amber-100 text-amber-800 hover:bg-amber-100' },
-    overdue: { label: 'Overdue', className: 'bg-red-100 text-red-800 hover:bg-red-100' },
+    ok: { label: 'Current', className: 'bg-emerald-950/40 text-emerald-400 hover:bg-emerald-950/40' },
+    warning: { label: 'Due Soon', className: 'bg-amber-950/40 text-amber-400 hover:bg-amber-950/40' },
+    overdue: { label: 'Overdue', className: 'bg-red-950/40 text-red-400 hover:bg-red-950/40' },
   }
   const v = map[status]
   return <Badge className={v.className}>{v.label}</Badge>
@@ -369,7 +369,7 @@ export default function TrustCompliancePage() {
                         {data.pending_disbursements.map((req: TrustComplianceData['pending_disbursements'][number]) => (
                           <TableRow
                             key={req.request_id}
-                            className={cn(req.hours_pending > 48 && 'bg-amber-50')}
+                            className={cn(req.hours_pending > 48 && 'bg-amber-950/30')}
                           >
                             <TableCell className="font-medium">{req.matter_title}</TableCell>
                             <TableCell className="text-right">
@@ -399,9 +399,9 @@ export default function TrustCompliancePage() {
                       key={idx}
                       className={cn(
                         'flex items-start gap-3 rounded-lg border p-4',
-                        anomaly.severity === 'critical' && 'border-red-200 bg-red-50',
-                        anomaly.severity === 'warning' && 'border-amber-200 bg-amber-50',
-                        anomaly.severity === 'info' && 'border-blue-200 bg-blue-50',
+                        anomaly.severity === 'critical' && 'border-red-500/20 bg-red-950/30',
+                        anomaly.severity === 'warning' && 'border-amber-500/20 bg-amber-950/30',
+                        anomaly.severity === 'info' && 'border-blue-500/20 bg-blue-950/30',
                       )}
                     >
                       <SeverityIcon severity={anomaly.severity} />

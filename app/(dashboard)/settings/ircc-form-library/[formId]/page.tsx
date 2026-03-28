@@ -346,7 +346,7 @@ function SectionHeaderRow({
               <button
                 onClick={handleSave}
                 disabled={updateSection.isPending}
-                className="h-5 w-5 flex items-center justify-center rounded text-green-600 hover:bg-green-50"
+                className="h-5 w-5 flex items-center justify-center rounded text-green-600 hover:bg-emerald-950/30"
               >
                 {updateSection.isPending ? <Loader2 className="h-3 w-3 animate-spin" /> : <Check className="h-3 w-3" />}
               </button>
@@ -450,7 +450,7 @@ function FieldRow({ field }: { field: IrccFormField }) {
         </TableCell>
         <TableCell className="text-center">
           {field.is_mapped ? (
-            <Badge variant="outline" className="text-[10px] px-1 py-0 h-4 border-green-300 text-green-700 bg-green-50">
+            <Badge variant="outline" className="text-[10px] px-1 py-0 h-4 border-green-300 text-emerald-400 bg-emerald-950/30">
               mapped
             </Badge>
           ) : (

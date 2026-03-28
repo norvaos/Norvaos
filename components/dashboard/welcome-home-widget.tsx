@@ -169,7 +169,7 @@ export function WelcomeHomeWidget({ tenantId }: WelcomeHomeWidgetProps) {
           <MigrationStatCard
             icon={Briefcase}
             iconColor="text-blue-600"
-            iconBg="bg-blue-50 dark:bg-blue-950/30"
+            iconBg="bg-blue-950/30 dark:bg-blue-950/30"
             value={stats.mattersNeedingAudit}
             label="Active Matters"
             sublabel="migrated and ready"
@@ -190,7 +190,7 @@ export function WelcomeHomeWidget({ tenantId }: WelcomeHomeWidgetProps) {
           <MigrationStatCard
             icon={ShieldAlert}
             iconColor={stats.conflictsFlagged > 0 ? 'text-amber-600' : 'text-emerald-600'}
-            iconBg={stats.conflictsFlagged > 0 ? 'bg-amber-50 dark:bg-amber-950/30' : 'bg-emerald-50 dark:bg-emerald-950/30'}
+            iconBg={stats.conflictsFlagged > 0 ? 'bg-amber-950/30 dark:bg-amber-950/30' : 'bg-emerald-950/30 dark:bg-emerald-950/30'}
             value={stats.conflictsFlagged}
             label={stats.conflictsFlagged > 0 ? 'Conflicts Flagged' : 'No Conflicts'}
             sublabel={stats.conflictsFlagged > 0 ? 'require lawyer review' : 'all clear'}
@@ -200,7 +200,7 @@ export function WelcomeHomeWidget({ tenantId }: WelcomeHomeWidgetProps) {
           {/* Delta-Sync status */}
           <div className="rounded-lg border p-3 space-y-1.5">
             <div className="flex items-center gap-2">
-              <div className={`flex h-7 w-7 items-center justify-center rounded-md ${syncActive ? 'bg-emerald-50 dark:bg-emerald-950/30' : 'bg-muted'}`}>
+              <div className={`flex h-7 w-7 items-center justify-center rounded-md ${syncActive ? 'bg-emerald-950/30 dark:bg-emerald-950/30' : 'bg-muted'}`}>
                 {syncActive ? (
                   <FolderSync className="h-4 w-4 text-emerald-600 dark:text-emerald-400 animate-pulse" />
                 ) : (
@@ -208,7 +208,7 @@ export function WelcomeHomeWidget({ tenantId }: WelcomeHomeWidgetProps) {
                 )}
               </div>
               {syncActive && (
-                <Badge variant="outline" className="text-[9px] h-4 px-1.5 border-emerald-300 text-emerald-700 dark:text-emerald-400">
+                <Badge variant="outline" className="text-[9px] h-4 px-1.5 border-emerald-500/30 text-emerald-400 dark:text-emerald-400">
                   <Loader2 className="h-2.5 w-2.5 mr-0.5 animate-spin" />
                   LIVE
                 </Badge>
@@ -318,14 +318,14 @@ function VaultMigrationCertificateBanner() {
   }
 
   return (
-    <div className="mt-3 rounded-lg border border-emerald-200 dark:border-emerald-800 bg-emerald-50/50 dark:bg-emerald-950/20 p-3">
+    <div className="mt-3 rounded-lg border border-emerald-500/20 dark:border-emerald-800 bg-emerald-950/30/50 dark:bg-emerald-950/20 p-3">
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-2.5">
-          <div className="flex h-8 w-8 items-center justify-center rounded-md bg-emerald-100 dark:bg-emerald-900/40">
+          <div className="flex h-8 w-8 items-center justify-center rounded-md bg-emerald-950/40 dark:bg-emerald-900/40">
             <Shield className="h-4.5 w-4.5 text-emerald-600 dark:text-emerald-400" />
           </div>
           <div>
-            <p className="text-xs font-semibold text-emerald-800 dark:text-emerald-300">
+            <p className="text-xs font-semibold text-emerald-400 dark:text-emerald-300">
               Your firm is now Norva-Protected
             </p>
             <p className="text-[10px] text-emerald-600/80 dark:text-emerald-400/60">
@@ -336,7 +336,7 @@ function VaultMigrationCertificateBanner() {
         <Button
           variant="outline"
           size="sm"
-          className="h-7 text-xs gap-1.5 border-emerald-300 text-emerald-700 hover:bg-emerald-100 dark:border-emerald-700 dark:text-emerald-300 dark:hover:bg-emerald-900/40 flex-shrink-0"
+          className="h-7 text-xs gap-1.5 border-emerald-500/30 text-emerald-400 hover:bg-emerald-950/40 dark:border-emerald-700 dark:text-emerald-300 dark:hover:bg-emerald-900/40 flex-shrink-0"
           onClick={handleDownload}
           disabled={isDownloading}
         >

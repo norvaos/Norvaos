@@ -46,20 +46,20 @@ export const CONTACT_TYPES = [
 /** All contact classification values with display metadata. */
 export const CONTACT_CLASSIFICATIONS = [
   // Client lifecycle (auto-managed by DB triggers)
-  { value: 'lead', label: 'Lead', colour: 'bg-amber-100 text-amber-800', group: 'lifecycle' },
-  { value: 'client', label: 'Client', colour: 'bg-green-100 text-green-800', group: 'lifecycle' },
-  { value: 'former_client', label: 'Former Client', colour: 'bg-slate-100 text-slate-700', group: 'lifecycle' },
+  { value: 'lead', label: 'Lead', colour: 'bg-amber-500/15 text-amber-400', group: 'lifecycle' },
+  { value: 'client', label: 'Client', colour: 'bg-emerald-500/15 text-emerald-400', group: 'lifecycle' },
+  { value: 'former_client', label: 'Former Client', colour: 'bg-zinc-500/15 text-zinc-400', group: 'lifecycle' },
   // Legal professionals
-  { value: 'lawyer', label: 'Lawyer', colour: 'bg-blue-100 text-blue-800', group: 'professional' },
-  { value: 'consultant', label: 'Consultant', colour: 'bg-indigo-100 text-indigo-800', group: 'professional' },
-  { value: 'judge', label: 'Judge', colour: 'bg-purple-100 text-purple-800', group: 'professional' },
+  { value: 'lawyer', label: 'Lawyer', colour: 'bg-blue-500/15 text-blue-400', group: 'professional' },
+  { value: 'consultant', label: 'Consultant', colour: 'bg-indigo-500/15 text-indigo-400', group: 'professional' },
+  { value: 'judge', label: 'Judge', colour: 'bg-purple-500/15 text-purple-400', group: 'professional' },
   // Government / IRCC
-  { value: 'ircc_officer', label: 'IRCC Officer', colour: 'bg-red-100 text-red-800', group: 'government' },
-  { value: 'government', label: 'Government', colour: 'bg-red-50 text-red-700', group: 'government' },
+  { value: 'ircc_officer', label: 'IRCC Officer', colour: 'bg-red-500/15 text-red-400', group: 'government' },
+  { value: 'government', label: 'Government', colour: 'bg-red-500/10 text-red-400', group: 'government' },
   // Other
-  { value: 'referral_source', label: 'Referral Source', colour: 'bg-teal-100 text-teal-800', group: 'other' },
-  { value: 'vendor', label: 'Vendor', colour: 'bg-orange-100 text-orange-800', group: 'other' },
-  { value: 'other_professional', label: 'Other Professional', colour: 'bg-gray-100 text-gray-700', group: 'other' },
+  { value: 'referral_source', label: 'Referral Source', colour: 'bg-teal-500/15 text-teal-400', group: 'other' },
+  { value: 'vendor', label: 'Vendor', colour: 'bg-orange-500/15 text-orange-400', group: 'other' },
+  { value: 'other_professional', label: 'Other Professional', colour: 'bg-zinc-500/15 text-zinc-400', group: 'other' },
 ] as const
 
 /** Quick lookup: classification value → display metadata */

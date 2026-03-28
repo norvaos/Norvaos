@@ -58,7 +58,7 @@ function getPeriodLabel(): string {
 // ─── Aging bar colours ──────────────────────────────────────────────────────
 
 const AGING_COLOURS: Record<string, string> = {
-  Current: 'bg-green-500',
+  Current: 'bg-emerald-500',
   '31-60': 'bg-yellow-400',
   '61-90': 'bg-orange-400',
   '91-120': 'bg-orange-600',

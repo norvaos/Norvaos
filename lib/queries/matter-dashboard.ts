@@ -103,41 +103,29 @@ export function useMatterDashboard(matterId: string) {
         staleTime: 1000 * 60 * 2, // 2 min
       },
 
-      // 2. Primary contact (two-step: matter_contacts → contacts)
+      // 2. Primary contact (single FK join query)
       {
         queryKey: dashboardKeys.contact(matterId),
         queryFn: async (): Promise<DashboardContact | null> => {
           const supabase = createClient()
 
-          // Step 1: find the primary client contact_id
-          const { data: mc, error: mcError } = await supabase
+          const { data, error } = await supabase
             .from('matter_contacts')
-            .select('contact_id')
+            .select('contacts!inner(id, first_name, last_name, email_primary, phone_primary, date_of_birth, nationality, immigration_status, immigration_data, custom_fields)')
             .eq('matter_id', matterId)
             .eq('role', 'client')
             .eq('is_primary', true)
             .limit(1)
             .single()
 
-          if (mcError) {
+          if (error) {
             // PGRST116 = no rows  -  not an error, just no primary contact
-            if (mcError.code === 'PGRST116') return null
-            throw mcError
+            if (error.code === 'PGRST116') return null
+            throw error
           }
 
-          if (!mc?.contact_id) return null
-
-          // Step 2: fetch contact details
-          const { data: contact, error: contactError } = await supabase
-            .from('contacts')
-            .select(
-              'id, first_name, last_name, email_primary, phone_primary, date_of_birth, nationality, immigration_status, immigration_data, custom_fields'
-            )
-            .eq('id', mc.contact_id)
-            .single()
-
-          if (contactError) throw contactError
-          return contact as DashboardContact
+          const contact = (data as unknown as { contacts: DashboardContact })?.contacts ?? null
+          return contact
         },
         enabled: !!matterId,
         staleTime: 1000 * 60 * 5, // 5 min
@@ -249,26 +237,20 @@ export function prefetchPrimaryContact(queryClient: QueryClient, matterId: strin
     queryKey: dashboardKeys.contact(matterId),
     queryFn: async (): Promise<DashboardContact | null> => {
       const supabase = createClient()
-      const { data: mc, error: mcError } = await supabase
+      const { data, error } = await supabase
         .from('matter_contacts')
-        .select('contact_id')
+        .select('contacts!inner(id, first_name, last_name, email_primary, phone_primary, date_of_birth, nationality, immigration_status, immigration_data, custom_fields)')
         .eq('matter_id', matterId)
         .eq('role', 'client')
         .eq('is_primary', true)
         .limit(1)
         .single()
-      if (mcError) {
-        if (mcError.code === 'PGRST116') return null
-        throw mcError
+      if (error) {
+        if (error.code === 'PGRST116') return null
+        throw error
       }
-      if (!mc?.contact_id) return null
-      const { data: contact, error: contactError } = await supabase
-        .from('contacts')
-        .select('id, first_name, last_name, email_primary, phone_primary, date_of_birth, nationality, immigration_status, immigration_data, custom_fields')
-        .eq('id', mc.contact_id)
-        .single()
-      if (contactError) throw contactError
-      return contact as DashboardContact
+      const contact = (data as unknown as { contacts: DashboardContact })?.contacts ?? null
+      return contact
     },
     staleTime: 1000 * 60 * 5,
   })
@@ -297,41 +279,29 @@ export function prefetchMatterFull(queryClient: QueryClient, matterId: string) {
       staleTime: 1000 * 60 * 2,
     }),
 
-    // 2. Primary contact (two-step: matter_contacts → contacts)
+    // 2. Primary contact (single FK join query)
     queryClient.prefetchQuery({
       queryKey: dashboardKeys.contact(matterId),
       queryFn: async (): Promise<DashboardContact | null> => {
         const supabase = createClient()
 
-        // Step 1: find the primary client contact_id
-        const { data: mc, error: mcError } = await supabase
+        const { data, error } = await supabase
           .from('matter_contacts')
-          .select('contact_id')
+          .select('contacts!inner(id, first_name, last_name, email_primary, phone_primary, date_of_birth, nationality, immigration_status, immigration_data, custom_fields)')
           .eq('matter_id', matterId)
           .eq('role', 'client')
           .eq('is_primary', true)
           .limit(1)
           .single()
 
-        if (mcError) {
+        if (error) {
           // PGRST116 = no rows  -  not an error, just no primary contact
-          if (mcError.code === 'PGRST116') return null
-          throw mcError
+          if (error.code === 'PGRST116') return null
+          throw error
         }
 
-        if (!mc?.contact_id) return null
-
-        // Step 2: fetch contact details
-        const { data: contact, error: contactError } = await supabase
-          .from('contacts')
-          .select(
-            'id, first_name, last_name, email_primary, phone_primary, date_of_birth, nationality, immigration_status, immigration_data, custom_fields'
-          )
-          .eq('id', mc.contact_id)
-          .single()
-
-        if (contactError) throw contactError
-        return contact as DashboardContact
+        const contact = (data as unknown as { contacts: DashboardContact })?.contacts ?? null
+        return contact
       },
       staleTime: 1000 * 60 * 5,
     }),

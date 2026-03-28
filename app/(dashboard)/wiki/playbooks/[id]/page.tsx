@@ -349,7 +349,7 @@ export default function PlaybookEditorPage({
             <div className="flex items-center gap-2">
               <div className={cn(
                 'h-2 w-2 rounded-full',
-                saveStatus === 'saved' ? 'bg-emerald-500' : saveStatus === 'saving' ? 'bg-amber-500 animate-pulse' : 'bg-muted-foreground/30',
+                saveStatus === 'saved' ? 'bg-emerald-950/300' : saveStatus === 'saving' ? 'bg-amber-950/300 animate-pulse' : 'bg-muted-foreground/30',
               )} />
               <span className="text-xs text-muted-foreground capitalize">{saveStatus}</span>
             </div>
@@ -360,7 +360,7 @@ export default function PlaybookEditorPage({
               onClick={() => { setIsPinned(!isPinned); markUnsaved() }}
               className={cn(
                 'rounded-lg p-2 transition-colors',
-                isPinned ? 'bg-amber-50 text-amber-600' : 'text-muted-foreground hover:bg-muted',
+                isPinned ? 'bg-amber-950/30 text-amber-600' : 'text-muted-foreground hover:bg-muted',
               )}
               title={isPinned ? 'Unpin' : 'Pin to top'}
             >
@@ -374,8 +374,8 @@ export default function PlaybookEditorPage({
               className={cn(
                 'flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium transition-colors',
                 status === 'published'
-                  ? 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100'
-                  : 'bg-amber-50 text-amber-700 hover:bg-amber-100',
+                  ? 'bg-emerald-950/30 text-emerald-400 hover:bg-emerald-950/40'
+                  : 'bg-amber-950/30 text-amber-400 hover:bg-amber-100',
               )}
             >
               <Globe className="h-3.5 w-3.5" />
@@ -385,7 +385,7 @@ export default function PlaybookEditorPage({
               onClick={() => setShowHistory(!showHistory)}
               className={cn(
                 'rounded-lg p-2 transition-colors',
-                showHistory ? 'bg-blue-50 text-blue-600' : 'text-muted-foreground hover:bg-muted',
+                showHistory ? 'bg-blue-950/30 text-blue-600' : 'text-muted-foreground hover:bg-muted',
               )}
             >
               <History className="h-4 w-4" />
@@ -401,7 +401,7 @@ export default function PlaybookEditorPage({
             {!isNew && (
               <button
                 onClick={handleDelete}
-                className="rounded-lg p-2 text-muted-foreground hover:bg-red-50 hover:text-red-600 transition-colors"
+                className="rounded-lg p-2 text-muted-foreground hover:bg-red-950/30 hover:text-red-600 transition-colors"
               >
                 <Trash2 className="h-4 w-4" />
               </button>
@@ -443,7 +443,7 @@ export default function PlaybookEditorPage({
             </select>
 
             {tags.map(tag => (
-              <span key={tag} className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2.5 py-1 text-xs text-blue-700">
+              <span key={tag} className="inline-flex items-center gap-1 rounded-full bg-blue-950/30 px-2.5 py-1 text-xs text-blue-400">
                 {tag}
                 <button onClick={() => removeTag(tag)} className="hover:text-red-500">
                   <X className="h-3 w-3" />
@@ -649,7 +649,7 @@ function BlockEditor({
             />
           </div>
         ) : block.type === 'callout' ? (
-          <div className="rounded-lg border-l-4 border-amber-400 bg-amber-50 p-3 my-1">
+          <div className="rounded-lg border-l-4 border-amber-400 bg-amber-950/30 p-3 my-1">
             <textarea
               value={block.content}
               onChange={e => onUpdate({ content: e.target.value })}

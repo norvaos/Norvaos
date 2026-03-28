@@ -26,12 +26,12 @@ type MatterImmigration = Database['public']['Tables']['matter_immigration']['Row
 function getStreamColour(matterType: string | null): string {
   if (!matterType) return 'bg-muted text-muted-foreground'
   const t = matterType.toLowerCase()
-  if (t.includes('study') || t.includes('student')) return 'bg-blue-100 text-blue-800 border-blue-200'
-  if (t.includes('express entry') || t.includes('permanent') || t.includes('pr ')) return 'bg-green-100 text-green-800 border-green-200'
-  if (t.includes('visitor') || t.includes('trv') || t.includes('tourist')) return 'bg-yellow-100 text-yellow-800 border-yellow-200'
+  if (t.includes('study') || t.includes('student')) return 'bg-blue-950/40 text-blue-400 border-blue-500/20'
+  if (t.includes('express entry') || t.includes('permanent') || t.includes('pr ')) return 'bg-emerald-950/40 text-emerald-400 border-emerald-500/20'
+  if (t.includes('visitor') || t.includes('trv') || t.includes('tourist')) return 'bg-yellow-950/30 text-yellow-400 border-yellow-500/20'
   if (t.includes('work') || t.includes('pgwp') || t.includes('lmia')) return 'bg-teal-100 text-teal-800 border-teal-200'
-  if (t.includes('spousal') || t.includes('family')) return 'bg-purple-100 text-purple-800 border-purple-200'
-  if (t.includes('citizenship')) return 'bg-orange-100 text-orange-800 border-orange-200'
+  if (t.includes('spousal') || t.includes('family')) return 'bg-purple-950/30 text-purple-400 border-purple-500/20'
+  if (t.includes('citizenship')) return 'bg-orange-950/30 text-orange-400 border-orange-500/20'
   return 'bg-muted text-muted-foreground'
 }
 
@@ -218,9 +218,9 @@ export function WorkspaceHeader({ matter, matterId, immigrationData, principalAp
         variant="outline"
         className={cn(
           'text-xs shrink-0',
-          matter.status === 'active' ? 'border-green-300 text-green-700 bg-green-50' :
+          matter.status === 'active' ? 'border-green-300 text-emerald-400 bg-emerald-950/30' :
           matter.status?.startsWith('closed') ? 'border-zinc-300 text-zinc-600 bg-zinc-50' :
-          'border-amber-300 text-amber-700 bg-amber-50'
+          'border-amber-300 text-amber-400 bg-amber-950/30'
         )}
       >
         {matter.status ?? 'Unknown'}

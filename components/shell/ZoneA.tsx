@@ -33,26 +33,26 @@ type Matter = Database['public']['Tables']['matters']['Row']
 // ── Status display config ────────────────────────────────────────────────────
 
 const STATUS_CONFIG: Record<string, { label: string; className: string }> = {
-  active:            { label: 'Active',              className: 'bg-green-100 text-green-800 border-green-300' },
-  intake:            { label: 'Intake',              className: 'bg-blue-100 text-blue-800 border-blue-300' },
+  active:            { label: 'Active',              className: 'bg-green-100 text-green-800 border-emerald-500/30' },
+  intake:            { label: 'Intake',              className: 'bg-blue-100 text-blue-800 border-blue-500/30' },
   closed_won:        { label: 'Closed  -  Won',        className: 'bg-slate-100 text-slate-700 border-slate-300' },
-  closed_refused:    { label: 'Closed  -  Refused',    className: 'bg-red-100 text-red-800 border-red-300' },
-  closed_withdrawn:  { label: 'Closed  -  Withdrawn',  className: 'bg-amber-100 text-amber-700 border-amber-300' },
+  closed_refused:    { label: 'Closed  -  Refused',    className: 'bg-red-100 text-red-800 border-red-500/30' },
+  closed_withdrawn:  { label: 'Closed  -  Withdrawn',  className: 'bg-amber-950/40 text-amber-400 border-amber-500/30' },
   on_hold:           { label: 'On Hold',             className: 'bg-yellow-100 text-yellow-800 border-yellow-300' },
 }
 
 const PRIORITY_DOT: Record<string, string> = {
   low:      'bg-slate-400',
   medium:   'bg-amber-400',
-  high:     'bg-red-500',
+  high:     'bg-red-950/300',
   critical: 'bg-red-700 animate-pulse',
 }
 
 const RISK_LEVEL_CONFIG: Record<string, string> = {
-  critical: 'bg-red-50 text-red-700 border-red-300',
-  high:     'bg-orange-50 text-orange-700 border-orange-300',
-  medium:   'bg-amber-50 text-amber-700 border-amber-300',
-  low:      'bg-green-50 text-green-700 border-green-300',
+  critical: 'bg-red-950/30 text-red-400 border-red-500/30',
+  high:     'bg-orange-950/30 text-orange-400 border-orange-500/30',
+  medium:   'bg-amber-950/30 text-amber-400 border-amber-500/30',
+  low:      'bg-emerald-950/30 text-emerald-400 border-emerald-500/30',
 }
 
 // ── Props ────────────────────────────────────────────────────────────────────
@@ -196,7 +196,7 @@ export function ZoneA({ matter, tenantId, onFlagClick, onNotesClick }: ZoneAProp
             )}
 
             {riskFlagCount > 0 && (
-              <div className="flex items-center gap-1 text-[10px] text-amber-700">
+              <div className="flex items-center gap-1 text-[10px] text-amber-400">
                 <AlertTriangle className="h-3 w-3 text-amber-500" />
                 <span className="font-medium">
                   {riskFlagCount} open {riskFlagCount === 1 ? 'flag' : 'flags'}
@@ -216,10 +216,10 @@ export function ZoneA({ matter, tenantId, onFlagClick, onNotesClick }: ZoneAProp
                 className={cn(
                   'text-[10px] px-1.5 py-0 border font-medium',
                   criticalSLA.status === 'breached'
-                    ? 'bg-red-50 text-red-700 border-red-300'
+                    ? 'bg-red-950/30 text-red-400 border-red-500/30'
                     : criticalSLARemaining !== null && criticalSLARemaining <= (criticalSLA ? Math.round(0.2 * (new Date(criticalSLA.due_at).getTime() - new Date(criticalSLA.started_at).getTime()) / (1000 * 60 * 60)) : 48)
-                      ? 'bg-amber-50 text-amber-700 border-amber-300'
-                      : 'bg-blue-50 text-blue-700 border-blue-300',
+                      ? 'bg-amber-950/30 text-amber-400 border-amber-500/30'
+                      : 'bg-blue-950/30 text-blue-400 border-blue-500/30',
                 )}
               >
                 {criticalSLA.status === 'breached' ? 'SLA: BREACHED' : `SLA: ${criticalSLARemaining}h`}
@@ -235,10 +235,10 @@ export function ZoneA({ matter, tenantId, onFlagClick, onNotesClick }: ZoneAProp
                 className={cn(
                   'text-[10px] px-1.5 py-0 border font-medium cursor-pointer',
                   readiness.total >= 80
-                    ? 'bg-green-50 text-green-700 border-green-300'
+                    ? 'bg-emerald-950/30 text-emerald-400 border-emerald-500/30'
                     : readiness.total >= 40
-                      ? 'bg-amber-50 text-amber-700 border-amber-300'
-                      : 'bg-red-50 text-red-700 border-red-300',
+                      ? 'bg-amber-950/30 text-amber-400 border-amber-500/30'
+                      : 'bg-red-950/30 text-red-400 border-red-500/30',
                 )}
                 onClick={() => router.push(`${pathname}?tab=details#readiness`)}
                 title={`Readiness: ${readiness.focus_area} needs attention`}

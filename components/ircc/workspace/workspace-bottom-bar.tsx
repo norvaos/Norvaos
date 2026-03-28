@@ -52,9 +52,9 @@ function getProcessingTime(matterType: string | null): { weeks: string; updated:
 
 function statusColour(status: string): string {
   switch (status) {
-    case 'active':       return 'text-green-700 bg-green-50 border-green-300'
-    case 'pending':      return 'text-amber-700 bg-amber-50 border-amber-300'
-    case 'closed_won':   return 'text-blue-700 bg-blue-50 border-blue-300'
+    case 'active':       return 'text-emerald-400 bg-emerald-950/30 border-green-300'
+    case 'pending':      return 'text-amber-400 bg-amber-950/30 border-amber-300'
+    case 'closed_won':   return 'text-blue-400 bg-blue-950/30 border-blue-300'
     case 'closed_lost':  return 'text-zinc-600 bg-zinc-50 border-zinc-300'
     case 'archived':     return 'text-zinc-500 bg-zinc-50 border-zinc-200'
     default:             return 'text-muted-foreground'
@@ -103,7 +103,7 @@ export function WorkspaceBottomBar({ matter, readinessData }: WorkspaceBottomBar
             <span className="text-[10px] text-muted-foreground">Intake:</span>
             <span className={cn(
               'text-[10px] font-medium',
-              intakeStatus === 'complete' ? 'text-green-700' :
+              intakeStatus === 'complete' ? 'text-emerald-400' :
               intakeStatus === 'incomplete' ? 'text-amber-600' :
               'text-muted-foreground'
             )}>

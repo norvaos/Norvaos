@@ -266,16 +266,16 @@ export function GenerationBlockerPanel({
       <CardContent className="pt-0 space-y-4">
         {/* Overall Status Badge */}
         {canGenerate ? (
-          <Alert className="border-green-200 bg-green-50">
+          <Alert className="border-emerald-500/20 bg-emerald-950/30">
             <CheckCircle2 className="h-4 w-4 text-green-600" />
-            <AlertDescription className="text-green-800 text-xs font-medium">
+            <AlertDescription className="text-emerald-400 text-xs font-medium">
               Ready to Generate  -  all requirements met.
             </AlertDescription>
           </Alert>
         ) : (
-          <Alert className="border-red-200 bg-red-50">
+          <Alert className="border-red-500/20 bg-red-950/30">
             <XCircle className="h-4 w-4 text-red-500" />
-            <AlertDescription className="text-red-800 text-xs font-medium">
+            <AlertDescription className="text-red-400 text-xs font-medium">
               {totalBlockers} {totalBlockers === 1 ? 'Blocker' : 'Blockers'} preventing generation.
             </AlertDescription>
           </Alert>
@@ -296,10 +296,10 @@ export function GenerationBlockerPanel({
               className={cn(
                 'h-full rounded-full transition-all',
                 canGenerate
-                  ? 'bg-green-500'
+                  ? 'bg-emerald-950/300'
                   : blockingCount > 0
-                    ? 'bg-red-500'
-                    : 'bg-amber-500'
+                    ? 'bg-red-950/300'
+                    : 'bg-amber-950/300'
               )}
               style={{
                 width: canGenerate
@@ -316,7 +316,7 @@ export function GenerationBlockerPanel({
             {validationSummary.missing_required > 0 && (
               <Badge
                 variant="outline"
-                className="text-[10px] py-0 px-1.5 border-red-300 text-red-600 bg-red-50"
+                className="text-[10px] py-0 px-1.5 border-red-300 text-red-600 bg-red-950/30"
               >
                 {validationSummary.missing_required} missing
               </Badge>
@@ -324,7 +324,7 @@ export function GenerationBlockerPanel({
             {validationSummary.stale > 0 && (
               <Badge
                 variant="outline"
-                className="text-[10px] py-0 px-1.5 border-amber-300 text-amber-600 bg-amber-50"
+                className="text-[10px] py-0 px-1.5 border-amber-300 text-amber-600 bg-amber-950/30"
               >
                 {validationSummary.stale} stale
               </Badge>
@@ -332,7 +332,7 @@ export function GenerationBlockerPanel({
             {validationSummary.pattern_errors > 0 && (
               <Badge
                 variant="outline"
-                className="text-[10px] py-0 px-1.5 border-orange-300 text-orange-600 bg-orange-50"
+                className="text-[10px] py-0 px-1.5 border-orange-300 text-orange-600 bg-orange-950/30"
               >
                 {validationSummary.pattern_errors} format errors
               </Badge>
@@ -340,7 +340,7 @@ export function GenerationBlockerPanel({
             {validationSummary.composite_failures > 0 && (
               <Badge
                 variant="outline"
-                className="text-[10px] py-0 px-1.5 border-purple-300 text-purple-600 bg-purple-50"
+                className="text-[10px] py-0 px-1.5 border-purple-300 text-purple-600 bg-purple-950/30"
               >
                 {validationSummary.composite_failures} rule failures
               </Badge>
@@ -348,7 +348,7 @@ export function GenerationBlockerPanel({
             {readiness.unresolved_conflicts.length > 0 && (
               <Badge
                 variant="outline"
-                className="text-[10px] py-0 px-1.5 border-orange-300 text-orange-600 bg-orange-50"
+                className="text-[10px] py-0 px-1.5 border-orange-300 text-orange-600 bg-orange-950/30"
               >
                 {readiness.unresolved_conflicts.length} conflicts
               </Badge>

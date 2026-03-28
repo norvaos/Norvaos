@@ -65,22 +65,22 @@ function getActivityColorClass(activityType: string): string {
   switch (activityType) {
     case 'completed':
     case 'task_completed':
-      return 'text-green-600 bg-green-50 dark:bg-green-950/30'
+      return 'text-green-600 bg-emerald-950/30 dark:bg-green-950/30'
     case 'status_change':
     case 'status_changed':
-      return 'text-blue-600 bg-blue-50 dark:bg-blue-950/30'
+      return 'text-blue-600 bg-blue-950/30 dark:bg-blue-950/30'
     case 'assigned':
     case 'task_assigned':
-      return 'text-purple-600 bg-purple-50 dark:bg-purple-950/30'
+      return 'text-purple-600 bg-purple-950/30 dark:bg-purple-950/30'
     case 'created':
     case 'task_created':
-      return 'text-emerald-600 bg-emerald-50 dark:bg-emerald-950/30'
+      return 'text-emerald-600 bg-emerald-950/30 dark:bg-emerald-950/30'
     case 'updated':
     case 'task_updated':
-      return 'text-amber-600 bg-amber-50 dark:bg-amber-950/30'
+      return 'text-amber-600 bg-amber-950/30 dark:bg-amber-950/30'
     case 'deleted':
     case 'task_deleted':
-      return 'text-red-600 bg-red-50 dark:bg-red-950/30'
+      return 'text-red-600 bg-red-950/30 dark:bg-red-950/30'
     case 'comment':
     case 'note':
       return 'text-sky-600 bg-sky-50 dark:bg-sky-950/30'

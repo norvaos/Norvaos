@@ -230,7 +230,7 @@ export default function AcademyPage() {
               className={cn(
                 'relative overflow-hidden transition-all duration-300 border-2',
                 isComplete
-                  ? 'border-emerald-300 bg-emerald-50/30 dark:border-emerald-700 dark:bg-emerald-900/10'
+                  ? 'border-emerald-500/30 bg-emerald-950/30/30 dark:border-emerald-700 dark:bg-emerald-900/10'
                   : 'border-border hover:border-violet-300 dark:hover:border-violet-700',
               )}
             >
@@ -275,7 +275,7 @@ export default function AcademyPage() {
                 <div className={cn(
                   'rounded-lg border-2 border-dashed aspect-video flex items-center justify-center',
                   isComplete
-                    ? 'border-emerald-200 bg-emerald-50/50 dark:border-emerald-800 dark:bg-emerald-900/20'
+                    ? 'border-emerald-500/20 bg-emerald-950/30/50 dark:border-emerald-800 dark:bg-emerald-900/20'
                     : 'border-violet-200 bg-violet-50/50 dark:border-violet-800 dark:bg-violet-900/20',
                 )}>
                   {mod.videoUrl ? (
@@ -336,7 +336,7 @@ export default function AcademyPage() {
             <h2 className="text-xl font-bold text-amber-800 dark:text-amber-300">
               Sovereign Certified
             </h2>
-            <p className="text-sm text-amber-700/80 dark:text-amber-400/80 max-w-md mx-auto">
+            <p className="text-sm text-amber-400/80 dark:text-amber-400/80 max-w-md mx-auto">
               You have completed all three Norva Sovereign Academy modules.
               Your sidebar avatar now bears the Gold Sparkle  -  the mark of a Master of the Fortress.
             </p>

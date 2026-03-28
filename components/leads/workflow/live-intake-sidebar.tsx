@@ -424,7 +424,7 @@ export function LiveIntakeSidebar({
                 {entities.map((entity, idx) => (
                   <div
                     key={idx}
-                    className="flex items-center gap-2 rounded border border-emerald-200 bg-emerald-50/50 px-2.5 py-1.5"
+                    className="flex items-center gap-2 rounded border border-emerald-500/20 bg-emerald-950/30 px-2.5 py-1.5"
                   >
                     <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
                     <div className="min-w-0 flex-1">
@@ -445,10 +445,10 @@ export function LiveIntakeSidebar({
               <p className="text-[10px] uppercase font-semibold text-muted-foreground tracking-wide mb-2">
                 Transcript
               </p>
-              <div className="rounded-lg border bg-slate-50 p-3 max-h-[300px] overflow-y-auto">
-                <p className="text-xs text-slate-700 whitespace-pre-wrap leading-relaxed">
+              <div className="rounded-lg border bg-muted/50 p-3 max-h-[300px] overflow-y-auto">
+                <p className="text-xs text-foreground/80 whitespace-pre-wrap leading-relaxed">
                   {transcript || (
-                    <span className="text-slate-400 italic">Listening...</span>
+                    <span className="text-muted-foreground/70 italic">Listening...</span>
                   )}
                 </p>
               </div>
@@ -476,7 +476,7 @@ export function LiveIntakeSidebar({
                     <div key={session.id} className="rounded-lg border p-2.5">
                       <div className="flex items-center gap-2 mb-1">
                         <FileText className="h-3.5 w-3.5 text-muted-foreground" />
-                        <span className="text-xs font-medium text-slate-700">
+                        <span className="text-xs font-medium text-foreground/80">
                           {session.suggested_stream || 'Intake Session'}
                         </span>
                         <Clock className="h-3 w-3 text-muted-foreground ml-auto" />
@@ -485,7 +485,7 @@ export function LiveIntakeSidebar({
                         </span>
                       </div>
                       {session.summary && (
-                        <p className="text-[11px] text-slate-500 line-clamp-2">{session.summary}</p>
+                        <p className="text-[11px] text-muted-foreground line-clamp-2">{session.summary}</p>
                       )}
                     </div>
                   ))}

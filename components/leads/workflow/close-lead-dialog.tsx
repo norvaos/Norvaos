@@ -71,7 +71,7 @@ export function CloseLeadDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md bg-background dark:bg-background/95 dark:backdrop-blur-xl dark:border-border">
         <DialogHeader>
           <DialogTitle>Close Lead</DialogTitle>
           <DialogDescription>

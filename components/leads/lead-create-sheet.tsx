@@ -1,5 +1,6 @@
 'use client'
 
+import { useRouter } from 'next/navigation'
 import { useCreateLead } from '@/lib/queries/leads'
 import { useTenant } from '@/lib/hooks/use-tenant'
 import { useUser } from '@/lib/hooks/use-user'
@@ -34,6 +35,7 @@ export function LeadCreateSheet({
   pipelineId,
   stageId,
 }: LeadCreateSheetProps) {
+  const router = useRouter()
   const { t } = useI18n()
   const { tenant } = useTenant()
   const { appUser } = useUser()
@@ -47,6 +49,11 @@ export function LeadCreateSheet({
     const customFields: Record<string, unknown> = {}
     if (values.preferred_language) {
       customFields.preferred_language = values.preferred_language
+    }
+
+    // Store email in custom_fields for data integrity
+    if (values.email) {
+      customFields.email = values.email
     }
 
     createLead.mutate(
@@ -67,8 +74,11 @@ export function LeadCreateSheet({
         ...(Object.keys(customFields).length > 0 ? { custom_fields: customFields as unknown as Json } : {}),
       },
       {
-        onSuccess: () => {
+        onSuccess: (lead) => {
           onOpenChange(false)
+          if (lead?.id) {
+            router.push(`/studio/workspace/${lead.id}?splash=1`)
+          }
         },
       }
     )
@@ -76,10 +86,10 @@ export function LeadCreateSheet({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="right" className="w-full sm:max-w-lg p-0">
-        <SheetHeader className="border-b px-6 py-4">
-          <SheetTitle>{t('form.add_new_lead' as any)}</SheetTitle>
-          <SheetDescription>
+      <SheetContent side="right" className="w-full sm:max-w-lg p-0 bg-background border-l border-border">
+        <SheetHeader className="border-b border-border px-6 py-4">
+          <SheetTitle className="text-emerald-600 dark:text-emerald-400 font-sans font-bold uppercase tracking-tight">{t('form.add_new_lead' as any)}</SheetTitle>
+          <SheetDescription className="text-muted-foreground font-sans text-xs">
             {t('form.add_new_lead_desc' as any)}
           </SheetDescription>
         </SheetHeader>

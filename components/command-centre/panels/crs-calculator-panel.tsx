@@ -54,9 +54,9 @@ function getScoreColor(score: number): string {
 }
 
 function getScoreBadge(score: number): string {
-  if (score >= 470) return 'bg-green-100 text-green-700 border-green-200'
-  if (score >= 400) return 'bg-blue-100 text-blue-700 border-blue-200'
-  if (score >= 300) return 'bg-amber-100 text-amber-700 border-amber-200'
+  if (score >= 470) return 'bg-green-100 text-emerald-400 border-green-200'
+  if (score >= 400) return 'bg-blue-100 text-blue-400 border-blue-200'
+  if (score >= 300) return 'bg-amber-100 text-amber-400 border-amber-200'
   return 'bg-slate-100 text-slate-700 border-slate-200'
 }
 

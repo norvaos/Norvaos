@@ -141,19 +141,19 @@ export default function ClientWorkspace() {
 
   const statusColour = (status: string | null) => {
     switch (status) {
-      case 'paid': return 'bg-green-100 text-green-700'
-      case 'overdue': return 'bg-red-100 text-red-700'
-      case 'sent': return 'bg-blue-100 text-blue-700'
-      case 'viewed': return 'bg-purple-100 text-purple-700'
+      case 'paid': return 'bg-emerald-950/40 text-emerald-400'
+      case 'overdue': return 'bg-red-950/40 text-red-400'
+      case 'sent': return 'bg-blue-950/40 text-blue-400'
+      case 'viewed': return 'bg-purple-950/40 text-purple-400'
       default: return 'bg-gray-100 text-gray-600'
     }
   }
 
   const apptStatusColour = (status: string) => {
     switch (status) {
-      case 'confirmed': return 'bg-green-100 text-green-700'
-      case 'pending': return 'bg-yellow-100 text-yellow-700'
-      case 'cancelled': return 'bg-red-100 text-red-700'
+      case 'confirmed': return 'bg-emerald-950/40 text-emerald-400'
+      case 'pending': return 'bg-yellow-950/40 text-yellow-400'
+      case 'cancelled': return 'bg-red-950/40 text-red-400'
       default: return 'bg-gray-100 text-gray-600'
     }
   }
@@ -172,12 +172,12 @@ export default function ClientWorkspace() {
             Client Portal
           </h1>
         </div>
-        <Card className="border-amber-200 bg-amber-50">
+        <Card className="border-amber-500/20 bg-amber-950/30">
           <CardContent className="pt-6 pb-6 text-center">
             <p className="text-sm font-medium text-amber-900">
               Your account is not yet linked to any matters.
             </p>
-            <p className="text-sm text-amber-700 mt-1">
+            <p className="text-sm text-amber-400 mt-1">
               Please contact your lawyer to have your account linked to your file.
             </p>
           </CardContent>
@@ -200,12 +200,12 @@ export default function ClientWorkspace() {
 
       {/* No matters linked to this contact */}
       {linkedContact && clientMatters.length === 0 && (
-        <Card className="border-amber-200 bg-amber-50">
+        <Card className="border-amber-500/20 bg-amber-950/30">
           <CardContent className="pt-6 pb-6 text-center">
             <p className="text-sm font-medium text-amber-900">
               Your account is not yet linked to any matters.
             </p>
-            <p className="text-sm text-amber-700 mt-1">
+            <p className="text-sm text-amber-400 mt-1">
               Please contact your lawyer to have your account linked to your file.
             </p>
           </CardContent>

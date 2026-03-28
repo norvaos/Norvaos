@@ -77,13 +77,19 @@ export function useDisconnectMicrosoft() {
   return useMutation({
     mutationFn: async () => {
       const res = await fetch('/api/integrations/microsoft/disconnect', { method: 'POST' })
-      if (!res.ok) throw new Error('Failed to disconnect')
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}))
+        throw new Error(body?.error || `Disconnect failed (${res.status})`)
+      }
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: microsoftKeys.all })
+      qc.setQueryData(microsoftKeys.all, null)
       toast.success('Microsoft account disconnected')
+      // Force page reload to clear all cached state
+      setTimeout(() => window.location.reload(), 500)
     },
-    onError: () => toast.error('Failed to disconnect Microsoft account'),
+    onError: (err: Error) => toast.error(err.message || 'Failed to disconnect Microsoft account'),
   })
 }
 

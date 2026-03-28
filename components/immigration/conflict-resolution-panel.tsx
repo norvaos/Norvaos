@@ -47,7 +47,7 @@ export function ConflictResolutionPanel({ profileId, userId }: ConflictResolutio
 
   if (!conflicts || conflicts.length === 0) {
     return (
-      <div className="rounded-md border border-green-200 bg-green-50 p-4 text-sm text-green-700 flex items-center gap-2">
+      <div className="rounded-md border border-emerald-500/30 bg-emerald-950/30 p-4 text-sm text-emerald-400 flex items-center gap-2">
         <Check className="h-4 w-4 shrink-0" />
         No pending conflicts. All profile data is consistent.
       </div>
@@ -182,7 +182,7 @@ function ConflictCard({
             <ChevronRight className="h-4 w-4 text-muted-foreground" />
           )}
           <span className="font-medium text-sm">{formatFieldKey(conflict.field_key)}</span>
-          <Badge variant="outline" className="text-[10px] border-amber-200 text-amber-700 bg-amber-50">
+          <Badge variant="outline" className="text-[10px] border-amber-500/30 text-amber-400 bg-amber-950/30">
             Conflict
           </Badge>
         </button>
@@ -199,10 +199,10 @@ function ConflictCard({
             {/* Existing Value */}
             <div className="space-y-1.5">
               <div className="flex items-center gap-1.5">
-                <div className="h-2 w-2 rounded-full bg-blue-500" />
+                <div className="h-2 w-2 rounded-full bg-blue-950/300" />
                 <span className="text-xs font-medium text-muted-foreground">Current Value</span>
               </div>
-              <div className="rounded-md border bg-blue-50/50 p-3">
+              <div className="rounded-md border bg-blue-950/30/50 p-3">
                 <p className="text-sm font-mono break-all">
                   {formatDisplayValue(conflict.existing_value)}
                 </p>
@@ -212,7 +212,7 @@ function ConflictCard({
             {/* New Value */}
             <div className="space-y-1.5">
               <div className="flex items-center gap-1.5">
-                <div className="h-2 w-2 rounded-full bg-amber-500" />
+                <div className="h-2 w-2 rounded-full bg-amber-950/300" />
                 <span className="text-xs font-medium text-muted-foreground">
                   New Value
                   <span className="ml-1 text-muted-foreground/70">
@@ -220,7 +220,7 @@ function ConflictCard({
                   </span>
                 </span>
               </div>
-              <div className="rounded-md border bg-amber-50/50 p-3">
+              <div className="rounded-md border bg-amber-950/30/50 p-3">
                 <p className="text-sm font-mono break-all">
                   {formatDisplayValue(conflict.new_value)}
                 </p>

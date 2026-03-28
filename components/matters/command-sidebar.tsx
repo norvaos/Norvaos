@@ -559,7 +559,7 @@ export function CommandSidebar({
         {activePortalLink ? (
           <div className="rounded-md border bg-white p-2.5 space-y-2">
             <div className="flex items-center justify-between">
-              <Badge className="bg-emerald-100 text-emerald-700 border-emerald-300 border text-[10px] font-medium">
+              <Badge className="bg-emerald-950/40 text-emerald-400 border-emerald-500/30 border text-[10px] font-medium">
                 Active
               </Badge>
               <div className="flex items-center gap-1">

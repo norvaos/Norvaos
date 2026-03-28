@@ -8,6 +8,31 @@ import { toast } from 'sonner'
 type Lead = Database['public']['Tables']['leads']['Row']
 type LeadInsert = Database['public']['Tables']['leads']['Insert']
 type LeadUpdate = Database['public']['Tables']['leads']['Update']
+type LeadSource = Database['public']['Tables']['lead_sources']['Row']
+
+// ---------------------------------------------------------------------------
+// Shared Lead Sources hook — single source of truth for both Filter & Intake
+// ---------------------------------------------------------------------------
+
+export function useLeadSources(tenantId: string) {
+  return useQuery({
+    queryKey: ['lead_sources', tenantId],
+    queryFn: async () => {
+      const supabase = createClient()
+      const { data, error } = await supabase
+        .from('lead_sources')
+        .select('*')
+        .eq('tenant_id', tenantId)
+        .eq('is_active', true)
+        .order('sort_order')
+
+      if (error) throw error
+      return data as LeadSource[]
+    },
+    enabled: !!tenantId,
+    staleTime: 1000 * 60 * 5,
+  })
+}
 
 interface LeadListParams {
   tenantId: string
@@ -112,7 +137,10 @@ export function useCreateLead() {
         .select()
         .single()
 
-      if (error) throw error
+      if (error) {
+        console.error('[CREATE_LEAD_DB_ERROR]', JSON.stringify(error))
+        throw error
+      }
       return data as Lead
     },
     onSuccess: (lead) => {
@@ -139,7 +167,7 @@ export function useCreateLead() {
       }
     },
     onError: () => {
-      toast.error('Failed to create lead')
+      toast.error('Satellite Link Interrupted — Required fields missing or Stage 1 not initialised.')
     },
   })
 }

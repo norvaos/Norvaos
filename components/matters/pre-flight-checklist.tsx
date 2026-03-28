@@ -234,16 +234,16 @@ export function PreFlightChecklist({
           <div className={cn(
             'rounded-lg border p-3 text-center',
             allPassed
-              ? 'border-emerald-300 bg-emerald-50 dark:border-emerald-700 dark:bg-emerald-900/20'
-              : 'border-red-300 bg-red-50 dark:border-red-700 dark:bg-red-900/20',
+              ? 'border-emerald-500/30 bg-emerald-950/30 dark:border-emerald-700 dark:bg-emerald-900/20'
+              : 'border-red-300 bg-red-950/30 dark:border-red-700 dark:bg-red-900/20',
           )}>
             {allPassed ? (
-              <div className="flex items-center justify-center gap-2 text-emerald-700 dark:text-emerald-400">
+              <div className="flex items-center justify-center gap-2 text-emerald-400 dark:text-emerald-400">
                 <CheckCircle2 className="h-5 w-5" />
                 <span className="font-semibold">All checks passed  -  ready to seal</span>
               </div>
             ) : (
-              <div className="flex items-center justify-center gap-2 text-red-700 dark:text-red-400">
+              <div className="flex items-center justify-center gap-2 text-red-400 dark:text-red-400">
                 <XCircle className="h-5 w-5" />
                 <span className="font-semibold">
                   {failCount} check{failCount > 1 ? 's' : ''} failed  -  cannot proceed
@@ -295,8 +295,8 @@ function PreFlightCheckRow({ check }: { check: PreFlightCheck }) {
     <div className={cn(
       'flex items-start gap-3 rounded-lg border p-3 transition-colors',
       isPassed
-        ? 'border-emerald-200 bg-emerald-50/50 dark:border-emerald-800 dark:bg-emerald-900/10'
-        : 'border-red-200 bg-red-50/50 dark:border-red-800 dark:bg-red-900/10',
+        ? 'border-emerald-500/20 bg-emerald-950/30/50 dark:border-emerald-800 dark:bg-emerald-900/10'
+        : 'border-red-200 bg-red-950/30/50 dark:border-red-800 dark:bg-red-900/10',
     )}>
       {/* Status icon */}
       <div className={cn(
@@ -322,8 +322,8 @@ function PreFlightCheckRow({ check }: { check: PreFlightCheck }) {
             className={cn(
               'text-[10px] px-1.5',
               isPassed
-                ? 'border-emerald-300 text-emerald-700 bg-emerald-50'
-                : 'border-red-300 text-red-700 bg-red-50',
+                ? 'border-emerald-500/30 text-emerald-400 bg-emerald-950/30'
+                : 'border-red-300 text-red-400 bg-red-950/30',
             )}
           >
             {isPassed ? 'PASS' : 'FAIL'}

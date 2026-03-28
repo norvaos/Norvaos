@@ -205,9 +205,9 @@ export function SovereignStepper({ onComplete, onCancel }: SovereignStepperProps
           <Badge
             className={cn(
               'gap-1.5 border text-xs font-medium',
-              currentPhase === 'conflict_search' && 'border-amber-200 bg-amber-50 text-amber-700',
-              currentPhase === 'contact_details' && 'border-blue-200 bg-blue-50 text-blue-700',
-              currentPhase === 'compliance_review' && 'border-emerald-200 bg-emerald-50 text-emerald-700',
+              currentPhase === 'conflict_search' && 'border-amber-500/20 bg-amber-950/30 text-amber-400',
+              currentPhase === 'contact_details' && 'border-blue-500/20 bg-blue-950/30 text-blue-400',
+              currentPhase === 'compliance_review' && 'border-emerald-500/20 bg-emerald-950/30 text-emerald-400',
             )}
           >
             {labelledSteps[currentIndex]?.icon}
@@ -231,8 +231,8 @@ export function SovereignStepper({ onComplete, onCancel }: SovereignStepperProps
                   <div
                     className={cn(
                       'flex size-9 items-center justify-center rounded-full border-2 text-sm font-semibold transition-all duration-300',
-                      isCompleted && 'border-emerald-500 bg-emerald-500 text-white',
-                      isCurrent && 'border-blue-500 bg-blue-500 text-white shadow-md shadow-blue-200',
+                      isCompleted && 'border-emerald-500 bg-emerald-950/300 text-white',
+                      isCurrent && 'border-blue-500 bg-blue-950/300 text-white shadow-md shadow-blue-200',
                       !isCompleted && !isCurrent && 'border-slate-200 bg-white text-slate-400',
                     )}
                   >
@@ -261,7 +261,7 @@ export function SovereignStepper({ onComplete, onCancel }: SovereignStepperProps
                       className={cn(
                         'h-full rounded-full transition-all duration-500',
                         idx < currentIndex
-                          ? 'bg-emerald-500'
+                          ? 'bg-emerald-950/300'
                           : 'bg-slate-200',
                       )}
                     />
@@ -275,7 +275,7 @@ export function SovereignStepper({ onComplete, onCancel }: SovereignStepperProps
         {/* Progress bar */}
         <div className="h-1 w-full overflow-hidden rounded-full bg-slate-100">
           <div
-            className="h-full rounded-full bg-blue-500 transition-all duration-500 ease-out"
+            className="h-full rounded-full bg-blue-950/300 transition-all duration-500 ease-out"
             style={{ width: `${((currentIndex + 1) / labelledSteps.length) * 100}%` }}
           />
         </div>

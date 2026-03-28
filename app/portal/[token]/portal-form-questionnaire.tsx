@@ -203,16 +203,16 @@ export function PortalFormQuestionnaire({
     return (
       <div className="space-y-4">
         <BackButton onBack={onBack} primaryColor={primaryColor} />
-        <div className="rounded-2xl border border-emerald-200/60 bg-gradient-to-br from-emerald-50 to-white p-6 text-center shadow-lg">
-          <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-100 shadow-sm">
+        <div className="rounded-2xl border border-emerald-500/20/60 bg-gradient-to-br from-emerald-50 to-white p-6 text-center shadow-lg">
+          <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-950/40 shadow-sm">
             <svg className="h-6 w-6 text-emerald-600" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
             </svg>
           </div>
-          <h3 className="text-base font-bold text-emerald-800">
+          <h3 className="text-base font-bold text-emerald-400">
             {formCode} Completed
           </h3>
-          <p className="mt-1 text-sm text-emerald-700">
+          <p className="mt-1 text-sm text-emerald-400">
             Your responses for {formName} have been saved. Returning to form list...
           </p>
         </div>

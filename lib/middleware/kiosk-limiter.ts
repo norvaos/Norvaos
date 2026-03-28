@@ -45,9 +45,9 @@ function buildRateLimitResponse(retryAfterMs: number): NextResponse {
  * Check general kiosk rate limit (30 req/min per token+IP).
  * Returns a 429 NextResponse if blocked, or null if allowed.
  */
-export function checkKioskRateLimit(request: Request, token: string): NextResponse | null {
+export async function checkKioskRateLimit(request: Request, token: string): Promise<NextResponse | null> {
   const ip = getClientIp(request)
-  const result = generalLimiter.check(`kiosk:${token}:${ip}`)
+  const result = await generalLimiter.check(`kiosk:${token}:${ip}`)
   if (!result.allowed) {
     return buildRateLimitResponse(result.retryAfterMs)
   }
@@ -58,9 +58,9 @@ export function checkKioskRateLimit(request: Request, token: string): NextRespon
  * Check DOB verification rate limit (10 req/min per token+IP).
  * Stricter limit because this endpoint is an identity verification gate.
  */
-export function checkVerifyRateLimit(request: Request, token: string): NextResponse | null {
+export async function checkVerifyRateLimit(request: Request, token: string): Promise<NextResponse | null> {
   const ip = getClientIp(request)
-  const result = verifyLimiter.check(`verify:${token}:${ip}`)
+  const result = await verifyLimiter.check(`verify:${token}:${ip}`)
   if (!result.allowed) {
     return buildRateLimitResponse(result.retryAfterMs)
   }
@@ -71,9 +71,9 @@ export function checkVerifyRateLimit(request: Request, token: string): NextRespo
  * Check ID scan upload rate limit (5 req/min per token+IP).
  * Strictest limit because file uploads are expensive.
  */
-export function checkUploadRateLimit(request: Request, token: string): NextResponse | null {
+export async function checkUploadRateLimit(request: Request, token: string): Promise<NextResponse | null> {
   const ip = getClientIp(request)
-  const result = uploadLimiter.check(`upload:${token}:${ip}`)
+  const result = await uploadLimiter.check(`upload:${token}:${ip}`)
   if (!result.allowed) {
     return buildRateLimitResponse(result.retryAfterMs)
   }

@@ -313,7 +313,7 @@ export default function KioskSettingsPage() {
                         {t.token.slice(0, 8)}...{t.token.slice(-4)}
                       </code>
                       {t.is_active ? (
-                        <Badge variant="outline" className="text-emerald-600 border-emerald-200 bg-emerald-50">
+                        <Badge variant="outline" className="text-emerald-600 border-emerald-500/20 bg-emerald-950/30">
                           Active
                         </Badge>
                       ) : (
@@ -362,7 +362,7 @@ export default function KioskSettingsPage() {
                           size="sm"
                           onClick={() => revokeMutation.mutate(t.id)}
                           disabled={revokeMutation.isPending}
-                          className="text-red-500 hover:text-red-700"
+                          className="text-red-500 hover:text-red-400"
                           title="Revoke token"
                         >
                           <Trash2 className="w-4 h-4" />

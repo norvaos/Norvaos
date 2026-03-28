@@ -24,7 +24,7 @@ import { useUser } from '@/lib/hooks/use-user'
 import { contactKeys, useCreateContact } from '@/lib/queries/contacts'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
-import { CONTACT_SOURCES } from '@/lib/utils/constants'
+import { useLeadSources } from '@/lib/queries/leads'
 import { NorvaGuardianTooltip } from '@/components/ui/norva-guardian-tooltip'
 import { resolveDefaultPipelineAndStage } from '@/lib/services/pipeline-resolver'
 
@@ -195,11 +195,18 @@ function StepIndicator({ currentStep }: { currentStep: Step }) {
 
 // ── Props ─────────────────────────────────────────────────────────────────────
 
+export interface ContactCreationResult {
+  contactId: string
+  contactName: string
+  email: string | null
+  leadCreated: boolean
+}
+
 export interface SovereignContactModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   matterId?: string | null
-  onSuccess?: (contactId: string) => void
+  onSuccess?: (contactId: string, result?: ContactCreationResult) => void
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
@@ -214,6 +221,7 @@ export function SovereignContactModal({
   const { appUser } = useUser()
   const createContact = useCreateContact()
   const queryClient = useQueryClient()
+  const { data: leadSources } = useLeadSources(tenant?.id ?? '')
   const firstInputRef = useRef<HTMLInputElement>(null)
 
   // ── Step state ──
@@ -526,6 +534,7 @@ export function SovereignContactModal({
       }
 
       // Auto-create lead in default Lead Intake Pipeline (unless matter-linked)
+      let leadCreated = false
       if (!matterId && result.id) {
         try {
           const supabase = createClient()
@@ -549,6 +558,7 @@ export function SovereignContactModal({
             .single()
 
           if (newLead) {
+            leadCreated = true
             queryClient.invalidateQueries({ queryKey: ['leads'] })
             toast.success('Lead created in intake pipeline')
           }
@@ -558,8 +568,23 @@ export function SovereignContactModal({
         }
       }
 
-      onSuccess?.(result.id)
-      onOpenChange(false)
+      // Build contact name for the post-creation hub
+      const contactName = values.contact_type === 'individual'
+        ? `${values.first_name} ${values.last_name}`.trim()
+        : values.organization_name || 'Unknown'
+
+      // Fire onSuccess — the layout handler will close the modal and open the PostContactHub.
+      if (onSuccess) {
+        onSuccess(result.id, {
+          contactId: result.id,
+          contactName,
+          email: values.email_primary || null,
+          leadCreated,
+        })
+      } else {
+        // Fallback: close modal if no onSuccess handler provided
+        onOpenChange(false)
+      }
     } catch {
       // Error handled by mutation's onError
     } finally {
@@ -651,7 +676,7 @@ export function SovereignContactModal({
                     className="flex flex-col gap-5"
                   >
                     {/* Regulatory banner */}
-                    <div className="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-200">
+                    <div className="flex items-start gap-3 rounded-xl border border-amber-500/20 bg-amber-950/30 p-4 text-sm text-amber-900 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-200">
                       <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-600 dark:text-amber-400" />
                       <span>
                         <strong>Regulatory Requirement:</strong> A conflict search must be completed before collecting personal data.
@@ -717,7 +742,7 @@ export function SovereignContactModal({
 
                     {/* Error */}
                     {scanError && (
-                      <div className="animate-in fade-in slide-in-from-bottom-2 duration-300 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800 dark:border-red-800 dark:bg-red-950/40 dark:text-red-200">
+                      <div className="animate-in fade-in slide-in-from-bottom-2 duration-300 rounded-xl border border-red-500/20 bg-red-950/30 p-4 text-sm text-red-800 dark:border-red-800 dark:bg-red-950/40 dark:text-red-200">
                         {scanError}
                       </div>
                     )}
@@ -727,14 +752,14 @@ export function SovereignContactModal({
                       <motion.div
                         initial={{ opacity: 0, y: 8 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="flex flex-col items-center gap-3 rounded-xl border border-green-200 bg-green-50 p-6 text-center dark:border-green-800 dark:bg-green-950/40"
+                        className="flex flex-col items-center gap-3 rounded-xl border border-green-200 bg-emerald-950/30 p-6 text-center dark:border-green-800 dark:bg-green-950/40"
                       >
                         <ShieldCheck className="h-10 w-10 text-green-600 dark:text-green-400" />
                         <p className="text-sm font-medium text-green-800 dark:text-green-200">
                           No conflicts found for{' '}
                           <strong>{conflictFirstName.trim()} {conflictLastName.trim()}</strong>
                         </p>
-                        <Badge variant="outline" className="border-green-300 text-green-700 dark:border-green-700 dark:text-green-300">
+                        <Badge variant="outline" className="border-green-300 text-emerald-400 dark:border-green-700 dark:text-green-300">
                           Cleared
                         </Badge>
                       </motion.div>
@@ -745,20 +770,20 @@ export function SovereignContactModal({
                       <motion.div
                         initial={{ opacity: 0, y: 8 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="flex flex-col items-center gap-3 rounded-xl border border-green-200 bg-green-50 p-6 text-center dark:border-green-800 dark:bg-green-950/40"
+                        className="flex flex-col items-center gap-3 rounded-xl border border-green-200 bg-emerald-950/30 p-6 text-center dark:border-green-800 dark:bg-green-950/40"
                       >
                         <ShieldCheck className="h-10 w-10 text-green-600 dark:text-green-400" />
                         <p className="text-sm font-medium text-green-800 dark:text-green-200">
                           Conflict Resolved
                         </p>
-                        <p className="text-xs text-green-700 dark:text-green-300">
+                        <p className="text-xs text-emerald-400 dark:text-green-300">
                           {conflictResolution === 'linked' ? (
                             <>Linked to existing contact: <strong>{resolvedMatch.first_name} {resolvedMatch.last_name}</strong></>
                           ) : (
                             <>Declared no conflict with <strong>{resolvedMatch.first_name} {resolvedMatch.last_name}</strong></>
                           )}
                         </p>
-                        <Badge variant="outline" className="border-green-300 text-green-700 dark:border-green-700 dark:text-green-300">
+                        <Badge variant="outline" className="border-green-300 text-emerald-400 dark:border-green-700 dark:text-green-300">
                           {conflictResolution === 'linked' ? 'Linked to Existing' : 'No Conflict Declared'}
                         </Badge>
                       </motion.div>
@@ -771,13 +796,13 @@ export function SovereignContactModal({
                         animate={{ opacity: 1, y: 0 }}
                         className="space-y-4"
                       >
-                        <div className="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-950/40">
+                        <div className="flex items-start gap-3 rounded-xl border border-amber-500/20 bg-amber-950/30 p-4 dark:border-amber-800 dark:bg-amber-950/40">
                           <ShieldAlert className="mt-0.5 h-6 w-6 shrink-0 text-amber-600 dark:text-amber-400" />
                           <div className="space-y-1">
                             <p className="text-sm font-medium text-amber-800 dark:text-amber-200">
                               Potential conflicts detected
                             </p>
-                            <p className="text-xs text-amber-700 dark:text-amber-300">
+                            <p className="text-xs text-amber-400 dark:text-amber-300">
                               Resolve each match before proceeding.
                             </p>
                           </div>
@@ -897,7 +922,7 @@ export function SovereignContactModal({
                           ))}
                         </div>
 
-                        <Badge variant="outline" className="border-amber-300 text-amber-700 dark:border-amber-700 dark:text-amber-300">
+                        <Badge variant="outline" className="border-amber-300 text-amber-400 dark:border-amber-700 dark:text-amber-300">
                           Resolution Required
                         </Badge>
                       </motion.div>
@@ -928,7 +953,7 @@ export function SovereignContactModal({
                           <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-500/15">
                             <User className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
                           </div>
-                          <span className="text-xs font-semibold uppercase tracking-widest text-emerald-700 dark:text-emerald-400">Identity</span>
+                          <span className="text-xs font-semibold uppercase tracking-widest text-emerald-400 dark:text-emerald-400">Identity</span>
                           <NorvaGuardianTooltip fieldKey="contactName" />
                         </div>
 
@@ -940,7 +965,7 @@ export function SovereignContactModal({
                             className={cn(
                               'flex items-center gap-2.5 rounded-xl border-2 px-5 py-3 text-sm font-medium transition-all',
                               contactType === 'individual'
-                                ? 'border-emerald-500 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 shadow-[0_0_16px_rgba(16,185,129,0.15)]'
+                                ? 'border-emerald-500 bg-emerald-500/10 text-emerald-400 dark:text-emerald-300 shadow-[0_0_16px_rgba(16,185,129,0.15)]'
                                 : 'border-gray-200 dark:border-white/10 text-gray-500 dark:text-white/40 hover:border-emerald-500/40 hover:bg-emerald-500/5',
                             )}
                           >
@@ -953,7 +978,7 @@ export function SovereignContactModal({
                             className={cn(
                               'flex items-center gap-2.5 rounded-xl border-2 px-5 py-3 text-sm font-medium transition-all',
                               contactType === 'organization'
-                                ? 'border-emerald-500 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 shadow-[0_0_16px_rgba(16,185,129,0.15)]'
+                                ? 'border-emerald-500 bg-emerald-500/10 text-emerald-400 dark:text-emerald-300 shadow-[0_0_16px_rgba(16,185,129,0.15)]'
                                 : 'border-gray-200 dark:border-white/10 text-gray-500 dark:text-white/40 hover:border-emerald-500/40 hover:bg-emerald-500/5',
                             )}
                           >
@@ -1041,7 +1066,7 @@ export function SovereignContactModal({
                           <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-500/15">
                             <Mail className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
                           </div>
-                          <span className="text-xs font-semibold uppercase tracking-widest text-emerald-700 dark:text-emerald-400">Digital</span>
+                          <span className="text-xs font-semibold uppercase tracking-widest text-emerald-400 dark:text-emerald-400">Digital</span>
                           <NorvaGuardianTooltip fieldKey="contactEmail" />
                         </div>
                         <div className="grid grid-cols-2 gap-3">
@@ -1088,7 +1113,7 @@ export function SovereignContactModal({
                           <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-500/15">
                             <MapPin className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
                           </div>
-                          <span className="text-xs font-semibold uppercase tracking-widest text-emerald-700 dark:text-emerald-400">Location</span>
+                          <span className="text-xs font-semibold uppercase tracking-widest text-emerald-400 dark:text-emerald-400">Location</span>
                           <NorvaGuardianTooltip fieldKey="contactAddress" />
                         </div>
 
@@ -1234,7 +1259,7 @@ export function SovereignContactModal({
                           <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-500/15">
                             <Users className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
                           </div>
-                          <span className="text-xs font-semibold uppercase tracking-widest text-emerald-700 dark:text-emerald-400">Source</span>
+                          <span className="text-xs font-semibold uppercase tracking-widest text-emerald-400 dark:text-emerald-400">Source</span>
                           <NorvaGuardianTooltip fieldKey="contactSource" />
                         </div>
                         <Select
@@ -1246,9 +1271,9 @@ export function SovereignContactModal({
                             <SelectValue placeholder="How did they find you?" />
                           </SelectTrigger>
                           <SelectContent className="z-[9996]">
-                            {CONTACT_SOURCES.map((src) => (
-                              <SelectItem key={src} value={src}>
-                                {src}
+                            {(leadSources ?? []).map((src) => (
+                              <SelectItem key={src.id} value={src.name}>
+                                {src.name}
                               </SelectItem>
                             ))}
                           </SelectContent>

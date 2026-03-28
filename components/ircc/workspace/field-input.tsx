@@ -138,7 +138,7 @@ export function FieldInput({
             <TooltipTrigger asChild>
               <Badge
                 variant="outline"
-                className="text-[10px] py-0 px-1.5 leading-4 border-amber-300 text-amber-700 bg-amber-50 gap-0.5"
+                className="text-[10px] py-0 px-1.5 leading-4 border-amber-300 text-amber-400 bg-amber-950/30 gap-0.5"
               >
                 <AlertTriangle className="h-2.5 w-2.5" />
                 Stale
@@ -432,8 +432,8 @@ export function FieldInput({
   return (
     <div className={cn(
       'py-2 border-b last:border-0',
-      answer?.stale && 'bg-amber-50/30',
-      isVerified && !answer?.stale && 'bg-green-50/10',
+      answer?.stale && 'bg-amber-950/30',
+      isVerified && !answer?.stale && 'bg-emerald-950/10',
     )}>
       {labelRow}
       {control}

@@ -77,13 +77,13 @@ const CATEGORY_META: Record<string, {
   identity: {
     icon: Fingerprint,
     colour: 'text-blue-600 dark:text-blue-400',
-    bgColour: 'bg-blue-50 dark:bg-blue-950/30',
+    bgColour: 'bg-blue-950/30 dark:bg-blue-950/30',
     label: 'Identity',
   },
   financial: {
     icon: Landmark,
     colour: 'text-emerald-600 dark:text-emerald-400',
-    bgColour: 'bg-emerald-50 dark:bg-emerald-950/30',
+    bgColour: 'bg-emerald-950/30 dark:bg-emerald-950/30',
     label: 'Financial',
   },
   legal: {
@@ -95,13 +95,13 @@ const CATEGORY_META: Record<string, {
   correspondence: {
     icon: Mail,
     colour: 'text-amber-600 dark:text-amber-400',
-    bgColour: 'bg-amber-50 dark:bg-amber-950/30',
+    bgColour: 'bg-amber-950/30 dark:bg-amber-950/30',
     label: 'Correspondence',
   },
   medical: {
     icon: Stethoscope,
     colour: 'text-red-600 dark:text-red-400',
-    bgColour: 'bg-red-50 dark:bg-red-950/30',
+    bgColour: 'bg-red-950/30 dark:bg-red-950/30',
     label: 'Medical',
   },
   immigration: {
@@ -408,7 +408,7 @@ function DocumentArchiveCard({
     <Card className={cn(
       'overflow-hidden transition-colors',
       isTampered
-        ? 'border-red-400 bg-red-50/60 dark:border-red-700 dark:bg-red-950/30 animate-pulse'
+        ? 'border-red-400 bg-red-950/30/60 dark:border-red-700 dark:bg-red-950/30 animate-pulse'
         : 'hover:bg-muted/30',
     )}>
       <CardContent className="p-3 flex items-start gap-3">

@@ -231,7 +231,60 @@ const handlePost = withPlatformAdmin(async (request, ctx) => {
     }).select().single()
   }
 
-  // ── 3. Audit log ────────────────────────────────────────────────────────────
+  // ── 3. NorvaOS Standard Master: 7-Stage Sovereign Pipeline (immutable) ──────
+  const pipelineActionKey = 'seed_golden_thread_pipeline'
+  const { data: pipelineLogEntry } = await admin
+    .from('tenant_setup_log')
+    .select('id')
+    .eq('tenant_id', tenantId)
+    .eq('action', pipelineActionKey)
+    .single()
+
+  if (!pipelineLogEntry) {
+    const { data: existingPipeline } = await admin
+      .from('pipelines')
+      .select('id')
+      .eq('tenant_id', tenantId)
+      .eq('name', 'NorvaOS Standard')
+      .maybeSingle()
+
+    if (!existingPipeline) {
+      const { data: pipeline } = await admin
+        .from('pipelines')
+        .insert({
+          tenant_id: tenantId,
+          name: 'NorvaOS Standard',
+          pipeline_type: 'lead',
+          is_default: true,
+          is_active: true,
+        } as never)
+        .select('id')
+        .single() as unknown as { data: { id: string } | null }
+
+      if (pipeline?.id) {
+        const pid = pipeline.id
+        await admin.from('pipeline_stages').insert([
+          { tenant_id: tenantId, pipeline_id: pid, name: 'Inquiry',          sort_order: 1, color: '#3b82f6', description: 'New inbound lead received.',                            is_win_stage: false, is_lost_stage: false, win_probability: 5,   rotting_days: 2  },
+          { tenant_id: tenantId, pipeline_id: pid, name: 'Contacted',        sort_order: 2, color: '#6366f1', description: 'First outbound contact made.',                           is_win_stage: false, is_lost_stage: false, win_probability: 15,  rotting_days: 3  },
+          { tenant_id: tenantId, pipeline_id: pid, name: 'Meeting Set',      sort_order: 3, color: '#8b5cf6', description: 'Strategy meeting scheduled.',                            is_win_stage: false, is_lost_stage: false, win_probability: 30,  rotting_days: 5  },
+          { tenant_id: tenantId, pipeline_id: pid, name: 'Strategy Held',    sort_order: 4, color: '#f59e0b', description: 'Strategy meeting completed. Smart Pause junction.',      is_win_stage: false, is_lost_stage: false, win_probability: 50,  rotting_days: 7  },
+          { tenant_id: tenantId, pipeline_id: pid, name: 'Retainer Sent',    sort_order: 5, color: '#f97316', description: 'Retainer agreement sent.',                               is_win_stage: false, is_lost_stage: false, win_probability: 70,  rotting_days: 10 },
+          { tenant_id: tenantId, pipeline_id: pid, name: 'Payment Pending',  sort_order: 6, color: '#eab308', description: 'Invoice or Stripe payment link active.',                 is_win_stage: false, is_lost_stage: false, win_probability: 85,  rotting_days: 14 },
+          { tenant_id: tenantId, pipeline_id: pid, name: 'Won / Onboarded',  sort_order: 7, color: '#10b981', description: 'Payment received. Matter created. Client onboarded.',    is_win_stage: true,  is_lost_stage: false, win_probability: 100, rotting_days: null },
+        ] as never)
+      }
+    }
+
+    await admin.from('tenant_setup_log').insert({
+      tenant_id: tenantId,
+      action: pipelineActionKey,
+      starter_pack,
+      applied_by: appliedBy,
+      result: { pipeline: 'NorvaOS Standard', stages: 7 } as unknown as Json,
+    }).select().single()
+  }
+
+  // ── 4. Audit log ────────────────────────────────────────────────────────────
   logPlatformAdminAction({
     tenant_id:   tenantId,
     action:      'tenant_bootstrapped',

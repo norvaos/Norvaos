@@ -139,7 +139,7 @@ function DocumentActionButton({ document }: { document: Document }) {
           <Button
             variant="ghost"
             size="sm"
-            className="h-7 w-7 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+            className="h-7 w-7 p-0 text-blue-600 hover:text-blue-400 hover:bg-blue-950/30"
             onClick={handleView}
             disabled={isPending}
           >
@@ -494,9 +494,9 @@ export function DocumentChecklistPanel({
                 completionPercent === 100
                   ? 'bg-green-500'
                   : completionPercent >= 75
-                    ? 'bg-blue-500'
+                    ? 'bg-blue-950/300'
                     : completionPercent >= 50
-                      ? 'bg-amber-500'
+                      ? 'bg-amber-950/300'
                       : 'bg-red-500'
               )}
               style={{ width: `${completionPercent}%` }}
@@ -608,7 +608,7 @@ export function DocumentChecklistPanel({
                             key={item.id}
                             className={cn(
                               isNA && 'opacity-50 bg-slate-50',
-                              isCustom && !isNA && 'bg-blue-50/50 dark:bg-blue-950/20',
+                              isCustom && !isNA && 'bg-blue-950/30/50 dark:bg-blue-950/20',
                             )}
                           >
                             {/* Document name */}
@@ -621,7 +621,7 @@ export function DocumentChecklistPanel({
                                   <Asterisk className="h-3 w-3 text-red-500 flex-shrink-0" />
                                 )}
                                 {isCustom && (
-                                  <Badge variant="outline" className="text-[10px] px-1 py-0 border-blue-300 text-blue-600 bg-blue-50">
+                                  <Badge variant="outline" className="text-[10px] px-1 py-0 border-blue-300 text-blue-600 bg-blue-950/30">
                                     Custom
                                   </Badge>
                                 )}
@@ -748,7 +748,7 @@ export function DocumentChecklistPanel({
                                     className={cn(
                                       'h-7 w-7 p-0',
                                       isNA
-                                        ? 'text-amber-600 hover:text-amber-700 hover:bg-amber-50'
+                                        ? 'text-amber-600 hover:text-amber-400 hover:bg-amber-950/30'
                                         : 'text-slate-400 hover:text-slate-600 hover:bg-slate-50',
                                     )}
                                     onClick={() => handleMarkNA(item)}

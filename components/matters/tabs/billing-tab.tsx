@@ -87,10 +87,10 @@ function RetainerAgreementCard({ matterId }: { matterId: string }) {
   const isPartial = summary.paymentStatus === 'partial'
 
   const statusBadge = isFullyPaid
-    ? { label: 'Paid in Full', icon: CheckCircle2, cls: 'text-green-700 bg-green-50 border-green-200' }
+    ? { label: 'Paid in Full', icon: CheckCircle2, cls: 'text-emerald-400 bg-emerald-950/30 border-emerald-500/20' }
     : isPartial
-    ? { label: 'Partial Payment', icon: Clock, cls: 'text-amber-700 bg-amber-50 border-amber-200' }
-    : { label: 'Payment Pending', icon: AlertCircle, cls: 'text-orange-700 bg-orange-50 border-orange-200' }
+    ? { label: 'Partial Payment', icon: Clock, cls: 'text-amber-400 bg-amber-950/30 border-amber-500/20' }
+    : { label: 'Payment Pending', icon: AlertCircle, cls: 'text-orange-400 bg-orange-950/30 border-orange-500/20' }
 
   const handleRecord = async () => {
     const cents = Math.round(parseFloat(payAmount) * 100)
@@ -103,7 +103,7 @@ function RetainerAgreementCard({ matterId }: { matterId: string }) {
 
   return (
     <>
-      <Card className="border-blue-200 bg-blue-50/30">
+      <Card className="border-blue-500/20 bg-blue-950/30/30">
         <CardHeader className="pb-2 flex flex-row items-center justify-between">
           <div className="flex items-center gap-2">
             <CardTitle className="text-sm font-semibold">
@@ -157,14 +157,14 @@ function RetainerAgreementCard({ matterId }: { matterId: string }) {
               <span className="font-bold text-sm">{fmtCents(summary.totalAmountCents)}</span>
             </div>
             <div className="flex justify-between items-center px-3 py-2 border-b border-slate-100">
-              <span className="text-green-700 text-xs font-medium">Paid to Date</span>
-              <span className="text-green-700 font-semibold text-xs">{fmtCents(summary.paymentAmount)}</span>
+              <span className="text-emerald-400 text-xs font-medium">Paid to Date</span>
+              <span className="text-emerald-400 font-semibold text-xs">{fmtCents(summary.paymentAmount)}</span>
             </div>
             <div className="flex justify-between items-center px-3 py-2">
-              <span className={`text-xs font-semibold ${summary.balanceCents > 0 ? 'text-orange-700' : 'text-green-700'}`}>
+              <span className={`text-xs font-semibold ${summary.balanceCents > 0 ? 'text-orange-400' : 'text-emerald-400'}`}>
                 Balance Due
               </span>
-              <span className={`font-bold text-sm ${summary.balanceCents > 0 ? 'text-orange-700' : 'text-green-700'}`}>
+              <span className={`font-bold text-sm ${summary.balanceCents > 0 ? 'text-orange-400' : 'text-emerald-400'}`}>
                 {summary.balanceCents > 0 ? fmtCents(summary.balanceCents) : 'Paid in Full'}
               </span>
             </div>
@@ -401,7 +401,7 @@ export function BillingTab({ matterId, tenantId, matter }: { matterId: string; t
           </span>
           {/* Tax badge */}
           {isOutsideCanada ? (
-            <Badge variant="outline" className="ml-auto text-xs border-emerald-200 text-emerald-700 bg-emerald-50">
+            <Badge variant="outline" className="ml-auto text-xs border-emerald-500/20 text-emerald-400 bg-emerald-950/30">
               Zero-rated (non-resident)
             </Badge>
           ) : taxLabel && taxRate != null ? (

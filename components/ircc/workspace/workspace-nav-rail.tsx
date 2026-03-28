@@ -40,9 +40,9 @@ type BadgeStatus = 'not_started' | 'in_progress' | 'complete' | 'blocked'
 function badgeClass(status: BadgeStatus): string {
   switch (status) {
     case 'not_started': return 'bg-muted text-muted-foreground'
-    case 'in_progress': return 'bg-blue-100 text-blue-700'
-    case 'complete':    return 'bg-green-100 text-green-700'
-    case 'blocked':     return 'bg-red-100 text-red-700'
+    case 'in_progress': return 'bg-blue-950/40 text-blue-400'
+    case 'complete':    return 'bg-emerald-950/40 text-emerald-400'
+    case 'blocked':     return 'bg-red-950/30 text-red-400'
   }
 }
 

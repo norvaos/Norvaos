@@ -17,7 +17,7 @@ async function handleGet(
 ) {
   try {
     const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
-    const { allowed, retryAfterMs } = tokenLookupLimiter.check(ip)
+    const { allowed, retryAfterMs } = await tokenLookupLimiter.check(ip)
     if (!allowed) {
       return NextResponse.json(
         { error: 'Too many requests. Please try again later.' },

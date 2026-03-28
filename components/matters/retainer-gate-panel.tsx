@@ -59,7 +59,7 @@ export function RetainerGatePanel({
   const isBlocked = !retainerCondition.passed
 
   return (
-    <Card className={isBlocked ? 'border-amber-500/50 bg-amber-50/50 dark:bg-amber-950/20' : 'border-emerald-500/50 bg-emerald-50/50 dark:bg-emerald-950/20'}>
+    <Card className={isBlocked ? 'border-amber-500/50 bg-amber-950/30/50 dark:bg-amber-950/20' : 'border-emerald-500/50 bg-emerald-950/30/50 dark:bg-emerald-950/20'}>
       <CardHeader className="pb-2">
         <CardTitle className="flex items-center gap-2 text-sm font-medium">
           {isBlocked ? (
@@ -111,7 +111,7 @@ export function RetainerGatePanel({
         )}
 
         {!isBlocked && (
-          <p className="text-sm text-emerald-700 dark:text-emerald-400">
+          <p className="text-sm text-emerald-400 dark:text-emerald-400">
             Retainer agreement requirement satisfied.
           </p>
         )}

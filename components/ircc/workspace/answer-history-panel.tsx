@@ -55,10 +55,10 @@ const SOURCE_LABELS: Record<AnswerSource, string> = {
 }
 
 const SOURCE_COLOURS: Record<AnswerSource, string> = {
-  client_portal: 'border-blue-300 text-blue-700 bg-blue-50',
-  staff_entry: 'border-green-300 text-green-700 bg-green-50',
-  canonical_prefill: 'border-purple-300 text-purple-700 bg-purple-50',
-  cross_form_reuse: 'border-amber-300 text-amber-700 bg-amber-50',
+  client_portal: 'border-blue-300 text-blue-400 bg-blue-950/30',
+  staff_entry: 'border-green-300 text-emerald-400 bg-emerald-950/30',
+  canonical_prefill: 'border-purple-300 text-purple-400 bg-purple-950/30',
+  cross_form_reuse: 'border-amber-300 text-amber-400 bg-amber-950/30',
   cross_matter_import: 'border-indigo-300 text-indigo-700 bg-indigo-50',
   extraction: 'border-slate-300 text-slate-600 bg-slate-50',
   migration: 'border-slate-300 text-slate-600 bg-slate-50',
@@ -178,7 +178,7 @@ function HistoryCard({ row }: { row: AnswerHistoryRow }) {
           {formatValue(row.old_value)}
         </span>
         <ArrowRight className="h-3 w-3 text-muted-foreground shrink-0" />
-        <span className="text-green-700 truncate max-w-[40%]">
+        <span className="text-emerald-400 truncate max-w-[40%]">
           {formatValue(row.new_value)}
         </span>
       </div>
@@ -194,7 +194,7 @@ function HistoryCard({ row }: { row: AnswerHistoryRow }) {
         {row.stale_triggered && (
           <Badge
             variant="outline"
-            className="text-[10px] py-0 px-1.5 border-orange-300 text-orange-600 bg-orange-50"
+            className="text-[10px] py-0 px-1.5 border-orange-300 text-orange-600 bg-orange-950/30"
           >
             Stale Triggered
           </Badge>
@@ -250,8 +250,8 @@ function ReuseLogCard({ row }: { row: ReuseLogRow }) {
             variant="outline"
             className={`text-[10px] py-0 px-1.5 ${
               row.accepted
-                ? 'border-green-300 text-green-700 bg-green-50'
-                : 'border-red-300 text-red-600 bg-red-50'
+                ? 'border-green-300 text-emerald-400 bg-emerald-950/30'
+                : 'border-red-300 text-red-600 bg-red-950/30'
             }`}
           >
             {row.accepted ? 'Accepted' : 'Rejected'}

@@ -50,10 +50,10 @@ export function MatterControlHeader({
   // Readiness % colour
   const pct = matrix?.overallPct ?? 0
   const pctClasses = pct >= threshold
-    ? 'text-emerald-700 bg-emerald-100 border-emerald-300'
+    ? 'text-emerald-400 bg-emerald-950/40 border-emerald-500/30'
     : pct >= 60
-      ? 'text-amber-700 bg-amber-100 border-amber-300'
-      : 'text-red-700 bg-red-100 border-red-300'
+      ? 'text-amber-400 bg-amber-100 border-amber-300'
+      : 'text-red-400 bg-red-100 border-red-300'
 
   // Drafting / Filing status
   const hasDraftingBlockers = (matrix?.draftingBlockers.length ?? 0) > 0
@@ -70,10 +70,10 @@ export function MatterControlHeader({
   // Form completion % (IRCC questionnaire)
   const formsPct = readinessData.questionnaire.completionPct
   const formsColour = formsPct >= 80
-    ? 'text-emerald-700 bg-emerald-50 border-emerald-200'
+    ? 'text-emerald-400 bg-emerald-950/30 border-emerald-500/20'
     : formsPct >= 50
-      ? 'text-amber-700 bg-amber-50 border-amber-200'
-      : 'text-red-700 bg-red-50 border-red-200'
+      ? 'text-amber-400 bg-amber-950/30 border-amber-200'
+      : 'text-red-400 bg-red-950/30 border-red-200'
 
   // Doc completion % (accepted / total)
   const docs = readinessData.documents
@@ -81,10 +81,10 @@ export function MatterControlHeader({
     ? Math.round((docs.accepted / docs.totalSlots) * 100)
     : 0
   const docsColour = docsPct >= 80
-    ? 'text-emerald-700 bg-emerald-50 border-emerald-200'
+    ? 'text-emerald-400 bg-emerald-950/30 border-emerald-500/20'
     : docsPct >= 50
-      ? 'text-amber-700 bg-amber-50 border-amber-200'
-      : 'text-red-700 bg-red-50 border-red-200'
+      ? 'text-amber-400 bg-amber-950/30 border-amber-200'
+      : 'text-red-400 bg-red-950/30 border-red-200'
 
   return (
     <div className="rounded-lg border bg-card px-4 py-2.5 space-y-1.5">
@@ -126,7 +126,7 @@ export function MatterControlHeader({
                 <div
                   className={cn(
                     'h-full rounded-full transition-all',
-                    pct >= threshold ? 'bg-emerald-500' : pct >= 60 ? 'bg-amber-500' : 'bg-red-500'
+                    pct >= threshold ? 'bg-emerald-950/300' : pct >= 60 ? 'bg-amber-950/300' : 'bg-red-950/300'
                   )}
                   style={{ width: `${Math.min(pct, 100)}%` }}
                 />
@@ -176,7 +176,7 @@ export function MatterControlHeader({
         {lawyerReviewNeeded && (
           <>
             <Divider />
-            <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-amber-300 text-amber-700 bg-amber-50 iron-canvas-guard max-w-[200px]" title="Lawyer Review Required">
+            <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-amber-300 text-amber-400 bg-amber-950/30 iron-canvas-guard max-w-[200px]" title="Lawyer Review Required">
               Lawyer Review Required
             </Badge>
           </>
@@ -186,7 +186,7 @@ export function MatterControlHeader({
         {stalePacks > 0 && (
           <>
             <Divider />
-            <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-amber-300 text-amber-700 bg-amber-50 iron-canvas-guard max-w-[200px]" title={`${stalePacks} outdated ${stalePacks === 1 ? 'form pack' : 'form packs'}`}>
+            <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-amber-300 text-amber-400 bg-amber-950/30 iron-canvas-guard max-w-[200px]" title={`${stalePacks} outdated ${stalePacks === 1 ? 'form pack' : 'form packs'}`}>
               {stalePacks} outdated {stalePacks === 1 ? 'form pack' : 'form packs'}
             </Badge>
           </>

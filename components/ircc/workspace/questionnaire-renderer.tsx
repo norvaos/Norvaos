@@ -139,9 +139,9 @@ function SectionHeader({
           className={cn(
             'text-[10px] py-0 px-1.5 leading-4 border',
             pct === 100
-              ? 'border-green-300 text-green-700 bg-green-50'
+              ? 'border-green-300 text-emerald-400 bg-emerald-950/30'
               : pct > 0
-                ? 'border-blue-300 text-blue-700 bg-blue-50'
+                ? 'border-blue-300 text-blue-400 bg-blue-950/30'
                 : 'border-zinc-200 text-muted-foreground',
           )}
         >
@@ -152,7 +152,7 @@ function SectionHeader({
         {staleCount > 0 && (
           <Badge
             variant="outline"
-            className="text-[10px] py-0 px-1.5 leading-4 border-amber-300 text-amber-700 bg-amber-50"
+            className="text-[10px] py-0 px-1.5 leading-4 border-amber-300 text-amber-400 bg-amber-950/30"
           >
             {staleCount} stale
           </Badge>
@@ -162,7 +162,7 @@ function SectionHeader({
         {conflictCount > 0 && (
           <Badge
             variant="outline"
-            className="text-[10px] py-0 px-1.5 leading-4 border-red-300 text-red-700 bg-red-50"
+            className="text-[10px] py-0 px-1.5 leading-4 border-red-300 text-red-400 bg-red-950/30"
           >
             {conflictCount} conflict{conflictCount > 1 ? 's' : ''}
           </Badge>

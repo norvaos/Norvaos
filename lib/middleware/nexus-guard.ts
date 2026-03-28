@@ -13,6 +13,11 @@
 import { NextResponse } from 'next/server'
 import { log } from '@/lib/utils/logger'
 
+const allowedIps = process.env.NEXUS_ALLOWED_IPS
+if (!allowedIps && process.env.NODE_ENV === 'production') {
+  console.warn('[NexusGuard] WARNING: NEXUS_ALLOWED_IPS not set in production. IP allowlist is not enforced. Set this env var for defence-in-depth.')
+}
+
 function getAllowedIPs(): string[] {
   const raw = process.env.NEXUS_ALLOWED_IPS
   if (!raw) return []

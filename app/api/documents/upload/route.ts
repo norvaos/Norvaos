@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
 import { createHash } from 'crypto'
 import { authenticateRequest, AuthError } from '@/lib/services/auth'
 import { requirePermission } from '@/lib/services/require-role'
@@ -13,6 +14,18 @@ import { checkAndNotifyReadiness } from '@/lib/services/matter-readiness-notifie
 import { broadcastDocumentStatus } from '@/lib/services/document-realtime'
 import { withTiming } from '@/lib/middleware/request-timing'
 
+const uploadParamsSchema = z.object({
+  matterId: z.string().uuid().optional().nullable(),
+  contactId: z.string().uuid().optional().nullable(),
+  leadId: z.string().uuid().optional().nullable(),
+  taskId: z.string().uuid().optional().nullable(),
+  slotId: z.string().uuid().optional().nullable(),
+  category: z.string().max(100).optional().nullable(),
+  description: z.string().max(1000).optional().nullable(),
+  displayName: z.string().max(255).optional().nullable(),
+  storageLocation: z.enum(['local', 'vault', 'archive', 'onedrive']).default('local'),
+})
+
 async function handlePost(request: NextRequest) {
   try {
     const auth = await authenticateRequest()
@@ -24,15 +37,28 @@ async function handlePost(request: NextRequest) {
 
     const formData = await request.formData()
     const file = formData.get('file') as File | null
-    const matterId = formData.get('matter_id') as string | null
-    const contactId = formData.get('contact_id') as string | null
-    const leadId = formData.get('lead_id') as string | null
-    const taskId = formData.get('task_id') as string | null
-    const category = formData.get('category') as string | null
-    const description = formData.get('description') as string | null
-    const displayName = formData.get('display_name') as string | null
-    const slotId = formData.get('slot_id') as string | null
-    const storageLocation = (formData.get('storage_location') as string | null) ?? 'local'
+
+    const rawParams = {
+      matterId: formData.get('matter_id') as string | null,
+      contactId: formData.get('contact_id') as string | null,
+      leadId: formData.get('lead_id') as string | null,
+      taskId: formData.get('task_id') as string | null,
+      slotId: formData.get('slot_id') as string | null,
+      category: formData.get('category') as string | null,
+      description: formData.get('description') as string | null,
+      displayName: formData.get('display_name') as string | null,
+      storageLocation: (formData.get('storage_location') as string | null) ?? 'local',
+    }
+
+    const parsed = uploadParamsSchema.safeParse(rawParams)
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: 'Invalid upload parameters', details: parsed.error.flatten().fieldErrors },
+        { status: 400 }
+      )
+    }
+
+    const { matterId, contactId, leadId, taskId, slotId, category, description, displayName, storageLocation } = parsed.data
 
     if (!file) {
       return NextResponse.json(

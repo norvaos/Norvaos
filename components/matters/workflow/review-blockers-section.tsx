@@ -103,7 +103,7 @@ export function ReviewBlockersWorkflowSection({
       groups.push({
         tier: 1,
         tierLabel: 'Critical',
-        tierColor: 'text-red-700 bg-red-50 border-red-200',
+        tierColor: 'text-red-400 bg-red-950/30 border-red-500/20',
         tierIcon: '🔴',
         items: criticalItems,
       })
@@ -126,7 +126,7 @@ export function ReviewBlockersWorkflowSection({
       groups.push({
         tier: 2,
         tierLabel: 'Blocks Drafting',
-        tierColor: 'text-orange-700 bg-orange-50 border-orange-200',
+        tierColor: 'text-orange-400 bg-orange-950/30 border-orange-500/20',
         tierIcon: '🟠',
         items: draftingItems,
       })
@@ -151,7 +151,7 @@ export function ReviewBlockersWorkflowSection({
       groups.push({
         tier: 3,
         tierLabel: 'Blocks Filing',
-        tierColor: 'text-amber-700 bg-amber-50 border-amber-200',
+        tierColor: 'text-amber-400 bg-amber-950/30 border-amber-500/20',
         tierIcon: '🟡',
         items: filingItems,
       })

@@ -27,25 +27,25 @@ const COLOR_CONFIG = {
   red: {
     border: 'border-l-red-500',
     bg: 'bg-gradient-to-br from-red-50/80 to-white',
-    label: 'text-red-700',
+    label: 'text-red-400',
     glow: 'shadow-red-100/50',
   },
   amber: {
     border: 'border-l-amber-500',
     bg: 'bg-gradient-to-br from-amber-50/80 to-white',
-    label: 'text-amber-700',
+    label: 'text-amber-400',
     glow: 'shadow-amber-100/50',
   },
   blue: {
     border: 'border-l-blue-500',
     bg: 'bg-gradient-to-br from-blue-50/80 to-white',
-    label: 'text-blue-700',
+    label: 'text-blue-400',
     glow: 'shadow-blue-100/50',
   },
   green: {
     border: 'border-l-green-500',
     bg: 'bg-gradient-to-br from-green-50/80 to-white',
-    label: 'text-green-700',
+    label: 'text-emerald-400',
     glow: 'shadow-emerald-100/50',
   },
 }
@@ -117,9 +117,9 @@ export function PortalNextActionPanel({
       : null
 
     return (
-      <div className="rounded-2xl border-l-[3px] border-l-emerald-500 border border-emerald-200/60 bg-gradient-to-br from-emerald-50/80 to-white p-5 shadow-md shadow-emerald-100/50 backdrop-blur-sm">
+      <div className="rounded-2xl border-l-[3px] border-l-emerald-500 border border-emerald-500/20/60 bg-gradient-to-br from-emerald-50/80 to-white p-5 shadow-md shadow-emerald-100/50 backdrop-blur-sm">
         <div className="flex items-start gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-100 shadow-sm">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-950/40 shadow-sm">
             <svg className="h-5 w-5 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
               <polyline points="22 4 12 14.01 9 11.01" />
@@ -129,13 +129,13 @@ export function PortalNextActionPanel({
             <h3 className="text-sm font-semibold text-green-800">
               {tr.next_action_awaiting_review_title ?? 'All items submitted'}
             </h3>
-            <p className="text-sm text-green-700 mt-1">
+            <p className="text-sm text-emerald-400 mt-1">
               {tr.next_action_awaiting_review_message ??
                 'Your file is currently under review by our office.'}
             </p>
 
             {/* Context details */}
-            <div className="mt-3 space-y-1.5 text-xs text-green-700">
+            <div className="mt-3 space-y-1.5 text-xs text-emerald-400">
               {lastSubmittedAt && (
                 <p className="flex items-center gap-1.5">
                   <span className="text-green-500">•</span>

@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation'
 import {
   ArrowLeft, MoreHorizontal, Pencil, XCircle, RotateCcw, ArrowRightLeft,
-  ExternalLink, Trash2, Thermometer, Brain,
+  ExternalLink, Trash2, Thermometer, Brain, Archive,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -134,6 +134,19 @@ export function LeadDetailHeader({
         </Button>
       )}
 
+      {/* Archive Mission button — prominent exit state for active leads */}
+      {!isTerminal && onClose && (
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={onClose}
+          className="shrink-0 hidden lg:flex border-red-200 text-red-700 hover:bg-red-50"
+        >
+          <Archive className="mr-1.5 h-3.5 w-3.5" />
+          Archive Mission
+        </Button>
+      )}
+
       {/* Converted → View Matter link */}
       {isConverted && lead.converted_matter_id && (
         <Button variant="outline" size="sm" asChild className="shrink-0">
@@ -172,8 +185,8 @@ export function LeadDetailHeader({
                   <>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={onClose} className="text-destructive">
-                      <XCircle className="mr-2 h-4 w-4" />
-                      Close Lead
+                      <Archive className="mr-2 h-4 w-4" />
+                      Archive Mission
                     </DropdownMenuItem>
                   </>
                 )}

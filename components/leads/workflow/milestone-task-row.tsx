@@ -49,7 +49,7 @@ export function MilestoneTaskRow({ task, users, isReadOnly, onComplete, onSkip, 
           {isUpdating ? (
             <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
           ) : (
-            <Circle className="h-4 w-4 text-slate-400 hover:text-green-600" />
+            <Circle className="h-4 w-4 text-muted-foreground/70 hover:text-green-600" />
           )}
         </button>
       ) : (
@@ -66,7 +66,7 @@ export function MilestoneTaskRow({ task, users, isReadOnly, onComplete, onSkip, 
         <div className="flex items-center gap-1.5 mt-0.5">
           {/* Overdue badge */}
           {statusConfig.isOverdue && overdueDays != null && (
-            <Badge variant="outline" size="xs" className="bg-red-50 text-red-600 border-red-200">
+            <Badge variant="outline" size="xs" className="bg-red-950/30 text-red-600 border-red-500/20">
               {overdueDays}d overdue
             </Badge>
           )}
@@ -94,7 +94,7 @@ export function MilestoneTaskRow({ task, users, isReadOnly, onComplete, onSkip, 
 
           {/* Skip reason */}
           {task.status === 'skipped' && task.skip_reason && (
-            <span className="text-xs text-slate-400 italic truncate max-w-[120px]" title={task.skip_reason}>
+            <span className="text-xs text-muted-foreground/70 italic truncate max-w-[120px]" title={task.skip_reason}>
               {task.skip_reason}
             </span>
           )}
@@ -122,7 +122,7 @@ export function MilestoneTaskRow({ task, users, isReadOnly, onComplete, onSkip, 
               Complete
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => onSkip?.(task.id)}>
-              <MinusCircle className="mr-2 h-4 w-4 text-slate-400" />
+              <MinusCircle className="mr-2 h-4 w-4 text-muted-foreground/70" />
               Skip
             </DropdownMenuItem>
           </DropdownMenuContent>

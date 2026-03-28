@@ -434,9 +434,9 @@ function SuggestionCard({
 }) {
   const confidenceColour =
     suggestion.confidence >= 0.9
-      ? 'bg-green-100 text-green-700'
+      ? 'bg-emerald-950/40 text-emerald-400'
       : suggestion.confidence >= 0.7
-        ? 'bg-amber-100 text-amber-700'
+        ? 'bg-amber-950/40 text-amber-400'
         : 'bg-slate-100 text-slate-600'
 
   return (

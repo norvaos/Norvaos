@@ -41,13 +41,13 @@ function scoreColour(score: number, shieldComplete?: boolean) {
 function riskColour(level: ReadinessZoneData['riskLevel']) {
   switch (level) {
     case 'low':
-      return { badge: 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400', icon: 'text-green-600' }
+      return { badge: 'bg-emerald-950/30 text-emerald-400 dark:bg-green-900/40 dark:text-green-400', icon: 'text-green-600' }
     case 'medium':
-      return { badge: 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400', icon: 'text-amber-600' }
+      return { badge: 'bg-amber-950/30 text-amber-400 dark:bg-amber-900/40 dark:text-amber-400', icon: 'text-amber-600' }
     case 'high':
-      return { badge: 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400', icon: 'text-red-600' }
+      return { badge: 'bg-red-950/40 text-red-400 dark:bg-red-900/40 dark:text-red-400', icon: 'text-red-600' }
     case 'critical':
-      return { badge: 'bg-red-200 text-red-900 dark:bg-red-900/60 dark:text-red-300', icon: 'text-red-700' }
+      return { badge: 'bg-red-200 text-red-900 dark:bg-red-900/60 dark:text-red-300', icon: 'text-red-400' }
   }
 }
 
@@ -178,8 +178,8 @@ function StatusBadge({
           className={cn(
             'gap-1 cursor-default',
             ready
-              ? 'border-green-300 bg-green-50 text-green-700 dark:border-green-700 dark:bg-green-900/30 dark:text-green-400'
-              : 'border-red-300 bg-red-50 text-red-700 dark:border-red-700 dark:bg-red-900/30 dark:text-red-400'
+              ? 'border-emerald-500/30 bg-emerald-950/30 text-emerald-400 dark:border-green-700 dark:bg-green-900/30 dark:text-green-400'
+              : 'border-red-500/30 bg-red-950/30 text-red-400 dark:border-red-700 dark:bg-red-900/30 dark:text-red-400'
           )}
         >
           {ready ? (
@@ -375,7 +375,7 @@ export function ReadinessZone({ data, isLoading, onDrillDown }: ReadinessZonePro
               <Badge
                 variant="outline"
                 size="sm"
-                className="gap-1 w-fit border-emerald-400 bg-gradient-to-r from-emerald-50 to-green-50 text-emerald-800 dark:from-emerald-900/30 dark:to-green-900/30 dark:text-emerald-300 dark:border-emerald-600"
+                className="gap-1 w-fit border-emerald-400 bg-gradient-to-r from-emerald-950/30 to-emerald-950/30 text-emerald-400 dark:from-emerald-900/30 dark:to-green-900/30 dark:text-emerald-300 dark:border-emerald-600"
                 style={{ animation: 'emerald-glow 2s ease-in-out infinite' }}
               >
                 <Shield className="size-3 text-emerald-600" />
@@ -386,7 +386,7 @@ export function ReadinessZone({ data, isLoading, onDrillDown }: ReadinessZonePro
               <Badge
                 variant="outline"
                 size="sm"
-                className="gap-1 w-fit border-yellow-400 bg-gradient-to-r from-yellow-50 to-amber-50 text-yellow-800 dark:from-yellow-900/30 dark:to-amber-900/30 dark:text-yellow-300 dark:border-yellow-600"
+                className="gap-1 w-fit border-yellow-400 bg-gradient-to-r from-yellow-950/30 to-amber-950/30 text-yellow-800 dark:from-yellow-900/30 dark:to-amber-900/30 dark:text-yellow-300 dark:border-yellow-600"
                 style={{ animation: 'gold-pulse 2s ease-in-out infinite' }}
               >
                 <CheckCircle2 className="size-3 text-yellow-600" />
@@ -444,7 +444,7 @@ export function ReadinessZone({ data, isLoading, onDrillDown }: ReadinessZonePro
             <Badge
               variant="outline"
               size="xs"
-              className="gap-1 border-amber-300 bg-amber-50 text-amber-700 dark:border-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
+              className="gap-1 border-amber-300 bg-amber-950/30 text-amber-400 dark:border-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
             >
               <Eye className="size-2.5" />
               Review Req.
@@ -457,7 +457,7 @@ export function ReadinessZone({ data, isLoading, onDrillDown }: ReadinessZonePro
                 <Badge
                   variant="outline"
                   size="xs"
-                  className="gap-1 border-amber-300 bg-amber-50 text-amber-700 dark:border-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
+                  className="gap-1 border-amber-300 bg-amber-950/30 text-amber-400 dark:border-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
                 >
                   <AlertTriangle className="size-2.5" />
                   {stalePacks} Stale
@@ -475,7 +475,7 @@ export function ReadinessZone({ data, isLoading, onDrillDown }: ReadinessZonePro
                 <Badge
                   variant="outline"
                   size="xs"
-                  className="gap-1 border-red-300 bg-red-50 text-red-700 dark:border-red-700 dark:bg-red-900/30 dark:text-red-400"
+                  className="gap-1 border-red-500/30 bg-red-950/30 text-red-400 dark:border-red-700 dark:bg-red-900/30 dark:text-red-400"
                 >
                   <Scale className="size-2.5" />
                   {contradictionCount} Contradiction{contradictionCount > 1 ? 's' : ''}

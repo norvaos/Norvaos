@@ -110,7 +110,7 @@ interface ConditionDebugPanelProps {
 function RuleResultRow({ ruleResult }: { ruleResult: RuleEvalResult }) {
   const { rule, result, actual_value } = ruleResult
   return (
-    <TableRow className={result ? 'bg-green-50 dark:bg-green-950/20' : 'bg-red-50 dark:bg-red-950/20'}>
+    <TableRow className={result ? 'bg-emerald-950/30 dark:bg-green-950/20' : 'bg-red-950/30 dark:bg-red-950/20'}>
       <TableCell className="font-mono text-xs">{rule.field_path}</TableCell>
       <TableCell>
         <Badge variant="outline" className="text-xs">{rule.operator}</Badge>
@@ -253,10 +253,10 @@ export function PrecedenceDebugPanel({ resolvedFields }: PrecedenceDebugPanelPro
             </CardHeader>
             <CardContent className="px-4 pb-3">
               {/* Winning value */}
-              <div className="mb-3 rounded-md border border-green-200 bg-green-50 p-2 dark:border-green-900 dark:bg-green-950/20">
+              <div className="mb-3 rounded-md border border-emerald-500/20 bg-emerald-950/30 p-2 dark:border-green-900 dark:bg-green-950/20">
                 <div className="flex items-center gap-2">
                   <Check className="h-4 w-4 text-green-600" />
-                  <span className="text-xs font-semibold text-green-700 dark:text-green-400">Winner</span>
+                  <span className="text-xs font-semibold text-emerald-400 dark:text-green-400">Winner</span>
                 </div>
                 <div className="mt-1 grid grid-cols-3 gap-2 text-xs">
                   <div>
@@ -439,9 +439,9 @@ interface CompletionDebugPanelProps {
 }
 
 function completionColour(pct: number): string {
-  if (pct >= 100) return 'bg-green-100 text-green-800 dark:bg-green-950/30 dark:text-green-400'
+  if (pct >= 100) return 'bg-emerald-950/40 text-emerald-400 dark:bg-green-950/30 dark:text-green-400'
   if (pct > 0) return 'bg-amber-100 text-amber-800 dark:bg-amber-950/30 dark:text-amber-400'
-  return 'bg-red-100 text-red-800 dark:bg-red-950/30 dark:text-red-400'
+  return 'bg-red-950/30 text-red-400 dark:bg-red-950/30 dark:text-red-400'
 }
 
 export function CompletionDebugPanel({ completionState }: CompletionDebugPanelProps) {

@@ -12,7 +12,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { Label } from '@/components/ui/label'
+// Label removed — using raw <label> with obsidian glass styling
 import {
   Select,
   SelectContent,
@@ -112,13 +112,13 @@ function ContactPreviewPanel({ contact }: ContactPreviewProps) {
 
   return (
     <div className="space-y-2">
-      <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+      <label className="block text-[11px] font-mono uppercase tracking-wider text-zinc-400">
         Contact Record Preview
-      </Label>
-      <p className="text-xs text-muted-foreground">
+      </label>
+      <p className="text-[10px] font-mono text-zinc-500">
         This contact will be linked to the new matter as the principal applicant.
       </p>
-      <div className="rounded-md border bg-muted/30 divide-y">
+      <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] divide-y divide-white/[0.06]">
         {rows.map(row => {
           const isRevealed = revealed.has(row.key)
           const Icon = row.icon
@@ -128,18 +128,18 @@ function ContactPreviewPanel({ contact }: ContactPreviewProps) {
 
           return (
             <div key={row.key} className="flex items-center gap-2 px-3 py-1.5">
-              <Icon className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
-              <span className="text-xs font-medium text-muted-foreground w-20 shrink-0">
+              <Icon className="h-3.5 w-3.5 shrink-0 text-zinc-500" />
+              <span className="text-[10px] font-mono font-medium text-zinc-500 w-20 shrink-0 uppercase tracking-wider">
                 {row.label}
               </span>
-              <span className={`text-xs flex-1 truncate ${row.sensitive && !isRevealed ? 'font-mono tracking-wider' : ''}`}>
+              <span className={`text-xs flex-1 truncate text-white ${row.sensitive && !isRevealed ? 'font-mono tracking-wider text-zinc-400' : 'font-sans'}`}>
                 {displayValue}
               </span>
               {row.sensitive && (
                 <button
                   type="button"
                   onClick={() => toggleReveal(row.key)}
-                  className="shrink-0 p-0.5 rounded text-muted-foreground hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                  className="shrink-0 p-0.5 rounded text-zinc-500 hover:text-white transition-colors"
                   aria-label={isRevealed ? `Hide ${row.label}` : `Reveal ${row.label}`}
                 >
                   {isRevealed ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
@@ -157,17 +157,17 @@ function ContactPreviewPanel({ contact }: ContactPreviewProps) {
 
 function SentinelErrorBanner({ message }: { message: string }) {
   return (
-    <div className="rounded-md bg-red-50 border border-red-300 px-3 py-3 dark:bg-red-950/30 dark:border-red-800">
+    <div className="rounded-lg bg-red-950/30 border border-red-800/50 px-3 py-3">
       <div className="flex items-start gap-2">
-        <ShieldAlert className="h-4 w-4 shrink-0 mt-0.5 text-red-600 dark:text-red-400" />
+        <ShieldAlert className="h-4 w-4 shrink-0 mt-0.5 text-red-400" />
         <div className="min-w-0">
-          <p className="text-xs font-semibold text-red-700 dark:text-red-400">
+          <p className="text-xs font-semibold font-mono uppercase tracking-wider text-red-400">
             Access Denied
           </p>
-          <p className="text-xs text-red-600 dark:text-red-400 mt-0.5">
+          <p className="text-xs text-red-400/80 mt-0.5 font-mono">
             {message}
           </p>
-          <p className="text-xs text-red-500 dark:text-red-500 mt-1">
+          <p className="text-[10px] text-zinc-500 mt-1 font-mono">
             Contact your administrator if you believe this is an error.
           </p>
         </div>
@@ -253,15 +253,31 @@ export function ConvertLeadDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent
+        className="sm:max-w-lg border-white/[0.08] shadow-2xl"
+        style={{
+          background: 'linear-gradient(180deg, rgba(2,6,23,0.92) 0%, rgba(2,6,23,0.96) 100%)',
+          backdropFilter: 'blur(40px)',
+          WebkitBackdropFilter: 'blur(40px)',
+        }}
+      >
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Shield className="h-5 w-5" />
-            Approve &amp; Convert to Matter
+          <div className="flex items-center gap-2 mb-2">
+            <span className="relative flex size-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+              <span className="relative inline-flex rounded-full size-2 bg-emerald-500" />
+            </span>
+            <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-emerald-400">
+              Retainer Verified
+            </span>
+          </div>
+          <DialogTitle className="flex items-center gap-2 text-white font-sans font-bold tracking-tight">
+            <Shield className="h-5 w-5 text-emerald-400" />
+            Initialise Matter
           </DialogTitle>
-          <DialogDescription>
-            Review the contact details below, then create an active matter. All conversion gates must pass.
-          </DialogDescription>
+          <p className="text-sm font-mono text-zinc-400 mt-1">
+            All conversion gates must pass before matter creation.
+          </p>
         </DialogHeader>
 
         <div className="space-y-5 py-2 max-h-[60vh] overflow-y-auto">
@@ -277,11 +293,11 @@ export function ConvertLeadDialog({
 
           {/* Gate Checklist */}
           <div className="space-y-2">
-            <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+            <label className="block text-[11px] font-mono uppercase tracking-wider text-zinc-400">
               Conversion Gates
-            </Label>
+            </label>
             {isGatesLoading ? (
-              <div className="flex items-center gap-2 text-sm text-muted-foreground py-2">
+              <div className="flex items-center gap-2 text-sm text-zinc-400 py-2">
                 <Loader2 className="h-4 w-4 animate-spin" />
                 Evaluating gates...
               </div>
@@ -310,11 +326,11 @@ export function ConvertLeadDialog({
 
             {/* Blocked summary */}
             {!canConvert && blockedReasons.length > 0 && (
-              <div className="rounded-md bg-red-50 border border-red-200 px-3 py-2 mt-2 dark:bg-red-950/20 dark:border-red-800">
-                <p className="text-xs font-medium text-red-700 dark:text-red-400 mb-1">Cannot convert</p>
+              <div className="rounded-lg bg-red-950/20 border border-red-800/40 px-3 py-2 mt-2">
+                <p className="text-[11px] font-mono font-medium text-red-400 uppercase tracking-wider mb-1">Cannot convert</p>
                 <ul className="space-y-0.5">
                   {blockedReasons.map((r, i) => (
-                    <li key={i} className="text-xs text-red-600 dark:text-red-400">• {r}</li>
+                    <li key={i} className="text-xs font-mono text-red-400/80">• {r}</li>
                   ))}
                 </ul>
               </div>
@@ -323,42 +339,42 @@ export function ConvertLeadDialog({
 
           {/* Matter creation form  -  only shown when gates pass */}
           {canConvert && (
-            <div className="space-y-4 border-t pt-4">
-              <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                Matter Details
-              </Label>
+            <div className="space-y-4 border-t border-white/[0.06] pt-4">
+              <label className="block text-[11px] font-mono uppercase tracking-wider text-zinc-400">
+                Matter Configuration
+              </label>
 
               {/* Title */}
               <div className="space-y-1">
-                <Label className="text-xs">
-                  Matter Title <span className="text-red-500">*</span>
-                </Label>
+                <label className="block text-[11px] font-mono uppercase tracking-wider text-zinc-400">
+                  Matter Title <span className="text-red-400">*</span>
+                </label>
                 <Input
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="e.g. Immigration Application – Smith"
-                  className="text-sm"
+                  className="bg-white/[0.04] border-white/[0.08] text-white placeholder:text-zinc-600 font-sans focus:border-emerald-500/50 focus:ring-emerald-500/20"
                 />
               </div>
 
               {/* Description */}
               <div className="space-y-1">
-                <Label className="text-xs">Description</Label>
+                <label className="block text-[11px] font-mono uppercase tracking-wider text-zinc-400">Description</label>
                 <Textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Brief description of the matter..."
                   rows={2}
-                  className="text-sm resize-none"
+                  className="bg-white/[0.04] border-white/[0.08] text-white placeholder:text-zinc-600 font-sans resize-none focus:border-emerald-500/50 focus:ring-emerald-500/20"
                 />
               </div>
 
               {/* Practice Area */}
               {practiceAreas.length > 0 && (
                 <div className="space-y-1">
-                  <Label className="text-xs">Practice Area</Label>
+                  <label className="block text-[11px] font-mono uppercase tracking-wider text-zinc-400">Practice Area</label>
                   <Select value={practiceAreaId} onValueChange={setPracticeAreaId}>
-                    <SelectTrigger className="text-sm">
+                    <SelectTrigger className="bg-white/[0.04] border-white/[0.08] text-white font-sans focus:border-emerald-500/50 focus:ring-emerald-500/20">
                       <SelectValue placeholder="Select practice area..." />
                     </SelectTrigger>
                     <SelectContent>
@@ -375,9 +391,9 @@ export function ConvertLeadDialog({
               {/* Responsible Lawyer */}
               {users.length > 0 && (
                 <div className="space-y-1">
-                  <Label className="text-xs">Responsible Lawyer</Label>
+                  <label className="block text-[11px] font-mono uppercase tracking-wider text-zinc-400">Responsible Lawyer</label>
                   <Select value={responsibleLawyerId} onValueChange={setResponsibleLawyerId}>
-                    <SelectTrigger className="text-sm">
+                    <SelectTrigger className="bg-white/[0.04] border-white/[0.08] text-white font-sans focus:border-emerald-500/50 focus:ring-emerald-500/20">
                       <SelectValue placeholder="Select lawyer..." />
                     </SelectTrigger>
                     <SelectContent>
@@ -394,9 +410,9 @@ export function ConvertLeadDialog({
               {/* Billing Type + Priority */}
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <Label className="text-xs">Billing Type</Label>
+                  <label className="block text-[11px] font-mono uppercase tracking-wider text-zinc-400">Billing Type</label>
                   <Select value={billingType} onValueChange={setBillingType}>
-                    <SelectTrigger className="text-sm">
+                    <SelectTrigger className="bg-white/[0.04] border-white/[0.08] text-white font-sans focus:border-emerald-500/50 focus:ring-emerald-500/20">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -409,9 +425,9 @@ export function ConvertLeadDialog({
                 </div>
 
                 <div className="space-y-1">
-                  <Label className="text-xs">Priority</Label>
+                  <label className="block text-[11px] font-mono uppercase tracking-wider text-zinc-400">Priority</label>
                   <Select value={priority} onValueChange={setPriority}>
-                    <SelectTrigger className="text-sm">
+                    <SelectTrigger className="bg-white/[0.04] border-white/[0.08] text-white font-sans focus:border-emerald-500/50 focus:ring-emerald-500/20">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -428,17 +444,26 @@ export function ConvertLeadDialog({
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isSubmitting}>
-            Cancel
+          <Button
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            disabled={isSubmitting}
+            className="border-white/[0.08] bg-white/[0.04] text-zinc-300 hover:bg-white/[0.08] hover:text-white font-mono text-xs uppercase tracking-wider"
+          >
+            Stay on Contact
           </Button>
-          <Button onClick={handleConfirm} disabled={!canSubmit}>
+          <Button
+            onClick={handleConfirm}
+            disabled={!canSubmit}
+            className="bg-emerald-600 hover:bg-emerald-500 text-white font-mono text-xs uppercase tracking-wider shadow-lg shadow-emerald-500/20 disabled:bg-zinc-800 disabled:text-zinc-600 disabled:shadow-none"
+          >
             {isSubmitting ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Converting...
+                Initialising...
               </>
             ) : (
-              'Approve & Create Matter'
+              'Proceed to Matter Configuration'
             )}
           </Button>
         </DialogFooter>

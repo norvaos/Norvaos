@@ -178,7 +178,7 @@ export function QuestionsWorkflowSection({
                         </Badge>
                       )}
                       {domainQuestionBlockers.some((b) => b.blocks_filing && !b.blocks_drafting) && (
-                        <Badge variant="outline" className="text-[9px] px-1 py-0 border-amber-300 text-amber-700 bg-amber-50">
+                        <Badge variant="outline" className="text-[9px] px-1 py-0 border-amber-300 text-amber-400 bg-amber-950/30">
                           Blocks Filing
                         </Badge>
                       )}

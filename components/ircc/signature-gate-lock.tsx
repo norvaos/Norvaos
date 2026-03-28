@@ -128,21 +128,21 @@ export function SignatureGateLock({
       bg: 'bg-red-500/5',
       icon: <Lock className="size-4 text-red-500" />,
       label: 'Locked: Signatures Missing',
-      textColor: 'text-red-700 dark:text-red-300',
+      textColor: 'text-red-400 dark:text-red-300',
     },
     partial: {
       border: 'border-amber-500/30',
       bg: 'bg-amber-500/5',
       icon: <ShieldAlert className="size-4 text-amber-500" />,
       label: 'Partial: Draft Available',
-      textColor: 'text-amber-700 dark:text-amber-300',
+      textColor: 'text-amber-400 dark:text-amber-300',
     },
     unlocked: {
       border: 'border-emerald-500/30',
       bg: 'bg-emerald-500/5',
       icon: <ShieldCheck className="size-4 text-emerald-500" />,
       label: 'Unlocked: Ready to Launch',
-      textColor: 'text-emerald-700 dark:text-emerald-300',
+      textColor: 'text-emerald-400 dark:text-emerald-300',
     },
   }
 
@@ -221,8 +221,8 @@ export function SignatureGateLock({
               className={cn(
                 'flex items-center gap-2 rounded-md px-2 py-1 text-[10px]',
                 req.present
-                  ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300'
-                  : 'bg-red-500/10 text-red-700 dark:text-red-300',
+                  ? 'bg-emerald-500/10 text-emerald-400 dark:text-emerald-300'
+                  : 'bg-red-500/10 text-red-400 dark:text-red-300',
               )}
             >
               {req.present ? (

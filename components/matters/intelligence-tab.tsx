@@ -134,8 +134,8 @@ function AuditScoreGauge({ score, grade }: { score: number; grade: string }) {
 // ── Fact Anchor Badge ────────────────────────────────────────────────────────
 
 function ConfidenceBadge({ level }: { level: string }) {
-  if (level === 'high') return <Badge variant="outline" className="text-[9px] h-4 px-1.5 border-emerald-300 text-emerald-700 dark:text-emerald-400">HIGH</Badge>
-  if (level === 'medium') return <Badge variant="outline" className="text-[9px] h-4 px-1.5 border-amber-300 text-amber-700 dark:text-amber-400">MED</Badge>
+  if (level === 'high') return <Badge variant="outline" className="text-[9px] h-4 px-1.5 border-emerald-500/30 text-emerald-400 dark:text-emerald-400">HIGH</Badge>
+  if (level === 'medium') return <Badge variant="outline" className="text-[9px] h-4 px-1.5 border-amber-300 text-amber-400 dark:text-amber-400">MED</Badge>
   return <Badge variant="outline" className="text-[9px] h-4 px-1.5 border-muted-foreground text-muted-foreground">LOW</Badge>
 }
 
@@ -427,7 +427,7 @@ export function IntelligenceTabPanel({ matterId, tenantId }: IntelligenceTabPane
                     {alert.overlapKeywords && alert.overlapKeywords.length > 0 && (
                       <div className="flex flex-wrap gap-1">
                         {alert.overlapKeywords.map((kw: string) => (
-                          <span key={kw} className="rounded bg-red-100 dark:bg-red-950 px-1.5 py-0.5 text-[9px] text-red-700 dark:text-red-400">
+                          <span key={kw} className="rounded bg-red-100 dark:bg-red-950 px-1.5 py-0.5 text-[9px] text-red-400 dark:text-red-400">
                             {kw}
                           </span>
                         ))}
@@ -567,8 +567,8 @@ export function IntelligenceTabPanel({ matterId, tenantId }: IntelligenceTabPane
           )}
 
           {draftError && (
-            <div className="rounded-lg border border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-950/30 p-4">
-              <div className="flex items-center gap-2 text-red-700 dark:text-red-400">
+            <div className="rounded-lg border border-red-200 dark:border-red-900 bg-red-950/30 dark:bg-red-950/30 p-4">
+              <div className="flex items-center gap-2 text-red-400 dark:text-red-400">
                 <AlertTriangle className="h-4 w-4" />
                 <p className="text-sm font-medium">Draft generation failed</p>
               </div>
@@ -615,13 +615,13 @@ export function IntelligenceTabPanel({ matterId, tenantId }: IntelligenceTabPane
 
               {/* Missing/Expired fields warning  -  scroll target for Compliance Alert Badge */}
               {draft.missingFields.length > 0 && (
-                <div data-section="compliance-expiry" className="rounded-lg border border-amber-200 dark:border-amber-900 bg-amber-50 dark:bg-amber-950/30 p-3">
-                  <p className="text-[11px] font-medium text-amber-700 dark:text-amber-400">
+                <div data-section="compliance-expiry" className="rounded-lg border border-amber-200 dark:border-amber-900 bg-amber-950/30 dark:bg-amber-950/30 p-3">
+                  <p className="text-[11px] font-medium text-amber-400 dark:text-amber-400">
                     Missing fields ({draft.missingFields.length})
                   </p>
                   <div className="flex flex-wrap gap-1 mt-1.5">
                     {draft.missingFields.map((f) => (
-                      <Badge key={f} variant="outline" className="text-[9px] border-amber-300 text-amber-700 dark:text-amber-400">
+                      <Badge key={f} variant="outline" className="text-[9px] border-amber-300 text-amber-400 dark:text-amber-400">
                         {f}
                       </Badge>
                     ))}

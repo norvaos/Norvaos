@@ -102,7 +102,7 @@ function StageTransitionItem({
 
         <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
           {isAutoTriggered && (
-            <Badge variant="outline" size="xs" className="bg-slate-100 text-slate-500 border-slate-200">
+            <Badge variant="outline" size="xs" className="bg-muted text-muted-foreground border-border">
               <Bot className="mr-0.5 h-2.5 w-2.5" />
               Auto-advanced
             </Badge>

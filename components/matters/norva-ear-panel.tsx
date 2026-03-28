@@ -66,9 +66,9 @@ function formatTime(seconds: number): string {
 }
 
 const CONFIDENCE_COLOURS: Record<string, string> = {
-  high: 'bg-emerald-100 text-emerald-800',
-  medium: 'bg-amber-100 text-amber-800',
-  low: 'bg-red-100 text-red-800',
+  high: 'bg-emerald-950/40 text-emerald-400',
+  medium: 'bg-amber-950/30 text-amber-400',
+  low: 'bg-red-950/30 text-red-400',
 }
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -288,7 +288,7 @@ export function NorvaEarPanel({ matterId, matterTitle }: NorvaEarPanelProps) {
                   <AlertTriangle className="h-5 w-5 text-amber-600 mt-0.5 shrink-0" />
                   <div>
                     <h4 className="font-semibold text-amber-900">Recording Consent Required</h4>
-                    <p className="mt-1 text-sm text-amber-800">
+                    <p className="mt-1 text-sm text-amber-400">
                       Before starting a Norva Ear session, you must confirm that all participants
                       have been informed that this consultation will be recorded and transcribed.
                     </p>

@@ -76,14 +76,14 @@ export function RegulatorySidebar() {
               <div className="flex items-center gap-1.5 mt-1">
                 <Badge
                   variant="outline"
-                  className="gap-1 text-[9px] border-emerald-300 bg-emerald-50 text-emerald-700"
+                  className="gap-1 text-[9px] border-emerald-500/30 bg-emerald-950/30 text-emerald-400"
                 >
                   <Building2 className="size-2.5" />
                   {regBody ? `${regBody.name} (${regBody.abbr})` : 'No Regulatory Body Set'}
                 </Badge>
                 <Badge
                   variant="outline"
-                  className="text-[9px] border-blue-200 text-blue-600"
+                  className="text-[9px] border-blue-500/20 text-blue-600"
                 >
                   {regBody ? `${regBody.scope === 'federal' ? 'Federal' : regBody.provinceCode}  -  Compliance Active` : 'Configure in Settings → Firm'}
                 </Badge>
@@ -115,9 +115,9 @@ export function RegulatorySidebar() {
               <Badge variant="outline" className={cn(
                 'text-[9px]',
                 conflictScan.status === 'completed' && (conflictScan.score ?? 0) < 50
-                  ? 'border-green-200 bg-green-50 text-green-700'
+                  ? 'border-green-200 bg-emerald-950/30 text-emerald-400'
                   : conflictScan.status === 'completed'
-                    ? 'border-amber-200 bg-amber-50 text-amber-700'
+                    ? 'border-amber-200 bg-amber-950/30 text-amber-400'
                     : 'border-slate-200 text-slate-500',
               )}>
                 {conflictScan.status === 'completed' ? `Score: ${conflictScan.score ?? 0}` : conflictScan.status}
@@ -153,7 +153,7 @@ export function RegulatorySidebar() {
                     className={cn(
                       'ml-auto text-[9px]',
                       amlResult?.hashMatch
-                        ? 'border-green-300 bg-green-50 text-green-700'
+                        ? 'border-green-300 bg-emerald-950/30 text-emerald-400'
                         : 'border-slate-200 text-slate-500',
                     )}
                   >
@@ -204,7 +204,7 @@ export function RegulatorySidebar() {
                   <ExternalLink className="size-2.5" />
                 </a>
                 {retainer.signed_at && (
-                  <Badge variant="outline" className="text-[8px] border-green-200 bg-green-50 text-green-700">
+                  <Badge variant="outline" className="text-[8px] border-green-200 bg-emerald-950/30 text-emerald-400">
                     SIGNED
                   </Badge>
                 )}

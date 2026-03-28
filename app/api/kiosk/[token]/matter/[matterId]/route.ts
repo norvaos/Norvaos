@@ -21,7 +21,7 @@ async function handleGet(
 ) {
   const { token, matterId } = await params
 
-  const rateLimitResponse = checkKioskRateLimit(request, token)
+  const rateLimitResponse = await checkKioskRateLimit(request, token)
   if (rateLimitResponse) return rateLimitResponse
 
   const result = await validateKioskToken(token)

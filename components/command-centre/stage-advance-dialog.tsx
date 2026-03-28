@@ -62,11 +62,11 @@ export interface StageAdvanceDialogProps {
 
 function WinBadge({ pct }: { pct: number }) {
   const color = pct >= 80
-    ? 'text-emerald-700 bg-emerald-50 border-emerald-200'
+    ? 'text-emerald-400 bg-emerald-950/30 border-emerald-500/20'
     : pct >= 50
-      ? 'text-blue-700 bg-blue-50 border-blue-200'
+      ? 'text-blue-400 bg-blue-950/30 border-blue-500/20'
       : pct >= 20
-        ? 'text-amber-700 bg-amber-50 border-amber-200'
+        ? 'text-amber-400 bg-amber-950/30 border-amber-200'
         : 'text-slate-500 bg-slate-50 border-slate-200'
 
   const Icon = pct >= 50 ? TrendingUp : pct === 0 ? TrendingDown : Minus
@@ -167,7 +167,7 @@ export function StageAdvanceDialog({
 
           {/* Stage description */}
           {proposedStageDescription && (
-            <div className="rounded-md border border-blue-100 bg-blue-50/60 px-3 py-2.5">
+            <div className="rounded-md border border-blue-100 bg-blue-950/30/60 px-3 py-2.5">
               <p className="text-xs text-blue-800 leading-relaxed">
                 <span className="font-semibold">What this means: </span>
                 {proposedStageDescription}
@@ -192,8 +192,8 @@ export function StageAdvanceDialog({
 
           {/* Lost-move warning */}
           {isLostMove && (
-            <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2.5">
-              <p className="text-xs text-red-700 font-medium">
+            <div className="rounded-md border border-red-200 bg-red-950/30 px-3 py-2.5">
+              <p className="text-xs text-red-400 font-medium">
                 ⚠ This will close the lead as <strong>Lost</strong>. This action can only be undone by a manager.
               </p>
             </div>

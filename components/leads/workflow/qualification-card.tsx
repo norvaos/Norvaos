@@ -12,22 +12,22 @@ import type { LeadQualificationDecisionRow, UserRow } from './lead-workflow-type
 const QUALIFICATION_STATUS: Record<string, { label: string; className: string; icon: React.ElementType }> = {
   pending: {
     label: 'Pending Review',
-    className: 'bg-slate-100 text-slate-600 border-slate-200',
+    className: 'bg-muted text-muted-foreground border-border',
     icon: ClipboardCheck,
   },
   qualified: {
     label: 'Qualified',
-    className: 'bg-green-50 text-green-700 border-green-200',
+    className: 'bg-emerald-950/30 text-emerald-400 border-emerald-500/20',
     icon: ClipboardCheck,
   },
   not_qualified: {
     label: 'Not Qualified',
-    className: 'bg-red-50 text-red-600 border-red-200',
+    className: 'bg-red-950/30 text-red-600 border-red-500/20',
     icon: AlertTriangle,
   },
   needs_review: {
     label: 'Needs Lawyer Review',
-    className: 'bg-amber-50 text-amber-700 border-amber-200',
+    className: 'bg-amber-950/30 text-amber-400 border-amber-500/20',
     icon: AlertTriangle,
   },
 }
@@ -71,7 +71,7 @@ export function QualificationCard({ decision, users }: QualificationCardProps) {
       <CardContent className="space-y-3">
         {/* Lawyer review flag */}
         {decision.requires_lawyer_review && decision.status !== 'qualified' && (
-          <div className="flex items-center gap-2 rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-700 border border-amber-200">
+          <div className="flex items-center gap-2 rounded-md bg-amber-950/30 px-3 py-2 text-sm text-amber-400 border border-amber-500/20">
             <AlertTriangle className="h-4 w-4 shrink-0" />
             <span>Requires lawyer review before proceeding</span>
           </div>

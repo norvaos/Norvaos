@@ -1,12 +1,20 @@
 /**
- * In-memory sliding-window rate limiter.
+ * Sliding-window rate limiter with Redis support.
+ *
+ * When Upstash Redis is configured (UPSTASH_REDIS_REST_URL + TOKEN),
+ * uses a Redis INCR counter with TTL per key. This works correctly
+ * across multi-instance deployments.
+ *
+ * When Redis is not configured, falls back to an in-memory Map
+ * (same behaviour as before). Redis failures also fall back to
+ * in-memory (fail-open for availability).
  *
  * Usage in API routes:
  *   const limiter = createRateLimiter({ maxRequests: 5, windowMs: 60_000 })
  *
  *   export async function POST(request: Request) {
  *     const ip = request.headers.get('x-forwarded-for') ?? 'unknown'
- *     const { allowed, remaining, retryAfterMs } = limiter.check(ip)
+ *     const { allowed, remaining, retryAfterMs } = await limiter.check(ip)
  *     if (!allowed) {
  *       return new Response('Too many requests', {
  *         status: 429,
@@ -15,10 +23,19 @@
  *     }
  *     // ... handle request
  *   }
- *
- * Note: In-memory  -  resets on deploy. For multi-instance deployments,
- * swap with Redis-backed implementation.
  */
+
+import { Redis } from '@upstash/redis'
+
+// ─── Redis client (shared with cache.ts env vars, but not tenant-scoped) ────
+
+const redis =
+  process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN
+    ? new Redis({
+        url: process.env.UPSTASH_REDIS_REST_URL,
+        token: process.env.UPSTASH_REDIS_REST_TOKEN,
+      })
+    : null
 
 interface RateLimitEntry {
   timestamps: number[]
@@ -37,7 +54,9 @@ interface RateLimitResult {
   retryAfterMs: number
 }
 
-export function createRateLimiter(config: RateLimitConfig) {
+// ─── In-memory fallback ─────────────────────────────────────────────────────
+
+function createInMemoryStore(config: RateLimitConfig) {
   const store = new Map<string, RateLimitEntry>()
 
   // Periodic cleanup to prevent memory leaks (every 5 minutes)
@@ -84,6 +103,58 @@ export function createRateLimiter(config: RateLimitConfig) {
         allowed: true,
         remaining: config.maxRequests - entry.timestamps.length,
         retryAfterMs: 0,
+      }
+    },
+  }
+}
+
+// ─── Public API ─────────────────────────────────────────────────────────────
+
+export function createRateLimiter(config: RateLimitConfig) {
+  const memoryStore = createInMemoryStore(config)
+  const windowSeconds = Math.ceil(config.windowMs / 1000)
+
+  return {
+    /**
+     * Check if the key (typically an IP) is within the rate limit.
+     *
+     * Uses Redis when available; falls back to in-memory on Redis
+     * absence or failure.
+     */
+    async check(key: string): Promise<RateLimitResult> {
+      if (!redis) {
+        return memoryStore.check(key)
+      }
+
+      const redisKey = `nexus-rate:${key}`
+
+      try {
+        const count = await redis.incr(redisKey)
+
+        // Set TTL on the first increment (start of a new window)
+        if (count === 1) {
+          await redis.expire(redisKey, windowSeconds)
+        }
+
+        if (count > config.maxRequests) {
+          // Estimate retry-after from TTL
+          const ttl = await redis.ttl(redisKey)
+          const retryAfterMs = (ttl > 0 ? ttl : windowSeconds) * 1000
+          return {
+            allowed: false,
+            remaining: 0,
+            retryAfterMs,
+          }
+        }
+
+        return {
+          allowed: true,
+          remaining: config.maxRequests - count,
+          retryAfterMs: 0,
+        }
+      } catch {
+        // Redis failure: fall back to in-memory (fail-open)
+        return memoryStore.check(key)
       }
     },
   }

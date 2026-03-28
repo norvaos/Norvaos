@@ -612,7 +612,7 @@ export default function MattersPage() {
           ))}
         </div>
       ) : isError ? (
-        <div className="rounded-lg border border-red-200 bg-red-50 p-8 text-center">
+        <div className="rounded-lg border border-red-200 bg-red-950/30 p-8 text-center">
           <p className="text-sm text-red-600">{t('matters.load_error' as any)}</p>
         </div>
       ) : matters.length === 0 ? (
@@ -632,7 +632,7 @@ export default function MattersPage() {
         <>
           {/* Bulk action bar */}
           {selectedIds.size > 0 && (
-            <div className="flex items-center justify-between rounded-lg border border-blue-200 bg-blue-50 px-4 py-2.5">
+            <div className="flex items-center justify-between rounded-lg border border-blue-500/20 bg-blue-950/30 px-4 py-2.5">
               <span className="text-sm font-medium text-blue-800">
                 {selectedIds.size} {selectedIds.size !== 1 ? t('matters.matters_plural' as any) : t('matters.matter_singular' as any)} {t('matters.selected' as any)}
               </span>
@@ -892,7 +892,7 @@ function VirtualizedMatterTable({
                   key={matter.id}
                   data-index={virtualRow.index}
                   ref={virtualizer.measureElement}
-                  className={`cursor-pointer ${selectedIds.has(matter.id) ? 'bg-blue-50/60' : ''}`}
+                  className={`cursor-pointer ${selectedIds.has(matter.id) ? 'bg-blue-950/30/60' : ''}`}
                   onClick={() => onRowClick(matter.id)}
                   onMouseEnter={() => onRowHover(matter.id)}
                 >
@@ -950,7 +950,7 @@ function VirtualizedMatterTable({
                                   <div
                                     className={cn(
                                       'h-full rounded-full transition-all duration-500',
-                                      pct >= 100 ? 'bg-emerald-500' : pct >= 70 ? 'bg-violet-500' : pct >= 40 ? 'bg-blue-500' : 'bg-amber-500'
+                                      pct >= 100 ? 'bg-emerald-950/300' : pct >= 70 ? 'bg-violet-500' : pct >= 40 ? 'bg-blue-950/300' : 'bg-amber-950/300'
                                     )}
                                     style={{ width: `${Math.min(pct, 100)}%` }}
                                   />

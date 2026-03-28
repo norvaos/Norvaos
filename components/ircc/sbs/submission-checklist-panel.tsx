@@ -171,7 +171,7 @@ function ChecklistItemRow({
 
   return (
     <div className={`flex items-center gap-2 px-3 py-2 border-b group ${
-      isComplete ? 'bg-emerald-50/50 dark:bg-emerald-950/10' : ''
+      isComplete ? 'bg-emerald-950/20 dark:bg-emerald-950/10' : ''
     }`}>
       {/* Toggle button */}
       <button
@@ -199,7 +199,7 @@ function ChecklistItemRow({
 
       {/* Required badge */}
       {item.is_required && !isComplete && (
-        <Badge variant="outline" className="text-[9px] h-4 px-1 border-amber-300 text-amber-700">
+        <Badge variant="outline" className="text-[9px] h-4 px-1 border-amber-500/30 text-amber-400">
           Required
         </Badge>
       )}

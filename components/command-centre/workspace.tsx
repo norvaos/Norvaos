@@ -4,7 +4,8 @@ import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 import { useCommandCentre } from './command-centre-context'
 import { useUpdateLead } from '@/lib/queries/leads'
-import { LEAD_TEMPERATURES, CONTACT_SOURCES, PERSON_SCOPES } from '@/lib/utils/constants'
+import { LEAD_TEMPERATURES, PERSON_SCOPES } from '@/lib/utils/constants'
+import { useLeadSources } from '@/lib/queries/leads'
 import { useMatterTypes } from '@/lib/queries/matter-types'
 import {
   usePreviousSponsors,
@@ -405,7 +406,7 @@ function GoldenThreadBar({
                             <button
                               type="button"
                               onClick={(e) => { e.stopPropagation(); onQuickLog() }}
-                              className="ml-auto shrink-0 rounded bg-blue-500 px-1.5 py-0.5 text-[9px] font-semibold text-white hover:bg-blue-600 transition-colors"
+                              className="ml-auto shrink-0 rounded bg-blue-950/300 px-1.5 py-0.5 text-[9px] font-semibold text-white hover:bg-blue-600 transition-colors"
                             >
                               Quick-Log
                             </button>
@@ -415,7 +416,7 @@ function GoldenThreadBar({
                             <button
                               type="button"
                               onClick={(e) => { e.stopPropagation(); onOverride(gate) }}
-                              className="ml-auto shrink-0 rounded bg-amber-100 px-1.5 py-0.5 text-[9px] font-semibold text-amber-700 hover:bg-amber-200 transition-colors border border-amber-200"
+                              className="ml-auto shrink-0 rounded bg-amber-100 px-1.5 py-0.5 text-[9px] font-semibold text-amber-400 hover:bg-amber-200 transition-colors border border-amber-200"
                             >
                               Override
                             </button>
@@ -476,7 +477,7 @@ function GateLockedOverlay({
       >
         {gate.status === 'overridden' && (
           <div className="absolute top-2 right-2 z-10">
-            <Badge variant="outline" className="text-[10px] border-amber-300 text-amber-600 bg-amber-50">
+            <Badge variant="outline" className="text-[10px] border-amber-300 text-amber-600 bg-amber-950/30">
               <AlertTriangle className="h-2.5 w-2.5 mr-0.5" />
               Override
             </Badge>
@@ -506,7 +507,7 @@ function GateLockedOverlay({
           <Button
             variant="outline"
             size="sm"
-            className="mt-3 h-7 text-xs gap-1 border-amber-200 text-amber-700 hover:bg-amber-50"
+            className="mt-3 h-7 text-xs gap-1 border-amber-200 text-amber-400 hover:bg-amber-950/30"
             onClick={() => onOverride(gate)}
           >
             <ShieldAlert className="h-3 w-3" />
@@ -586,6 +587,10 @@ export function Workspace() {
     setQuickLogMode(true)
     setMeetingOutcomeOpen(true)
   }, [])
+
+  // Schema-driven sources from DB
+  const { data: leadSources } = useLeadSources(tenantId)
+  const leadSourceNames = useMemo(() => (leadSources ?? []).map(s => s.name), [leadSources])
 
   // Determine if CRS calculator should show based on matter type name
   const { data: allMatterTypes } = useMatterTypes(tenantId, lead?.practice_area_id || undefined)
@@ -766,7 +771,7 @@ export function Workspace() {
                     <UserCheck className="h-4 w-4" />
                     NorvaOS Capture — Identity Verification
                     {gateC && isGatePassed(gateC) && (
-                      <Badge className="ml-auto bg-emerald-50 text-emerald-700 border-emerald-200 text-[10px]">
+                      <Badge className="ml-auto bg-emerald-950/30 text-emerald-400 border-emerald-500/20 text-[10px]">
                         <CheckCircle2 className="h-2.5 w-2.5 mr-0.5" />
                         Verified
                       </Badge>
@@ -843,7 +848,7 @@ export function Workspace() {
       {/* Zero Empty States: Retainer action card when no matter type set */}
       {!lead?.matter_type_id && !isConverted && !isClosedStage && (
         <motion.div variants={panelVariants} initial="hidden" animate="visible">
-          <Card className="border-dashed border-blue-200 bg-blue-50/30">
+          <Card className="border-dashed border-blue-200 bg-blue-950/30/30">
             <CardContent className="py-6 flex flex-col items-center text-center gap-3">
               <Briefcase className="h-8 w-8 text-blue-400" />
               <p className="text-sm font-medium text-slate-700">Set a Service Stream to unlock the Retainer</p>
@@ -1233,12 +1238,12 @@ function CoreDataCard({ lead, entityId, tenantId, users, practiceAreas, isConver
               </SelectTrigger>
               <SelectContent>
                 {/* Always include the current value even if it came from front desk */}
-                {watch('source') && !CONTACT_SOURCES.includes(watch('source') as typeof CONTACT_SOURCES[number]) && (
+                {watch('source') && !leadSourceNames.includes(watch('source')) && (
                   <SelectItem value={watch('source')}>{watch('source')}</SelectItem>
                 )}
-                {CONTACT_SOURCES.map((s) => (
-                  <SelectItem key={s} value={s}>
-                    {s}
+                {(leadSources ?? []).map((s) => (
+                  <SelectItem key={s.id} value={s.name}>
+                    {s.name}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -1334,13 +1339,13 @@ function CoreDataCard({ lead, entityId, tenantId, users, practiceAreas, isConver
                 <SelectContent>
                   <SelectItem value="inland">
                     <span className="flex items-center gap-2">
-                      <span className="h-2 w-2 rounded-full bg-blue-500 shrink-0" />
+                      <span className="h-2 w-2 rounded-full bg-blue-950/300 shrink-0" />
                       Inland  -  Inside Canada
                     </span>
                   </SelectItem>
                   <SelectItem value="outside">
                     <span className="flex items-center gap-2">
-                      <span className="h-2 w-2 rounded-full bg-amber-500 shrink-0" />
+                      <span className="h-2 w-2 rounded-full bg-amber-950/300 shrink-0" />
                       Outside Canada
                     </span>
                   </SelectItem>
@@ -1418,7 +1423,7 @@ function CoreDataCard({ lead, entityId, tenantId, users, practiceAreas, isConver
                 onValueChange={(val) => setValue('has_refusals', val)}
                 disabled={isConverted}
               >
-                <SelectTrigger className={`h-9 text-sm ${watch('has_refusals') === 'yes' ? 'border-amber-400 bg-amber-50' : ''}`}>
+                <SelectTrigger className={`h-9 text-sm ${watch('has_refusals') === 'yes' ? 'border-amber-400 bg-amber-950/30' : ''}`}>
                   <SelectValue placeholder="Unknown" />
                 </SelectTrigger>
                 <SelectContent>
@@ -1585,7 +1590,7 @@ function EntityRecognitionCard({ lead, entityId, tenantId, isConverted }: Entity
           <Search className="h-4 w-4" />
           Entity Recognition
           {principalContact && (
-            <Badge variant="outline" className="ml-auto text-[10px] font-normal text-emerald-600 border-emerald-200 bg-emerald-50">
+            <Badge variant="outline" className="ml-auto text-[10px] font-normal text-emerald-600 border-emerald-500/20 bg-emerald-950/30">
               <Link2 className="h-3 w-3 mr-1" />
               Linked
             </Badge>
@@ -1634,7 +1639,7 @@ function EntityRecognitionCard({ lead, entityId, tenantId, isConverted }: Entity
 
             {/* Previous sponsor suggestions */}
             {!sponsorContactId && previousSponsors && previousSponsors.length > 0 && (
-              <div className="rounded-md border border-blue-100 bg-blue-50/50 p-2 space-y-1.5">
+              <div className="rounded-md border border-blue-100 bg-blue-950/30/50 p-2 space-y-1.5">
                 <p className="text-[10px] font-semibold text-blue-600 uppercase tracking-wide">
                   Previously Linked Sponsors
                 </p>

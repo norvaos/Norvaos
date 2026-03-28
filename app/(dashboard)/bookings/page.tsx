@@ -66,7 +66,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Label } from '@/components/ui/label'
+// Label removed — using raw <label> with obsidian glass styling
 import { Textarea } from '@/components/ui/textarea'
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
@@ -617,18 +617,26 @@ export default function BookingsPage() {
       </Tabs>
 
       {/* ── Create / Edit Dialog ── */}
+      {/* ── Obsidian Glass Modal — Appointment Type Creator ── */}
       <Dialog open={createOpen} onOpenChange={setCreateOpen}>
-        <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-lg">
+        <DialogContent
+          className="max-h-[85vh] overflow-y-auto sm:max-w-lg border-white/[0.08] shadow-2xl"
+          style={{
+            background: 'linear-gradient(180deg, rgba(2,6,23,0.92) 0%, rgba(2,6,23,0.96) 100%)',
+            backdropFilter: 'blur(40px)',
+            WebkitBackdropFilter: 'blur(40px)',
+          }}
+        >
           <DialogHeader>
-            <DialogTitle>
+            <DialogTitle className="text-white font-sans font-bold tracking-tight">
               {editingPage ? 'Edit Appointment Type' : 'New Appointment Type'}
             </DialogTitle>
           </DialogHeader>
 
-          <div className="space-y-4 py-2">
+          <div className="space-y-5 py-2">
             {/* Title */}
             <div>
-              <Label>Title</Label>
+              <label className="block text-[11px] font-mono uppercase tracking-wider text-zinc-400 mb-1.5">Title</label>
               <Input
                 value={formTitle}
                 onChange={(e) => {
@@ -636,45 +644,48 @@ export default function BookingsPage() {
                   if (!editingPage) setFormSlug(generateSlug(e.target.value))
                 }}
                 placeholder="30 Minute Consultation"
+                className="bg-white/[0.04] border-white/[0.08] text-white placeholder:text-zinc-600 font-sans focus:border-emerald-500/50 focus:ring-emerald-500/20"
               />
-              <p className="mt-1 text-xs text-muted-foreground">
+              <p className="mt-1 text-[10px] text-zinc-500 font-mono">
                 This name is shown to clients (e.g., &quot;15 Min Phone Call&quot;, &quot;60 Min Full Consultation&quot;)
               </p>
             </div>
 
             {/* Slug */}
             <div>
-              <Label>URL Slug</Label>
+              <label className="block text-[11px] font-mono uppercase tracking-wider text-zinc-400 mb-1.5">URL Slug</label>
               <Input
                 value={formSlug}
                 onChange={(e) => setFormSlug(e.target.value)}
                 placeholder="30-minute-consultation"
+                className="bg-white/[0.04] border-white/[0.08] text-white placeholder:text-zinc-600 font-mono focus:border-emerald-500/50 focus:ring-emerald-500/20"
               />
-              <p className="mt-1 text-xs text-muted-foreground">
+              <p className="mt-1 text-[10px] text-zinc-500 font-mono">
                 Your booking URL: /booking/{formSlug || 'your-slug'}
               </p>
             </div>
 
             {/* Description */}
             <div>
-              <Label>Description</Label>
+              <label className="block text-[11px] font-mono uppercase tracking-wider text-zinc-400 mb-1.5">Description</label>
               <Textarea
                 value={formDescription}
                 onChange={(e) => setFormDescription(e.target.value)}
                 placeholder="Brief description of this consultation type..."
                 rows={2}
+                className="bg-white/[0.04] border-white/[0.08] text-white placeholder:text-zinc-600 font-sans focus:border-emerald-500/50 focus:ring-emerald-500/20"
               />
             </div>
 
             {/* Duration + Buffer */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label>Duration</Label>
+                <label className="block text-[11px] font-mono uppercase tracking-wider text-zinc-400 mb-1.5">Duration</label>
                 <Select
                   value={String(formDuration)}
                   onValueChange={(v) => setFormDuration(Number(v))}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="bg-white/[0.04] border-white/[0.08] text-white font-sans focus:border-emerald-500/50 focus:ring-emerald-500/20">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -687,12 +698,12 @@ export default function BookingsPage() {
                 </Select>
               </div>
               <div>
-                <Label>Buffer Between</Label>
+                <label className="block text-[11px] font-mono uppercase tracking-wider text-zinc-400 mb-1.5">Buffer Between</label>
                 <Select
                   value={String(formBuffer)}
                   onValueChange={(v) => setFormBuffer(Number(v))}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="bg-white/[0.04] border-white/[0.08] text-white font-sans focus:border-emerald-500/50 focus:ring-emerald-500/20">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -709,26 +720,28 @@ export default function BookingsPage() {
             {/* Working Hours */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label>Start Time</Label>
+                <label className="block text-[11px] font-mono uppercase tracking-wider text-zinc-400 mb-1.5">Start Time</label>
                 <Input
                   type="time"
                   value={formStartTime}
                   onChange={(e) => setFormStartTime(e.target.value)}
+                  className="bg-white/[0.04] border-white/[0.08] text-white font-mono focus:border-emerald-500/50 focus:ring-emerald-500/20"
                 />
               </div>
               <div>
-                <Label>End Time</Label>
+                <label className="block text-[11px] font-mono uppercase tracking-wider text-zinc-400 mb-1.5">End Time</label>
                 <Input
                   type="time"
                   value={formEndTime}
                   onChange={(e) => setFormEndTime(e.target.value)}
+                  className="bg-white/[0.04] border-white/[0.08] text-white font-mono focus:border-emerald-500/50 focus:ring-emerald-500/20"
                 />
               </div>
             </div>
 
             {/* Working Days */}
             <div>
-              <Label>Working Days</Label>
+              <label className="block text-[11px] font-mono uppercase tracking-wider text-zinc-400 mb-1.5">Working Days</label>
               <div className="mt-2 flex flex-wrap gap-2">
                 {DAYS_OF_WEEK.map((day) => (
                   <button
@@ -742,10 +755,10 @@ export default function BookingsPage() {
                       )
                     }
                     className={cn(
-                      'rounded-md border px-3 py-1.5 text-xs font-medium transition-colors',
+                      'rounded-md border px-3 py-1.5 text-xs font-medium font-mono transition-colors',
                       formDays.includes(day.value)
-                        ? 'border-blue-500 bg-blue-50 text-blue-700'
-                        : 'border-slate-200 text-slate-500 hover:bg-slate-50'
+                        ? 'border-emerald-500/50 bg-emerald-500/15 text-emerald-400'
+                        : 'border-white/[0.08] text-zinc-500 hover:bg-white/[0.04] hover:text-zinc-300'
                     )}
                   >
                     {day.label}
@@ -757,54 +770,61 @@ export default function BookingsPage() {
             {/* Advance Booking + Notice */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label>Max Days Ahead</Label>
+                <label className="block text-[11px] font-mono uppercase tracking-wider text-zinc-400 mb-1.5">Max Days Ahead</label>
                 <Input
                   type="number"
                   min={1}
                   max={365}
                   value={formMaxDays}
                   onChange={(e) => setFormMaxDays(Number(e.target.value))}
+                  className="bg-white/[0.04] border-white/[0.08] text-white font-mono focus:border-emerald-500/50 focus:ring-emerald-500/20"
                 />
               </div>
               <div>
-                <Label>Min Notice (hours)</Label>
+                <label className="block text-[11px] font-mono uppercase tracking-wider text-zinc-400 mb-1.5">Min Notice (hours)</label>
                 <Input
                   type="number"
                   min={0}
                   max={168}
                   value={formMinNotice}
                   onChange={(e) => setFormMinNotice(Number(e.target.value))}
+                  className="bg-white/[0.04] border-white/[0.08] text-white font-mono focus:border-emerald-500/50 focus:ring-emerald-500/20"
                 />
               </div>
             </div>
 
             {/* Theme Color */}
             <div>
-              <Label>Theme Color</Label>
+              <label className="block text-[11px] font-mono uppercase tracking-wider text-zinc-400 mb-1.5">Theme Colour</label>
               <div className="mt-1 flex items-center gap-2">
                 <input
                   type="color"
                   value={formColor}
                   onChange={(e) => setFormColor(e.target.value)}
-                  className="h-8 w-8 cursor-pointer rounded border"
+                  className="h-8 w-8 cursor-pointer rounded border border-white/[0.08] bg-transparent"
                 />
                 <Input
                   value={formColor}
                   onChange={(e) => setFormColor(e.target.value)}
-                  className="w-28"
-                  placeholder="#2563eb"
+                  className="w-28 bg-white/[0.04] border-white/[0.08] text-white font-mono focus:border-emerald-500/50 focus:ring-emerald-500/20"
+                  placeholder="#10b981"
                 />
               </div>
             </div>
           </div>
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setCreateOpen(false)}>
+            <Button
+              variant="outline"
+              onClick={() => setCreateOpen(false)}
+              className="border-white/[0.08] bg-white/[0.04] text-zinc-300 hover:bg-white/[0.08] hover:text-white font-mono text-xs uppercase tracking-wider"
+            >
               Cancel
             </Button>
             <Button
               onClick={handleSave}
               disabled={createPage.isPending || updatePage.isPending}
+              className="bg-emerald-600 hover:bg-emerald-500 text-white font-mono text-xs uppercase tracking-wider shadow-lg shadow-emerald-500/20 disabled:bg-zinc-800 disabled:text-zinc-600 disabled:shadow-none"
             >
               {createPage.isPending || updatePage.isPending ? 'Saving...' : 'Save'}
             </Button>

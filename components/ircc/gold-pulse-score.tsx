@@ -64,7 +64,7 @@ export function GoldPulseScore({ score, passed, total, className }: GoldPulseSco
   }, [score])
 
   const isComplete = score === 100
-  const barColor = isComplete ? 'bg-green-500' : score >= 60 ? 'bg-amber-500' : 'bg-red-500'
+  const barColor = isComplete ? 'bg-green-500' : score >= 60 ? 'bg-amber-950/300' : 'bg-red-950/300'
 
   return (
     <div className={cn('px-3 py-1.5 border-b shrink-0', className)}>
@@ -78,7 +78,7 @@ export function GoldPulseScore({ score, passed, total, className }: GoldPulseSco
       <div className="relative">
         <div className={cn(
           'h-1.5 w-full rounded-full overflow-hidden transition-all',
-          isPulsing ? 'bg-amber-100' : 'bg-muted'
+          isPulsing ? 'bg-amber-950/40' : 'bg-muted'
         )}>
           <div
             className={cn(
@@ -105,10 +105,10 @@ export function GoldPulseScore({ score, passed, total, className }: GoldPulseSco
             isPulsing
               ? 'bg-gradient-to-br from-amber-400 to-amber-600 text-white gold-pulse-ring'
               : isComplete
-                ? 'bg-green-100 text-green-700'
+                ? 'bg-emerald-950/40 text-emerald-400'
                 : score >= 60
-                  ? 'bg-amber-50 text-amber-700'
-                  : 'bg-red-50 text-red-700'
+                  ? 'bg-amber-950/30 text-amber-400'
+                  : 'bg-red-950/30 text-red-400'
           )}>
             {score}
           </span>

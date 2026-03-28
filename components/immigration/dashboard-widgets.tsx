@@ -168,7 +168,7 @@ export function FilesAwaitingDocsWidget({ tenantId }: WidgetProps) {
       <CardContent>
         <p
           className={cn(
-            'text-3xl font-bold tabular-nums',
+            'text-3xl font-semibold tracking-tight font-mono',
             hasItems ? 'text-orange-500' : 'text-foreground'
           )}
         >
@@ -202,7 +202,7 @@ export function FilesWaitingIRCCWidget({ tenantId }: WidgetProps) {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <p className="text-3xl font-bold tabular-nums text-blue-500">{count}</p>
+        <p className="text-3xl font-semibold tracking-tight font-mono text-blue-500">{count}</p>
         <p className="text-sm text-muted-foreground mt-1">
           Files waiting on IRCC decision
         </p>
@@ -233,7 +233,7 @@ export function RetainerConversionWidget({ tenantId }: WidgetProps) {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <p className="text-3xl font-bold tabular-nums text-emerald-500">
+        <p className="text-3xl font-semibold tracking-tight font-mono text-emerald-500">
           {rate.toFixed(0)}%
         </p>
         <p className="text-sm text-muted-foreground mt-1">
@@ -282,7 +282,7 @@ export function OverdueRiskWidget({ tenantId }: WidgetProps) {
       <CardContent>
         <p
           className={cn(
-            'text-3xl font-bold tabular-nums',
+            'text-3xl font-semibold tracking-tight font-mono',
             hasCritical ? 'text-red-500' : 'text-emerald-500'
           )}
         >
@@ -539,7 +539,7 @@ export function DeadlineRiskSummaryWidget({ tenantId }: WidgetProps) {
         {atRiskTotal > 0 ? (
           <div className="space-y-1 mb-4">
             <p className={cn(
-              'text-3xl font-bold tabular-nums',
+              'text-3xl font-semibold tracking-tight font-mono',
               criticalCount > 0 ? 'text-red-500' : 'text-orange-500'
             )}>
               {atRiskTotal}
@@ -560,7 +560,7 @@ export function DeadlineRiskSummaryWidget({ tenantId }: WidgetProps) {
           </div>
         ) : (
           <div className="mb-4">
-            <p className="text-3xl font-bold tabular-nums text-emerald-500">0</p>
+            <p className="text-3xl font-semibold tracking-tight font-mono text-emerald-500">0</p>
             <div className="flex items-center gap-1 mt-1 text-emerald-500">
               <CheckCircle2 className="h-3.5 w-3.5" />
               <span className="text-xs font-medium">No high-risk deadlines</span>
@@ -716,9 +716,9 @@ export function StaffWorkloadWidget({ tenantId }: WidgetProps) {
 // ---------------------------------------------------------------------------
 
 const WELLNESS_CONFIG = {
-  healthy:    { label: 'Healthy',    color: 'text-green-700',  bg: 'bg-green-50',  border: 'border-green-200', icon: CheckCircle2 },
-  elevated:   { label: 'Elevated',   color: 'text-amber-700',  bg: 'bg-amber-50',  border: 'border-amber-200', icon: AlertTriangle },
-  overloaded: { label: 'Overloaded', color: 'text-red-700',    bg: 'bg-red-50',    border: 'border-red-200',   icon: AlertTriangle },
+  healthy:    { label: 'Healthy',    color: 'text-emerald-400',  bg: 'bg-emerald-950/30',  border: 'border-emerald-500/30', icon: CheckCircle2 },
+  elevated:   { label: 'Elevated',   color: 'text-amber-400',  bg: 'bg-amber-950/30',  border: 'border-amber-500/30', icon: AlertTriangle },
+  overloaded: { label: 'Overloaded', color: 'text-red-400',    bg: 'bg-red-950/30',    border: 'border-red-500/20',   icon: AlertTriangle },
 } as const
 
 export function StaffWellnessMeter({ tenantId }: WidgetProps) {
@@ -759,7 +759,7 @@ export function StaffWellnessMeter({ tenantId }: WidgetProps) {
   const alertCount = staff.filter((s) => s.load_balance_alert).length
 
   return (
-    <Card className={alertCount > 0 ? 'border-red-200' : undefined}>
+    <Card className={alertCount > 0 ? 'border-red-500/20' : undefined}>
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-sm">
           <Shield className="h-4 w-4 text-muted-foreground" />

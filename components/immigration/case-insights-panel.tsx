@@ -59,29 +59,29 @@ const SEVERITY_CONFIG: Record<InsightSeverity, {
   critical: {
     icon: AlertTriangle,
     color: 'text-red-600',
-    bg: 'bg-red-50',
-    border: 'border-red-200',
+    bg: 'bg-red-950/30',
+    border: 'border-red-500/20',
     label: 'Critical',
   },
   warning: {
     icon: AlertCircle,
     color: 'text-amber-600',
-    bg: 'bg-amber-50',
-    border: 'border-amber-200',
+    bg: 'bg-amber-950/30',
+    border: 'border-amber-500/30',
     label: 'Warning',
   },
   info: {
     icon: Info,
     color: 'text-blue-600',
-    bg: 'bg-blue-50',
-    border: 'border-blue-200',
+    bg: 'bg-blue-950/30',
+    border: 'border-blue-500/20',
     label: 'Info',
   },
   success: {
     icon: CheckCircle2,
     color: 'text-green-600',
-    bg: 'bg-green-50',
-    border: 'border-green-200',
+    bg: 'bg-emerald-950/30',
+    border: 'border-emerald-500/30',
     label: 'Good',
   },
 }
@@ -106,10 +106,10 @@ function ReadinessGauge({
 
   const progressClass =
     score >= 80
-      ? '[&_[data-slot=progress-indicator]]:bg-green-500'
+      ? '[&_[data-slot=progress-indicator]]:bg-emerald-950/300'
       : score >= 50
-        ? '[&_[data-slot=progress-indicator]]:bg-amber-500'
-        : '[&_[data-slot=progress-indicator]]:bg-red-500'
+        ? '[&_[data-slot=progress-indicator]]:bg-amber-950/300'
+        : '[&_[data-slot=progress-indicator]]:bg-red-950/300'
 
   return (
     <div className="space-y-1.5">
@@ -130,19 +130,19 @@ function CrsCompetitivenessCard({ analysis }: { analysis: CrsAnalysis }) {
     competitive: {
       label: 'Competitive',
       color: 'text-green-600',
-      bg: 'bg-green-50 border-green-200',
+      bg: 'bg-emerald-950/30 border-emerald-500/30',
       icon: TrendingUp,
     },
     borderline: {
       label: 'Borderline',
       color: 'text-amber-600',
-      bg: 'bg-amber-50 border-amber-200',
+      bg: 'bg-amber-950/30 border-amber-500/30',
       icon: Minus,
     },
     needs_improvement: {
       label: 'Below Cutoff',
       color: 'text-red-600',
-      bg: 'bg-red-50 border-red-200',
+      bg: 'bg-red-950/30 border-red-500/20',
       icon: TrendingDown,
     },
   }
@@ -377,7 +377,7 @@ export function CaseInsightsPanel({ matterId, tenantId, stageEnteredAt, currentS
           return (
             <div className={cn(
               'flex items-center justify-between rounded-lg border px-3 py-2',
-              isBottleneck ? 'bg-red-50 border-red-200' : isWarning ? 'bg-amber-50 border-amber-200' : 'bg-slate-50 border-slate-200'
+              isBottleneck ? 'bg-red-950/30 border-red-500/20' : isWarning ? 'bg-amber-950/30 border-amber-500/30' : 'bg-slate-50 border-slate-200'
             )}>
               <div className="flex items-center gap-2">
                 <span className="text-xs text-slate-600">Current Stage:</span>
@@ -466,7 +466,7 @@ export function CaseInsightsPanel({ matterId, tenantId, stageEnteredAt, currentS
 
         {/* All clear */}
         {insights.insights.length === 0 && (
-          <div className="flex items-center gap-2 py-3 px-4 bg-green-50 border border-green-200 rounded-lg">
+          <div className="flex items-center gap-2 py-3 px-4 bg-emerald-950/30 border border-emerald-500/30 rounded-lg">
             <CheckCircle2 className="h-4 w-4 text-green-600" />
             <span className="text-xs font-medium text-green-800">
               No issues found  -  case is on track

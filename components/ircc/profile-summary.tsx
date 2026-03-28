@@ -103,7 +103,7 @@ export function ProfileSummary({ formCodes, profile, className, prebuiltQuestion
                   </p>
                 </div>
                 {hasData ? (
-                  <span className="inline-flex items-center rounded-full bg-green-50 px-2 py-0.5 text-xs font-medium text-green-700 border border-green-200">
+                  <span className="inline-flex items-center rounded-full bg-emerald-950/30 px-2 py-0.5 text-xs font-medium text-emerald-400 border border-emerald-500/20">
                     {filledInSection} filled
                   </span>
                 ) : (

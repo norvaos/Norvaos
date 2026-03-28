@@ -119,19 +119,19 @@ export const STATUS_CONFIG: Record<SlotStatus, {
     label: 'Empty',
     variant: 'outline',
     icon: AlertCircle,
-    className: 'border-amber-300 text-amber-700 bg-amber-50',
+    className: 'border-amber-500/30 text-amber-400 bg-amber-950/30',
   },
   pending_review: {
     label: 'Pending Review',
     variant: 'outline',
     icon: Clock,
-    className: 'border-blue-300 text-blue-700 bg-blue-50',
+    className: 'border-blue-500/30 text-blue-400 bg-blue-950/30',
   },
   accepted: {
     label: 'Accepted',
     variant: 'outline',
     icon: CheckCircle2,
-    className: 'border-green-300 text-green-700 bg-green-50',
+    className: 'border-emerald-500/30 text-emerald-400 bg-emerald-950/30',
   },
   needs_re_upload: {
     label: 'Needs Re-upload',
@@ -445,8 +445,8 @@ export function SlotCard({
 
               {/* Scan Results */}
               {slotScanExtracted && (
-                <div className="border rounded-lg bg-green-50/50 border-green-200 divide-y divide-green-100">
-                  <div className="px-3 py-1.5 text-xs font-medium text-green-700 flex items-center gap-1.5">
+                <div className="border rounded-lg bg-emerald-950/30 border-emerald-500/20 divide-y divide-emerald-500/10">
+                  <div className="px-3 py-1.5 text-xs font-medium text-emerald-400 flex items-center gap-1.5">
                     <ScanSearch className="h-3.5 w-3.5" />
                     Extracted Information
                   </div>
@@ -626,7 +626,7 @@ export function SlotReviewDialog({
             size="sm"
             onClick={() => handleReview('reject')}
             disabled={reviewMutation.isPending}
-            className="text-red-600 border-red-200 hover:bg-red-50"
+            className="text-red-400 border-red-500/20 hover:bg-red-950/30"
           >
             <X className="mr-1 h-4 w-4" />
             Reject
@@ -636,7 +636,7 @@ export function SlotReviewDialog({
             size="sm"
             onClick={() => handleReview('needs_re_upload')}
             disabled={reviewMutation.isPending}
-            className="text-orange-600 border-orange-200 hover:bg-orange-50"
+            className="text-orange-400 border-orange-500/20 hover:bg-orange-950/30"
           >
             <RotateCcw className="mr-1 h-4 w-4" />
             Needs Re-upload

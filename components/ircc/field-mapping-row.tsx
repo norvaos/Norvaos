@@ -24,7 +24,7 @@ export function FieldMappingRow({
   )
 
   return (
-    <TableRow className={field.is_mapped ? 'bg-green-50/30' : ''}>
+    <TableRow className={field.is_mapped ? 'bg-emerald-950/30/30' : ''}>
       <TableCell className="font-mono text-xs max-w-[200px] truncate" title={field.xfa_path}>
         {field.xfa_path}
       </TableCell>

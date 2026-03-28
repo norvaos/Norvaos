@@ -522,7 +522,7 @@ function VerifyStepContent({
         <div className="flex items-center gap-3 rounded-2xl border border-blue-500/30 bg-blue-500/5 p-4">
           <Loader2 className="h-5 w-5 shrink-0 animate-spin text-blue-500" />
           <div>
-            <p className="text-sm font-medium text-blue-700 dark:text-blue-300">Checking for conflicts...</p>
+            <p className="text-sm font-medium text-blue-400 dark:text-blue-300">Checking for conflicts...</p>
             <p className="mt-1 text-xs text-blue-600/80 dark:text-blue-400/70">
               Scanning existing contacts to make sure this isn&apos;t a duplicate.
             </p>
@@ -534,7 +534,7 @@ function VerifyStepContent({
         <div className="flex items-center gap-3 rounded-2xl border border-emerald-500/30 bg-emerald-500/5 p-4">
           <ShieldCheck className="h-5 w-5 shrink-0 text-emerald-500" />
           <div>
-            <p className="text-sm font-medium text-emerald-700 dark:text-emerald-300">No conflicts found</p>
+            <p className="text-sm font-medium text-emerald-400 dark:text-emerald-300">No conflicts found</p>
             <p className="mt-1 text-xs text-emerald-600/80 dark:text-emerald-400/70">
               {verifyText}
             </p>
@@ -547,7 +547,7 @@ function VerifyStepContent({
           <div className="flex items-start gap-3">
             <ShieldAlert className="mt-0.5 h-5 w-5 shrink-0 text-amber-500" />
             <div>
-              <p className="text-sm font-medium text-amber-700 dark:text-amber-300">
+              <p className="text-sm font-medium text-amber-400 dark:text-amber-300">
                 Possible duplicate{conflictMatches.length > 1 ? 's' : ''} found
               </p>
               <p className="mt-1 text-xs text-amber-600/80 dark:text-amber-400/70">
@@ -576,7 +576,7 @@ function VerifyStepContent({
               onChange={(e) => setConflictAcknowledged(e.target.checked)}
               className="h-4 w-4 rounded border-amber-400 text-emerald-500 focus:ring-emerald-500"
             />
-            <span className="text-xs font-medium text-amber-700 dark:text-amber-300">
+            <span className="text-xs font-medium text-amber-400 dark:text-amber-300">
               I confirm this is a different person  -  not a duplicate
             </span>
           </label>
@@ -587,7 +587,7 @@ function VerifyStepContent({
         <div className="flex items-start gap-3 rounded-2xl border border-amber-500/30 bg-amber-500/5 p-4">
           <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-500" />
           <div>
-            <p className="text-sm font-medium text-amber-700 dark:text-amber-300">Please verify before saving</p>
+            <p className="text-sm font-medium text-amber-400 dark:text-amber-300">Please verify before saving</p>
             <p className="mt-1 text-xs text-amber-600/80 dark:text-amber-400/70">
               {verifyText}
             </p>

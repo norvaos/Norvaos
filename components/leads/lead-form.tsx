@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { useQuery } from '@tanstack/react-query'
@@ -9,7 +9,8 @@ import { Loader2 } from 'lucide-react'
 import { leadSchema, type LeadFormValues } from '@/lib/schemas/lead'
 import { createClient } from '@/lib/supabase/client'
 import { useTenant } from '@/lib/hooks/use-tenant'
-import { LEAD_TEMPERATURES, CONTACT_SOURCES } from '@/lib/utils/constants'
+import { useLeadSources } from '@/lib/queries/leads'
+import { LEAD_TEMPERATURES } from '@/lib/utils/constants'
 import { CLIENT_LOCALES } from '@/lib/i18n/config'
 import { useI18n } from '@/lib/i18n/i18n-provider'
 import type { Database } from '@/lib/types/database'
@@ -37,6 +38,7 @@ import {
 import { ContactSearch } from '@/components/shared/contact-search'
 
 type PracticeArea = Database['public']['Tables']['practice_areas']['Row']
+type LeadSource = Database['public']['Tables']['lead_sources']['Row']
 type Pipeline = Database['public']['Tables']['pipelines']['Row']
 type PipelineStage = Database['public']['Tables']['pipeline_stages']['Row']
 type User = Database['public']['Tables']['users']['Row']
@@ -51,7 +53,39 @@ interface LeadFormProps {
 }
 
 // ---------------------------------------------------------------------------
-// Inline data-fetching hooks (same pattern as MatterForm)
+// Sovereign Error Handler — parses PostgreSQL error codes
+// ---------------------------------------------------------------------------
+
+function parseSovereignError(error: unknown): string | null {
+  if (!error || typeof error !== 'object') return null
+  const err = error as { code?: string; message?: string; details?: string }
+
+  switch (err.code) {
+    case '23505': {
+      // Unique constraint violation
+      const detail = err.details ?? err.message ?? ''
+      const emailMatch = detail.match(/\(([^)]*email[^)]*)\)/i)
+      if (emailMatch) {
+        return `IDENTITY_EXISTS — This email is already locked in the system.`
+      }
+      return `DUPLICATE_RECORD — A record with this data already exists.`
+    }
+    case '23503':
+      return `LINK_BROKEN — Referenced record does not exist. Check your selections.`
+    case '23502':
+      return `FIELD_REQUIRED — A mandatory field is missing.`
+    case '42501':
+      return `ACCESS_DENIED — You do not have permission for this operation.`
+    default:
+      if (err.message) {
+        return `SYSTEM_FAULT — ${err.message}`
+      }
+      return null
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Data-fetching hooks
 // ---------------------------------------------------------------------------
 
 function usePracticeAreas(tenantId: string) {
@@ -145,17 +179,19 @@ export function LeadForm({
   const { t } = useI18n()
   const { tenant } = useTenant()
   const tenantId = tenant?.id ?? ''
+  const [sovereignError, setSovereignError] = useState<string | null>(null)
 
   const form = useForm<LeadFormValues>({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     resolver: standardSchemaResolver(leadSchema) as any,
     defaultValues: {
       contact_id: '',
+      email: '',
       pipeline_id: fixedPipelineId ?? '',
       stage_id: fixedStageId ?? '',
-      source: undefined,
+      source: '',
       source_detail: undefined,
-      practice_area_id: undefined,
+      practice_area_id: '',
       estimated_value: undefined,
       assigned_to: undefined,
       temperature: 'warm',
@@ -164,10 +200,21 @@ export function LeadForm({
       next_follow_up: undefined,
       ...defaultValues,
     },
+    mode: 'onChange',
   })
 
   const watchedPipelineId = form.watch('pipeline_id')
 
+  // Watch mandatory fields for validation lock
+  const watchedEmail = form.watch('email')
+  const watchedSource = form.watch('source')
+  const watchedPracticeArea = form.watch('practice_area_id')
+  const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(watchedEmail ?? '')
+  const isSourceSelected = !!watchedSource && watchedSource.length > 0
+  const isCaseTypeSelected = !!watchedPracticeArea && watchedPracticeArea.length > 0
+  const canIgnite = isEmailValid && isSourceSelected && isCaseTypeSelected
+
+  const { data: leadSources, isLoading: sourcesLoading } = useLeadSources(tenantId)
   const { data: practiceAreas, isLoading: practiceAreasLoading } = usePracticeAreas(tenantId)
   const { data: pipelines, isLoading: pipelinesLoading } = useLeadPipelines(tenantId)
   const { data: stages, isLoading: stagesLoading } = useStagesForPipeline(watchedPipelineId)
@@ -181,17 +228,35 @@ export function LeadForm({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [watchedPipelineId])
 
+  // Clear sovereign error when form changes
+  useEffect(() => {
+    setSovereignError(null)
+  }, [watchedEmail, watchedSource, watchedPracticeArea])
+
   function formatUserName(user: User): string {
     const name = [user.first_name, user.last_name].filter(Boolean).join(' ')
     return name || user.email
   }
 
+  function handleFormSubmit(values: LeadFormValues) {
+    setSovereignError(null)
+    try {
+      onSubmit(values)
+    } catch (err) {
+      const parsed = parseSovereignError(err)
+      if (parsed) setSovereignError(parsed)
+    }
+  }
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form
+        onSubmit={form.handleSubmit(handleFormSubmit)}
+        className={`space-y-6 relative ${sovereignError ? 'ring-1 ring-amber-500/40 rounded-lg' : ''}`}
+      >
         {/* Contact Selection */}
         <div>
-          <h3 className="text-sm font-medium text-slate-900">{t('form.section_contact' as any)}</h3>
+          <h3 className="text-sm font-semibold text-foreground/80 font-sans uppercase tracking-tight">{t('form.section_contact' as any)}</h3>
           <Separator className="my-3" />
           <div className="space-y-4">
             <FormField
@@ -199,7 +264,7 @@ export function LeadForm({
               name="contact_id"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t('form.lead_contact' as any)} *</FormLabel>
+                  <FormLabel className="text-foreground/70 font-mono text-xs uppercase tracking-wider">{t('form.lead_contact' as any)} *</FormLabel>
                   <FormControl>
                     <ContactSearch
                       value={field.value}
@@ -208,7 +273,26 @@ export function LeadForm({
                       placeholder={t('form.search_contacts' as any)}
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="font-mono text-[10px]" />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-foreground/70 font-mono text-xs uppercase tracking-wider">Email *</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="email"
+                      placeholder="client@example.com"
+                      className="font-mono text-foreground placeholder:text-muted-foreground"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage className="font-mono text-[10px]" />
                 </FormItem>
               )}
             />
@@ -217,7 +301,7 @@ export function LeadForm({
 
         {/* Pipeline & Stage */}
         <div>
-          <h3 className="text-sm font-medium text-slate-900">{t('form.section_pipeline_stage' as any)}</h3>
+          <h3 className="text-sm font-semibold text-foreground/80 font-sans uppercase tracking-tight">{t('form.section_pipeline_stage' as any)}</h3>
           <Separator className="my-3" />
           <div className="space-y-4">
             <FormField
@@ -225,13 +309,13 @@ export function LeadForm({
               name="pipeline_id"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t('form.lead_pipeline' as any)} *</FormLabel>
+                  <FormLabel className="font-mono text-xs uppercase tracking-wider">{t('form.lead_pipeline' as any)} *</FormLabel>
                   <Select
                     onValueChange={field.onChange}
                     value={field.value}
                   >
                     <FormControl>
-                      <SelectTrigger className="w-full">
+                      <SelectTrigger className="w-full font-mono">
                         <SelectValue
                           placeholder={pipelinesLoading ? t('common.loading') : t('form.select_pipeline' as any)}
                         />
@@ -239,13 +323,13 @@ export function LeadForm({
                     </FormControl>
                     <SelectContent>
                       {pipelines?.map((p) => (
-                        <SelectItem key={p.id} value={p.id}>
+                        <SelectItem key={p.id} value={p.id} className="font-mono">
                           {p.name}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
-                  <FormMessage />
+                  <FormMessage className="font-mono text-[10px]" />
                 </FormItem>
               )}
             />
@@ -255,14 +339,14 @@ export function LeadForm({
               name="stage_id"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t('form.lead_stage' as any)} *</FormLabel>
+                  <FormLabel className="font-mono text-xs uppercase tracking-wider">{t('form.lead_stage' as any)} *</FormLabel>
                   <Select
                     onValueChange={field.onChange}
                     value={field.value}
                     disabled={!watchedPipelineId}
                   >
                     <FormControl>
-                      <SelectTrigger className="w-full">
+                      <SelectTrigger className="w-full font-mono">
                         <SelectValue
                           placeholder={
                             !watchedPipelineId
@@ -276,13 +360,13 @@ export function LeadForm({
                     </FormControl>
                     <SelectContent>
                       {stages?.map((s) => (
-                        <SelectItem key={s.id} value={s.id}>
+                        <SelectItem key={s.id} value={s.id} className="font-mono">
                           {s.name}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
-                  <FormMessage />
+                  <FormMessage className="font-mono text-[10px]" />
                 </FormItem>
               )}
             />
@@ -291,7 +375,7 @@ export function LeadForm({
 
         {/* Lead Details */}
         <div>
-          <h3 className="text-sm font-medium text-slate-900">{t('form.section_lead_details' as any)}</h3>
+          <h3 className="text-sm font-semibold text-foreground/80 font-sans uppercase tracking-tight">{t('form.section_lead_details' as any)}</h3>
           <Separator className="my-3" />
           <div className="space-y-4">
             <FormField
@@ -299,16 +383,16 @@ export function LeadForm({
               name="temperature"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t('form.lead_temperature' as any)}</FormLabel>
+                  <FormLabel className="font-mono text-xs uppercase tracking-wider">{t('form.lead_temperature' as any)}</FormLabel>
                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
-                      <SelectTrigger className="w-full">
+                      <SelectTrigger className="w-full font-mono">
                         <SelectValue placeholder={t('form.select_temperature' as any)} />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
                       {LEAD_TEMPERATURES.map((temp) => (
-                        <SelectItem key={temp.value} value={temp.value}>
+                        <SelectItem key={temp.value} value={temp.value} className="font-mono">
                           <div className="flex items-center gap-2">
                             <span
                               className="inline-block h-2.5 w-2.5 rounded-full"
@@ -320,7 +404,7 @@ export function LeadForm({
                       ))}
                     </SelectContent>
                   </Select>
-                  <FormMessage />
+                  <FormMessage className="font-mono text-[10px]" />
                 </FormItem>
               )}
             />
@@ -330,22 +414,22 @@ export function LeadForm({
               name="source"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t('form.lead_source' as any)}</FormLabel>
+                  <FormLabel className="text-foreground/70 font-mono text-xs uppercase tracking-wider">{t('form.lead_source' as any)} *</FormLabel>
                   <Select onValueChange={field.onChange} value={field.value ?? ''}>
                     <FormControl>
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder={t('form.select_source' as any)} />
+                      <SelectTrigger className="w-full font-mono">
+                        <SelectValue placeholder={sourcesLoading ? t('common.loading') : t('form.select_source' as any)} />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {CONTACT_SOURCES.map((s) => (
-                        <SelectItem key={s} value={s}>
-                          {s}
+                      {leadSources?.map((s) => (
+                        <SelectItem key={s.id} value={s.name} className="font-mono">
+                          {s.name}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
-                  <FormMessage />
+                  <FormMessage className="font-mono text-[10px]" />
                 </FormItem>
               )}
             />
@@ -355,22 +439,22 @@ export function LeadForm({
               name="preferred_language"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t('form.preferred_language' as any)}</FormLabel>
+                  <FormLabel className="font-mono text-xs uppercase tracking-wider">{t('form.preferred_language' as any)}</FormLabel>
                   <Select onValueChange={field.onChange} value={field.value ?? ''}>
                     <FormControl>
-                      <SelectTrigger className="w-full">
+                      <SelectTrigger className="w-full font-mono">
                         <SelectValue placeholder={t('form.select_preferred_language' as any)} />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
                       {CLIENT_LOCALES.map((locale) => (
-                        <SelectItem key={locale.code} value={locale.code}>
+                        <SelectItem key={locale.code} value={locale.code} className="font-mono">
                           {locale.nativeLabel} ({locale.label})
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
-                  <FormMessage />
+                  <FormMessage className="font-mono text-[10px]" />
                 </FormItem>
               )}
             />
@@ -380,10 +464,10 @@ export function LeadForm({
               name="practice_area_id"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t('form.lead_practice_area' as any)}</FormLabel>
+                  <FormLabel className="text-foreground/70 font-mono text-xs uppercase tracking-wider">{t('form.lead_practice_area' as any)} *</FormLabel>
                   <Select onValueChange={field.onChange} value={field.value ?? ''}>
                     <FormControl>
-                      <SelectTrigger className="w-full">
+                      <SelectTrigger className="w-full font-mono">
                         <SelectValue
                           placeholder={practiceAreasLoading ? t('common.loading') : t('form.select_practice_area' as any)}
                         />
@@ -391,13 +475,13 @@ export function LeadForm({
                     </FormControl>
                     <SelectContent>
                       {practiceAreas?.map((pa) => (
-                        <SelectItem key={pa.id} value={pa.id}>
+                        <SelectItem key={pa.id} value={pa.id} className="font-mono">
                           {pa.name}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
-                  <FormMessage />
+                  <FormMessage className="font-mono text-[10px]" />
                 </FormItem>
               )}
             />
@@ -407,19 +491,20 @@ export function LeadForm({
               name="estimated_value"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t('form.lead_estimated_value' as any)}</FormLabel>
+                  <FormLabel className="font-mono text-xs uppercase tracking-wider">{t('form.lead_estimated_value' as any)}</FormLabel>
                   <FormControl>
                     <Input
                       type="number"
                       min={0}
                       step="0.01"
                       placeholder="0.00"
+                      className="font-mono"
                       {...field}
                       value={field.value ?? ''}
                       onChange={(e) => field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)}
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="font-mono text-[10px]" />
                 </FormItem>
               )}
             />
@@ -428,7 +513,7 @@ export function LeadForm({
 
         {/* Assignment */}
         <div>
-          <h3 className="text-sm font-medium text-slate-900">{t('form.section_assignment' as any)}</h3>
+          <h3 className="text-sm font-semibold text-foreground/80 font-sans uppercase tracking-tight">{t('form.section_assignment' as any)}</h3>
           <Separator className="my-3" />
           <div className="space-y-4">
             <FormField
@@ -436,10 +521,10 @@ export function LeadForm({
               name="assigned_to"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t('form.lead_assigned_to' as any)}</FormLabel>
+                  <FormLabel className="font-mono text-xs uppercase tracking-wider">{t('form.lead_assigned_to' as any)}</FormLabel>
                   <Select onValueChange={field.onChange} value={field.value ?? ''}>
                     <FormControl>
-                      <SelectTrigger className="w-full">
+                      <SelectTrigger className="w-full font-mono">
                         <SelectValue
                           placeholder={lawyersLoading ? t('common.loading') : t('form.select_lawyer' as any)}
                         />
@@ -447,13 +532,13 @@ export function LeadForm({
                     </FormControl>
                     <SelectContent>
                       {lawyers?.map((u) => (
-                        <SelectItem key={u.id} value={u.id}>
+                        <SelectItem key={u.id} value={u.id} className="font-mono">
                           {formatUserName(u)}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
-                  <FormMessage />
+                  <FormMessage className="font-mono text-[10px]" />
                 </FormItem>
               )}
             />
@@ -462,7 +547,7 @@ export function LeadForm({
 
         {/* Follow-up & Notes */}
         <div>
-          <h3 className="text-sm font-medium text-slate-900">{t('form.section_followup_notes' as any)}</h3>
+          <h3 className="text-sm font-semibold text-foreground/80 font-sans uppercase tracking-tight">{t('form.section_followup_notes' as any)}</h3>
           <Separator className="my-3" />
           <div className="space-y-4">
             <FormField
@@ -470,14 +555,14 @@ export function LeadForm({
               name="next_follow_up"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t('form.lead_follow_up' as any)}</FormLabel>
+                  <FormLabel className="font-mono text-xs uppercase tracking-wider">{t('form.lead_follow_up' as any)}</FormLabel>
                   <FormControl>
                     <TenantDateInput
                       value={field.value ?? ''}
                       onChange={(iso) => field.onChange(iso)}
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="font-mono text-[10px]" />
                 </FormItem>
               )}
             />
@@ -487,26 +572,40 @@ export function LeadForm({
               name="notes"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t('form.lead_notes' as any)}</FormLabel>
+                  <FormLabel className="font-mono text-xs uppercase tracking-wider">{t('form.lead_notes' as any)}</FormLabel>
                   <FormControl>
                     <Textarea
                       placeholder={t('form.lead_notes_placeholder' as any)}
                       rows={3}
+                      className="font-mono"
                       {...field}
                       value={field.value ?? ''}
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="font-mono text-[10px]" />
                 </FormItem>
               )}
             />
           </div>
         </div>
 
+        {/* Sovereign Error Alert — slim amber HUD bar */}
+        {sovereignError && (
+          <div className="rounded border border-amber-500/30 bg-amber-500/5 px-3 py-2">
+            <p className="font-mono text-[10px] uppercase tracking-widest text-amber-400">
+              [SATELLITE_ALERT]: {sovereignError}
+            </p>
+          </div>
+        )}
+
         <div className="flex justify-end gap-2 pt-4">
-          <Button type="submit" disabled={isLoading}>
+          <Button
+            type="submit"
+            disabled={isLoading || !canIgnite}
+            className="bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-500/20 shadow-lg disabled:bg-muted disabled:text-muted-foreground disabled:shadow-none disabled:cursor-not-allowed font-mono uppercase tracking-wider text-xs"
+          >
             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {mode === 'create' ? 'Create Lead' : 'Update Lead'}
+            {mode === 'create' ? 'Ignite Mission' : 'Update Lead'}
           </Button>
         </div>
       </form>

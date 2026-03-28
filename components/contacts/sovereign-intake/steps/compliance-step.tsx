@@ -78,8 +78,8 @@ function buildComplianceItems(conflictCleared: boolean): ComplianceItemConfig[] 
         ? 'Conflict check passed'
         : 'Conflict check incomplete',
       colourClass: conflictCleared
-        ? 'border-green-300 bg-green-50 text-green-700'
-        : 'border-amber-300 bg-amber-50 text-amber-700',
+        ? 'border-green-300 bg-emerald-950/30 text-emerald-400'
+        : 'border-amber-300 bg-amber-950/30 text-amber-400',
     },
     {
       key: 'retainer',
@@ -181,7 +181,7 @@ export function SovereignComplianceStep({ intake }: InternalComplianceStepProps)
                         className={cn(
                           'text-[9px] px-1.5 py-0',
                           isPassed
-                            ? 'border-green-300 bg-green-50 text-green-700'
+                            ? 'border-green-300 bg-emerald-950/30 text-emerald-400'
                             : 'border-slate-200 bg-slate-50 text-slate-500',
                         )}
                       >
@@ -320,7 +320,7 @@ export function ComplianceStepStandalone({
                         className={cn(
                           'text-[9px] px-1.5 py-0',
                           isPassed
-                            ? 'border-green-300 bg-green-50 text-green-700'
+                            ? 'border-green-300 bg-emerald-950/30 text-emerald-400'
                             : 'border-slate-200 bg-slate-50 text-slate-500',
                         )}
                       >

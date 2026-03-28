@@ -80,6 +80,15 @@ async function handlePut(request: Request) {
       )
     }
 
+    // Base64 inflation guard (2MB file = ~2.7MB base64)
+    const MAX_BASE64_SIZE = 3 * 1024 * 1024 // 3MB
+    if (dataUrl.length > MAX_BASE64_SIZE) {
+      return NextResponse.json(
+        { error: 'Signature payload exceeds 3MB base64 limit' },
+        { status: 413 },
+      )
+    }
+
     if (!['drawn', 'typed', 'uploaded'].includes(mode)) {
       return NextResponse.json(
         { error: 'mode must be "drawn", "typed", or "uploaded"' },

@@ -26,7 +26,7 @@ export async function GET(
 ) {
   try {
     const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
-    const { allowed, retryAfterMs } = limiter.check(ip)
+    const { allowed, retryAfterMs } = await limiter.check(ip)
     if (!allowed) {
       return NextResponse.json(
         { error: 'Too many requests' },
@@ -71,7 +71,7 @@ export async function POST(
 ) {
   try {
     const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
-    const { allowed, retryAfterMs } = limiter.check(ip)
+    const { allowed, retryAfterMs } = await limiter.check(ip)
     if (!allowed) {
       return NextResponse.json(
         { error: 'Too many requests' },

@@ -54,7 +54,7 @@ function getStatusLabel(
 
 function getStatusDot(status: string): string {
   const group = getStatusGroup(status)
-  if (group === 'completed') return 'bg-green-500'
+  if (group === 'completed') return 'bg-emerald-950/300'
   if (group === 'in_progress') return 'bg-blue-500'
   return 'bg-slate-400'
 }
@@ -74,8 +74,8 @@ function getPriorityLabel(
 function getPriorityColor(priority: string | null): string {
   if (!priority) return ''
   const p = priority.toLowerCase()
-  if (p === 'high' || p === 'urgent') return 'text-red-600 bg-red-50 border-red-200'
-  if (p === 'medium' || p === 'normal') return 'text-amber-600 bg-amber-50 border-amber-200'
+  if (p === 'high' || p === 'urgent') return 'text-red-600 bg-red-950/30 border-red-200'
+  if (p === 'medium' || p === 'normal') return 'text-amber-600 bg-amber-950/30 border-amber-200'
   return 'text-slate-500 bg-slate-50 border-slate-200'
 }
 

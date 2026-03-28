@@ -31,9 +31,9 @@ const STEP_CONFIG = [
 
 const STATUS_ICONS: Record<string, { icon: React.ElementType; class: string }> = {
   completed: { icon: CheckCircle2, class: 'text-emerald-600' },
-  pending: { icon: MinusCircle, class: 'text-slate-400' },
+  pending: { icon: MinusCircle, class: 'text-muted-foreground/70' },
   failed: { icon: XCircle, class: 'text-red-500' },
-  skipped: { icon: MinusCircle, class: 'text-slate-300' },
+  skipped: { icon: MinusCircle, class: 'text-muted-foreground/50' },
 }
 
 // ─── Component ───────────────────────────────────────────────────────────────
@@ -62,7 +62,7 @@ export function OnboardingProgressCard({ matterId }: OnboardingProgressCardProps
         <Zap className="h-4 w-4 text-amber-500" />
         <h4 className="text-sm font-semibold">One-Click Onboarding</h4>
         {allComplete && (
-          <Badge className="bg-emerald-100 text-emerald-700 text-[10px] ml-auto">
+          <Badge className="bg-emerald-950/40 text-emerald-400 text-[10px] ml-auto">
             Complete
           </Badge>
         )}
@@ -84,7 +84,7 @@ export function OnboardingProgressCard({ matterId }: OnboardingProgressCardProps
               <div className="min-w-0 flex-1">
                 <p className={cn(
                   'text-xs font-medium',
-                  status === 'completed' ? 'text-emerald-700' : 'text-slate-700'
+                  status === 'completed' ? 'text-emerald-400' : 'text-foreground/80'
                 )}>
                   {step.label}
                 </p>

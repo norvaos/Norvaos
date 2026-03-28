@@ -206,10 +206,10 @@ export function ConflictReviewPanel({
 function ConflictScoreGauge({ score }: { score: number }) {
   const color =
     score >= 50
-      ? 'text-red-600 border-red-200 bg-red-50'
+      ? 'text-red-600 border-red-500/20 bg-red-950/30'
       : score >= 25
-        ? 'text-amber-600 border-amber-200 bg-amber-50'
-        : 'text-emerald-600 border-emerald-200 bg-emerald-50'
+        ? 'text-amber-600 border-amber-200 bg-amber-950/30'
+        : 'text-emerald-600 border-emerald-500/20 bg-emerald-950/30'
 
   const icon =
     score >= 50 ? (
@@ -247,47 +247,47 @@ export function ConflictStatusBadge({ status, className }: { status: string; cla
     },
     auto_scan_complete: {
       label: 'Auto Scan Complete',
-      variant: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+      variant: 'bg-emerald-950/30 text-emerald-400 border-emerald-500/20',
       icon: <CheckCircle2 className="size-3" />,
     },
     review_suggested: {
       label: 'Review Suggested',
-      variant: 'bg-amber-50 text-amber-700 border-amber-200',
+      variant: 'bg-amber-950/30 text-amber-400 border-amber-200',
       icon: <AlertTriangle className="size-3" />,
     },
     review_required: {
       label: 'Review Required',
-      variant: 'bg-red-50 text-red-700 border-red-200',
+      variant: 'bg-red-950/30 text-red-400 border-red-500/20',
       icon: <ShieldAlert className="size-3" />,
     },
     cleared_by_lawyer: {
       label: 'Cleared by Lawyer',
-      variant: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+      variant: 'bg-emerald-950/30 text-emerald-400 border-emerald-500/20',
       icon: <ShieldCheck className="size-3" />,
     },
     conflict_confirmed: {
       label: 'Conflict Confirmed',
-      variant: 'bg-red-50 text-red-700 border-red-200',
+      variant: 'bg-red-950/30 text-red-400 border-red-500/20',
       icon: <XCircle className="size-3" />,
     },
     waiver_required: {
       label: 'Waiver Required',
-      variant: 'bg-orange-50 text-orange-700 border-orange-200',
+      variant: 'bg-orange-950/30 text-orange-400 border-orange-200',
       icon: <AlertTriangle className="size-3" />,
     },
     waiver_obtained: {
       label: 'Waiver Obtained',
-      variant: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+      variant: 'bg-emerald-950/30 text-emerald-400 border-emerald-500/20',
       icon: <ShieldCheck className="size-3" />,
     },
     blocked: {
       label: 'Blocked',
-      variant: 'bg-red-50 text-red-700 border-red-200',
+      variant: 'bg-red-950/30 text-red-400 border-red-500/20',
       icon: <XCircle className="size-3" />,
     },
     CONFLICT_DETECTED: {
       label: 'Conflict Detected',
-      variant: 'bg-red-50 text-red-700 border-red-200',
+      variant: 'bg-red-950/30 text-red-400 border-red-500/20',
       icon: <XCircle className="size-3" />,
     },
   }
@@ -334,13 +334,13 @@ function MatchCard({ match }: { match: ConflictMatch }) {
   }
 
   const categoryColors: Record<string, string> = {
-    possible_duplicate: 'bg-blue-50 text-blue-700 border-blue-200',
-    adverse_party: 'bg-red-50 text-red-700 border-red-200',
-    same_household: 'bg-purple-50 text-purple-700 border-purple-200',
+    possible_duplicate: 'bg-blue-950/30 text-blue-400 border-blue-500/20',
+    adverse_party: 'bg-red-950/30 text-red-400 border-red-500/20',
+    same_household: 'bg-purple-950/30 text-purple-400 border-purple-200',
     related_corporate: 'bg-indigo-50 text-indigo-700 border-indigo-200',
-    former_client: 'bg-amber-50 text-amber-700 border-amber-200',
+    former_client: 'bg-amber-950/30 text-amber-400 border-amber-200',
     shared_payor: 'bg-teal-50 text-teal-700 border-teal-200',
-    opposing_party: 'bg-red-50 text-red-700 border-red-200',
+    opposing_party: 'bg-red-950/30 text-red-400 border-red-500/20',
   }
 
   return (
@@ -530,17 +530,17 @@ function DecisionRow({ decision }: { decision: ConflictDecision }) {
   }
 
   const decisionColors: Record<string, string> = {
-    no_conflict: 'text-emerald-700',
-    proceed_with_caution: 'text-amber-700',
-    conflict_confirmed: 'text-red-700',
-    waiver_required: 'text-orange-700',
-    waiver_obtained: 'text-emerald-700',
-    block_matter_opening: 'text-red-700',
+    no_conflict: 'text-emerald-400',
+    proceed_with_caution: 'text-amber-400',
+    conflict_confirmed: 'text-red-400',
+    waiver_required: 'text-orange-400',
+    waiver_obtained: 'text-emerald-400',
+    block_matter_opening: 'text-red-400',
   }
 
   return (
     <div className="flex items-start gap-3">
-      <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-blue-50">
+      <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-blue-950/30">
         <Shield className="size-3 text-blue-600" />
       </div>
       <div className="min-w-0 flex-1">

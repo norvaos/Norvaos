@@ -60,25 +60,25 @@ const STATUS_CONFIG = {
   sent: {
     label: 'Sent to Client',
     icon: Send,
-    colour: 'text-blue-700 bg-blue-50 border-blue-200',
+    colour: 'text-blue-400 bg-blue-950/30 border-blue-500/20',
     description: 'Plain-English summary sent to client for review and signature.',
   },
   signed: {
     label: 'Signed',
     icon: CheckCircle2,
-    colour: 'text-emerald-700 bg-emerald-50 border-emerald-200',
+    colour: 'text-emerald-400 bg-emerald-950/30 border-emerald-500/20',
     description: 'Client has signed the summary. Final form pack is now unlocked.',
   },
   declined: {
     label: 'Declined',
     icon: XCircle,
-    colour: 'text-red-700 bg-red-50 border-red-200',
+    colour: 'text-red-400 bg-red-950/30 border-red-500/20',
     description: 'Client declined or requested changes. Please follow up.',
   },
   expired: {
     label: 'Expired',
     icon: AlertCircle,
-    colour: 'text-amber-700 bg-amber-50 border-amber-200',
+    colour: 'text-amber-400 bg-amber-950/30 border-amber-500/20',
     description: 'Review link has expired. Create a new review request.',
   },
 } as const
@@ -181,9 +181,9 @@ export function ClientReviewPanel({ matterId }: ClientReviewPanelProps) {
       )}
 
       {review.status === 'signed' && (
-        <div className="flex items-center gap-2 rounded-md border border-emerald-200 bg-emerald-50 px-4 py-3">
+        <div className="flex items-center gap-2 rounded-md border border-emerald-500/20 bg-emerald-950/30 px-4 py-3">
           <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
-          <p className="text-sm text-emerald-800 font-medium">
+          <p className="text-sm text-emerald-400 font-medium">
             File is unlocked  -  you can now generate the final form pack.
           </p>
         </div>
@@ -351,7 +351,7 @@ function SentActions({
         <Button
           variant="outline"
           size="sm"
-          className="gap-1.5 border-red-200 text-red-600 hover:text-red-700 hover:bg-red-50"
+          className="gap-1.5 border-red-500/20 text-red-600 hover:text-red-400 hover:bg-red-950/30"
           disabled={markDeclined.isPending}
           onClick={() => markDeclined.mutate({ reviewId: review.id, matterId })}
         >

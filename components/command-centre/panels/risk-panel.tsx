@@ -53,20 +53,20 @@ function getRiskLevelDisplay(
 ): { label: string; color: string; icon: React.ReactNode } {
   // Use explicit risk_level string if available
   if (level === 'low') {
-    return { label: 'Low Risk', color: 'bg-green-50 text-green-700 border-green-200', icon: <ShieldCheck className="h-4 w-4 text-green-600" /> }
+    return { label: 'Low Risk', color: 'bg-emerald-950/30 text-emerald-400 border-green-200', icon: <ShieldCheck className="h-4 w-4 text-green-600" /> }
   }
   if (level === 'medium') {
-    return { label: 'Medium Risk', color: 'bg-amber-50 text-amber-700 border-amber-200', icon: <AlertTriangle className="h-4 w-4 text-amber-600" /> }
+    return { label: 'Medium Risk', color: 'bg-amber-950/30 text-amber-400 border-amber-200', icon: <AlertTriangle className="h-4 w-4 text-amber-600" /> }
   }
   if (level === 'high') {
-    return { label: 'High Risk', color: 'bg-red-50 text-red-700 border-red-200', icon: <ShieldAlert className="h-4 w-4 text-red-600" /> }
+    return { label: 'High Risk', color: 'bg-red-950/30 text-red-400 border-red-200', icon: <ShieldAlert className="h-4 w-4 text-red-600" /> }
   }
 
   // Fall back to score-based determination
   if (score !== null) {
-    if (score <= 30) return { label: 'Low Risk', color: 'bg-green-50 text-green-700 border-green-200', icon: <ShieldCheck className="h-4 w-4 text-green-600" /> }
-    if (score <= 60) return { label: 'Medium Risk', color: 'bg-amber-50 text-amber-700 border-amber-200', icon: <AlertTriangle className="h-4 w-4 text-amber-600" /> }
-    return { label: 'High Risk', color: 'bg-red-50 text-red-700 border-red-200', icon: <ShieldAlert className="h-4 w-4 text-red-600" /> }
+    if (score <= 30) return { label: 'Low Risk', color: 'bg-emerald-950/30 text-emerald-400 border-green-200', icon: <ShieldCheck className="h-4 w-4 text-green-600" /> }
+    if (score <= 60) return { label: 'Medium Risk', color: 'bg-amber-950/30 text-amber-400 border-amber-200', icon: <AlertTriangle className="h-4 w-4 text-amber-600" /> }
+    return { label: 'High Risk', color: 'bg-red-950/30 text-red-400 border-red-200', icon: <ShieldAlert className="h-4 w-4 text-red-600" /> }
   }
 
   return { label: 'Not Assessed', color: 'bg-slate-50 text-slate-500 border-slate-200', icon: <Info className="h-4 w-4" /> }
@@ -154,7 +154,7 @@ export function RiskPanel() {
                     <Badge
                       key={i}
                       variant="outline"
-                      className="text-xs bg-red-50 text-red-600 border-red-200"
+                      className="text-xs bg-red-950/30 text-red-600 border-red-200"
                     >
                       {flag}
                     </Badge>

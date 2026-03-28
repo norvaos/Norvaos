@@ -51,7 +51,7 @@ export function MilestoneGroupCard({
           <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
         )}
 
-        <span className={`text-sm font-medium flex-1 ${isFullyComplete ? 'text-green-700' : 'text-foreground'}`}>
+        <span className={`text-sm font-medium flex-1 ${isFullyComplete ? 'text-emerald-400' : 'text-foreground'}`}>
           {group.title}
         </span>
 
@@ -61,10 +61,10 @@ export function MilestoneGroupCard({
           size="xs"
           className={
             isFullyComplete
-              ? 'bg-green-50 text-green-700 border-green-200'
+              ? 'bg-emerald-950/30 text-emerald-400 border-emerald-500/20'
               : hasPending
-                ? 'bg-slate-100 text-slate-600 border-slate-200'
-                : 'bg-slate-50 text-slate-400 border-slate-200'
+                ? 'bg-muted text-muted-foreground border-border'
+                : 'bg-muted/50 text-muted-foreground/70 border-border'
           }
         >
           {completedTasks}/{totalTasks}
@@ -73,9 +73,9 @@ export function MilestoneGroupCard({
 
       {/* Progress bar */}
       <div className="px-3 pb-1">
-        <div className="h-1 w-full rounded-full bg-slate-100 overflow-hidden">
+        <div className="h-1 w-full rounded-full bg-muted overflow-hidden">
           <div
-            className={`h-full rounded-full transition-all ${isFullyComplete ? 'bg-green-500' : 'bg-primary'}`}
+            className={`h-full rounded-full transition-all ${isFullyComplete ? 'bg-emerald-950/300' : 'bg-primary'}`}
             style={{ width: `${completionPercent}%` }}
           />
         </div>

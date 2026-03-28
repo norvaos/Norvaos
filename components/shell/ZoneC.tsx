@@ -128,29 +128,29 @@ function relativeTimestamp(isoStr: string): { label: string; isOverdue: boolean 
 }
 
 const SEVERITY_STYLES: Record<string, string> = {
-  critical: 'bg-red-50 text-red-700 border-red-300',
-  elevated: 'bg-orange-50 text-orange-700 border-orange-300',
-  advisory: 'bg-yellow-50 text-yellow-700 border-yellow-300',
-  low:      'bg-blue-50 text-blue-700 border-blue-300',
+  critical: 'bg-red-950/30 text-red-400 border-red-500/30',
+  elevated: 'bg-orange-950/30 text-orange-400 border-orange-500/30',
+  advisory: 'bg-yellow-950/30 text-yellow-400 border-yellow-500/30',
+  low:      'bg-blue-950/30 text-blue-400 border-blue-500/30',
 }
 
 const SEVERITY_DOT: Record<string, string> = {
-  critical: 'bg-red-500',
+  critical: 'bg-red-950/300',
   elevated: 'bg-orange-400',
   advisory: 'bg-yellow-400',
   low:      'bg-blue-400',
 }
 
 const STATUS_STYLES: Record<string, string> = {
-  open:         'bg-red-100 text-red-700',
-  acknowledged: 'bg-yellow-100 text-yellow-700',
+  open:         'bg-red-950/40 text-red-400',
+  acknowledged: 'bg-yellow-950/40 text-yellow-400',
   overridden:   'bg-slate-100 text-slate-600',
-  resolved:     'bg-green-100 text-green-700',
+  resolved:     'bg-emerald-950/40 text-emerald-400',
 }
 
 const PRIORITY_STYLES: Record<string, string> = {
-  high:   'bg-red-100 text-red-700',
-  medium: 'bg-amber-100 text-amber-700',
+  high:   'bg-red-950/40 text-red-400',
+  medium: 'bg-amber-950/40 text-amber-400',
   low:    'bg-slate-100 text-slate-600',
 }
 
@@ -262,7 +262,7 @@ export function ZoneC({ matter, tenantId }: ZoneCProps) {
           <div
             className={cn(
               'flex items-center justify-center w-6 h-6 rounded-full text-[10px] font-bold',
-              criticalCount > 0 ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700',
+              criticalCount > 0 ? 'bg-red-950/40 text-red-400' : 'bg-amber-950/40 text-amber-400',
             )}
             title={`${openFlags.length} open risk ${openFlags.length === 1 ? 'flag' : 'flags'}`}
           >
@@ -398,7 +398,7 @@ export function ZoneC({ matter, tenantId }: ZoneCProps) {
             </div>
           )}
           {latestRetainer?.status === 'signed' && (
-            <div className="rounded-md border border-green-200 bg-green-50 px-2.5 py-1.5 flex items-center gap-1.5">
+            <div className="rounded-md border border-emerald-500/20 bg-emerald-950/30 px-2.5 py-1.5 flex items-center gap-1.5">
               <CheckCircle2 className="h-3 w-3 text-green-600 shrink-0" />
               <span className="text-[10px] text-green-800 font-medium">Retainer Signed</span>
             </div>
@@ -412,9 +412,9 @@ export function ZoneC({ matter, tenantId }: ZoneCProps) {
             </p>
             <div className="space-y-1 text-[10px]">
               <BillingRow label="Billed"  value={matter.total_billed}  colour="text-foreground" />
-              <BillingRow label="Paid"    value={matter.total_paid}    colour="text-green-700" />
+              <BillingRow label="Paid"    value={matter.total_paid}    colour="text-emerald-400" />
               {Number(matter.trust_balance ?? 0) > 0 && (
-                <BillingRow label="Trust"   value={matter.trust_balance} colour="text-blue-700" />
+                <BillingRow label="Trust"   value={matter.trust_balance} colour="text-blue-400" />
               )}
             </div>
           </div>
@@ -470,16 +470,16 @@ export function ZoneC({ matter, tenantId }: ZoneCProps) {
 
 const ESCALATION_CARD: Record<string, string> = {
   none:     'border-border bg-card',
-  amber:    'border-amber-300 bg-amber-50',
-  red:      'border-red-300 bg-red-50',
-  critical: 'border-red-400 bg-red-50',
+  amber:    'border-amber-500/30 bg-amber-950/30',
+  red:      'border-red-500/30 bg-red-950/30',
+  critical: 'border-red-400 bg-red-950/30',
 }
 
 const ESCALATION_LABEL: Record<string, string> = {
   none:     'text-muted-foreground',
-  amber:    'text-amber-700',
-  red:      'text-red-700',
-  critical: 'text-red-700',
+  amber:    'text-amber-400',
+  red:      'text-red-400',
+  critical: 'text-red-400',
 }
 
 const ESCALATION_TEXT: Record<string, string> = {
@@ -491,9 +491,9 @@ const ESCALATION_TEXT: Record<string, string> = {
 
 const OWNER_BADGE: Record<string, string> = {
   lawyer:          'bg-indigo-100 text-indigo-700',
-  legal_assistant: 'bg-blue-100 text-blue-700',
-  client:          'bg-green-100 text-green-700',
-  billing:         'bg-yellow-100 text-yellow-700',
+  legal_assistant: 'bg-blue-950/40 text-blue-400',
+  client:          'bg-emerald-950/40 text-emerald-400',
+  billing:         'bg-yellow-950/40 text-yellow-400',
 }
 
 const ACTION_TYPE_LABEL: Record<string, string> = {
@@ -534,7 +534,7 @@ function NextActionPanel({
         <div className="flex items-center gap-1.5">
           {isCritical && (
             <span
-              className="inline-block h-2 w-2 rounded-full bg-red-500 animate-pulse shrink-0"
+              className="inline-block h-2 w-2 rounded-full bg-red-950/300 animate-pulse shrink-0"
               aria-hidden
             />
           )}
@@ -625,13 +625,13 @@ function RiskFlagsPanel({
       </p>
 
       {criticalCount > 0 && (
-        <Badge variant="outline" className="text-[10px] px-1.5 py-0 bg-red-50 text-red-700 border-red-300 w-full justify-start gap-1">
-          <span className="h-1.5 w-1.5 rounded-full bg-red-500 shrink-0" />
+        <Badge variant="outline" className="text-[10px] px-1.5 py-0 bg-red-950/30 text-red-400 border-red-500/30 w-full justify-start gap-1">
+          <span className="h-1.5 w-1.5 rounded-full bg-red-950/300 shrink-0" />
           {criticalCount} Critical
         </Badge>
       )}
       {elevatedCount > 0 && (
-        <Badge variant="outline" className="text-[10px] px-1.5 py-0 bg-orange-50 text-orange-700 border-orange-300 w-full justify-start gap-1">
+        <Badge variant="outline" className="text-[10px] px-1.5 py-0 bg-orange-950/30 text-orange-400 border-orange-500/30 w-full justify-start gap-1">
           <span className="h-1.5 w-1.5 rounded-full bg-orange-400 shrink-0" />
           {elevatedCount} Elevated
         </Badge>
@@ -938,7 +938,7 @@ function SLAPanel({ slas }: { slas: MatterSLATrackingRow[] }) {
               <div
                 className={cn(
                   'h-full rounded-full transition-all',
-                  isBreached ? 'bg-red-500' : isAmber ? 'bg-amber-400' : 'bg-blue-400',
+                  isBreached ? 'bg-red-950/300' : isAmber ? 'bg-amber-400' : 'bg-blue-400',
                 )}
                 style={{ width: `${pct}%` }}
               />

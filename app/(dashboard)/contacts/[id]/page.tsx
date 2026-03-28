@@ -27,6 +27,7 @@ import type { KioskQuestion } from '@/lib/types/kiosk-question'
 import { TagManager } from '@/components/shared/tag-manager'
 import { NotesEditor } from '@/components/shared/notes-editor'
 import { ActivityTimeline } from '@/components/shared/activity-timeline'
+import { CommunicationStream } from '@/components/shared/communication-stream'
 import { MiniTimeline } from '@/components/shared/mini-timeline'
 import { useCreateAuditLog } from '@/lib/queries/audit-logs'
 import { ContactBookingsTab } from '@/components/contacts/contact-bookings-tab'
@@ -118,6 +119,7 @@ import {
   ChevronUp,
   Eye,
   ChevronRight,
+  Target,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
@@ -189,17 +191,29 @@ function useContactStats(contactId: string, tenantId: string) {
     queryKey: ['contact-stats', contactId],
     queryFn: async () => {
       const supabase = createClient()
-      const [mattersRes, leadsRes, tasksRes, docsRes] = await Promise.all([
+      // Fetch the contact's email_primary for the email threads query
+      const { data: contactRow } = await supabase
+        .from('contacts')
+        .select('email_primary')
+        .eq('id', contactId)
+        .single()
+      const contactEmail = contactRow?.email_primary
+
+      const [mattersRes, leadsRes, tasksRes, docsRes, emailRes] = await Promise.all([
         supabase.from('matter_contacts').select('id', { count: 'exact', head: true }).eq('contact_id', contactId),
         supabase.from('leads').select('id', { count: 'exact', head: true }).eq('contact_id', contactId),
         supabase.from('tasks').select('id', { count: 'exact', head: true }).eq('contact_id', contactId),
         supabase.from('documents').select('id', { count: 'exact', head: true }).eq('contact_id', contactId),
+        contactEmail
+          ? supabase.from('email_threads').select('*', { count: 'exact', head: true }).contains('participant_emails', [contactEmail])
+          : Promise.resolve({ count: 0 }),
       ])
       return {
         matterCount: mattersRes.count ?? 0,
         leadCount: leadsRes.count ?? 0,
         taskCount: tasksRes.count ?? 0,
         documentCount: docsRes.count ?? 0,
+        emailCount: emailRes.count ?? 0,
       }
     },
     enabled: !!contactId && !!tenantId,
@@ -493,12 +507,12 @@ export default function ContactDetailPage() {
               </h1>
               {/* Logic-Gate Badge  -  Directive 41.0 Status Authority */}
               {(stats?.matterCount ?? 0) > 0 ? (
-                <Badge className="gap-1.5 bg-emerald-50 text-emerald-700 border-emerald-300 hover:bg-emerald-50 font-semibold tracking-wide text-[11px] uppercase">
+                <Badge className="gap-1.5 bg-emerald-950/30 text-emerald-400 border-emerald-500/30 hover:bg-emerald-950/30 font-semibold tracking-wide text-[11px] uppercase">
                   <ShieldCheck className="size-3.5" />
                   Retained Client
                 </Badge>
               ) : (stats?.leadCount ?? 0) > 0 ? (
-                <Badge className="gap-1.5 bg-amber-50 text-amber-700 border-amber-300 hover:bg-amber-50 font-semibold tracking-wide text-[11px] uppercase">
+                <Badge className="gap-1.5 bg-amber-950/30 text-amber-400 border-amber-300 hover:bg-amber-950/30 font-semibold tracking-wide text-[11px] uppercase">
                   <UserCircle className="size-3.5" />
                   Prospective Lead
                 </Badge>
@@ -599,7 +613,7 @@ export default function ContactDetailPage() {
                   </Button>
                 </TooltipTrigger>
                 {isRedScore && (
-                  <TooltipContent side="bottom" className="bg-red-50 text-red-800 border-red-200">
+                  <TooltipContent side="bottom" className="bg-red-950/30 text-red-800 border-red-200">
                     Readiness score is critically low  -  immediate attention required
                   </TooltipContent>
                 )}
@@ -675,9 +689,17 @@ export default function ContactDetailPage() {
           <DocumentUpload entityType="contact" entityId={contactId} tenantId={tenantId} entityName={displayName} />
         </TabsContent>
 
-        {/* Communications Tab */}
+        {/* Communications Tab — Omniscient Archive Stream */}
         <TabsContent value="communications" className="space-y-4">
-          <CommunicationsTab contactId={contactId} tenantId={tenantId} />
+          {contact.email_primary ? (
+            <CommunicationStream
+              contactEmail={contact.email_primary}
+              contactName={displayName}
+              contactId={contactId}
+            />
+          ) : (
+            <CommunicationsTab contactId={contactId} tenantId={tenantId} />
+          )}
         </TabsContent>
 
         {/* Family Members Tab */}
@@ -759,7 +781,7 @@ export default function ContactDetailPage() {
             </DialogDescription>
           </DialogHeader>
           {deps?.hasLinkedRecords && (
-            <div className="rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
+            <div className="rounded-md border border-amber-200 bg-amber-950/30 p-3 text-sm text-amber-800">
               <p className="font-medium mb-1">This contact has linked records:</p>
               <ul className="list-disc list-inside space-y-0.5 text-xs">
                 {deps.matterCount > 0 && (
@@ -832,7 +854,7 @@ function OverviewTab({
   contact: Database['public']['Tables']['contacts']['Row']
   tenantId: string
   contactId: string
-  stats?: { matterCount: number; leadCount: number; taskCount: number; documentCount: number }
+  stats?: { matterCount: number; leadCount: number; taskCount: number; documentCount: number; emailCount: number }
   onTabChange: (tab: string) => void
 }) {
   const router = useRouter()
@@ -1128,130 +1150,205 @@ function OverviewTab({
         </Card>
       </div>
 
-      {/* Right column: Stats sidebar */}
+      {/* Right column: Stats sidebar  -  Contextual Sovereignty */}
       <div className="space-y-4">
-        {/* Intake Funnel  -  Directive 41.0 Command Centre Sync */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center justify-between text-sm">
-              Intake Funnel
-              {activeLead?.current_stage && (
-                <span className="inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium bg-blue-50 text-blue-700 border-blue-200">
-                  {STAGE_LABELS[activeLead.current_stage as keyof typeof STAGE_LABELS] ?? activeLead.current_stage}
-                </span>
-              )}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {leadLoading ? (
-              <div className="h-16 animate-pulse rounded bg-slate-100" />
-            ) : (() => {
-              // Resolve the current stage  -  fallback to pipeline_stage for contacts without an active lead
-              const currentStage = activeLead?.current_stage ?? contact.pipeline_stage ?? 'new_lead'
-              const stageIndex = ACTIVE_STAGES.indexOf(currentStage as typeof ACTIVE_STAGES[number])
-              const effectiveIndex = stageIndex >= 0 ? stageIndex : 0
-              const progress = Math.round(((effectiveIndex + 1) / ACTIVE_STAGES.length) * 100)
-              const nextStage = effectiveIndex < ACTIVE_STAGES.length - 1
-                ? ACTIVE_STAGES[effectiveIndex + 1]
-                : null
+        {(() => {
+          // ── Contextual Sovereignty — classification-based UI toggle ──
+          const classification = (contact as any).client_status as string | null
+          const PROFESSIONAL_TYPES = ['lawyer', 'consultant', 'judge', 'ircc_officer', 'government', 'other_professional']
+          const isProfessional = PROFESSIONAL_TYPES.includes(classification ?? '')
+          const isLeadOrClient = !classification || ['lead', 'client', 'former_client', 'prospect'].includes(classification ?? '')
 
-              return (
-                <div className="space-y-3">
-                  {/* Funnel Chevron  -  visual stage indicators */}
-                  <div className="flex items-center gap-0.5 overflow-x-auto pb-1">
-                    {ACTIVE_STAGES.map((stage, idx) => {
-                      const isCompleted = idx < effectiveIndex
-                      const isCurrent = idx === effectiveIndex
-                      const label = STAGE_LABELS[stage as keyof typeof STAGE_LABELS] ?? stage
-                      // Abbreviate for chevron display
-                      const shortLabel = label.split(/[–\s]/).slice(0, 2).join(' ').slice(0, 12)
-
-                      return (
-                        <TooltipProvider key={stage} delayDuration={100}>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <div className="flex items-center">
-                                <div
-                                  className={cn(
-                                    'flex items-center gap-1 rounded-sm px-1.5 py-1 text-[9px] font-medium transition-all whitespace-nowrap',
-                                    isCompleted && 'bg-emerald-100 text-emerald-700',
-                                    isCurrent && 'bg-blue-100 text-blue-700 ring-1 ring-blue-300',
-                                    !isCompleted && !isCurrent && 'bg-slate-50 text-slate-400',
-                                  )}
-                                >
-                                  {isCompleted && <CheckCircle2 className="size-2.5 shrink-0" />}
-                                  {isCurrent && <div className="size-2 shrink-0 rounded-full bg-blue-500" />}
-                                  {shortLabel}
-                                </div>
-                                {idx < ACTIVE_STAGES.length - 1 && (
-                                  <ChevronRight className="size-3 shrink-0 text-slate-300" />
-                                )}
-                              </div>
-                            </TooltipTrigger>
-                            <TooltipContent side="bottom" className="text-xs">
-                              {label}
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
-                      )
-                    })}
+          if (isProfessional) {
+            // ── Case C: Professional / Third-Party Dossier ──
+            return (
+              <>
+                {/* System Role Badge */}
+                <div
+                  className="rounded-xl border border-white/[0.08] p-4"
+                  style={{ background: 'linear-gradient(180deg, rgba(2,6,23,0.92) 0%, rgba(2,6,23,0.96) 100%)' }}
+                >
+                  <div className="flex items-center gap-2 mb-3">
+                    <Shield className="size-4 text-emerald-400" />
+                    <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-zinc-400">
+                      System Role
+                    </span>
                   </div>
+                  <div className="flex items-center gap-3">
+                    <span className="inline-flex items-center rounded-md border border-emerald-500/30 bg-emerald-950/300/10 px-3 py-1.5 text-xs font-mono font-semibold uppercase tracking-wider text-emerald-400">
+                      {classification?.replace(/_/g, ' ') ?? 'Professional'}
+                    </span>
+                  </div>
+                  <p className="mt-3 text-[10px] font-mono text-zinc-500">
+                    Intake funnels are disabled for professional contacts. View connected matters below.
+                  </p>
+                </div>
 
-                  {/* Progress bar */}
-                  <div className="space-y-1">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-medium text-slate-700">
-                        {STAGE_LABELS[currentStage as keyof typeof STAGE_LABELS] ?? currentStage}
+                {/* Connected Matters Grid */}
+                <div
+                  className="rounded-xl border border-white/[0.08] p-4"
+                  style={{ background: 'linear-gradient(180deg, rgba(2,6,23,0.92) 0%, rgba(2,6,23,0.96) 100%)' }}
+                >
+                  <div className="flex items-center gap-2 mb-3">
+                    <Briefcase className="size-4 text-emerald-400" />
+                    <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-zinc-400">
+                      Connected Matters
+                    </span>
+                    <span className="ml-auto text-[10px] font-mono text-zinc-600">
+                      {stats?.matterCount ?? 0}
+                    </span>
+                  </div>
+                  {(stats?.matterCount ?? 0) > 0 ? (
+                    <button
+                      type="button"
+                      onClick={() => onTabChange('matters')}
+                      className="w-full rounded-lg border border-white/[0.06] bg-white/[0.03] px-3 py-2.5 text-left transition-all hover:bg-white/[0.06] hover:border-white/[0.10] group"
+                    >
+                      <span className="text-xs font-mono text-zinc-300 group-hover:text-white uppercase tracking-wider">
+                        View {stats?.matterCount} linked matter{(stats?.matterCount ?? 0) !== 1 ? 's' : ''} →
                       </span>
-                      <span className="text-xs text-muted-foreground">{progress}%</span>
-                    </div>
-                    <div className="h-1.5 w-full rounded-full bg-slate-100">
-                      <div
-                        className="h-1.5 rounded-full bg-blue-500 transition-all duration-500"
-                        style={{ width: `${progress}%` }}
-                      />
-                    </div>
-                    <p className="text-[10px] text-muted-foreground">
-                      Step {effectiveIndex + 1} of {ACTIVE_STAGES.length}
+                    </button>
+                  ) : (
+                    <p className="text-[10px] font-mono text-zinc-600">
+                      No matters linked to this contact.
                     </p>
-                  </div>
-
-                  {/* Advance button  -  only for contacts with an active lead */}
-                  {activeLead && nextStage && (
-                    <div className="border-t border-slate-100 pt-2">
-                      <button
-                        type="button"
-                        disabled={isAdvancingStage}
-                        onClick={() => handleLeadStageAdvance(nextStage)}
-                        className="flex w-full items-center justify-center gap-1.5 rounded-md border border-blue-200 bg-blue-50 px-2.5 py-1.5 text-xs font-medium text-blue-700 transition-colors hover:bg-blue-100 hover:border-blue-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        {isAdvancingStage ? (
-                          <span className="size-3 animate-spin rounded-full border border-blue-500 border-t-transparent" />
-                        ) : (
-                          <ChevronRight className="size-3" />
-                        )}
-                        Advance to {STAGE_LABELS[nextStage as keyof typeof STAGE_LABELS] ?? nextStage}
-                      </button>
-                    </div>
                   )}
                 </div>
-              )
-            })()}
-          </CardContent>
-        </Card>
+              </>
+            )
+          }
 
-        {/* Readiness  -  Directive 41.0: Intake Completion (Leads) / Legal Success (Clients) */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center justify-between text-sm">
-              {(stats?.matterCount ?? 0) > 0 ? 'Matter Readiness' : 'Intake Progress'}
-              <ConflictStatusBadge status={contact.conflict_status ?? 'not_run'} />
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ContactReadinessZone contactId={contactId} tenantId={tenantId} />
-          </CardContent>
-        </Card>
+          // ── Case A/B: Lead or Client — Intake Funnel ──
+          return (
+            <>
+              {/* Precision Tracker  -  Midnight Glass Intake Funnel */}
+              <div
+                className="rounded-xl border border-white/[0.08] p-4"
+                style={{ background: 'linear-gradient(180deg, rgba(2,6,23,0.92) 0%, rgba(2,6,23,0.96) 100%)' }}
+              >
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <Target className="size-4 text-emerald-400" />
+                    <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-zinc-400">
+                      Intake Funnel
+                    </span>
+                  </div>
+                  {activeLead?.current_stage && (
+                    <span className="inline-flex items-center rounded-md border border-emerald-500/30 bg-emerald-950/300/10 px-2 py-0.5 text-[10px] font-mono text-emerald-400">
+                      {STAGE_LABELS[activeLead.current_stage as keyof typeof STAGE_LABELS] ?? activeLead.current_stage}
+                    </span>
+                  )}
+                </div>
+
+                {leadLoading ? (
+                  <div className="h-16 animate-pulse rounded bg-white/[0.04]" />
+                ) : (() => {
+                  const currentStage = activeLead?.current_stage ?? contact.pipeline_stage ?? 'new_lead'
+                  const stageIndex = ACTIVE_STAGES.indexOf(currentStage as typeof ACTIVE_STAGES[number])
+                  const effectiveIndex = stageIndex >= 0 ? stageIndex : 0
+                  const progress = Math.round(((effectiveIndex + 1) / ACTIVE_STAGES.length) * 100)
+                  const nextStage = effectiveIndex < ACTIVE_STAGES.length - 1
+                    ? ACTIVE_STAGES[effectiveIndex + 1]
+                    : null
+
+                  return (
+                    <div className="space-y-3">
+                      {/* Precision Stage Tracker */}
+                      <div className="flex items-center gap-0.5 overflow-x-auto pb-1">
+                        {ACTIVE_STAGES.map((stage, idx) => {
+                          const isCompleted = idx < effectiveIndex
+                          const isCurrent = idx === effectiveIndex
+                          const label = STAGE_LABELS[stage as keyof typeof STAGE_LABELS] ?? stage
+                          const shortLabel = label.split(/[–\s]/).slice(0, 2).join(' ').slice(0, 12)
+
+                          return (
+                            <TooltipProvider key={stage} delayDuration={100}>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <div className="flex items-center">
+                                    <div
+                                      className={cn(
+                                        'flex items-center gap-1 rounded-sm px-1.5 py-1 text-[9px] font-mono font-medium transition-all whitespace-nowrap',
+                                        isCompleted && 'bg-emerald-950/300/15 text-emerald-400',
+                                        isCurrent && 'bg-white/[0.08] text-white ring-1 ring-emerald-500/40',
+                                        !isCompleted && !isCurrent && 'bg-white/[0.03] text-zinc-600',
+                                      )}
+                                    >
+                                      {isCompleted && <CheckCircle2 className="size-2.5 shrink-0" />}
+                                      {isCurrent && <div className="size-2 shrink-0 rounded-full bg-emerald-950/300" />}
+                                      {shortLabel}
+                                    </div>
+                                    {idx < ACTIVE_STAGES.length - 1 && (
+                                      <ChevronRight className="size-3 shrink-0 text-zinc-700" />
+                                    )}
+                                  </div>
+                                </TooltipTrigger>
+                                <TooltipContent side="bottom" className="text-xs">
+                                  {label}
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          )
+                        })}
+                      </div>
+
+                      {/* Progress bar */}
+                      <div className="space-y-1">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[11px] font-mono text-zinc-300">
+                            {STAGE_LABELS[currentStage as keyof typeof STAGE_LABELS] ?? currentStage}
+                          </span>
+                          <span className="text-[11px] font-mono text-emerald-400">{progress}%</span>
+                        </div>
+                        <div className="h-1.5 w-full rounded-full bg-white/[0.06]">
+                          <div
+                            className="h-1.5 rounded-full bg-emerald-950/300 transition-all duration-500"
+                            style={{ width: `${progress}%` }}
+                          />
+                        </div>
+                        <p className="text-[10px] font-mono text-zinc-600">
+                          Step {effectiveIndex + 1} of {ACTIVE_STAGES.length}
+                        </p>
+                      </div>
+
+                      {/* Advance button */}
+                      {activeLead && nextStage && (
+                        <div className="border-t border-white/[0.06] pt-2">
+                          <button
+                            type="button"
+                            disabled={isAdvancingStage}
+                            onClick={() => handleLeadStageAdvance(nextStage)}
+                            className="flex w-full items-center justify-center gap-1.5 rounded-md border border-emerald-500/30 bg-emerald-950/300/10 px-2.5 py-1.5 text-[11px] font-mono font-medium text-emerald-400 transition-colors hover:bg-emerald-950/300/20 hover:border-emerald-500/40 disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            {isAdvancingStage ? (
+                              <span className="size-3 animate-spin rounded-full border border-emerald-500 border-t-transparent" />
+                            ) : (
+                              <ChevronRight className="size-3" />
+                            )}
+                            Advance to {STAGE_LABELS[nextStage as keyof typeof STAGE_LABELS] ?? nextStage}
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )
+                })()}
+              </div>
+
+              {/* Readiness  -  Directive 41.0 */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center justify-between text-sm">
+                    {(stats?.matterCount ?? 0) > 0 ? 'Matter Readiness' : 'Intake Progress'}
+                    <ConflictStatusBadge status={contact.conflict_status ?? 'not_run'} />
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ContactReadinessZone contactId={contactId} tenantId={tenantId} />
+                </CardContent>
+              </Card>
+            </>
+          )
+        })()}
 
         {/* Norva Vault Monitor  -  SHA-256 document integrity (replaces legacy Quick Stats) */}
         <Card>
@@ -1270,6 +1367,37 @@ function OverviewTab({
           </CardContent>
         </Card>
 
+        {/* Email Threads */}
+        <div
+          className="rounded-xl border border-white/[0.08] p-4"
+          style={{ background: 'linear-gradient(180deg, rgba(2,6,23,0.92) 0%, rgba(2,6,23,0.96) 100%)' }}
+        >
+          <div className="flex items-center gap-2 mb-3">
+            <Mail className="size-4 text-emerald-400" />
+            <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-zinc-400">
+              Emails
+            </span>
+            <span className="ml-auto text-[10px] font-mono text-zinc-600">
+              {stats?.emailCount ?? 0}
+            </span>
+          </div>
+          {(stats?.emailCount ?? 0) > 0 ? (
+            <button
+              type="button"
+              onClick={() => onTabChange('emails')}
+              className="w-full rounded-lg border border-white/[0.06] bg-white/[0.03] px-3 py-2.5 text-left transition-all hover:bg-white/[0.06] hover:border-white/[0.10] group"
+            >
+              <span className="text-xs font-mono text-zinc-300 group-hover:text-white uppercase tracking-wider">
+                View {stats?.emailCount} email thread{(stats?.emailCount ?? 0) !== 1 ? 's' : ''} →
+              </span>
+            </button>
+          ) : (
+            <p className="text-[10px] font-mono text-zinc-600">
+              No email threads for this contact.
+            </p>
+          )}
+        </div>
+
         {/* Milestones */}
         <Card>
           <CardHeader>
@@ -1278,33 +1406,33 @@ function OverviewTab({
           <CardContent>
             <div className="space-y-3">
               <div className="flex items-start gap-3">
-                <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-blue-50">
-                  <Plus className="size-3 text-blue-600" />
+                <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/[0.06] border border-white/[0.08]">
+                  <Plus className="size-3 text-emerald-400" />
                 </div>
                 <div>
-                  <p className="text-xs font-medium text-slate-700">First Created</p>
-                  <p className="text-xs text-muted-foreground">{formatDate(contact.created_at)}</p>
+                  <p className="text-xs font-medium">First Created</p>
+                  <p className="text-xs text-muted-foreground font-mono">{formatDate(contact.created_at)}</p>
                 </div>
               </div>
               {contact.last_contacted_at && (
                 <div className="flex items-start gap-3">
-                  <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-50">
-                    <Phone className="size-3 text-emerald-600" />
+                  <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/[0.06] border border-white/[0.08]">
+                    <Phone className="size-3 text-emerald-400" />
                   </div>
                   <div>
-                    <p className="text-xs font-medium text-slate-700">Last Contacted</p>
-                    <p className="text-xs text-muted-foreground">{formatDate(contact.last_contacted_at)}</p>
+                    <p className="text-xs font-medium">Last Contacted</p>
+                    <p className="text-xs text-muted-foreground font-mono">{formatDate(contact.last_contacted_at)}</p>
                   </div>
                 </div>
               )}
               {contact.has_portal_access && contact.portal_last_login && (
                 <div className="flex items-start gap-3">
-                  <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-purple-50">
-                    <Globe className="size-3 text-purple-600" />
+                  <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/[0.06] border border-white/[0.08]">
+                    <Globe className="size-3 text-emerald-400" />
                   </div>
                   <div>
-                    <p className="text-xs font-medium text-slate-700">Last Portal Login</p>
-                    <p className="text-xs text-muted-foreground">{formatDate(contact.portal_last_login)}</p>
+                    <p className="text-xs font-medium">Last Portal Login</p>
+                    <p className="text-xs text-muted-foreground font-mono">{formatDate(contact.portal_last_login)}</p>
                   </div>
                 </div>
               )}
@@ -1548,7 +1676,7 @@ function MattersTab({
                       type="button"
                       onClick={() => setSelectedMatterId(m.id)}
                       className={`flex w-full items-center gap-3 px-3 py-2 text-left text-sm hover:bg-slate-50 ${
-                        selectedMatterId === m.id ? 'bg-blue-50' : ''
+                        selectedMatterId === m.id ? 'bg-blue-950/30' : ''
                       }`}
                     >
                       <Briefcase className="size-4 shrink-0 text-slate-400" />
@@ -1628,9 +1756,9 @@ function ContactTasksTab({
 
   function getPriorityColor(priority: string) {
     switch (priority) {
-      case 'urgent': return 'text-red-600 bg-red-50 border-red-200'
-      case 'high': return 'text-orange-600 bg-orange-50 border-orange-200'
-      case 'medium': return 'text-yellow-600 bg-yellow-50 border-yellow-200'
+      case 'urgent': return 'text-red-600 bg-red-950/30 border-red-200'
+      case 'high': return 'text-orange-600 bg-orange-950/30 border-orange-200'
+      case 'medium': return 'text-yellow-600 bg-yellow-950/30 border-yellow-200'
       default: return 'text-slate-600 bg-slate-50 border-slate-200'
     }
   }
@@ -2525,7 +2653,7 @@ function FamilyTab({
                       type="button"
                       onClick={() => setSelectedRelated(c)}
                       className={`flex w-full items-center gap-3 px-3 py-2 text-left text-sm hover:bg-slate-50 ${
-                        selectedRelated?.id === c.id ? 'bg-blue-50' : ''
+                        selectedRelated?.id === c.id ? 'bg-blue-950/30' : ''
                       }`}
                     >
                       <User className="size-4 shrink-0 text-slate-400" />

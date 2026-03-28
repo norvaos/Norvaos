@@ -70,9 +70,9 @@ const BLOCKING_STATUSES = new Set(['open', 'in_progress', 'reopened'])
 
 function SeverityBadge({ severity }: { severity: MatterDeficiencyRow['severity'] }) {
   const map: Record<MatterDeficiencyRow['severity'], string> = {
-    minor: 'bg-yellow-100 text-yellow-800',
-    major: 'bg-orange-100 text-orange-800',
-    critical: 'bg-red-100 text-red-800',
+    minor: 'bg-yellow-950/40 text-yellow-400',
+    major: 'bg-orange-950/30 text-orange-400',
+    critical: 'bg-red-950/40 text-red-400',
   }
   return (
     <Badge className={map[severity] ?? ''} variant="outline">
@@ -85,11 +85,11 @@ function SeverityBadge({ severity }: { severity: MatterDeficiencyRow['severity']
 
 function StatusBadge({ status }: { status: MatterDeficiencyRow['status'] }) {
   const map: Record<MatterDeficiencyRow['status'], string> = {
-    open: 'bg-red-50 text-red-700',
-    in_progress: 'bg-blue-50 text-blue-700',
-    resolved: 'bg-green-50 text-green-700',
+    open: 'bg-red-950/30 text-red-400',
+    in_progress: 'bg-blue-950/30 text-blue-400',
+    resolved: 'bg-emerald-950/30 text-emerald-400',
     closed: 'bg-gray-100 text-gray-600',
-    reopened: 'bg-orange-50 text-orange-700',
+    reopened: 'bg-orange-950/30 text-orange-400',
   }
   const labels: Record<MatterDeficiencyRow['status'], string> = {
     open: 'Open',
@@ -195,7 +195,7 @@ function AddDeficiencyDialog({ matterId, onClose }: AddDeficiencyDialogProps) {
       <div className="space-y-1">
         <Label htmlFor="description">
           Description{' '}
-          <span className={descCharCount < 50 ? 'text-red-500 text-xs' : 'text-green-600 text-xs'}>
+          <span className={descCharCount < 50 ? 'text-red-500 text-xs' : 'text-emerald-400 text-xs'}>
             ({descCharCount}/50 min)
           </span>
         </Label>
@@ -273,7 +273,7 @@ function ResolveDialog({ matterId, deficiency, onClose }: ResolveDialogProps) {
       <div className="space-y-1">
         <Label htmlFor="resolution-notes">
           Resolution Notes{' '}
-          <span className={resolutionNotes.trim().length < 20 ? 'text-red-500 text-xs' : 'text-green-600 text-xs'}>
+          <span className={resolutionNotes.trim().length < 20 ? 'text-red-500 text-xs' : 'text-emerald-400 text-xs'}>
             ({resolutionNotes.trim().length}/20 min)
           </span>
         </Label>

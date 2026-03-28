@@ -222,7 +222,7 @@ function MicroAuditTrace({
   if (!visible || !genesisHash) return null
 
   return (
-    <div className="absolute inset-0 z-10 flex flex-col items-center justify-center rounded-2xl bg-black/70 backdrop-blur-md transition-opacity duration-500 animate-in fade-in">
+    <div className="absolute inset-0 z-10 flex flex-col items-center justify-center rounded-2xl bg-background/80 backdrop-blur-xl transition-opacity duration-500 animate-in fade-in">
       {/* Genesis Hash */}
       <div className="flex items-center gap-1.5 mb-2">
         <Fingerprint className="h-3 w-3 text-emerald-400" />
@@ -293,8 +293,8 @@ function GlassMatterCard({
         className={cn(
           'group relative rounded-2xl border p-4 transition-all duration-300',
           // Glassmorphism base
-          'bg-white/[0.04] backdrop-blur-xl',
-          'hover:bg-white/[0.08] hover:shadow-lg hover:shadow-emerald-900/10',
+          'bg-muted/50 backdrop-blur-xl',
+          'hover:bg-muted hover:shadow-lg hover:shadow-emerald-900/10',
           // Border colour by state
           isSealed && isPerfect
             ? 'border-amber-400/20 hover:border-amber-400/40'
@@ -302,7 +302,7 @@ function GlassMatterCard({
               ? 'border-emerald-500/15 hover:border-emerald-500/30'
               : isLocked
                 ? 'border-red-500/20 hover:border-red-500/35 glass-heatmap-pulse'
-                : 'border-white/[0.08] hover:border-emerald-500/20',
+                : 'border-border hover:border-emerald-500/20',
           // Gold Aura for perfect score
           isPerfect && 'glass-gold-aura',
         )}
@@ -322,26 +322,26 @@ function GlassMatterCard({
           {/* Matter info */}
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
-              <span className="text-[11px] font-mono text-white/40 tracking-wider">
+              <span className="text-[11px] font-mono text-muted-foreground/70 tracking-wider">
                 {matter.matter_number}
               </span>
               {isSealed && (
                 <Badge
                   variant="outline"
-                  className="text-[9px] px-1.5 py-0 h-4 border-emerald-500/30 text-emerald-400/80 bg-emerald-500/5"
+                  className="text-[9px] px-1.5 py-0 h-4 border-white/[0.08] text-emerald-400/80 bg-white/[0.04]"
                 >
                   <ShieldCheck className="h-2.5 w-2.5 mr-0.5" />
                   Sealed
                 </Badge>
               )}
             </div>
-            <p className="text-sm font-medium text-white/80 truncate group-hover:text-white transition-colors">
+            <p className="text-sm font-medium text-foreground/80 truncate group-hover:text-foreground transition-colors">
               {matter.title}
             </p>
             <div className="flex items-center gap-2 mt-1.5">
               <StatusPill status={matter.status ?? 'pending'} />
               {matter.genesis_hash && (
-                <span className="text-[9px] font-mono text-white/25 truncate max-w-20">
+                <span className="text-[9px] font-mono text-muted-foreground/50 truncate max-w-20">
                   {matter.genesis_hash.slice(0, 8)}...
                 </span>
               )}
@@ -349,7 +349,7 @@ function GlassMatterCard({
           </div>
 
           {/* Arrow indicator */}
-          <ArrowRight className="h-4 w-4 text-white/20 group-hover:text-white/50 transition-colors shrink-0 mt-1" />
+          <ArrowRight className="h-4 w-4 text-muted-foreground/40 group-hover:text-muted-foreground transition-colors shrink-0 mt-1" />
         </div>
       </div>
     </Link>
@@ -360,11 +360,11 @@ function GlassMatterCard({
 
 function StatusPill({ status }: { status: string }) {
   const config: Record<string, { bg: string; text: string; label: string }> = {
-    active: { bg: 'bg-emerald-500/15', text: 'text-emerald-400', label: 'Active' },
+    active: { bg: 'bg-white/[0.06]', text: 'text-emerald-400', label: 'Active' },
     pending: { bg: 'bg-amber-500/15', text: 'text-amber-400', label: 'Pending' },
     in_progress: { bg: 'bg-blue-500/15', text: 'text-blue-400', label: 'In Progress' },
   }
-  const c = config[status] ?? { bg: 'bg-white/10', text: 'text-white/50', label: status }
+  const c = config[status] ?? { bg: 'bg-muted', text: 'text-muted-foreground', label: status }
 
   return (
     <span className={cn('inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium', c.bg, c.text)}>
@@ -377,7 +377,7 @@ function StatusPill({ status }: { status: string }) {
 
 function FirmHashCard({ firmHash }: { firmHash: FirmHashData }) {
   return (
-    <div className="rounded-2xl border border-violet-500/15 bg-white/[0.03] backdrop-blur-xl p-5">
+    <div className="rounded-2xl border border-violet-500/15 bg-muted/30 backdrop-blur-xl p-5">
       <div className="flex items-center gap-2 mb-3">
         <Shield className="h-4 w-4 text-violet-400" />
         <span className="text-xs font-semibold text-violet-300/90 uppercase tracking-wider">
@@ -388,13 +388,13 @@ function FirmHashCard({ firmHash }: { firmHash: FirmHashData }) {
         {firmHash.globalFirmHash}
       </p>
       <div className="grid grid-cols-2 gap-3">
-        <div className="rounded-xl bg-white/[0.04] p-3 text-center">
+        <div className="rounded-xl bg-muted/50 p-3 text-center">
           <p className="text-lg font-bold text-emerald-400 tabular-nums">{firmHash.totalGenesis}</p>
-          <p className="text-[10px] text-white/40 mt-0.5">Genesis Sealed</p>
+          <p className="text-[10px] text-muted-foreground/70 mt-0.5">Genesis Sealed</p>
         </div>
-        <div className="rounded-xl bg-white/[0.04] p-3 text-center">
-          <p className="text-lg font-bold text-white/70 tabular-nums">{firmHash.totalMatters}</p>
-          <p className="text-[10px] text-white/40 mt-0.5">Active Matters</p>
+        <div className="rounded-xl bg-muted/50 p-3 text-center">
+          <p className="text-lg font-bold text-foreground/70 tabular-nums">{firmHash.totalMatters}</p>
+          <p className="text-[10px] text-muted-foreground/70 mt-0.5">Active Matters</p>
         </div>
       </div>
     </div>
@@ -418,10 +418,10 @@ function HealthPulseCard() {
   const gapRate = data?.checks?.hardeningIntegrity?.gapClosureRate ?? 0
 
   return (
-    <div className={cn('rounded-2xl border bg-white/[0.03] backdrop-blur-xl p-5', config.bg)}>
+    <div className={cn('rounded-2xl border bg-muted/30 backdrop-blur-xl p-5', config.bg)}>
       <div className="flex items-center gap-2 mb-3">
-        <Activity className="h-4 w-4 text-white/50" />
-        <span className="text-xs font-semibold text-white/60 uppercase tracking-wider">
+        <Activity className="h-4 w-4 text-muted-foreground" />
+        <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
           Firm Health Pulse
         </span>
       </div>
@@ -429,10 +429,10 @@ function HealthPulseCard() {
         <Icon className={cn('h-8 w-8', config.colour)} />
         <div>
           <p className={cn('text-lg font-bold', config.colour)}>{config.label}</p>
-          <p className="text-[10px] text-white/30">Real-time compliance state</p>
+          <p className="text-[10px] text-muted-foreground/60">Real-time compliance state</p>
         </div>
       </div>
-      <div className="h-1.5 rounded-full bg-white/[0.06] overflow-hidden">
+      <div className="h-1.5 rounded-full bg-muted/40 overflow-hidden">
         <div
           className={cn(
             'h-full rounded-full transition-all duration-1000',
@@ -441,7 +441,7 @@ function HealthPulseCard() {
           style={{ width: `${Math.min(gapRate, 100)}%` }}
         />
       </div>
-      <p className="text-[10px] text-white/30 mt-1.5 text-right tabular-nums">
+      <p className="text-[10px] text-muted-foreground/60 mt-1.5 text-right tabular-nums">
         Gap Closure: {gapRate}%
       </p>
     </div>
@@ -456,7 +456,7 @@ export function GlassFortressMatrix() {
 
   if (isLoading || !data) {
     return (
-      <div className="glass-fortress-container rounded-3xl border border-white/[0.06] bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-6">
+      <div className="glass-fortress-container rounded-3xl border border-border bg-card/95 backdrop-blur-xl p-6">
         <div className="flex items-center justify-center py-16">
           <Loader2 className="h-6 w-6 animate-spin text-emerald-500/50" />
         </div>
@@ -465,21 +465,21 @@ export function GlassFortressMatrix() {
   }
 
   return (
-    <div className="glass-fortress-container rounded-3xl border border-white/[0.06] bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-6 space-y-5">
+    <div className="glass-fortress-container rounded-3xl border border-border bg-card/95 backdrop-blur-xl p-6 space-y-5">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2.5">
-          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-500/10">
+          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-white/[0.04] border border-white/[0.06]">
             <Sparkles className="h-4 w-4 text-emerald-400" />
           </div>
           <div>
-            <h2 className="text-sm font-semibold text-white/90">Norva Sovereign Matrix</h2>
-            <p className="text-[10px] text-white/30">Hover a sealed matter for Micro-Audit Trace</p>
+            <h2 className="text-sm font-semibold text-foreground">Norva Sovereign Matrix</h2>
+            <p className="text-[10px] text-muted-foreground/60">Hover a sealed matter for Micro-Audit Trace</p>
           </div>
         </div>
         <Badge
           variant="outline"
-          className="text-[10px] border-emerald-500/20 text-emerald-400/60 bg-emerald-500/5"
+          className="text-[10px] border-white/[0.08] text-emerald-400/60 bg-white/[0.04]"
         >
           {data.matters.length} matters
         </Badge>
@@ -504,8 +504,8 @@ export function GlassFortressMatrix() {
 
       {data.matters.length === 0 && (
         <div className="text-center py-12">
-          <Lock className="h-8 w-8 mx-auto text-white/20 mb-3" />
-          <p className="text-sm text-white/30">No active matters in the Sovereign Matrix</p>
+          <Lock className="h-8 w-8 mx-auto text-muted-foreground/40 mb-3" />
+          <p className="text-sm text-muted-foreground/60">No active matters in the Sovereign Matrix</p>
         </div>
       )}
     </div>

@@ -247,7 +247,7 @@ function UploadDialog({
             onDrop={(e) => { e.preventDefault(); setIsDragging(false); handleFiles(e.dataTransfer.files) }}
             onClick={() => fileInputRef.current?.click()}
             className={`border-2 border-dashed rounded-lg p-10 text-center cursor-pointer transition-colors ${
-              isDragging ? 'border-blue-500 bg-blue-50' : 'border-slate-300 hover:border-slate-400 hover:bg-slate-50'
+              isDragging ? 'border-blue-500 bg-blue-950/30' : 'border-slate-300 hover:border-slate-400 hover:bg-slate-50'
             }`}
           >
             <input
@@ -576,7 +576,7 @@ export default function DocumentsPage() {
         </Card>
         <Card>
           <CardContent className="flex items-center gap-3 p-4">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-100">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-950/40">
               <HardDrive className="h-4 w-4 text-emerald-600" />
             </div>
             <div>

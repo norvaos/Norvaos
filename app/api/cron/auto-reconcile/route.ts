@@ -53,73 +53,83 @@ async function handlePost(request: Request) {
   }
 
   try {
-    // Fetch all due schedules
-    const { data: schedules, error: schedErr } = await client
-      .from('reconciliation_schedule')
-      .select('*')
-      .lte('next_run_date', today)
-      .eq('is_active', true)
+    // Paginated fetch of due schedules to avoid unbounded queries
+    const PAGE_SIZE = 100
+    let offset = 0
 
-    if (schedErr) {
-      return NextResponse.json({ error: `Failed to fetch schedules: ${schedErr.message}` }, { status: 500 })
+    while (true) {
+      const { data: batch, error: schedErr } = await client
+        .from('reconciliation_schedule')
+        .select('*')
+        .lte('next_run_date', today)
+        .eq('is_active', true)
+        .range(offset, offset + PAGE_SIZE - 1)
+
+      if (schedErr) {
+        return NextResponse.json({ error: `Failed to fetch schedules: ${schedErr.message}` }, { status: 500 })
+      }
+
+      if (!batch || batch.length === 0) break
+
+      stats.schedulesChecked += batch.length
+
+      for (const schedule of batch) {
+        try {
+          // Calculate period: from last_run_date (or 30 days ago) to today
+          const periodStart = schedule.last_run_date ?? new Date(
+            Date.now() - 30 * 24 * 60 * 60 * 1000,
+          ).toISOString().split('T')[0]
+          const periodEnd = today
+
+          // Run auto-reconciliation via RPC
+          const { data, error } = await client.rpc('rpc_auto_reconcile', {
+            p_tenant_id: schedule.tenant_id,
+            p_user_id: 'system-cron',
+            p_trust_account_id: schedule.trust_account_id,
+            p_period_start: periodStart,
+            p_period_end: periodEnd,
+          })
+
+          if (error) {
+            stats.reconciliationsFailed++
+            stats.errors.push(
+              `Schedule ${schedule.id} (account ${schedule.trust_account_id}): ${error.message}`,
+            )
+            continue
+          }
+
+          stats.reconciliationsRun++
+
+          // Update schedule: set last_run_date and advance next_run_date
+          const nextRun = advanceNextRunDate(schedule.next_run_date, schedule.frequency)
+
+          await client
+            .from('reconciliation_schedule')
+            .update({
+              last_run_date: today,
+              next_run_date: nextRun,
+              updated_at: new Date().toISOString(),
+            })
+            .eq('id', schedule.id)
+
+        } catch (err) {
+          stats.reconciliationsFailed++
+          stats.errors.push(
+            `Schedule ${schedule.id}: ${err instanceof Error ? err.message : 'Unknown error'}`,
+          )
+        }
+      }
+
+      offset += PAGE_SIZE
     }
 
-    if (!schedules || schedules.length === 0) {
+    if (stats.schedulesChecked === 0) {
       return NextResponse.json({
         success: true,
         message: 'No scheduled reconciliations due',
         processedAt: today,
         stats,
       })
-    }
-
-    stats.schedulesChecked = schedules.length
-
-    for (const schedule of schedules) {
-      try {
-        // Calculate period: from last_run_date (or 30 days ago) to today
-        const periodStart = schedule.last_run_date ?? new Date(
-          Date.now() - 30 * 24 * 60 * 60 * 1000,
-        ).toISOString().split('T')[0]
-        const periodEnd = today
-
-        // Run auto-reconciliation via RPC
-        const { data, error } = await client.rpc('rpc_auto_reconcile', {
-          p_tenant_id: schedule.tenant_id,
-          p_user_id: 'system-cron',
-          p_trust_account_id: schedule.trust_account_id,
-          p_period_start: periodStart,
-          p_period_end: periodEnd,
-        })
-
-        if (error) {
-          stats.reconciliationsFailed++
-          stats.errors.push(
-            `Schedule ${schedule.id} (account ${schedule.trust_account_id}): ${error.message}`,
-          )
-          continue
-        }
-
-        stats.reconciliationsRun++
-
-        // Update schedule: set last_run_date and advance next_run_date
-        const nextRun = advanceNextRunDate(schedule.next_run_date, schedule.frequency)
-
-        await client
-          .from('reconciliation_schedule')
-          .update({
-            last_run_date: today,
-            next_run_date: nextRun,
-            updated_at: new Date().toISOString(),
-          })
-          .eq('id', schedule.id)
-
-      } catch (err) {
-        stats.reconciliationsFailed++
-        stats.errors.push(
-          `Schedule ${schedule.id}: ${err instanceof Error ? err.message : 'Unknown error'}`,
-        )
-      }
     }
 
     return NextResponse.json({

@@ -138,7 +138,7 @@ export function PortalPaymentSection({
 
         {/* Overdue warning */}
         {summary.overdueAmount > 0 && (
-          <div className="px-4 py-2 bg-red-50 border-t border-red-100 text-xs text-red-700">
+          <div className="px-4 py-2 bg-red-950/30 border-t border-red-100 text-xs text-red-400">
             <span className="font-semibold">${(summary.overdueAmount / 100).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span> is overdue. Please arrange payment at your earliest convenience.
           </div>
         )}
@@ -368,12 +368,12 @@ function InvoiceRow({
               {t(tr.payment_invoice ?? 'Invoice #{number}', { number: invoice.invoiceNumber })}
             </span>
             {invoice.isOverdue && (
-              <span className="rounded-full bg-red-100 border border-red-200 px-2 py-0.5 text-[10px] font-semibold text-red-700 uppercase">
+              <span className="rounded-full bg-red-100 border border-red-200 px-2 py-0.5 text-[10px] font-semibold text-red-400 uppercase">
                 {tr.payment_overdue_badge ?? 'Overdue'}
               </span>
             )}
             {isPaidInFull && (
-              <span className="rounded-full bg-green-100 border border-green-200 px-2 py-0.5 text-[10px] font-semibold text-green-700 uppercase">
+              <span className="rounded-full bg-green-100 border border-green-200 px-2 py-0.5 text-[10px] font-semibold text-emerald-400 uppercase">
                 {tr.payment_paid_in_full ?? 'Paid in full'}
               </span>
             )}
@@ -400,14 +400,14 @@ function InvoiceRow({
 
           {/* Overdue + blocks work warning */}
           {invoice.isOverdue && invoice.requiredBeforeWork && (
-            <p className="text-xs text-red-700 mt-1 font-medium">
+            <p className="text-xs text-red-400 mt-1 font-medium">
               {tr.payment_overdue_blocks_work ?? 'This payment is required before work can proceed on your file.'}
             </p>
           )}
         </div>
 
         <div className="text-right shrink-0">
-          <p className={cn('text-lg font-semibold', invoice.isOverdue ? 'text-red-700' : 'text-slate-800')}>
+          <p className={cn('text-lg font-semibold', invoice.isOverdue ? 'text-red-400' : 'text-slate-800')}>
             ${(invoice.totalAmount / 100).toLocaleString()}
           </p>
         </div>
@@ -417,7 +417,7 @@ function InvoiceRow({
       {!isPaidInFull && (
         <div className="mt-3 pt-3 border-t border-slate-200/60">
           {invoice.markedAsSent ? (
-            <p className="text-xs text-green-700 flex items-center gap-1.5">
+            <p className="text-xs text-emerald-400 flex items-center gap-1.5">
               <svg className="h-3.5 w-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
                 <polyline points="22 4 12 14.01 9 11.01" />

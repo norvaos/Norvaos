@@ -121,7 +121,7 @@ function OverrideRow({
       className="flex items-center justify-between gap-4 rounded-lg border border-amber-500/30 bg-amber-500/5 px-4 py-3"
     >
       <div className="flex items-center gap-3 min-w-0">
-        <div className="flex items-center justify-center size-9 rounded-full bg-amber-100 dark:bg-amber-900/40">
+        <div className="flex items-center justify-center size-9 rounded-full bg-amber-950/40 dark:bg-amber-900/40">
           <ShieldAlert className="size-4 text-amber-600 dark:text-amber-400" />
         </div>
         <div className="min-w-0">
@@ -193,7 +193,7 @@ function StaleRow({
       className="flex items-center justify-between gap-4 rounded-lg border border-red-500/30 bg-red-500/5 px-4 py-3"
     >
       <div className="flex items-center gap-3 min-w-0">
-        <div className="flex items-center justify-center size-9 rounded-full bg-red-100 dark:bg-red-900/40">
+        <div className="flex items-center justify-center size-9 rounded-full bg-red-950/40 dark:bg-red-900/40">
           <Clock className="size-4 text-red-600 dark:text-red-400" />
         </div>
         <div className="min-w-0">
@@ -246,10 +246,10 @@ function StaleRow({
 function EmptyRadar({ label }: { label: string }) {
   return (
     <div className="flex flex-col items-center justify-center py-12 text-center">
-      <div className="flex items-center justify-center size-12 rounded-full bg-emerald-100 dark:bg-emerald-900/40 mb-3">
+      <div className="flex items-center justify-center size-12 rounded-full bg-emerald-950/40 dark:bg-emerald-900/40 mb-3">
         <Shield className="size-5 text-emerald-600 dark:text-emerald-400" />
       </div>
-      <p className="text-sm font-medium text-emerald-700 dark:text-emerald-300">All clear</p>
+      <p className="text-sm font-medium text-emerald-400 dark:text-emerald-300">All clear</p>
       <p className="text-xs text-muted-foreground mt-1">{label}</p>
     </div>
   )

@@ -99,18 +99,18 @@ export default function LawyerWorkspace() {
 
   const severityColour = (severity: string) => {
     switch (severity) {
-      case 'critical': return 'bg-red-100 text-red-700 border-red-200'
-      case 'high': return 'bg-orange-100 text-orange-700 border-orange-200'
-      case 'medium': return 'bg-yellow-100 text-yellow-700 border-yellow-200'
+      case 'critical': return 'bg-red-950/40 text-red-400 border-red-500/20'
+      case 'high': return 'bg-orange-950/40 text-orange-400 border-orange-500/20'
+      case 'medium': return 'bg-yellow-950/40 text-yellow-400 border-yellow-500/20'
       default: return 'bg-gray-100 text-gray-600 border-gray-200'
     }
   }
 
   const intakeColour = (status: string | null) => {
     switch (status) {
-      case 'awaiting_lawyer_review': return 'bg-orange-100 text-orange-700'
-      case 'approved': return 'bg-green-100 text-green-700'
-      case 'rejected': return 'bg-red-100 text-red-700'
+      case 'awaiting_lawyer_review': return 'bg-orange-950/40 text-orange-400'
+      case 'approved': return 'bg-emerald-950/40 text-emerald-400'
+      case 'rejected': return 'bg-red-950/40 text-red-400'
       default: return 'bg-gray-100 text-gray-600'
     }
   }

@@ -46,13 +46,13 @@ interface TodayScheduleProps {
 // ─── Status Badge Colours ────────────────────────────────────────────────────
 
 const STATUS_STYLES: Record<string, string> = {
-  confirmed: 'bg-blue-50 text-blue-700',
-  pending: 'bg-blue-50 text-blue-700',
-  checked_in: 'bg-emerald-50 text-emerald-700',
-  in_meeting: 'bg-purple-50 text-purple-700',
+  confirmed: 'bg-blue-950/30 text-blue-400',
+  pending: 'bg-blue-950/30 text-blue-400',
+  checked_in: 'bg-emerald-950/30 text-emerald-400',
+  in_meeting: 'bg-purple-950/30 text-purple-400',
   completed: 'bg-slate-50 text-slate-500',
-  cancelled: 'bg-red-50 text-red-700',
-  no_show: 'bg-red-50 text-red-500',
+  cancelled: 'bg-red-950/30 text-red-400',
+  no_show: 'bg-red-950/30 text-red-500',
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -115,7 +115,7 @@ function AppointmentRow({
         {appointment.contact_id && onSelectContact ? (
           <button
             type="button"
-            className="text-sm font-medium text-foreground hover:text-blue-700 transition-colors truncate"
+            className="text-sm font-medium text-foreground hover:text-blue-400 transition-colors truncate"
             onClick={() => onSelectContact(appointment.contact_id!)}
           >
             {appointment.guest_name || 'Walk-in'}
@@ -166,7 +166,7 @@ function AppointmentRow({
                 <Button
                   variant="ghost"
                   size="icon-xs"
-                  className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
+                  className="text-emerald-600 hover:text-emerald-400 hover:bg-emerald-950/30"
                   onClick={(e) => {
                     e.stopPropagation()
                     onAcknowledge(appointment.id)

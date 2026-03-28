@@ -197,7 +197,7 @@ function IntakeCompletionRing({ score, missing }: { score: number; missing: { ke
             {missing.slice(0, 5).map((m) => (
               <span
                 key={m.key}
-                className="inline-flex items-center rounded bg-amber-50 border border-amber-200 px-1.5 py-0.5 text-[9px] text-amber-700"
+                className="inline-flex items-center rounded bg-amber-950/30 border border-amber-500/20 px-1.5 py-0.5 text-[9px] text-amber-400"
               >
                 {m.label}
               </span>
@@ -221,7 +221,7 @@ function IntakeBar({ label, pct }: { label: string; pct: number }) {
         <div
           className={cn(
             'h-1 rounded-full transition-all duration-500',
-            clampedPct >= 100 ? 'bg-emerald-500' : clampedPct > 0 ? 'bg-amber-400' : 'bg-slate-200',
+            clampedPct >= 100 ? 'bg-emerald-950/300' : clampedPct > 0 ? 'bg-amber-400' : 'bg-slate-200',
           )}
           style={{ width: `${clampedPct}%` }}
         />
@@ -236,26 +236,26 @@ function IntakeBar({ label, pct }: { label: string; pct: number }) {
 /** Colour helpers  -  mirrors readiness-zone.tsx scoreColour */
 function gaugeColour(score: number) {
   if (score >= 95) return { stroke: '#d4af37', text: 'text-yellow-600', bg: 'bg-yellow-500', ring: 'stroke-yellow-200', gold: true }
-  if (score >= 85) return { stroke: '#22c55e', text: 'text-green-600', bg: 'bg-green-500', ring: 'stroke-green-100', gold: false }
-  if (score >= 60) return { stroke: '#f59e0b', text: 'text-amber-600', bg: 'bg-amber-500', ring: 'stroke-amber-100', gold: false }
-  return { stroke: '#ef4444', text: 'text-red-600', bg: 'bg-red-500', ring: 'stroke-red-100', gold: false }
+  if (score >= 85) return { stroke: '#22c55e', text: 'text-green-600', bg: 'bg-emerald-950/300', ring: 'stroke-green-100', gold: false }
+  if (score >= 60) return { stroke: '#f59e0b', text: 'text-amber-600', bg: 'bg-amber-950/300', ring: 'stroke-amber-100', gold: false }
+  return { stroke: '#ef4444', text: 'text-red-600', bg: 'bg-red-950/300', ring: 'stroke-red-100', gold: false }
 }
 
 function riskLabel(level: string) {
   switch (level) {
-    case 'ready': return { label: 'Ready', classes: 'border-green-300 bg-green-50 text-green-700' }
-    case 'high': return { label: 'High', classes: 'border-green-300 bg-green-50 text-green-700' }
-    case 'medium': return { label: 'Medium', classes: 'border-amber-300 bg-amber-50 text-amber-700' }
-    case 'low': return { label: 'Low', classes: 'border-red-300 bg-red-50 text-red-700' }
+    case 'ready': return { label: 'Ready', classes: 'border-green-300 bg-emerald-950/30 text-emerald-400' }
+    case 'high': return { label: 'High', classes: 'border-green-300 bg-emerald-950/30 text-emerald-400' }
+    case 'medium': return { label: 'Medium', classes: 'border-amber-300 bg-amber-950/30 text-amber-400' }
+    case 'low': return { label: 'Low', classes: 'border-red-300 bg-red-950/30 text-red-400' }
     case 'critical': return { label: 'Critical', classes: 'border-red-400 bg-red-100 text-red-800' }
     default: return { label: level, classes: 'border-slate-300 bg-slate-50 text-slate-700' }
   }
 }
 
 function domainBarColour(pct: number) {
-  if (pct >= 85) return 'bg-green-500'
-  if (pct >= 60) return 'bg-amber-500'
-  return 'bg-red-500'
+  if (pct >= 85) return 'bg-emerald-950/300'
+  if (pct >= 60) return 'bg-amber-950/300'
+  return 'bg-red-950/300'
 }
 
 function ClientReadinessView({ matterId }: { matterId: string }) {
@@ -308,7 +308,7 @@ function ClientReadinessView({ matterId }: { matterId: string }) {
             </span>
           </div>
           {isRed35 && (
-            <span className="inline-flex items-center gap-1 rounded-full bg-red-100 border border-red-300 px-2 py-0.5 text-[10px] font-bold text-red-700 animate-pulse">
+            <span className="inline-flex items-center gap-1 rounded-full bg-red-100 border border-red-300 px-2 py-0.5 text-[10px] font-bold text-red-400 animate-pulse">
               <AlertTriangle className="size-2.5" />
               Red {score}
             </span>
@@ -368,8 +368,8 @@ function ClientReadinessView({ matterId }: { matterId: string }) {
                     className={cn(
                       'gap-1 text-[9px]',
                       draftingReady
-                        ? 'border-green-300 bg-green-50 text-green-700'
-                        : 'border-red-300 bg-red-50 text-red-700',
+                        ? 'border-green-300 bg-emerald-950/30 text-emerald-400'
+                        : 'border-red-300 bg-red-950/30 text-red-400',
                     )}
                   >
                     {draftingReady ? <CheckCircle2 className="size-2.5" /> : <XCircle className="size-2.5" />}
@@ -388,8 +388,8 @@ function ClientReadinessView({ matterId }: { matterId: string }) {
                     className={cn(
                       'gap-1 text-[9px]',
                       filingReady
-                        ? 'border-green-300 bg-green-50 text-green-700'
-                        : 'border-red-300 bg-red-50 text-red-700',
+                        ? 'border-green-300 bg-emerald-950/30 text-emerald-400'
+                        : 'border-red-300 bg-red-950/30 text-red-400',
                     )}
                   >
                     {filingReady ? <CheckCircle2 className="size-2.5" /> : <XCircle className="size-2.5" />}

@@ -278,7 +278,7 @@ export function SendDocumentRequestDialog({
                       {!slot.slot_template_id && (
                         <Badge
                           variant="outline"
-                          className="border-blue-300 text-blue-700 bg-blue-50"
+                          className="border-blue-500/30 text-blue-400 bg-blue-950/30"
                         >
                           Custom
                         </Badge>
@@ -289,10 +289,10 @@ export function SendDocumentRequestDialog({
                           slot.status === 'accepted'
                             ? 'border-green-300 text-green-700 bg-green-50'
                             : slot.status === 'needs_re_upload'
-                              ? 'border-orange-300 text-orange-700 bg-orange-50'
+                              ? 'border-orange-500/30 text-orange-400 bg-orange-950/30'
                               : slot.status === 'rejected'
-                                ? 'border-red-300 text-red-700 bg-red-50'
-                                : 'border-amber-300 text-amber-700 bg-amber-50'
+                                ? 'border-red-500/30 text-red-400 bg-red-950/30'
+                                : 'border-amber-500/30 text-amber-400 bg-amber-950/30'
                         }
                       >
                         {slot.status === 'accepted' ? 'Accepted' : (STATUS_LABELS[slot.status] ?? 'Needed')}

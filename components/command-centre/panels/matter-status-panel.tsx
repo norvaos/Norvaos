@@ -66,11 +66,11 @@ function useMatterStageInfo(matterId: string, tenantId: string) {
 // ─── Status helpers ─────────────────────────────────────────────────
 
 const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
-  active: { label: 'Active', color: 'bg-green-50 text-green-700 border-green-200' },
-  pending: { label: 'Pending', color: 'bg-amber-50 text-amber-700 border-amber-200' },
-  on_hold: { label: 'On Hold', color: 'bg-yellow-50 text-yellow-700 border-yellow-200' },
-  closed_won: { label: 'Closed (Won)', color: 'bg-blue-50 text-blue-700 border-blue-200' },
-  closed_lost: { label: 'Closed (Lost)', color: 'bg-red-50 text-red-700 border-red-200' },
+  active: { label: 'Active', color: 'bg-emerald-950/30 text-emerald-400 border-green-200' },
+  pending: { label: 'Pending', color: 'bg-amber-950/30 text-amber-400 border-amber-200' },
+  on_hold: { label: 'On Hold', color: 'bg-yellow-950/30 text-yellow-400 border-yellow-200' },
+  closed_won: { label: 'Closed (Won)', color: 'bg-blue-950/30 text-blue-400 border-blue-200' },
+  closed_lost: { label: 'Closed (Lost)', color: 'bg-red-950/30 text-red-400 border-red-200' },
 }
 
 // ─── Component ──────────────────────────────────────────────────────
@@ -187,9 +187,9 @@ export function MatterStatusPanel() {
               )
               if (daysInStage > 14) {
                 return (
-                  <div className="flex items-center gap-2 p-2 bg-amber-50 rounded-md border border-amber-200">
+                  <div className="flex items-center gap-2 p-2 bg-amber-950/30 rounded-md border border-amber-200">
                     <AlertTriangle className="h-4 w-4 text-amber-600 shrink-0" />
-                    <span className="text-xs text-amber-700">
+                    <span className="text-xs text-amber-400">
                       This matter has been in the current stage for {daysInStage} days.
                     </span>
                   </div>
@@ -197,9 +197,9 @@ export function MatterStatusPanel() {
               }
               if (data.matter.status === 'active' && daysInStage <= 3) {
                 return (
-                  <div className="flex items-center gap-2 p-2 bg-green-50 rounded-md border border-green-200">
+                  <div className="flex items-center gap-2 p-2 bg-emerald-950/30 rounded-md border border-green-200">
                     <CheckCircle2 className="h-4 w-4 text-green-600 shrink-0" />
-                    <span className="text-xs text-green-700">
+                    <span className="text-xs text-emerald-400">
                       Matter is progressing on schedule.
                     </span>
                   </div>

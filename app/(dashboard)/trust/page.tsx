@@ -306,28 +306,28 @@ function TrustDashboard() {
           value={isLoading ? undefined : formatCurrency(totalBalanceCents)}
           icon={DollarSign}
           iconColour="text-emerald-600"
-          bgColour="bg-emerald-50"
+          bgColour="bg-emerald-950/30"
         />
         <SummaryCard
           title="Active Matters"
           value={isLoading ? undefined : String(activeMatterCount)}
           icon={Briefcase}
           iconColour="text-blue-600"
-          bgColour="bg-blue-50"
+          bgColour="bg-blue-950/30"
         />
         <SummaryCard
           title="Outstanding Holds"
           value={isLoading ? undefined : String(outstandingHolds)}
           icon={ShieldCheck}
           iconColour="text-amber-600"
-          bgColour="bg-amber-50"
+          bgColour="bg-amber-950/30"
         />
         <SummaryCard
           title="Last Reconciliation"
           value={isLoading ? undefined : lastReconciliation ? formatDate(lastReconciliation.period_end) : 'Never'}
           icon={CalendarCheck}
           iconColour="text-purple-600"
-          bgColour="bg-purple-50"
+          bgColour="bg-purple-950/30"
           badge={lastReconciliation ? lastReconciliation.status : undefined}
         />
       </div>
@@ -470,7 +470,7 @@ function TrustDashboard() {
                             </TableCell>
                             <TableCell>
                               {t.hold_status === 'held' ? (
-                                <Badge variant="outline" className="text-amber-700 border-amber-300 bg-amber-50">
+                                <Badge variant="outline" className="text-amber-400 border-amber-300 bg-amber-950/30">
                                   <Clock className="mr-1 h-3 w-3" />
                                   On Hold
                                 </Badge>
@@ -545,7 +545,7 @@ function TrustDashboard() {
                                   <Button
                                     size="sm"
                                     variant="ghost"
-                                    className="h-7 text-emerald-700 hover:text-emerald-800 hover:bg-emerald-50"
+                                    className="h-7 text-emerald-400 hover:text-emerald-400 hover:bg-emerald-950/30"
                                     onClick={() => approveMutation.mutate(req.id!)}
                                     disabled={approveMutation.isPending}
                                   >
@@ -555,7 +555,7 @@ function TrustDashboard() {
                                   <Button
                                     size="sm"
                                     variant="ghost"
-                                    className="h-7 text-red-700 hover:text-red-800 hover:bg-red-50"
+                                    className="h-7 text-red-400 hover:text-red-800 hover:bg-red-950/30"
                                     onClick={() => {
                                       setRejectTargetId(req.id!)
                                       setRejectDialogOpen(true)

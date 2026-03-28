@@ -136,8 +136,8 @@ export function LaunchDemoHook({ tenantId, userId }: LaunchDemoHookProps) {
             <div className="w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
               <AlertCircle className="h-5 w-5 text-amber-600" />
             </div>
-            <span className="absolute -top-0.5 -right-0.5 w-3 h-3 rounded-full bg-amber-500 animate-ping" />
-            <span className="absolute -top-0.5 -right-0.5 w-3 h-3 rounded-full bg-amber-500" />
+            <span className="absolute -top-0.5 -right-0.5 w-3 h-3 rounded-full bg-amber-950/300 animate-ping" />
+            <span className="absolute -top-0.5 -right-0.5 w-3 h-3 rounded-full bg-amber-950/300" />
           </div>
 
           <div className="flex-1 min-w-0">
@@ -164,15 +164,15 @@ export function LaunchDemoHook({ tenantId, userId }: LaunchDemoHookProps) {
 
             {/* Feature badges */}
             <div className="flex flex-wrap gap-1.5 mb-3">
-              <Badge variant="outline" className="text-[10px] border-amber-200 bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400">
+              <Badge variant="outline" className="text-[10px] border-amber-200 bg-amber-950/30 text-amber-400 dark:bg-amber-900/20 dark:text-amber-400">
                 <Globe className="h-2.5 w-2.5 mr-0.5" />
                 Global 15 Active
               </Badge>
-              <Badge variant="outline" className="text-[10px] border-emerald-200 bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-400">
+              <Badge variant="outline" className="text-[10px] border-emerald-500/20 bg-emerald-950/30 text-emerald-400 dark:bg-emerald-900/20 dark:text-emerald-400">
                 <Shield className="h-2.5 w-2.5 mr-0.5" />
                 Sentinel Secured
               </Badge>
-              <Badge variant="outline" className="text-[10px] border-blue-200 bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400">
+              <Badge variant="outline" className="text-[10px] border-blue-200 bg-blue-950/30 text-blue-400 dark:bg-blue-900/20 dark:text-blue-400">
                 <Sparkles className="h-2.5 w-2.5 mr-0.5" />
                 Fact-Anchors Linked
               </Badge>

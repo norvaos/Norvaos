@@ -44,7 +44,7 @@ async function handlePost(
 ) {
   // ── Rate limit ──────────────────────────────────────────────────────────────
   const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
-  const { allowed, retryAfterMs } = rateLimiter.check(ip)
+  const { allowed, retryAfterMs } = await rateLimiter.check(ip)
   if (!allowed) {
     return NextResponse.json(
       { error: 'Too many requests. Please try again later.' },
@@ -77,7 +77,14 @@ async function handlePost(
 
   const file = formData.get('file') as File | null
   const slotId = formData.get('slot_id') as string | null
-  const label = (formData.get('label') as string | null) ?? file?.name ?? 'document'
+  const label = formData.get('label') as string | null
+
+  // ── Input validation (Zod-light) ─────────────────────────────────────────
+  if (slotId && !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(slotId)) {
+    return NextResponse.json({ error: 'Invalid slot_id format' }, { status: 400 })
+  }
+  // Truncate label to prevent oversized strings
+  const safeLabel = (label || file?.name || 'document').slice(0, 255)
 
   if (!file) {
     return NextResponse.json({ success: false, error: 'No file provided' }, { status: 400 })
@@ -154,7 +161,7 @@ async function handlePost(
       file_size: file.size,
       storage_path: storagePath,
       category: 'portal_upload',
-      description: `Uploaded via client portal: ${label}`,
+      description: `Uploaded via client portal: ${safeLabel}`,
     })
     .select('id')
     .single()
@@ -185,7 +192,7 @@ async function handlePost(
     contact_id: link.contact_id,
     activity_type: 'portal_document_upload',
     title: `Client uploaded "${file.name}" via portal`,
-    description: `Document "${label}" received via client portal`,
+    description: `Document "${safeLabel}" received via client portal`,
     entity_type: 'matter',
     entity_id: link.matter_id,
     metadata: {

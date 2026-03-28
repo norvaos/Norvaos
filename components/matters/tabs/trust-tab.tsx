@@ -54,11 +54,11 @@ function fmtCents(cents: number): string {
 function txTypeBadge(type: string) {
   switch (type) {
     case 'deposit':
-      return { label: 'Deposit', cls: 'bg-green-50 text-green-700 border-green-200' }
+      return { label: 'Deposit', cls: 'bg-emerald-950/30 text-emerald-400 border-green-200' }
     case 'opening_balance':
-      return { label: 'Opening Balance', cls: 'bg-blue-50 text-blue-700 border-blue-200' }
+      return { label: 'Opening Balance', cls: 'bg-blue-950/30 text-blue-400 border-blue-200' }
     case 'disbursement':
-      return { label: 'Disbursement', cls: 'bg-red-50 text-red-700 border-red-200' }
+      return { label: 'Disbursement', cls: 'bg-red-950/30 text-red-400 border-red-200' }
     case 'transfer':
       return { label: 'Transfer', cls: 'bg-purple-50 text-purple-700 border-purple-200' }
     case 'refund':
@@ -73,7 +73,7 @@ function txTypeBadge(type: string) {
 function statusBadge(status: string) {
   switch (status) {
     case 'cleared':
-      return { label: 'Cleared', cls: 'bg-green-50 text-green-700 border-green-200' }
+      return { label: 'Cleared', cls: 'bg-emerald-950/30 text-emerald-400 border-green-200' }
     case 'held':
       return { label: 'Held', cls: 'bg-amber-50 text-amber-700 border-amber-200' }
     case 'pending':

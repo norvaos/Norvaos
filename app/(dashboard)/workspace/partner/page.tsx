@@ -162,7 +162,7 @@ function RevenueWidget({ tenantId }: { tenantId: string }) {
               <div className="mt-1">
                 <Badge
                   variant="outline"
-                  className={`text-[10px] px-1.5 py-0 border ${delta.up ? 'bg-green-100 text-green-700 border-green-200' : 'bg-red-100 text-red-700 border-red-200'}`}
+                  className={`text-[10px] px-1.5 py-0 border ${delta.up ? 'bg-emerald-950/40 text-emerald-400 border-emerald-500/20' : 'bg-red-950/40 text-red-400 border-red-500/20'}`}
                 >
                   {delta.up
                     ? <TrendingUp className="inline h-2.5 w-2.5 mr-0.5" />
@@ -260,7 +260,7 @@ function OutstandingBalanceWidget({ tenantId }: { tenantId: string }) {
                   <p className="text-[11px] text-muted-foreground truncate">{m.client_name}</p>
                 )}
               </div>
-              <span className="text-sm font-bold text-amber-700 shrink-0">{fmtCents(m.outstanding)}</span>
+              <span className="text-sm font-bold text-amber-400 shrink-0">{fmtCents(m.outstanding)}</span>
             </div>
           ))
         )}
@@ -355,9 +355,9 @@ function StaffUtilisationWidget({ tenantId }: { tenantId: string }) {
 // ── Widget E: Risk Exposure Summary ──────────────────────────────────────────
 
 const SEVERITY_CONFIG: Record<string, { label: string; className: string }> = {
-  critical:  { label: 'Critical',  className: 'bg-red-100 text-red-700 border-red-200' },
-  elevated:  { label: 'Elevated',  className: 'bg-orange-100 text-orange-700 border-orange-200' },
-  advisory:  { label: 'Advisory',  className: 'bg-amber-100 text-amber-700 border-amber-200' },
+  critical:  { label: 'Critical',  className: 'bg-red-950/40 text-red-400 border-red-500/20' },
+  elevated:  { label: 'Elevated',  className: 'bg-orange-950/40 text-orange-400 border-orange-500/20' },
+  advisory:  { label: 'Advisory',  className: 'bg-amber-950/40 text-amber-400 border-amber-500/20' },
   low:       { label: 'Low',       className: 'bg-slate-100 text-slate-600 border-slate-200' },
 }
 

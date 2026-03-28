@@ -55,22 +55,30 @@ async function handlePost(request: Request) {
         try {
           stats.processed++
 
+          const now = new Date().toISOString()
+          const syncUpdate: Record<string, unknown> = {
+            error_count: 0,
+            updated_at: now,
+          }
+
           if (conn.calendar_sync_enabled) {
             await syncCalendarPull(conn.id, admin)
             await syncCalendarPush(conn.id, admin)
             stats.calendarSynced++
+            syncUpdate.last_calendar_sync_at = now
           }
 
           if (conn.tasks_sync_enabled) {
             await syncTasksPull(conn.id, admin)
             await syncTasksPush(conn.id, admin)
             stats.tasksSynced++
+            syncUpdate.last_tasks_sync_at = now
           }
 
-          // Reset error count on success
+          // Update sync timestamps and reset error count
           await admin
             .from('microsoft_connections')
-            .update({ error_count: 0, updated_at: new Date().toISOString() })
+            .update(syncUpdate)
             .eq('id', conn.id)
         } catch (err) {
           stats.errors++

@@ -94,12 +94,12 @@ function fmtCents(cents: number | null | undefined): string {
 function statusBadgeClass(status: string | null): string {
   switch (status) {
     case 'draft':          return 'bg-slate-100 text-slate-700 border-slate-200'
-    case 'sent':           return 'bg-blue-100 text-blue-700 border-blue-200'
+    case 'sent':           return 'bg-blue-950/40 text-blue-400 border-blue-500/20'
     case 'viewed':         return 'bg-indigo-100 text-indigo-700 border-indigo-200'
     case 'finalized':      return 'bg-sky-100 text-sky-700 border-sky-200'
-    case 'partially_paid': return 'bg-amber-100 text-amber-700 border-amber-200'
-    case 'paid':           return 'bg-green-100 text-green-700 border-green-200'
-    case 'overdue':        return 'bg-red-100 text-red-700 border-red-200'
+    case 'partially_paid': return 'bg-amber-950/40 text-amber-400 border-amber-500/20'
+    case 'paid':           return 'bg-emerald-950/40 text-emerald-400 border-emerald-500/20'
+    case 'overdue':        return 'bg-red-950/40 text-red-400 border-red-500/20'
     case 'cancelled':
     case 'void':           return 'bg-gray-100 text-gray-500 border-gray-200'
     default:               return 'bg-slate-100 text-slate-600 border-slate-200'
@@ -299,7 +299,7 @@ function RecordTrustTransactionDialog({
 
         <div className="space-y-4">
           {/* Correction toggle */}
-          <div className="flex items-center gap-2 rounded-md border border-amber-200 bg-amber-50 px-3 py-2">
+          <div className="flex items-center gap-2 rounded-md border border-amber-500/20 bg-amber-950/30 px-3 py-2">
             <Checkbox
               id="correction-toggle"
               checked={isCorrection}
@@ -438,7 +438,7 @@ function TrustWidget({ matterId, tenantId, trustBalance }: { matterId: string; t
   if (!isLoading && !hasBalance && !hasTxns) return null
 
   return (
-    <Card className="border-emerald-200 bg-emerald-50/30">
+    <Card className="border-emerald-500/20 bg-emerald-950/30/30">
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -460,13 +460,13 @@ function TrustWidget({ matterId, tenantId, trustBalance }: { matterId: string; t
       <CardContent className="pt-0 space-y-2">
         <div className="flex items-center justify-between rounded-md border border-emerald-100 bg-white px-3 py-2">
           <span className="text-xs text-muted-foreground">Current Balance</span>
-          <span className="text-sm font-bold text-emerald-700">
+          <span className="text-sm font-bold text-emerald-400">
             {fmtCents((trustBalance ?? 0) * 100)}
           </span>
         </div>
 
         {(trustBalance ?? 0) > 0 && (trustBalance ?? 0) < 50000 && (
-          <div className="flex items-center gap-2 rounded-md bg-amber-50 border border-amber-200 px-3 py-2 text-xs text-amber-700">
+          <div className="flex items-center gap-2 rounded-md bg-amber-950/30 border border-amber-500/20 px-3 py-2 text-xs text-amber-400">
             <AlertTriangle className="size-4 shrink-0" />
             <span>Low trust balance  -  consider requesting a retainer top-up from the client.</span>
           </div>
@@ -497,7 +497,7 @@ function TrustWidget({ matterId, tenantId, trustBalance }: { matterId: string; t
                   }
                   <span className="flex-1 truncate text-slate-700">{tx.description}</span>
                   <span className="text-slate-500 shrink-0">{formatDate(tx.effective_date)}</span>
-                  <span className={`font-semibold shrink-0 ${isCredit ? 'text-emerald-700' : 'text-red-600'}`}>
+                  <span className={`font-semibold shrink-0 ${isCredit ? 'text-emerald-400' : 'text-red-600'}`}>
                     {isCredit ? '+' : '-'}{fmtCents(tx.amount_cents)}
                   </span>
                 </div>
@@ -536,7 +536,7 @@ function BalanceCard({ matter, unbilledCount, onGenerateInvoice }: BalanceCardPr
   const trustDisplay   = fmtCents((matter.trust_balance ?? 0) * 100)
 
   return (
-    <Card className={outstanding > 0 ? 'border-orange-200 bg-orange-50/20' : 'border-green-200 bg-green-50/20'}>
+    <Card className={outstanding > 0 ? 'border-orange-500/20 bg-orange-950/30/20' : 'border-emerald-500/20 bg-emerald-950/30/20'}>
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <CardTitle className="text-sm font-semibold text-muted-foreground">
@@ -547,7 +547,7 @@ function BalanceCard({ matter, unbilledCount, onGenerateInvoice }: BalanceCardPr
             Generate Invoice
           </Button>
         </div>
-        <p className={`text-2xl font-bold mt-1 ${outstanding > 0 ? 'text-orange-700' : 'text-green-700'}`}>
+        <p className={`text-2xl font-bold mt-1 ${outstanding > 0 ? 'text-orange-400' : 'text-emerald-400'}`}>
           {fmtCents(outstandingCents)} CAD
         </p>
         {unbilledCount > 0 && (
@@ -840,10 +840,10 @@ function RecordPaymentDialog({ invoiceId, tenantId, contactId, onClose }: Record
 
 function milestoneBadgeClass(status: string): string {
   switch (status) {
-    case 'complete':   return 'bg-green-100 text-green-700 border-green-200'
-    case 'billed':     return 'bg-blue-100 text-blue-700 border-blue-200'
+    case 'complete':   return 'bg-emerald-950/40 text-emerald-400 border-emerald-500/20'
+    case 'billed':     return 'bg-blue-950/40 text-blue-400 border-blue-500/20'
     case 'cancelled':  return 'bg-gray-100 text-gray-500 border-gray-200'
-    default:           return 'bg-amber-100 text-amber-700 border-amber-200'
+    default:           return 'bg-amber-950/40 text-amber-400 border-amber-500/20'
   }
 }
 

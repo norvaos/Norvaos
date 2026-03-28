@@ -149,10 +149,10 @@ export function ComplianceHealthBar() {
             className={cn(
               'text-[10px] font-bold tabular-nums',
               data.overallPercent === 100
-                ? 'border-green-300 bg-green-50 text-green-700'
+                ? 'border-emerald-500/30 bg-emerald-950/30 text-emerald-400'
                 : data.overallPercent >= 70
-                  ? 'border-amber-300 bg-amber-50 text-amber-700'
-                  : 'border-red-300 bg-red-50 text-red-700'
+                  ? 'border-amber-500/30 bg-amber-950/30 text-amber-400'
+                  : 'border-red-500/30 bg-red-950/30 text-red-400'
             )}
           >
             {data.overallPercent}% Compliant
@@ -164,10 +164,10 @@ export function ComplianceHealthBar() {
             className={cn(
               'h-full rounded-full transition-all duration-700',
               data.overallPercent === 100
-                ? 'bg-green-500'
+                ? 'bg-emerald-950/300'
                 : data.overallPercent >= 70
-                  ? 'bg-amber-500'
-                  : 'bg-red-500'
+                  ? 'bg-amber-950/300'
+                  : 'bg-red-950/300'
             )}
             style={{ width: `${data.overallPercent}%` }}
           />

@@ -219,7 +219,7 @@ export default function BrandIdentityPage() {
           </p>
         </div>
         {isActivated && (
-          <Badge variant="outline" className="border-emerald-300 text-emerald-600 gap-1">
+          <Badge variant="outline" className="border-emerald-500/30 text-emerald-600 gap-1">
             <CheckCircle2 className="h-3 w-3" />
             Brand Active
           </Badge>
@@ -541,7 +541,7 @@ export default function BrandIdentityPage() {
                 <FileText className="h-3 w-3 text-muted-foreground shrink-0" />
                 <span className="text-muted-foreground truncate">{item.originalName}</span>
                 <ArrowRight className="h-3 w-3 text-emerald-500 shrink-0" />
-                <span className="text-emerald-700 dark:text-emerald-400 truncate font-medium">
+                <span className="text-emerald-400 dark:text-emerald-400 truncate font-medium">
                   {item.filedPath}
                 </span>
               </div>

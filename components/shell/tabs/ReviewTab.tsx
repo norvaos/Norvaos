@@ -119,7 +119,7 @@ function GateBlockersSection({
       </div>
 
       {items.length === 0 ? (
-        <div className="flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 p-3 text-sm text-green-700">
+        <div className="flex items-center gap-2 rounded-lg border border-emerald-500/20 bg-emerald-950/30 p-3 text-sm text-emerald-400">
           <CheckCircle2 className="h-4 w-4 shrink-0" />
           No gate blockers  -  file is clear to advance.
         </div>
@@ -128,7 +128,7 @@ function GateBlockersSection({
           {items.map((item, idx) => (
             <div
               key={idx}
-              className="flex items-center justify-between gap-3 rounded-lg border border-amber-100 bg-amber-50 px-3 py-2"
+              className="flex items-center justify-between gap-3 rounded-lg border border-amber-950/40 bg-amber-950/30 px-3 py-2"
             >
               <div className="flex items-center gap-2 min-w-0">
                 <BlockerIcon type={item.type} />
@@ -190,11 +190,11 @@ function ContradictionFlagRow({ flag, matterId, flagIndex, allFlags }: Contradic
   })
 
   const severityClass = flag.severity === 'blocking'
-    ? 'border-red-200 bg-red-50'
-    : 'border-amber-100 bg-amber-50'
+    ? 'border-red-500/20 bg-red-950/30'
+    : 'border-amber-950/40 bg-amber-950/30'
 
   const severityBadgeVariant = flag.severity === 'blocking' ? 'destructive' : 'outline'
-  const severityBadgeClassName = flag.severity !== 'blocking' ? 'text-amber-700 border-amber-300 bg-amber-50' : ''
+  const severityBadgeClassName = flag.severity !== 'blocking' ? 'text-amber-400 border-amber-500/30 bg-amber-950/30' : ''
 
   // The flag shape from ContradictionFlag uses `message` not `description`
   // field_key → flag.key, intake_value and ircc_value are not in ContradictionFlag
@@ -281,7 +281,7 @@ function ContradictionFlagsSection({ matterId }: { matterId: string }) {
       </div>
 
       {readinessData?.contradictions.overridden && (
-        <div className="flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 p-2 text-xs text-green-700">
+        <div className="flex items-center gap-2 rounded-lg border border-emerald-500/20 bg-emerald-950/30 p-2 text-xs text-emerald-400">
           <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
           Contradictions overridden on{' '}
           {readinessData.contradictions.overrideAt
@@ -291,7 +291,7 @@ function ContradictionFlagsSection({ matterId }: { matterId: string }) {
       )}
 
       {flags.length === 0 ? (
-        <div className="flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 p-3 text-sm text-green-700">
+        <div className="flex items-center gap-2 rounded-lg border border-emerald-500/20 bg-emerald-950/30 p-3 text-sm text-emerald-400">
           <CheckCircle2 className="h-4 w-4 shrink-0" />
           No contradictions detected.
         </div>
@@ -377,7 +377,7 @@ function LawyerSignOffSection({
       return <Badge className="text-[11px] bg-green-600 hover:bg-green-600 text-white">Approved</Badge>
     }
     if (status === 'returned_for_correction') {
-      return <Badge variant="outline" className="text-[11px] text-amber-700 border-amber-300 bg-amber-50">Returned for Correction</Badge>
+      return <Badge variant="outline" className="text-[11px] text-amber-400 border-amber-500/30 bg-amber-950/30">Returned for Correction</Badge>
     }
     return <Badge variant="outline" className="text-[11px] capitalize">{status.replace(/_/g, ' ')}</Badge>
   }
@@ -392,9 +392,9 @@ function LawyerSignOffSection({
 
       {/* Approved state */}
       {status === 'approved' && (
-        <div className="rounded-lg border border-green-200 bg-green-50 p-4 space-y-2">
+        <div className="rounded-lg border border-emerald-500/20 bg-emerald-950/30 p-4 space-y-2">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-green-700">
+            <div className="flex items-center gap-2 text-emerald-400">
               <CheckCircle2 className="h-4 w-4" />
               <span className="text-sm font-medium">
                 Approved by {review?.reviewedBy ?? 'Lawyer'}
@@ -422,13 +422,13 @@ function LawyerSignOffSection({
 
       {/* Returned for correction state */}
       {status === 'returned_for_correction' && (
-        <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 space-y-2">
-          <div className="flex items-center gap-2 text-amber-700">
+        <div className="rounded-lg border border-amber-500/20 bg-amber-950/30 p-4 space-y-2">
+          <div className="flex items-center gap-2 text-amber-400">
             <AlertTriangle className="h-4 w-4" />
             <span className="text-sm font-medium">File returned for correction</span>
           </div>
           {review?.notes && (
-            <p className="text-xs text-amber-700/80 whitespace-pre-wrap">{review.notes}</p>
+            <p className="text-xs text-amber-400/80 whitespace-pre-wrap">{review.notes}</p>
           )}
           {review?.reviewedAt && (
             <p className="text-[10px] text-amber-600/70">
@@ -470,7 +470,7 @@ function LawyerSignOffSection({
             <Button
               variant="outline"
               size="sm"
-              className="gap-1.5 border-amber-300 text-amber-700 hover:bg-amber-50"
+              className="gap-1.5 border-amber-500/30 text-amber-400 hover:bg-amber-950/30"
               onClick={onReturnForCorrection}
             >
               <ArrowRight className="h-3.5 w-3.5" />

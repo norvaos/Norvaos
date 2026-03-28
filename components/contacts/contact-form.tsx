@@ -4,7 +4,8 @@ import { useEffect, useState, useCallback, useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { contactSchema, type ContactFormValues } from '@/lib/schemas/contact'
-import { CONTACT_SOURCES } from '@/lib/utils/constants'
+import { useTenant } from '@/lib/hooks/use-tenant'
+import { useLeadSources } from '@/lib/queries/leads'
 import { CLIENT_LOCALES } from '@/lib/i18n/config'
 import { useI18n } from '@/lib/i18n/i18n-provider'
 
@@ -219,6 +220,8 @@ export function ContactForm({
   isLoading = false,
 }: ContactFormProps) {
   const { t } = useI18n()
+  const { tenant } = useTenant()
+  const { data: leadSources } = useLeadSources(tenant?.id ?? '')
   const [additionalDetailsOpen, setAdditionalDetailsOpen] = useState(false)
   /** Fields the OCR parser flagged as needing manual review  -  shows amber border */
   const [reviewRequiredFields, setReviewRequiredFields] = useState<Set<string>>(new Set())
@@ -1005,9 +1008,9 @@ export function ContactForm({
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    {CONTACT_SOURCES.map((source) => (
-                      <SelectItem key={source} value={source}>
-                        {source}
+                    {(leadSources ?? []).map((source) => (
+                      <SelectItem key={source.id} value={source.name}>
+                        {source.name}
                       </SelectItem>
                     ))}
                   </SelectContent>

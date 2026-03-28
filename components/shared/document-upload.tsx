@@ -337,7 +337,7 @@ export function DocumentUpload({ entityType, entityId, tenantId, entityName, hid
         onDrop={handleDrop}
         onClick={() => fileInputRef.current?.click()}
         className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
-          isDragging ? 'border-blue-500 bg-blue-50' : 'border-slate-300 hover:border-slate-400 hover:bg-slate-50'
+          isDragging ? 'border-blue-500 bg-blue-950/30' : 'border-slate-300 hover:border-slate-400 hover:bg-slate-50'
         }`}
       >
         <input
@@ -521,8 +521,8 @@ export function DocumentUpload({ entityType, entityId, tenantId, entityName, hid
                   <span className="text-xs text-muted-foreground">AI-powered extraction</span>
                 </div>
                 {scanExtracted && (
-                  <div className="border rounded-lg bg-green-50/50 border-green-200 divide-y divide-green-100">
-                    <div className="px-3 py-1.5 text-xs font-medium text-green-700 flex items-center gap-1.5">
+                  <div className="border rounded-lg bg-emerald-950/30/50 border-green-200 divide-y divide-green-100">
+                    <div className="px-3 py-1.5 text-xs font-medium text-emerald-400 flex items-center gap-1.5">
                       <ScanSearch className="h-3.5 w-3.5" />
                       Extracted Information
                     </div>

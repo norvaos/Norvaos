@@ -527,7 +527,7 @@ export function TaskTable({
           const billable = row.original.is_billable
           if (!billable) return <span className="text-xs text-muted-foreground">--</span>
           return (
-            <Badge variant="secondary" className="text-[10px] bg-emerald-50 text-emerald-700 border-emerald-200">
+            <Badge variant="secondary" className="text-[10px] bg-emerald-950/30 text-emerald-400 border-emerald-500/20">
               $
             </Badge>
           )

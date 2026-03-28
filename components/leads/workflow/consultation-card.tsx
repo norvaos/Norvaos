@@ -13,7 +13,7 @@ const CONSULTATION_STATUS: Record<string, { label: string; className: string }> 
   booked: { label: 'Booked', className: 'bg-blue-50 text-blue-700 border-blue-200' },
   completed: { label: 'Completed', className: 'bg-green-50 text-green-700 border-green-200' },
   no_show: { label: 'No Show', className: 'bg-red-50 text-red-600 border-red-200' },
-  cancelled: { label: 'Cancelled', className: 'bg-slate-100 text-slate-500 border-slate-200' },
+  cancelled: { label: 'Cancelled', className: 'bg-muted text-muted-foreground border-border' },
 }
 
 const CONSULTATION_TYPE_LABELS: Record<string, string> = {

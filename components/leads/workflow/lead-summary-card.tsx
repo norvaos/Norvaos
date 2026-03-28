@@ -11,18 +11,18 @@ import type { Lead, Contact, PracticeArea, UserRow } from './lead-workflow-types
 // ─── Temperature Visual Config ──────────────────────────────────────────────
 
 const TEMPERATURE_CONFIG: Record<string, { label: string; className: string }> = {
-  hot: { label: 'Hot', className: 'bg-red-50 text-red-700 border-red-200' },
-  warm: { label: 'Warm', className: 'bg-orange-50 text-orange-700 border-orange-200' },
-  cold: { label: 'Cold', className: 'bg-blue-50 text-blue-700 border-blue-200' },
+  hot: { label: 'Hot', className: 'bg-red-950/30 text-red-400 border-red-500/20' },
+  warm: { label: 'Warm', className: 'bg-orange-950/30 text-orange-400 border-orange-500/20' },
+  cold: { label: 'Cold', className: 'bg-blue-950/30 text-blue-400 border-blue-500/20' },
 }
 
 // ─── Qualification Status Config ────────────────────────────────────────────
 
 const QUALIFICATION_STATUS_CONFIG: Record<string, { label: string; className: string }> = {
-  pending: { label: 'Pending', className: 'bg-slate-100 text-slate-600 border-slate-200' },
-  qualified: { label: 'Qualified', className: 'bg-green-50 text-green-700 border-green-200' },
-  not_qualified: { label: 'Not Qualified', className: 'bg-red-50 text-red-600 border-red-200' },
-  needs_review: { label: 'Needs Review', className: 'bg-amber-50 text-amber-700 border-amber-200' },
+  pending: { label: 'Pending', className: 'bg-muted text-muted-foreground border-border' },
+  qualified: { label: 'Qualified', className: 'bg-emerald-950/30 text-emerald-400 border-emerald-500/20' },
+  not_qualified: { label: 'Not Qualified', className: 'bg-red-950/30 text-red-600 border-red-500/20' },
+  needs_review: { label: 'Needs Review', className: 'bg-amber-950/30 text-amber-400 border-amber-500/20' },
 }
 
 // ─── Component ──────────────────────────────────────────────────────────────
@@ -133,12 +133,12 @@ export function LeadSummaryCard({ lead, contact, practiceArea, users }: LeadSumm
 
         {/* Follow-Up */}
         {lead.next_follow_up && (
-          <div className={`flex items-center gap-2 rounded-md px-3 py-2 text-sm ${followUpOverdue ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-muted/50 text-foreground'}`}>
+          <div className={`flex items-center gap-2 rounded-md px-3 py-2 text-sm ${followUpOverdue ? 'bg-red-950/30 text-red-400 border border-red-500/20' : 'bg-muted/50 text-foreground'}`}>
             <Calendar className={`h-4 w-4 shrink-0 ${followUpOverdue ? 'text-red-500' : 'text-muted-foreground'}`} />
             <span className="font-medium">Follow-up:</span>
             <span>{formatRelativeDate(lead.next_follow_up)}</span>
             {followUpOverdue && (
-              <Badge variant="outline" size="xs" className="ml-auto bg-red-50 text-red-600 border-red-200">
+              <Badge variant="outline" size="xs" className="ml-auto bg-red-950/30 text-red-600 border-red-500/20">
                 Overdue
               </Badge>
             )}
@@ -202,7 +202,7 @@ function AssignmentRow({ label, user }: { label: string; user: UserRow }) {
   return (
     <div className="flex items-center gap-2">
       <Avatar size="sm">
-        <AvatarFallback className="text-[10px] bg-slate-100">
+        <AvatarFallback className="text-[10px] bg-muted">
           {formatInitials(user.first_name, user.last_name)}
         </AvatarFallback>
       </Avatar>

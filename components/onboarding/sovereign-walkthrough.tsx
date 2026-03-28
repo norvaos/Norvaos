@@ -146,7 +146,7 @@ export function SovereignWalkthrough({ open, onComplete }: SovereignWalkthroughP
       transition={{ duration: 0.3 }}
     >
       {/* Full-screen blur backdrop */}
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-3xl" />
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-xl" />
 
       {/* Card */}
       <motion.div
@@ -154,13 +154,13 @@ export function SovereignWalkthrough({ open, onComplete }: SovereignWalkthroughP
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.9, y: 30 }}
         transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-        className="relative z-10 mx-4 flex w-full max-w-lg flex-col overflow-hidden rounded-3xl border border-white/[0.08] bg-zinc-950/95 shadow-2xl backdrop-blur-xl"
+        className="relative z-10 mx-4 flex w-full max-w-lg flex-col overflow-hidden rounded-3xl border border-border bg-background/95 shadow-2xl backdrop-blur-xl"
       >
         {/* Skip button */}
         <button
           type="button"
           onClick={onComplete}
-          className="absolute right-4 top-4 z-20 rounded-full px-3 py-1.5 text-[10px] font-medium uppercase tracking-wider text-white/40 transition-colors hover:bg-white/[0.06] hover:text-white"
+          className="absolute right-4 top-4 z-20 rounded-full px-3 py-1.5 text-[10px] font-medium uppercase tracking-wider text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
         >
           Skip Tour
         </button>
@@ -172,9 +172,9 @@ export function SovereignWalkthrough({ open, onComplete }: SovereignWalkthroughP
             initial={{ scale: 0.5, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.15, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-            className="flex h-20 w-20 items-center justify-center rounded-2xl border border-white/[0.1] bg-white/[0.06] backdrop-blur-lg"
+            className="flex h-20 w-20 items-center justify-center rounded-2xl border border-border bg-background/50 backdrop-blur-lg"
           >
-            <SlideIcon className="h-10 w-10 text-white/80" />
+            <SlideIcon className="h-10 w-10 text-foreground/80" />
           </motion.div>
         </div>
 
@@ -189,13 +189,13 @@ export function SovereignWalkthrough({ open, onComplete }: SovereignWalkthroughP
               exit={exitVariant}
               transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
             >
-              <p className="text-[10px] font-medium uppercase tracking-[0.2em] text-emerald-400/80">
+              <p className="text-[10px] font-medium uppercase tracking-[0.2em] text-emerald-500">
                 {slide.subtitle}
               </p>
-              <h2 className="mt-1.5 text-xl font-semibold tracking-tight text-white">
+              <h2 className="mt-1.5 text-xl font-semibold tracking-tight text-foreground">
                 {slide.title}
               </h2>
-              <p className="mt-3 text-sm leading-relaxed text-white/60">
+              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
                 {slide.body}
               </p>
             </motion.div>
@@ -218,7 +218,7 @@ export function SovereignWalkthrough({ open, onComplete }: SovereignWalkthroughP
                   'h-1.5 rounded-full transition-all duration-300',
                   i === current
                     ? 'w-6 bg-emerald-500'
-                    : 'w-1.5 bg-white/20 hover:bg-white/30',
+                    : 'w-1.5 bg-muted-foreground/30 hover:bg-muted-foreground/50',
                 )}
               />
             ))}
@@ -230,7 +230,7 @@ export function SovereignWalkthrough({ open, onComplete }: SovereignWalkthroughP
               <button
                 type="button"
                 onClick={goBack}
-                className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/[0.1] text-white/50 transition-colors hover:bg-white/[0.06] hover:text-white"
+                className="flex h-10 w-10 items-center justify-center rounded-xl border border-border text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
               >
                 <ArrowLeft className="h-4 w-4" />
               </button>
@@ -243,7 +243,7 @@ export function SovereignWalkthrough({ open, onComplete }: SovereignWalkthroughP
                 'flex items-center gap-2 rounded-xl px-5 py-2.5 text-xs font-semibold uppercase tracking-wide transition-all',
                 isLast
                   ? 'bg-gradient-to-r from-emerald-600 to-emerald-500 text-white shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40'
-                  : 'bg-white/[0.08] text-white/80 hover:bg-white/[0.12] hover:text-white',
+                  : 'bg-muted text-foreground/80 hover:bg-muted/80 hover:text-foreground',
               )}
             >
               {isLast ? (

@@ -183,7 +183,7 @@ export function ComplianceGateModal({
                 )}
 
                 {!isOwner && (
-                  <Badge variant="outline" className="mt-2 text-[10px] text-slate-500 border-slate-300">
+                  <Badge variant="outline" className="mt-2 text-[10px] text-muted-foreground border-border">
                     Requires Owner role
                   </Badge>
                 )}

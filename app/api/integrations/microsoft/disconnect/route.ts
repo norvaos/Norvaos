@@ -7,7 +7,8 @@ import { withTiming } from '@/lib/middleware/request-timing'
 /**
  * POST /api/integrations/microsoft/disconnect
  *
- * Disconnects the user's Microsoft account (soft-delete).
+ * Fully disconnects the user's Microsoft account (hard-delete).
+ * Removes the microsoft_connections row and deactivates email_accounts.
  */
 async function handlePost() {
   try {
@@ -15,25 +16,28 @@ async function handlePost() {
     requirePermission(auth, 'settings', 'edit')
     const admin = createAdminClient()
 
-    // Soft-delete the connection
-    // Note: microsoft_connections is 1:1 with users (unique on user_id),
-    // so filtering by user_id alone is sufficient and avoids tenant_id mismatches.
-    const { error: updateError } = await admin
+    // Hard-delete the microsoft_connections row so reconnect starts fresh
+    const { error: deleteError } = await admin
       .from('microsoft_connections')
-      .update({
-        is_active: false,
-        calendar_sync_enabled: false,
-        tasks_sync_enabled: false,
-        onedrive_enabled: false,
-        updated_at: new Date().toISOString(),
-      })
+      .delete()
       .eq('user_id', auth.userId)
 
-    if (updateError) {
-      throw updateError
+    if (deleteError) {
+      console.error('[microsoft/disconnect] delete error:', deleteError)
+      // Fallback to soft-delete if hard-delete fails (e.g. FK constraints)
+      await admin
+        .from('microsoft_connections')
+        .update({
+          is_active: false,
+          calendar_sync_enabled: false,
+          tasks_sync_enabled: false,
+          onedrive_enabled: false,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('user_id', auth.userId)
     }
 
-    // Also deactivate email accounts for this user so email sync stops
+    // Deactivate email accounts for this user so email sync stops
     await admin
       .from('email_accounts')
       .update({

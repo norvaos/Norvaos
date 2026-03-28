@@ -26,7 +26,7 @@ async function handleGet(
   const ip = headersList.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
   const userAgent = headersList.get('user-agent') ?? undefined
 
-  const rateLimitResult = rateLimiter.check(ip)
+  const rateLimitResult = await rateLimiter.check(ip)
   if (!rateLimitResult.allowed) {
     return notFoundResponse()
   }

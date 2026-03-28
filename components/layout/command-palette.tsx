@@ -139,9 +139,24 @@ export function CommandPalette() {
           </div>
         )}
 
-        {/* No results for query */}
+        {/* No results — show "Create New Lead" action at top */}
         {!isSearching && hasQuery && !hasResults && (
-          <CommandEmpty>{(t as any)('common.noResultsFor', { query })}</CommandEmpty>
+          <>
+            <CommandEmpty>{(t as any)('common.noResultsFor', { query })}</CommandEmpty>
+            <CommandGroup heading="Quick Actions">
+              <CommandItem
+                onSelect={() => runAction(() => openModal('create-lead-quick', { prefillName: query.trim() }))}
+              >
+                <Plus className="mr-2 size-4 text-emerald-500" />
+                <div className="flex flex-col">
+                  <span className="text-sm font-medium">Create New Lead</span>
+                  <span className="text-xs text-muted-foreground">
+                    Start a new engagement{query.trim() ? ` for "${query.trim()}"` : ''}
+                  </span>
+                </div>
+              </CommandItem>
+            </CommandGroup>
+          </>
         )}
 
         {/* Search Results */}

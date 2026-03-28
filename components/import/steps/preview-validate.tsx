@@ -75,12 +75,12 @@ export function PreviewValidate({
           <p className="text-2xl font-bold text-slate-900">{totalRows}</p>
           <p className="text-[10px] uppercase tracking-wider text-slate-400">Total Rows</p>
         </div>
-        <div className="rounded-lg border bg-green-50 border-green-200 px-4 py-2 text-center">
-          <p className="text-2xl font-bold text-green-700">{validRows}</p>
+        <div className="rounded-lg border bg-emerald-950/30 border-green-200 px-4 py-2 text-center">
+          <p className="text-2xl font-bold text-emerald-400">{validRows}</p>
           <p className="text-[10px] uppercase tracking-wider text-green-600">Valid</p>
         </div>
         {invalidRows > 0 && (
-          <div className="rounded-lg border bg-red-50 border-red-200 px-4 py-2 text-center">
+          <div className="rounded-lg border bg-red-950/30 border-red-200 px-4 py-2 text-center">
             <p className="text-2xl font-bold text-red-700">{invalidRows}</p>
             <p className="text-[10px] uppercase tracking-wider text-red-600">Errors</p>
           </div>
@@ -115,7 +115,7 @@ export function PreviewValidate({
 
       {/* Errors */}
       {errors.length > 0 && (
-        <div className="rounded-lg border border-red-200 bg-red-50 p-4 space-y-2">
+        <div className="rounded-lg border border-red-200 bg-red-950/30 p-4 space-y-2">
           <div className="flex items-center justify-between">
             <p className="text-xs font-medium text-red-800">Validation errors:</p>
             {batchId && (
@@ -170,7 +170,7 @@ export function PreviewValidate({
                     {row.isDuplicate ? (
                       <Badge variant="secondary" className="text-[10px]">Duplicate</Badge>
                     ) : (
-                      <Badge variant="outline" className="text-[10px] text-green-700 border-green-300">Valid</Badge>
+                      <Badge variant="outline" className="text-[10px] text-emerald-400 border-green-300">Valid</Badge>
                     )}
                   </TableCell>
                 </TableRow>

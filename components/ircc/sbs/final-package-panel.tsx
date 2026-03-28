@@ -124,8 +124,8 @@ export function FinalPackagePanel({ matterId, tenantId }: FinalPackagePanelProps
         {/* Approved packs first */}
         {approvedVersions.length > 0 && (
           <div>
-            <div className="px-3 py-1.5 bg-emerald-50/50 dark:bg-emerald-950/10 border-b">
-              <span className="text-[10px] font-medium uppercase tracking-wider text-emerald-700 dark:text-emerald-400">
+            <div className="px-3 py-1.5 bg-emerald-950/20 dark:bg-emerald-950/10 border-b">
+              <span className="text-[10px] font-medium uppercase tracking-wider text-emerald-400 dark:text-emerald-400">
                 Approved  -  Ready to Submit
               </span>
             </div>

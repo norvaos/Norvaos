@@ -50,19 +50,19 @@ const STATUS_CONFIG: Record<SlotStatus, {
     label: 'Empty',
     variant: 'outline',
     icon: AlertCircle,
-    className: 'border-amber-300 text-amber-700 bg-amber-50',
+    className: 'border-amber-300 text-amber-400 bg-amber-950/30',
   },
   pending_review: {
     label: 'Pending Review',
     variant: 'outline',
     icon: Clock,
-    className: 'border-blue-300 text-blue-700 bg-blue-50',
+    className: 'border-blue-300 text-blue-400 bg-blue-950/30',
   },
   accepted: {
     label: 'Accepted',
     variant: 'outline',
     icon: CheckCircle2,
-    className: 'border-green-300 text-green-700 bg-green-50',
+    className: 'border-green-300 text-emerald-400 bg-emerald-950/30',
   },
   needs_re_upload: {
     label: 'Needs Re-upload',
@@ -165,9 +165,9 @@ export function DocumentStatusPanel({ matterId }: DocumentStatusPanelProps) {
 
   const progressColor =
     stats.progressPct >= 80
-      ? '[&_[data-slot=progress-indicator]]:bg-green-500'
+      ? '[&_[data-slot=progress-indicator]]:bg-emerald-950/300'
       : stats.progressPct >= 50
-        ? '[&_[data-slot=progress-indicator]]:bg-amber-500'
+        ? '[&_[data-slot=progress-indicator]]:bg-amber-950/300'
         : '[&_[data-slot=progress-indicator]]:bg-red-500'
 
   return (

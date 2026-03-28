@@ -43,10 +43,10 @@ function useMatterDocumentSlots(matterId: string, tenantId: string) {
 // ─── Status config ──────────────────────────────────────────────────
 
 const SLOT_STATUS: Record<string, { label: string; icon: React.ReactNode; color: string }> = {
-  pending: { label: 'Pending', icon: <File className="h-3.5 w-3.5" />, color: 'text-amber-600 bg-amber-50 border-amber-200' },
-  uploaded: { label: 'Uploaded', icon: <FileCheck className="h-3.5 w-3.5" />, color: 'text-blue-600 bg-blue-50 border-blue-200' },
-  approved: { label: 'Approved', icon: <CheckCircle2 className="h-3.5 w-3.5" />, color: 'text-green-600 bg-green-50 border-green-200' },
-  rejected: { label: 'Rejected', icon: <FileX2 className="h-3.5 w-3.5" />, color: 'text-red-600 bg-red-50 border-red-200' },
+  pending: { label: 'Pending', icon: <File className="h-3.5 w-3.5" />, color: 'text-amber-600 bg-amber-950/30 border-amber-200' },
+  uploaded: { label: 'Uploaded', icon: <FileCheck className="h-3.5 w-3.5" />, color: 'text-blue-600 bg-blue-950/30 border-blue-200' },
+  approved: { label: 'Approved', icon: <CheckCircle2 className="h-3.5 w-3.5" />, color: 'text-green-600 bg-emerald-950/30 border-green-200' },
+  rejected: { label: 'Rejected', icon: <FileX2 className="h-3.5 w-3.5" />, color: 'text-red-600 bg-red-950/30 border-red-200' },
   not_applicable: { label: 'N/A', icon: <File className="h-3.5 w-3.5" />, color: 'text-slate-400 bg-slate-50 border-slate-200' },
 }
 
@@ -114,7 +114,7 @@ export function DocumentStatusPanel() {
               </div>
               <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-green-500 rounded-full transition-all"
+                  className="h-full bg-emerald-950/300 rounded-full transition-all"
                   style={{ width: `${(completed / total) * 100}%` }}
                 />
               </div>
@@ -122,17 +122,17 @@ export function DocumentStatusPanel() {
 
             {/* Warnings */}
             {pending > 0 && (
-              <div className="flex items-center gap-2 p-2 bg-amber-50 rounded-md border border-amber-200">
+              <div className="flex items-center gap-2 p-2 bg-amber-950/30 rounded-md border border-amber-200">
                 <AlertTriangle className="h-4 w-4 text-amber-600 shrink-0" />
-                <span className="text-xs text-amber-700">
+                <span className="text-xs text-amber-400">
                   {pending} required document{pending > 1 ? 's' : ''} still pending
                 </span>
               </div>
             )}
             {rejected > 0 && (
-              <div className="flex items-center gap-2 p-2 bg-red-50 rounded-md border border-red-200">
+              <div className="flex items-center gap-2 p-2 bg-red-950/30 rounded-md border border-red-200">
                 <FileX2 className="h-4 w-4 text-red-600 shrink-0" />
-                <span className="text-xs text-red-700">
+                <span className="text-xs text-red-400">
                   {rejected} document{rejected > 1 ? 's' : ''} rejected  -  needs resubmission
                 </span>
               </div>
@@ -154,7 +154,7 @@ export function DocumentStatusPanel() {
                         <div
                           key={slot.id}
                           className={`flex items-center justify-between p-2 rounded-md text-xs ${
-                            isMissing ? 'bg-amber-50/50 border border-amber-100' : 'hover:bg-slate-50'
+                            isMissing ? 'bg-amber-950/30/50 border border-amber-100' : 'hover:bg-slate-50'
                           }`}
                         >
                           <div className="flex items-center gap-2">

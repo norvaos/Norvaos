@@ -108,10 +108,10 @@ export default function LegalAssistantWorkspace() {
 
   const stageColour = (status: string) => {
     switch (status) {
-      case 'open': return 'bg-blue-100 text-blue-700'
-      case 'active': return 'bg-green-100 text-green-700'
-      case 'pending': return 'bg-yellow-100 text-yellow-700'
-      case 'on_hold': return 'bg-orange-100 text-orange-700'
+      case 'open': return 'bg-blue-950/40 text-blue-400'
+      case 'active': return 'bg-emerald-950/40 text-emerald-400'
+      case 'pending': return 'bg-yellow-950/40 text-yellow-400'
+      case 'on_hold': return 'bg-orange-950/40 text-orange-400'
       default: return 'bg-gray-100 text-gray-600'
     }
   }
@@ -275,7 +275,7 @@ export default function LegalAssistantWorkspace() {
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   const stage = row.matter_stages as any
                   return (
-                    <li key={row.id} className="flex items-center justify-between rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm">
+                    <li key={row.id} className="flex items-center justify-between rounded-md border border-amber-500/20 bg-amber-950/30 px-3 py-2 text-sm">
                       <div className="min-w-0">
                         <p className="font-medium truncate">
                           {matter?.title ?? row.matter_id}

@@ -90,10 +90,10 @@ export default function AdminWorkspace() {
   })()
 
   const activityTypeColour = (type: string) => {
-    if (type.includes('error')) return 'bg-red-100 text-red-600'
-    if (type.includes('create')) return 'bg-green-100 text-green-600'
-    if (type.includes('delete')) return 'bg-red-100 text-red-600'
-    if (type.includes('update') || type.includes('edit')) return 'bg-blue-100 text-blue-600'
+    if (type.includes('error')) return 'bg-red-950/40 text-red-600'
+    if (type.includes('create')) return 'bg-emerald-950/40 text-green-600'
+    if (type.includes('delete')) return 'bg-red-950/40 text-red-600'
+    if (type.includes('update') || type.includes('edit')) return 'bg-blue-950/40 text-blue-600'
     return 'bg-gray-100 text-gray-600'
   }
 

@@ -42,7 +42,7 @@ export async function POST(request: Request, { params }: RouteParams) {
     requirePermission(auth, 'form_packs', 'view')
 
     // Rate limit by userId
-    const { allowed, retryAfterMs } = previewLimiter.check(auth.userId)
+    const { allowed, retryAfterMs } = await previewLimiter.check(auth.userId)
     if (!allowed) {
       return NextResponse.json(
         { error: 'Too many preview requests. Please wait before trying again.' },

@@ -188,7 +188,7 @@ export function UnifiedFormsQuestionsSection({
                   <Button
                     variant="outline"
                     size="sm"
-                    className="h-7 gap-1.5 text-xs text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700"
+                    className="h-7 gap-1.5 text-xs text-red-600 border-red-500/20 hover:bg-red-950/30 hover:text-red-400"
                     onClick={() => setBulkDeleteOpen(true)}
                   >
                     <Trash2 className="h-3 w-3" />
@@ -416,9 +416,9 @@ function AssignedFormRow({
                   <Badge
                     variant="outline"
                     className={cn(
-                      'text-[10px] gap-1 h-5 cursor-pointer hover:bg-blue-50 transition-colors',
+                      'text-[10px] gap-1 h-5 cursor-pointer hover:bg-blue-950/30 transition-colors',
                       questionsEnabled
-                        ? 'text-emerald-600 border-emerald-200 bg-emerald-50 hover:border-emerald-300'
+                        ? 'text-emerald-600 border-emerald-500/20 bg-emerald-950/30 hover:border-emerald-500/30'
                         : 'text-slate-400 border-slate-200 bg-slate-50 hover:border-slate-300'
                     )}
                   >
@@ -438,7 +438,7 @@ function AssignedFormRow({
                     checked={questionsEnabled}
                     onCheckedChange={handleToggleQuestions}
                     disabled={toggleMutation.isPending}
-                    className="h-4 w-7 data-[state=checked]:bg-emerald-500"
+                    className="h-4 w-7 data-[state=checked]:bg-emerald-950/300"
                   />
                   <span className="text-[10px] text-slate-400">
                     {questionsEnabled ? 'Questions on' : 'Questions off'}
@@ -648,7 +648,7 @@ function AddFormDialog({
           />
         </div>
 
-        <div className="flex items-center gap-2 rounded-lg bg-blue-50 border border-blue-100 px-3 py-2">
+        <div className="flex items-center gap-2 rounded-lg bg-blue-950/30 border border-blue-100 px-3 py-2">
           <AlertCircle className="h-3.5 w-3.5 text-blue-500 shrink-0" />
           <p className="text-xs text-blue-600">
             Questions are automatically enabled when available for the selected form.
@@ -684,7 +684,7 @@ function AddFormDialog({
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-medium text-slate-900">{form.form_code}</span>
                       {stats && (
-                        <Badge variant="outline" className="text-[10px] gap-1 text-emerald-600 border-emerald-200 bg-emerald-50 h-4">
+                        <Badge variant="outline" className="text-[10px] gap-1 text-emerald-600 border-emerald-500/20 bg-emerald-950/30 h-4">
                           <ClipboardList className="h-2 w-2" />
                           {stats.sectionCount} sections
                         </Badge>

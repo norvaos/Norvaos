@@ -27,12 +27,12 @@ import { cn } from '@/lib/utils'
 // ── Status type labels & colours ──────────────────────────────────────────────
 
 const STATUS_TYPE_CONFIG: Record<string, { label: string; color: string; bg: string; border: string }> = {
-  work_permit:  { label: 'Work Permit',  color: 'text-blue-700',   bg: 'bg-blue-50',   border: 'border-blue-200' },
+  work_permit:  { label: 'Work Permit',  color: 'text-blue-400',   bg: 'bg-blue-950/30',   border: 'border-blue-500/20' },
   study_permit: { label: 'Study Permit', color: 'text-indigo-700', bg: 'bg-indigo-50', border: 'border-indigo-200' },
-  pr:           { label: 'PR Card',      color: 'text-green-700',  bg: 'bg-green-50',  border: 'border-green-200' },
-  citizenship:  { label: 'Citizenship',  color: 'text-emerald-700',bg: 'bg-emerald-50',border: 'border-emerald-200' },
-  visa:         { label: 'Visa',         color: 'text-purple-700', bg: 'bg-purple-50', border: 'border-purple-200' },
-  passport:     { label: 'Passport',     color: 'text-amber-700',  bg: 'bg-amber-50',  border: 'border-amber-200' },
+  pr:           { label: 'PR Card',      color: 'text-emerald-400',  bg: 'bg-emerald-950/30',  border: 'border-green-200' },
+  citizenship:  { label: 'Citizenship',  color: 'text-emerald-400',bg: 'bg-emerald-950/30',border: 'border-emerald-500/20' },
+  visa:         { label: 'Visa',         color: 'text-purple-400', bg: 'bg-purple-950/30', border: 'border-purple-200' },
+  passport:     { label: 'Passport',     color: 'text-amber-400',  bg: 'bg-amber-950/30',  border: 'border-amber-200' },
 }
 
 function getStatusConfig(type: string) {
@@ -41,8 +41,8 @@ function getStatusConfig(type: string) {
 
 function getUrgencyBadge(days: number) {
   if (days <= 30) return { label: `${days}d`, variant: 'destructive' as const, cls: '' }
-  if (days <= 90) return { label: `${days}d`, variant: 'outline' as const, cls: 'text-amber-700 border-amber-300' }
-  if (days <= 365) return { label: `${Math.ceil(days / 30)}mo`, variant: 'outline' as const, cls: 'text-blue-700 border-blue-200' }
+  if (days <= 90) return { label: `${days}d`, variant: 'outline' as const, cls: 'text-amber-400 border-amber-300' }
+  if (days <= 365) return { label: `${Math.ceil(days / 30)}mo`, variant: 'outline' as const, cls: 'text-blue-400 border-blue-500/20' }
   return { label: `${Math.round(days / 365)}yr`, variant: 'outline' as const, cls: 'text-slate-500 border-slate-200' }
 }
 
@@ -56,7 +56,7 @@ function TimelineYearGroup({ year, entries }: { year: number; entries: GuardianT
       {/* Year marker */}
       <div className="sticky top-0 z-10 bg-white/95 backdrop-blur-sm border-b border-slate-100 px-4 py-2 flex items-center gap-2">
         <Calendar className="h-4 w-4 text-muted-foreground" />
-        <span className={cn('text-sm font-semibold', isCurrentYear ? 'text-blue-700' : 'text-slate-600')}>
+        <span className={cn('text-sm font-semibold', isCurrentYear ? 'text-blue-400' : 'text-slate-600')}>
           {year}
         </span>
         <Badge variant="outline" className="text-[10px] ml-auto">
@@ -85,7 +85,7 @@ function TimelineYearGroup({ year, entries }: { year: number; entries: GuardianT
               {/* Contact name */}
               <Link
                 href={`/contacts/${entry.contact_id}`}
-                className="text-sm font-medium text-blue-700 hover:underline truncate min-w-0 flex-1"
+                className="text-sm font-medium text-blue-400 hover:underline truncate min-w-0 flex-1"
               >
                 {entry.contact_name}
               </Link>
@@ -99,7 +99,7 @@ function TimelineYearGroup({ year, entries }: { year: number; entries: GuardianT
 
               {/* Matter link */}
               {entry.matter_id && (
-                <Link href={`/matters/${entry.matter_id}`} className="text-muted-foreground hover:text-blue-700">
+                <Link href={`/matters/${entry.matter_id}`} className="text-muted-foreground hover:text-blue-400">
                   <ExternalLink className="h-3 w-3" />
                 </Link>
               )}
@@ -156,7 +156,7 @@ function BirthdaysCard({ tenantId }: { tenantId: string }) {
             {birthdays.slice(0, 15).map((b) => (
               <div key={b.contact_id} className="flex items-center justify-between rounded-md px-2 py-1.5 hover:bg-slate-50">
                 <div className="flex items-center gap-2 min-w-0">
-                  <Link href={`/contacts/${b.contact_id}`} className="text-sm font-medium text-blue-700 hover:underline truncate">
+                  <Link href={`/contacts/${b.contact_id}`} className="text-sm font-medium text-blue-400 hover:underline truncate">
                     {b.contact_name}
                   </Link>
                   <span className="text-xs text-muted-foreground">
@@ -253,7 +253,7 @@ export default function GuardianDashboardPage() {
               <AlertTriangle className="h-3 w-3 text-red-500" />
               Expiring in 30 Days
             </p>
-            <p className={cn('text-2xl font-bold tabular-nums', expiring30 > 0 ? 'text-red-700' : '')}>
+            <p className={cn('text-2xl font-bold tabular-nums', expiring30 > 0 ? 'text-red-400' : '')}>
               {expiring30}
             </p>
           </CardContent>
@@ -264,7 +264,7 @@ export default function GuardianDashboardPage() {
               <Clock className="h-3 w-3 text-amber-500" />
               Expiring in 90 Days
             </p>
-            <p className={cn('text-2xl font-bold tabular-nums', expiring90 > 0 ? 'text-amber-700' : '')}>
+            <p className={cn('text-2xl font-bold tabular-nums', expiring90 > 0 ? 'text-amber-400' : '')}>
               {expiring90}
             </p>
           </CardContent>

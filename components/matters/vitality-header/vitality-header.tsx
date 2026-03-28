@@ -74,11 +74,11 @@ function MiniScoreRing({ score }: { score: number }) {
 function riskBadgeClass(level: string): string {
   switch (level) {
     case 'low':
-      return 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400'
+      return 'bg-emerald-950/30 text-emerald-400 dark:bg-green-900/40 dark:text-green-400'
     case 'medium':
-      return 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400'
+      return 'bg-amber-950/30 text-amber-400 dark:bg-amber-900/40 dark:text-amber-400'
     case 'high':
-      return 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400'
+      return 'bg-red-950/40 text-red-400 dark:bg-red-900/40 dark:text-red-400'
     case 'critical':
       return 'bg-red-200 text-red-900 dark:bg-red-900/60 dark:text-red-300'
     default:

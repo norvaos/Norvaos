@@ -42,6 +42,21 @@ export interface StaleLead {
   engagement_score: number | null
 }
 
+export interface ExpiredSnoozeLead {
+  lead_id: string
+  contact_id: string | null
+  contact_first_name: string | null
+  contact_last_name: string | null
+  contact_email: string | null
+  assigned_to: string | null
+  assigned_user_name: string | null
+  lead_status: string | null
+  current_stage: string | null
+  snooze_until: string
+  snoozed_at: string | null
+  hours_overdue: number
+}
+
 // ---------------------------------------------------------------------------
 // Query Keys
 // ---------------------------------------------------------------------------
@@ -50,6 +65,7 @@ export const radarKeys = {
   all: ['principal-radar'] as const,
   overrides: (tenantId: string) => [...radarKeys.all, 'overrides', tenantId] as const,
   stale: (tenantId: string) => [...radarKeys.all, 'stale', tenantId] as const,
+  expiredSnoozes: (tenantId: string) => [...radarKeys.all, 'expired-snoozes', tenantId] as const,
 }
 
 // ---------------------------------------------------------------------------
@@ -223,6 +239,73 @@ export function useStaleLeads(tenantId: string) {
 }
 
 // ---------------------------------------------------------------------------
+// Expired Snoozes  -  Smart Pause leads whose snooze_until has passed
+// ---------------------------------------------------------------------------
+
+export function useExpiredSnoozeLeads(tenantId: string) {
+  return useQuery({
+    queryKey: radarKeys.expiredSnoozes(tenantId),
+    queryFn: async () => {
+      const supabase = createClient()
+
+      // Fetch snoozed leads whose snooze_until is in the past
+      const { data: leads, error } = await supabase
+        .from('leads')
+        .select('id, contact_id, assigned_to, status, current_stage, snooze_until, snoozed_at, engagement_score')
+        .eq('tenant_id', tenantId)
+        .eq('visibility_status', 'snoozed')
+        .lt('snooze_until', new Date().toISOString())
+        .order('snooze_until', { ascending: true })
+        .limit(50)
+
+      if (error) throw error
+      if (!leads || leads.length === 0) return [] as ExpiredSnoozeLead[]
+
+      // Batch fetch contacts
+      const contactIds = [...new Set(leads.map((l) => l.contact_id).filter(Boolean))] as string[]
+      const { data: contacts } = contactIds.length > 0
+        ? await supabase.from('contacts').select('id, first_name, last_name, email_primary').in('id', contactIds)
+        : { data: [] }
+      const contactsMap = new Map((contacts ?? []).map((c) => [c.id, c]))
+
+      // Batch fetch assigned users
+      const assignedIds = [...new Set(leads.map((l) => l.assigned_to).filter(Boolean))] as string[]
+      const { data: users } = assignedIds.length > 0
+        ? await supabase.from('users').select('id, first_name, last_name').in('id', assignedIds)
+        : { data: [] }
+      const usersMap = new Map((users ?? []).map((u) => [u.id, u]))
+
+      return leads.map((l): ExpiredSnoozeLead => {
+        const contact = l.contact_id ? contactsMap.get(l.contact_id) : null
+        const assignedUser = l.assigned_to ? usersMap.get(l.assigned_to) : null
+        const hoursOverdue = l.snooze_until
+          ? Math.round((Date.now() - new Date(l.snooze_until).getTime()) / (1000 * 60 * 60))
+          : 0
+
+        return {
+          lead_id: l.id,
+          contact_id: l.contact_id,
+          contact_first_name: contact?.first_name ?? null,
+          contact_last_name: contact?.last_name ?? null,
+          contact_email: contact?.email_primary ?? null,
+          assigned_to: l.assigned_to ?? null,
+          assigned_user_name: assignedUser
+            ? [assignedUser.first_name, assignedUser.last_name].filter(Boolean).join(' ')
+            : null,
+          lead_status: l.status ?? null,
+          current_stage: l.current_stage ?? null,
+          snooze_until: l.snooze_until!,
+          snoozed_at: l.snoozed_at ?? null,
+          hours_overdue: hoursOverdue,
+        }
+      })
+    },
+    enabled: !!tenantId,
+    staleTime: 1000 * 60 * 2,
+  })
+}
+
+// ---------------------------------------------------------------------------
 // Nudge Mutation  -  sends in-app notification to assigned staff
 // ---------------------------------------------------------------------------
 
@@ -248,6 +331,17 @@ export function useNudgeStaff() {
         ? `Lead "${input.contactName}" has had no activity for over 48 hours. Immediate follow-up required.`
         : `Lead "${input.contactName}" has an overridden gate${input.detail ? `: ${input.detail}` : ''}. Review and resolve.`
 
+      // 1. Update last_nudged_at on the lead
+      const { error: nudgeErr } = await supabase
+        .from('leads')
+        .update({ last_nudged_at: new Date().toISOString() })
+        .eq('id', input.leadId)
+
+      if (nudgeErr) throw nudgeErr
+
+      // 2. Dispatch high-priority notification to assigned staff
+      //    metadata.flash_stage = 'strategy' tells the UI to pulse
+      //    the Stage 4 (Strategy) node in the staff's Golden Thread
       const { data, error } = await supabase
         .from('notifications')
         .insert({
@@ -260,6 +354,11 @@ export function useNudgeStaff() {
           entity_id: input.leadId,
           channels: ['in_app'],
           priority: 'high',
+          metadata: {
+            flash_stage: 'strategy',
+            nudged_by: 'principal',
+            reason: input.reason,
+          },
         })
         .select('id')
         .single()
@@ -267,8 +366,10 @@ export function useNudgeStaff() {
       if (error) throw error
       return data
     },
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
       toast.success('Nudge sent — staff member notified')
+      // Invalidate radar queries so the UI reflects the update
+      qc.invalidateQueries({ queryKey: radarKeys.all })
     },
     onError: () => {
       toast.error('Failed to send nudge notification')

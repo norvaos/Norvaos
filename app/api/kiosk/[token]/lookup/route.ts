@@ -24,7 +24,7 @@ async function handlePost(
     const { token } = await params
 
     // Rate limit: 30 req/min per token+IP
-    const rateLimitResponse = checkKioskRateLimit(request, token)
+    const rateLimitResponse = await checkKioskRateLimit(request, token)
     if (rateLimitResponse) return rateLimitResponse
 
     // 1. Validate kiosk token
@@ -131,7 +131,7 @@ async function handlePut(
     const { token } = await params
 
     // Rate limit: 30 req/min per token+IP
-    const rateLimitResponse = checkKioskRateLimit(request, token)
+    const rateLimitResponse = await checkKioskRateLimit(request, token)
     if (rateLimitResponse) return rateLimitResponse
 
     const result = await validateKioskToken(token)

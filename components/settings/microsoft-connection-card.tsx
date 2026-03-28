@@ -14,7 +14,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
-import { Loader2, Plug, Unplug } from 'lucide-react'
+import { Loader2, Plug, RefreshCw, Unplug } from 'lucide-react'
+import { cn } from '@/lib/utils'
 import {
   useMicrosoftConnection,
   useDisconnectMicrosoft,
@@ -76,9 +77,19 @@ export function MicrosoftConnectionCard({ userId }: MicrosoftConnectionCardProps
     )
   }
 
+  const hasErrors = connection.error_count > 0 || !connection.is_active
+  const allSyncsHealthy =
+    connection.calendar_sync_enabled && connection.is_active && connection.error_count === 0
+
+  const glowClass = allSyncsHealthy
+    ? 'ring-2 ring-emerald-500/40 shadow-[0_0_15px_rgba(16,185,129,0.15)]'
+    : hasErrors
+      ? 'ring-2 ring-amber-500/40 shadow-[0_0_15px_rgba(245,158,11,0.15)]'
+      : ''
+
   return (
     <>
-      <Card>
+      <Card className={cn(glowClass)}>
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
@@ -88,6 +99,15 @@ export function MicrosoftConnectionCard({ userId }: MicrosoftConnectionCardProps
                 <Badge variant="default" className="bg-green-600 text-xs">
                   Connected
                 </Badge>
+                {hasErrors ? (
+                  <Badge variant="outline" className="border-amber-500/50 text-amber-600 dark:text-amber-400 text-xs">
+                    Sync Issue
+                  </Badge>
+                ) : (
+                  <Badge variant="outline" className="border-emerald-500/50 text-emerald-600 dark:text-emerald-400 text-xs">
+                    Mail &amp; Calendar Synced
+                  </Badge>
+                )}
               </CardTitle>
               <CardDescription className="mt-1">
                 {connection.microsoft_display_name && (
@@ -97,15 +117,28 @@ export function MicrosoftConnectionCard({ userId }: MicrosoftConnectionCardProps
                 {connection.microsoft_email}
               </CardDescription>
             </div>
-            <Button
-              variant="outline"
-              size="sm"
-              className="gap-1.5 text-destructive hover:text-destructive"
-              onClick={() => setShowDisconnectDialog(true)}
-            >
-              <Unplug className="h-3.5 w-3.5" />
-              Disconnect
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-1.5"
+                onClick={() => {
+                  window.location.href = '/api/integrations/microsoft/connect'
+                }}
+              >
+                <RefreshCw className="h-3.5 w-3.5" />
+                Reconnect
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-1.5 text-destructive hover:text-destructive"
+                onClick={() => setShowDisconnectDialog(true)}
+              >
+                <Unplug className="h-3.5 w-3.5" />
+                Disconnect
+              </Button>
+            </div>
           </div>
         </CardHeader>
         {connection.error_count > 0 && connection.last_error && (

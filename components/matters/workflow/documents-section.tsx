@@ -405,15 +405,15 @@ function DocumentsDetailView({
     <div className="space-y-4">
       {/* Bulk accept bar */}
       {pendingSlotIds.length >= 2 && (
-        <div className="flex items-center gap-3 rounded-md border border-blue-200 bg-blue-50 px-3 py-2">
-          <span className="text-xs font-medium text-blue-700">
+        <div className="flex items-center gap-3 rounded-md border border-blue-200 bg-blue-950/30 px-3 py-2">
+          <span className="text-xs font-medium text-blue-400">
             {pendingSlotIds.length} pending review
           </span>
           <div className="flex-1" />
           <Button
             variant="ghost"
             size="sm"
-            className="h-7 text-xs text-blue-700"
+            className="h-7 text-xs text-blue-400"
             onClick={selectedSlots.size === pendingSlotIds.length ? deselectAll : selectAll}
           >
             {selectedSlots.size === pendingSlotIds.length ? 'Deselect All' : 'Select All'}
@@ -905,7 +905,7 @@ function InlineSlotRow({
             <Button
               variant="outline"
               size="sm"
-              className="h-7 text-xs text-blue-700 border-blue-200 hover:bg-blue-50 shrink-0 ml-1"
+              className="h-7 text-xs text-blue-400 border-blue-200 hover:bg-blue-950/30 shrink-0 ml-1"
               onClick={() => fileInputRef.current?.click()}
               disabled={uploadSlot.isPending}
             >

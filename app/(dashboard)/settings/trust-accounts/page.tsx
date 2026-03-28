@@ -493,7 +493,7 @@ function TrustAccountRow({ account, onEdit, onToggle }: TrustAccountRowProps) {
       <td className="px-4 py-3">
         <Badge variant={account.is_active ? 'default' : 'secondary'} className={cn(
           account.is_active
-            ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-100'
+            ? 'bg-emerald-950/40 text-emerald-400 hover:bg-emerald-950/40'
             : 'bg-slate-100 text-slate-600'
         )}>
           {account.is_active ? 'Active' : 'Inactive'}
@@ -522,7 +522,7 @@ function TrustAccountRow({ account, onEdit, onToggle }: TrustAccountRowProps) {
               'h-8 w-8',
               account.is_active
                 ? 'text-destructive hover:text-destructive'
-                : 'text-emerald-600 hover:text-emerald-700'
+                : 'text-emerald-600 hover:text-emerald-400'
             )}
             onClick={onToggle}
             aria-label={`${account.is_active ? 'Deactivate' : 'Reactivate'} ${account.account_name}`}
@@ -562,7 +562,7 @@ function OperatingAccountRow({ account, onEdit, onToggle }: OperatingAccountRowP
       <td className="px-4 py-3">
         <Badge variant={account.is_active ? 'default' : 'secondary'} className={cn(
           account.is_active
-            ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-100'
+            ? 'bg-emerald-950/40 text-emerald-400 hover:bg-emerald-950/40'
             : 'bg-slate-100 text-slate-600'
         )}>
           {account.is_active ? 'Active' : 'Inactive'}
@@ -586,7 +586,7 @@ function OperatingAccountRow({ account, onEdit, onToggle }: OperatingAccountRowP
               'h-8 w-8',
               account.is_active
                 ? 'text-destructive hover:text-destructive'
-                : 'text-emerald-600 hover:text-emerald-700'
+                : 'text-emerald-600 hover:text-emerald-400'
             )}
             onClick={onToggle}
             aria-label={`${account.is_active ? 'Deactivate' : 'Reactivate'} ${account.account_name}`}

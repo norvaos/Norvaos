@@ -76,10 +76,15 @@ export function useIgniteMatter(matterId: string) {
   const qc = useQueryClient()
 
   return useMutation({
-    mutationFn: async (): Promise<IgniteResult> => {
+    mutationFn: async (
+      variables?: { sendWelcomeEmail?: boolean },
+    ): Promise<IgniteResult> => {
       const res = await fetch(`/api/matters/${matterId}/ignite`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sendWelcomeEmail: variables?.sendWelcomeEmail ?? false,
+        }),
       })
 
       if (!res.ok) {

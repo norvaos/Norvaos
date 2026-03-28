@@ -68,7 +68,7 @@ export default function PlaybooksPage() {
           className={cn(
             'flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors text-left',
             !activeCategory
-              ? 'bg-blue-50 text-blue-700 font-medium dark:bg-blue-950 dark:text-blue-300'
+              ? 'bg-blue-950/30 text-blue-400 font-medium dark:bg-blue-950 dark:text-blue-300'
               : 'text-muted-foreground hover:bg-muted',
           )}
         >
@@ -82,7 +82,7 @@ export default function PlaybooksPage() {
             className={cn(
               'flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors text-left',
               activeCategory === cat.id
-                ? 'bg-blue-50 text-blue-700 font-medium dark:bg-blue-950 dark:text-blue-300'
+                ? 'bg-blue-950/30 text-blue-400 font-medium dark:bg-blue-950 dark:text-blue-300'
                 : 'text-muted-foreground hover:bg-muted',
             )}
           >
@@ -242,9 +242,9 @@ function PlaybookCard({
   onClick: () => void
 }) {
   const statusColor = playbook.status === 'published'
-    ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'
+    ? 'bg-emerald-950/40 text-emerald-400 dark:bg-emerald-950 dark:text-emerald-300'
     : playbook.status === 'draft'
-    ? 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300'
+    ? 'bg-amber-100 text-amber-400 dark:bg-amber-950 dark:text-amber-300'
     : 'bg-muted text-muted-foreground'
 
   return (

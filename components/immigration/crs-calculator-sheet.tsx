@@ -73,9 +73,9 @@ function getScoreColor(score: number): string {
 }
 
 function getScoreBg(score: number): string {
-  if (score >= 470) return 'bg-green-50 border-green-200'
-  if (score >= 400) return 'bg-blue-50 border-blue-200'
-  if (score >= 300) return 'bg-amber-50 border-amber-200'
+  if (score >= 470) return 'bg-emerald-950/30 border-emerald-500/30'
+  if (score >= 400) return 'bg-blue-950/30 border-blue-500/20'
+  if (score >= 300) return 'bg-amber-950/30 border-amber-500/30'
   return 'bg-slate-50 border-slate-200'
 }
 

@@ -80,12 +80,12 @@ const RISK_FLAG_CONFIG: Record<string, { label: string; className: string; icon:
   },
   billing_restricted: {
     label: 'Billing Restricted',
-    className: 'bg-amber-100 text-amber-800 border-amber-200',
+    className: 'bg-amber-100 text-amber-800 border-amber-500/20',
     icon: <Shield className="size-3" />,
   },
   id_verification_required: {
     label: 'ID Verification Required',
-    className: 'bg-blue-100 text-blue-800 border-blue-200',
+    className: 'bg-blue-100 text-blue-800 border-blue-500/20',
     icon: <Shield className="size-3" />,
   },
   vip: {
@@ -598,10 +598,10 @@ export function ContactWorkPanel({ contactId, onClose, onCreateIntake }: Contact
                             )}
                           </div>
                           <span className={`ml-2 shrink-0 text-xs px-1.5 py-0.5 rounded font-medium capitalize ${
-                            m.status === 'active' ? 'bg-green-100 text-green-700' :
-                            m.status === 'pending' ? 'bg-amber-100 text-amber-700' :
+                            m.status === 'active' ? 'bg-green-100 text-emerald-400' :
+                            m.status === 'pending' ? 'bg-amber-100 text-amber-400' :
                             m.status === 'closed_won' ? 'bg-slate-100 text-slate-600' :
-                            'bg-red-100 text-red-700'
+                            'bg-red-100 text-red-400'
                           }`}>
                             {m.status.replace('_', ' ')}
                           </span>
@@ -633,10 +633,10 @@ export function ContactWorkPanel({ contactId, onClose, onCreateIntake }: Contact
                           <div className="flex items-center justify-between">
                             <span className="font-medium">{a.appointment_date}</span>
                             <span className={`text-xs px-1.5 py-0.5 rounded font-medium capitalize ${
-                              a.status === 'confirmed' ? 'bg-blue-100 text-blue-700' :
-                              a.status === 'checked_in' ? 'bg-green-100 text-green-700' :
+                              a.status === 'confirmed' ? 'bg-blue-100 text-blue-400' :
+                              a.status === 'checked_in' ? 'bg-green-100 text-emerald-400' :
                               a.status === 'completed' ? 'bg-slate-100 text-slate-600' :
-                              'bg-amber-100 text-amber-700'
+                              'bg-amber-100 text-amber-400'
                             }`}>
                               {a.status.replace('_', ' ')}
                             </span>
@@ -660,19 +660,19 @@ export function ContactWorkPanel({ contactId, onClose, onCreateIntake }: Contact
                   </div>
                   <div className="flex flex-wrap gap-x-3 gap-y-1">
                     {interactions.inbound_calls > 0 && (
-                      <span className="text-xs text-emerald-700">📲 {interactions.inbound_calls} in</span>
+                      <span className="text-xs text-emerald-400">📲 {interactions.inbound_calls} in</span>
                     )}
                     {interactions.outbound_calls > 0 && (
                       <span className="text-xs text-teal-700">📞 {interactions.outbound_calls} out</span>
                     )}
                     {interactions.no_answer > 0 && (
-                      <span className="text-xs text-amber-700">🔕 {interactions.no_answer} no ans</span>
+                      <span className="text-xs text-amber-400">🔕 {interactions.no_answer} no ans</span>
                     )}
                     {interactions.voicemail > 0 && (
-                      <span className="text-xs text-blue-700">📬 {interactions.voicemail} vm</span>
+                      <span className="text-xs text-blue-400">📬 {interactions.voicemail} vm</span>
                     )}
                     {interactions.busy > 0 && (
-                      <span className="text-xs text-orange-700">🔴 {interactions.busy} busy</span>
+                      <span className="text-xs text-orange-400">🔴 {interactions.busy} busy</span>
                     )}
                     {interactions.emails > 0 && (
                       <span className="text-xs text-indigo-700">✉️ {interactions.emails} email</span>
@@ -870,7 +870,7 @@ export function ContactWorkPanel({ contactId, onClose, onCreateIntake }: Contact
                             key={note.id}
                             className={`rounded-md border px-3 py-2 text-sm ${
                               note.is_pinned
-                                ? 'border-amber-200 bg-amber-50/60'
+                                ? 'border-amber-500/20 bg-amber-950/30'
                                 : 'bg-background border-border'
                             }`}
                           >

@@ -74,7 +74,7 @@ export function PipelineProgress({
       <div className="relative mb-2">
         <div className="h-1.5 w-full rounded-full bg-slate-100">
           <div
-            className="h-1.5 rounded-full bg-blue-500 transition-all duration-500"
+            className="h-1.5 rounded-full bg-blue-950/300 transition-all duration-500"
             style={{
               width: `${((currentIndex + 1) / PIPELINE_STAGES.length) * 100}%`,
             }}
@@ -111,7 +111,7 @@ export function PipelineProgress({
                     ) : isCompleted ? (
                       <CheckCircle2 className="size-4 shrink-0 text-emerald-500" />
                     ) : isCurrent ? (
-                      <div className="size-4 shrink-0 rounded-full border-2 border-blue-500 bg-blue-500" />
+                      <div className="size-4 shrink-0 rounded-full border-2 border-blue-500 bg-blue-950/300" />
                     ) : (
                       <Circle className="size-4 shrink-0 text-slate-300" />
                     )}
@@ -173,7 +173,7 @@ function CompactPipeline({
       {/* Progress bar */}
       <div className="h-1.5 w-full rounded-full bg-slate-100">
         <div
-          className="h-1.5 rounded-full bg-blue-500 transition-all duration-500"
+          className="h-1.5 rounded-full bg-blue-950/300 transition-all duration-500"
           style={{ width: `${progress}%` }}
         />
       </div>
@@ -201,7 +201,7 @@ function CompactPipeline({
                     {idx < currentIndex ? (
                       <CheckCircle2 className="size-3 text-emerald-500" />
                     ) : idx === currentIndex ? (
-                      <div className="size-3 rounded-full border-2 border-blue-500 bg-blue-500" />
+                      <div className="size-3 rounded-full border-2 border-blue-500 bg-blue-950/300" />
                     ) : (
                       <Circle className="size-3 text-slate-300" />
                     )}
@@ -219,7 +219,7 @@ function CompactPipeline({
               disabled={isUpdating}
               onClick={() => onStageChange(nextStage.key)}
               className={cn(
-                'flex w-full items-center justify-center gap-1.5 rounded-md border border-blue-200 bg-blue-50 px-2.5 py-1.5 text-xs font-medium text-blue-700 transition-colors',
+                'flex w-full items-center justify-center gap-1.5 rounded-md border border-blue-500/20 bg-blue-950/30 px-2.5 py-1.5 text-xs font-medium text-blue-400 transition-colors',
                 'hover:bg-blue-100 hover:border-blue-300',
                 isUpdating && 'opacity-50 cursor-not-allowed'
               )}
@@ -252,12 +252,12 @@ export function PipelineStageBadge({ stage, className }: PipelineStageBadgeProps
   // Color mapping based on position in pipeline
   const colorClass =
     index < 3
-      ? 'bg-blue-50 text-blue-700 border-blue-200'
+      ? 'bg-blue-950/30 text-blue-400 border-blue-500/20'
       : index < 6
-        ? 'bg-amber-50 text-amber-700 border-amber-200'
+        ? 'bg-amber-950/30 text-amber-400 border-amber-200'
         : index < 8
-          ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-          : 'bg-green-50 text-green-700 border-green-200'
+          ? 'bg-emerald-950/30 text-emerald-400 border-emerald-500/20'
+          : 'bg-emerald-950/30 text-emerald-400 border-green-200'
 
   return (
     <span

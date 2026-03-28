@@ -286,7 +286,7 @@ export function LiveTasksQueue({ onCompleteTask, onSelectContact }: LiveTasksQue
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="h-7 w-7 p-0 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50"
+                      className="h-7 w-7 p-0 text-zinc-400 hover:text-emerald-400 hover:bg-white/[0.06]"
                       onClick={() => onCompleteTask(task.id)}
                       title="Mark as complete"
                     >

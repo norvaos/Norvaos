@@ -107,42 +107,42 @@ const OUTCOME_BUTTONS: {
     outcome: 'RETAIN',
     label: 'Retain',
     icon: CheckCircle2,
-    className: 'border-emerald-200 text-emerald-700 hover:bg-emerald-50 hover:border-emerald-400',
+    className: 'border-emerald-500/20 text-emerald-400 hover:bg-emerald-950/30 hover:border-emerald-400',
     description: 'Client retained  -  generate retainer agreement',
   },
   {
     outcome: 'FOLLOW_UP',
     label: 'Follow Up',
     icon: CalendarClock,
-    className: 'border-blue-200 text-blue-700 hover:bg-blue-50 hover:border-blue-400',
+    className: 'border-blue-500/20 text-blue-400 hover:bg-blue-950/30 hover:border-blue-400',
     description: 'Schedule a follow-up task',
   },
   {
     outcome: 'NOT_QUALIFIED',
     label: 'Not Qualified',
     icon: XCircle,
-    className: 'border-orange-200 text-orange-700 hover:bg-orange-50 hover:border-orange-400',
+    className: 'border-orange-500/20 text-orange-400 hover:bg-orange-950/30 hover:border-orange-400',
     description: 'Client does not qualify',
   },
   {
     outcome: 'REFERRED_OUT',
     label: 'Referred Out',
     icon: ArrowUpRight,
-    className: 'border-purple-200 text-purple-700 hover:bg-purple-50 hover:border-purple-400',
+    className: 'border-purple-500/20 text-purple-400 hover:bg-purple-950/30 hover:border-purple-400',
     description: 'Refer to another firm',
   },
   {
     outcome: 'NO_SHOW',
     label: 'No Show',
     icon: Clock,
-    className: 'border-amber-200 text-amber-700 hover:bg-amber-50 hover:border-amber-400',
+    className: 'border-amber-500/20 text-amber-400 hover:bg-amber-950/30 hover:border-amber-400',
     description: 'Client did not attend',
   },
   {
     outcome: 'DECLINED',
     label: 'Declined',
     icon: ThumbsDown,
-    className: 'border-red-200 text-red-700 hover:bg-red-50 hover:border-red-400',
+    className: 'border-red-500/20 text-red-400 hover:bg-red-950/30 hover:border-red-400',
     description: 'Client declined to retain',
   },
   {
@@ -558,7 +558,7 @@ export default function ConsultationPage() {
               {/* Contact summary */}
               <div className="flex flex-col items-center text-center gap-2 pt-2">
                 <Avatar className="h-14 w-14">
-                  <AvatarFallback className="bg-blue-100 text-blue-700 text-lg font-semibold">
+                  <AvatarFallback className="bg-blue-950/40 text-blue-400 text-lg font-semibold">
                     {initials}
                   </AvatarFallback>
                 </Avatar>
@@ -654,8 +654,8 @@ export default function ConsultationPage() {
 
           {/* Immigration Assessment panel  -  shown if lead has intake data */}
           {lead?.practice_area_id && (
-            <section className="bg-blue-50/60 border border-blue-100 rounded-lg p-4">
-              <h3 className="text-sm font-semibold text-blue-800 mb-2">Immigration Assessment</h3>
+            <section className="bg-blue-950/30/60 border border-blue-100 rounded-lg p-4">
+              <h3 className="text-sm font-semibold text-blue-400 mb-2">Immigration Assessment</h3>
               <p className="text-xs text-blue-600">
                 Questionnaire data and risk factors will appear here when an intake form is linked to this lead.
               </p>
@@ -842,7 +842,7 @@ export default function ConsultationPage() {
               className={cn(
                 'flex items-center gap-2 px-3 py-2 rounded-lg border text-sm font-medium transition-colors',
                 showReschedule
-                  ? 'border-blue-400 bg-blue-50 text-blue-700'
+                  ? 'border-blue-400 bg-blue-950/30 text-blue-400'
                   : 'border-slate-200 text-slate-600 hover:border-slate-300'
               )}
             >
@@ -923,7 +923,7 @@ export default function ConsultationPage() {
                       onClick={() => setCanonicalContactId(c.id)}
                       className={cn(
                         'w-full text-left px-3 py-2 text-sm transition-colors',
-                        isSelected ? 'bg-blue-50 text-blue-700 font-medium' : 'hover:bg-slate-50 text-slate-700'
+                        isSelected ? 'bg-blue-950/30 text-blue-400 font-medium' : 'hover:bg-slate-50 text-slate-700'
                       )}
                     >
                       <p className="font-medium">{name}</p>

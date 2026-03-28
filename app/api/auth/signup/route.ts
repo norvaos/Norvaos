@@ -23,7 +23,7 @@ const signupLimiter = createRateLimiter({ maxRequests: 5, windowMs: 60_000 })
 async function handlePost(request: Request) {
   // Rate limit by IP
   const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
-  const { allowed, retryAfterMs } = signupLimiter.check(ip)
+  const { allowed, retryAfterMs } = await signupLimiter.check(ip)
   if (!allowed) {
     return NextResponse.json(
       { data: null, error: 'Too many signup attempts. Please try again later.' },

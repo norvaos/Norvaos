@@ -99,8 +99,8 @@ export function TravelHistoryTimeline({
               className={cn(
                 'flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-[10px] transition-colors',
                 gap.severity === 'critical'
-                  ? 'bg-red-500/10 text-red-700 dark:text-red-300 hover:bg-red-500/20'
-                  : 'bg-amber-500/10 text-amber-700 dark:text-amber-300 hover:bg-amber-500/20',
+                  ? 'bg-red-500/10 text-red-400 dark:text-red-300 hover:bg-red-500/20'
+                  : 'bg-amber-500/10 text-amber-400 dark:text-amber-300 hover:bg-amber-500/20',
               )}
             >
               {gap.severity === 'critical' ? (
@@ -121,7 +121,7 @@ export function TravelHistoryTimeline({
 
       {/* All clear */}
       {analysis.isComplete && (
-        <div className="flex items-center gap-2 rounded-md bg-emerald-500/10 px-2 py-1.5 text-[10px] text-emerald-700 dark:text-emerald-300">
+        <div className="flex items-center gap-2 rounded-md bg-emerald-500/10 px-2 py-1.5 text-[10px] text-emerald-400 dark:text-emerald-300">
           <CheckCircle2 className="size-3" />
           <span>10-year history complete  -  no gaps detected</span>
         </div>
@@ -143,7 +143,7 @@ function StatusBadge({ analysis }: { analysis: TravelHistoryAnalysis }) {
 
   if (analysis.isComplete) {
     return (
-      <span className="flex items-center gap-1 rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 dark:text-emerald-300">
+      <span className="flex items-center gap-1 rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] font-semibold text-emerald-400 dark:text-emerald-300">
         <CheckCircle2 className="size-3" />
         Complete
       </span>
@@ -152,7 +152,7 @@ function StatusBadge({ analysis }: { analysis: TravelHistoryAnalysis }) {
 
   if (criticalCount > 0) {
     return (
-      <span className="flex items-center gap-1 rounded-full bg-red-500/20 px-2 py-0.5 text-[10px] font-semibold text-red-700 dark:text-red-300">
+      <span className="flex items-center gap-1 rounded-full bg-red-500/20 px-2 py-0.5 text-[10px] font-semibold text-red-400 dark:text-red-300">
         <XCircle className="size-3" />
         {criticalCount} Critical Gap{criticalCount !== 1 ? 's' : ''}
       </span>
@@ -160,7 +160,7 @@ function StatusBadge({ analysis }: { analysis: TravelHistoryAnalysis }) {
   }
 
   return (
-    <span className="flex items-center gap-1 rounded-full bg-amber-500/20 px-2 py-0.5 text-[10px] font-semibold text-amber-700 dark:text-amber-300">
+    <span className="flex items-center gap-1 rounded-full bg-amber-500/20 px-2 py-0.5 text-[10px] font-semibold text-amber-400 dark:text-amber-300">
       <AlertTriangle className="size-3" />
       Gaps Found
     </span>

@@ -77,9 +77,9 @@ function JRDeadlineBadge({
 
   if (passed) {
     return (
-      <div className="flex items-center gap-1.5 mt-2 px-2.5 py-1.5 rounded-md bg-red-50 border border-red-200">
+      <div className="flex items-center gap-1.5 mt-2 px-2.5 py-1.5 rounded-md bg-red-950/30 border border-red-500/20">
         <XCircle className="h-4 w-4 text-red-600 shrink-0" />
-        <span className="text-xs font-semibold text-red-700">
+        <span className="text-xs font-semibold text-red-400">
           JR DEADLINE PASSED  -  {format(deadline, 'MMMM d, yyyy')}
         </span>
       </div>
@@ -90,11 +90,11 @@ function JRDeadlineBadge({
     <div className={cn(
       'flex items-center gap-1.5 mt-2 px-2.5 py-1.5 rounded-md border',
       urgent
-        ? 'bg-amber-50 border-amber-200'
-        : 'bg-blue-50 border-blue-200',
+        ? 'bg-amber-950/30 border-amber-500/20'
+        : 'bg-blue-950/30 border-blue-500/20',
     )}>
       <Clock className={cn('h-4 w-4 shrink-0', urgent ? 'text-amber-600' : 'text-blue-600')} />
-      <span className={cn('text-xs font-semibold', urgent ? 'text-amber-700' : 'text-blue-700')}>
+      <span className={cn('text-xs font-semibold', urgent ? 'text-amber-400' : 'text-blue-400')}>
         JR Deadline: {format(deadline, 'MMMM d, yyyy')} ({daysRemaining} day{daysRemaining !== 1 ? 's' : ''} remaining)
       </span>
     </div>
@@ -153,7 +153,7 @@ function MilestoneRow({
         <div className={cn(
           'h-8 w-8 rounded-full flex items-center justify-center shrink-0 border-2',
           hasDate
-            ? 'bg-green-50 border-green-400 text-green-600'
+            ? 'bg-emerald-950/30 border-green-400 text-green-600'
             : 'bg-muted border-border text-muted-foreground',
         )}>
           {hasDate
@@ -516,7 +516,7 @@ export function CorrespondenceTab({ matterId, tenantId }: CorrespondenceTabProps
               <div className={cn(
                 'h-8 w-8 rounded-full flex items-center justify-center shrink-0 border-2',
                 decisionDate
-                  ? 'bg-green-50 border-green-400 text-green-600'
+                  ? 'bg-emerald-950/30 border-green-400 text-green-600'
                   : 'bg-muted border-border text-muted-foreground',
               )}>
                 {decisionDate
@@ -645,14 +645,14 @@ export function CorrespondenceTab({ matterId, tenantId }: CorrespondenceTabProps
           {showRefusal && (
             <div className="flex gap-4 py-3">
               <div className="flex flex-col items-center">
-                <div className="h-8 w-8 rounded-full flex items-center justify-center shrink-0 border-2 bg-red-50 border-red-300 text-red-600">
+                <div className="h-8 w-8 rounded-full flex items-center justify-center shrink-0 border-2 bg-red-950/30 border-red-500/30 text-red-600">
                   <XCircle className="h-4 w-4" />
                 </div>
               </div>
               <div className="flex-1 min-w-0 pb-1">
                 <div className="flex items-center gap-2 mb-2">
                   <AlertTriangle className="h-4 w-4 text-red-500" />
-                  <span className="text-sm font-medium text-red-700">Refused  -  Judicial Review Window</span>
+                  <span className="text-sm font-medium text-red-400">Refused  -  Judicial Review Window</span>
                 </div>
                 <p className="text-xs text-muted-foreground">
                   JR deadline is calculated automatically from the decision date above.

@@ -152,7 +152,7 @@ export function HeroHeader({ onToggleActivity, activityOpen, onToggleScreening, 
             <Button
               variant="outline"
               size="sm"
-              className="h-8 gap-1.5 text-green-600 border-green-200 hover:bg-green-50 hover:text-green-700"
+              className="h-8 gap-1.5 text-green-600 border-green-200 hover:bg-emerald-950/30 hover:text-emerald-400"
               onClick={startMeetingTimer}
             >
               <Play className="h-3.5 w-3.5 fill-current" />

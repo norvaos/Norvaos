@@ -1,9 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
 import { authenticateRequest, AuthError } from '@/lib/services/auth'
 import { requirePermission } from '@/lib/services/require-role'
 import { invalidateGating } from '@/lib/services/cache-invalidation'
 import { withTiming } from '@/lib/middleware/request-timing'
 import { createAdminClient } from '@/lib/supabase/admin'
+
+const overrideSchema = z.object({
+  overrideLevel: z.enum(['low', 'medium', 'high', 'critical']),
+  overrideReason: z.string().min(1).max(500),
+  previousLevel: z.string().optional().nullable(),
+})
 
 async function handlePost(
   request: NextRequest,
@@ -44,19 +51,24 @@ async function handlePost(
       )
     }
 
-    // Parse body
+    // Parse and validate body
     const body = await request.json()
-    const { overrideLevel, overrideReason, previousLevel } = body as {
-      overrideLevel: string
-      overrideReason: string
-      previousLevel: string | null
-    }
-
-    if (!overrideLevel || !overrideReason) {
-      return NextResponse.json(
-        { error: 'overrideLevel and overrideReason are required' },
-        { status: 400 }
-      )
+    let overrideLevel: string
+    let overrideReason: string
+    let previousLevel: string | null | undefined
+    try {
+      const parsed = overrideSchema.parse(body)
+      overrideLevel = parsed.overrideLevel
+      overrideReason = parsed.overrideReason
+      previousLevel = parsed.previousLevel
+    } catch (validationError) {
+      if (validationError instanceof z.ZodError) {
+        return NextResponse.json(
+          { error: 'Validation failed', details: validationError.errors },
+          { status: 400 }
+        )
+      }
+      throw validationError
     }
 
     // Call transactional RPC  -  single atomic operation that:

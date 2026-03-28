@@ -40,39 +40,39 @@ export interface PortalCollapsibleSectionProps {
 
 const METRIC_COLOURS: Record<string, string> = {
   default: 'text-slate-600 bg-slate-100/80',
-  red: 'text-red-700 bg-red-50',
-  green: 'text-emerald-700 bg-emerald-50',
-  amber: 'text-amber-700 bg-amber-50',
-  blue: 'text-blue-700 bg-blue-50',
+  red: 'text-red-400 bg-red-950/30',
+  green: 'text-emerald-400 bg-emerald-950/30',
+  amber: 'text-amber-400 bg-amber-950/30',
+  blue: 'text-blue-400 bg-blue-950/30',
 }
 
 const BADGE_COLOURS: Record<string, string> = {
-  red: 'bg-red-500 text-white shadow-red-500/25',
-  amber: 'bg-amber-500 text-white shadow-amber-500/25',
-  blue: 'bg-blue-500 text-white shadow-blue-500/25',
-  green: 'bg-emerald-500 text-white shadow-emerald-500/25',
+  red: 'bg-red-950/300 text-white shadow-red-500/25',
+  amber: 'bg-amber-950/300 text-white shadow-amber-500/25',
+  blue: 'bg-blue-950/300 text-white shadow-blue-500/25',
+  green: 'bg-emerald-950/300 text-white shadow-emerald-500/25',
 }
 
 const VARIANT_STYLES: Record<string, { border: string; glow: string; iconBg: string }> = {
   action: {
     border: 'border-l-[3px] border-l-amber-400',
     glow: 'shadow-amber-100/50',
-    iconBg: 'bg-amber-50 text-amber-600',
+    iconBg: 'bg-amber-950/30 text-amber-600',
   },
   warning: {
     border: 'border-l-[3px] border-l-red-400',
     glow: 'shadow-red-100/50',
-    iconBg: 'bg-red-50 text-red-600',
+    iconBg: 'bg-red-950/30 text-red-600',
   },
   info: {
     border: 'border-l-[3px] border-l-blue-400',
     glow: 'shadow-blue-100/50',
-    iconBg: 'bg-blue-50 text-blue-600',
+    iconBg: 'bg-blue-950/30 text-blue-600',
   },
   success: {
     border: 'border-l-[3px] border-l-emerald-400',
     glow: 'shadow-emerald-100/50',
-    iconBg: 'bg-emerald-50 text-emerald-600',
+    iconBg: 'bg-emerald-950/30 text-emerald-600',
   },
   default: {
     border: '',

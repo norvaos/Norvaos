@@ -140,7 +140,7 @@ function getExpiryBadge(expiryDate: string | null) {
     return <Badge variant="destructive" className="text-xs">Expired {Math.abs(daysUntilExpiry)}d ago</Badge>
   }
   if (daysUntilExpiry <= 30) {
-    return <Badge className="bg-amber-100 text-amber-800 border-amber-200 text-xs">Expires in {daysUntilExpiry}d</Badge>
+    return <Badge className="bg-amber-950/40 text-amber-800 border-amber-200 text-xs">Expires in {daysUntilExpiry}d</Badge>
   }
   return null // No badge needed if >30 days away
 }
@@ -191,10 +191,10 @@ function CategoryNode({
             className={cn(
               'text-[10px] font-mono rounded px-1 py-0.5',
               allDone
-                ? 'bg-green-100 text-green-700'
+                ? 'bg-emerald-950/40 text-emerald-400'
                 : anyEmpty
-                  ? 'bg-amber-100 text-amber-700'
-                  : 'bg-blue-100 text-blue-700',
+                  ? 'bg-amber-950/40 text-amber-400'
+                  : 'bg-blue-950/40 text-blue-400',
             )}
           >
             {accepted}/{total}
@@ -625,7 +625,7 @@ function InlineReviewDialog({
             size="sm"
             onClick={() => handleReview('reject')}
             disabled={reviewMutation.isPending}
-            className="text-red-600 border-red-200 hover:bg-red-50"
+            className="text-red-600 border-red-500/20 hover:bg-red-950/30"
           >
             <X className="mr-1 h-4 w-4" />
             Reject
@@ -635,7 +635,7 @@ function InlineReviewDialog({
             size="sm"
             onClick={() => handleReview('needs_re_upload')}
             disabled={reviewMutation.isPending}
-            className="text-orange-600 border-orange-200 hover:bg-orange-50"
+            className="text-orange-600 border-orange-500/20 hover:bg-orange-950/30"
           >
             <RotateCcw className="mr-1 h-4 w-4" />
             Needs Re-upload
@@ -839,25 +839,25 @@ function StatusSummaryBar({
 
       <div className="flex items-center gap-3 flex-wrap">
         {stats.accepted > 0 && (
-          <span className="inline-flex items-center gap-1 text-[11px] text-green-700">
+          <span className="inline-flex items-center gap-1 text-[11px] text-emerald-400">
             <span className="h-1.5 w-1.5 rounded-full bg-green-500 inline-block" />
             {stats.accepted} accepted
           </span>
         )}
         {stats.pendingReview > 0 && (
-          <span className="inline-flex items-center gap-1 text-[11px] text-blue-700">
+          <span className="inline-flex items-center gap-1 text-[11px] text-blue-400">
             <span className="h-1.5 w-1.5 rounded-full bg-blue-500 inline-block" />
             {stats.pendingReview} pending review
           </span>
         )}
         {stats.needsReupload > 0 && (
-          <span className="inline-flex items-center gap-1 text-[11px] text-orange-700">
-            <span className="h-1.5 w-1.5 rounded-full bg-orange-500 inline-block" />
+          <span className="inline-flex items-center gap-1 text-[11px] text-orange-400">
+            <span className="h-1.5 w-1.5 rounded-full bg-orange-950/300 inline-block" />
             {stats.needsReupload} needs re-upload
           </span>
         )}
         {stats.empty > 0 && (
-          <span className="inline-flex items-center gap-1 text-[11px] text-amber-700">
+          <span className="inline-flex items-center gap-1 text-[11px] text-amber-400">
             <span className="h-1.5 w-1.5 rounded-full bg-amber-500 inline-block" />
             {stats.empty} empty
           </span>

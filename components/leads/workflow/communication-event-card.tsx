@@ -79,7 +79,7 @@ export function CommunicationEventCard({ event, users }: CommunicationEventCardP
 
           {/* Subtype label for automated events */}
           {subtypeLabel && event.actor_type === 'system' && (
-            <Badge variant="outline" size="xs" className="bg-slate-50 text-slate-600 border-slate-200">
+            <Badge variant="outline" size="xs" className="bg-muted/50 text-muted-foreground border-border">
               {subtypeLabel}
             </Badge>
           )}

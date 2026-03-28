@@ -114,12 +114,12 @@ function getActivityMeta(
         icon: direction === 'inbound' ? PhoneIncoming : PhoneOutgoing,
         colour:
           direction === 'inbound'
-            ? 'text-green-600 bg-green-50'
-            : 'text-blue-600 bg-blue-50',
+            ? 'text-green-600 bg-emerald-950/30'
+            : 'text-blue-600 bg-blue-950/30',
         label: direction === 'inbound' ? 'Inbound Call' : 'Outbound Call',
       }
     case 'front_desk_email_logged':
-      return { icon: Mail, colour: 'text-blue-600 bg-blue-50', label: 'Email Logged' }
+      return { icon: Mail, colour: 'text-blue-600 bg-blue-950/30', label: 'Email Logged' }
     case 'front_desk_meeting_logged':
       return {
         icon:
@@ -137,19 +137,19 @@ function getActivityMeta(
               : 'In-Person Meeting',
       }
     case 'front_desk_note':
-      return { icon: StickyNote, colour: 'text-amber-600 bg-amber-50', label: 'Note Logged' }
+      return { icon: StickyNote, colour: 'text-amber-600 bg-amber-950/30', label: 'Note Logged' }
     case 'appointment_booked_front_desk':
     case 'appointment_booked':
       return { icon: Calendar, colour: 'text-violet-600 bg-violet-50', label: 'Appointment Booked' }
     case 'appointment_rescheduled':
-      return { icon: Calendar, colour: 'text-amber-600 bg-amber-50', label: 'Appointment Rescheduled' }
+      return { icon: Calendar, colour: 'text-amber-600 bg-amber-950/30', label: 'Appointment Rescheduled' }
     case 'appointment_cancelled':
-      return { icon: Calendar, colour: 'text-red-600 bg-red-50', label: 'Appointment Cancelled' }
+      return { icon: Calendar, colour: 'text-red-600 bg-red-950/30', label: 'Appointment Cancelled' }
     case 'client_checked_in_front_desk':
     case 'client_checked_in':
       return {
         icon: CheckCircle2,
-        colour: 'text-green-600 bg-green-50',
+        colour: 'text-green-600 bg-emerald-950/30',
         label: 'Checked In',
       }
     case 'task_created_front_desk':
@@ -163,7 +163,7 @@ function getActivityMeta(
     case 'task_completed':
       return {
         icon: CheckCircle2,
-        colour: 'text-green-600 bg-green-50',
+        colour: 'text-green-600 bg-emerald-950/30',
         label: 'Task Completed',
       }
     case 'document_uploaded_front_desk':
@@ -174,11 +174,11 @@ function getActivityMeta(
         label: 'Document Uploaded',
       }
     case 'staff_notified':
-      return { icon: Bell, colour: 'text-purple-600 bg-purple-50', label: 'Staff Notified' }
+      return { icon: Bell, colour: 'text-purple-600 bg-purple-950/30', label: 'Staff Notified' }
     case 'intake_created':
       return {
         icon: UserPlus,
-        colour: 'text-emerald-600 bg-emerald-50',
+        colour: 'text-emerald-600 bg-emerald-950/30',
         label: 'Intake Created',
       }
     default:
@@ -388,7 +388,7 @@ function NotesTab({ contactId, tenantId }: { contactId: string; tenantId: string
             <div
               key={note.id}
               className={`p-3 rounded-lg border ${
-                note.is_pinned ? 'border-amber-200 bg-amber-50/50' : 'bg-background border-border'
+                note.is_pinned ? 'border-amber-200 bg-amber-950/30/50' : 'bg-background border-border'
               }`}
             >
               {editingId === note.id ? (
@@ -479,7 +479,7 @@ function NotesTab({ contactId, tenantId }: { contactId: string; tenantId: string
                     <span>{relativeTime(note.created_at)}</span>
                     {/* Badge indicating note came from a lead */}
                     {note.lead_id && !note.contact_id && (
-                      <span className="bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded text-[10px] font-medium">
+                      <span className="bg-blue-950/30 text-blue-600 px-1.5 py-0.5 rounded text-[10px] font-medium">
                         Lead note
                       </span>
                     )}
@@ -597,10 +597,10 @@ function ActivityTab({ contactId, tenantId }: { contactId: string; tenantId: str
     wrong_number: 'Wrong #',
   }
   const outcomeColours: Record<string, string> = {
-    connected: 'bg-green-100 text-green-700',
+    connected: 'bg-green-100 text-emerald-400',
     no_answer: 'bg-slate-100 text-slate-600',
-    voicemail: 'bg-blue-100 text-blue-700',
-    busy: 'bg-orange-100 text-orange-700',
+    voicemail: 'bg-blue-100 text-blue-400',
+    busy: 'bg-orange-100 text-orange-400',
     wrong_number: 'bg-red-100 text-red-600',
   }
 
@@ -758,15 +758,15 @@ function TasksTab({ contactId, tenantId }: { contactId: string; tenantId: string
   }
 
   const statusColours: Record<string, string> = {
-    done: 'bg-green-100 text-green-700',
+    done: 'bg-green-100 text-emerald-400',
     not_started: 'bg-slate-100 text-slate-600',
-    working_on_it: 'bg-blue-100 text-blue-700',
+    working_on_it: 'bg-blue-100 text-blue-400',
     stuck: 'bg-red-100 text-red-600',
     cancelled: 'bg-slate-100 text-slate-400',
   }
 
   const priorityDot: Record<string, string> = {
-    critical: 'bg-red-500',
+    critical: 'bg-red-950/300',
     high: 'bg-orange-400',
     medium: 'bg-yellow-400',
     low: 'bg-slate-300',
@@ -1008,12 +1008,12 @@ function AppointmentsTab({ contactId }: { contactId: string }) {
   }
 
   const statusColours: Record<string, string> = {
-    confirmed: 'bg-blue-100 text-blue-700',
-    checked_in: 'bg-green-100 text-green-700',
+    confirmed: 'bg-blue-100 text-blue-400',
+    checked_in: 'bg-green-100 text-emerald-400',
     completed: 'bg-slate-100 text-slate-600',
     cancelled: 'bg-red-100 text-red-600',
-    no_show: 'bg-orange-100 text-orange-700',
-    pending: 'bg-amber-100 text-amber-700',
+    no_show: 'bg-orange-100 text-orange-400',
+    pending: 'bg-amber-100 text-amber-400',
   }
 
   const today = new Date().toISOString().split('T')[0]
@@ -1030,7 +1030,7 @@ function AppointmentsTab({ contactId }: { contactId: string }) {
           <div key={appt.id} className="flex items-center gap-3 py-3">
             <div
               className={`flex h-10 w-10 shrink-0 flex-col items-center justify-center rounded-lg border text-center ${
-                isUpcoming ? 'border-blue-200 bg-blue-50' : 'border-slate-200 bg-slate-50'
+                isUpcoming ? 'border-blue-500/20 bg-blue-950/30' : 'border-slate-200 bg-slate-50'
               }`}
             >
               <span className="text-[9px] font-medium uppercase tracking-wider text-muted-foreground leading-none">

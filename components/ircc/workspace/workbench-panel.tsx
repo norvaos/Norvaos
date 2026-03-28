@@ -239,8 +239,8 @@ function FieldRow({
           className={cn(
             'w-full text-xs px-2 py-1 rounded border bg-background transition-colors',
             'focus:outline-none focus:ring-1 focus:ring-primary/40',
-            isDirty && 'border-amber-400 bg-amber-50/30',
-            isVerified && !isDirty && 'border-green-300 bg-green-50/20',
+            isDirty && 'border-amber-400 bg-amber-950/30',
+            isVerified && !isDirty && 'border-green-300 bg-emerald-950/20',
             isLocked && 'bg-muted cursor-not-allowed opacity-60',
           )}
         />
@@ -267,7 +267,7 @@ function FieldRow({
                 className={cn(
                   'transition-colors rounded-full p-0.5',
                   isVerified && !isDirty
-                    ? 'text-green-600 hover:text-green-700'
+                    ? 'text-green-600 hover:text-emerald-400'
                     : 'text-muted-foreground/40 hover:text-muted-foreground',
                   (isLocked || (!localValue && !isVerified)) && 'opacity-30 cursor-not-allowed'
                 )}
@@ -324,8 +324,8 @@ function SectionBlock({ section, profile, ver, isLocked, savingPaths, onSave, on
             variant="outline"
             className={cn(
               'text-[10px] py-0 px-1.5 leading-4 border',
-              pct === 100 ? 'border-green-300 text-green-700 bg-green-50' :
-              pct > 0     ? 'border-blue-300 text-blue-700 bg-blue-50' :
+              pct === 100 ? 'border-green-300 text-emerald-400 bg-emerald-950/30' :
+              pct > 0     ? 'border-blue-300 text-blue-400 bg-blue-950/30' :
               'border-zinc-200 text-muted-foreground'
             )}
           >
@@ -554,7 +554,7 @@ export function WorkbenchPanel({
         </span>
         <div className="flex items-center gap-2">
           {isLocked && (
-            <Badge variant="outline" className="text-[10px] border-amber-300 text-amber-700 bg-amber-50">
+            <Badge variant="outline" className="text-[10px] border-amber-300 text-amber-400 bg-amber-950/30">
               <Lock className="h-2.5 w-2.5 mr-1" />
               Profile Locked
             </Badge>

@@ -16,11 +16,11 @@ const INSIGHT_FIELDS: Array<{
   className: string
   type: 'text' | 'json_list'
 }> = [
-  { key: 'practice_area_suggestion', label: 'Practice Area', className: 'bg-blue-50 text-blue-700 border-blue-200', type: 'text' },
-  { key: 'intake_summary', label: 'Summary', className: 'bg-slate-100 text-slate-600 border-slate-200', type: 'text' },
-  { key: 'qualification_suggestion', label: 'Qualification', className: 'bg-purple-50 text-purple-700 border-purple-200', type: 'text' },
-  { key: 'next_action_suggestion', label: 'Next Action', className: 'bg-green-50 text-green-700 border-green-200', type: 'text' },
-  { key: 'urgency_flags', label: 'Urgency', className: 'bg-amber-50 text-amber-700 border-amber-200', type: 'json_list' },
+  { key: 'practice_area_suggestion', label: 'Practice Area', className: 'bg-blue-950/30 text-blue-400 border-blue-500/20', type: 'text' },
+  { key: 'intake_summary', label: 'Summary', className: 'bg-muted text-muted-foreground border-border', type: 'text' },
+  { key: 'qualification_suggestion', label: 'Qualification', className: 'bg-purple-950/30 text-purple-400 border-purple-500/20', type: 'text' },
+  { key: 'next_action_suggestion', label: 'Next Action', className: 'bg-emerald-950/30 text-emerald-400 border-emerald-500/20', type: 'text' },
+  { key: 'urgency_flags', label: 'Urgency', className: 'bg-amber-950/30 text-amber-400 border-amber-500/20', type: 'json_list' },
   { key: 'missing_data_flags', label: 'Missing Data', className: 'bg-red-50 text-red-600 border-red-200', type: 'json_list' },
 ]
 
@@ -107,7 +107,7 @@ export function LeadAiInsightsCard({
             {/* Status + generated time */}
             <div className="flex items-center gap-1.5">
               {isAccepted && (
-                <Badge variant="outline" size="xs" className="bg-green-50 text-green-700 border-green-200">
+                <Badge variant="outline" size="xs" className="bg-emerald-950/30 text-emerald-400 border-emerald-500/20">
                   <CheckCircle2 className="mr-0.5 h-2.5 w-2.5" />
                   Accepted
                 </Badge>
@@ -254,7 +254,7 @@ function ConfidenceBar({ scores }: { scores: unknown }) {
   return (
     <div className="flex items-center gap-2 text-[10px] text-muted-foreground">
       <span>Confidence:</span>
-      <div className="flex-1 h-1.5 rounded-full bg-slate-100 overflow-hidden">
+      <div className="flex-1 h-1.5 rounded-full bg-muted overflow-hidden">
         <div
           className="h-full rounded-full bg-amber-400 transition-all"
           style={{ width: `${pct}%` }}

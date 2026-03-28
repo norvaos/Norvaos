@@ -15,7 +15,7 @@ const resendLimiter = createRateLimiter({ maxRequests: 3, windowMs: 60_000 })
 
 async function handlePost(request: Request) {
   const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
-  const { allowed, retryAfterMs } = resendLimiter.check(ip)
+  const { allowed, retryAfterMs } = await resendLimiter.check(ip)
   if (!allowed) {
     return NextResponse.json(
       { error: 'Too many requests. Please try again later.' },

@@ -667,7 +667,7 @@ export function MatterForm({ mode, defaultValues, onSubmit, isLoading }: MatterF
               </p>
             </div>
             {hasTemplateApplied && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-700 border border-emerald-200">
+              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-950/30 px-2.5 py-0.5 text-xs font-medium text-emerald-400 border border-emerald-500/20">
                 <CheckCircle2 className="h-3 w-3" />
                 Template Applied
               </span>
@@ -723,9 +723,9 @@ export function MatterForm({ mode, defaultValues, onSubmit, isLoading }: MatterF
 
             {/* ── Fee Summary Breakdown  -  only shown when a template is applied ── */}
             {hasTemplateApplied && feeBreakdown && (
-              <div className="rounded-lg border border-emerald-200 bg-emerald-50/50 p-4 space-y-3">
+              <div className="rounded-lg border border-emerald-500/20 bg-emerald-950/30/50 p-4 space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-semibold text-emerald-800 uppercase tracking-wide">
+                  <span className="text-xs font-semibold text-emerald-400 uppercase tracking-wide">
                     Fee Breakdown
                   </span>
                   <div className="flex items-center gap-2">
@@ -757,7 +757,7 @@ export function MatterForm({ mode, defaultValues, onSubmit, isLoading }: MatterF
                         'inline-flex items-center gap-1 rounded px-2 py-0.5 text-[10px] font-medium transition-colors',
                         isEditingLineItems
                           ? 'bg-emerald-600 text-white hover:bg-emerald-700'
-                          : 'bg-white border border-emerald-300 text-emerald-700 hover:bg-emerald-100'
+                          : 'bg-white border border-emerald-500/30 text-emerald-400 hover:bg-emerald-950/40'
                       )}
                     >
                       <Pencil className="h-2.5 w-2.5" />
@@ -791,8 +791,8 @@ export function MatterForm({ mode, defaultValues, onSubmit, isLoading }: MatterF
 
                 {/* Inline editable line items */}
                 {isEditingLineItems && editedLineItems && (
-                  <div className="space-y-2 pt-2 border-t border-emerald-200">
-                    <div className="text-[10px] font-semibold text-emerald-700 uppercase tracking-wide">{t('form.fee_edit_individual' as any)}</div>
+                  <div className="space-y-2 pt-2 border-t border-emerald-500/20">
+                    <div className="text-[10px] font-semibold text-emerald-400 uppercase tracking-wide">{t('form.fee_edit_individual' as any)}</div>
                     {editedLineItems.profItems.map((item, i) => (
                       <div key={`edit-pf-${i}`} className="flex items-center justify-between gap-2 text-xs">
                         <span className="truncate text-muted-foreground">{item.name || item.description || 'Professional Fee'}</span>
@@ -901,7 +901,7 @@ export function MatterForm({ mode, defaultValues, onSubmit, isLoading }: MatterF
                   const totalWithTax = feeBreakdown.professional + feeBreakdown.government + feeBreakdown.disbursements + taxAmountCents
 
                   return (
-                    <div className="space-y-2 pt-1 border-t border-emerald-200">
+                    <div className="space-y-2 pt-1 border-t border-emerald-500/20">
                       <div className="flex items-center justify-between text-xs">
                         <span className="text-muted-foreground">
                           Tax {provinceConfig || isOutsideCanada ? '' : ''}
@@ -926,8 +926,8 @@ export function MatterForm({ mode, defaultValues, onSubmit, isLoading }: MatterF
                       </div>
                       {(provinceConfig || isOutsideCanada) && (
                         <div className="flex items-center justify-between text-xs font-semibold">
-                          <span className="text-emerald-800">{t('form.fee_total_incl_tax' as any)}</span>
-                          <span className="text-emerald-800">{formatCents(totalWithTax)}</span>
+                          <span className="text-emerald-400">{t('form.fee_total_incl_tax' as any)}</span>
+                          <span className="text-emerald-400">{formatCents(totalWithTax)}</span>
                         </div>
                       )}
                     </div>
@@ -939,7 +939,7 @@ export function MatterForm({ mode, defaultValues, onSubmit, isLoading }: MatterF
                   <summary className="cursor-pointer hover:text-foreground transition-colors">
                     View itemised breakdown
                   </summary>
-                  <div className="mt-2 space-y-1 pl-2 border-l-2 border-emerald-200">
+                  <div className="mt-2 space-y-1 pl-2 border-l-2 border-emerald-500/20">
                     {feeBreakdown.profItems.length > 0 && (
                       <div className="pt-1 pb-0.5">
                         <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide">{t('form.fee_professional_services' as any)}</div>
@@ -1013,7 +1013,7 @@ export function MatterForm({ mode, defaultValues, onSubmit, isLoading }: MatterF
                       const showTax = taxAmountCents > 0 || (watchedApplicantLocation === 'inside_canada' && !!watchedClientProvince)
 
                       return (
-                        <div className="mt-3 border-t border-emerald-300 pt-3 space-y-1.5">
+                        <div className="mt-3 border-t border-emerald-500/30 pt-3 space-y-1.5">
                           <div className="flex justify-between text-xs">
                             <span>
                               Subtotal (Taxable)
@@ -1030,7 +1030,7 @@ export function MatterForm({ mode, defaultValues, onSubmit, isLoading }: MatterF
                           </div>
                           {showTax && (
                             <>
-                              <div className="border-t border-emerald-200 my-1" />
+                              <div className="border-t border-emerald-500/20 my-1" />
                               <div className="flex justify-between text-xs">
                                 <span>
                                   {taxLabel || 'Tax'}
@@ -1047,7 +1047,7 @@ export function MatterForm({ mode, defaultValues, onSubmit, isLoading }: MatterF
                               </div>
                             </>
                           )}
-                          <div className="border-t border-emerald-300 my-1" />
+                          <div className="border-t border-emerald-500/30 my-1" />
                           <div className="flex justify-between text-sm font-bold">
                             <span>{t('form.fee_total' as any)}</span>
                             <span className="tabular-nums">{formatCents(totalCents)}</span>

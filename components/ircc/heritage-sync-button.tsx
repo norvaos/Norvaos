@@ -159,12 +159,12 @@ export function HeritageSyncButton({
   // Already synced  -  show summary
   if (synced && summary) {
     return (
-      <div className={cn('rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-3', className)}>
+      <div className={cn('rounded-xl border border-white/[0.06] bg-white/[0.02] p-3', className)}>
         {/* Summary header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <CheckCircle2 className="size-4 text-emerald-500" />
-            <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-300">
+            <span className="text-xs font-semibold text-emerald-400 dark:text-emerald-300">
               Heritage Data Synced
             </span>
           </div>
@@ -203,14 +203,14 @@ export function HeritageSyncButton({
                 key={f.path}
                 className={cn(
                   'flex items-center justify-between rounded-md px-2 py-1 text-[10px]',
-                  f.category === 'stable' && 'bg-emerald-500/10',
+                  f.category === 'stable' && 'bg-white/[0.06]',
                   f.category === 'semi_stable' && 'bg-amber-500/10',
                   f.category === 'matter_specific' && 'bg-muted/30 opacity-50',
                 )}
               >
                 <span className={cn(
                   'font-medium',
-                  f.category === 'stable' && 'text-emerald-700 dark:text-emerald-300',
+                  f.category === 'stable' && 'text-emerald-400 dark:text-emerald-300',
                   f.category === 'semi_stable' && 'text-amber-700 dark:text-amber-300',
                   f.category === 'matter_specific' && 'text-muted-foreground line-through',
                 )}>
@@ -236,8 +236,8 @@ export function HeritageSyncButton({
             variant="outline"
             size={compact ? 'icon' : 'sm'}
             className={cn(
-              'gap-1.5 border-emerald-500/30 text-emerald-700 dark:text-emerald-400',
-              'hover:bg-emerald-500/10 hover:border-emerald-500/50',
+              'gap-1.5 border-emerald-500/30 text-emerald-400 dark:text-emerald-400',
+              'hover:bg-white/[0.06] hover:border-emerald-500/50',
               className,
             )}
             disabled={profileLoading}

@@ -7,21 +7,21 @@ export function ScanStatusBadge({ status }: { status: string }) {
   switch (status) {
     case 'scanned':
       return (
-        <Badge variant="outline" className="gap-1 text-green-600 border-green-200 bg-green-50">
+        <Badge variant="outline" className="gap-1 text-green-600 border-emerald-500/20 bg-emerald-950/30">
           <CheckCircle2 className="h-3 w-3" />
           Scanned
         </Badge>
       )
     case 'scanning':
       return (
-        <Badge variant="outline" className="gap-1 text-blue-600 border-blue-200 bg-blue-50">
+        <Badge variant="outline" className="gap-1 text-blue-600 border-blue-500/20 bg-blue-950/30">
           <Loader2 className="h-3 w-3 animate-spin" />
           Scanning
         </Badge>
       )
     case 'error':
       return (
-        <Badge variant="outline" className="gap-1 text-red-600 border-red-200 bg-red-50">
+        <Badge variant="outline" className="gap-1 text-red-600 border-red-500/20 bg-red-950/30">
           <AlertCircle className="h-3 w-3" />
           Error
         </Badge>

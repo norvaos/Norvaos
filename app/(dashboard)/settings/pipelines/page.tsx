@@ -34,6 +34,7 @@ import {
   Clock,
 } from 'lucide-react'
 
+import { stageDescriptions, type StageId } from '@/components/studio/golden-thread'
 import { useTenant } from '@/lib/hooks/use-tenant'
 import {
   usePipelines,
@@ -91,6 +92,35 @@ import { Skeleton } from '@/components/ui/skeleton'
 type Pipeline = Database['public']['Tables']['pipelines']['Row']
 type PipelineStage = Database['public']['Tables']['pipeline_stages']['Row']
 
+// The NorvaOS Standard pipeline is immutable — users cannot rename, delete,
+// or reorder its 7 sovereign stages. This is the Sovereign Standard.
+const SYSTEM_PIPELINE_NAME = 'NorvaOS Standard'
+function isSystemPipeline(pipeline: Pipeline): boolean {
+  return pipeline.name === SYSTEM_PIPELINE_NAME
+}
+
+/** Map a stage name (e.g. "Inquiry") to its sovereign SOP description, if it matches */
+const STAGE_NAME_TO_ID: Record<string, StageId> = {
+  inquiry: 'inquiry',
+  contact: 'contact',
+  contacted: 'contact',
+  meeting: 'meeting',
+  'meeting set': 'meeting',
+  strategy: 'strategy',
+  'strategy held': 'strategy',
+  retainer: 'retainer',
+  'retainer sent': 'retainer',
+  payment: 'payment',
+  'payment pending': 'payment',
+  won: 'won',
+  'won / onboarded': 'won',
+}
+
+function getSopDescription(stageName: string): string | null {
+  const stageId = STAGE_NAME_TO_ID[stageName.toLowerCase()]
+  return stageId ? stageDescriptions[stageId] : null
+}
+
 // ---------- Practice Areas hook ----------
 
 function usePracticeAreas(tenantId: string) {
@@ -134,10 +164,12 @@ function SortableStageRow({
   stage,
   onEdit,
   onDelete,
+  readOnly = false,
 }: {
   stage: PipelineStage
   onEdit: (stage: PipelineStage) => void
   onDelete: (stage: PipelineStage) => void
+  readOnly?: boolean
 }) {
   const {
     attributes,
@@ -158,18 +190,20 @@ function SortableStageRow({
       ref={setNodeRef}
       style={style}
       className={cn(
-        'flex items-center gap-3 rounded-lg border bg-white px-3 py-2.5 transition-shadow',
+        'flex items-center gap-3 rounded-lg border border-border bg-background px-3 py-2.5 transition-shadow',
         isDragging && 'z-50 shadow-lg ring-2 ring-primary/20'
       )}
     >
-      <button
-        type="button"
-        className="cursor-grab touch-none text-slate-400 hover:text-slate-600"
-        {...attributes}
-        {...listeners}
-      >
-        <GripVertical className="h-4 w-4" />
-      </button>
+      {!readOnly && (
+        <button
+          type="button"
+          className="cursor-grab touch-none text-muted-foreground hover:text-foreground"
+          {...attributes}
+          {...listeners}
+        >
+          <GripVertical className="h-4 w-4" />
+        </button>
+      )}
 
       <div
         className="h-4 w-4 shrink-0 rounded-full"
@@ -178,28 +212,33 @@ function SortableStageRow({
 
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
-          <span className="truncate text-sm font-medium text-slate-900">
+          <span className="truncate text-sm font-medium text-foreground">
             {stage.name}
           </span>
           {stage.is_win_stage && (
-            <Badge variant="secondary" className="gap-1 text-[10px] text-emerald-700 bg-emerald-50 border-emerald-200">
+            <Badge variant="secondary" className="gap-1 text-[10px] text-emerald-400 bg-emerald-950/30 border-emerald-500/20">
               <Trophy className="h-3 w-3" />
               Win
             </Badge>
           )}
           {stage.is_lost_stage && (
-            <Badge variant="secondary" className="gap-1 text-[10px] text-red-700 bg-red-50 border-red-200">
+            <Badge variant="secondary" className="gap-1 text-[10px] text-red-400 bg-red-950/30 border-red-200">
               <XCircle className="h-3 w-3" />
               Lost
             </Badge>
           )}
         </div>
+        {readOnly && getSopDescription(stage.name) && (
+          <p className="text-xs text-muted-foreground mt-1 font-mono leading-snug">
+            {getSopDescription(stage.name)}
+          </p>
+        )}
         <div className="flex items-center gap-3 mt-0.5">
-          <span className="text-xs text-slate-500">
+          <span className="text-xs text-muted-foreground font-mono">
             {stage.win_probability ?? 0}% probability
           </span>
           {stage.rotting_days && (
-            <span className="flex items-center gap-1 text-xs text-slate-400">
+            <span className="flex items-center gap-1 text-xs text-muted-foreground/70 font-mono">
               <Clock className="h-3 w-3" />
               {stage.rotting_days}d rotting
             </span>
@@ -207,24 +246,26 @@ function SortableStageRow({
         </div>
       </div>
 
-      <div className="flex items-center gap-1">
-        <Button
-          variant="ghost"
-          size="sm"
-          className="h-7 w-7 p-0 text-slate-400 hover:text-slate-600"
-          onClick={() => onEdit(stage)}
-        >
-          <Pencil className="h-3.5 w-3.5" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="h-7 w-7 p-0 text-slate-400 hover:text-red-600"
-          onClick={() => onDelete(stage)}
-        >
-          <Trash2 className="h-3.5 w-3.5" />
-        </Button>
-      </div>
+      {!readOnly && (
+        <div className="flex items-center gap-1">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground"
+            onClick={() => onEdit(stage)}
+          >
+            <Pencil className="h-3.5 w-3.5" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-7 w-7 p-0 text-muted-foreground hover:text-red-600"
+            onClick={() => onDelete(stage)}
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+          </Button>
+        </div>
+      )}
     </div>
   )
 }
@@ -727,6 +768,7 @@ function StageListPanel({
 }) {
   const { data: stages, isLoading } = usePipelineStages(pipeline.id)
   const reorderStages = useReorderStages()
+  const isSystem = isSystemPipeline(pipeline)
 
   const [stageFormOpen, setStageFormOpen] = useState(false)
   const [editingStage, setEditingStage] = useState<PipelineStage | null>(null)
@@ -765,18 +807,34 @@ function StageListPanel({
     <div className="flex flex-col h-full">
       <div className="flex items-center justify-between px-1 pb-4">
         <div>
-          <h2 className="text-lg font-semibold text-slate-900">
+          <h2 className="text-lg font-semibold text-foreground">
             {pipeline.name}
           </h2>
-          <p className="text-sm text-slate-500">
-            Manage stages for this pipeline
+          <p className="text-sm text-muted-foreground">
+            {isSystem
+              ? 'Sovereign Standard — immutable 7-stage pipeline'
+              : 'Manage stages for this pipeline'}
           </p>
         </div>
-        <Button size="sm" onClick={() => { setEditingStage(null); setStageFormOpen(true) }}>
-          <Plus className="mr-1 h-4 w-4" />
-          Add Stage
-        </Button>
+        {!isSystem && (
+          <Button size="sm" onClick={() => { setEditingStage(null); setStageFormOpen(true) }}>
+            <Plus className="mr-1 h-4 w-4" />
+            Add Stage
+          </Button>
+        )}
       </div>
+
+      {isSystem && (
+        <div className="mb-4 rounded-lg border border-emerald-500/20 bg-emerald-950/30/50 px-4 py-3">
+          <p className="text-xs font-semibold text-emerald-400">
+            ✦ NorvaOS Sovereign Standard
+          </p>
+          <p className="text-xs text-emerald-600 mt-0.5">
+            These 7 stages are the sovereign pipeline. They cannot be renamed, reordered, or deleted.
+            Every engagement follows this high-performance sequence from Inquiry through to Won / Onboarded.
+          </p>
+        </div>
+      )}
 
       <Separator />
 
@@ -788,11 +846,11 @@ function StageListPanel({
         </div>
       ) : !stages || stages.length === 0 ? (
         <div className="flex flex-1 flex-col items-center justify-center py-16 text-center">
-          <Settings2 className="h-10 w-10 text-slate-300" />
-          <p className="mt-3 text-sm font-medium text-slate-600">
+          <Settings2 className="h-10 w-10 text-muted-foreground/40" />
+          <p className="mt-3 text-sm font-medium text-foreground/70">
             No stages yet
           </p>
-          <p className="mt-1 text-sm text-slate-400">
+          <p className="mt-1 text-sm text-muted-foreground">
             This pipeline has no stages yet. Add your first stage.
           </p>
           <Button
@@ -820,6 +878,7 @@ function StageListPanel({
                   <SortableStageRow
                     key={stage.id}
                     stage={stage}
+                    readOnly={isSystem}
                     onEdit={(s) => {
                       setEditingStage(s)
                       setStageFormOpen(true)
@@ -877,14 +936,14 @@ function PipelineCard({
         'cursor-pointer p-4 transition-all hover:shadow-sm',
         isSelected
           ? 'border-primary bg-primary/5 ring-1 ring-primary/20'
-          : 'hover:border-slate-300'
+          : 'hover:border-border'
       )}
       onClick={onClick}
     >
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
-            <span className="truncate text-sm font-semibold text-slate-900">
+            <span className="truncate text-sm font-semibold text-foreground">
               {pipeline.name}
             </span>
             {pipeline.is_default && (
@@ -897,21 +956,21 @@ function PipelineCard({
               className={cn(
                 'text-[10px]',
                 pipeline.pipeline_type === 'lead'
-                  ? 'bg-blue-50 text-blue-700 border-blue-200'
-                  : 'bg-purple-50 text-purple-700 border-purple-200'
+                  ? 'bg-blue-950/30 text-blue-400 border-blue-200'
+                  : 'bg-purple-950/30 text-purple-400 border-purple-200'
               )}
             >
               {pipeline.pipeline_type === 'lead' ? 'Lead' : 'Matter'}
             </Badge>
             {pipeline.practice_area && (
-              <span className="truncate text-xs text-slate-500">
+              <span className="truncate text-xs text-muted-foreground">
                 {pipeline.practice_area}
               </span>
             )}
           </div>
         </div>
         {stageCount !== undefined && (
-          <span className="shrink-0 text-xs text-slate-400">
+          <span className="shrink-0 text-xs text-muted-foreground">
             {stageCount} {stageCount === 1 ? 'stage' : 'stages'}
           </span>
         )}
@@ -986,14 +1045,14 @@ export default function PipelinesPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-900">
+          <h1 className="text-2xl font-semibold text-foreground">
             Pipeline Management
           </h1>
-          <p className="mt-1 text-sm text-slate-500">
+          <p className="mt-1 text-sm text-muted-foreground">
             Configure lead and matter pipelines with custom stages
           </p>
         </div>
-        <Button onClick={() => setCreateDialogOpen(true)}>
+        <Button onClick={() => setCreateDialogOpen(true)} className="bg-emerald-600 hover:bg-emerald-950/300 text-white shadow-lg shadow-emerald-500/20">
           <Plus className="mr-2 h-4 w-4" />
           Create Pipeline
         </Button>
@@ -1021,11 +1080,11 @@ export default function PipelinesPage() {
             </div>
           ) : effectivePipelines.length === 0 ? (
             <div className="flex flex-1 flex-col items-center justify-center rounded-lg border border-dashed py-16 text-center">
-              <Settings2 className="h-10 w-10 text-slate-300" />
-              <p className="mt-3 text-sm font-medium text-slate-600">
+              <Settings2 className="h-10 w-10 text-muted-foreground/40" />
+              <p className="mt-3 text-sm font-medium text-foreground/70">
                 No pipelines configured yet
               </p>
-              <p className="mt-1 text-sm text-slate-400">
+              <p className="mt-1 text-sm text-muted-foreground">
                 Create your first pipeline to get started.
               </p>
               <Button
@@ -1054,7 +1113,7 @@ export default function PipelinesPage() {
         </div>
 
         {/* Right panel: stages */}
-        <div className="flex-1 rounded-lg border bg-slate-50/50 p-5">
+        <div className="flex-1 rounded-lg border border-border bg-muted/30 p-5">
           {selectedPipeline ? (
             <StageListPanel
               key={selectedPipeline.id}
@@ -1063,11 +1122,11 @@ export default function PipelinesPage() {
             />
           ) : (
             <div className="flex h-full flex-col items-center justify-center text-center">
-              <Settings2 className="h-10 w-10 text-slate-300" />
-              <p className="mt-3 text-sm font-medium text-slate-600">
+              <Settings2 className="h-10 w-10 text-muted-foreground/40" />
+              <p className="mt-3 text-sm font-medium text-foreground/70">
                 No pipeline selected
               </p>
-              <p className="mt-1 text-sm text-slate-400">
+              <p className="mt-1 text-sm text-muted-foreground">
                 Select a pipeline from the left to manage its stages.
               </p>
             </div>

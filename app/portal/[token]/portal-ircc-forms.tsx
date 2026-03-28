@@ -323,23 +323,23 @@ export function PortalIRCCForms({
       {allCompleted && (
         <div className="pt-4">
           {/* Completed banner */}
-          <div className="rounded-2xl border border-emerald-200/60 bg-gradient-to-br from-emerald-50 to-white p-5 text-center mb-4 shadow-sm">
-            <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-100 shadow-sm">
+          <div className="rounded-2xl border border-emerald-500/20/60 bg-gradient-to-br from-emerald-50 to-white p-5 text-center mb-4 shadow-sm">
+            <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-950/40 shadow-sm">
               <svg className="h-5 w-5 text-emerald-600" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
               </svg>
             </div>
-            <h3 className="text-sm font-bold text-emerald-800">
+            <h3 className="text-sm font-bold text-emerald-400">
               {tr.ircc_submitted_title}
             </h3>
-            <p className="mt-1 text-xs text-emerald-700">
+            <p className="mt-1 text-xs text-emerald-400">
               {tr.ircc_submitted_message}
             </p>
           </div>
 
           {/* Edit request */}
           {hasPendingEditRequest || editSubmitted ? (
-            <p className="text-xs text-amber-700 flex items-center gap-1.5">
+            <p className="text-xs text-amber-400 flex items-center gap-1.5">
               <svg className="h-3.5 w-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <circle cx="12" cy="12" r="10" />
                 <path d="M12 6v6l4 2" />
@@ -423,9 +423,9 @@ function FormCard({
 
   // Status badge
   const statusConfig = isCompleted
-    ? { icon: '✓', label: 'Completed', className: 'bg-emerald-50 text-emerald-700 border-emerald-200/60' }
+    ? { icon: '✓', label: 'Completed', className: 'bg-emerald-950/30 text-emerald-400 border-emerald-500/20/60' }
     : isInProgress
-      ? { icon: '●', label: `In Progress  -  ${form.progress_percent}%`, className: 'bg-blue-50 text-blue-700 border-blue-200/60' }
+      ? { icon: '●', label: `In Progress  -  ${form.progress_percent}%`, className: 'bg-blue-950/30 text-blue-400 border-blue-200/60' }
       : { icon: '○', label: 'Not Started', className: 'bg-slate-50 text-slate-500 border-slate-200/60' }
 
   // Action button

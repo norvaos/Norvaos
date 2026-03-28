@@ -75,10 +75,10 @@ function getAuditIcon(action: string) {
 
 function getAuditColor(action: string) {
   switch (action) {
-    case 'create': return 'text-green-600 bg-green-50'
-    case 'update': return 'text-blue-600 bg-blue-50'
-    case 'delete': return 'text-red-600 bg-red-50'
-    case 'stage_change': return 'text-purple-600 bg-purple-50'
+    case 'create': return 'text-green-600 bg-emerald-950/30'
+    case 'update': return 'text-blue-600 bg-blue-950/30'
+    case 'delete': return 'text-red-600 bg-red-950/30'
+    case 'stage_change': return 'text-purple-600 bg-purple-950/30'
     default: return 'text-slate-600 bg-slate-50'
   }
 }
@@ -143,19 +143,19 @@ export function ActivityTimeline({ tenantId, matterId, contactId, entityType, en
   activities?.forEach((a) => {
     // Determine icon and color for phone calls based on direction
     let icon = getActivityIcon(a.activity_type)
-    let iconColor = 'text-blue-600 bg-blue-50'
+    let iconColor = 'text-blue-600 bg-blue-950/30'
 
     if (a.activity_type === 'phone_call' || a.activity_type === 'phone_inbound' || a.activity_type === 'phone_outbound') {
       const meta = (a.metadata ?? {}) as Record<string, unknown>
       const direction = (meta.call_direction ?? meta.direction) as string | undefined
       if (direction === 'inbound' || a.activity_type === 'phone_inbound') {
         icon = PhoneIncoming
-        iconColor = 'text-green-600 bg-green-50'
+        iconColor = 'text-green-600 bg-emerald-950/30'
       } else if (direction === 'outbound' || a.activity_type === 'phone_outbound') {
         icon = PhoneOutgoing
-        iconColor = 'text-blue-600 bg-blue-50'
+        iconColor = 'text-blue-600 bg-blue-950/30'
       } else {
-        iconColor = 'text-emerald-600 bg-emerald-50'
+        iconColor = 'text-emerald-600 bg-emerald-950/30'
       }
     }
 
@@ -180,7 +180,7 @@ export function ActivityTimeline({ tenantId, matterId, contactId, entityType, en
       userId: n.user_id,
       createdAt: n.created_at,
       icon: StickyNote,
-      iconColor: 'text-amber-600 bg-amber-50',
+      iconColor: 'text-amber-600 bg-amber-950/30',
     })
   })
 

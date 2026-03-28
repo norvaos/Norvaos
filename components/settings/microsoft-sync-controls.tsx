@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
-import { Calendar, CheckSquare, Loader2, RefreshCw } from 'lucide-react'
+import { Calendar, CheckSquare, Loader2, Mail, RefreshCw } from 'lucide-react'
 import {
   useMicrosoftConnection,
   useUpdateMicrosoftSettings,
@@ -114,6 +114,38 @@ export function MicrosoftSyncControls({ userId }: MicrosoftSyncControlsProps) {
               }
               disabled={updateSettings.isPending}
             />
+          </div>
+        </div>
+
+        <Separator />
+
+        {/* Email Sync (always on when connected) */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Mail className="h-5 w-5 text-muted-foreground" />
+            <div>
+              <Label className="text-sm font-medium">
+                Outlook Email
+              </Label>
+              <p className="text-xs text-muted-foreground">
+                Inbound emails sync automatically every 15 minutes. 24-month Deep History on first sync.
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              disabled={triggerSync.isPending}
+              onClick={() => triggerSync.mutate('all')}
+            >
+              {triggerSync.isPending ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <RefreshCw className="h-3.5 w-3.5" />
+              )}
+            </Button>
+            <span className="text-xs font-medium text-emerald-600">Active</span>
           </div>
         </div>
 

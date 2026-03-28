@@ -74,14 +74,14 @@ function StatusBadge({ status }: { status: string }) {
   switch (status) {
     case 'syncing':
       return (
-        <Badge variant="outline" className="gap-1 border-green-200 bg-green-50 text-green-700">
+        <Badge variant="outline" className="gap-1 border-green-200 bg-emerald-950/30 text-emerald-400">
           <CheckCircle2 className="size-3" />
           Syncing
         </Badge>
       )
     case 'error':
       return (
-        <Badge variant="outline" className="gap-1 border-red-200 bg-red-50 text-red-700">
+        <Badge variant="outline" className="gap-1 border-red-200 bg-red-950/30 text-red-400">
           <XCircle className="size-3" />
           Error
         </Badge>
@@ -95,7 +95,7 @@ function StatusBadge({ status }: { status: string }) {
       )
     default:
       return (
-        <Badge variant="outline" className="gap-1 border-amber-200 bg-amber-50 text-amber-700">
+        <Badge variant="outline" className="gap-1 border-amber-200 bg-amber-950/30 text-amber-400">
           <RefreshCw className="size-3" />
           Pending
         </Badge>
@@ -271,7 +271,7 @@ export default function EmailAccountsSettingsPage() {
                     className="flex items-center justify-between rounded-lg border p-4"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="flex size-9 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
+                      <div className="flex size-9 items-center justify-center rounded-lg bg-blue-950/30 text-blue-600">
                         <Mail className="size-4" />
                       </div>
                       <div>

@@ -341,7 +341,7 @@ export function ChainLockActivateButton({
               className={cn(
                 'relative overflow-hidden transition-all duration-300',
                 !isSealed && !isGenerating && 'bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white border-0',
-                isSealed && 'border-emerald-300 bg-emerald-50 text-emerald-700 dark:border-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400',
+                isSealed && 'border-emerald-500/30 bg-emerald-950/30 text-emerald-400 dark:border-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400',
                 className,
               )}
             >

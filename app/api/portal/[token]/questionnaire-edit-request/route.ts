@@ -65,7 +65,7 @@ export async function POST(
 ) {
   try {
     const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
-    const { allowed, retryAfterMs } = rateLimiter.check(ip)
+    const { allowed, retryAfterMs } = await rateLimiter.check(ip)
     if (!allowed) {
       return NextResponse.json(
         { error: 'Too many requests' },

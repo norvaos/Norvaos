@@ -80,22 +80,22 @@ export function MilestonesTab({ matterId, tenantId }: { matterId: string; tenant
                 icon = dir === 'inbound'
                   ? <PhoneIncoming className="h-4 w-4" />
                   : <PhoneOutgoing className="h-4 w-4" />
-                iconBg = dir === 'inbound' ? 'bg-green-50 text-green-600' : 'bg-blue-50 text-blue-600'
+                iconBg = dir === 'inbound' ? 'bg-emerald-950/30 text-green-600' : 'bg-blue-950/30 text-blue-600'
               } else if (m.activity_type === 'meeting') {
                 icon = <Calendar className="h-4 w-4" />
-                iconBg = 'bg-purple-50 text-purple-600'
+                iconBg = 'bg-purple-950/30 text-purple-600'
               } else if (m.activity_type === 'stage_change') {
                 icon = <ArrowLeft className="h-4 w-4 rotate-180" />
                 iconBg = 'bg-indigo-50 text-indigo-600'
               } else if (m.activity_type === 'no_show') {
                 icon = <AlertTriangle className="h-4 w-4" />
-                iconBg = 'bg-red-50 text-red-600'
+                iconBg = 'bg-red-950/30 text-red-600'
               } else if (m.activity_type === 'document_submitted') {
                 icon = <FileText className="h-4 w-4" />
-                iconBg = 'bg-emerald-50 text-emerald-600'
+                iconBg = 'bg-emerald-950/30 text-emerald-600'
               } else if (m.activity_type === 'retainer_signed') {
                 icon = <CheckCircle2 className="h-4 w-4" />
-                iconBg = 'bg-green-50 text-green-600'
+                iconBg = 'bg-emerald-950/30 text-green-600'
               }
 
               return (

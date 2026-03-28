@@ -243,12 +243,12 @@ function IntakeWizardInner({
         <Sparkles className="h-4 w-4 text-indigo-500" />
         <span className="text-sm font-semibold text-slate-800">Interactive Intake</span>
         {wizardState === 'completed' && (
-          <Badge variant="secondary" className="text-[10px] bg-emerald-50 text-emerald-700 border-emerald-200">
+          <Badge variant="secondary" className="text-[10px] bg-emerald-950/30 text-emerald-400 border-emerald-500/20">
             Complete
           </Badge>
         )}
         {wizardState === 'active' && (
-          <Badge variant="secondary" className="text-[10px] bg-blue-50 text-blue-700 border-blue-200">
+          <Badge variant="secondary" className="text-[10px] bg-blue-950/30 text-blue-400 border-blue-500/20">
             In Progress
           </Badge>
         )}
@@ -302,7 +302,7 @@ function IntakeWizardInner({
         <div className="px-4 pt-4 pb-3 space-y-2">
           {header}
           <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
-            <div className="h-1.5 bg-emerald-500 rounded-full w-full" />
+            <div className="h-1.5 bg-emerald-950/300 rounded-full w-full" />
           </div>
           <p className="text-[11px] text-slate-400">{answeredCount} {answeredCount === 1 ? 'answer' : 'answers'} recorded</p>
         </div>
@@ -366,7 +366,7 @@ function IntakeWizardInner({
                     </div>
                   )}
                   {rec.deadlineWarning && (
-                    <div className="rounded border border-amber-200 bg-amber-50 px-2 py-1.5 flex items-start gap-1.5">
+                    <div className="rounded border border-amber-200 bg-amber-950/30 px-2 py-1.5 flex items-start gap-1.5">
                       <AlertTriangle className="h-3.5 w-3.5 text-amber-500 shrink-0 mt-0.5" />
                       <p className="text-[11px] text-amber-800 font-medium">{rec.deadlineWarning}</p>
                     </div>
@@ -630,9 +630,9 @@ function IntakeWizardInner({
 
 function ConfidenceBadge({ confidence }: { confidence: 'strong' | 'likely' | 'possible' }) {
   const config = {
-    strong:   { label: 'Strong match', className: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
-    likely:   { label: 'Likely match', className: 'bg-blue-50 text-blue-700 border-blue-200' },
-    possible: { label: 'Possible',     className: 'bg-amber-50 text-amber-700 border-amber-200' },
+    strong:   { label: 'Strong match', className: 'bg-emerald-950/30 text-emerald-400 border-emerald-500/20' },
+    likely:   { label: 'Likely match', className: 'bg-blue-950/30 text-blue-400 border-blue-500/20' },
+    possible: { label: 'Possible',     className: 'bg-amber-950/30 text-amber-400 border-amber-200' },
   }[confidence]
 
   return (

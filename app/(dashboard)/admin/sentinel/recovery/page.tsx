@@ -189,8 +189,8 @@ export default function SentinelRecoveryPage() {
           variant="outline"
           className={
             activeLockdowns.length > 0
-              ? 'bg-red-50 text-red-700 border-red-200'
-              : 'bg-green-50 text-green-700 border-green-200'
+              ? 'bg-red-950/30 text-red-400 border-red-500/20'
+              : 'bg-emerald-950/30 text-emerald-400 border-green-500/20'
           }
         >
           {activeLockdowns.length > 0 ? (
@@ -208,7 +208,7 @@ export default function SentinelRecoveryPage() {
       </div>
 
       {/* ── Active Lockdowns ────────────────────────────────────────────── */}
-      <Card className={activeLockdowns.length > 0 ? 'border-red-200' : ''}>
+      <Card className={activeLockdowns.length > 0 ? 'border-red-500/20' : ''}>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-lg">
             <Lock className="h-5 w-5 text-red-500" />
@@ -245,7 +245,7 @@ export default function SentinelRecoveryPage() {
               </TableHeader>
               <TableBody>
                 {activeLockdowns.map((lockdown) => (
-                  <TableRow key={lockdown.id} className="bg-red-50/50">
+                  <TableRow key={lockdown.id} className="bg-red-950/30/50">
                     <TableCell>
                       <Badge variant="destructive" className="text-xs">
                         {lockdown.trigger_event}
@@ -270,7 +270,7 @@ export default function SentinelRecoveryPage() {
                       <Button
                         variant="outline"
                         size="sm"
-                        className="text-amber-700 border-amber-300 hover:bg-amber-50"
+                        className="text-amber-400 border-amber-500/30 hover:bg-amber-950/30"
                         onClick={() => handleUnlockClick(lockdown)}
                       >
                         <KeyRound className="h-3.5 w-3.5 mr-1.5" />
@@ -362,11 +362,11 @@ export default function SentinelRecoveryPage() {
           {selectedLockdown && (
             <div className="space-y-4 py-2">
               {/* Lockdown summary */}
-              <div className="rounded-md border border-red-200 bg-red-50 p-3 space-y-1.5">
-                <p className="text-xs font-medium text-red-800">
+              <div className="rounded-md border border-red-500/20 bg-red-950/30 p-3 space-y-1.5">
+                <p className="text-xs font-medium text-red-400">
                   Lockdown: {selectedLockdown.trigger_event}
                 </p>
-                <p className="text-xs text-red-700">
+                <p className="text-xs text-red-400">
                   {selectedLockdown.trigger_count} security event{selectedLockdown.trigger_count !== 1 ? 's' : ''}{' '}
                   detected within {selectedLockdown.details?.window_minutes ?? 60} minutes
                 </p>
@@ -420,9 +420,9 @@ export default function SentinelRecoveryPage() {
               </p>
 
               {unlockMutation.isError && (
-                <div className="rounded-md border border-red-200 bg-red-50 p-2 flex items-center gap-2">
+                <div className="rounded-md border border-red-500/20 bg-red-950/30 p-2 flex items-center gap-2">
                   <XCircle className="h-4 w-4 text-red-500 flex-shrink-0" />
-                  <p className="text-xs text-red-700">{unlockMutation.error?.message}</p>
+                  <p className="text-xs text-red-400">{unlockMutation.error?.message}</p>
                 </div>
               )}
             </div>

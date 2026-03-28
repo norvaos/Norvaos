@@ -95,17 +95,17 @@ function HealthBadge({ health }: { health: 'healthy' | 'warning' | 'critical' })
     healthy: {
       dot: 'bg-green-500',
       text: 'Healthy',
-      badge: 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400',
+      badge: 'bg-emerald-950/30 text-emerald-400 dark:bg-green-900/40 dark:text-green-400',
     },
     warning: {
       dot: 'bg-amber-500',
       text: 'Warning',
-      badge: 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400',
+      badge: 'bg-amber-950/30 text-amber-400 dark:bg-amber-900/40 dark:text-amber-400',
     },
     critical: {
       dot: 'bg-red-500',
       text: 'Critical',
-      badge: 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400',
+      badge: 'bg-red-950/40 text-red-400 dark:bg-red-900/40 dark:text-red-400',
     },
   }[health]
 

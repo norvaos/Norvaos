@@ -24,7 +24,7 @@ async function handlePost(
     const { token } = await params
 
     // Rate limit: 10 req/min per token+IP (stricter for identity verification)
-    const rateLimitResponse = checkVerifyRateLimit(request, token)
+    const rateLimitResponse = await checkVerifyRateLimit(request, token)
     if (rateLimitResponse) return rateLimitResponse
 
     // 1. Validate kiosk token

@@ -54,6 +54,7 @@ import { ArrowLeft, Loader2, MessageSquare, Brain } from 'lucide-react'
 import { LeadDetailHeader } from '@/components/leads/workflow/lead-detail-header'
 import { LeadStagePipelineBar } from '@/components/leads/workflow/lead-stage-pipeline-bar'
 import { CommunicationPanel } from '@/components/leads/workflow/communication-panel'
+import { CommunicationStream } from '@/components/shared/communication-stream'
 import { CentrePanel } from '@/components/leads/workflow/centre-panel'
 import { RightPanel } from '@/components/leads/workflow/right-panel'
 import { AdvanceStageDialog } from '@/components/leads/workflow/advance-stage-dialog'
@@ -449,6 +450,17 @@ export default function LeadDetailPage() {
             onLogEvent={handleLogCommunication}
             isSubmitting={logCommMutation.isPending}
           />
+          {/* Omniscient Archive — Microsoft Email Stream */}
+          {contact?.email_primary && (
+            <div className="border-t flex-1 overflow-hidden">
+              <CommunicationStream
+                contactEmail={contact.email_primary}
+                contactName={`${contact.first_name ?? ''} ${contact.last_name ?? ''}`.trim()}
+                leadId={leadId}
+                contactId={contact.id}
+              />
+            </div>
+          )}
         </div>
 
         {/* Centre Panel  -  Summary & Activity */}

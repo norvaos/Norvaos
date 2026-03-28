@@ -191,12 +191,12 @@ function getAuditIcon(action: string) {
 
 function getAuditIconColor(action: string): string {
   switch (action) {
-    case 'created': return 'text-emerald-600 bg-emerald-50'
-    case 'updated': return 'text-blue-600 bg-blue-50'
+    case 'created': return 'text-emerald-600 bg-emerald-950/30'
+    case 'updated': return 'text-blue-600 bg-blue-950/30'
     case 'deleted':
-    case 'archived': return 'text-red-500 bg-red-50'
+    case 'archived': return 'text-red-500 bg-red-950/30'
     case 'stage_changed': return 'text-violet-600 bg-violet-50'
-    case 'completed': return 'text-green-600 bg-green-50'
+    case 'completed': return 'text-green-600 bg-emerald-950/30'
     default: return 'text-muted-foreground bg-muted'
   }
 }
@@ -602,7 +602,7 @@ const StatCard = memo(function StatCard({ icon: Icon, label, value, subtitle, ic
           </div>
           <div>
             <p className="text-sm font-medium text-muted-foreground">{label}</p>
-            <p className="text-2xl font-bold tracking-tight">{value}</p>
+            <p className="text-2xl font-semibold tracking-tight font-mono">{value}</p>
             {subtitle && (
               <p className="text-xs text-muted-foreground">{subtitle}</p>
             )}
@@ -969,7 +969,7 @@ function DeadlinesIn14DaysWidget({
                     variant={isUrgent ? 'destructive' : isWarning ? 'outline' : 'secondary'}
                     className={cn(
                       'ml-2 shrink-0',
-                      isWarning && 'border-orange-400 text-orange-600 bg-orange-50'
+                      isWarning && 'border-orange-400 text-orange-600 bg-orange-950/30'
                     )}
                   >
                     {daysLeft === 0 ? t('dashboard.deadline_today') : daysLeft === 1 ? t('dashboard.deadline_1_day') : t('dashboard.deadline_days').replace('{days}', String(daysLeft))}
@@ -990,12 +990,16 @@ function DeadlinesIn14DaysWidget({
 
 function PipelineSummaryWidget({ tenantId }: { tenantId: string }) {
   const { t } = useI18n()
+  const openModal = useUIStore((s) => s.openModal)
   const { data: pipelineData, isLoading } = useLeadPipeline(tenantId)
 
   const maxCount = useMemo(() => {
     if (!pipelineData?.stageData) return 0
     return Math.max(...pipelineData.stageData.map((s) => s.count), 1)
   }, [pipelineData])
+
+  // Zero-leads Ignition CTA
+  const hasZeroLeads = pipelineData && pipelineData.totalLeads === 0
 
   return (
     <Card>
@@ -1021,6 +1025,21 @@ function PipelineSummaryWidget({ tenantId }: { tenantId: string }) {
             title={t('dashboard.no_lead_pipeline')}
             description={t('dashboard.no_lead_pipeline_desc')}
           />
+        ) : hasZeroLeads ? (
+          <div className="flex flex-col items-center text-center py-4">
+            <div className="flex items-center justify-center size-12 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-700 text-white shadow mb-3">
+              <Target className="size-5" />
+            </div>
+            <p className="text-sm font-semibold text-slate-700 mb-1">Your workflow is ready</p>
+            <p className="text-xs text-slate-400 mb-4">4 gates active. Start your first engagement.</p>
+            <button
+              onClick={() => openModal('create-lead-quick')}
+              className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow hover:bg-emerald-700 transition-colors"
+            >
+              <Plus className="size-3.5" />
+              Start Your First Mission
+            </button>
+          </div>
         ) : (
           <div className="space-y-3">
             {pipelineData.stageData.map((stage) => (
@@ -1184,7 +1203,7 @@ export default function DashboardPage() {
               label={t('dashboard.active_matters')}
               value={stats?.activeMatterCount ?? 0}
               subtitle={t('dashboard.currently_open')}
-              iconBg="bg-blue-50"
+              iconBg="bg-blue-950/30"
               iconColor="text-blue-600"
               href="/matters"
             />
@@ -1202,7 +1221,7 @@ export default function DashboardPage() {
               label={t('dashboard.new_leads')}
               value={stats?.newLeadCount ?? 0}
               subtitle={t('dashboard.this_month')}
-              iconBg="bg-emerald-50"
+              iconBg="bg-emerald-950/30"
               iconColor="text-emerald-600"
               href="/leads"
             />
@@ -1215,7 +1234,7 @@ export default function DashboardPage() {
                   ? t('dashboard.require_attention')
                   : t('dashboard.all_on_track')
               }
-              iconBg={(stats?.overdueTaskCount ?? 0) > 0 ? 'bg-red-50' : 'bg-slate-50'}
+              iconBg={(stats?.overdueTaskCount ?? 0) > 0 ? 'bg-red-950/30' : 'bg-slate-50'}
               iconColor={
                 (stats?.overdueTaskCount ?? 0) > 0
                   ? 'text-red-600'

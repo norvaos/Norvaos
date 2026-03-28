@@ -8,11 +8,11 @@ import { useContactCalendarEvents } from '@/lib/queries/calendar-events'
 import { formatDate } from '@/lib/utils/formatters'
 
 const EVENT_TYPE_LABELS: Record<string, { label: string; color: string }> = {
-  meeting: { label: 'Meeting', color: 'bg-blue-100 text-blue-700' },
+  meeting: { label: 'Meeting', color: 'bg-blue-100 text-blue-400' },
   consultation: { label: 'Consultation', color: 'bg-indigo-100 text-indigo-700' },
-  court_date: { label: 'Court', color: 'bg-red-100 text-red-700' },
-  deadline: { label: 'Deadline', color: 'bg-amber-100 text-amber-700' },
-  reminder: { label: 'Reminder', color: 'bg-green-100 text-green-700' },
+  court_date: { label: 'Court', color: 'bg-red-100 text-red-400' },
+  deadline: { label: 'Deadline', color: 'bg-amber-100 text-amber-400' },
+  reminder: { label: 'Reminder', color: 'bg-green-100 text-emerald-400' },
   other: { label: 'Event', color: 'bg-slate-100 text-slate-600' },
 }
 

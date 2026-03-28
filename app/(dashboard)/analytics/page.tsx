@@ -161,10 +161,10 @@ function SkeletonRows({ cols, rows = 5 }: { cols: number; rows?: number }) {
 
 function AgingBadge({ bucket }: { bucket: string }) {
   const variants: Record<string, string> = {
-    current: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400',
-    '31-60': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
-    '61-90': 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400',
-    '91-120': 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
+    current: 'bg-emerald-950/40 text-emerald-400 dark:bg-emerald-900/30 dark:text-emerald-400',
+    '31-60': 'bg-yellow-950/40 text-yellow-400 dark:bg-yellow-900/30 dark:text-yellow-400',
+    '61-90': 'bg-orange-950/40 text-orange-400 dark:bg-orange-900/30 dark:text-orange-400',
+    '91-120': 'bg-red-950/40 text-red-400 dark:bg-red-900/30 dark:text-red-400',
     '120+': 'bg-red-200 text-red-900 dark:bg-red-900/50 dark:text-red-300',
   }
   return (

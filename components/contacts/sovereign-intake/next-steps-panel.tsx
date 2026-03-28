@@ -64,7 +64,7 @@ export function NextStepsPanel({ hasGovId, hasConsultation, hasRetainer }: NextS
                 'flex items-start gap-2.5 text-xs p-2 rounded-md transition-colors',
                 'animate-in fade-in slide-in-from-bottom-2 duration-300',
                 step.completed
-                  ? 'bg-green-50/50 text-green-700'
+                  ? 'bg-emerald-950/30/50 text-emerald-400'
                   : 'text-slate-600 hover:bg-slate-100'
               )}
               style={{ animationDelay: `${index * 100}ms` }}

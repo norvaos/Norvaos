@@ -604,7 +604,7 @@ export function IRCCQuestionnaire({
                               if (portalMode) {
                                 if (isFieldLocked(v)) {
                                   return (
-                                    <Badge variant="outline" className="text-[10px] px-1 py-0 h-4 border-green-300 text-green-700 bg-green-50 gap-0.5">
+                                    <Badge variant="outline" className="text-[10px] px-1 py-0 h-4 border-emerald-500/30 text-emerald-400 bg-emerald-950/30 gap-0.5">
                                       <ShieldCheck className="h-2.5 w-2.5" />
                                       Verified by Law Firm
                                     </Badge>
@@ -612,7 +612,7 @@ export function IRCCQuestionnaire({
                                 }
                                 if (isFieldRejected(v)) {
                                   return (
-                                    <Badge variant="outline" className="text-[10px] px-1 py-0 h-4 border-red-300 text-red-700 bg-red-50 gap-0.5">
+                                    <Badge variant="outline" className="text-[10px] px-1 py-0 h-4 border-red-500/30 text-red-400 bg-red-950/30 gap-0.5">
                                       <AlertCircle className="h-2.5 w-2.5" />
                                       Needs Correction
                                     </Badge>
@@ -624,12 +624,12 @@ export function IRCCQuestionnaire({
                               // Staff mode: show verified/stale badges
                               const stale = isVerificationStale(v, fieldValue)
                               return stale ? (
-                                <Badge variant="outline" className="text-[10px] px-1 py-0 h-4 border-amber-300 text-amber-700 bg-amber-50 gap-0.5">
+                                <Badge variant="outline" className="text-[10px] px-1 py-0 h-4 border-amber-500/30 text-amber-400 bg-amber-950/30 gap-0.5">
                                   <ShieldAlert className="h-2.5 w-2.5" />
                                   Stale
                                 </Badge>
                               ) : (
-                                <Badge variant="outline" className="text-[10px] px-1 py-0 h-4 border-green-300 text-green-700 bg-green-50 gap-0.5">
+                                <Badge variant="outline" className="text-[10px] px-1 py-0 h-4 border-emerald-500/30 text-emerald-400 bg-emerald-950/30 gap-0.5">
                                   <ShieldCheck className="h-2.5 w-2.5" />
                                   Verified
                                 </Badge>
@@ -657,7 +657,7 @@ export function IRCCQuestionnaire({
                                 {onFieldResubmit && (
                                   <button
                                     type="button"
-                                    className="flex items-center gap-1 rounded-md border border-green-300 bg-green-50 px-2.5 py-1 text-[11px] font-medium text-green-700 hover:bg-green-100 transition-colors"
+                                    className="flex items-center gap-1 rounded-md border border-emerald-500/30 bg-emerald-950/30 px-2.5 py-1 text-[11px] font-medium text-emerald-400 hover:bg-emerald-950/40 transition-colors"
                                     onClick={() => onFieldResubmit(field.profile_path)}
                                   >
                                     <Check className="h-3 w-3" />
@@ -729,7 +729,7 @@ export function IRCCQuestionnaire({
                         if (v?.verification_status === 'submitted') {
                           return (
                             <div className="flex items-center gap-2">
-                              <Badge variant="outline" className="text-[10px] px-1 py-0 h-4 border-blue-300 text-blue-700 bg-blue-50 gap-0.5">
+                              <Badge variant="outline" className="text-[10px] px-1 py-0 h-4 border-blue-500/30 text-blue-400 bg-blue-950/30 gap-0.5">
                                 <Clock className="h-2.5 w-2.5" />
                                 Re-submitted
                               </Badge>
@@ -773,7 +773,7 @@ export function IRCCQuestionnaire({
                             </button>
                             <button
                               type="button"
-                              className="flex items-center gap-1 text-[11px] text-red-500 hover:text-red-700 transition-colors"
+                              className="flex items-center gap-1 text-[11px] text-red-500 hover:text-red-400 transition-colors"
                               onClick={() => {
                                 setRejectTarget({ profilePath: field.profile_path, label: field.label })
                                 setRejectDialogOpen(true)

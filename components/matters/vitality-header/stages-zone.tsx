@@ -46,19 +46,19 @@ function slaColour(status: 'ok' | 'warning' | 'exceeded') {
       return {
         text: 'text-green-600 dark:text-green-400',
         bg: 'bg-green-100 dark:bg-green-900/40',
-        badge: 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400',
+        badge: 'bg-emerald-950/30 text-emerald-400 dark:bg-green-900/40 dark:text-green-400',
       }
     case 'warning':
       return {
         text: 'text-amber-600 dark:text-amber-400',
         bg: 'bg-amber-100 dark:bg-amber-900/40',
-        badge: 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400',
+        badge: 'bg-amber-950/30 text-amber-400 dark:bg-amber-900/40 dark:text-amber-400',
       }
     case 'exceeded':
       return {
         text: 'text-red-600 dark:text-red-400',
-        bg: 'bg-red-100 dark:bg-red-900/40',
-        badge: 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400',
+        bg: 'bg-red-950/40 dark:bg-red-900/40',
+        badge: 'bg-red-950/40 text-red-400 dark:bg-red-900/40 dark:text-red-400',
       }
   }
 }
@@ -195,7 +195,7 @@ export function StagesZone({ data, isLoading, onDrillDown }: StagesZoneProps) {
                       'relative flex items-center justify-center h-10 flex-1 text-xs font-medium transition-all duration-300 select-none',
                       // Gated upcoming
                       isGated && isUpcoming &&
-                        'border-2 border-dashed border-red-400 dark:border-red-500 bg-red-50 dark:bg-red-950/30 text-red-500 dark:text-red-400',
+                        'border-2 border-dashed border-red-400 dark:border-red-500 bg-red-950/30 dark:bg-red-950/30 text-red-500 dark:text-red-400',
                       // Upcoming (not gated)
                       isUpcoming && !isGated &&
                         'bg-muted/50 text-muted-foreground/50',
@@ -248,9 +248,9 @@ export function StagesZone({ data, isLoading, onDrillDown }: StagesZoneProps) {
                       variant="secondary"
                       className={cn(
                         'text-[10px] px-1.5 py-0',
-                        isCompleted && 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400',
-                        isCurrent && 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400',
-                        isGated && 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400',
+                        isCompleted && 'bg-emerald-950/40 text-emerald-400 dark:bg-emerald-900/40 dark:text-emerald-400',
+                        isCurrent && 'bg-blue-950/40 text-blue-400 dark:bg-blue-900/40 dark:text-blue-400',
+                        isGated && 'bg-red-950/40 text-red-400 dark:bg-red-900/40 dark:text-red-400',
                         isUpcoming && !isGated && 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400'
                       )}
                     >

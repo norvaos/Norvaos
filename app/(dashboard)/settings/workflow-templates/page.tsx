@@ -246,7 +246,7 @@ function WorkflowRow({
   return (
     <div className="flex items-center justify-between px-4 py-3 hover:bg-slate-50/50 transition-colors">
       <div className="flex items-center gap-3 min-w-0">
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-orange-50 text-orange-600">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-orange-950/30 text-orange-600">
           <Zap className="h-4 w-4" />
         </div>
         <div className="min-w-0">
@@ -278,7 +278,7 @@ function WorkflowRow({
             {taskTemplate && (
               <>
                 <ArrowRight className="h-3 w-3 text-slate-300" />
-                <Badge variant="outline" className="text-[10px] px-1.5 py-0 font-normal text-emerald-600 border-emerald-200 bg-emerald-50">
+                <Badge variant="outline" className="text-[10px] px-1.5 py-0 font-normal text-emerald-600 border-emerald-500/20 bg-emerald-950/30">
                   <ListChecks className="h-3 w-3 mr-0.5" />
                   {taskTemplate.name}
                 </Badge>
@@ -738,7 +738,7 @@ function DeadlineCountBadge({ workflowTemplateId }: { workflowTemplateId: string
   if (!bindings || bindings.length === 0) return null
 
   return (
-    <Badge variant="outline" className="text-[10px] px-1.5 py-0 font-normal text-amber-600 border-amber-200 bg-amber-50">
+    <Badge variant="outline" className="text-[10px] px-1.5 py-0 font-normal text-amber-600 border-amber-200 bg-amber-950/30">
       <Clock className="h-3 w-3 mr-0.5" />
       {bindings.length} deadline{bindings.length !== 1 ? 's' : ''}
     </Badge>

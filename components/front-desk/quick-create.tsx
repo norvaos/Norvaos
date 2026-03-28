@@ -886,7 +886,7 @@ export function QuickCreate({ onCreated }: QuickCreateProps) {
                   onClick={() => updateStep2('entityType', 'contact')}
                   className={`flex flex-col items-center gap-1 rounded-lg border-2 p-4 text-sm font-medium transition-colors ${
                     step2.entityType === 'contact'
-                      ? 'border-emerald-600 bg-emerald-50 text-emerald-700'
+                      ? 'border-emerald-600 bg-emerald-950/30 text-emerald-400'
                       : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'
                   }`}
                 >

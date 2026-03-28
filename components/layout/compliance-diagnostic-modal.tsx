@@ -77,10 +77,10 @@ export const COMPLIANCE_TIERS: TierDef[] = [
     tier: 'compliant',
     label: 'Compliant',
     min: 100,
-    badgeClass: 'border-emerald-300 bg-emerald-50 text-emerald-700',
+    badgeClass: 'border-emerald-500/30 bg-emerald-950/30 text-emerald-400',
     textClass: 'text-emerald-600',
-    bgClass: 'bg-emerald-50',
-    borderClass: 'border-emerald-200',
+    bgClass: 'bg-emerald-950/30',
+    borderClass: 'border-emerald-500/20',
     icon: ShieldCheck,
     description: 'Audit-ready. No action required.',
   },
@@ -88,10 +88,10 @@ export const COMPLIANCE_TIERS: TierDef[] = [
     tier: 'good',
     label: 'Good',
     min: 80,
-    badgeClass: 'border-green-300 bg-green-50 text-green-700',
+    badgeClass: 'border-emerald-500/30 bg-emerald-950/30 text-emerald-400',
     textClass: 'text-green-500',
-    bgClass: 'bg-green-50',
-    borderClass: 'border-green-200',
+    bgClass: 'bg-emerald-950/30',
+    borderClass: 'border-emerald-500/20',
     icon: ShieldCheck,
     description: 'Minimum legal requirements met.',
   },
@@ -99,10 +99,10 @@ export const COMPLIANCE_TIERS: TierDef[] = [
     tier: 'warning',
     label: 'Warning',
     min: 60,
-    badgeClass: 'border-amber-300 bg-amber-50 text-amber-700',
+    badgeClass: 'border-amber-500/30 bg-amber-950/30 text-amber-400',
     textClass: 'text-amber-500',
-    bgClass: 'bg-amber-50',
-    borderClass: 'border-amber-200',
+    bgClass: 'bg-amber-950/30',
+    borderClass: 'border-amber-500/20',
     icon: ShieldAlert,
     description: 'Operational but failing minor By-Laws.',
   },
@@ -110,10 +110,10 @@ export const COMPLIANCE_TIERS: TierDef[] = [
     tier: 'high_risk',
     label: 'High Risk',
     min: 40,
-    badgeClass: 'border-orange-300 bg-orange-50 text-orange-700',
+    badgeClass: 'border-orange-500/30 bg-orange-950/30 text-orange-400',
     textClass: 'text-orange-600',
-    bgClass: 'bg-orange-50',
-    borderClass: 'border-orange-200',
+    bgClass: 'bg-orange-950/30',
+    borderClass: 'border-orange-500/20',
     icon: ShieldAlert,
     description: 'Likely failing By-Law 9 (Trust Accounting).',
   },
@@ -121,10 +121,10 @@ export const COMPLIANCE_TIERS: TierDef[] = [
     tier: 'critical',
     label: 'Critical',
     min: 0,
-    badgeClass: 'border-red-300 bg-red-50 text-red-700',
+    badgeClass: 'border-red-500/30 bg-red-950/30 text-red-400',
     textClass: 'text-red-600',
-    bgClass: 'bg-red-50',
-    borderClass: 'border-red-200',
+    bgClass: 'bg-red-950/30',
+    borderClass: 'border-red-500/20',
     icon: ShieldX,
     description: 'Severe liability. Breach of Directive 41.',
   },
@@ -404,7 +404,7 @@ export function ComplianceDiagnosticModal({
               </div>
             </div>
             <div className="text-right">
-              <div className={cn('text-3xl font-black tabular-nums', tier.textClass)}>
+              <div className={cn('text-3xl font-semibold tracking-tight font-mono', tier.textClass)}>
                 {score}%
               </div>
               <Badge className={cn('text-[9px]', tier.badgeClass)}>
@@ -453,19 +453,19 @@ export function ComplianceDiagnosticModal({
         {/* ── Footer: Bypass or Close ────────────────────────── */}
         <div className="border-t p-4 space-y-3">
           {score === 100 ? (
-            <div className="flex items-center justify-center gap-2 text-sm text-emerald-700 font-semibold">
+            <div className="flex items-center justify-center gap-2 text-sm text-emerald-400 font-semibold">
               <ShieldCheck className="size-4" />
               Audit-Ready  -  All Directives Satisfied
             </div>
           ) : showBypass ? (
             <div className="space-y-2">
-              <div className="flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 p-3">
+              <div className="flex items-start gap-2 rounded-lg border border-red-500/20 bg-red-950/30 p-3">
                 <AlertTriangle className="size-4 text-red-600 shrink-0 mt-0.5" />
                 <div className="space-y-1.5">
                   <p className="text-xs font-semibold text-red-800">
                     Regulatory Bypass Warning
                   </p>
-                  <p className="text-[10px] text-red-700 leading-relaxed">
+                  <p className="text-[10px] text-red-400 leading-relaxed">
                     You are choosing to operate below compliance thresholds. This may expose your firm to regulatory action under {regBody?.abbr ?? 'Regulator'} By-Laws. Type <strong>&quot;{BYPASS_PHRASE}&quot;</strong> to continue.
                   </p>
                   <div className="flex gap-2">
@@ -474,7 +474,7 @@ export function ComplianceDiagnosticModal({
                       value={bypassInput}
                       onChange={(e) => setBypassInput(e.target.value)}
                       placeholder={`Type "${BYPASS_PHRASE}" to continue`}
-                      className="flex-1 rounded-md border border-red-300 bg-white px-2.5 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-red-400"
+                      className="flex-1 rounded-md border border-red-500/30 bg-white px-2.5 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-red-400"
                       onKeyDown={(e) => {
                         if (e.key === 'Enter') handleBypass()
                       }}
@@ -542,9 +542,9 @@ function ComplianceCheckRow({
     optimisation: 'Optimisation',
   }
   const severityColor: Record<CheckSeverity, string> = {
-    mandatory: 'text-red-600 bg-red-50 border-red-200',
-    recommended: 'text-amber-600 bg-amber-50 border-amber-200',
-    optimisation: 'text-blue-600 bg-blue-50 border-blue-200',
+    mandatory: 'text-red-600 bg-red-950/30 border-red-500/20',
+    recommended: 'text-amber-600 bg-amber-950/30 border-amber-500/20',
+    optimisation: 'text-blue-600 bg-blue-950/30 border-blue-500/20',
   }
 
   return (
@@ -552,7 +552,7 @@ function ComplianceCheckRow({
       className={cn(
         'rounded-lg border p-3 transition-colors',
         check.passed
-          ? 'border-emerald-100 bg-emerald-50/50'
+          ? 'border-emerald-100 bg-emerald-950/30/50'
           : 'border-slate-200 bg-white hover:border-slate-300',
       )}
     >
@@ -602,7 +602,7 @@ function ComplianceCheckRow({
             <Button
               size="sm"
               variant="outline"
-              className="mt-2 h-7 text-[10px] gap-1.5 border-amber-300 text-amber-700 hover:bg-amber-50"
+              className="mt-2 h-7 text-[10px] gap-1.5 border-amber-500/30 text-amber-400 hover:bg-amber-950/30"
               onClick={onFix}
             >
               {check.fixLabel}

@@ -47,32 +47,32 @@ const STATUS_CONFIG: Record<
   in_progress: {
     label: 'In Progress',
     variant: 'outline',
-    className: 'border-blue-300 text-blue-700 bg-blue-50',
+    className: 'border-blue-300 text-blue-400 bg-blue-950/30',
   },
   ready_for_review: {
     label: 'Submitted',
     variant: 'outline',
-    className: 'border-amber-300 text-amber-700 bg-amber-50',
+    className: 'border-amber-300 text-amber-400 bg-amber-950/30',
   },
   approved: {
     label: 'Approved',
     variant: 'outline',
-    className: 'border-green-300 text-green-700 bg-green-50',
+    className: 'border-green-300 text-emerald-400 bg-emerald-950/30',
   },
   rejected: {
     label: 'Needs Revision',
     variant: 'outline',
-    className: 'border-red-300 text-red-700 bg-red-50',
+    className: 'border-red-300 text-red-400 bg-red-950/30',
   },
   generated: {
     label: 'Generated',
     variant: 'outline',
-    className: 'border-green-300 text-green-700 bg-green-50',
+    className: 'border-green-300 text-emerald-400 bg-emerald-950/30',
   },
   submitted: {
     label: 'Submitted',
     variant: 'outline',
-    className: 'border-green-300 text-green-700 bg-green-50',
+    className: 'border-green-300 text-emerald-400 bg-emerald-950/30',
   },
 }
 
@@ -142,10 +142,10 @@ function FormInstanceCard({
                 className={cn(
                   'h-1.5 flex-1',
                   completionPct >= 100
-                    ? '[&>[data-slot=progress-indicator]]:bg-green-500'
+                    ? '[&>[data-slot=progress-indicator]]:bg-emerald-950/300'
                     : completionPct >= 60
-                      ? '[&>[data-slot=progress-indicator]]:bg-amber-500'
-                      : '[&>[data-slot=progress-indicator]]:bg-blue-500'
+                      ? '[&>[data-slot=progress-indicator]]:bg-amber-950/300'
+                      : '[&>[data-slot=progress-indicator]]:bg-blue-950/300'
                 )}
               />
               <span className="text-[10px] text-muted-foreground tabular-nums shrink-0">

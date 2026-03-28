@@ -28,11 +28,11 @@ import { frontDeskKeys } from '@/lib/queries/front-desk-queries'
  */
 
 const OUTCOMES = [
-  { value: 'connected',    label: 'Connected',    icon: Phone,       color: 'border-emerald-300 text-emerald-700 hover:bg-emerald-50',  activeColor: 'bg-emerald-600 text-white border-emerald-600' },
-  { value: 'no_answer',   label: 'No Answer',    icon: PhoneOff,    color: 'border-amber-300  text-amber-700  hover:bg-amber-50',     activeColor: 'bg-amber-600  text-white border-amber-600' },
-  { value: 'voicemail',   label: 'Voicemail',    icon: Voicemail,   color: 'border-blue-300   text-blue-700   hover:bg-blue-50',      activeColor: 'bg-blue-600   text-white border-blue-600' },
-  { value: 'busy',        label: 'Busy',         icon: PhoneMissed, color: 'border-orange-300 text-orange-700 hover:bg-orange-50',    activeColor: 'bg-orange-600 text-white border-orange-600' },
-  { value: 'wrong_number',label: 'Wrong #',      icon: XCircle,     color: 'border-red-300    text-red-700    hover:bg-red-50',       activeColor: 'bg-red-600    text-white border-red-600' },
+  { value: 'connected',    label: 'Connected',    icon: Phone,       color: 'border-emerald-500/30 text-emerald-400 hover:bg-emerald-950/30',  activeColor: 'bg-emerald-600 text-white border-emerald-600' },
+  { value: 'no_answer',   label: 'No Answer',    icon: PhoneOff,    color: 'border-amber-300  text-amber-400  hover:bg-amber-950/30',     activeColor: 'bg-amber-600  text-white border-amber-600' },
+  { value: 'voicemail',   label: 'Voicemail',    icon: Voicemail,   color: 'border-blue-300   text-blue-400   hover:bg-blue-950/30',      activeColor: 'bg-blue-600   text-white border-blue-600' },
+  { value: 'busy',        label: 'Busy',         icon: PhoneMissed, color: 'border-orange-300 text-orange-400 hover:bg-orange-950/30',    activeColor: 'bg-orange-600 text-white border-orange-600' },
+  { value: 'wrong_number',label: 'Wrong #',      icon: XCircle,     color: 'border-red-300    text-red-400    hover:bg-red-950/30',       activeColor: 'bg-red-600    text-white border-red-600' },
 ]
 
 // Quick-action tags that can be appended to notes for fast logging
@@ -150,7 +150,7 @@ export function CallOutcomeBar({ contactId }: CallOutcomeBarProps) {
         <Button
           variant="outline"
           size="sm"
-          className="h-7 px-3 text-xs gap-1.5 text-emerald-700 border-emerald-300 hover:bg-emerald-50"
+          className="h-7 px-3 text-xs gap-1.5 text-emerald-400 border-emerald-500/30 hover:bg-emerald-950/30"
           onClick={openDialog}
           disabled={logCallMutation.isPending}
         >

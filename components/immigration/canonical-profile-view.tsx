@@ -159,19 +159,19 @@ function DomainSection({ domain, fields, profileId, compact }: DomainSectionProp
         </span>
         <div className="flex items-center gap-1.5">
           {verifiedCount > 0 && (
-            <Badge variant="outline" className="text-xs border-green-200 text-green-700 bg-green-50">
+            <Badge variant="outline" className="text-xs border-emerald-500/30 text-emerald-400 bg-emerald-950/30">
               <Check className="h-3 w-3 mr-0.5" />
               {verifiedCount}
             </Badge>
           )}
           {pendingCount > 0 && (
-            <Badge variant="outline" className="text-xs border-yellow-200 text-yellow-700 bg-yellow-50">
+            <Badge variant="outline" className="text-xs border-yellow-500/20 text-yellow-400 bg-yellow-950/30">
               <Clock className="h-3 w-3 mr-0.5" />
               {pendingCount}
             </Badge>
           )}
           {conflictCount > 0 && (
-            <Badge variant="outline" className="text-xs border-red-200 text-red-700 bg-red-50">
+            <Badge variant="outline" className="text-xs border-red-500/20 text-red-400 bg-red-950/30">
               <AlertTriangle className="h-3 w-3 mr-0.5" />
               {conflictCount}
             </Badge>
@@ -299,26 +299,26 @@ function VerificationBadge({ status }: { status: string }) {
   switch (status) {
     case 'verified':
       return (
-        <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-green-200 text-green-700 bg-green-50">
+        <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-emerald-500/30 text-emerald-400 bg-emerald-950/30">
           Verified
         </Badge>
       )
     case 'client_submitted':
       return (
-        <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-blue-200 text-blue-700 bg-blue-50">
+        <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-blue-500/20 text-blue-400 bg-blue-950/30">
           Client Submitted
         </Badge>
       )
     case 'conflict':
       return (
-        <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-red-200 text-red-700 bg-red-50">
+        <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-red-500/20 text-red-400 bg-red-950/30">
           Conflict
         </Badge>
       )
     case 'pending':
     default:
       return (
-        <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-yellow-200 text-yellow-700 bg-yellow-50">
+        <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-yellow-500/20 text-yellow-400 bg-yellow-950/30">
           Pending
         </Badge>
       )

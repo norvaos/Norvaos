@@ -94,21 +94,21 @@ function statusBadge(status: string) {
   switch (status) {
     case 'completed':
       return (
-        <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 gap-1">
+        <Badge className="bg-emerald-950/30 text-emerald-400 border-emerald-500/20 gap-1">
           <CheckCircle className="h-3 w-3" />
           Imported
         </Badge>
       )
     case 'in_progress':
       return (
-        <Badge className="bg-amber-50 text-amber-700 border-amber-200 gap-1 animate-pulse">
+        <Badge className="bg-amber-950/30 text-amber-400 border-amber-200 gap-1 animate-pulse">
           <Loader2 className="h-3 w-3 animate-spin" />
           Processing
         </Badge>
       )
     case 'failed':
       return (
-        <Badge className="bg-red-50 text-red-700 border-red-200 gap-1">
+        <Badge className="bg-red-950/30 text-red-400 border-red-200 gap-1">
           <XCircle className="h-3 w-3" />
           Failed
         </Badge>
@@ -265,7 +265,7 @@ export function ClioMigrationDashboard() {
               className={cn(
                 'relative overflow-hidden rounded-2xl border p-5 transition-all duration-500',
                 isDone
-                  ? 'border-emerald-200/60 bg-gradient-to-br from-emerald-50/80 to-white shadow-sm'
+                  ? 'border-emerald-500/20/60 bg-gradient-to-br from-emerald-50/80 to-white shadow-sm'
                   : isActive
                     ? 'border-amber-200/60 bg-gradient-to-br from-amber-50/50 to-white shadow-md'
                     : 'border-gray-200 bg-white',
@@ -277,13 +277,13 @@ export function ClioMigrationDashboard() {
                   <div
                     className={cn(
                       'flex h-9 w-9 items-center justify-center rounded-xl',
-                      isDone ? 'bg-emerald-100' : isActive ? 'bg-amber-100' : 'bg-gray-100',
+                      isDone ? 'bg-emerald-950/40' : isActive ? 'bg-amber-100' : 'bg-gray-100',
                     )}
                   >
                     <Icon
                       className={cn(
                         'h-4 w-4',
-                        isDone ? 'text-emerald-700' : isActive ? 'text-amber-700' : 'text-gray-400',
+                        isDone ? 'text-emerald-400' : isActive ? 'text-amber-400' : 'text-gray-400',
                       )}
                     />
                   </div>
@@ -313,7 +313,7 @@ export function ClioMigrationDashboard() {
                     <div
                       className={cn(
                         'h-full rounded-full transition-all duration-700 ease-out',
-                        isDone ? 'bg-emerald-500' : isActive ? 'bg-amber-400' : 'bg-gray-300',
+                        isDone ? 'bg-emerald-950/300' : isActive ? 'bg-amber-400' : 'bg-gray-300',
                       )}
                       style={{ width: `${progress}%` }}
                     />
@@ -335,14 +335,14 @@ export function ClioMigrationDashboard() {
 
       {/* Gap Alerts */}
       {isComplete && gapAlerts > 0 && (
-        <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5">
+        <div className="rounded-2xl border border-amber-200 bg-amber-950/30 p-5">
           <div className="flex items-start gap-3">
             <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-600" />
             <div>
               <p className="text-sm font-semibold text-amber-900">
                 Legacy Gap Diagnostic: {gapAlerts} matters need attention
               </p>
-              <p className="mt-1 text-xs text-amber-700">
+              <p className="mt-1 text-xs text-amber-400">
                 These matters were imported with incomplete data. The Readiness Ring is below 100 and
                 Genesis Block creation is locked until all gaps are resolved.
               </p>
@@ -357,14 +357,14 @@ export function ClioMigrationDashboard() {
 
       {/* Completion Summary */}
       {isComplete && (
-        <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-5">
+        <div className="rounded-2xl border border-emerald-500/20 bg-emerald-950/30 p-5">
           <div className="flex items-start gap-3">
             <Shield className="mt-0.5 h-5 w-5 shrink-0 text-emerald-600" />
             <div>
               <p className="text-sm font-semibold text-emerald-900">
                 Sovereign Extraction Complete
               </p>
-              <p className="mt-1 text-xs text-emerald-700">
+              <p className="mt-1 text-xs text-emerald-400">
                 {migration?.progress?.totalImported?.toLocaleString()} records imported.{' '}
                 {migration?.progress?.totalErrors === 0
                   ? 'Zero errors.'
@@ -382,8 +382,8 @@ export function ClioMigrationDashboard() {
         {[
           { icon: Lock, label: 'PII Encrypted', color: 'text-indigo-600 bg-indigo-50' },
           { icon: Eye, label: 'Sentinel Scanned', color: 'text-violet-600 bg-violet-50' },
-          { icon: Fingerprint, label: 'Hash Anchored', color: 'text-emerald-600 bg-emerald-50' },
-          { icon: AlertTriangle, label: 'Gap Detected', color: 'text-amber-600 bg-amber-50' },
+          { icon: Fingerprint, label: 'Hash Anchored', color: 'text-emerald-600 bg-emerald-950/30' },
+          { icon: AlertTriangle, label: 'Gap Detected', color: 'text-amber-600 bg-amber-950/30' },
         ].map((item) => (
           <div key={item.label} className="flex items-center gap-2 rounded-xl border border-gray-100 px-3 py-2">
             <div className={cn('flex h-6 w-6 items-center justify-center rounded-lg', item.color)}>

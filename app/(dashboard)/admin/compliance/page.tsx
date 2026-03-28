@@ -369,10 +369,10 @@ export default function ComplianceDashboard() {
                     <div
                       className={`h-full rounded-full transition-all duration-500 ${
                         data.checks.hardeningIntegrity.gapClosureRate >= 90
-                          ? 'bg-emerald-500'
+                          ? 'bg-emerald-950/300'
                           : data.checks.hardeningIntegrity.gapClosureRate >= 60
-                            ? 'bg-amber-500'
-                            : 'bg-red-500'
+                            ? 'bg-amber-950/300'
+                            : 'bg-red-950/300'
                       }`}
                       style={{ width: `${Math.min(data.checks.hardeningIntegrity.gapClosureRate, 100)}%` }}
                     />
@@ -417,8 +417,8 @@ export default function ComplianceDashboard() {
                   {/* Verdict Banner */}
                   <div className={`rounded-lg border-2 p-4 ${
                     simulationResult.overallVerdict === 'BATTLE_READY'
-                      ? 'border-emerald-300 bg-emerald-50 dark:border-emerald-700 dark:bg-emerald-900/20'
-                      : 'border-red-300 bg-red-50 dark:border-red-700 dark:bg-red-900/20'
+                      ? 'border-emerald-500/30 bg-emerald-950/30 dark:border-emerald-700 dark:bg-emerald-900/20'
+                      : 'border-red-500/30 bg-red-950/30 dark:border-red-700 dark:bg-red-900/20'
                   }`}>
                     <div className="flex items-center gap-3">
                       {simulationResult.overallVerdict === 'BATTLE_READY' ? (
@@ -429,8 +429,8 @@ export default function ComplianceDashboard() {
                       <div>
                         <p className={`font-bold text-lg ${
                           simulationResult.overallVerdict === 'BATTLE_READY'
-                            ? 'text-emerald-700 dark:text-emerald-400'
-                            : 'text-red-700 dark:text-red-400'
+                            ? 'text-emerald-400 dark:text-emerald-400'
+                            : 'text-red-400 dark:text-red-400'
                         }`}>
                           {simulationResult.overallVerdict === 'BATTLE_READY'
                             ? 'BATTLE-READY  -  All checks passed'
@@ -449,15 +449,15 @@ export default function ComplianceDashboard() {
                       <div className="text-2xl font-bold">{simulationResult.summary.totalMatters}</div>
                       <div className="text-xs font-medium text-muted-foreground">Total Matters</div>
                     </div>
-                    <div className={`rounded-md border p-3 text-center ${simulationResult.summary.genesisSealed === simulationResult.summary.totalMatters ? 'bg-emerald-50 border-emerald-200' : 'bg-amber-50 border-amber-200'}`}>
+                    <div className={`rounded-md border p-3 text-center ${simulationResult.summary.genesisSealed === simulationResult.summary.totalMatters ? 'bg-emerald-950/30 border-emerald-500/20' : 'bg-amber-950/30 border-amber-500/20'}`}>
                       <div className="text-2xl font-bold">{simulationResult.summary.genesisSealed}</div>
                       <div className="text-xs font-medium">Genesis Sealed</div>
                     </div>
-                    <div className={`rounded-md border p-3 text-center ${simulationResult.summary.ledgerParityFailed === 0 ? 'bg-emerald-50 border-emerald-200' : 'bg-red-50 border-red-200'}`}>
+                    <div className={`rounded-md border p-3 text-center ${simulationResult.summary.ledgerParityFailed === 0 ? 'bg-emerald-950/30 border-emerald-500/20' : 'bg-red-950/30 border-red-500/20'}`}>
                       <div className="text-2xl font-bold">{simulationResult.summary.ledgerParityPassed}</div>
                       <div className="text-xs font-medium">Ledger Parity OK</div>
                     </div>
-                    <div className={`rounded-md border p-3 text-center ${simulationResult.summary.integrityBreach === 0 ? 'bg-emerald-50 border-emerald-200' : 'bg-red-50 border-red-200'}`}>
+                    <div className={`rounded-md border p-3 text-center ${simulationResult.summary.integrityBreach === 0 ? 'bg-emerald-950/30 border-emerald-500/20' : 'bg-red-950/30 border-red-500/20'}`}>
                       <div className="text-2xl font-bold">{simulationResult.summary.integrityVerified}</div>
                       <div className="text-xs font-medium">Integrity Verified</div>
                     </div>
@@ -479,7 +479,7 @@ export default function ComplianceDashboard() {
                           </div>
                         </div>
                         <div className="flex items-center gap-2 shrink-0">
-                          <Badge variant="outline" className={`text-[10px] ${m.genesisStatus === 'sealed' ? 'border-emerald-300 text-emerald-700' : 'border-amber-300 text-amber-700'}`}>
+                          <Badge variant="outline" className={`text-[10px] ${m.genesisStatus === 'sealed' ? 'border-emerald-500/30 text-emerald-400' : 'border-amber-500/30 text-amber-400'}`}>
                             {m.genesisStatus === 'sealed' ? 'Sealed' : 'No Genesis'}
                           </Badge>
                           {m.integrityStatus === 'breach' && (
@@ -569,21 +569,21 @@ function StatusBadge({ status }: { status: 'pass' | 'warn' | 'fail' }) {
   switch (status) {
     case 'pass':
       return (
-        <Badge variant="outline" className="text-green-700 border-green-300 bg-green-50 gap-1">
+        <Badge variant="outline" className="text-emerald-400 border-green-500/30 bg-emerald-950/30 gap-1">
           <CheckCircle2 className="h-3 w-3" />
           PASS
         </Badge>
       )
     case 'warn':
       return (
-        <Badge variant="outline" className="text-yellow-700 border-yellow-300 bg-yellow-50 gap-1">
+        <Badge variant="outline" className="text-yellow-400 border-yellow-500/30 bg-yellow-950/30 gap-1">
           <AlertTriangle className="h-3 w-3" />
           WARN
         </Badge>
       )
     case 'fail':
       return (
-        <Badge variant="outline" className="text-red-700 border-red-300 bg-red-50 gap-1">
+        <Badge variant="outline" className="text-red-400 border-red-500/30 bg-red-950/30 gap-1">
           <XCircle className="h-3 w-3" />
           FAIL
         </Badge>
@@ -599,9 +599,9 @@ function HealthCheckCard({
   check: HealthCheck
 }) {
   const borderColor = {
-    pass: 'border-green-200',
-    warn: 'border-yellow-200',
-    fail: 'border-red-200',
+    pass: 'border-green-500/20',
+    warn: 'border-yellow-500/20',
+    fail: 'border-red-500/20',
   }[check.status]
 
   return (
@@ -632,8 +632,8 @@ function SeverityCard({
   variant: 'destructive' | 'warning' | 'default'
 }) {
   const colors = {
-    destructive: count > 0 ? 'text-red-600 bg-red-50 border-red-200' : 'text-muted-foreground bg-muted',
-    warning: count > 0 ? 'text-yellow-600 bg-yellow-50 border-yellow-200' : 'text-muted-foreground bg-muted',
+    destructive: count > 0 ? 'text-red-600 bg-red-950/30 border-red-500/20' : 'text-muted-foreground bg-muted',
+    warning: count > 0 ? 'text-yellow-600 bg-yellow-950/30 border-yellow-500/20' : 'text-muted-foreground bg-muted',
     default: 'text-muted-foreground bg-muted',
   }
 
@@ -661,7 +661,7 @@ function HardeningMetric({
   alert?: boolean
 }) {
   return (
-    <div className={`rounded-md border p-3 ${alert ? 'border-red-300 bg-red-50' : 'bg-muted/30'}`}>
+    <div className={`rounded-md border p-3 ${alert ? 'border-red-500/30 bg-red-950/30' : 'bg-muted/30'}`}>
       <div className="flex items-center gap-2 mb-1">
         {icon}
         <span className="text-xs font-medium text-muted-foreground">{label}</span>

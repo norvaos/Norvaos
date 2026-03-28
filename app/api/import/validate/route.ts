@@ -84,6 +84,13 @@ async function handlePost(request: Request) {
     // API imports store JSON rows; CSV imports store raw CSV
     let parsedCsv: { rows: Record<string, string>[]; totalRows: number }
     if (batch.import_mode === 'api') {
+      // Guard against oversized payloads blocking the event loop
+      if (typeof fileContent === 'string' && fileContent.length > 5_000_000) {
+        return NextResponse.json(
+          { error: 'Import file too large. Maximum 5MB for JSON imports.' },
+          { status: 400 },
+        )
+      }
       const apiRows: Record<string, string>[] = JSON.parse(fileContent)
       parsedCsv = { rows: apiRows, totalRows: apiRows.length }
     } else {

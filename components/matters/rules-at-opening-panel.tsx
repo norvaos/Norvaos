@@ -134,11 +134,11 @@ function SnapshotCard({ snapshot, currentMatterTypeHash }: SnapshotCardProps) {
   if (snapshot.rule_type === 'matter_type_config' && currentMatterTypeHash != null) {
     const isDrifted = currentMatterTypeHash !== snapshot.version_hash
     driftBadge = isDrifted ? (
-      <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-medium text-amber-700 ring-1 ring-amber-200">
+      <span className="inline-flex items-center gap-1 rounded-full bg-amber-950/30 px-2 py-0.5 text-[10px] font-medium text-amber-400 ring-1 ring-amber-200">
         ⚠ Config has changed since matter opened
       </span>
     ) : (
-      <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-medium text-emerald-700 ring-1 ring-emerald-200">
+      <span className="inline-flex items-center gap-1 rounded-full bg-emerald-950/30 px-2 py-0.5 text-[10px] font-medium text-emerald-400 ring-1 ring-emerald-200">
         ✓ Config unchanged
       </span>
     )

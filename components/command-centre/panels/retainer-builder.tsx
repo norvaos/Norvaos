@@ -163,15 +163,15 @@ function RetainerTimeline({
                 className={cn(
                   'w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-medium',
                   isCompleted
-                    ? 'bg-green-100 text-green-700'
+                    ? 'bg-green-100 text-emerald-400'
                     : isCurrent
-                      ? 'bg-blue-100 text-blue-700'
+                      ? 'bg-blue-100 text-blue-400'
                       : 'bg-slate-100 text-slate-400'
                 )}
               >
                 {isCompleted ? <Check className="h-3 w-3" /> : i + 1}
               </div>
-              <span className={cn('text-[9px]', isCompleted ? 'text-green-700' : 'text-slate-400')}>
+              <span className={cn('text-[9px]', isCompleted ? 'text-emerald-400' : 'text-slate-400')}>
                 {step.label}
               </span>
               {step.timestamp && (
@@ -780,7 +780,7 @@ function RetainerBuilderContent() {
                   isAdded={isServiceAdded}
                   onToggle={toggleServicePreset}
                   triggerLabel="Quick Add"
-                  triggerColor="text-blue-600 hover:text-blue-700"
+                  triggerColor="text-blue-600 hover:text-blue-400"
                   disabled={isReadOnly}
                 />
                 <Button variant="ghost" size="sm" className="h-7 text-xs gap-1" onClick={addLineItem} disabled={isReadOnly}>
@@ -891,7 +891,7 @@ function RetainerBuilderContent() {
                   isAdded={isGovFeeAdded}
                   onToggle={toggleGovFeePreset}
                   triggerLabel="Quick Add"
-                  triggerColor="text-amber-600 hover:text-amber-700"
+                  triggerColor="text-amber-600 hover:text-amber-400"
                   disabled={isReadOnly}
                 />
                 <Button

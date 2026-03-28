@@ -143,17 +143,17 @@ const STATUS_CONFIG: Record<IntegrityStatus, {
   verified: {
     label: 'SHA-256 Verified',
     icon: ShieldCheck,
-    badgeClass: 'border-green-300 bg-green-50 text-green-700 dark:border-green-700 dark:bg-green-900/30 dark:text-green-400',
+    badgeClass: 'border-green-300 bg-emerald-950/30 text-emerald-400 dark:border-green-700 dark:bg-green-900/30 dark:text-green-400',
   },
   pending: {
     label: 'Hash Pending',
     icon: Clock,
-    badgeClass: 'border-amber-300 bg-amber-50 text-amber-700 dark:border-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
+    badgeClass: 'border-amber-300 bg-amber-950/30 text-amber-400 dark:border-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
   },
   tampered: {
     label: 'Integrity Alert',
     icon: ShieldAlert,
-    badgeClass: 'border-red-300 bg-red-50 text-red-700 dark:border-red-700 dark:bg-red-900/30 dark:text-red-400',
+    badgeClass: 'border-red-300 bg-red-950/30 text-red-400 dark:border-red-700 dark:bg-red-900/30 dark:text-red-400',
   },
   untracked: {
     label: 'Untracked',
@@ -189,7 +189,7 @@ function SentinelEyeViewer({
         {/* Header  -  responsive: stacks on mobile */}
         <DialogHeader className={cn(
           'px-3 sm:px-4 py-2 sm:py-3 border-b flex-shrink-0',
-          isTampered && 'bg-red-50 border-red-200',
+          isTampered && 'bg-red-950/30 border-red-500/20',
         )}>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5">
             <div className="flex items-center gap-2">
@@ -248,7 +248,7 @@ function SentinelEyeViewer({
         <div className={cn(
           'px-3 sm:px-4 py-2 border-t flex-shrink-0 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1',
           'sticky bottom-0 z-10',
-          isTampered ? 'bg-red-50 border-red-200' : 'bg-slate-50 border-slate-200',
+          isTampered ? 'bg-red-950/30 border-red-500/20' : 'bg-slate-50 border-slate-200',
         )}>
           <div className="flex items-center gap-1.5">
             <Shield className="size-3 text-muted-foreground shrink-0" />
@@ -258,7 +258,7 @@ function SentinelEyeViewer({
           </div>
           <code className={cn(
             'text-[10px] sm:text-[11px] font-mono break-all select-all',
-            isTampered ? 'text-red-700' : 'text-slate-600',
+            isTampered ? 'text-red-400' : 'text-slate-600',
           )}>
             {doc.content_hash ?? 'No hash computed'}
           </code>
@@ -356,7 +356,7 @@ export function VaultMonitor({ contactId, tenantId, contactName }: VaultMonitorP
               className={cn(
                 'flex items-center gap-2 rounded-md px-2 py-1.5 transition-colors group',
                 isTampered
-                  ? 'border border-red-300 bg-red-50/50 hover:bg-red-50'
+                  ? 'border border-red-300 bg-red-950/30/50 hover:bg-red-950/30'
                   : 'hover:bg-muted/50',
               )}
             >
@@ -405,7 +405,7 @@ export function VaultMonitor({ contactId, tenantId, contactName }: VaultMonitorP
                         'opacity-100 sm:opacity-0 sm:group-hover:opacity-100',
                         isTampered
                           ? 'hover:bg-red-100 text-red-600 active:bg-red-200'
-                          : 'hover:bg-blue-50 text-blue-600 active:bg-blue-100',
+                          : 'hover:bg-blue-950/30 text-blue-600 active:bg-blue-100',
                       )}
                     >
                       <Eye className="size-4 sm:size-3.5 drop-shadow-sm" />

@@ -41,11 +41,11 @@ const STATUS_CONFIG: Record<
   },
   in_progress: {
     label: 'In Progress',
-    className: 'bg-blue-50 text-blue-700 border-blue-200',
+    className: 'bg-blue-950/30 text-blue-400 border-blue-500/20',
   },
   complete: {
     label: 'Complete',
-    className: 'bg-green-50 text-green-700 border-green-200',
+    className: 'bg-emerald-950/30 text-emerald-400 border-emerald-500/20',
   },
   submitted: {
     label: 'Submitted',
@@ -181,7 +181,7 @@ function FormCard({ form }: { form: FormInstanceStatus }) {
       {/* Status icon */}
       <div className={cn(
         'h-7 w-7 rounded-full flex items-center justify-center shrink-0',
-        isDone ? 'bg-green-50' : 'bg-slate-50'
+        isDone ? 'bg-emerald-950/30' : 'bg-slate-50'
       )}>
         {isDone
           ? <CheckCircle2 className="h-4 w-4 text-green-500" />

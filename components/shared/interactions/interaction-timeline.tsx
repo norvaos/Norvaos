@@ -44,23 +44,23 @@ interface InteractionTimelineProps {
 function getItemIcon(activityType: string, metadata?: Record<string, unknown>): { Icon: LucideIcon; colorClass: string } {
   switch (activityType) {
     case 'phone_inbound':
-      return { Icon: PhoneIncoming, colorClass: 'bg-green-50 text-green-600' }
+      return { Icon: PhoneIncoming, colorClass: 'bg-emerald-950/30 text-green-600' }
     case 'phone_outbound':
-      return { Icon: PhoneOutgoing, colorClass: 'bg-blue-50 text-blue-600' }
+      return { Icon: PhoneOutgoing, colorClass: 'bg-blue-950/30 text-blue-600' }
     case 'phone_call': {
       const dir = (metadata?.direction as string) ?? 'outbound'
       return dir === 'inbound'
-        ? { Icon: PhoneIncoming, colorClass: 'bg-green-50 text-green-600' }
-        : { Icon: PhoneOutgoing, colorClass: 'bg-blue-50 text-blue-600' }
+        ? { Icon: PhoneIncoming, colorClass: 'bg-emerald-950/30 text-green-600' }
+        : { Icon: PhoneOutgoing, colorClass: 'bg-blue-950/30 text-blue-600' }
     }
     case 'email_sent':
-      return { Icon: Mail, colorClass: 'bg-purple-50 text-purple-600' }
+      return { Icon: Mail, colorClass: 'bg-purple-950/30 text-purple-600' }
     case 'email_received':
-      return { Icon: MailOpen, colorClass: 'bg-purple-50 text-purple-600' }
+      return { Icon: MailOpen, colorClass: 'bg-purple-950/30 text-purple-600' }
     case 'sms_sent':
-      return { Icon: Send, colorClass: 'bg-amber-50 text-amber-600' }
+      return { Icon: Send, colorClass: 'bg-amber-950/30 text-amber-600' }
     case 'sms_received':
-      return { Icon: Inbox, colorClass: 'bg-amber-50 text-amber-600' }
+      return { Icon: Inbox, colorClass: 'bg-amber-950/30 text-amber-600' }
     case 'meeting':
     case 'consultation':
     case 'booking_created':
@@ -68,7 +68,7 @@ function getItemIcon(activityType: string, metadata?: Record<string, unknown>): 
     case 'appointment_started':
     case 'appointment_checked_in':
     case 'appointment_completed':
-      return { Icon: Calendar, colorClass: 'bg-green-50 text-green-600' }
+      return { Icon: Calendar, colorClass: 'bg-emerald-950/30 text-green-600' }
     default:
       return { Icon: Activity, colorClass: 'bg-slate-50 text-slate-600' }
   }

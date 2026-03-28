@@ -86,7 +86,7 @@ function readinessColour(score: number): string {
 }
 
 function readinessProgressColour(score: number): string {
-  if (score < 30) return '[&>div]:bg-red-500'
+  if (score < 30) return '[&>div]:bg-red-950/300'
   if (score < 60) return '[&>div]:bg-amber-500'
   return '[&>div]:bg-green-500'
 }
@@ -94,8 +94,8 @@ function readinessProgressColour(score: number): string {
 function riskBadgeVariant(level: string): string {
   switch (level) {
     case 'low': return 'bg-green-100 text-green-800 border-green-300'
-    case 'medium': return 'bg-amber-100 text-amber-800 border-amber-300'
-    case 'high': return 'bg-red-100 text-red-800 border-red-300'
+    case 'medium': return 'bg-amber-950/30 text-amber-400 border-amber-300'
+    case 'high': return 'bg-red-950/30 text-red-400 border-red-300'
     case 'critical': return 'bg-red-200 text-red-900 border-red-500'
     default: return 'bg-muted text-muted-foreground'
   }
@@ -405,7 +405,7 @@ function RelationshipMatrix({
           <div
             className={cn(
               'rounded px-2 py-1 -mx-2',
-              passportExpiring && 'border border-red-500 bg-red-50'
+              passportExpiring && 'border border-red-500 bg-red-950/30'
             )}
           >
             <span className="text-xs text-muted-foreground">Passport Expiry</span>
@@ -537,7 +537,7 @@ function ProcessingStream({
                         isCompleted && 'text-white',
                         isCurrent && 'text-white ring-2 ring-offset-1 animate-pulse',
                         isUpcoming && !isGated && 'bg-muted text-muted-foreground',
-                        isGated && 'border-2 border-dashed border-red-400 bg-red-50 text-red-700'
+                        isGated && 'border-2 border-dashed border-red-400 bg-red-950/30 text-red-400'
                       )}
                       style={{
                         backgroundColor: isCompleted || isCurrent ? stageColour : undefined,

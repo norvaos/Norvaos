@@ -38,6 +38,14 @@ const SuspensionOverlay = dynamic(
   () => import('@/components/layout/suspension-overlay').then(m => ({ default: m.SuspensionOverlay })),
   { ssr: false },
 )
+const EmeraldFAB = dynamic(
+  () => import('@/components/layout/emerald-fab').then(m => ({ default: m.EmeraldFAB })),
+  { ssr: false },
+)
+const PostContactHub = dynamic(
+  () => import('@/components/contacts/post-contact-hub').then(m => ({ default: m.PostContactHub })),
+  { ssr: false },
+)
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
@@ -525,10 +533,21 @@ export default function DashboardLayout({
 
   // ─── Global modal state: HUD / command palette / dashboard buttons ──────
   const activeModal = useUIStore((s) => s.activeModal)
+  const modalData = useUIStore((s) => s.modalData)
+  const openModal = useUIStore((s) => s.openModal)
   const closeModal = useUIStore((s) => s.closeModal)
 
   const isContactModalOpen = activeModal === 'create-contact'
   const isMatterModalOpen = activeModal === 'create-matter'
+
+  // ─── Post-Contact Hub state (driven by Zustand activeModal) ──────────────
+  const isContactHubOpen = activeModal === 'post-contact-hub'
+  const contactHubPayload = (isContactHubOpen && modalData) ? modalData as {
+    contactId: string
+    contactName: string
+    email: string | null
+    leadCreated: boolean
+  } : null
 
   // ─── Hydration gate: branded loading screen while auth resolves ──
   if (userLoading || tenantLoading) {
@@ -579,15 +598,29 @@ export default function DashboardLayout({
           <SovereignContactModal
             open={isContactModalOpen}
             onOpenChange={(v) => { if (!v) closeModal() }}
-            onSuccess={(contactId) => {
-              closeModal()
-              router.push(`/contacts/${contactId}`)
+            onSuccess={(contactId, result) => {
+              if (result) {
+                // Single Zustand call: swap activeModal from 'create-contact' → 'post-contact-hub'
+                // No cross-store race — both modal close and hub open happen in one store update
+                openModal('post-contact-hub', result as unknown as Record<string, unknown>)
+              } else {
+                closeModal()
+                router.push(`/contacts/${contactId}`)
+              }
             }}
+          />
+          <PostContactHub
+            open={isContactHubOpen}
+            onOpenChange={(v) => { if (!v) closeModal() }}
+            payload={contactHubPayload}
           />
           <SovereignInitiationModal
             open={isMatterModalOpen}
             onOpenChange={(v) => { if (!v) closeModal() }}
           />
+
+          {/* Emerald FAB — Universal Add Button (Vision 2035) */}
+          <EmeraldFAB />
 
           {/* NUCLEAR FIX #3: Visual Debug  -  shows locale state vs DB vs localStorage */}
           <LocaleDebugFooter />

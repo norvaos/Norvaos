@@ -74,23 +74,23 @@ function getIcon(type: string, action: string) {
 function getColorClass(type: string, action: string): string {
   if (type === 'audit') {
     switch (action) {
-      case 'created': return 'text-emerald-600 bg-emerald-50'
-      case 'updated': return 'text-blue-600 bg-blue-50'
+      case 'created': return 'text-emerald-600 bg-emerald-950/30'
+      case 'updated': return 'text-blue-600 bg-blue-950/30'
       case 'deleted':
-      case 'archived': return 'text-red-500 bg-red-50'
+      case 'archived': return 'text-red-500 bg-red-950/30'
       case 'stage_changed': return 'text-violet-600 bg-violet-50'
-      case 'completed': return 'text-green-600 bg-green-50'
+      case 'completed': return 'text-green-600 bg-emerald-950/30'
       case 'converted': return 'text-indigo-600 bg-indigo-50'
       default: return 'text-slate-500 bg-slate-50'
     }
   }
   // activity types
   switch (action) {
-    case 'phone_inbound': return 'text-green-600 bg-green-50'
-    case 'phone_outbound': return 'text-blue-600 bg-blue-50'
-    case 'phone_call': return 'text-emerald-600 bg-emerald-50'
-    case 'meeting': return 'text-purple-600 bg-purple-50'
-    default: return 'text-blue-500 bg-blue-50'
+    case 'phone_inbound': return 'text-green-600 bg-emerald-950/30'
+    case 'phone_outbound': return 'text-blue-600 bg-blue-950/30'
+    case 'phone_call': return 'text-emerald-600 bg-emerald-950/30'
+    case 'meeting': return 'text-purple-600 bg-purple-950/30'
+    default: return 'text-blue-500 bg-blue-950/30'
   }
 }
 

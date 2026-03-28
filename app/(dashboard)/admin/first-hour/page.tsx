@@ -116,7 +116,7 @@ function SyncVelocityPanel({ sync }: { sync: FirstHourMetrics['sync'] }) {
       <div className="flex items-center gap-2 px-5 py-3 border-b border-slate-100 bg-gradient-to-r from-emerald-50 to-white">
         <Activity className="size-4 text-emerald-600" />
         <h3 className="font-semibold text-sm text-slate-900">Clio-to-Norva Sync Velocity</h3>
-        <Badge variant="outline" className="ml-auto text-[10px] border-emerald-200 text-emerald-700">
+        <Badge variant="outline" className="ml-auto text-[10px] border-emerald-500/20 text-emerald-400">
           Live
         </Badge>
       </div>
@@ -383,13 +383,13 @@ export default function FirstHourPage() {
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
           <span className="relative inline-flex size-2.5 rounded-full bg-emerald-500" />
         </span>
-        <span className="text-xs font-medium text-emerald-700">Live  -  polling every 15 seconds</span>
+        <span className="text-xs font-medium text-emerald-400">Live  -  polling every 15 seconds</span>
       </div>
 
       {/* Error state */}
       {error && (
-        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3">
-          <p className="text-sm text-red-800">
+        <div className="rounded-lg border border-red-500/20 bg-red-950/30 px-4 py-3">
+          <p className="text-sm text-red-400">
             Failed to load metrics: {error.message}
           </p>
         </div>
@@ -408,12 +408,12 @@ export default function FirstHourPage() {
 
       {/* Goal callout */}
       {metrics && (
-        <div className="rounded-xl border border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50 px-5 py-4">
+        <div className="rounded-xl border border-amber-500/20 bg-gradient-to-r from-amber-950/30 to-orange-950/30 px-5 py-4">
           <div className="flex items-start gap-3">
             <ArrowUpRight className="size-5 text-amber-600 shrink-0 mt-0.5" />
             <div>
               <h4 className="text-sm font-semibold text-amber-900">Launch Goal</h4>
-              <p className="text-sm text-amber-700 mt-0.5">
+              <p className="text-sm text-amber-400 mt-0.5">
                 Track how many of the first 25 firms utilise{' '}
                 <span className="font-semibold">{SOUTH_ASIAN_LABEL}</span> Fact-Anchors in their
                 first 60 minutes.

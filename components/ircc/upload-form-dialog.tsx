@@ -152,7 +152,7 @@ export function UploadFormDialog({
               dragOver
                 ? 'border-primary bg-primary/5'
                 : file
-                  ? 'border-green-300 bg-green-50'
+                  ? 'border-emerald-500/30 bg-emerald-950/30'
                   : 'border-slate-200 hover:border-slate-300'
             }`}
             onClick={() => fileRef.current?.click()}
@@ -189,7 +189,7 @@ export function UploadFormDialog({
                 </div>
                 <button
                   type="button"
-                  className="ml-2 rounded-full p-1 hover:bg-green-100"
+                  className="ml-2 rounded-full p-1 hover:bg-emerald-950/40"
                   onClick={(e) => {
                     e.stopPropagation()
                     setFile(null)

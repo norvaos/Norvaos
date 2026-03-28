@@ -16,9 +16,9 @@ import type { ShiftKpiValue } from '@/lib/queries/front-desk-queries'
  */
 
 const KPI_COLOR_MAP: Record<string, string> = {
-  green: 'bg-emerald-100 text-emerald-800 border-emerald-200',
-  amber: 'bg-amber-100 text-amber-800 border-amber-200',
-  red: 'bg-red-100 text-red-800 border-red-200',
+  green: 'bg-emerald-950/40 text-emerald-400 border-emerald-500/20',
+  amber: 'bg-amber-950/40 text-amber-400 border-amber-500/20',
+  red: 'bg-red-950/40 text-red-400 border-red-500/20',
   grey: 'bg-slate-100 text-slate-500 border-slate-200',
 }
 
@@ -82,16 +82,16 @@ function UserKpiSection({ user }: { user: AdminUserKpiSummary }) {
         </div>
 
         <div className="flex items-center gap-2 text-xs">
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 font-medium">
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-950/40 text-emerald-400 font-medium">
             {greenCount} green
           </span>
           {amberCount > 0 && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 font-medium">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-950/40 text-amber-400 font-medium">
               {amberCount} amber
             </span>
           )}
           {redCount > 0 && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-100 text-red-700 font-medium">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-950/40 text-red-400 font-medium">
               {redCount} red
             </span>
           )}

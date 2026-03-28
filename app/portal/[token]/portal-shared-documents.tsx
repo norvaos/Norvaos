@@ -244,8 +244,8 @@ export function PortalSharedDocuments({
                     className={cn(
                       'inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-medium shrink-0',
                       isViewed
-                        ? 'bg-green-50 text-green-700 border-green-200'
-                        : 'bg-amber-50 text-amber-700 border-amber-200',
+                        ? 'bg-emerald-950/30 text-emerald-400 border-green-200'
+                        : 'bg-amber-50 text-amber-400 border-amber-200',
                     )}
                   >
                     {isViewed

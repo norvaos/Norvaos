@@ -20,9 +20,9 @@ import {
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
 const STATUS_BADGE: Record<string, { label: string; color: string }> = {
-  confirmed: { label: 'Confirmed', color: 'bg-emerald-100 text-emerald-700' },
-  checked_in: { label: 'Checked In', color: 'bg-amber-100 text-amber-700' },
-  in_meeting: { label: 'In Progress', color: 'bg-purple-100 text-purple-700' },
+  confirmed: { label: 'Confirmed', color: 'bg-emerald-950/40 text-emerald-400' },
+  checked_in: { label: 'Checked In', color: 'bg-amber-100 text-amber-400' },
+  in_meeting: { label: 'In Progress', color: 'bg-purple-100 text-purple-400' },
 }
 
 function formatTime12(time: string): string {

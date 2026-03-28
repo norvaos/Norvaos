@@ -137,7 +137,7 @@ export function IdScanner({ onScanComplete, compact, className }: IdScannerProps
                 size="sm"
                 className={cn(
                   'gap-1.5',
-                  state === 'success' && 'border-emerald-300 text-emerald-700',
+                  state === 'success' && 'border-emerald-500/30 text-emerald-400',
                 )}
                 onClick={() => inputRef.current?.click()}
                 disabled={state === 'processing' || state === 'uploading'}
@@ -171,10 +171,10 @@ export function IdScanner({ onScanComplete, compact, className }: IdScannerProps
     <div
       className={cn(
         'relative rounded-lg border-2 border-dashed p-6 text-center transition-colors',
-        state === 'idle' && 'border-slate-200 hover:border-blue-300 hover:bg-blue-50/30',
-        state === 'processing' && 'border-blue-300 bg-blue-50/30',
-        state === 'success' && 'border-emerald-300 bg-emerald-50/30',
-        state === 'error' && 'border-red-300 bg-red-50/30',
+        state === 'idle' && 'border-slate-200 hover:border-blue-300 hover:bg-blue-950/30/30',
+        state === 'processing' && 'border-blue-300 bg-blue-950/30/30',
+        state === 'success' && 'border-emerald-500/30 bg-emerald-950/30/30',
+        state === 'error' && 'border-red-300 bg-red-950/30/30',
         className,
       )}
       onDrop={handleDrop}
@@ -225,7 +225,7 @@ export function IdScanner({ onScanComplete, compact, className }: IdScannerProps
       {(state === 'uploading' || state === 'processing') && (
         <>
           <Loader2 className="mx-auto size-8 text-blue-500 animate-spin mb-2" />
-          <p className="text-sm font-medium text-blue-700">
+          <p className="text-sm font-medium text-blue-400">
             {state === 'uploading' ? 'Uploading...' : 'Extracting Fields...'}
           </p>
           <p className="text-xs text-muted-foreground mt-1">
@@ -237,14 +237,14 @@ export function IdScanner({ onScanComplete, compact, className }: IdScannerProps
       {state === 'success' && (
         <>
           <CheckCircle2 className="mx-auto size-8 text-emerald-500 mb-2" />
-          <p className="text-sm font-medium text-emerald-700">
+          <p className="text-sm font-medium text-emerald-400">
             {fieldsFound} Fields Extracted
           </p>
           <p className="text-xs text-muted-foreground mt-1 mb-3">
             Review the auto-filled fields below. Edit anything that needs correction.
           </p>
           <div className="flex justify-center gap-2">
-            <Badge variant="outline" className="text-[9px] border-emerald-300 text-emerald-700">
+            <Badge variant="outline" className="text-[9px] border-emerald-500/30 text-emerald-400">
               Auto-Populated
             </Badge>
             <Button type="button" variant="ghost" size="sm" className="text-xs h-6" onClick={reset}>
@@ -257,7 +257,7 @@ export function IdScanner({ onScanComplete, compact, className }: IdScannerProps
       {state === 'error' && (
         <>
           <AlertTriangle className="mx-auto size-8 text-red-400 mb-2" />
-          <p className="text-sm font-medium text-red-700">Scan Failed</p>
+          <p className="text-sm font-medium text-red-400">Scan Failed</p>
           <p className="text-xs text-destructive mt-1 mb-3">{error}</p>
           <Button
             type="button"

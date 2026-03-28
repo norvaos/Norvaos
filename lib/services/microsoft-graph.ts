@@ -119,7 +119,7 @@ export function buildAuthUrl(state: string, codeVerifier: string): string {
     state,
     code_challenge: codeChallenge,
     code_challenge_method: 'S256',
-    prompt: 'consent',
+    prompt: 'select_account',
   })
 
   return `${MICROSOFT_AUTH_URL}/${tenantId}/oauth2/v2.0/authorize?${params.toString()}`

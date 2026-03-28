@@ -67,7 +67,7 @@ export function AIUsageReport() {
       {/* ── Efficiency Metrics (3 Bento Cards) ─────────────────────────────── */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         {/* Hours Saved */}
-        <div className="relative overflow-hidden rounded-2xl border border-emerald-200/60 bg-gradient-to-br from-emerald-50 to-white p-5 shadow-sm">
+        <div className="relative overflow-hidden rounded-2xl border border-emerald-500/20 bg-gradient-to-br from-emerald-50 to-white p-5 shadow-sm">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs font-medium uppercase tracking-wider text-emerald-600">
@@ -78,8 +78,8 @@ export function AIUsageReport() {
               </p>
               <p className="mt-0.5 text-xs text-emerald-600/70">This month</p>
             </div>
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-100">
-              <Clock className="h-5 w-5 text-emerald-700" />
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-950/40">
+              <Clock className="h-5 w-5 text-emerald-400" />
             </div>
           </div>
           {/* Glow */}
@@ -186,16 +186,16 @@ export function AIUsageReport() {
                           className={cn(
                             'inline-flex rounded-full px-2 py-0.5 text-xs font-bold tabular-nums',
                             row.accuracy >= 99
-                              ? 'bg-emerald-50 text-emerald-700'
+                              ? 'bg-emerald-950/30 text-emerald-400'
                               : row.accuracy >= 95
-                                ? 'bg-amber-50 text-amber-700'
-                                : 'bg-red-50 text-red-700'
+                                ? 'bg-amber-950/30 text-amber-400'
+                                : 'bg-red-950/30 text-red-400'
                           )}
                         >
                           {row.accuracy.toFixed(1)}%
                         </span>
                       </td>
-                      <td className="px-5 py-3 text-right tabular-nums font-semibold text-emerald-700">
+                      <td className="px-5 py-3 text-right tabular-nums font-semibold text-emerald-400">
                         {row.hoursSaved} hrs
                       </td>
                     </tr>

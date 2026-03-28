@@ -186,7 +186,7 @@ export function IRCC5257EIntakeTab({ matterId, contactId, tenantId }: IRCC5257EI
       <Card>
         <CardContent className="flex flex-col items-center justify-center py-12 text-center">
           <AlertCircle className="mb-3 h-8 w-8 text-amber-400" />
-          <h3 className="text-sm font-medium text-amber-700">No Primary Contact</h3>
+          <h3 className="text-sm font-medium text-amber-400">No Primary Contact</h3>
           <p className="mt-1 max-w-md text-sm text-amber-600">
             Please assign a primary contact to this matter before starting the IMM 5257E questionnaire.
           </p>
@@ -269,7 +269,7 @@ export function IRCC5257EIntakeTab({ matterId, contactId, tenantId }: IRCC5257EI
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <Badge variant="outline" className="gap-1 text-green-600 border-green-200 bg-green-50">
+                <Badge variant="outline" className="gap-1 text-green-600 border-green-200 bg-emerald-950/30">
                   <CheckCircle2 className="h-3 w-3" />
                   Ready
                 </Badge>

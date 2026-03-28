@@ -316,8 +316,8 @@ export function UploadDocumentDialog({
                 </span>
               </div>
               {scanExtracted && (
-                <div className="border rounded-lg bg-green-50/50 border-green-200 divide-y divide-green-100">
-                  <div className="px-3 py-1.5 text-xs font-medium text-green-700 flex items-center gap-1.5">
+                <div className="border rounded-lg bg-emerald-950/30/50 border-green-200 divide-y divide-green-100">
+                  <div className="px-3 py-1.5 text-xs font-medium text-emerald-400 flex items-center gap-1.5">
                     <ScanSearch className="h-3.5 w-3.5" />
                     Extracted Information
                   </div>
@@ -378,7 +378,7 @@ export function UploadDocumentDialog({
           )}
 
           {uploadError && (
-            <p className="text-xs text-red-600 bg-red-50 border border-red-200 rounded px-2 py-1.5">{uploadError}</p>
+            <p className="text-xs text-red-600 bg-red-950/30 border border-red-200 rounded px-2 py-1.5">{uploadError}</p>
           )}
         </div>
 

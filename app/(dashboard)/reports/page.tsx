@@ -462,7 +462,7 @@ export default function ReportsPage() {
               <ChartEmpty />
             ) : (
               <div className="flex flex-col items-center gap-4 py-6">
-                <div className="text-5xl font-bold tabular-nums">
+                <div className="text-5xl font-semibold tracking-tight font-mono">
                   {overallCompletionRate}%
                 </div>
                 <Progress value={overallCompletionRate} className="h-3 w-48" />

@@ -133,9 +133,9 @@ export async function syncInboundEmails(
     if (account.delta_link) {
       url = account.delta_link
     } else {
-      // Initial sync: fetch messages from last 90 days
+      // Initial sync: Deep History fetch — last 24 months (Omniscient Archive)
       const startDate = new Date()
-      startDate.setDate(startDate.getDate() - 90)
+      startDate.setMonth(startDate.getMonth() - 24)
       url = `me/mailFolders/inbox/messages/delta?$filter=receivedDateTime ge ${startDate.toISOString()}&$select=id,conversationId,subject,body,bodyPreview,from,toRecipients,ccRecipients,bccRecipients,hasAttachments,isRead,importance,receivedDateTime,sentDateTime,lastModifiedDateTime&$top=100`
     }
 

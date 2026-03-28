@@ -338,6 +338,51 @@ async function handlePost() {
       await admin.from('tenants').update({ settings: j(settings), feature_flags: j(flags), currency: 'CAD' } as never).eq('id', auth.tenantId)
     } catch { errors.push('tenant_settings_batch') }
 
+    // ── NorvaOS Standard Master: 7-Stage Sovereign Pipeline (immutable) ────────
+    // The "Standard Seven" — every tenant gets this pre-configured, read-only
+    // pipeline from second zero. No setup required. No customisation allowed.
+    try {
+      // Check if the system pipeline already exists (idempotent)
+      const existingPipelineRes = await admin
+        .from('pipelines')
+        .select('id')
+        .eq('tenant_id', auth.tenantId)
+        .eq('name', 'NorvaOS Standard')
+        .maybeSingle()
+      const existingPipeline = (existingPipelineRes as unknown as { data: { id: string } | null }).data
+
+      if (!existingPipeline) {
+        // Create the system pipeline
+        const pipelineRes = await admin
+          .from('pipelines')
+          .insert({
+            tenant_id: auth.tenantId,
+            name: 'NorvaOS Standard',
+            pipeline_type: 'lead',
+            is_default: true,
+            is_active: true,
+          } as never)
+          .select('id')
+          .single()
+        const pipelineData = (pipelineRes as unknown as { data: { id: string } | null }).data
+
+        if (pipelineData?.id) {
+          const pid = pipelineData.id
+          const tid = auth.tenantId
+          // Inject the 7-stage NorvaOS Standard Master
+          await admin.from('pipeline_stages').insert([
+            { tenant_id: tid, pipeline_id: pid, name: 'Inquiry',          sort_order: 1, color: '#3b82f6', description: 'New inbound lead received. Auto-created on intake.',                     is_win_stage: false, is_lost_stage: false, win_probability: 5,  rotting_days: 2  },
+            { tenant_id: tid, pipeline_id: pid, name: 'Contacted',        sort_order: 2, color: '#6366f1', description: 'First outbound contact made (call, email, or SMS).',                    is_win_stage: false, is_lost_stage: false, win_probability: 15, rotting_days: 3  },
+            { tenant_id: tid, pipeline_id: pid, name: 'Meeting Set',      sort_order: 3, color: '#8b5cf6', description: 'Strategy meeting scheduled. Calendar invite sent.',                    is_win_stage: false, is_lost_stage: false, win_probability: 30, rotting_days: 5  },
+            { tenant_id: tid, pipeline_id: pid, name: 'Strategy Held',    sort_order: 4, color: '#f59e0b', description: 'Strategy meeting completed. Decision junction — Smart Pause enabled.', is_win_stage: false, is_lost_stage: false, win_probability: 50, rotting_days: 7  },
+            { tenant_id: tid, pipeline_id: pid, name: 'Retainer Sent',    sort_order: 5, color: '#f97316', description: 'Retainer agreement sent via DocuSign or PandaDoc.',                    is_win_stage: false, is_lost_stage: false, win_probability: 70, rotting_days: 10 },
+            { tenant_id: tid, pipeline_id: pid, name: 'Payment Pending',  sort_order: 6, color: '#eab308', description: 'Invoice or Stripe payment link active. Awaiting payment.',             is_win_stage: false, is_lost_stage: false, win_probability: 85, rotting_days: 14 },
+            { tenant_id: tid, pipeline_id: pid, name: 'Won / Onboarded',  sort_order: 7, color: '#10b981', description: 'Payment received. Matter created. Client onboarded.',                  is_win_stage: true,  is_lost_stage: false, win_probability: 100, rotting_days: null },
+          ] as never)
+        }
+      }
+    } catch { errors.push('golden_thread_pipeline') }
+
     // Data import intent
     try {
       await admin.from('tenant_setup_log').upsert(

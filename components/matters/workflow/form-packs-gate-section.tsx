@@ -154,7 +154,7 @@ export function FormPacksGateSection({
                 {statusBlockers.length > 0 && (
                   <ul className="mt-2 space-y-0.5">
                     {statusBlockers.slice(0, 3).map((reason, i) => (
-                      <li key={i} className="text-xs text-amber-700 flex items-start gap-1">
+                      <li key={i} className="text-xs text-amber-400 flex items-start gap-1">
                         <span className="shrink-0 mt-px">→</span>
                         <span>{reason}</span>
                       </li>
@@ -171,7 +171,7 @@ export function FormPacksGateSection({
                 <div
                   className={cn(
                     'h-full rounded-full transition-all',
-                    pct >= threshold ? 'bg-green-500' : pct >= 60 ? 'bg-amber-500' : 'bg-red-500'
+                    pct >= threshold ? 'bg-green-500' : pct >= 60 ? 'bg-amber-950/300' : 'bg-red-500'
                   )}
                   style={{ width: `${Math.min(pct, 100)}%` }}
                 />
@@ -201,7 +201,7 @@ export function FormPacksGateSection({
             UNLOCKED
           </Badge>
           {readinessData.formPacks.stale.length > 0 && (
-            <Badge variant="outline" className="text-[10px] border-amber-300 text-amber-700 bg-amber-50 ml-1">
+            <Badge variant="outline" className="text-[10px] border-amber-300 text-amber-400 bg-amber-950/30 ml-1">
               {readinessData.formPacks.stale.length} outdated
             </Badge>
           )}

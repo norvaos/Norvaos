@@ -117,7 +117,7 @@ function FolderNode({
             className={cn(
               'text-[10px] px-1.5 py-0 shrink-0',
               acceptedSlots === totalSlots && totalSlots > 0
-                ? 'border-green-300 text-green-700 bg-green-50'
+                ? 'border-emerald-500/30 text-emerald-400 bg-emerald-950/30'
                 : 'border-slate-200 text-slate-500'
             )}
           >

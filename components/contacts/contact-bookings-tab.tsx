@@ -71,12 +71,12 @@ import { useRouter } from 'next/navigation'
 // ── Status helpers ──────────────────────────────────────────────────────────
 
 const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
-  confirmed: { label: 'Confirmed', color: 'bg-emerald-100 text-emerald-700' },
-  checked_in: { label: 'Checked In', color: 'bg-amber-100 text-amber-700' },
-  in_meeting: { label: 'In Progress', color: 'bg-purple-100 text-purple-700' },
-  completed: { label: 'Completed', color: 'bg-blue-100 text-blue-700' },
+  confirmed: { label: 'Confirmed', color: 'bg-emerald-950/40 text-emerald-400' },
+  checked_in: { label: 'Checked In', color: 'bg-amber-100 text-amber-400' },
+  in_meeting: { label: 'In Progress', color: 'bg-purple-100 text-purple-400' },
+  completed: { label: 'Completed', color: 'bg-blue-100 text-blue-400' },
   cancelled: { label: 'Cancelled', color: 'bg-slate-100 text-slate-500' },
-  no_show: { label: 'No Show', color: 'bg-red-100 text-red-700' },
+  no_show: { label: 'No Show', color: 'bg-red-100 text-red-400' },
 }
 
 const ACTIVE_STATUSES = ['confirmed', 'checked_in', 'in_meeting']

@@ -129,7 +129,7 @@ function CreatedCredentialsModal({
     <Dialog open={open} onOpenChange={(o) => { if (!o) onClose() }}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-emerald-700">
+          <DialogTitle className="flex items-center gap-2 text-emerald-400">
             <CheckCheck className="w-5 h-5" />
             User Created Successfully
           </DialogTitle>
@@ -160,7 +160,7 @@ function CreatedCredentialsModal({
           </div>
         </div>
 
-        <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-md px-3 py-2">
+        <p className="text-xs text-amber-400 bg-amber-950/30 border border-amber-200 rounded-md px-3 py-2">
           <strong>Note:</strong> This password will not be shown again. Copy it now before closing.
         </p>
 

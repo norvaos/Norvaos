@@ -269,22 +269,22 @@ function SortableFieldRow({
             {field.label}
           </span>
           {field.is_required && (
-            <Badge variant="secondary" className="text-[10px] text-red-600 bg-red-50 border-red-200">
+            <Badge variant="secondary" className="text-[10px] text-red-600 bg-red-950/30 border-red-200">
               Required
             </Badge>
           )}
           {field.mapping && (
-            <Badge variant="secondary" className="text-[10px] text-blue-600 bg-blue-50 border-blue-200">
+            <Badge variant="secondary" className="text-[10px] text-blue-600 bg-blue-950/30 border-blue-200">
               {CONTACT_MAPPINGS.find((m) => m.value === field.mapping)?.label ?? field.mapping}
             </Badge>
           )}
           {field.allow_other && (
-            <Badge variant="secondary" className="text-[10px] text-purple-600 bg-purple-50 border-purple-200">
+            <Badge variant="secondary" className="text-[10px] text-purple-600 bg-purple-950/30 border-purple-200">
               +Other
             </Badge>
           )}
           {field.condition && (
-            <Badge variant="secondary" className="text-[10px] text-amber-600 bg-amber-50 border-amber-200">
+            <Badge variant="secondary" className="text-[10px] text-amber-600 bg-amber-950/30 border-amber-200">
               Conditional
             </Badge>
           )}
@@ -1052,10 +1052,10 @@ function SubmissionDetailSheet({
                 className={cn(
                   'text-xs',
                   submission.status === 'processed'
-                    ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                    ? 'bg-emerald-950/30 text-emerald-400 border-emerald-500/20'
                     : submission.status === 'error'
-                      ? 'bg-red-50 text-red-700 border-red-200'
-                      : 'bg-blue-50 text-blue-700 border-blue-200'
+                      ? 'bg-red-950/30 text-red-400 border-red-200'
+                      : 'bg-blue-950/30 text-blue-400 border-blue-200'
                 )}
               >
                 {submission.status}
@@ -1190,10 +1190,10 @@ function SubmissionsPanel({ formId, fields }: { formId: string; fields: IntakeFi
                   className={cn(
                     'text-[10px] shrink-0',
                     sub.status === 'processed'
-                      ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                      ? 'bg-emerald-950/30 text-emerald-400 border-emerald-500/20'
                       : sub.status === 'error'
-                        ? 'bg-red-50 text-red-700 border-red-200'
-                        : 'bg-blue-50 text-blue-700 border-blue-200'
+                        ? 'bg-red-950/30 text-red-400 border-red-200'
+                        : 'bg-blue-950/30 text-blue-400 border-blue-200'
                   )}
                 >
                   {sub.status}
@@ -1457,7 +1457,7 @@ function FormBuilderPanel({
               className={cn(
                 'text-[10px]',
                 isPublished
-                  ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                  ? 'bg-emerald-950/30 text-emerald-400 border-emerald-500/20'
                   : 'bg-slate-100 text-slate-600 border-slate-200'
               )}
             >
@@ -1851,13 +1851,13 @@ function FormBuilderPanel({
 
               {/* Shareable Link */}
               {isPublished && (
-                <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-3">
+                <div className="rounded-lg border border-emerald-500/20 bg-emerald-950/30 p-3">
                   <div className="flex items-center gap-2">
                     <ExternalLink className="h-4 w-4 text-emerald-600" />
-                    <span className="text-sm font-medium text-emerald-800">Shareable Link</span>
+                    <span className="text-sm font-medium text-emerald-400">Shareable Link</span>
                   </div>
                   <div className="mt-2 flex items-center gap-2">
-                    <code className="flex-1 rounded bg-white px-2.5 py-1.5 text-xs font-mono text-emerald-700 border">
+                    <code className="flex-1 rounded bg-white px-2.5 py-1.5 text-xs font-mono text-emerald-400 border">
                       {typeof window !== 'undefined' ? window.location.origin : ''}/forms/{form.slug}
                     </code>
                     <Button variant="outline" size="sm" onClick={handleCopyLink}>
@@ -1869,12 +1869,12 @@ function FormBuilderPanel({
 
               {/* Embed Code */}
               {isPublished && (
-                <div className="rounded-lg border border-blue-200 bg-blue-50 p-3">
+                <div className="rounded-lg border border-blue-200 bg-blue-950/30 p-3">
                   <div className="flex items-center gap-2">
                     <Code2 className="h-4 w-4 text-blue-600" />
                     <span className="text-sm font-medium text-blue-800">Embed on Your Website</span>
                   </div>
-                  <p className="mt-1 text-xs text-blue-700/70">
+                  <p className="mt-1 text-xs text-blue-400/70">
                     Copy the code below and paste it into your website&apos;s HTML.
                   </p>
                   <div className="mt-2">
@@ -1959,10 +1959,10 @@ function FormCard({
               className={cn(
                 'text-[10px] shrink-0',
                 form.status === 'published'
-                  ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                  ? 'bg-emerald-950/30 text-emerald-400 border-emerald-500/20'
                   : form.status === 'archived'
                     ? 'bg-slate-100 text-slate-500 border-slate-200'
-                    : 'bg-amber-50 text-amber-700 border-amber-200'
+                    : 'bg-amber-950/30 text-amber-400 border-amber-200'
               )}
             >
               {form.status}

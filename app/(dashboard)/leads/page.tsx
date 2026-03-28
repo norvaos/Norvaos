@@ -43,10 +43,10 @@ import { usePracticeAreaContext } from '@/lib/hooks/use-practice-area-context'
 import { useI18n } from '@/lib/i18n/i18n-provider'
 import { createClient } from '@/lib/supabase/client'
 import { usePipelines, usePipelineStages } from '@/lib/queries/pipelines'
-import { useLeads, useUpdateLeadStage, useUpdateLead, leadKeys } from '@/lib/queries/leads'
+import { useLeads, useUpdateLeadStage, useUpdateLead, leadKeys, useLeadSources } from '@/lib/queries/leads'
 import { formatCurrency, formatDate, isOverdue } from '@/lib/utils/formatters'
 import { cn } from '@/lib/utils'
-import { LEAD_TEMPERATURES, CONTACT_SOURCES } from '@/lib/utils/constants'
+import { LEAD_TEMPERATURES } from '@/lib/utils/constants'
 
 import { KanbanColumn, KanbanColumnSkeleton } from '@/components/pipeline/kanban-column'
 import { KanbanCard } from '@/components/pipeline/kanban-card'
@@ -57,6 +57,7 @@ import { DeferredDateDialog } from '@/components/leads/deferred-date-dialog'
 import { LostReasonDialog } from '@/components/leads/lost-reason-dialog'
 import type { LostReason } from '@/components/leads/lost-reason-dialog'
 import { EmptyState } from '@/components/shared/empty-state'
+import { useUIStore } from '@/lib/stores/ui-store'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
@@ -87,6 +88,86 @@ import { toast } from 'sonner'
 import type { Database } from '@/lib/types/database'
 
 type Lead = Database['public']['Tables']['leads']['Row']
+
+// ---------------------------------------------------------------------------
+// First-Lead Ignition — Zero-state Emerald Pulse "Start Your First Mission"
+// ---------------------------------------------------------------------------
+
+function FirstLeadIgnition() {
+  const openModal = useUIStore((s) => s.openModal)
+
+  return (
+    <div className="flex h-full flex-col items-center justify-center px-6">
+      <div className="flex flex-col items-center text-center max-w-md">
+        {/* Sovereign shield icon */}
+        <div className="flex items-center justify-center size-20 rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-700 text-white shadow-lg mb-6">
+          <svg className="size-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z" />
+          </svg>
+        </div>
+
+        <h1
+          className="text-3xl font-bold tracking-tight text-slate-900 mb-2"
+          style={{ fontFamily: 'var(--font-geist-mono), ui-monospace, monospace' }}
+        >
+          Ready to Begin
+        </h1>
+        <p className="text-base text-slate-500 mb-8 leading-relaxed" style={{ fontSize: '16px' }}>
+          Your 7-stage master workflow is active. From first enquiry to signed retainer — every step is automated. Start your first mission now.
+        </p>
+
+        {/* Emerald Pulse "Start Your First Mission" Button */}
+        <button
+          onClick={() => openModal('create-lead-quick')}
+          className="relative inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-8 py-4 text-lg font-semibold text-white shadow-lg hover:bg-emerald-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 transition-colors"
+          style={{
+            animation: 'emerald-pulse 2.5s ease-in-out infinite',
+          }}
+        >
+          <Plus className="size-5" strokeWidth={2.5} />
+          Start Your First Mission
+        </button>
+
+        {/* 7-Stage Pipeline Blueprint */}
+        <div className="mt-10 flex items-center gap-1 w-full max-w-lg">
+          {[
+            { label: 'Inquiry',     color: 'bg-blue-950/300' },
+            { label: 'Contacted',   color: 'bg-indigo-500' },
+            { label: 'Meeting Set', color: 'bg-violet-500' },
+            { label: 'Strategy',    color: 'bg-amber-950/300' },
+            { label: 'Retainer',    color: 'bg-orange-950/300' },
+            { label: 'Payment',     color: 'bg-yellow-950/300' },
+            { label: 'Won',         color: 'bg-emerald-950/300' },
+          ].map((stage, i) => (
+            <div key={i} className="flex flex-col items-center gap-1 flex-1">
+              <div className="flex items-center w-full">
+                <div className={`size-3 rounded-full ${stage.color} shrink-0`} />
+                {i < 6 && <div className="h-px flex-1 bg-slate-200" />}
+              </div>
+              <span className="text-[9px] text-slate-400 font-medium leading-tight text-center">
+                {stage.label}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Inline keyframes for the breathing pulse */}
+      <style jsx>{`
+        @keyframes emerald-pulse {
+          0%, 100% {
+            transform: scale(1);
+            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+          }
+          50% {
+            transform: scale(1.02);
+            box-shadow: 0 0 20px 6px rgba(16, 185, 129, 0.35);
+          }
+        }
+      `}</style>
+    </div>
+  )
+}
 
 // ---------------------------------------------------------------------------
 // Main page component
@@ -183,6 +264,9 @@ export default function LeadsPage() {
 
   // ---- Global practice area context ----------------------------------------
   const { filter: globalPracticeFilter, effectiveName: practiceAreaName } = usePracticeAreaContext()
+
+  // ---- Lead sources (shared DB hook — same as Intake modal) ----------------
+  const { data: leadSources } = useLeadSources(tenantId)
 
   // ---- Pipeline selection --------------------------------------------------
   const {
@@ -744,6 +828,11 @@ export default function LeadsPage() {
     )
   }
 
+  // ---- First-Lead Ignition: Zero leads → show "Start Your First Mission" ---
+  if (!leadsLoading && leads.length === 0 && !searchQuery.trim() && temperatureFilter === 'all' && sourceFilter === 'all') {
+    return <FirstLeadIgnition />
+  }
+
   return (
     <div className="flex h-full flex-col" data-leads-command>
       {/* Page header with pipeline selector */}
@@ -756,7 +845,7 @@ export default function LeadsPage() {
             {totalLeads > 0 && (
               <div className="flex items-center gap-2">
                 <MiniScoreRing score={pipelineReadiness} />
-                <Badge variant="outline" className="text-[10px] font-medium text-blue-700 border-blue-200 bg-blue-50 iron-shadow">
+                <Badge variant="outline" className="text-[10px] font-medium text-blue-400 border-blue-500/20 bg-blue-950/30 iron-shadow">
                   {t('leads.new_inquiry', 'New Inquiry')}
                 </Badge>
               </div>
@@ -922,9 +1011,9 @@ export default function LeadsPage() {
             </SelectTrigger>
             <SelectContent className="iron-shadow-elevated">
               <SelectItem value="all">{t('leads.all_sources', 'All sources')}</SelectItem>
-              {CONTACT_SOURCES.map((s) => (
-                <SelectItem key={s} value={s}>
-                  {s}
+              {leadSources?.map((s) => (
+                <SelectItem key={s.id} value={s.name}>
+                  {s.name}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -1321,7 +1410,7 @@ function LeadsTable({
             return (
               <TableRow
                 key={lead.id}
-                className="cursor-pointer hover:bg-blue-50/40 transition-colors"
+                className="cursor-pointer hover:bg-blue-950/30/40 transition-colors"
                 onClick={() => onRowClick(lead.id)}
               >
                 {/* Contact */}
@@ -1429,7 +1518,7 @@ function LeadsTable({
                   <Link
                     href={`/leads/${lead.id}/consultation`}
                     onClick={(e) => e.stopPropagation()}
-                    className="inline-flex items-center gap-1 rounded-md border border-blue-200 bg-blue-50 px-2 py-1 text-[11px] font-medium text-blue-700 hover:bg-blue-100 hover:border-blue-300 transition-colors"
+                    className="inline-flex items-center gap-1 rounded-md border border-blue-500/20 bg-blue-950/30 px-2 py-1 text-[11px] font-medium text-blue-400 hover:bg-blue-100 hover:border-blue-300 transition-colors"
                   >
                     <ClipboardList className="h-3 w-3" />
                     {t('leads.consult', 'Consult')}

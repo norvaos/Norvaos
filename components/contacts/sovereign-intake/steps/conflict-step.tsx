@@ -346,7 +346,7 @@ export function SovereignConflictStep({
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <div className="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-200">
+              <div className="flex items-start gap-3 rounded-lg border border-amber-500/20 bg-amber-950/30 p-4 text-sm text-amber-900 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-200">
                 <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-600 dark:text-amber-400" />
                 <span>
                   <strong>Regulatory Requirement:</strong> You cannot collect
@@ -462,7 +462,7 @@ export function SovereignConflictStep({
 
         {/* Error */}
         {error && (
-          <div className="animate-in fade-in slide-in-from-bottom-2 duration-300 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800 dark:border-red-800 dark:bg-red-950/40 dark:text-red-200">
+          <div className="animate-in fade-in slide-in-from-bottom-2 duration-300 rounded-lg border border-red-500/20 bg-red-950/30 p-4 text-sm text-red-800 dark:border-red-800 dark:bg-red-950/40 dark:text-red-200">
             {error}
           </div>
         )}
@@ -470,7 +470,7 @@ export function SovereignConflictStep({
         {/* Results  -  clear (no matches at all) */}
         {scanState === 'clear' && (
           <div className="animate-in fade-in slide-in-from-bottom-2 duration-300 space-y-4">
-            <div className="flex flex-col items-center gap-3 rounded-lg border border-green-200 bg-green-50 p-6 text-center dark:border-green-800 dark:bg-green-950/40">
+            <div className="flex flex-col items-center gap-3 rounded-lg border border-green-200 bg-emerald-950/30 p-6 text-center dark:border-green-800 dark:bg-green-950/40">
               <ShieldCheck className="h-10 w-10 text-green-600 animate-pulse dark:text-green-400" />
               <p className="text-sm font-medium text-green-800 dark:text-green-200">
                 No conflicts found for{' '}
@@ -480,7 +480,7 @@ export function SovereignConflictStep({
               </p>
               <Badge
                 variant="outline"
-                className="border-green-300 text-green-700 dark:border-green-700 dark:text-green-300"
+                className="border-green-300 text-emerald-400 dark:border-green-700 dark:text-green-300"
               >
                 Cleared
               </Badge>
@@ -491,12 +491,12 @@ export function SovereignConflictStep({
         {/* Results  -  conflict resolved */}
         {scanState === 'resolved' && resolvedMatch && (
           <div className="animate-in fade-in slide-in-from-bottom-2 duration-300 space-y-4">
-            <div className="flex flex-col items-center gap-3 rounded-lg border border-green-200 bg-green-50 p-6 text-center dark:border-green-800 dark:bg-green-950/40">
+            <div className="flex flex-col items-center gap-3 rounded-lg border border-green-200 bg-emerald-950/30 p-6 text-center dark:border-green-800 dark:bg-green-950/40">
               <ShieldCheck className="h-10 w-10 text-green-600 animate-pulse dark:text-green-400" />
               <p className="text-sm font-medium text-green-800 dark:text-green-200">
                 Conflict Resolved
               </p>
-              <p className="text-xs text-green-700 dark:text-green-300">
+              <p className="text-xs text-emerald-400 dark:text-green-300">
                 {intake.conflictResolution === 'linked' ? (
                   <>
                     Linked to existing contact:{' '}
@@ -515,7 +515,7 @@ export function SovereignConflictStep({
               </p>
               <Badge
                 variant="outline"
-                className="border-green-300 text-green-700 dark:border-green-700 dark:text-green-300"
+                className="border-green-300 text-emerald-400 dark:border-green-700 dark:text-green-300"
               >
                 {intake.conflictResolution === 'linked'
                   ? 'Linked to Existing'
@@ -528,13 +528,13 @@ export function SovereignConflictStep({
         {/* Results  -  conflicts found, unresolved */}
         {scanState === 'conflict' && (
           <div className="animate-in fade-in slide-in-from-bottom-2 duration-300 space-y-4">
-            <div className="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-950/40">
+            <div className="flex items-start gap-3 rounded-lg border border-amber-500/20 bg-amber-950/30 p-4 dark:border-amber-800 dark:bg-amber-950/40">
               <ShieldAlert className="mt-0.5 h-6 w-6 shrink-0 text-amber-600 dark:text-amber-400" />
               <div className="space-y-1">
                 <p className="text-sm font-medium text-amber-800 dark:text-amber-200">
                   Potential conflicts detected
                 </p>
-                <p className="text-xs text-amber-700 dark:text-amber-300">
+                <p className="text-xs text-amber-400 dark:text-amber-300">
                   The following existing contacts match the name provided. You
                   must resolve each match before proceeding.
                 </p>
@@ -690,7 +690,7 @@ export function SovereignConflictStep({
 
             <Badge
               variant="outline"
-              className="border-amber-300 text-amber-700 dark:border-amber-700 dark:text-amber-300"
+              className="border-amber-300 text-amber-400 dark:border-amber-700 dark:text-amber-300"
             >
               Resolution Required
             </Badge>

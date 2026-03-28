@@ -239,13 +239,13 @@ export function ImmigrationReadinessHub({ matterId, userId, userRole }: Props) {
 
           {/* ── Contradictions Detail ── */}
           {contradictions.flags.length > 0 && (
-            <div className="rounded-lg border border-red-200 bg-red-50 p-3 dark:border-red-900 dark:bg-red-950/30">
+            <div className="rounded-lg border border-red-200 bg-red-950/30 p-3 dark:border-red-900 dark:bg-red-950/30">
               <p className="text-xs font-medium text-red-800 dark:text-red-300 mb-2">
                 Contradictions Detected
               </p>
               <ul className="space-y-1">
                 {contradictions.flags.map((flag, i) => (
-                  <li key={`${flag.key}-${i}`} className="flex items-start gap-2 text-xs text-red-700 dark:text-red-400">
+                  <li key={`${flag.key}-${i}`} className="flex items-start gap-2 text-xs text-red-400 dark:text-red-400">
                     {flag.severity === 'blocking' ? (
                       <XCircle className="h-3 w-3 mt-0.5 shrink-0" />
                     ) : (
@@ -270,13 +270,13 @@ export function ImmigrationReadinessHub({ matterId, userId, userRole }: Props) {
 
           {/* ── Blocked Reasons ── */}
           {blockedReasons.length > 0 && (
-            <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 dark:border-amber-900 dark:bg-amber-950/30">
+            <div className="rounded-lg border border-amber-200 bg-amber-950/30 p-3 dark:border-amber-900 dark:bg-amber-950/30">
               <p className="text-xs font-medium text-amber-800 dark:text-amber-300 mb-1">
                 Blocked
               </p>
               <ul className="space-y-0.5">
                 {blockedReasons.map((reason, i) => (
-                  <li key={i} className="text-xs text-amber-700 dark:text-amber-400">
+                  <li key={i} className="text-xs text-amber-400 dark:text-amber-400">
                     • {reason}
                   </li>
                 ))}
@@ -324,7 +324,7 @@ function NextActionSection({
   const wrapperClass = intakeStatus === 'ready_for_filing'
     ? 'flex items-center justify-between rounded-lg border-l-4 border-l-green-500 border bg-green-50/50 dark:bg-green-950/20 p-3'
     : intakeStatus === 'deficiency_outstanding'
-      ? 'flex items-center justify-between rounded-lg border-l-4 border-l-red-500 border bg-red-50/50 dark:bg-red-950/20 p-3'
+      ? 'flex items-center justify-between rounded-lg border-l-4 border-l-red-500 border bg-red-950/30/50 dark:bg-red-950/20 p-3'
       : 'flex items-center justify-between rounded-lg border-l-4 border-l-blue-500 border bg-blue-50/50 dark:bg-blue-950/20 p-3'
 
   const labelClass = intakeStatus === 'ready_for_filing'
@@ -478,7 +478,7 @@ function DomainCard({ domain, onClick }: { domain: DomainReadiness; onClick?: ()
           {domain.label}
         </p>
         {hasBlockers && (
-          <span className="inline-block h-2.5 w-2.5 rounded-full bg-red-500 shrink-0 mt-0.5" title={`${domain.blockers.length} blocker(s)`} />
+          <span className="inline-block h-2.5 w-2.5 rounded-full bg-red-950/300 shrink-0 mt-0.5" title={`${domain.blockers.length} blocker(s)`} />
         )}
       </div>
       <Progress value={domain.completionPct} className="h-1.5 mb-1" />
@@ -508,9 +508,9 @@ function BlockerSection({
   onToggle: () => void
 }) {
   const borderClass = color === 'red' ? 'border-red-200 dark:border-red-900' : 'border-amber-200 dark:border-amber-900'
-  const bgClass = color === 'red' ? 'bg-red-50 dark:bg-red-950/30' : 'bg-amber-50 dark:bg-amber-950/30'
+  const bgClass = color === 'red' ? 'bg-red-950/30 dark:bg-red-950/30' : 'bg-amber-950/30 dark:bg-amber-950/30'
   const textClass = color === 'red' ? 'text-red-800 dark:text-red-300' : 'text-amber-800 dark:text-amber-300'
-  const itemClass = color === 'red' ? 'text-red-700 dark:text-red-400' : 'text-amber-700 dark:text-amber-400'
+  const itemClass = color === 'red' ? 'text-red-400 dark:text-red-400' : 'text-amber-400 dark:text-amber-400'
 
   return (
     <div className={`rounded-lg border ${borderClass} ${bgClass} p-3`}>

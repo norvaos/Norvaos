@@ -34,16 +34,16 @@ interface ProgressStep {
 
 const STATUS_STYLES = {
   complete: {
-    dot: 'bg-green-500',
-    line: 'bg-green-500',
-    text: 'text-green-700',
-    bg: 'bg-green-50',
+    dot: 'bg-emerald-950/300',
+    line: 'bg-emerald-950/300',
+    text: 'text-emerald-400',
+    bg: 'bg-emerald-950/30',
   },
   current: {
-    dot: 'bg-blue-500 ring-4 ring-blue-100',
+    dot: 'bg-blue-950/300 ring-4 ring-blue-100',
     line: 'bg-slate-200',
-    text: 'text-blue-700',
-    bg: 'bg-blue-50',
+    text: 'text-blue-400',
+    bg: 'bg-blue-950/30',
   },
   upcoming: {
     dot: 'bg-slate-300',
@@ -52,10 +52,10 @@ const STATUS_STYLES = {
     bg: 'bg-slate-50',
   },
   at_risk: {
-    dot: 'bg-amber-500 ring-4 ring-amber-100',
+    dot: 'bg-amber-950/300 ring-4 ring-amber-100',
     line: 'bg-slate-200',
-    text: 'text-amber-700',
-    bg: 'bg-amber-50',
+    text: 'text-amber-400',
+    bg: 'bg-amber-950/30',
   },
 }
 
@@ -85,12 +85,12 @@ function AssemblyStep({
         <div className="flex items-center gap-2">
           <span className={cn('text-sm font-medium', style.text)}>{step.label}</span>
           {step.status === 'current' && (
-            <Badge variant="outline" className="text-[10px] h-4 px-1.5 text-blue-600 border-blue-200">
+            <Badge variant="outline" className="text-[10px] h-4 px-1.5 text-blue-600 border-blue-500/20">
               In Progress
             </Badge>
           )}
           {step.status === 'at_risk' && (
-            <Badge variant="outline" className="text-[10px] h-4 px-1.5 text-amber-600 border-amber-200">
+            <Badge variant="outline" className="text-[10px] h-4 px-1.5 text-amber-600 border-amber-500/30">
               At Risk
             </Badge>
           )}
@@ -248,9 +248,9 @@ export function ClientProgressPanel({ matterId }: ClientProgressPanelProps) {
 
   const progressColor =
     overallPct >= 80
-      ? '[&_[data-slot=progress-indicator]]:bg-green-500'
+      ? '[&_[data-slot=progress-indicator]]:bg-emerald-950/300'
       : overallPct >= 40
-        ? '[&_[data-slot=progress-indicator]]:bg-blue-500'
+        ? '[&_[data-slot=progress-indicator]]:bg-blue-950/300'
         : '[&_[data-slot=progress-indicator]]:bg-slate-400'
 
   return (

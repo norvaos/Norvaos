@@ -108,9 +108,9 @@ export function DocumentScanButton({
   }
 
   const confidenceColour = (c: number) => {
-    if (c >= 80) return 'border-green-300 text-green-700 bg-green-50'
-    if (c >= 50) return 'border-amber-300 text-amber-700 bg-amber-50'
-    return 'border-red-300 text-red-700 bg-red-50'
+    if (c >= 80) return 'border-green-300 text-emerald-400 bg-emerald-950/30'
+    if (c >= 50) return 'border-amber-300 text-amber-400 bg-amber-950/30'
+    return 'border-red-300 text-red-400 bg-red-950/30'
   }
 
   return (
@@ -189,9 +189,9 @@ export function DocumentScanButton({
               </div>
 
               {scanResult.confidence < 50 && (
-                <div className="flex items-start gap-2 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                <div className="flex items-start gap-2 p-3 bg-amber-950/30 border border-amber-200 rounded-lg">
                   <AlertCircle className="h-4 w-4 text-amber-600 mt-0.5 shrink-0" />
-                  <p className="text-xs text-amber-700">
+                  <p className="text-xs text-amber-400">
                     Low confidence score. Please verify the extracted data carefully before applying.
                   </p>
                 </div>

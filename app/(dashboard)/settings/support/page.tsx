@@ -115,7 +115,7 @@ export default function SupportDashboardPage() {
       {error && (
         <Card className="border-red-200">
           <CardContent className="pt-6">
-            <div className="flex items-center gap-2 text-red-700">
+            <div className="flex items-center gap-2 text-red-400">
               <XCircle className="h-4 w-4" />
               <span className="text-sm">
                 Could not load health data. Check server logs for details.

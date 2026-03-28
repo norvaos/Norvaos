@@ -47,6 +47,14 @@ export async function POST(req: NextRequest) {
       )
     }
 
+    const MAX_IMAGE_SIZE = 10 * 1024 * 1024 // 10MB base64
+    if (image.length > MAX_IMAGE_SIZE) {
+      return NextResponse.json(
+        { error: 'Image too large. Maximum 10MB.' },
+        { status: 400 }
+      )
+    }
+
     // Determine file type from base64 header or fileName
     const fileType = detectFileType(image, fileName)
 

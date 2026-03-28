@@ -104,7 +104,7 @@ function ConflictCard({
         {isResolved && (
           <Badge
             variant="outline"
-            className="text-[10px] py-0 px-1.5 border-green-300 text-green-700 bg-green-50 shrink-0"
+            className="text-[10px] py-0 px-1.5 border-green-300 text-emerald-400 bg-emerald-950/30 shrink-0"
           >
             <Check className="h-2.5 w-2.5 mr-0.5" />
             Resolved
@@ -126,13 +126,13 @@ function ConflictCard({
           className={cn(
             'rounded-lg border-2 p-2.5 transition-colors',
             resolvedChoice === 'client'
-              ? 'border-blue-500 bg-blue-50/50'
-              : 'border-blue-200 bg-blue-50/20',
+              ? 'border-blue-500 bg-blue-950/50'
+              : 'border-blue-500/20 bg-blue-950/20',
           )}
         >
           <div className="flex items-center gap-1.5 mb-1.5">
             <Shield className="h-3 w-3 text-blue-500" />
-            <span className="text-[10px] font-semibold text-blue-700 uppercase tracking-wide">
+            <span className="text-[10px] font-semibold text-blue-400 uppercase tracking-wide">
               Client Value
             </span>
           </div>
@@ -146,7 +146,7 @@ function ConflictCard({
             <Button
               variant="outline"
               size="sm"
-              className="h-7 text-[10px] px-2 mt-2 w-full border-blue-300 text-blue-700 hover:bg-blue-100"
+              className="h-7 text-[10px] px-2 mt-2 w-full border-blue-300 text-blue-400 hover:bg-blue-950/40"
               onClick={onChooseClient}
             >
               <Check className="h-3 w-3 mr-1" />
@@ -160,13 +160,13 @@ function ConflictCard({
           className={cn(
             'rounded-lg border-2 p-2.5 transition-colors',
             resolvedChoice === 'canonical'
-              ? 'border-green-500 bg-green-50/50'
-              : 'border-green-200 bg-green-50/20',
+              ? 'border-green-500 bg-emerald-950/50'
+              : 'border-emerald-500/20 bg-emerald-950/20',
           )}
         >
           <div className="flex items-center gap-1.5 mb-1.5">
             <ShieldCheck className="h-3 w-3 text-green-500" />
-            <span className="text-[10px] font-semibold text-green-700 uppercase tracking-wide">
+            <span className="text-[10px] font-semibold text-emerald-400 uppercase tracking-wide">
               Canonical Value
             </span>
           </div>
@@ -180,7 +180,7 @@ function ConflictCard({
             <Button
               variant="outline"
               size="sm"
-              className="h-7 text-[10px] px-2 mt-2 w-full border-green-300 text-green-700 hover:bg-green-100"
+              className="h-7 text-[10px] px-2 mt-2 w-full border-green-300 text-emerald-400 hover:bg-emerald-950/40"
               onClick={onChooseCanonical}
             >
               <Check className="h-3 w-3 mr-1" />
@@ -247,13 +247,13 @@ export function TrustConflictResolver({
   return (
     <div className="space-y-3">
       {/* Header alert */}
-      <Alert className="border-amber-200 bg-amber-50/50">
+      <Alert className="border-amber-500/20 bg-amber-950/30">
         <AlertTriangle className="h-4 w-4 text-amber-500" />
         <AlertDescription className="text-xs">
           <span className="font-semibold">{conflicts.length} trust conflict{conflicts.length !== 1 ? 's' : ''}</span>
           {' '}detected  -  client-submitted values differ from verified canonical values.
           {unresolvedCount > 0 && (
-            <span className="text-amber-700 font-medium">
+            <span className="text-amber-400 font-medium">
               {' '}{unresolvedCount} unresolved.
             </span>
           )}
@@ -265,7 +265,7 @@ export function TrustConflictResolver({
         <Button
           variant="outline"
           size="sm"
-          className="h-7 text-[10px] px-2.5 border-blue-300 text-blue-700 hover:bg-blue-50"
+          className="h-7 text-[10px] px-2.5 border-blue-300 text-blue-400 hover:bg-blue-950/30"
           onClick={handleAcceptAllClient}
           disabled={unresolvedCount === 0}
         >
@@ -275,7 +275,7 @@ export function TrustConflictResolver({
         <Button
           variant="outline"
           size="sm"
-          className="h-7 text-[10px] px-2.5 border-green-300 text-green-700 hover:bg-green-50"
+          className="h-7 text-[10px] px-2.5 border-green-300 text-emerald-400 hover:bg-emerald-950/30"
           onClick={handleAcceptAllCanonical}
           disabled={unresolvedCount === 0}
         >
@@ -286,7 +286,7 @@ export function TrustConflictResolver({
         {unresolvedCount === 0 && (
           <Badge
             variant="outline"
-            className="text-[10px] py-0 px-1.5 border-green-300 text-green-700 bg-green-50 ml-auto"
+            className="text-[10px] py-0 px-1.5 border-green-300 text-emerald-400 bg-emerald-950/30 ml-auto"
           >
             All conflicts resolved
           </Badge>

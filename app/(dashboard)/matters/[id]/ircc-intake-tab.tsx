@@ -238,7 +238,7 @@ export function IRCCIntakeTab({ matterId, contactId, tenantId, matterTypeId, ini
       <Card>
         <CardContent className="flex flex-col items-center justify-center py-12 text-center">
           <AlertCircle className="mb-3 h-8 w-8 text-amber-400" />
-          <h3 className="text-sm font-medium text-amber-700">No Primary Contact</h3>
+          <h3 className="text-sm font-medium text-amber-400">No Primary Contact</h3>
           <p className="mt-1 max-w-md text-sm text-amber-600">
             Please assign a primary contact to this matter before starting the IRCC questionnaire.
           </p>
@@ -264,7 +264,7 @@ export function IRCCIntakeTab({ matterId, contactId, tenantId, matterTypeId, ini
     return (
       <Card>
         <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-          <div className="mb-4 rounded-full bg-amber-50 p-4">
+          <div className="mb-4 rounded-full bg-amber-950/30 p-4">
             <Settings className="h-8 w-8 text-amber-500" />
           </div>
           <h3 className="text-lg font-semibold">No IRCC Forms Configured</h3>
@@ -368,7 +368,7 @@ export function IRCCIntakeTab({ matterId, contactId, tenantId, matterTypeId, ini
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Badge variant="outline" className="gap-1 text-green-600 border-green-200 bg-green-50">
+                    <Badge variant="outline" className="gap-1 text-green-600 border-green-200 bg-emerald-950/30">
                       <CheckCircle2 className="h-3 w-3" />
                       Ready
                     </Badge>
@@ -456,7 +456,7 @@ export function IRCCIntakeTab({ matterId, contactId, tenantId, matterTypeId, ini
   return (
     <Card>
       <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-        <div className="mb-4 rounded-full bg-blue-50 p-4">
+        <div className="mb-4 rounded-full bg-blue-950/30 p-4">
           <ClipboardList className="h-8 w-8 text-blue-500" />
         </div>
         <h3 className="text-lg font-semibold">IRCC Smart Intake</h3>

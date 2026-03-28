@@ -11102,6 +11102,68 @@ export type Database = {
           },
         ]
       }
+      lead_sources: {
+        Row: {
+          id: string
+          tenant_id: string
+          name: string
+          sort_order: number
+          is_active: boolean
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          tenant_id: string
+          name: string
+          sort_order?: number
+          is_active?: boolean
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          tenant_id?: string
+          name?: string
+          sort_order?: number
+          is_active?: boolean
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lead_sources_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lead_sources: {
+        Row: {
+          id: string
+          tenant_id: string
+          name: string
+          sort_order: number
+          is_active: boolean
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          tenant_id: string
+          name: string
+          sort_order?: number
+          is_active?: boolean
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          tenant_id?: string
+          name?: string
+          sort_order?: number
+          is_active?: boolean
+          created_at?: string
+        }
+        Relationships: []
+      }
       leads: {
         Row: {
           assigned_intake_staff_id: string | null
@@ -11168,6 +11230,11 @@ export type Database = {
           last_name_encrypted: string | null
           email_encrypted: string | null
           phone_encrypted: string | null
+          snooze_until: string | null
+          snoozed_at: string | null
+          snoozed_by: string | null
+          visibility_status: string
+          last_nudged_at: string | null
         }
         Insert: {
           assigned_intake_staff_id?: string | null
@@ -11234,6 +11301,11 @@ export type Database = {
           last_name_encrypted?: string | null
           email_encrypted?: string | null
           phone_encrypted?: string | null
+          snooze_until?: string | null
+          snoozed_at?: string | null
+          snoozed_by?: string | null
+          visibility_status?: string
+          last_nudged_at?: string | null
         }
         Update: {
           assigned_intake_staff_id?: string | null
@@ -11300,6 +11372,11 @@ export type Database = {
           last_name_encrypted?: string | null
           email_encrypted?: string | null
           phone_encrypted?: string | null
+          snooze_until?: string | null
+          snoozed_at?: string | null
+          snoozed_by?: string | null
+          visibility_status?: string
+          last_nudged_at?: string | null
         }
         Relationships: [
           {
@@ -13430,6 +13507,55 @@ export type Database = {
           },
         ]
       }
+      contact_field_changes: {
+        Row: {
+          id: string
+          tenant_id: string
+          contact_id: string
+          field_name: string
+          old_value: string | null
+          new_value: string | null
+          is_high_security: boolean
+          evidence_document_id: string | null
+          change_rationale: string | null
+          changed_by: string | null
+          changed_at: string
+          matter_id: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          tenant_id: string
+          contact_id: string
+          field_name: string
+          old_value?: string | null
+          new_value?: string | null
+          is_high_security?: boolean
+          evidence_document_id?: string | null
+          change_rationale?: string | null
+          changed_by?: string | null
+          changed_at?: string
+          matter_id?: string | null
+        }
+        Update: {
+          evidence_document_id?: string | null
+          change_rationale?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'contact_field_changes_contact_id_fkey'
+            columns: ['contact_id']
+            referencedRelation: 'contacts'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'contact_field_changes_tenant_id_fkey'
+            columns: ['tenant_id']
+            referencedRelation: 'tenants'
+            referencedColumns: ['id']
+          }
+        ]
+      }
       matter_type_schema: {
         Row: {
           created_at: string
@@ -13558,10 +13684,12 @@ export type Database = {
           tenant_id: string
           updated_at: string
           ghost_document_config: Json | null
+          consultation_fee_cents: number
         }
         Insert: {
           auto_send_document_request?: boolean | null
           color?: string
+          consultation_fee_cents?: number
           created_at?: string
           description?: string | null
           document_naming_template?: string | null
@@ -13585,6 +13713,7 @@ export type Database = {
         Update: {
           auto_send_document_request?: boolean | null
           color?: string
+          consultation_fee_cents?: number
           created_at?: string
           description?: string | null
           document_naming_template?: string | null

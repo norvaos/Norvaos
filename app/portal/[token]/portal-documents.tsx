@@ -90,11 +90,11 @@ function getPlainStatusLabel(status: string, tr: ReturnType<typeof getTranslatio
 // ─── Status Config ──────────────────────────────────────────────────────────
 
 const STATUS_BG_CONFIG: Record<string, { color: string; bgClass: string }> = {
-  empty: { color: '#d97706', bgClass: 'bg-amber-50 text-amber-700 border-amber-200' },
-  pending_review: { color: '#2563eb', bgClass: 'bg-blue-50 text-blue-700 border-blue-200' },
-  accepted: { color: '#16a34a', bgClass: 'bg-green-50 text-green-700 border-green-200' },
-  needs_re_upload: { color: '#ea580c', bgClass: 'bg-orange-50 text-orange-700 border-orange-200' },
-  rejected: { color: '#dc2626', bgClass: 'bg-red-50 text-red-700 border-red-200' },
+  empty: { color: '#d97706', bgClass: 'bg-amber-950/30 text-amber-400 border-amber-200' },
+  pending_review: { color: '#2563eb', bgClass: 'bg-blue-950/30 text-blue-400 border-blue-200' },
+  accepted: { color: '#16a34a', bgClass: 'bg-emerald-950/30 text-emerald-400 border-green-200' },
+  needs_re_upload: { color: '#ea580c', bgClass: 'bg-orange-950/30 text-orange-400 border-orange-200' },
+  rejected: { color: '#dc2626', bgClass: 'bg-red-950/30 text-red-400 border-red-200' },
 }
 
 function getStatusBgConfig(status: string) {
@@ -383,7 +383,7 @@ export function PortalDocuments({
     return (
       <div
         key={slot.id}
-        className={cn('px-4 py-3', justUploaded && 'bg-green-50')}
+        className={cn('px-4 py-3', justUploaded && 'bg-emerald-950/30')}
       >
         <div className="flex items-center gap-3">
           {/* Document info */}
@@ -412,12 +412,12 @@ export function PortalDocuments({
           {/* Status + action */}
           <div className="flex items-center gap-2 shrink-0">
             {isVerified ? (
-              <Badge variant="outline" className="text-xs py-0 px-1.5 border border-green-300 bg-green-50 text-green-700 gap-0.5">
+              <Badge variant="outline" className="text-xs py-0 px-1.5 border border-green-300 bg-emerald-950/30 text-emerald-400 gap-0.5">
                 <CheckCircle2 className="h-3 w-3" />
                 Verified by Law Firm
               </Badge>
             ) : isVerificationRejected ? (
-              <Badge variant="outline" className="text-xs py-0 px-1.5 border border-red-300 bg-red-50 text-red-700 gap-0.5">
+              <Badge variant="outline" className="text-xs py-0 px-1.5 border border-red-300 bg-red-950/30 text-red-400 gap-0.5">
                 <AlertCircle className="h-3 w-3" />
                 Needs Correction
               </Badge>
@@ -479,7 +479,7 @@ export function PortalDocuments({
 
           if (info) {
             return (
-              <div className="mt-2 rounded-md border border-orange-200 bg-orange-50 overflow-hidden">
+              <div className="mt-2 rounded-md border border-orange-200 bg-orange-950/30 overflow-hidden">
                 {/* Reason heading */}
                 <div className="flex items-start gap-1.5 px-3 pt-2.5 pb-1.5 border-b border-orange-100">
                   <AlertTriangle className="mt-0.5 h-3.5 w-3.5 text-orange-600 flex-shrink-0" />
@@ -497,7 +497,7 @@ export function PortalDocuments({
                 {/* Best practice tip */}
                 {info.tip && (
                   <div className="px-3 pt-1 pb-2.5">
-                    <p className="text-[11px] text-orange-700 italic">
+                    <p className="text-[11px] text-orange-400 italic">
                       <span className="font-medium not-italic">{uiLabels.tip}: </span>
                       {info.tip}
                     </p>
@@ -520,7 +520,7 @@ export function PortalDocuments({
           // Fallback: plain text reason only
           if (slot.latest_review_reason) {
             return (
-              <div className="mt-2 flex items-start gap-1.5 rounded-md border border-amber-200 bg-amber-50 px-3 py-2">
+              <div className="mt-2 flex items-start gap-1.5 rounded-md border border-amber-200 bg-amber-950/30 px-3 py-2">
                 <AlertTriangle className="mt-0.5 h-3.5 w-3.5 text-amber-600 flex-shrink-0" />
                 <p className="text-xs text-amber-800">
                   <span className="font-medium">{tr.reason_label}:</span>{' '}
@@ -535,7 +535,7 @@ export function PortalDocuments({
 
         {/* Verification rejection reason (from lawyer review) */}
         {isVerificationRejected && slot.verification_rejection_reason && (
-          <div className="mt-2 rounded-md border border-red-200 bg-red-50 px-3 py-2">
+          <div className="mt-2 rounded-md border border-red-200 bg-red-950/30 px-3 py-2">
             <div className="flex items-start gap-1.5">
               <AlertCircle className="mt-0.5 h-3.5 w-3.5 text-red-600 flex-shrink-0" />
               <p className="text-xs text-red-800">
@@ -548,7 +548,7 @@ export function PortalDocuments({
               <Button
                 size="sm"
                 variant="outline"
-                className="h-7 text-xs border-green-300 text-green-700 hover:bg-green-50"
+                className="h-7 text-xs border-green-300 text-emerald-400 hover:bg-emerald-950/30"
                 onClick={async () => {
                   try {
                     const res = await fetch(`/api/portal/${token}/field-verifications/resubmit`, {

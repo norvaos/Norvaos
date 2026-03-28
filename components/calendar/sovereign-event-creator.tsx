@@ -218,7 +218,7 @@ export function SovereignEventCreator({
                   className={cn(
                     'rounded-lg border px-3 py-1.5 text-xs font-medium transition-all',
                     eventType === et.value
-                      ? 'border-emerald-500/50 bg-emerald-500/15 text-emerald-700 dark:text-emerald-300'
+                      ? 'border-emerald-500/50 bg-emerald-500/15 text-emerald-400 dark:text-emerald-300'
                       : 'border-gray-200 dark:border-white/[0.06] text-gray-500 dark:text-white/50 hover:border-gray-300 dark:hover:border-white/[0.12]',
                   )}
                 >
@@ -255,7 +255,7 @@ export function SovereignEventCreator({
               className={cn(
                 'flex items-center gap-2 rounded-xl border px-4 py-2.5 text-xs font-medium transition-all',
                 allDay
-                  ? 'border-emerald-500/50 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300'
+                  ? 'border-emerald-500/50 bg-emerald-500/10 text-emerald-400 dark:text-emerald-300'
                   : 'border-gray-200 dark:border-white/[0.06] text-gray-500 dark:text-white/50',
               )}
             >
@@ -426,7 +426,7 @@ export function SovereignEventCreator({
           <div className="flex items-start gap-3 rounded-2xl border border-emerald-500/30 bg-emerald-500/5 p-4">
             <Check className="mt-0.5 h-5 w-5 shrink-0 text-emerald-500" />
             <div>
-              <p className="text-sm font-medium text-emerald-700 dark:text-emerald-300">Ready to schedule</p>
+              <p className="text-sm font-medium text-emerald-400 dark:text-emerald-300">Ready to schedule</p>
               <p className="mt-1 text-xs text-emerald-600/80 dark:text-emerald-400/70">
                 {EVENT_HELP.verify}
               </p>

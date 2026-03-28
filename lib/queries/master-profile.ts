@@ -81,7 +81,7 @@ export interface MasterProfile {
   /** Raw data for downstream consumers (preserves full row access) */
   _raw: {
     lead: Lead
-    contact: Contact
+    contact: Contact | null
     conflictScan: LatestScanData
     completedMeetingCount: number
     identityVerified: boolean
@@ -400,7 +400,11 @@ export function useMasterProfile(leadId: string): {
   // ── 7. Compute the Master Profile ───────────────────────────────────────
   const isLoading = leadLoading || contactLoading
 
-  if (!lead || !contact) {
+  // Gate Zero Fix: If the lead exists but has no contact yet, we still
+  // evaluate the Golden Thread so Gate A (Conflict Check) is always active.
+  // No lead should ever exist without an active gate — this prevents blank
+  // rendering on the /command/lead/ workspace.
+  if (!lead) {
     return {
       data: null,
       isLoading,
@@ -410,7 +414,7 @@ export function useMasterProfile(leadId: string): {
 
   const goldenThread = evaluateGoldenThread(
     conflictScan,
-    contact.conflict_status ?? null,
+    contact?.conflict_status ?? null,
     completedMeetingCount ?? 0,
     identityVerified ?? false,
     lead.retainer_status ?? null,
@@ -420,16 +424,16 @@ export function useMasterProfile(leadId: string): {
 
   const profile: MasterProfile = {
     person: {
-      id: contact.id,
-      firstName: contact.first_name,
-      lastName: contact.last_name,
-      email: contact.email_primary,
-      phone: contact.phone_primary,
-      dob: contact.date_of_birth,
-      nationality: (contact as Record<string, unknown>).nationality as string | null ?? null,
-      immigrationStatus: (contact as Record<string, unknown>).immigration_status as string | null ?? null,
-      address: [contact.address_line1, contact.city, contact.province_state].filter(Boolean).join(', ') || null,
-      conflictStatus: contact.conflict_status,
+      id: contact?.id ?? '',
+      firstName: contact?.first_name ?? null,
+      lastName: contact?.last_name ?? null,
+      email: contact?.email_primary ?? null,
+      phone: contact?.phone_primary ?? null,
+      dob: contact?.date_of_birth ?? null,
+      nationality: contact ? ((contact as Record<string, unknown>).nationality as string | null ?? null) : null,
+      immigrationStatus: contact ? ((contact as Record<string, unknown>).immigration_status as string | null ?? null) : null,
+      address: contact ? [contact.address_line1, contact.city, contact.province_state].filter(Boolean).join(', ') || null : null,
+      conflictStatus: contact?.conflict_status ?? null,
       identityVerified: identityVerified ?? false,
     },
     engagement: {
@@ -451,7 +455,7 @@ export function useMasterProfile(leadId: string): {
     goldenThread,
     _raw: {
       lead,
-      contact,
+      contact: contact ?? null,
       conflictScan: conflictScan ?? { scan: null, matches: [] },
       completedMeetingCount: completedMeetingCount ?? 0,
       identityVerified: identityVerified ?? false,

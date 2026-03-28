@@ -40,7 +40,7 @@ export async function POST(request: Request) {
     const description = (formData.get('description') as string) || null
     const descriptionTranslationsRaw = formData.get('description_translations') as string | null
     let descriptionTranslations: Record<string, string> = {}
-    if (descriptionTranslationsRaw) {
+    if (descriptionTranslationsRaw && descriptionTranslationsRaw.length < 10000) {
       try { descriptionTranslations = JSON.parse(descriptionTranslationsRaw) } catch { /* ignore */ }
     }
 
@@ -310,33 +310,37 @@ export async function POST(request: Request) {
           const toRestore = (newFields as any[]).filter((f) => prevByPath.has(f.xfa_path))
 
           if (toRestore.length > 0) {
-            // Parallel bulk update  -  each field gets its previous mapping applied
-            await Promise.all(
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              toRestore.map((newField: any) => {
+            // Batched bulk update  -  each field gets its previous mapping applied
+            const BATCH_SIZE = 50
+            for (let i = 0; i < toRestore.length; i += BATCH_SIZE) {
+              const batch = toRestore.slice(i, i + BATCH_SIZE)
+              await Promise.all(
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                const prev = prevByPath.get(newField.xfa_path) as any
-                return supabase
-                  .from('ircc_form_fields')
-                  .update({
-                    profile_path: prev.profile_path,
-                    label: prev.label,
-                    field_type: prev.field_type,
-                    is_required: prev.is_required ?? false,
-                    is_client_visible: prev.is_client_visible ?? true,
-                    is_meta_field: prev.is_meta_field ?? false,
-                    meta_field_key: prev.meta_field_key ?? null,
-                    date_split: prev.date_split ?? null,
-                    options: prev.options ?? null,
-                    value_format: prev.value_format ?? null,
-                    show_when: prev.show_when ?? null,
-                    placeholder: prev.placeholder ?? null,
-                    description: prev.description ?? null,
-                    is_mapped: true,
-                  })
-                  .eq('id', newField.id)
-              }),
-            )
+                batch.map((newField: any) => {
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  const prev = prevByPath.get(newField.xfa_path) as any
+                  return supabase
+                    .from('ircc_form_fields')
+                    .update({
+                      profile_path: prev.profile_path,
+                      label: prev.label,
+                      field_type: prev.field_type,
+                      is_required: prev.is_required ?? false,
+                      is_client_visible: prev.is_client_visible ?? true,
+                      is_meta_field: prev.is_meta_field ?? false,
+                      meta_field_key: prev.meta_field_key ?? null,
+                      date_split: prev.date_split ?? null,
+                      options: prev.options ?? null,
+                      value_format: prev.value_format ?? null,
+                      show_when: prev.show_when ?? null,
+                      placeholder: prev.placeholder ?? null,
+                      description: prev.description ?? null,
+                      is_mapped: true,
+                    })
+                    .eq('id', newField.id)
+                }),
+              )
+            }
             mappingsRestored = toRestore.length
             console.log(`[ircc-forms/upload] Restored ${mappingsRestored} field mappings onto new form`)
           }

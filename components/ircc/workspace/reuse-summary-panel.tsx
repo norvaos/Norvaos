@@ -85,7 +85,7 @@ function CategoryBadge({ category }: { category: string }) {
       return (
         <Badge
           variant="outline"
-          className="text-[10px] py-0 px-1.5 border-green-300 text-green-700 bg-green-50"
+          className="text-[10px] py-0 px-1.5 border-green-300 text-emerald-400 bg-emerald-950/30"
         >
           Stable
         </Badge>
@@ -94,7 +94,7 @@ function CategoryBadge({ category }: { category: string }) {
       return (
         <Badge
           variant="outline"
-          className="text-[10px] py-0 px-1.5 border-amber-300 text-amber-700 bg-amber-50"
+          className="text-[10px] py-0 px-1.5 border-amber-300 text-amber-400 bg-amber-950/30"
         >
           Needs Review
         </Badge>
@@ -185,7 +185,7 @@ export function ReuseSummaryPanel({
         {totalConflicts > 0 && (
           <Badge
             variant="outline"
-            className="text-[10px] py-0 px-1.5 border-red-300 text-red-600 bg-red-50"
+            className="text-[10px] py-0 px-1.5 border-red-300 text-red-600 bg-red-950/30"
           >
             {totalConflicts} conflict{totalConflicts !== 1 ? 's' : ''}
           </Badge>
@@ -193,7 +193,7 @@ export function ReuseSummaryPanel({
         {reviewCount > 0 && (
           <Badge
             variant="outline"
-            className="text-[10px] py-0 px-1.5 border-amber-300 text-amber-600 bg-amber-50"
+            className="text-[10px] py-0 px-1.5 border-amber-300 text-amber-600 bg-amber-950/30"
           >
             {reviewCount} to review
           </Badge>
@@ -252,10 +252,10 @@ export function ReuseSummaryPanel({
       {/* Cross-form results */}
       {crossFormResult && (
         <div className="border-b">
-          <div className="flex items-center justify-between px-3 py-2 bg-blue-50/50">
+          <div className="flex items-center justify-between px-3 py-2 bg-blue-950/50">
             <div className="flex items-center gap-1.5">
               <FileText className="h-3.5 w-3.5 text-blue-600" />
-              <span className="text-[11px] font-medium text-blue-800">Cross-Form Prefill</span>
+              <span className="text-[11px] font-medium text-blue-400">Cross-Form Prefill</span>
             </div>
             {crossFormTimestamp && (
               <span className="text-[10px] text-muted-foreground">
@@ -345,10 +345,10 @@ export function ReuseSummaryPanel({
       {/* Cross-matter results */}
       {crossMatterResult && (
         <div>
-          <div className="flex items-center justify-between px-3 py-2 bg-purple-50/50 border-b">
+          <div className="flex items-center justify-between px-3 py-2 bg-purple-950/50 border-b">
             <div className="flex items-center gap-1.5">
               <UserCheck className="h-3.5 w-3.5 text-purple-600" />
-              <span className="text-[11px] font-medium text-purple-800">
+              <span className="text-[11px] font-medium text-purple-400">
                 Client Profile Import
               </span>
             </div>
@@ -389,7 +389,7 @@ export function ReuseSummaryPanel({
                 <div
                   key={field.profilePath}
                   className={`flex items-start gap-2 py-2 px-3 border-b last:border-b-0 hover:bg-muted/30 ${
-                    field.category === 'semi_stable' ? 'bg-amber-50/30' : ''
+                    field.category === 'semi_stable' ? 'bg-amber-950/30' : ''
                   }`}
                 >
                   {field.category === 'semi_stable' ? (

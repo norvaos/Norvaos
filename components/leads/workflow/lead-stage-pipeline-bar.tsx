@@ -55,7 +55,7 @@ export function LeadStagePipelineBar({
           return (
             <div key={stage} className="flex items-center shrink-0">
               {idx > 0 && (
-                <ArrowRight className={`h-3 w-3 mx-0.5 ${isPast ? 'text-green-400' : 'text-slate-300'}`} />
+                <ArrowRight className={`h-3 w-3 mx-0.5 ${isPast ? 'text-green-400' : 'text-muted-foreground/50'}`} />
               )}
 
               <Tooltip>
@@ -79,7 +79,7 @@ export function LeadStagePipelineBar({
                       <CheckCircle2 className="h-3 w-3 text-green-600" />
                     )}
                     {transition && !transition.allowed && isFuture && (
-                      <Lock className="h-3 w-3 text-slate-400" />
+                      <Lock className="h-3 w-3 text-muted-foreground/70" />
                     )}
                     {getStageLabel(stage)}
                   </button>

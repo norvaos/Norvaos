@@ -86,8 +86,8 @@ export function CentralActionPanel({
   const labelClass = intakeStatus === 'ready_for_filing'
     ? 'text-[10px] font-semibold uppercase tracking-wider text-green-700 dark:text-green-300'
     : intakeStatus === 'deficiency_outstanding'
-      ? 'text-[10px] font-semibold uppercase tracking-wider text-red-700 dark:text-red-300'
-      : 'text-[10px] font-semibold uppercase tracking-wider text-blue-700 dark:text-blue-300'
+      ? 'text-[10px] font-semibold uppercase tracking-wider text-red-400 dark:text-red-300'
+      : 'text-[10px] font-semibold uppercase tracking-wider text-blue-400 dark:text-blue-300'
 
   return (
     <div className={wrapperClass}>

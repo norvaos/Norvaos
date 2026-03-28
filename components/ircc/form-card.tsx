@@ -76,13 +76,13 @@ export function FormCard({
             </Badge>
           )}
           {form.mapped_field_count > 0 && (
-            <Badge variant="secondary" className="text-xs gap-1 text-green-600 bg-green-50">
+            <Badge variant="secondary" className="text-xs gap-1 text-green-600 bg-emerald-950/30">
               <Link2 className="h-2.5 w-2.5" />
               {form.mapped_field_count} mapped
             </Badge>
           )}
           {questionStats && (
-            <Badge variant="outline" className="text-xs gap-1 text-blue-600 border-blue-200 bg-blue-50">
+            <Badge variant="outline" className="text-xs gap-1 text-blue-600 border-blue-500/20 bg-blue-950/30">
               <ClipboardList className="h-2.5 w-2.5" />
               {questionStats.sectionCount} question sections
             </Badge>

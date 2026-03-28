@@ -45,7 +45,7 @@ export async function POST(request: Request) {
   try {
     const auth = await authenticateRequest()
 
-    const { allowed, retryAfterMs } = livePreviewLimiter.check(auth.userId)
+    const { allowed, retryAfterMs } = await livePreviewLimiter.check(auth.userId)
     if (!allowed) {
       return NextResponse.json(
         { error: 'Preview rate limit exceeded. The mirror will refresh shortly.' },

@@ -100,7 +100,7 @@ export function ClientQuestionnaire({
       <div className="min-h-[60vh] flex items-center justify-center px-4">
         <Card className="max-w-md w-full">
           <CardContent className="pt-8 pb-6 px-6 text-center space-y-4">
-            <div className="mx-auto w-14 h-14 rounded-full bg-green-100 flex items-center justify-center">
+            <div className="mx-auto w-14 h-14 rounded-full bg-emerald-950/40 flex items-center justify-center">
               <CheckCircle2 className="h-7 w-7 text-green-600" />
             </div>
 

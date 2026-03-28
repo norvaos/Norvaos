@@ -62,7 +62,7 @@ export function FrontDeskHeader({ userId, userName, avatarUrl, firmName }: Front
     ? (Date.now() - new Date(activeShift.started_at).getTime()) / 3600000
     : 0
   const shiftColor = shiftHours > 10 ? 'text-red-600' : shiftHours > 8 ? 'text-amber-600' : 'text-emerald-600'
-  const shiftBg = shiftHours > 10 ? 'bg-red-50 border-red-200' : shiftHours > 8 ? 'bg-amber-50 border-amber-200' : 'bg-emerald-50 border-emerald-200'
+  const shiftBg = shiftHours > 10 ? 'bg-red-950/30 border-red-200' : shiftHours > 8 ? 'bg-amber-950/30 border-amber-500/20' : 'bg-emerald-950/30 border-emerald-500/20'
 
   const shiftMutation = useMutation({
     mutationFn: async (actionType: 'front_desk_start_shift' | 'front_desk_end_shift') => {
@@ -140,7 +140,7 @@ export function FrontDeskHeader({ userId, userName, avatarUrl, firmName }: Front
         <div className="flex items-center gap-6">
           <Link href="/front-desk" className="flex items-center gap-2">
             <span className="text-lg font-bold text-slate-900">{firmName}</span>
-            <span className="text-xs font-medium bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">
+            <span className="text-xs font-medium bg-blue-100 text-blue-400 px-2 py-0.5 rounded-full">
               Front Desk
             </span>
           </Link>
@@ -184,7 +184,7 @@ export function FrontDeskHeader({ userId, userName, avatarUrl, firmName }: Front
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-6 px-2 text-xs text-red-600 hover:text-red-700 hover:bg-red-100"
+                className="h-6 px-2 text-xs text-red-600 hover:text-red-400 hover:bg-red-100"
                 onClick={() => shiftMutation.mutate('front_desk_end_shift')}
                 disabled={shiftMutation.isPending}
               >
@@ -196,7 +196,7 @@ export function FrontDeskHeader({ userId, userName, avatarUrl, firmName }: Front
             <Button
               variant="outline"
               size="sm"
-              className="flex items-center gap-1.5 text-xs border-emerald-300 text-emerald-700 hover:bg-emerald-50"
+              className="flex items-center gap-1.5 text-xs border-emerald-500/30 text-emerald-400 hover:bg-emerald-950/30"
               onClick={() => shiftMutation.mutate('front_desk_start_shift')}
               disabled={shiftMutation.isPending}
             >
@@ -211,9 +211,9 @@ export function FrontDeskHeader({ userId, userName, avatarUrl, firmName }: Front
 
           {/* Kiosk Link Generator */}
           {kioskUrl ? (
-            <div className="hidden sm:flex items-center gap-1 bg-emerald-50 border border-emerald-200 rounded-md px-2 py-1">
+            <div className="hidden sm:flex items-center gap-1 bg-emerald-950/30 border border-emerald-500/20 rounded-md px-2 py-1">
               <Monitor className="w-3.5 h-3.5 text-emerald-600" />
-              <span className="text-xs text-emerald-700 font-medium max-w-[180px] truncate">
+              <span className="text-xs text-emerald-400 font-medium max-w-[180px] truncate">
                 Kiosk Ready
               </span>
               <Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={copyKioskUrl} title="Copy kiosk URL">

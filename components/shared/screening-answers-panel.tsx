@@ -161,7 +161,7 @@ export function ScreeningAnswersPanel({
                         <XCircle className="w-4 h-4 text-red-500 shrink-0" />
                       )}
                       <span className={`text-sm font-medium ${
-                        raw === 'yes' ? 'text-green-700' : 'text-red-600'
+                        raw === 'yes' ? 'text-emerald-400' : 'text-red-600'
                       }`}>
                         {display}
                       </span>

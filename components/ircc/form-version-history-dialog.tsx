@@ -97,7 +97,7 @@ export function FormVersionHistoryDialog({
                       {v.field_count} fields
                     </Badge>
                     {v.mapped_field_count > 0 && (
-                      <Badge variant="secondary" className="text-[10px] text-green-600 bg-green-50 border-green-200">
+                      <Badge variant="secondary" className="text-[10px] text-green-600 bg-emerald-950/30 border-emerald-500/20">
                         {v.mapped_field_count} mapped
                       </Badge>
                     )}

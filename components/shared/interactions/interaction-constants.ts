@@ -32,7 +32,7 @@ export const INTERACTION_GROUPS: InteractionGroup[] = [
     // front_desk_call_logged = call logged via the Front Desk console
     activityTypes: ['phone_inbound', 'phone_outbound', 'phone_call', 'front_desk_call_logged'],
     color: 'blue',
-    bgClass: 'bg-blue-50 text-blue-600',
+    bgClass: 'bg-blue-950/30 text-blue-600',
   },
   {
     key: 'emails',
@@ -41,7 +41,7 @@ export const INTERACTION_GROUPS: InteractionGroup[] = [
     // front_desk_email_logged = email logged via the Front Desk console
     activityTypes: ['email_sent', 'email_received', 'front_desk_email_logged'],
     color: 'purple',
-    bgClass: 'bg-purple-50 text-purple-600',
+    bgClass: 'bg-purple-950/30 text-purple-600',
   },
   {
     key: 'meetings',
@@ -54,7 +54,7 @@ export const INTERACTION_GROUPS: InteractionGroup[] = [
       'front_desk_meeting_logged',
     ],
     color: 'green',
-    bgClass: 'bg-green-50 text-green-600',
+    bgClass: 'bg-emerald-950/30 text-green-600',
   },
   {
     key: 'sms',
@@ -62,7 +62,7 @@ export const INTERACTION_GROUPS: InteractionGroup[] = [
     icon: MessageSquare,
     activityTypes: ['sms_sent', 'sms_received'],
     color: 'amber',
-    bgClass: 'bg-amber-50 text-amber-600',
+    bgClass: 'bg-amber-950/30 text-amber-600',
   },
   {
     key: 'other',
@@ -98,7 +98,7 @@ export const INTERACTION_QUICK_ACTIONS: QuickAction[] = [
     icon: PhoneIncoming,
     dialog: 'call',
     defaultDirection: 'inbound',
-    color: 'text-green-600 border-green-200 hover:bg-green-50',
+    color: 'text-green-600 border-emerald-500/20 hover:bg-emerald-950/30',
   },
   {
     key: 'phone_outbound',
@@ -106,7 +106,7 @@ export const INTERACTION_QUICK_ACTIONS: QuickAction[] = [
     icon: PhoneOutgoing,
     dialog: 'call',
     defaultDirection: 'outbound',
-    color: 'text-blue-600 border-blue-200 hover:bg-blue-50',
+    color: 'text-blue-600 border-blue-500/20 hover:bg-blue-950/30',
   },
   {
     key: 'email_sent',
@@ -114,14 +114,14 @@ export const INTERACTION_QUICK_ACTIONS: QuickAction[] = [
     icon: MailPlus,
     dialog: 'email',
     defaultDirection: 'sent',
-    color: 'text-purple-600 border-purple-200 hover:bg-purple-50',
+    color: 'text-purple-600 border-purple-500/20 hover:bg-purple-950/30',
   },
   {
     key: 'meeting',
     label: 'Meeting',
     icon: CalendarPlus,
     dialog: 'meeting',
-    color: 'text-green-600 border-green-200 hover:bg-green-50',
+    color: 'text-green-600 border-emerald-500/20 hover:bg-emerald-950/30',
   },
   {
     key: 'sms_sent',
@@ -129,7 +129,7 @@ export const INTERACTION_QUICK_ACTIONS: QuickAction[] = [
     icon: MessageSquarePlus,
     dialog: 'sms',
     defaultDirection: 'sent',
-    color: 'text-amber-600 border-amber-200 hover:bg-amber-50',
+    color: 'text-amber-600 border-amber-500/20 hover:bg-amber-950/30',
   },
 ]
 

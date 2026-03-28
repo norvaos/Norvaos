@@ -224,7 +224,7 @@ export default function BillingPlanPage() {
             <CardContent className="space-y-4">
               {/* Trial info */}
               {subscriptionStatus === 'trialing' && trialEndsAt && (
-                <div className="flex items-center gap-2 rounded-lg border border-yellow-200 bg-yellow-50 p-3 text-sm dark:border-yellow-900/50 dark:bg-yellow-900/20">
+                <div className="flex items-center gap-2 rounded-lg border border-yellow-200 bg-yellow-950/30 p-3 text-sm dark:border-yellow-900/50 dark:bg-yellow-900/20">
                   <AlertTriangle className="size-4 text-yellow-600 dark:text-yellow-400" />
                   <span>
                     Trial ends on{' '}
@@ -252,7 +252,7 @@ export default function BillingPlanPage() {
 
               {/* Cancel at period end warning */}
               {subscription?.cancel_at_period_end && (
-                <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 p-3 text-sm dark:border-red-900/50 dark:bg-red-900/20">
+                <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-950/30 p-3 text-sm dark:border-red-900/50 dark:bg-red-900/20">
                   <AlertTriangle className="size-4 text-red-600 dark:text-red-400" />
                   <span className="text-red-800 dark:text-red-300">
                     Your plan will be cancelled at the end of the billing period.

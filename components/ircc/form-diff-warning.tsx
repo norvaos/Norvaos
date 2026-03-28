@@ -71,15 +71,15 @@ export function FormDiffWarning({ matterId, formCode }: FormDiffWarningProps) {
   const mismatchCount = diff.mismatches.length
 
   return (
-    <Alert variant="destructive" className="border-amber-500 bg-amber-50 dark:bg-amber-950/20">
+    <Alert variant="destructive" className="border-amber-500 bg-amber-950/30 dark:bg-amber-950/20">
       <AlertTriangle className="h-4 w-4 text-amber-600" />
-      <AlertTitle className="text-amber-800 dark:text-amber-400 flex items-center gap-2">
+      <AlertTitle className="text-amber-400 dark:text-amber-400 flex items-center gap-2">
         Data Mismatch Detected
-        <Badge variant="outline" className="text-amber-700 border-amber-400">
+        <Badge variant="outline" className="text-amber-400 border-amber-400">
           {mismatchCount} field{mismatchCount !== 1 ? 's' : ''} changed
         </Badge>
       </AlertTitle>
-      <AlertDescription className="text-amber-700 dark:text-amber-300">
+      <AlertDescription className="text-amber-400 dark:text-amber-300">
         <p className="text-sm mb-2">
           The client&apos;s data has changed since <strong>{diff.formCode}</strong> v{diff.versionNumber} was generated.
           Regenerate the form pack before submitting to IRCC.
@@ -88,7 +88,7 @@ export function FormDiffWarning({ matterId, formCode }: FormDiffWarningProps) {
         <Collapsible open={isOpen} onOpenChange={setIsOpen}>
           <div className="flex items-center gap-2">
             <CollapsibleTrigger asChild>
-              <Button variant="ghost" size="sm" className="text-amber-700 hover:text-amber-900 p-0 h-auto">
+              <Button variant="ghost" size="sm" className="text-amber-400 hover:text-amber-900 p-0 h-auto">
                 {isOpen ? <ChevronDown className="h-4 w-4 mr-1" /> : <ChevronRight className="h-4 w-4 mr-1" />}
                 {isOpen ? 'Hide' : 'Show'} changed fields
               </Button>
@@ -97,7 +97,7 @@ export function FormDiffWarning({ matterId, formCode }: FormDiffWarningProps) {
               variant="ghost"
               size="sm"
               onClick={() => refetch()}
-              className="text-amber-700 hover:text-amber-900 p-0 h-auto ml-auto"
+              className="text-amber-400 hover:text-amber-900 p-0 h-auto ml-auto"
             >
               <RefreshCw className="h-3 w-3 mr-1" />
               Re-check
@@ -105,10 +105,10 @@ export function FormDiffWarning({ matterId, formCode }: FormDiffWarningProps) {
           </div>
 
           <CollapsibleContent>
-            <div className="mt-2 rounded border border-amber-300 bg-white dark:bg-amber-950/40 overflow-hidden">
+            <div className="mt-2 rounded border border-amber-500/30 bg-white dark:bg-amber-950/40 overflow-hidden">
               <table className="w-full text-xs">
                 <thead>
-                  <tr className="bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-300">
+                  <tr className="bg-amber-950/40 dark:bg-amber-900/40 text-amber-400 dark:text-amber-300">
                     <th className="px-3 py-1.5 text-left font-medium">Field</th>
                     <th className="px-3 py-1.5 text-left font-medium">In Form (v{diff.versionNumber})</th>
                     <th className="px-3 py-1.5 text-center font-medium w-8"></th>
@@ -117,7 +117,7 @@ export function FormDiffWarning({ matterId, formCode }: FormDiffWarningProps) {
                 </thead>
                 <tbody>
                   {diff.mismatches.map((m) => (
-                    <tr key={m.field} className="border-t border-amber-200 dark:border-amber-800">
+                    <tr key={m.field} className="border-t border-amber-500/20 dark:border-amber-800">
                       <td className="px-3 py-1.5 font-medium text-amber-900 dark:text-amber-200">
                         {m.label}
                       </td>
@@ -127,7 +127,7 @@ export function FormDiffWarning({ matterId, formCode }: FormDiffWarningProps) {
                       <td className="px-3 py-1.5 text-center">
                         <ArrowRight className="h-3 w-3 text-amber-500 inline" />
                       </td>
-                      <td className="px-3 py-1.5 text-green-700 dark:text-green-400 font-medium">
+                      <td className="px-3 py-1.5 text-emerald-400 dark:text-green-400 font-medium">
                         {m.currentValue}
                       </td>
                     </tr>

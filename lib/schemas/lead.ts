@@ -2,11 +2,12 @@ import { z } from 'zod/v4'
 
 export const leadSchema = z.object({
   contact_id: z.string().uuid('Please select or create a contact'),
+  email: z.string().email('A valid email address is required'),
   pipeline_id: z.string().uuid(),
   stage_id: z.string().uuid(),
-  source: z.string().max(100).optional(),
+  source: z.string().min(1, 'Lead source is required').max(100),
   source_detail: z.string().optional(),
-  practice_area_id: z.string().uuid().optional().nullable(),
+  practice_area_id: z.string().uuid('Case type is required'),
   estimated_value: z.number().min(0).optional().nullable(),
   assigned_to: z.string().uuid().optional().nullable(),
   temperature: z.enum(['cold', 'warm', 'hot']).default('warm'),

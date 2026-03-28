@@ -17,9 +17,9 @@ interface ExpiryEntry {
 }
 
 function getUrgencyColour(days: number): { bg: string; text: string; badge: 'default' | 'destructive' | 'secondary' } {
-  if (days <= 0) return { bg: 'bg-red-50 dark:bg-red-950/40', text: 'text-red-700 dark:text-red-300', badge: 'destructive' }
-  if (days < 90) return { bg: 'bg-red-50 dark:bg-red-950/30', text: 'text-red-600 dark:text-red-400', badge: 'destructive' }
-  if (days < 180) return { bg: 'bg-amber-50 dark:bg-amber-950/30', text: 'text-amber-600 dark:text-amber-400', badge: 'default' }
+  if (days <= 0) return { bg: 'bg-red-950/30 dark:bg-red-950/40', text: 'text-red-400 dark:text-red-300', badge: 'destructive' }
+  if (days < 90) return { bg: 'bg-red-950/30 dark:bg-red-950/30', text: 'text-red-600 dark:text-red-400', badge: 'destructive' }
+  if (days < 180) return { bg: 'bg-amber-950/30 dark:bg-amber-950/30', text: 'text-amber-600 dark:text-amber-400', badge: 'default' }
   return { bg: 'bg-muted/30', text: 'text-muted-foreground', badge: 'secondary' }
 }
 
@@ -65,16 +65,16 @@ export function GlobalExpiryDashboard() {
 
       {/* Legend */}
       <div className="flex items-center gap-4 text-xs text-muted-foreground">
-        <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-red-500" /> &lt;90 days (Sovereign Red)</span>
-        <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-amber-500 animate-pulse" /> 90–180 days (Amber Pulse)</span>
+        <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-red-950/300" /> &lt;90 days (Sovereign Red)</span>
+        <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-amber-950/300 animate-pulse" /> 90–180 days (Amber Pulse)</span>
         <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-muted-foreground" /> &gt;180 days (Grey)</span>
       </div>
 
       {/* Entries */}
       {entries.length === 0 ? (
-        <div className="flex items-center gap-2 rounded-lg border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/30 px-4 py-8 justify-center">
+        <div className="flex items-center gap-2 rounded-lg border border-emerald-500/20 dark:border-emerald-800 bg-emerald-950/30 dark:bg-emerald-950/30 px-4 py-8 justify-center">
           <CheckCircle2 className="h-5 w-5 text-emerald-500" />
-          <p className="text-sm text-emerald-700 dark:text-emerald-300">No upcoming expiries detected  -  all clients secure</p>
+          <p className="text-sm text-emerald-400 dark:text-emerald-300">No upcoming expiries detected  -  all clients secure</p>
         </div>
       ) : (
         <div className="space-y-1.5">

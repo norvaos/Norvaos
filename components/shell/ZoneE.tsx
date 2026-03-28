@@ -61,27 +61,27 @@ const TRANSITION_CONFIG: Record<TransitionType, {
 }> = {
   advance: {
     label: 'Advance',
-    className: 'bg-green-50 text-green-700 border-green-200',
+    className: 'bg-emerald-950/30 text-emerald-400 border-emerald-500/20',
   },
   rollback: {
     label: 'Rollback',
-    className: 'bg-red-50 text-red-700 border-red-200',
+    className: 'bg-red-950/30 text-red-400 border-red-500/20',
   },
   system: {
     label: 'System',
-    className: 'bg-blue-50 text-blue-700 border-blue-200',
+    className: 'bg-blue-950/30 text-blue-400 border-blue-500/20',
   },
   return_for_correction: {
     label: 'Return',
-    className: 'bg-amber-50 text-amber-700 border-amber-200',
+    className: 'bg-amber-950/30 text-amber-400 border-amber-500/20',
   },
   override: {
     label: 'Override',
-    className: 'bg-red-50 text-red-700 border-red-200',
+    className: 'bg-red-950/30 text-red-400 border-red-500/20',
   },
   reassignment: {
     label: 'Reassign',
-    className: 'bg-blue-50 text-blue-700 border-blue-200',
+    className: 'bg-blue-950/30 text-blue-400 border-blue-500/20',
   },
 }
 
@@ -167,7 +167,7 @@ function GateSnapshotDetail({ snapshot }: { snapshot: GateSnapshot | null }) {
             <div className="min-w-0">
               <span className={cn(
                 'text-[9px] leading-snug',
-                c.passed ? 'text-foreground' : 'text-red-700',
+                c.passed ? 'text-foreground' : 'text-red-400',
               )}>
                 {c.conditionName}
               </span>
@@ -244,9 +244,9 @@ function TransitionEntry({ entry }: { entry: StageTransitionWithUser }) {
 
       {/* Override reason */}
       {entry.override_reason && (
-        <div className="flex items-start gap-1 rounded bg-red-50 px-1.5 py-1">
+        <div className="flex items-start gap-1 rounded bg-red-950/30 px-1.5 py-1">
           <AlertCircle className="h-2.5 w-2.5 text-red-500 shrink-0 mt-0.5" />
-          <p className="text-[9px] text-red-700 leading-snug line-clamp-2">
+          <p className="text-[9px] text-red-400 leading-snug line-clamp-2">
             {entry.override_reason}
           </p>
         </div>

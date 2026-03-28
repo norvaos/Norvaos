@@ -38,8 +38,8 @@ interface InstanceProgressProps {
 
 function progressColor(pct: number): string {
   if (pct >= 100) return 'bg-green-500'
-  if (pct >= 60) return 'bg-amber-500'
-  return 'bg-red-500'
+  if (pct >= 60) return 'bg-amber-950/300'
+  return 'bg-red-950/300'
 }
 
 function progressTextColor(pct: number): string {
@@ -100,7 +100,7 @@ function SectionRow({
         {section.stale > 0 && (
           <Badge
             variant="outline"
-            className="text-[10px] py-0 px-1.5 border-amber-300 text-amber-600 bg-amber-50 shrink-0"
+            className="text-[10px] py-0 px-1.5 border-amber-300 text-amber-600 bg-amber-950/30 shrink-0"
           >
             {section.stale} stale
           </Badge>
@@ -108,7 +108,7 @@ function SectionRow({
         {section.blocked > 0 && (
           <Badge
             variant="outline"
-            className="text-[10px] py-0 px-1.5 border-red-300 text-red-600 bg-red-50 shrink-0"
+            className="text-[10px] py-0 px-1.5 border-red-300 text-red-600 bg-red-950/30 shrink-0"
           >
             {section.blocked} blocked
           </Badge>
@@ -271,7 +271,7 @@ export function InstanceProgress({
           {total_stale > 0 && (
             <Badge
               variant="outline"
-              className="text-[10px] py-0 px-1.5 border-amber-300 text-amber-600 bg-amber-50"
+              className="text-[10px] py-0 px-1.5 border-amber-300 text-amber-600 bg-amber-950/30"
             >
               {total_stale} stale
             </Badge>
@@ -279,7 +279,7 @@ export function InstanceProgress({
           {total_blocked > 0 && (
             <Badge
               variant="outline"
-              className="text-[10px] py-0 px-1.5 border-red-300 text-red-600 bg-red-50"
+              className="text-[10px] py-0 px-1.5 border-red-300 text-red-600 bg-red-950/30"
             >
               {total_blocked} blocked
             </Badge>
@@ -319,8 +319,8 @@ export function InstanceProgress({
             completion_pct >= 100
               ? '[&>[data-slot=progress-indicator]]:bg-green-500'
               : completion_pct >= 60
-                ? '[&>[data-slot=progress-indicator]]:bg-amber-500'
-                : '[&>[data-slot=progress-indicator]]:bg-red-500'
+                ? '[&>[data-slot=progress-indicator]]:bg-amber-950/300'
+                : '[&>[data-slot=progress-indicator]]:bg-red-950/300'
           )}
         />
 

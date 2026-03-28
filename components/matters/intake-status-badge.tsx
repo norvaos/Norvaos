@@ -10,11 +10,11 @@ const STATUS_CONFIG: Record<string, { label: string; className: string; icon?: b
   },
   incomplete: {
     label: 'Incomplete',
-    className: 'bg-amber-50 text-amber-700 border-amber-200',
+    className: 'bg-amber-950/30 text-amber-400 border-amber-200',
   },
   complete: {
     label: 'Complete',
-    className: 'bg-blue-50 text-blue-700 border-blue-200',
+    className: 'bg-blue-950/30 text-blue-400 border-blue-200',
   },
   validated: {
     label: 'Validated',

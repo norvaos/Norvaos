@@ -81,11 +81,11 @@ export default function FirmOversightPage() {
 
       {/* Red Alert Pulse Banner */}
       {breachCount > 0 && (
-        <div className="rounded-lg border-2 border-red-500 bg-red-50 dark:bg-red-950/30 p-4 animate-pulse">
+        <div className="rounded-lg border-2 border-red-500 bg-red-950/30 dark:bg-red-950/30 p-4 animate-pulse">
           <div className="flex items-center gap-3">
             <ShieldAlert className="h-6 w-6 text-red-600" />
             <div>
-              <p className="font-bold text-red-700 dark:text-red-400">
+              <p className="font-bold text-red-400 dark:text-red-400">
                 INTEGRITY BREACH DETECTED
               </p>
               <p className="text-sm text-red-600">
@@ -109,43 +109,43 @@ export default function FirmOversightPage() {
           </CardContent>
         </Card>
 
-        <Card className="border-emerald-200 bg-emerald-50/50 dark:border-emerald-800 dark:bg-emerald-950/20">
+        <Card className="border-emerald-500/20 bg-emerald-950/30/50 dark:border-emerald-800 dark:bg-emerald-950/20">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-emerald-700 dark:text-emerald-400">
+            <CardTitle className="text-sm font-medium text-emerald-400 dark:text-emerald-400">
               Hardened
             </CardTitle>
             <ShieldCheck className="h-4 w-4 text-emerald-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-emerald-700 dark:text-emerald-400">
+            <div className="text-3xl font-bold text-emerald-400 dark:text-emerald-400">
               {summary?.hardened ?? 0}
             </div>
           </CardContent>
         </Card>
 
-        <Card className="border-amber-200 bg-amber-50/50 dark:border-amber-800 dark:bg-amber-950/20">
+        <Card className="border-amber-500/20 bg-amber-950/30/50 dark:border-amber-800 dark:bg-amber-950/20">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-amber-700 dark:text-amber-400">
+            <CardTitle className="text-sm font-medium text-amber-400 dark:text-amber-400">
               Soft
             </CardTitle>
             <AlertTriangle className="h-4 w-4 text-amber-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-amber-700 dark:text-amber-400">
+            <div className="text-3xl font-bold text-amber-400 dark:text-amber-400">
               {summary?.soft ?? 0}
             </div>
           </CardContent>
         </Card>
 
-        <Card className="border-red-200 bg-red-50/50 dark:border-red-800 dark:bg-red-950/20">
+        <Card className="border-red-500/20 bg-red-950/30/50 dark:border-red-800 dark:bg-red-950/20">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-red-700 dark:text-red-400">
+            <CardTitle className="text-sm font-medium text-red-400 dark:text-red-400">
               Integrity Breaches
             </CardTitle>
             <ShieldAlert className="h-4 w-4 text-red-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-red-700 dark:text-red-400">
+            <div className="text-3xl font-bold text-red-400 dark:text-red-400">
               {summary?.breaches ?? 0}
             </div>
           </CardContent>
@@ -155,7 +155,7 @@ export default function FirmOversightPage() {
       {/* Breached Matters (shown first if any) */}
       {breachedMatters.length > 0 && (
         <div className="space-y-3">
-          <h2 className="flex items-center gap-2 text-lg font-semibold text-red-700 dark:text-red-400">
+          <h2 className="flex items-center gap-2 text-lg font-semibold text-red-400 dark:text-red-400">
             <ShieldAlert className="h-5 w-5" />
             Breached Matters
           </h2>
@@ -171,7 +171,7 @@ export default function FirmOversightPage() {
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Hardened Column */}
         <div className="space-y-3">
-          <h2 className="flex items-center gap-2 text-lg font-semibold text-emerald-700 dark:text-emerald-400">
+          <h2 className="flex items-center gap-2 text-lg font-semibold text-emerald-400 dark:text-emerald-400">
             <ShieldCheck className="h-5 w-5" />
             Hardened  -  Genesis Sealed
           </h2>
@@ -188,7 +188,7 @@ export default function FirmOversightPage() {
 
         {/* Soft Column */}
         <div className="space-y-3">
-          <h2 className="flex items-center gap-2 text-lg font-semibold text-amber-700 dark:text-amber-400">
+          <h2 className="flex items-center gap-2 text-lg font-semibold text-amber-400 dark:text-amber-400">
             <Lock className="h-5 w-5" />
             Soft  -  In Progress
           </h2>
@@ -220,8 +220,8 @@ function MatterCard({ matter }: { matter: Matter }) {
     <Card
       className={cn(
         'transition-all',
-        isHardened && 'border-emerald-300 dark:border-emerald-700',
-        isSoft && 'border-amber-300 dark:border-amber-700',
+        isHardened && 'border-emerald-500/30 dark:border-emerald-700',
+        isSoft && 'border-amber-500/30 dark:border-amber-700',
         isBreach && 'border-red-500 animate-pulse dark:border-red-600'
       )}
     >
@@ -249,11 +249,11 @@ function MatterCard({ matter }: { matter: Matter }) {
             className={cn(
               'shrink-0 text-xs',
               isHardened &&
-                'border-emerald-300 bg-emerald-50 text-emerald-700 dark:border-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400',
+                'border-emerald-500/30 bg-emerald-950/30 text-emerald-400 dark:border-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400',
               isSoft &&
-                'border-amber-300 bg-amber-50 text-amber-700 dark:border-amber-700 dark:bg-amber-950/30 dark:text-amber-400',
+                'border-amber-500/30 bg-amber-950/30 text-amber-400 dark:border-amber-700 dark:bg-amber-950/30 dark:text-amber-400',
               isBreach &&
-                'border-red-300 bg-red-50 text-red-700 dark:border-red-700 dark:bg-red-950/30 dark:text-red-400'
+                'border-red-500/30 bg-red-950/30 text-red-400 dark:border-red-700 dark:bg-red-950/30 dark:text-red-400'
             )}
           >
             {matter.status}
@@ -263,7 +263,7 @@ function MatterCard({ matter }: { matter: Matter }) {
       <CardContent className="space-y-2">
         {/* Genesis Hash */}
         {isHardened && matter.genesisHash ? (
-          <div className="flex items-center gap-1.5 text-xs text-emerald-700 dark:text-emerald-400">
+          <div className="flex items-center gap-1.5 text-xs text-emerald-400 dark:text-emerald-400">
             <ShieldCheck className="h-3.5 w-3.5" />
             <span className="font-mono">
               {matter.genesisHash.slice(0, 16)}...
@@ -313,11 +313,11 @@ function MatterCard({ matter }: { matter: Matter }) {
             className={cn(
               'text-[10px] px-1.5 py-0',
               isHardened &&
-                'border-emerald-300 text-emerald-700 dark:border-emerald-700 dark:text-emerald-400',
+                'border-emerald-500/30 text-emerald-400 dark:border-emerald-700 dark:text-emerald-400',
               isSoft &&
-                'border-amber-300 text-amber-700 dark:border-amber-700 dark:text-amber-400',
+                'border-amber-500/30 text-amber-400 dark:border-amber-700 dark:text-amber-400',
               isBreach &&
-                'border-red-400 text-red-700 dark:border-red-600 dark:text-red-400'
+                'border-red-400 text-red-400 dark:border-red-600 dark:text-red-400'
             )}
           >
             {isHardened && 'Verified'}

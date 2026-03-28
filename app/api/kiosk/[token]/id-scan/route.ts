@@ -27,7 +27,7 @@ async function handlePost(
     const { token } = await params
 
     // Rate limit: 5 req/min per token+IP (strict for file uploads)
-    const rateLimitResponse = checkUploadRateLimit(request, token)
+    const rateLimitResponse = await checkUploadRateLimit(request, token)
     if (rateLimitResponse) return rateLimitResponse
 
     // 1. Validate kiosk token
